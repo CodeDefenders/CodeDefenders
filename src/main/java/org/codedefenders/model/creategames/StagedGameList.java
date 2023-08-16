@@ -43,7 +43,7 @@ public class StagedGameList implements Serializable {
      * Returns a mapping of staged games' IDs to the corresponding staged games.
      * @return A mapping of staged games' IDs to the corresponding staged games.
      */
-    public Map<Integer, StagedGame> getStagedGames() {
+    public Map<Integer, StagedGame> getMap() {
         return Collections.unmodifiableMap(stagedGames);
     }
 
@@ -52,7 +52,7 @@ public class StagedGameList implements Serializable {
      * @param gameId The ID of the staged game to get.
      * @return The staged game with the given ID, if it exists. {@code null} otherwise.
      */
-    public StagedGame getStagedGame(int gameId) {
+    public StagedGame getGame(int gameId) {
         return stagedGames.get(gameId);
     }
 

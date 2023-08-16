@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.creategames.AdminCreateGamesBean;
 import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.beans.creategames.CreateGamesBean.UserInfo;
 import org.codedefenders.beans.message.MessagesBean;
@@ -50,10 +48,8 @@ import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
-import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -338,7 +334,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 .distinct()
                 .collect(Collectors.toList());
 
-        Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getStagedGames();
+        Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getMap();
 
         /* Verify that all staged games exist. */
         if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
@@ -369,7 +365,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 .distinct()
                 .collect(Collectors.toList());
 
-        Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getStagedGames();
+        Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getMap();
 
         /* Verify that all staged games exist. */
         if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
@@ -394,7 +390,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         int gameId = getStringParameter(request, "gameId")
                 .flatMap(StagedGameList::formattedToNumericGameId).get();
 
-        StagedGame stagedGame = getContext().getStagedGames().getStagedGame(gameId);
+        StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist.",
                     userId, StagedGameList.numericToFormattedGameId(gameId)));
@@ -414,7 +410,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         int gameId = getStringParameter(request, "gameId")
                 .flatMap(StagedGameList::formattedToNumericGameId).get();
 
-        StagedGame stagedGame = getContext().getStagedGames().getStagedGame(gameId);
+        StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot remove you from staged game {1}. Staged game does not exist.",
                     StagedGameList.numericToFormattedGameId(gameId)));
@@ -439,7 +435,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
             return;
         }
 
-        StagedGame stagedGame = getContext().getStagedGames().getStagedGame(gameId);
+        StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist.",
                     userId, StagedGameList.numericToFormattedGameId(gameId)));
@@ -458,7 +454,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         int gameId = getStringParameter(request, "gameId")
                 .flatMap(StagedGameList::formattedToNumericGameId).get();
 
-        StagedGame stagedGame = getContext().getStagedGames().getStagedGame(gameId);
+        StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot switch creator role in staged game {1}. Staged game does not exist.",
                     StagedGameList.numericToFormattedGameId(gameId)));
@@ -481,21 +477,21 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 .flatMap(StagedGameList::formattedToNumericGameId).get();
         Role role = getEnumParameter(request, Role.class, "role").get();
 
-        StagedGame stagedGameFrom = getContext().getStagedGames().getStagedGame(gameIdFrom);
+        StagedGame stagedGameFrom = getContext().getStagedGame(gameIdFrom);
         if (stagedGameFrom == null) {
             messages.add(format("ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist.",
                     userId, StagedGameList.numericToFormattedGameId(gameIdFrom)));
             return;
         }
 
-        StagedGame stagedGameTo = getContext().getStagedGames().getStagedGame(gameIdTo);
+        StagedGame stagedGameTo = getContext().getStagedGame(gameIdTo);
         if (stagedGameTo == null) {
             messages.add(format("ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist.",
                     userId, StagedGameList.numericToFormattedGameId(gameIdTo)));
             return;
         }
 
-        UserInfo user = getContext().getUserInfos().get(userId);
+        UserInfo user = getContext().getUserInfo(userId);
         if (user == null) {
             messages.add(format("ERROR: Cannot move user {0}. User does not exist.",
                     userId, gameIdTo));
@@ -527,7 +523,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         int userId = getIntParameter(request, "userId").get();
         Role role = getEnumParameter(request, Role.class, "role").get();
 
-        UserInfo user = getContext().getUserInfos().get(userId);
+        UserInfo user = getContext().getUserInfo(userId);
         if (user == null) {
             if (isStagedGame) {
                 messages.add(format("ERROR: Cannot add user {0} to staged game {1}. User does not exist.",
@@ -540,7 +536,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         }
 
         if (isStagedGame) {
-            StagedGame stagedGame = getContext().getStagedGames().getStagedGame(gameId);
+            StagedGame stagedGame = getContext().getStagedGame(gameId);
             if (stagedGame == null) {
                 messages.add(format("ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist.",
                         userId, StagedGameList.numericToFormattedGameId(gameId)));

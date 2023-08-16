@@ -139,9 +139,9 @@ public class CreateGamesBeanTest {
         createGamesBean.stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 attackersPerGame, defendersPerGame);
 
-        assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
+        assertThat(stagedGameList.getMap().values(), hasSize(2));
 
-        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getMap().values()) {
             assertThat(stagedGame.getAttackers(), hasSize(2));
             assertThat(stagedGame.getDefenders(), hasSize(2));
         }
@@ -161,9 +161,9 @@ public class CreateGamesBeanTest {
         createGamesBean.stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 playersPerGame, 0);
 
-        assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
+        assertThat(stagedGameList.getMap().values(), hasSize(2));
 
-        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getMap().values()) {
             assertThat(stagedGame.getPlayers(), hasSize(4));
         }
     }
@@ -186,9 +186,9 @@ public class CreateGamesBeanTest {
         createGamesBean.stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 attackersPerGame, defendersPerGame);
 
-        assertThat(stagedGameList.getStagedGames().values(), hasSize(1));
+        assertThat(stagedGameList.getMap().values(), hasSize(1));
 
-        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getMap().values()) {
             assertThat(stagedGame.getAttackers(), hasSize(1));
             assertThat(stagedGame.getDefenders(), hasSize(1));
         }
@@ -206,7 +206,7 @@ public class CreateGamesBeanTest {
         stagedGames.add(stagedGame3);
 
         createGamesBean.deleteStagedGames(stagedGames);
-        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
+        assertThat(stagedGameList.getMap().values(), containsInAnyOrder(stagedGame1, stagedGame4));
     }
 
     @Test
@@ -229,7 +229,7 @@ public class CreateGamesBeanTest {
 
         createGamesBean.createStagedGames(stagedGames);
 
-        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
+        assertThat(stagedGameList.getMap().values(), containsInAnyOrder(stagedGame1, stagedGame4));
         Mockito.verify(createGamesService).createGame(stagedGame2);
         Mockito.verify(createGamesService).createGame(stagedGame3);
     }

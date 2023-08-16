@@ -3,8 +3,6 @@ package org.codedefenders.model.creategames;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.creategames.GameSettings;
-import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,20 +52,20 @@ public class StagedGameListTest {
         StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(defaultSettings);
         StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(defaultSettings);
 
-        assertThat(stagedGameList.getStagedGame(stagedGame1.getId()), equalTo(stagedGame1));
-        assertThat(stagedGameList.getStagedGame(stagedGame2.getId()), equalTo(stagedGame2));
-        assertThat(stagedGameList.getStagedGame(Integer.MAX_VALUE), nullValue());
+        assertThat(stagedGameList.getGame(stagedGame1.getId()), equalTo(stagedGame1));
+        assertThat(stagedGameList.getGame(stagedGame2.getId()), equalTo(stagedGame2));
+        assertThat(stagedGameList.getGame(Integer.MAX_VALUE), nullValue());
     }
 
     @Test
     public void testGetStagedGames() {
-        assertThat(stagedGameList.getStagedGames().values(), empty());
+        assertThat(stagedGameList.getMap().values(), empty());
 
         StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(defaultSettings);
-        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1));
+        assertThat(stagedGameList.getMap().values(), containsInAnyOrder(stagedGame1));
 
         StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(defaultSettings);
-        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame2));
+        assertThat(stagedGameList.getMap().values(), containsInAnyOrder(stagedGame1, stagedGame2));
     }
 
     @Test
@@ -76,11 +74,11 @@ public class StagedGameListTest {
         StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(defaultSettings);
 
         assertThat(stagedGameList.removeStagedGame(stagedGame1.getId()), is(true));
-        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame2));
+        assertThat(stagedGameList.getMap().values(), containsInAnyOrder(stagedGame2));
         assertThat(stagedGameList.removeStagedGame(stagedGame1.getId()), is(false));
 
         assertThat(stagedGameList.removeStagedGame(stagedGame2.getId()), is(true));
-        assertThat(stagedGameList.getStagedGames().values(), empty());
+        assertThat(stagedGameList.getMap().values(), empty());
         assertThat(stagedGameList.removeStagedGame(stagedGame2.getId()), is(false));
     }
 

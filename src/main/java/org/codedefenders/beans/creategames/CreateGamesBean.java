@@ -98,7 +98,7 @@ public abstract class CreateGamesBean implements Serializable {
     }
 
     public StagedGame getStagedGame(int stagedGameId) {
-        return stagedGames.getStagedGame(stagedGameId);
+        return stagedGames.getGame(stagedGameId);
     }
 
     /**
@@ -458,7 +458,7 @@ public abstract class CreateGamesBean implements Serializable {
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .registerTypeAdapterFactory(new JSONUtils.SetTypeAdapterFactory())
                 .create();
-        return gson.toJson(getStagedGames().getStagedGames());
+        return gson.toJson(getStagedGames().getMap());
     }
 
     public String getAvailableMultiplayerGameIdsJSON() {
@@ -491,7 +491,7 @@ public abstract class CreateGamesBean implements Serializable {
                 return obj;
             }
         }
-        Map<Integer, GameClass> classes = stagedGames.getStagedGames().values().stream()
+        Map<Integer, GameClass> classes = stagedGames.getMap().values().stream()
                 .map(StagedGame::getGameSettings)
                 .map(GameSettings::getClassId)
                 .distinct()
