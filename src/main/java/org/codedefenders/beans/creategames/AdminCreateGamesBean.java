@@ -10,6 +10,7 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
@@ -18,6 +19,9 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
     private final Map<Integer, UserInfo> userInfos;
     private final Set<Integer> availableMultiplayerGames;
     private final Set<Integer> availableMeleeGames;
+    private final Set<Integer> assignedUsers;
+
+    private final UserRepository userRepo;
 
     public AdminCreateGamesBean(StagedGameList stagedGames,
                                 MessagesBean messages,
@@ -25,9 +29,11 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
                                 UserRepository userRepo,
                                 CreateGamesService createGamesService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
+        this.userRepo = userRepo;
         userInfos = fetchUserInfos();
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
+        assignedUsers = fetchAssignedUsers();
         stagedGames.retainUsers(userInfos.keySet());
     }
 
@@ -58,6 +64,12 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
                 .collect(Collectors.toSet());
     }
 
+    protected Set<Integer> fetchAssignedUsers() {
+        return userRepo.getAssignedUsers().stream()
+                .map(UserEntity::getId)
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public Map<Integer, UserInfo> getUserInfos() {
         return userInfos;
@@ -71,5 +83,10 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
     @Override
     public Set<Integer> getAvailableMeleeGames() {
         return availableMeleeGames;
+    }
+
+    @Override
+    public Set<Integer> getAssignedUsers() {
+        return assignedUsers;
     }
 }

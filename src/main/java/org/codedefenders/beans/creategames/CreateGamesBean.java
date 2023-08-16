@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,8 +19,6 @@ import javax.inject.Inject;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
@@ -116,6 +113,11 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
      * Fetches the IDs of all active melee games in the context.
      */
     public abstract Set<Integer> getAvailableMeleeGames();
+
+    /**
+     * Fetches the IDs of all active melee games in the context.
+     */
+    public abstract Set<Integer> getAssignedUsers();
 
     /**
      * Returns user information for the given user ID.
@@ -457,28 +459,23 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
         return gson.toJson(getStagedGames().getStagedGames());
     }
 
-    public String getActiveMultiplayerGameIdsJSON() {
-        List<Integer> gameIds = MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
-                .map(AbstractGame::getId)
-                .collect(Collectors.toList());
-        Gson gson = new GsonBuilder().create();
-        return gson.toJson(gameIds);
+    public String getAvailableMultiplayerGameIdsJSON() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapterFactory(new JSONUtils.SetTypeAdapterFactory())
+                .create();
+        return gson.toJson(getAvailableMultiplayerGames());
     }
 
-    public String getActiveMeleeGameIdsJSON() {
-        List<Integer> gameIds = MeleeGameDAO.getAvailableMeleeGames().stream()
-                .map(AbstractGame::getId)
-                .collect(Collectors.toList());
-        Gson gson = new GsonBuilder().create();
-        return gson.toJson(gameIds);
+    public String getAvailableMeleeGameIdsJSON() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapterFactory(new JSONUtils.SetTypeAdapterFactory())
+                .create();
+        return gson.toJson(getAvailableMeleeGames());
     }
 
-    public String getUnassignedUserIdsJSON() {
-        List<Integer> userIds = userRepo.getUnassignedUsers().stream()
-                .map(UserEntity::getId)
-                .collect(Collectors.toList());
+    public String getAssignedUserIdsJSON() {
         Gson gson = new GsonBuilder().create();
-        return gson.toJson(userIds);
+        return gson.toJson(getAssignedUsers());
     }
 
     public String getUsedClassesJSON() {

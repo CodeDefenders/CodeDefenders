@@ -15,6 +15,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.ClassroomService;
@@ -26,8 +27,10 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
     private final Map<Integer, UserInfo> userInfos;
     private final Set<Integer> availableMultiplayerGames;
     private final Set<Integer> availableMeleeGames;
+    private final Set<Integer> assignedUsers;
 
     private final ClassroomService classroomService;
+    private final UserRepository userRepo;
     private final int classroomId;
 
     public ClassroomCreateGamesBean(int classroomId,
@@ -39,10 +42,12 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
                                     ClassroomService classroomService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
         this.classroomService = classroomService;
+        this.userRepo = userRepo;
         this.classroomId = classroomId;
         userInfos = fetchUserInfos();
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
+        assignedUsers = fetchAssignedUsers();
         stagedGames.retainUsers(userInfos.keySet());
     }
 
@@ -80,6 +85,12 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
                 .collect(Collectors.toSet());
     }
 
+    protected Set<Integer> fetchAssignedUsers() {
+        return userRepo.getAssignedUsersForClassroom(classroomId).stream()
+                .map(UserEntity::getId)
+                .collect(Collectors.toSet());
+    }
+
     @Override
     public Map<Integer, UserInfo> getUserInfos() {
         return userInfos;
@@ -93,6 +104,11 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
     @Override
     public Set<Integer> getAvailableMeleeGames() {
         return availableMeleeGames;
+    }
+
+    @Override
+    public Set<Integer> getAssignedUsers() {
+        return assignedUsers;
     }
 
     public static class UserInfo extends CreateGamesBean.UserInfo {

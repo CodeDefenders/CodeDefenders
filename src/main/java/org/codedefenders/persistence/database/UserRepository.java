@@ -266,29 +266,44 @@ public class UserRepository {
         }
     }
 
-    /**
-     * Retrieve a list of unassigned users from the database.
-     *
-     * <p>This list includes neither system nor inactive users
-     */
     @Nonnull
-    public List<UserEntity> getUnassignedUsers() {
-        String query = "SELECT DISTINCT u.* "
-                + "FROM view_valid_users u "
-                + "WHERE u.User_ID NOT IN"
-                + "    ("
-                + "      SELECT DISTINCT players.User_ID"
-                + "      FROM players, games"
-                + "      WHERE players.Game_ID = games.ID"
-                + "        AND games.Mode <> 'PUZZLE'"
-                + "        AND (games.State = 'ACTIVE' OR games.State = 'CREATED')"
-                + "        AND players.Role IN ('ATTACKER', 'DEFENDER')"
-                + "        AND Active = TRUE"
-                + "    )"
-                + "ORDER BY Username, User_ID;";
+    public List<UserEntity> getAssignedUsers() {
+        String query = String.join("\n",
+                "SELECT DISTINCT users.*",
+                "FROM view_valid_users users",
+                "LEFT JOIN players on players.User_ID = users.User_ID",
+                "LEFT JOIN games on games.ID = players.Game_ID",
+                "WHERE games.Mode <> 'PUZZLE'",
+                "  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
+                "  AND players.Role IN ('ATTACKER', 'DEFENDER')",
+                "  AND users.Active = TRUE",
+                "ORDER BY User_ID;"
+        );
+        try {
+            return queryRunner.query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    @Nonnull
+    public List<UserEntity> getAssignedUsersForClassroom(int classroomId) {
+        String query = String.join("\n",
+                "SELECT DISTINCT users.*",
+                "FROM view_valid_users users",
+                "LEFT JOIN players on players.User_ID = users.User_ID",
+                "LEFT JOIN games on games.ID = players.Game_ID",
+                "WHERE games.Mode <> 'PUZZLE'",
+                "  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
+                "  AND players.Role IN ('ATTACKER', 'DEFENDER')",
+                "  AND users.Active = TRUE",
+                "  AND games.Classroom_ID = ?",
+                "ORDER BY User_ID;"
+        );
         try {
             return queryRunner
-                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS), classroomId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

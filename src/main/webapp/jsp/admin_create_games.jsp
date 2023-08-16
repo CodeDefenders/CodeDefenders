@@ -562,17 +562,17 @@
         /**
          * IDs of active (started and not finished) multiplayer games.
          */
-        const activeMultiplayerGameIds = new Set(JSON.parse('${createGamesBean.activeMultiplayerGameIdsJSON}'));
+        const activeMultiplayerGameIds = new Set(JSON.parse('${createGamesBean.availableMultiplayerGameIdsJSON}'));
 
         /**
          *  IDs of active (started and not finished) melee games.
          */
-        const activeMeleeGameIds = new Set(JSON.parse('${createGamesBean.activeMeleeGameIdsJSON}'));
+        const activeMeleeGameIds = new Set(JSON.parse('${createGamesBean.availableMeleeGameIdsJSON}'));
 
         /**
          * IDs of users not assigned to any active games.
          */
-        const unassignedUserIds = new Set(JSON.parse('${createGamesBean.unassignedUserIdsJSON}'));
+        const assignedUserIds = new Set(JSON.parse('${createGamesBean.assignedUserIdsJSON}'));
 
         const classes = new Map(JSON.parse('${createGamesBean.usedClassesJSON}'));
 
@@ -681,7 +681,7 @@
             }
 
             /* Filter out assigned users. */
-            return unassignedUserIds.has(data.id);
+            return !assignedUserIds.has(data.id);
         };
         DataTable.ext.search.push(searchFunction);
 
