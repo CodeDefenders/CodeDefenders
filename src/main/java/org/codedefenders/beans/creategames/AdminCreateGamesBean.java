@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
@@ -29,6 +32,20 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
                         userInfo.getLastLogin(),
                         userInfo.getLastRole(),
                         userInfo.getTotalScore()))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    protected Set<Integer> fetchAvailableMultiplayerGames() {
+        return MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    protected Set<Integer> fetchAvailableMeleeGames() {
+        return MeleeGameDAO.getAvailableMeleeGames().stream()
+                .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }
 }

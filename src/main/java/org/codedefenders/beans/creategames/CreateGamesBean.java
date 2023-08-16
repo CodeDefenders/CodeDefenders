@@ -108,6 +108,16 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
     protected abstract Set<T> fetchUserInfos();
 
     /**
+     * Fetches the IDs of all active multiplayer games in the context.
+     */
+    protected abstract Set<Integer> fetchAvailableMultiplayerGames();
+
+    /**
+     * Fetches the IDs of all active melee games in the context.
+     */
+    protected abstract Set<Integer> fetchAvailableMeleeGames();
+
+    /**
      * Updates the context to keep users and staged games consistent with the actual application state.
      */
     public void update() {

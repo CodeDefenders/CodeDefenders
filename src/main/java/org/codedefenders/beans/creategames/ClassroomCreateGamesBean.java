@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
@@ -52,6 +55,20 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
                         userInfo.getLastRole(),
                         userInfo.getTotalScore(),
                         membersMap.get(userInfo.getUser().getId()).getRole()))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    protected Set<Integer> fetchAvailableMultiplayerGames() {
+        return MultiplayerGameDAO.getAvailableClassroomGames(classroomId).stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    protected Set<Integer> fetchAvailableMeleeGames() {
+        return MeleeGameDAO.getAvailableClassroomGames(classroomId).stream()
+                .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }
 
