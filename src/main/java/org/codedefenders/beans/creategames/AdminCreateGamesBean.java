@@ -34,7 +34,9 @@ public class AdminCreateGamesBean extends CreateGamesBean {
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
         assignedUsers = fetchAssignedUsers();
-        stagedGames.retainUsers(userInfos.keySet());
+        synchronized (getStagedGames()) {
+            stagedGames.retainUsers(userInfos.keySet());
+        }
     }
 
     protected Map<Integer, UserInfo> fetchUserInfos() {
