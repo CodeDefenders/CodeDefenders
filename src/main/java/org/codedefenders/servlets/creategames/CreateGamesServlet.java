@@ -70,16 +70,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(CreateGamesServlet.class);
 
     @Inject
-    protected CodeDefendersAuth login;
+    private MessagesBean messages;
 
     @Inject
-    protected MessagesBean messages;
-
-    @Inject
-    protected CreateGamesService createGamesService;
-
-    @Inject
-    protected URLUtils url;
+    private URLUtils url;
 
     protected abstract CreateGamesBean getContext();
 
