@@ -544,6 +544,14 @@ public abstract class CreateGamesServlet extends HttpServlet {
             }
             getContext().addPlayerToStagedGame(stagedGame, user.getId(), role);
         } else {
+            if (!getContext().getAvailableMultiplayerGames().contains(gameId)
+                    && !getContext().getAvailableMeleeGames().contains(gameId)) {
+                messages.add(format(
+                        "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action.",
+                        userId, gameId));
+                return;
+            }
+
             AbstractGame game = GameDAO.getGame(gameId);
             if (game == null) {
                 messages.add(format("ERROR: Cannot add user {0} to existing game {1}. Game does not exist.",
