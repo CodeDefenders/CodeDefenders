@@ -61,14 +61,13 @@ import static org.codedefenders.game.GameType.MELEE;
  * @see StagedGameList
  * @see AdminCreateGames
  */
-public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implements Serializable {
+public abstract class CreateGamesBean implements Serializable {
     private final MessagesBean messages;
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
     private final CreateGamesService createGamesService;
 
     protected final StagedGameList stagedGames;
-    protected final Map<Integer, T> userInfos;
 
     @Inject
     public CreateGamesBean(StagedGameList stagedGames,
@@ -81,7 +80,6 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
         this.userRepo = userRepo;
         this.createGamesService = createGamesService;
         this.stagedGames = stagedGames;
-        userInfos = new HashMap<>();
     }
 
     /**
@@ -97,6 +95,10 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
      */
     public StagedGameList getStagedGames() {
         return stagedGames;
+    }
+
+    public StagedGame getStagedGame(int stagedGameId) {
+        return stagedGames.getStagedGame(stagedGameId);
     }
 
     /**
@@ -122,8 +124,8 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
     /**
      * Returns user information for the given user ID.
      */
-    public T getUserInfo(int userId) {
-        return userInfos.get(userId);
+    public UserInfo getUserInfo(int userId) {
+        return getUserInfos().get(userId);
     }
 
     /**
@@ -387,7 +389,7 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
         Set<UserInfo> users = new HashSet<>();
 
         for (int userId : userIds) {
-            UserInfo user = userInfos.get(userId);
+            UserInfo user = getUserInfo(userId);
             if (user != null) {
                 users.add(user);
                 continue;
@@ -409,11 +411,11 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
         /* Construct maps like this, because userInfos.stream().collect(Collectors.toMap(...)) produces a
            NullPointerException for some reason. */
         Map<String, UserInfo> userByName = new HashMap<>();
-        for (UserInfo userInfo : userInfos.values()) {
+        for (UserInfo userInfo : getUserInfos().values()) {
             userByName.put(userInfo.getName(), userInfo);
         }
         Map<String, UserInfo> userByEmail = new HashMap<>();
-        for (UserInfo userInfo : userInfos.values()) {
+        for (UserInfo userInfo : getUserInfos().values()) {
             userByEmail.put(userInfo.getEmail().toLowerCase(), userInfo);
         }
 

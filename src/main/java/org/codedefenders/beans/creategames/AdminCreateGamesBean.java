@@ -15,7 +15,7 @@ import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 
-public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserInfo> {
+public class AdminCreateGamesBean extends CreateGamesBean {
     private final Map<Integer, UserInfo> userInfos;
     private final Set<Integer> availableMultiplayerGames;
     private final Set<Integer> availableMeleeGames;
@@ -88,5 +88,10 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
     @Override
     public Set<Integer> getAssignedUsers() {
         return assignedUsers;
+    }
+
+    @Override
+    public UserInfo getUserInfo(int userId) {
+        return userInfos.get(userId);
     }
 }

@@ -81,7 +81,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     @Inject
     protected URLUtils url;
 
-    protected abstract CreateGamesBean<?> getContext();
+    protected abstract CreateGamesBean getContext();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

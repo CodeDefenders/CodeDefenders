@@ -23,7 +23,7 @@ import org.codedefenders.service.CreateGamesService;
 
 import com.google.gson.annotations.Expose;
 
-public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGamesBean.UserInfo> {
+public class ClassroomCreateGamesBean extends CreateGamesBean {
     private final Map<Integer, UserInfo> userInfos;
     private final Set<Integer> availableMultiplayerGames;
     private final Set<Integer> availableMeleeGames;
@@ -109,6 +109,11 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
     @Override
     public Set<Integer> getAssignedUsers() {
         return assignedUsers;
+    }
+
+    @Override
+    public UserInfo getUserInfo(int userId) {
+        return userInfos.get(userId);
     }
 
     public static class UserInfo extends CreateGamesBean.UserInfo {

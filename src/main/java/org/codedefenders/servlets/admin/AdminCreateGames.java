@@ -40,21 +40,19 @@ public class AdminCreateGames extends CreateGamesServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
         synchronized (createGamesBean.getSynchronizer()) {
-            createGamesBean.update();
             request.setAttribute("createGamesBean", createGamesBean);
             request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
         }
     }
 
     @Override
-    protected CreateGamesBean<?> getContext() {
-        return createGamesBean;
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
+        super.doPost(request, response);
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
-        createGamesBean.update();
-        super.doPost(request, response);
+    protected CreateGamesBean getContext() {
+        return createGamesBean;
     }
 }
