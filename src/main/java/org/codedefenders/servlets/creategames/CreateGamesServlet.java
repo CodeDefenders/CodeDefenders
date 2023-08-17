@@ -67,9 +67,6 @@ public abstract class CreateGamesServlet extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
-    @Inject
-    private URLUtils url;
-
     protected abstract CreateGamesBean getContext();
 
     @Override
@@ -123,9 +120,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 messages.add("ERROR: Missing parameter");
             } catch (IllegalArgumentException e) {
                 messages.add("ERROR: Invalid parameter");
-
             }
         }
+        Redirect.redirectBack(request, response);
     }
 
     /**

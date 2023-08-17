@@ -37,9 +37,7 @@ import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
-import org.codedefenders.util.URLUtils;
 
 
 @WebServlet(Paths.CLASSROOM_CREATE_GAMES)

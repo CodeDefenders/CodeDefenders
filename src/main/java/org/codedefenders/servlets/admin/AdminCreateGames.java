@@ -58,6 +58,7 @@ public class AdminCreateGames extends CreateGamesServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
         super.doPost(request, response);
+
     }
 
     @Override
