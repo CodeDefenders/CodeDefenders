@@ -103,7 +103,7 @@ public class AdminDAO {
 
         if (ids != null) {
             userIdClause = String.join("",
-                    "WHERE users.ID IN (",
+                    "WHERE users.User_ID IN (",
                     ids.stream()
                             .map(id -> "?")
                             .collect(Collectors.joining(",")),
