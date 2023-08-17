@@ -875,10 +875,11 @@
         userNameCell.style.paddingLeft = '1em';
         userNameCell.style.width = '20%';
         userNameCell.textContent = userInfo.name;
+        userNameCell.classList.add('truncate');
 
         <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
             const roleCell = tr.insertCell();
-            roleCell.style.width = '10%';
+            roleCell.style.width = '15%';
             roleCell.textContent = userInfo.classroomRole.substring(0, 1).toUpperCase()
                 + userInfo.classroomRole.substring(1).toLowerCase();
         </c:if>
@@ -937,10 +938,11 @@
         userNameCell.style.paddingLeft = '1em';
         userNameCell.style.width = '20%';
         userNameCell.textContent = userInfo.name;
+        userNameCell.classList.add('truncate');
 
         <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
             const roleCell = tr.insertCell();
-            roleCell.style.width = '20%';
+            roleCell.style.width = '15%';
             roleCell.textContent = userInfo.classroomRole.substring(0, 1).toUpperCase()
                     + userInfo.classroomRole.substring(1).toLowerCase();
         </c:if>
@@ -1191,7 +1193,7 @@
                 data: null,
                 render: renderStagedGamePlayers,
                 type: 'html',
-                width: '55%',
+                width: '65%',
                 title:
                     <c:choose>
                         <c:when test="${createGamesBean.kind == 'CLASSROOM'}">

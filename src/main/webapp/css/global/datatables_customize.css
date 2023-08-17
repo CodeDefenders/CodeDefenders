@@ -102,7 +102,7 @@ table.dataTable tr.selected th.select-checkbox::after {
 /* Class for truncating overflowing cell text instead of line wrapping.
 ----------------------------------------------------------------------------- */
 
-table.dataTable tbody td.truncate {
+tbody td.truncate {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
