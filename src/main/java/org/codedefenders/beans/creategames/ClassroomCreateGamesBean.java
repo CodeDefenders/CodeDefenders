@@ -132,4 +132,9 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
             return classroomRole;
         }
     }
+
+    @Override
+    public Kind getKind() {
+        return Kind.CLASSROOM;
+    }
 }

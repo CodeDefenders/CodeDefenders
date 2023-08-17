@@ -121,6 +121,8 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public abstract Set<Integer> getAssignedUsers();
 
+    public abstract Kind getKind();
+
     /**
      * Returns user information for the given user ID.
      */
@@ -558,5 +560,10 @@ public abstract class CreateGamesBean implements Serializable {
         public int getTotalScore() {
             return totalScore;
         }
+    }
+
+    public enum Kind {
+        ADMIN,
+        CLASSROOM
     }
 }

@@ -27,9 +27,6 @@
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
-    <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
-    <jsp:include page="/jsp/admin_navigation.jsp"/>
-
     <t:create_games/>
 </div>
 

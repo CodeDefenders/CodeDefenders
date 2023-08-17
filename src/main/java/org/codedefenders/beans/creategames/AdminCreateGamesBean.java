@@ -96,4 +96,9 @@ public class AdminCreateGamesBean extends CreateGamesBean {
     public UserInfo getUserInfo(int userId) {
         return userInfos.get(userId);
     }
+
+    @Override
+    public Kind getKind() {
+        return Kind.ADMIN;
+    }
 }
