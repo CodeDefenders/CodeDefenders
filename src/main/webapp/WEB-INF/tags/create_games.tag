@@ -717,15 +717,18 @@
     };
 
     const renderUserAddToGame = function (userInfo, type, row, meta) {
-        const table = document.createElement('table');
-        const tr = table.insertRow();
-
-        const gameIdCell = tr.insertCell();
-        gameIdCell.style.width = '5em';
+        const container = document.createElement('div');
+        container.classList.add('w-100');
+        container.classList.add('d-flex');
+        container.classList.add('align-items-center');
+        container.classList.add('gap-2');
 
         const gameIdSelect = document.createElement('select');
         gameIdSelect.classList.add('add-player-game');
-        gameIdCell.appendChild(gameIdSelect);
+        gameIdSelect.classList.add('form-select');
+        gameIdSelect.classList.add('form-select-sm');
+        gameIdSelect.style.flex = '1 0 25%';
+        container.appendChild(gameIdSelect);
 
         for (const stagedGame of stagedGamesTableData) {
             const option = document.createElement('option');
@@ -743,23 +746,27 @@
             gameIdSelect.disabled = true;
         }
 
-        const roleCell = tr.insertCell();
-        roleCell.style.width = '8em';
-
         /* The role select is generated empty, as options are set based on the type of the selected game. */
         const roleSelect = document.createElement('select');
         roleSelect.classList.add('add-player-role');
+        roleSelect.classList.add('form-select');
+        roleSelect.classList.add('form-select-sm');
+        roleSelect.style.flex = '1 0 35%';
         roleSelect.disabled = true;
-        roleCell.appendChild(roleSelect);
+        container.appendChild(roleSelect);
 
-        const addToGameCell = tr.insertCell();
-        addToGameCell.style.width = '0px';
-        addToGameCell.innerHTML =
-                `<button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
-                     <i class="fa fa-plus"></i>
-                 </button>`;
+        const addToGameButton = document.createElement('button');
+        addToGameButton.classList.add('add-player-button');
+        addToGameButton.classList.add('btn');
+        addToGameButton.classList.add('btn-sm');
+        addToGameButton.classList.add('btn-primary');
+        addToGameButton.title = 'Add player to selected game';
+        addToGameButton.innerHTML = '<i class="fa fa-plus"></i>';
+        addToGameButton.disabled = true;
+        addToGameButton.style.flex = '0 0 0';
+        container.appendChild(addToGameButton);
 
-        return table.outerHTML;
+        return container.outerHTML;
     };
 
     const renderStagedGameId = function (stagedGameId, type, row, meta) {
@@ -975,10 +982,14 @@
                      </button>`;
 
         const moveGameIdCell = tr.insertCell();
-        moveGameIdCell.style.width = '5em';
+        moveGameIdCell.style.width = '3.5em';
+        moveGameIdCell.classList.add('ps-4');
 
         const gameIdSelect = document.createElement('select');
         gameIdSelect.classList.add('move-player-game');
+        gameIdSelect.classList.add('form-select');
+        gameIdSelect.classList.add('form-select-sm');
+        gameIdSelect.classList.add('w-100');
         moveGameIdCell.appendChild(gameIdSelect);
 
         for (const otherStagedGame of stagedGames.values()) {
@@ -994,10 +1005,13 @@
         }
 
         const moveRoleCell = tr.insertCell();
-        moveRoleCell.style.width = '8em';
+        moveRoleCell.style.width = '5em';
 
         const roleSelect = document.createElement('select');
         roleSelect.classList.add('move-player-role');
+        roleSelect.classList.add('form-select');
+        roleSelect.classList.add('form-select-sm');
+        roleSelect.classList.add('w-100');
         roleSelect.disabled = true;
         moveRoleCell.appendChild(roleSelect);
 
@@ -1438,7 +1452,8 @@
                 render: renderUserAddToGame,
                 orderable: false,
                 type: 'html',
-                title: 'Add to existing game'
+                title: 'Add to existing game',
+                width: '20em'
             }
         ],
         select: {
@@ -1501,10 +1516,10 @@
         if (button === null) return;
 
         /* Go up two levels of tr, since the form is in a table itself. */
-        const outerTr = button.closest('tr').parentElement.closest('tr');
-        const userInfo = usersTable.row(outerTr).data();
-        const gameSelect = outerTr.querySelector('.add-player-game');
-        const roleSelect = outerTr.querySelector('.add-player-role');
+        const tr = button.closest('tr');
+        const userInfo = usersTable.row(tr).data();
+        const gameSelect = tr.querySelector('.add-player-game');
+        const roleSelect = tr.querySelector('.add-player-role');
         postForm({
             formType: 'addPlayerToGame',
             userId: userInfo.id,
