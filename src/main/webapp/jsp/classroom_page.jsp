@@ -768,9 +768,11 @@
                     break;
                 case ClassroomRole.STUDENT:
                     changeRoleStudent.setAttribute('hidden', '');
-                    changeRoleOwner.classList.add('disabled');
                     if (!canChangeRoles) {
                         changeRoleModerator.classList.add('disabled');
+                    }
+                    if (!canChangeOwner) {
+                        changeRoleOwner.classList.add('disabled');
                     }
                     if (!canKickStudents) {
                         changeRoleStudent.classList.add('disabled');
