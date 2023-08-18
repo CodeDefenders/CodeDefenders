@@ -550,6 +550,8 @@
 
     const classes = new Map(JSON.parse('${createGamesBean.usedClassesJSON}'));
 
+    const kind = '${createGamesBean.kind}';
+
 
     /**
      * IDs of users assigned to any staged game.
@@ -659,25 +661,23 @@
     };
     DataTable.ext.search.push(searchFunction);
 
-    <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
-        const renderClassroomRole = function(role, type, row, meta) {
-            switch (type) {
-                case 'type':
+    const renderClassroomRole = function(role, type, row, meta) {
+        switch (type) {
+            case 'type':
+                return role;
+            case 'sort':
+                // Sort owner(s) first
+                if (role === 'OWNER') {
+                    return 'a';
+                } else {
                     return role;
-                case 'sort':
-                    // Sort owner(s) first
-                    if (role === ClassroomRole.OWNER) {
-                        return 'a';
-                    } else {
-                        return role;
-                    }
-                case 'filter':
-                case 'display':
-                    // Capitalize first letter, make rest lower case
-                    return role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
-            }
-        };
-    </c:if>
+                }
+            case 'filter':
+            case 'display':
+                // Capitalize first letter, make rest lower case
+                return role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+        }
+    };
 
     const renderUserLastRole = function (lastRole, type, row, meta) {
         switch (type) {
@@ -885,12 +885,12 @@
         userNameCell.textContent = userInfo.name;
         userNameCell.classList.add('truncate');
 
-        <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
+        if (kind === 'CLASSROOM') {
             const roleCell = tr.insertCell();
             roleCell.style.width = '15%';
             roleCell.textContent = userInfo.classroomRole.substring(0, 1).toUpperCase()
-                + userInfo.classroomRole.substring(1).toLowerCase();
-        </c:if>
+                    + userInfo.classroomRole.substring(1).toLowerCase();
+        }
 
         const lastRoleCell = tr.insertCell();
         lastRoleCell.style.width = '15%';
@@ -948,12 +948,12 @@
         userNameCell.textContent = userInfo.name;
         userNameCell.classList.add('truncate');
 
-        <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
+        if (kind === 'CLASSROOOM') {
             const roleCell = tr.insertCell();
             roleCell.style.width = '15%';
             roleCell.textContent = userInfo.classroomRole.substring(0, 1).toUpperCase()
                     + userInfo.classroomRole.substring(1).toLowerCase();
-        </c:if>
+        }
 
         const lastRoleCell = tr.insertCell();
         lastRoleCell.style.width = '15%';
@@ -1211,15 +1211,9 @@
                 render: renderStagedGamePlayers,
                 type: 'html',
                 width: '65%',
-                title:
-                    <c:choose>
-                        <c:when test="${createGamesBean.kind == 'CLASSROOM'}">
-                            'Players (Username, Classroom Role, Last Game Role, Total Score)'
-                        </c:when>
-                        <c:otherwise>
-                            'Players (Username, Last Game Role, Total Score)'
-                        </c:otherwise>
-                    </c:choose>
+                title: kind == 'CLASSROOM'
+                    ? 'Players (Username, Classroom Role, Last Game Role, Total Score)'
+                    : 'Players (Username, Last Game Role, Total Score)'
             },
         ],
         select: {
@@ -1434,14 +1428,13 @@
                 type: 'string',
                 title: 'Name'
             },
-            <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
+            kind !== 'CLASSROOM' ? null :
                 {
                     data: 'classroomRole',
                     type: 'string',
                     title: 'Classroom Role',
                     render: renderClassroomRole
                 },
-            </c:if>
             {
                 data: 'lastRole',
                 render: renderUserLastRole,
@@ -1467,7 +1460,7 @@
                 title: 'Add to existing game',
                 width: '20em'
             }
-        ],
+        ].filter(col => col !== null),
         select: {
             style: 'multi',
             className: 'selected'
@@ -1480,7 +1473,9 @@
                 select.selectedIndex = -1;
             }
         },
-        order: [[5, 'asc']],
+        order: kind === 'CLASSROOM'
+            ? [[3, 'asc']]
+            : [[5, 'asc']],
         scrollY: '600px',
         scrollCollapse: true,
         paging: false,
