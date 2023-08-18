@@ -1302,10 +1302,17 @@
         adjustFormForGame(roleSelect, button, select.value);
     });
 
+    stagedGamesTable.table().node().addEventListener('click', function (event) {
+        const select = event.target.closest('select');
+        if (select === null) return;
+        event.stopPropagation();
+    });
+
     /* Switch a player's role. */
     stagedGamesTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.switch-role-button');
         if (button === null) return;
+        event.stopPropagation();
 
         const innerTr = button.closest('tr');
         const outerTr = innerTr.parentElement.closest('tr');
@@ -1322,6 +1329,7 @@
     stagedGamesTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.switch-creator-role-button');
         if (button === null) return;
+        event.stopPropagation();
 
         const outerTr = button.closest('tr').parentElement.closest('tr');
         const stagedGame = stagedGamesTable.row(outerTr).data();
@@ -1335,6 +1343,7 @@
     stagedGamesTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.remove-player-button');
         if (button === null) return;
+        event.stopPropagation();
 
         const innerTr = button.closest('tr');
         const outerTr = innerTr.parentElement.closest('tr');
@@ -1350,6 +1359,7 @@
     stagedGamesTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.remove-creator-button');
         if (button === null) return;
+        event.stopPropagation();
 
         const outerTr = button.closest('tr').parentElement.closest('tr');
         const stagedGame = stagedGamesTable.row(outerTr).data();
@@ -1363,6 +1373,7 @@
     stagedGamesTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.move-player-button');
         if (button === null) return;
+        event.stopPropagation();
 
         const innerTr = button.closest('tr');
         const outerTr = innerTr.parentElement.closest('tr');
@@ -1510,10 +1521,17 @@
         adjustFormForGame(roleSelect, button, select.value);
     });
 
+    usersTable.table().node().addEventListener('click', function (event) {
+        const select = event.target.closest('select');
+        if (select === null) return;
+        event.stopPropagation();
+    });
+
     /* Add a users to a staged game or existing active game. */
     usersTable.table().node().addEventListener('click', function (event) {
         const button = event.target.closest('.add-player-button');
         if (button === null) return;
+        event.stopPropagation();
 
         /* Go up two levels of tr, since the form is in a table itself. */
         const tr = button.closest('tr');
