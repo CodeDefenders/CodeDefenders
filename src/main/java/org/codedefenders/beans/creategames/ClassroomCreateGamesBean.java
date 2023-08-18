@@ -137,4 +137,8 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
     public Kind getKind() {
         return Kind.CLASSROOM;
     }
+
+    public int getClassroomId() {
+        return classroomId;
+    }
 }

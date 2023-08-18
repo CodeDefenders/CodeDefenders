@@ -175,6 +175,11 @@ public abstract class CreateGamesServlet extends HttpServlet {
         builder.setGameDurationMinutes(
                 clampGameDuration(getIntParameter(request, "gameDurationMinutes").get()));
 
+        if (request.getParameter("classroomId") != null) {
+            builder.setClassroomId(
+                    getIntParameter(request, "classroomId").get());
+        }
+
         return builder.build();
     }
 

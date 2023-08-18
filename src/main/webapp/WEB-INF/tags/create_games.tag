@@ -91,6 +91,10 @@
 </div>
 
 <form id="form-settings" autocomplete="off">
+    <c:if test="${createGamesBean.kind == 'CLASSROOM'}">
+        <input type="hidden" name="classroomId" value="${createGamesBean.classroomId}"/>
+    </c:if>
+
     <div class="row">
         <div class="col-md-6 col-12">
 
