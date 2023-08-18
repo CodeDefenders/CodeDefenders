@@ -60,7 +60,7 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
                         ClassroomMember::getUserId,
                         member -> member
                 ));
-        return AdminDAO.getUsersInfo(membersMap.keySet()).stream()
+        return AdminDAO.getClassroomUsersInfo(classroomId).stream()
                 .map(userInfo -> new UserInfo(
                         userInfo.getUser().getId(),
                         userInfo.getUser().getUsername(),
