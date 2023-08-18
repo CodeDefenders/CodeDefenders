@@ -515,6 +515,7 @@
     import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
     import DataTable from '${url.forPath("/js/datatables.mjs")}';
     import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {parseHTML} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     const loggedInUserId = ${login.userId};
 
@@ -727,7 +728,7 @@
         gameIdSelect.classList.add('add-player-game');
         gameIdSelect.classList.add('form-select');
         gameIdSelect.classList.add('form-select-sm');
-        gameIdSelect.style.flex = '1 0 25%';
+        gameIdSelect.style.flex = '1 1 25%';
         container.appendChild(gameIdSelect);
 
         for (const stagedGame of stagedGamesTableData) {
@@ -751,19 +752,15 @@
         roleSelect.classList.add('add-player-role');
         roleSelect.classList.add('form-select');
         roleSelect.classList.add('form-select-sm');
-        roleSelect.style.flex = '1 0 35%';
+        roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         container.appendChild(roleSelect);
 
-        const addToGameButton = document.createElement('button');
-        addToGameButton.classList.add('add-player-button');
-        addToGameButton.classList.add('btn');
-        addToGameButton.classList.add('btn-sm');
-        addToGameButton.classList.add('btn-primary');
-        addToGameButton.title = 'Add player to selected game';
-        addToGameButton.innerHTML = '<i class="fa fa-plus"></i>';
-        addToGameButton.disabled = true;
-        addToGameButton.style.flex = '0 0 0';
+        const addToGameButton = parseHTML(`
+            <button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
+                <i class="fa fa-plus"></i>
+            </button>
+        `);
         container.appendChild(addToGameButton);
 
         return container.outerHTML;
@@ -962,35 +959,40 @@
         totalScoreCell.style.width = '8%';
         totalScoreCell.textContent = userInfo.totalScore;
 
-        const switchRolesCell = tr.insertCell();
-        switchRolesCell.style.width = '0px';
-        switchRolesCell.innerHTML =
-                `<button class="switch-role-button btn btn-sm btn-primary" title="Switch role of player">
-                         <i class="fa fa-exchange"></i>
-                     </button>`;
+        const controlsCell = tr.insertCell();
+        const controlsContainer = document.createElement('div');
+        controlsContainer.classList.add('w-100')
+        controlsContainer.classList.add('d-flex')
+        controlsContainer.classList.add('align-items-center')
+        controlsContainer.classList.add('gap-2')
+        controlsCell.appendChild(controlsContainer);
+
+        const switchRolesButton = parseHTML(`
+            <button class="switch-role-button btn btn-sm btn-primary" title="Switch role of player">
+                 <i class="fa fa-exchange"></i>
+            </button>
+        `);
+        controlsContainer.appendChild(switchRolesButton);
 
         /* Hide switch role button for melee games. */
         if (role === Role.PLAYER.name) {
-            switchRolesCell.firstChild.style.visibility = 'hidden';
+            switchRolesButton.style.visibility = 'hidden';
         }
 
-        const removeCell = tr.insertCell();
-        removeCell.style.width = '0px';
-        removeCell.innerHTML =
-                `<button class="remove-player-button btn btn-sm btn-danger" title="Remove player from game">
-                         <i class="fa fa-trash"></i>
-                     </button>`;
-
-        const moveGameIdCell = tr.insertCell();
-        moveGameIdCell.style.width = '3.5em';
-        moveGameIdCell.classList.add('ps-4');
+        const removeButton = parseHTML(`
+            <button class="remove-player-button btn btn-sm btn-danger" title="Remove player from game">
+                <i class="fa fa-trash"></i>
+            </button>
+        `)
+        controlsContainer.appendChild(removeButton);
 
         const gameIdSelect = document.createElement('select');
         gameIdSelect.classList.add('move-player-game');
         gameIdSelect.classList.add('form-select');
         gameIdSelect.classList.add('form-select-sm');
-        gameIdSelect.classList.add('w-100');
-        moveGameIdCell.appendChild(gameIdSelect);
+        gameIdSelect.classList.add('ms-4');
+        gameIdSelect.style.flex = '1 1 25%';
+        controlsContainer.appendChild(gameIdSelect);
 
         for (const otherStagedGame of stagedGames.values()) {
             if (otherStagedGame.id !== stagedGame.id) {
@@ -1004,23 +1006,20 @@
             gameIdSelect.disabled = true;
         }
 
-        const moveRoleCell = tr.insertCell();
-        moveRoleCell.style.width = '5em';
-
         const roleSelect = document.createElement('select');
         roleSelect.classList.add('move-player-role');
         roleSelect.classList.add('form-select');
         roleSelect.classList.add('form-select-sm');
-        roleSelect.classList.add('w-100');
+        roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
-        moveRoleCell.appendChild(roleSelect);
+        controlsContainer.appendChild(roleSelect);
 
-        const moveButtonCell = tr.insertCell();
-        moveButtonCell.style.width = '0px';
-        moveButtonCell.innerHTML =
-                `<button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
-                         <i class="fa fa-arrow-right"></i>
-                     </button>`;
+        const moveButton = parseHTML(`
+            <button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
+                <i class="fa fa-arrow-right"></i>
+            </button>;
+        `)
+        controlsContainer.appendChild(moveButton);
     };
 
     /**

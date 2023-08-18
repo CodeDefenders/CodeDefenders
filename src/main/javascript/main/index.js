@@ -20,3 +20,5 @@ export {
     PushSocket,
     PuzzleAPI
 }
+
+export * from './utils';
