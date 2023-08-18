@@ -1424,13 +1424,11 @@
                 orderDataType: 'select-extension',
                 width: '3em'
             },
-            <c:if test="${createGamesBean.kind == 'ADMIN'}">
-                {
-                    data: 'id',
-                    type: 'num',
-                    title: 'ID'
-                },
-            </c:if>
+            {
+                data: 'id',
+                type: 'num',
+                title: 'ID'
+            },
             {
                 data: 'name',
                 type: 'string',
