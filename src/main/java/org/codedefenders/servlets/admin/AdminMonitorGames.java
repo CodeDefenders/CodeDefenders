@@ -168,10 +168,9 @@ public class AdminMonitorGames extends HttpServlet {
                     game.setEventDAO(eventDAO);
                     game.setUserRepository(userRepo);
                     if (!game.addPlayer(userId.get(), newRole)) {
-                        messages.add("Inserting user " + userId.get() + " failed! \n Please check the logs!");
+                        messages.add("Changing role of user " + userId.get() + " failed! \n Please check the logs!");
                     } else {
-                        messages.add("The game with id " + gameToRemoveFromId + " doesn't exist! Could not switch user"
-                                + " role. \n Please check the logs!");
+                        messages.add("Successfully changed role of user " + userId.get() + ".");
                     }
                 }
             }
