@@ -226,13 +226,13 @@
                     <div>
                         <c:choose>
                             <c:when test="${classroom.archived}">
-                                <button id="change-name" class="btn btn-xs btn-success"
+                                <button id="restore" class="btn btn-xs btn-success"
                                         data-bs-toggle="modal" data-bs-target="#restore-classroom-modal">
                                     Restore Classroom
                                 </button>
                             </c:when>
                             <c:otherwise>
-                                <button id="change-name" class="btn btn-xs btn-danger"
+                                <button id="archive" class="btn btn-xs btn-danger"
                                         data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
                                     Archive Classroom
                                 </button>
