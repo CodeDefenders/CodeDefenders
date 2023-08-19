@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <c:set var="classroom" value="${requestScope.classroom}"/>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -29,7 +31,15 @@
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
-    <h2><c:out value="${classroom.name}"/></h2>
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <h2 class="m-0"><c:out value="${classroom.name}"/></h2>
+        <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}"
+           class="btn btn-sm rounded-pill btn-outline-secondary flex-shrink-0">
+            Back to Classroom
+            <i class="fa fa-external-link ms-1"></i>
+        </a>
+    </div>
+
     <t:create_games/>
 </div>
 
