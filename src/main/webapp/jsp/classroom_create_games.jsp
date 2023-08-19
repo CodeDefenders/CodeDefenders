@@ -21,12 +21,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<c:set var="classroom" value="${requestScope.classroom}"/>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Games"); %>
 
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
+    <h2><c:out value="${classroom.name}"/></h2>
     <t:create_games/>
 </div>
 

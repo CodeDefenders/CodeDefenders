@@ -68,6 +68,7 @@ public class ClassroomServlet extends HttpServlet {
         request.setAttribute("canChangeOwner", classroomService.canChangeOwner(member.orElse(null)));
         request.setAttribute("canKickStudents", classroomService.canKickStudents(member.orElse(null)));
         request.setAttribute("canKickModerators", classroomService.canKickModerators(member.orElse(null)));
+        request.setAttribute("canCreateGames", classroomService.canCreateGames(member.orElse(null)));
         request.setAttribute("canLeave", classroomService.canLeave(member.orElse(null)));
         request.setAttribute("canJoin", classroomService.canJoin(classroom.get(), member.orElse(null)));
         request.getRequestDispatcher("/jsp/classroom_page.jsp").forward(request, response);

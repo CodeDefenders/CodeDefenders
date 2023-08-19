@@ -21,6 +21,7 @@
 <c:set var="canChangeOwner" value="${requestScope.canChangeOwner}"/>
 <c:set var="canKickStudents" value="${requestScope.canKickStudents}"/>
 <c:set var="canKickModerators" value="${requestScope.canKickModerators}"/>
+<c:set var="canCreateGames" value="${requestScope.canCreateGames}"/>
 <c:set var="canLeave" value="${requestScope.canLeave}"/>
 <c:set var="canJoin" value="${requestScope.canJoin}"/>
 
@@ -70,6 +71,13 @@
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
             <h4 class="mb-3">Games</h4>
             <div class="d-flex gap-3">
+                <c:if test="${canCreateGames}">
+                    <a href="${url.forPath(Paths.CLASSROOM_CREATE_GAMES)}?classroomUid=${classroom.UUID}"
+                       class="btn btn-sm rounded-pill btn-primary ${disabledIfArchved}">
+                        Create Games
+                        <i class="fa fa-external-link ms-1"></i>
+                    </a>
+                </c:if>
                 <div>
                     <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
                     <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-active">Active</label>

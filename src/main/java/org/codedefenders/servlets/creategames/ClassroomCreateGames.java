@@ -73,9 +73,16 @@ public class ClassroomCreateGames extends CreateGamesServlet {
             return;
         }
 
+        if (classroom.get().isArchived()) {
+            messages.add("This classroom is archived. You cannot create games for it.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         createGamesBean = createGamesService.getContextForClassroom(login.getUserId(), classroom.get().getId());
         synchronized (createGamesBean.getSynchronizer()) {
             request.setAttribute("createGamesBean", createGamesBean);
+            request.setAttribute("classroom", classroom.get());
             request.getRequestDispatcher("/jsp/classroom_create_games.jsp").forward(request, response);
         }
     }
@@ -93,6 +100,12 @@ public class ClassroomCreateGames extends CreateGamesServlet {
                 classroom.get().getId(), login.getUserId());
         if (!classroomService.canCreateGames(member.orElse(null))) {
             messages.add("You don't have access to this page.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        if (classroom.get().isArchived()) {
+            messages.add("This classroom is archived. You cannot create games for it.");
             Redirect.redirectBack(request, response);
             return;
         }
