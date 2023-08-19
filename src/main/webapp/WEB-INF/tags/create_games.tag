@@ -900,30 +900,32 @@
         totalScoreCell.style.width = '8%';
         totalScoreCell.textContent = userInfo.totalScore;
 
-        const switchRolesCell = tr.insertCell();
-        switchRolesCell.style.width = '0px';
-        switchRolesCell.innerHTML =
-                `<button class="switch-creator-role-button btn btn-sm btn-primary" title="Switch your role">
-                         <i class="fa fa-exchange"></i>
-                     </button>`;
+        const controlsCell = tr.insertCell();
+        const controlsContainer = document.createElement('div');
+        controlsContainer.classList.add('w-100')
+        controlsContainer.classList.add('d-flex')
+        controlsContainer.classList.add('align-items-center')
+        controlsContainer.classList.add('gap-2')
+        controlsCell.appendChild(controlsContainer);
+
+        const switchRolesButton = parseHTML(`
+            <button class="switch-creator-role-button btn btn-sm btn-primary" title="Switch your role">
+                <i class="fa fa-exchange"></i>
+            </button>
+        `);
+        controlsContainer.appendChild(switchRolesButton);
 
         /* Hide switch role button for melee games. */
         if (role === Role.PLAYER.name) {
-            switchRolesCell.firstChild.style.visibility = 'hidden';
+            switchRolesButton.style.visibility = 'hidden';
         }
 
-        const removeCell = tr.insertCell();
-        removeCell.style.width = '0px';
-        removeCell.innerHTML =
-                `<button class="remove-creator-button btn btn-sm btn-danger" title="Change to Observer">
-                         <i class="fa fa-trash"></i>
-                     </button>`;
-
-        const moveGameIdCell = tr.insertCell();
-        moveGameIdCell.style.width = '5em';
-
-        const paddingCell = tr.insertCell();
-        paddingCell.colSpan = 3;
+        const removeButton = parseHTML(`
+            <button class="remove-creator-button btn btn-sm btn-danger" title="Change to Observer">
+                <i class="fa fa-trash"></i>
+            </button>
+        `);
+        controlsContainer.appendChild(removeButton);
     };
 
     /**
