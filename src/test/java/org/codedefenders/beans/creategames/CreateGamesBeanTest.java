@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,10 +12,13 @@ import java.util.stream.Stream;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
@@ -45,7 +49,6 @@ public class CreateGamesBeanTest {
     private StagedGameList stagedGameList;
 
     private HashMap<Integer, CreateGamesBean.UserInfo> userInfos;
-    private HashMap<Integer, CreateGamesBean.UserInfo> userInfosForBean;
 
     private UserRepository userRepo;
     private CreateGamesService createGamesService;
@@ -88,8 +91,23 @@ public class CreateGamesBeanTest {
                 createGamesService
         ) {
             @Override
-            public Set<UserInfo> fetchUserInfos() {
-               return new HashSet<>(userInfosForBean.values());
+            public Map<Integer, CreateGamesBean.UserInfo> fetchUserInfos() {
+               return userInfos;
+            }
+
+            @Override
+            public Set<Integer> fetchAvailableMultiplayerGames() {
+                return new HashSet<>();
+            }
+
+            @Override
+            public Set<Integer> fetchAvailableMeleeGames() {
+                return new HashSet<>();
+            }
+
+            @Override
+            public Set<Integer> fetchAssignedUsers() {
+                return new HashSet<>();
             }
         };
     }
@@ -119,8 +137,6 @@ public class CreateGamesBeanTest {
 
     @Test
     public void testGetUserInfos() {
-        userInfosForBean = userInfos;
-        createGamesBean.update();
         assertThat(createGamesBean.getUserInfos(), equalTo(userInfos));
     }
 
@@ -292,9 +308,6 @@ public class CreateGamesBeanTest {
 
     @Test
     public void testGetUserInfosForIds() {
-        userInfosForBean = userInfos;
-        createGamesBean.update();
-
         Set<Integer> validSet = Stream.of(1, 2, 3).collect(Collectors.toSet());
         Set<Integer> inValidSet = Stream.of(0, 1, 2).collect(Collectors.toSet());
 
@@ -308,9 +321,6 @@ public class CreateGamesBeanTest {
 
     @Test
     public void testGetUserInfosForNamesAndEmails() {
-        userInfosForBean = userInfos;
-        createGamesBean.update();
-
         Set<String> validSet1 = Stream.of("userA", "userB", "userC@email.com").collect(Collectors.toSet());
         Set<String> validSet2 = Stream.of("userA", "userA@email.com", "userB").collect(Collectors.toSet());
         Set<String> inValidSet = Stream.of("userA", "X", "").collect(Collectors.toSet());
