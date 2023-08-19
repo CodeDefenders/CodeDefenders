@@ -38,6 +38,7 @@ import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 
 @WebServlet(Paths.CLASSROOM_CREATE_GAMES)
@@ -56,12 +57,15 @@ public class ClassroomCreateGames extends CreateGamesServlet {
     @Inject
     private ClassroomService classroomService;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!classroom.isPresent()) {
             messages.add("Classroom not found.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
         }
 
@@ -69,13 +73,13 @@ public class ClassroomCreateGames extends CreateGamesServlet {
                 classroom.get().getId(), login.getUserId());
         if (!classroomService.canCreateGames(member.orElse(null))) {
             messages.add("You don't have access to this page.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
         }
 
         if (classroom.get().isArchived()) {
             messages.add("This classroom is archived. You cannot create games for it.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomUid=" + classroom.get().getUUID());
             return;
         }
 
@@ -92,7 +96,7 @@ public class ClassroomCreateGames extends CreateGamesServlet {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!classroom.isPresent()) {
             messages.add("Classroom not found.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
         }
 
@@ -100,13 +104,13 @@ public class ClassroomCreateGames extends CreateGamesServlet {
                 classroom.get().getId(), login.getUserId());
         if (!classroomService.canCreateGames(member.orElse(null))) {
             messages.add("You don't have access to this page.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
         }
 
         if (classroom.get().isArchived()) {
             messages.add("This classroom is archived. You cannot create games for it.");
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomUid=" + classroom.get().getUUID());
             return;
         }
 
