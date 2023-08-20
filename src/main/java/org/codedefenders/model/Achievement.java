@@ -59,6 +59,10 @@ public class Achievement implements Serializable {
         return metricCurrent;
     }
 
+    public float getProgress() {
+        return 100f * metricCurrent / metricForNextLevel;
+    }
+
     public boolean updateCurrentMetric(int metricChange) {
         metricCurrent += metricChange;
         return reachedNextLevel();

@@ -37,7 +37,7 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<link rel="stylesheet" href="${url.forPath("/css/specific/dashboard.css")}">
+<link rel="stylesheet" href="${url.forPath("/css/specific/user_profile.css")}">
 
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
@@ -47,11 +47,18 @@
         <div class="achievements">
             <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
             <c:forEach items="${profile.achievements}" var="achievement">
-                <p id="achievement-${achievement.id}">
-                        ${achievement.name} (Level ${achievement.level}) <br>
+                <div class="achievement-card achievement-level-${achievement.level}">
+                    <div class="pie animate" style="--percentage: ${achievement.progress}">
+                        <img src="${url.forPath("/images/achievements/")}codedefenders achievements 0 level ${achievement.level}.png"
+                             alt="${achievement.name} (Level ${achievement.level})">
+                    </div>
+                    <p>
+                        <strong>${achievement.name} <c:if test="${
+                            achievement.level > 0}">(Level ${achievement.level})</c:if></strong><br>
                         ${achievement.description} <br>
-                        ${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel} to next level
-                </p>
+                            ${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel} for next level
+                    </p>
+                </div>
             </c:forEach>
         </div>
     </section>
