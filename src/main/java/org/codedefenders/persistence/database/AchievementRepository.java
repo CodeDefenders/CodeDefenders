@@ -33,26 +33,34 @@ public class AchievementRepository {
                 rs.getString("achievements.Description"),
                 rs.getInt("achievements.Metric"),
                 rs.getInt("NextLevelMetric"),
-                rs.getInt("has_achievement.Metric")
+                rs.getInt("CurrentUserMetric")
         );
     }
 
     public Collection<Achievement> getAchievementsForUser(int userId) {
         @Language("SQL")
         String query = String.join("\n",
-                "SELECT achievements.*, has_achievement.Metric, (SELECT a.Metric FROM achievements a ",
-                "    WHERE a.ID = achievements.ID AND a.Level = achievements.Level + 1) AS NextLevelMetric",
-                "FROM has_achievement, achievements",
-                "WHERE has_achievement.User_ID = ?",
+                "SELECT achievements.*, COALESCE(has_achievement.Metric, 0) AS CurrentUserMetric, (",
+                "    SELECT a.Metric FROM achievements a ",
+                "    WHERE a.ID = achievements.ID ",
+                "    AND a.Level = achievements.Level + 1",
+                ") AS NextLevelMetric",
+                "FROM achievements LEFT OUTER JOIN has_achievement",
+                // get achievements with no progress tracked as well
+                "ON has_achievement.User_ID = ?",
                 "AND has_achievement.Achievement_ID = achievements.ID",
-                "AND has_achievement.Achievement_Level = achievements.Level"
+                "AND has_achievement.Achievement_Level = achievements.Level",
+                "WHERE (achievements.Level = 0 AND achievements.ID NOT IN (",
+                // if no progress tracked, fetch only level 0
+                "    SELECT Achievement_ID FROM has_achievement WHERE User_ID = ?))",
+                "OR has_achievement.Achievement_Level IS NOT NULL"
         );
 
         try {
             return queryRunner.query(
                     query,
                     resultSet -> listFromRS(resultSet, this::achievementFromRS),
-                    userId
+                    userId, userId
             );
         } catch (SQLException e) {
             logger.error("Failed to get achievements for user {}", userId, e);
