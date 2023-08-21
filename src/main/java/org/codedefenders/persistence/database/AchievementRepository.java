@@ -69,7 +69,7 @@ public class AchievementRepository {
     }
     public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
         int updated = updateAchievementMetricForUser(userId, achievementId, metricChange);
-        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : updated;
+        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
     }
 
     private int updateAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricChange) {

@@ -13,6 +13,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Achievement;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
@@ -45,29 +46,27 @@ public class AchievementService {
         return repo.getAchievementsForUser(userId);
     }
 
+    private Achievement.Id getGamePlayedAchievementIdForRole(Role role) {
+        switch (role) {
+            case DEFENDER:
+                return Achievement.Id.PLAY_AS_DEFENDER;
+            case ATTACKER:
+                return Achievement.Id.PLAY_AS_ATTACKER;
+            case PLAYER:
+                return Achievement.Id.PLAY_MELEE_GAMES;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
     private void addGamePlayed(List<Player> players, Role role) {
-        int affected = players.stream().mapToInt(player -> {
-            int userId = player.getUser().getId();
-            // TODO: replace with switch expression once we are on a higher language level
-            Achievement.Id achievementId;
-            switch (role) {
-                case DEFENDER:
-                    achievementId = Achievement.Id.PLAY_AS_DEFENDER;
-                    break;
-                case ATTACKER:
-                    achievementId = Achievement.Id.PLAY_AS_ATTACKER;
-                    break;
-                case PLAYER:
-                    achievementId = Achievement.Id.PLAY_MELEE_GAMES;
-                    break;
-                default:
-                    throw new IllegalArgumentException();
-            }
-            return repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1)
-                    + repo.updateAchievementForUser(userId, achievementId, 1);
-        }).sum();
+        Achievement.Id achievementId = getGamePlayedAchievementIdForRole(role);
+        int affected = players.stream().map(Player::getUser).mapToInt(UserEntity::getId).map(userId ->
+                repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) +
+                        repo.updateAchievementForUser(userId, achievementId, 1)
+        ).sum();
         if (affected > 0) {
-            logger.info("Updated {} achievements for role {}", affected, role);
+            logger.info("Updated {} achievement levels for role {}", affected, role);
         }
     }
 
