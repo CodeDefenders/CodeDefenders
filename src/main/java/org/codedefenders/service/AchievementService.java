@@ -3,6 +3,7 @@ package org.codedefenders.service;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +16,7 @@ import org.codedefenders.model.Achievement;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
@@ -112,6 +114,17 @@ public class AchievementService {
         public void handleGameStarted(GameStartedEvent event) {
             Arrays.asList(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
                 List<Player> players = GameDAO.getPlayersForGame(event.getGameId(), role);
+                addGamePlayed(players, role);
+            });
+        }
+
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handlePlayerJoined(GameJoinedEvent event) {
+            Arrays.asList(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
+                List<Player> players = GameDAO.getPlayersForGame(event.getGameId(), role).stream()
+                        .filter(player -> player.getUser().getId() == event.getUserId())
+                        .collect(Collectors.toList());
                 addGamePlayed(players, role);
             });
         }
