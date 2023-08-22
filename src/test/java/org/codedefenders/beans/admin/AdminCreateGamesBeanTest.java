@@ -1,7 +1,6 @@
 package org.codedefenders.beans.admin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,11 +15,9 @@ import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -29,7 +26,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -84,7 +80,8 @@ public class AdminCreateGamesBeanTest {
         GameService gameService = mock(GameService.class);
         ClassroomService classroomService = mock(ClassroomService.class);
 
-        bean = new AdminCreateGamesBean(auth, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
+        bean = new AdminCreateGamesBean(auth, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService,
+                classroomService);
     }
 
     @BeforeEach

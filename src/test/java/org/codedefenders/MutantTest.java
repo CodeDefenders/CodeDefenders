@@ -59,15 +59,6 @@ public class MutantTest {
     @TempDir
     static Path tempDir;
 
-    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @Rule
-    public WeldInitiator weld = WeldInitiator.of(MutantTest.class);
-
-    @Produces
-    public Configuration produceConfiguration() {
-        return new Configuration() {};
-    }
-
     @Test
     public void testApplyPatch() throws IOException, PatchFailedException {
         List<String> originalCode = Arrays.asList("public class Lift {", "private int topFloor;",
