@@ -77,6 +77,8 @@ public class MultiplayerGame extends AbstractGame {
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
+    private Integer classroomId;
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -103,6 +105,8 @@ public class MultiplayerGame extends AbstractGame {
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
 
         private int automaticMutantEquivalenceThreshold = 0;
+
+        private Integer classroomId = null;
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
@@ -200,6 +204,11 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder classroomId(Integer classroomId) {
+            this.classroomId = classroomId;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
@@ -229,6 +238,7 @@ public class MultiplayerGame extends AbstractGame {
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
+        this.classroomId = builder.classroomId;
     }
 
     public int getGameDurationMinutes() {
@@ -274,6 +284,10 @@ public class MultiplayerGame extends AbstractGame {
 
     public int getAutomaticMutantEquivalenceThreshold() {
         return automaticMutantEquivalenceThreshold;
+    }
+
+    public Optional<Integer> getClassroomId() {
+        return Optional.ofNullable(classroomId);
     }
 
     public Role getRole(int userId) {

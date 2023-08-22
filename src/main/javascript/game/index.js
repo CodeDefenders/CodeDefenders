@@ -4,7 +4,7 @@ import DefenderIntentionCollection from './defender_intention_collection';
 import ErrorHighlighting from './error_highlighting';
 import GameChat from './game_chat';
 import GameHighlighting from './game_highlighting';
-import {GameTimeManager, GameTimeValidator, formatTime} from './game_time';
+import {GameTimeManager, GameTimeValidator, GameTime} from './game_time';
 import MutantAccordion from './mutant_accordion';
 import KillMapMutantAccordion from './killmap_mutant_accordion';
 import MutantEditor from './mutant_editor';
@@ -22,9 +22,9 @@ export {
     ErrorHighlighting,
     GameChat,
     GameHighlighting,
+    GameTime,
     GameTimeManager,
     GameTimeValidator,
-    formatTime,
     MutantAccordion,
     KillMapMutantAccordion,
     MutantEditor,

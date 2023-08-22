@@ -34,7 +34,7 @@
 <%@ page import="org.codedefenders.util.URLUtils" %>
 <%@ page import="org.codedefenders.util.CDIUtil" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
+<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%

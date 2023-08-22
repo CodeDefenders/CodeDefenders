@@ -26,7 +26,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
 <% pageInfo.setPageTitle(profile.isSelf() ? "My Profile" : "Profile of " + profile.getUser().getUsername()); %>

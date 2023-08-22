@@ -80,4 +80,25 @@ public class ResultSetUtils {
         }
         return result;
     }
+
+    /**
+     * @see ResultSetUtils#nextFromRS(ResultSet, ResultSetHandler)
+     */
+    public static <T> ResultSetHandler<Optional<T>> nextFromRS(ResultSetHandler<T> handler) {
+        return resultSet -> nextFromRS(resultSet, handler);
+    }
+
+    /**
+     * @see ResultSetUtils#listFromRS(ResultSet, ResultSetHandler)
+     */
+    public static <T> ResultSetHandler<List<T>> listFromRS(ResultSetHandler<T> handler) {
+        return resultSet -> listFromRS(resultSet, handler);
+    }
+
+    /**
+     * @see ResultSetUtils#oneFromRS(ResultSet, ResultSetHandler)
+     */
+    public static <T> ResultSetHandler<Optional<T>> oneFromRS(ResultSetHandler<T> handler) {
+        return resultSet -> oneFromRS(resultSet, handler);
+    }
 }

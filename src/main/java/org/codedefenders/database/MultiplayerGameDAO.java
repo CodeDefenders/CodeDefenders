@@ -74,6 +74,11 @@ public class MultiplayerGameDAO {
         long startTime = rs.getLong("Timestamp_Start");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
+        Integer classroomId = rs.getInt("Classroom_ID");
+        if (rs.wasNull()) {
+            classroomId = null;
+        }
+
         return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
@@ -90,6 +95,7 @@ public class MultiplayerGameDAO {
                 .gameDurationMinutes(gameDuration)
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
+                .classroomId(classroomId)
                 .build();
     }
 
@@ -169,6 +175,7 @@ public class MultiplayerGameDAO {
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
+        Integer classroomId = game.getClassroomId().orElse(null);
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -187,8 +194,9 @@ public class MultiplayerGameDAO {
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold,",
-                "Game_Duration_Minutes)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "Game_Duration_Minutes,",
+                "Classroom_ID)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -207,6 +215,7 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(capturePlayersIntention),
                 DatabaseValue.of(automaticMutantEquivalenceThreshold),
                 DatabaseValue.of(gameDurationMinutes),
+                DatabaseValue.of(classroomId),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -321,6 +330,7 @@ public class MultiplayerGameDAO {
                 "WHERE u.User_ID = ?",
                 "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
                 "  AND g.Creator_ID != u.User_ID",
+                "  AND g.Classroom_ID IS NULL",
                 "  AND g.ID NOT IN (SELECT ig.ID",
                 "    FROM games ig",
                 "    INNER JOIN players p ON ig.ID = p.Game_ID",
@@ -330,7 +340,6 @@ public class MultiplayerGameDAO {
 
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::openGameInfoFromRS, DatabaseValue.of(userId));
     }
-
 
     /**
      * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games
@@ -465,5 +474,14 @@ public class MultiplayerGameDAO {
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
         return DB.executeQueryReturnList(sql, MultiplayerGameDAO::multiplayerGameFromRS, state);
+    }
+
+    public static List<MultiplayerGame> getClassroomGames(int classroomId) {
+        final String query = String.join("\n",
+                "SELECT * FROM view_battleground_games as games",
+                "WHERE games.Classroom_ID = ?;"
+        );
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
+                DatabaseValue.of(classroomId));
     }
 }

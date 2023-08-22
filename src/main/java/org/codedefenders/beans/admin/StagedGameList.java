@@ -303,6 +303,8 @@ public class StagedGameList implements Serializable {
 
         @Expose private Boolean startGame;
 
+        @Expose private Integer classroomId;
+
         /**
          * Creates a new GameSettings object with empty settings.
          */
@@ -328,6 +330,7 @@ public class StagedGameList implements Serializable {
             this.creatorRole = other.creatorRole;
             this.startGame = other.startGame;
             this.gameDurationMinutes = other.gameDurationMinutes;
+            this.classroomId = other.classroomId;
         }
 
         public GameType getGameType() {
@@ -460,6 +463,14 @@ public class StagedGameList implements Serializable {
             this.startGame = startGame;
         }
 
+        public Optional<Integer> getClassroomId() {
+            return Optional.ofNullable(classroomId);
+        }
+
+        public void setClassroomId(Integer classroomId) {
+            this.classroomId = classroomId;
+        }
+
         public static GameSettings getDefault() {
             GameSettings gameSettings = new GameSettings();
             gameSettings.setGameType(MULTIPLAYER);
@@ -473,6 +484,7 @@ public class StagedGameList implements Serializable {
             gameSettings.setLevel(HARD);
             gameSettings.setCreatorRole(OBSERVER);
             gameSettings.setStartGame(false);
+            gameSettings.setClassroomId(null);
 
             final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();

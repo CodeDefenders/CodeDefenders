@@ -98,9 +98,9 @@ const shouldSkipBuild = function () {
         return false;
     }
 
-    /* Get latest timestamp of source files and this config file. */
+    /* Get latest timestamp of source files, this config file and the package.json. */
     let latestSrcTimestamp = null;
-    for (const sourceFile of [...walkSync(SRC_DIR), __filename]) {
+    for (const sourceFile of [...walkSync(SRC_DIR), __filename, 'package.json']) {
         let stats = fs.statSync(sourceFile);
         if (latestSrcTimestamp === null
                 || stats.mtime.getTime() > latestSrcTimestamp.getTime())  {

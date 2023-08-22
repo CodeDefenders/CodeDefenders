@@ -101,6 +101,8 @@ public class MeleeGame extends AbstractGame {
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
+    private Integer classroomId;
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -133,6 +135,8 @@ public class MeleeGame extends AbstractGame {
         private boolean withMutants = false;
 
         private int automaticMutantEquivalenceThreshold = 0;
+
+        private Integer classroomId = null;
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
@@ -235,6 +239,11 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
+        public Builder classroomId(Integer classroomId) {
+            this.classroomId = classroomId;
+            return this;
+        }
+
         public MeleeGame build() {
             return new MeleeGame(this);
         }
@@ -266,6 +275,7 @@ public class MeleeGame extends AbstractGame {
         this.withTests = builder.withTests;
 
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+        this.classroomId = builder.classroomId;
     }
 
     public boolean hasSystemTests() {
@@ -321,6 +331,10 @@ public class MeleeGame extends AbstractGame {
 
     public long getStartTimeUnixSeconds() {
         return startTimeUnixSeconds;
+    }
+
+    public Optional<Integer> getClassroomId() {
+        return Optional.ofNullable(classroomId);
     }
 
     // TODO Those methods should be removed? The scoring bean should take the game
