@@ -360,7 +360,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_SELECTION));
         } else {
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_HISTORY) + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
         }
     }
 
@@ -424,6 +424,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
                 .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(oldGame.getGameDurationMinutes())
+                .classroomId(oldGame.getClassroomId().orElse(null))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);

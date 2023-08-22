@@ -23,10 +23,10 @@
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.beans.admin.AdminCreateGamesBean" %>
-<%@ page import="org.codedefenders.beans.admin.StagedGameList" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
+<%@ page import="org.codedefenders.game.GameType" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -84,13 +84,38 @@
 
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-            Unassigned Users
-            <div class="d-flex flex-wrap gap-2">
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist" id="table-tabs">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1 active" id="classrooms-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#classrooms-pane"
+                            aria-controls="classrooms-pane"
+                            type="button" role="tab" aria-selected="true">
+                        Classrooms
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1" id="users-tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#users-pane"
+                            aria-controls="users-pane"
+                            type="button" role="tab" aria-selected="true">
+                        Unassigned Users
+                    </button>
+                </li>
+            </ul>
+
+            <div id="classroom-table-controls" class="d-flex flex-wrap gap-2">
+                <input type="search" id="search-classrooms" class="form-control input-xs" placeholder="Search">
+            </div>
+            <div id="user-table-controls" class="d-flex flex-wrap gap-2" hidden>
                 <button id="select-visible-users" class="btn btn-xs btn-secondary">Select Visible</button>
                 <button id="deselect-visible-users" class="btn btn-xs btn-secondary">Deselect Visible</button>
                 <div>
                     <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
-                    <label for="toggle-show-assigned-users" class="btn btn-xs btn-outline-secondary"
+                    <label for="toggle-show-assigned-users"
+                           class="btn btn-xs btn-outline-secondary d-flex align-items-center gap-1"
+                           style="height: 100%"
                            title="Show users that are part of an existing active game.">
                         Show Assigned Users (in active games)
                         <i class="fa fa-check btn-check-active"></i>
@@ -99,8 +124,16 @@
                 <input type="search" id="search-users" class="form-control input-xs" placeholder="Search">
             </div>
         </div>
+
         <div class="card-body">
-            <table id="table-users" class="table table-v-align-middle"></table>
+            <div class="tab-content">
+                <div class="tab-pane active" id="classrooms-pane" role="tabpanel">
+                    <table id="table-classrooms" class="table table-v-align-middle"></table>
+                </div>
+                <div class="tab-pane" id="users-pane" role="tabpanel">
+                    <table id="table-users" class="table table-v-align-middle"></table>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -119,14 +152,17 @@
                                 <label class="form-label" for="gameType-group">Game Type</label>
                                 <div id="gameType-group">
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="gameType-radio-battleground" name="gameType"
-                                               value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
+                                        <input type="radio" class="form-check-input" id="gameType-radio-battleground"
+                                               name="gameType"
+                                               value="<%=GameType.MULTIPLAYER%>"
                                                checked>
-                                        <label class="form-check-label" for="gameType-radio-battleground">Battleground</label>
+                                        <label class="form-check-label"
+                                               for="gameType-radio-battleground">Battleground</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="gameType-radio-melee" name="gameType"
-                                               value="<%=StagedGameList.GameSettings.GameType.MELEE%>">
+                                        <input type="radio" class="form-check-input" id="gameType-radio-melee"
+                                               name="gameType"
+                                               value="<%=GameType.MELEE%>">
                                         <label class="form-check-label" for="gameType-radio-melee">Melee</label>
                                     </div>
                                 </div>
@@ -282,7 +318,7 @@
                                 </small>
 
                                 <script type="module">
-                                    import {GameTimeValidator, formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                                    import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                     const gameTimeValidator = new GameTimeValidator(
                                             Number(${maximumDuration}),
@@ -295,7 +331,7 @@
 
 
                                     document.getElementById('displayMaxDuration').innerText =
-                                            formatTime(${maximumDuration});
+                                            GameTime.formatTime(${maximumDuration});
 
                                     // show the max duration limit in red if an invalid duration was given
                                     const maxDurationInfo = document.getElementById('maxDurationInfo');
@@ -405,8 +441,8 @@
                             </div>
 
                             <div class="col-12">
-                                <button class="btn btn-md btn-primary" type="button" name="stage-games-with-users-button"
-                                        id="stage-games-with-users-button" disabled>
+                                <button class="btn btn-md btn-primary" type="button" name="stage-games-button"
+                                        id="stage-games-button" disabled>
                                     Stage Games
                                 </button>
                             </div>
@@ -531,7 +567,7 @@
         import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
-        import {formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+        import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
         const loggedInUserId = ${login.userId};
 
@@ -560,6 +596,10 @@
          */
         const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
 
+        /**
+         * Classrooms the user is participating in as OWNER or MODERATOR.
+         */
+        const classrooms = JSON.parse('${adminCreateGames.classroomsJSON}');
 
         /**
          * IDs of users assigned to any staged game.
@@ -630,6 +670,8 @@
             hour: '2-digit',
             minute: '2-digit'
         });
+
+        const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
 
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
         DataTable.ext.order['select-extension'] = function (settings, col) {
@@ -792,6 +834,38 @@
                     }
             }
         }
+
+        const renderClassroomMemberCount = function(memberCount, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return memberCount;
+                case 'display':
+                    const members = memberCount > 1 ? 'Members' : 'Member';
+                    return `
+                        <span class="text-muted">\${memberCount} \${members}</span>
+                    `;
+            }
+        };
+
+        const renderClassroomLinkButton = function(data, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return null;
+                case 'display':
+                    const params = new URLSearchParams({
+                        classroomUid: data.uuid
+                    });
+                    return `
+                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
+                            <i class="fa fa-external-link text-primary"></i>
+                        </a>
+                    `;
+            }
+        };
 
         /**
          * Creates a table displaying the players of a staged game, as well as a "form" to manipulate them.
@@ -1102,13 +1176,13 @@
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Game Duration';
-            tr.insertCell().textContent = formatTime(gameSettings.gameDurationMinutes);
+            tr.insertCell().textContent = GameTime.formatTime(gameSettings.gameDurationMinutes);
 
             return table;
         };
 
-        /* Restore the state of show/hide toggles for the tables. */
         $(document).ready(function () {
+            /* Restore the state of show/hide toggles for the tables. */
             const setCheckboxButton = function (checkbox, checked) {
                 if (checked) {
                     checkbox.checked = true;
@@ -1120,19 +1194,18 @@
             }
             setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
             setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
-        });
 
-        /* Staged games table and related components. */
-        $(document).ready(function () {
+            /* Staged games table and related components. */
             const stagedGamesTable = new DataTable('#table-staged-games', {
                 data: stagedGamesTableData,
                 columns: [
                     {
                         data: null,
-                        title: '',
+                        title: 'Select',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select-extension'
+                        orderDataType: 'select-extension',
+                        width: '3em'
                     },
                     {
                         data: 'id',
@@ -1330,19 +1403,18 @@
                     stagedGameIds
                 });
             });
-        });
 
-        /* Users table and related components. */
-        $(document).ready(function () {
+            /* Users table and related components. */
             const usersTable = new DataTable('#table-users', {
                 data: usersTableData,
                 columns: [
                     {
                         data: null,
-                        title: '',
+                        title: 'Select',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select-extension'
+                        orderDataType: 'select-extension',
+                        width: '3em'
                     },
                     {
                         data: 'user.id',
@@ -1442,25 +1514,6 @@
                 });
             });
 
-            /* Toggle stage games button based on whether users are selected or user names are given. */
-            usersTable.on('select', function (e, dt, type, indexes) {
-                $('#stage-games-with-users-button').get(0).disabled = false;
-            });
-            usersTable.on('deselect', function (e, dt, type, indexes) {
-                if (usersTable.rows({selected: true})[0].length === 0
-                        && $('#userNames').val().length === 0) {
-                    $('#stage-games-with-users-button').get(0).disabled = true;
-                }
-            });
-            $('#userNames').on('keyup', function () {
-                if (usersTable.rows({selected: true})[0].length === 0
-                        && $('#userNames').val().length === 0) {
-                    $('#stage-games-with-users-button').get(0).disabled = true;
-                } else {
-                    $('#stage-games-with-users-button').get(0).disabled = false;
-                }
-            });
-
             /* Toggle multiplayer/melee specific forms based on selected game type. */
             $('#gameType-group').on('change', function (event) {
                 const roleSelect = document.getElementById('role-select');
@@ -1501,17 +1554,133 @@
                 }
             });
 
+            /* Classrooms table and related components. */
+            const classroomsTable = new DataTable('#table-classrooms', {
+                data: classrooms,
+                columns: [
+                    {
+                        data: null,
+                        title: 'Select',
+                        defaultContent: '',
+                        className: 'select-checkbox',
+                        orderDataType: 'select-extension',
+                        width: '3em'
+                    },
+                    {
+                        data: 'name',
+                        type: 'string',
+                        title: 'Name',
+                        width: '25em',
+                        className: 'truncate'
+                    },
+                    {
+                        data: 'memberCount',
+                        type: 'html',
+                        title: 'Members',
+                        render: renderClassroomMemberCount
+                    },
+                    {
+                        data: 'uuid',
+                        type: 'string',
+                        title: 'UID'
+                    },
+                    {
+                        data: null,
+                        title: 'Link',
+                        render: renderClassroomLinkButton,
+                        width: '2em'
+                    },
+                ],
+                select: {
+                    style: 'single',
+                    className: 'selected'
+                },
+                order: [[1, 'asc']],
+                scrollY: '600px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {emptyTable: "You don't manage any classrooms."}
+            });
+
+            /* Search bar. */
+            $('#search-classrooms').on('keyup', function () {
+                setTimeout(() => classroomsTable.search(this.value).draw(), 0);
+            });
+
+            /* Classrooms table and users table interaction. */
+            /* Toggle stage games button based on whether users are selected or usernames are given. */
+            usersTable.on('select', function (e, dt, type, indexes) {
+                $('#stage-games-button').get(0).disabled = false;
+            });
+            classroomsTable.on('select', function (e, dt, type, indexes) {
+                $('#stage-games-button').get(0).disabled = false;
+            });
+            usersTable.on('deselect', function (e, dt, type, indexes) {
+                if (usersTable.rows({selected: true})[0].length === 0
+                        && classroomsTable.rows({selected: true})[0].length === 0
+                        && $('#userNames').val().length === 0) {
+                    $('#stage-games-button').get(0).disabled = true;
+                }
+            });
+            classroomsTable.on('deselect', function (e, dt, type, indexes) {
+                if (usersTable.rows({selected: true})[0].length === 0
+                        && classroomsTable.rows({selected: true})[0].length === 0
+                        && $('#userNames').val().length === 0) {
+                    $('#stage-games-button').get(0).disabled = true;
+                }
+            });
+            $('#userNames').on('keyup', function () {
+                if (usersTable.rows({selected: true})[0].length === 0
+                        && classroomsTable.rows({selected: true})[0].length === 0
+                        && $('#userNames').val().length === 0) {
+                    $('#stage-games-button').get(0).disabled = true;
+                } else {
+                    $('#stage-games-button').get(0).disabled = false;
+                }
+            });
+
+            /* Toggle table controls when tab is selected. */
+            document.getElementById('table-tabs').addEventListener('shown.bs.tab', function (event) {
+                const userControls = document.getElementById('user-table-controls');
+                const classroomControls = document.getElementById('classroom-table-controls');
+
+                if (event.target.id === 'classrooms-tab') {
+                    userControls.classList.remove('d-flex');
+                    userControls.classList.add('d-none');
+                    classroomControls.classList.remove('d-none');
+                    classroomControls.classList.add('d-flex');
+                    classroomsTable.draw();
+                } else if (event.target.id === 'users-tab') {
+                    classroomControls.classList.remove('d-flex');
+                    classroomControls.classList.add('d-none');
+                    userControls.classList.remove('d-none');
+                    userControls.classList.add('d-flex');
+                    usersTable.draw();
+                }
+            });
+            /* Switch the controls to the initial state. */
+            const userControls = document.getElementById('user-table-controls');
+            userControls.classList.remove('d-flex');
+            userControls.classList.add('d-none');
+
             /* Create new staged games with users. */
-            $('#stage-games-with-users-button').on('click', function () {
+            $('#stage-games-button').on('click', function () {
                 const userIds = [];
                 usersTable.rows({selected: true}).every(function () {
                     const userInfo = this.data();
                     userIds.push(userInfo.user.id);
                 });
+
                 const params = {
                     formType: 'stageGamesWithUsers',
                     userIds
                 };
+
+                if (classroomsTable.rows({selected: true})[0].length > 0) {
+                    params.classroomId = classroomsTable.rows({selected: true}).data()[0].id;
+                }
+
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;
                 }
@@ -1520,7 +1689,11 @@
 
             /* Create new empty staged games. */
             $('#stage-games-empty-button').on('click', function () {
-                if (usersTable.rows({selected: true})[0].length > 0) {
+                if (classroomsTable.rows({selected: true})[0].length > 0) {
+                    if (!confirm("You have a classroom selected. Are you sure you want to stage empty games?")) {
+                        return;
+                    }
+                } else if (usersTable.rows({selected: true})[0].length > 0) {
                     if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
                         return;
                     }
@@ -1531,8 +1704,13 @@
                 }
 
                 const params = {
-                    formType: 'stageEmptyGames',
+                    formType: 'stageEmptyGames'
                 };
+
+                if (classroomsTable.rows({selected: true})[0].length > 0) {
+                    params.classroomId = classroomsTable.rows({selected: true}).data()[0].id;
+                }
+
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;
                 }

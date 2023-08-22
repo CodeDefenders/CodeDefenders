@@ -1,6 +1,7 @@
 package org.codedefenders.beans.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,9 +16,11 @@ import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -26,6 +29,8 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.AuthService;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -36,8 +41,8 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
 
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
+import static org.codedefenders.game.GameType.MELEE;
+import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
@@ -77,6 +82,7 @@ public class AdminCreateGamesBeanTest {
         EventDAO eventDAO = mock(EventDAO.class);
         userRepo = mock(UserRepository.class);
         GameService gameService = mock(GameService.class);
+        ClassroomService classroomService = mock(ClassroomService.class);
 
         bean = new AdminCreateGamesBean(auth, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
     }

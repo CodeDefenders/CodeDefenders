@@ -28,7 +28,7 @@
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
 <%@ page import="java.util.SortedSet" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%--
     Displays all puzzles for a user. Puzzles may link to active puzzle games

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2023 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,23 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.codedefenders.game;
 
-package org.codedefenders.servlets.games.battleground;
+public enum GameType {
+    MULTIPLAYER("Multiplayer"),
+    MELEE("Melee");
 
-import java.io.IOException;
+    private final String name;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+    GameType(String name) {
+        this.name = name;
+    }
 
-@WebServlet("/multiplayer/history")
-public class MultiplayerGameHistoryManager extends HttpServlet {
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/battleground/history_game_view.jsp").forward(req, resp);
+    public String getName() {
+        return name;
     }
 }
-

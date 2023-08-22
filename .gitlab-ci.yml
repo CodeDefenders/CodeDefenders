@@ -13,15 +13,21 @@ stages:
   - validate
   - build
   - test
+  - publish
   - deploy
   - visualize
+
+.cache-maven-repo: &cache-maven-repo
+  key: maven-repo
+  when: always
+  policy: pull-push
+  paths:
+    - .m2/repository/
 
 default:
   image: maven:3.8.5-openjdk-17-slim
   cache:
-    paths:
-      - .m2/repository/
-    when: always
+    - *cache-maven-repo
   artifacts:
     # Expire all artifacts already after 36 hours. (Default is around 30 days/4 weeks)
     expire_in: 36 hours
@@ -42,6 +48,9 @@ variables:
 checkstyle:
   stage: validate
   needs: [ ]
+  cache:
+    - <<: *cache-maven-repo
+      policy: pull
   script:
     - mvn $MAVEN_ARGS validate
   after_script: # Will also execute if the above fails so the errors will be shown in the MergeRequest
@@ -76,6 +85,14 @@ metrics:
 build:
   stage: build
   needs: [ ]
+  cache:
+    - *cache-maven-repo
+    # TODO(Alex): Add caching for node/npm/js stuff
+    #- key: node-stuff
+    #  when: always
+    #  paths:
+    #    - node/
+    #    - node_modules/
   script:
     - mvn $MAVEN_ARGS -DskipCheckstyle -DskipTests package
     - printf 'artifact_size_bytes{artifact="codedefenders.war"} %d\n' "$(stat --printf="%s" target/codedefenders.war)" >> metrics.txt
@@ -84,6 +101,21 @@ build:
       - target/
     reports:
       metrics: metrics.txt
+
+bundle-libs:
+  stage: build
+  needs: [ ]
+  cache:
+    - key: maven-repo-libs
+      paths:
+        - .m2/repository/
+  before_script:
+    - echo 'data.dir=.' >installation/config.properties
+  script:
+    - mvn $MAVEN_ARGS -f installation/installation-pom.xml clean validate package -Dconfig.properties="config.properties"
+  artifacts:
+    paths:
+      - installation/lib/
 
 
 ###
@@ -252,6 +284,40 @@ visualize-coverage:
       coverage_report:
         coverage_format: cobertura
         path: target/site/cobertura.xml
+
+
+###
+### Publish jobs
+###
+
+container-images:
+  image: quay.io/containers/buildah
+  stage: publish
+  tags:
+    - container
+  cache: [ ]
+  needs:
+    - build
+    - bundle-libs
+  variables:
+    # Use vfs with buildah. Docker offers overlayfs as a default, but buildah
+    # cannot stack overlayfs on top of another overlayfs filesystem.
+    STORAGE_DRIVER: vfs
+    # You may need this workaround for some errors: https://stackoverflow.com/a/70438141/1233435
+    BUILDAH_ISOLATION: chroot
+  before_script:
+    # Log in to container registries
+    - export REGISTRY_AUTH_FILE=$HOME/auth.json
+    - echo "$REGISTRY_QUAY_PASSWORD" | buildah login -u "$REGISTRY_QUAY_USER" --password-stdin quay.io
+    - echo "$REGISTRY_DOCKER_PASSWORD" | buildah login -u "$REGISTRY_DOCKER_USER" --password-stdin docker.io
+    - echo "$REGISTRY_GHCR_PASSWORD" | buildah login -u "$REGISTRY_GHCR_USER" --password-stdin ghcr.io
+  script:
+    - scripts/ci/build-container-image "localhost/codedefenders:tmp" "production"
+    - scripts/ci/push-container-images "localhost/codedefenders:tmp" "codedefenders/codedefenders" "quay.io" "docker.io" "ghcr.io"
+  allow_failure: true # Otherwise pipelines will block on this job
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
 
 
 ###

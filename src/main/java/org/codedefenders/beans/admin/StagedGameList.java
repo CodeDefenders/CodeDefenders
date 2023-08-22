@@ -13,14 +13,15 @@ import java.util.Set;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
 
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
 import static org.codedefenders.game.GameLevel.HARD;
+import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.codedefenders.game.Role.OBSERVER;
 import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
 
@@ -302,6 +303,8 @@ public class StagedGameList implements Serializable {
 
         @Expose private Boolean startGame;
 
+        @Expose private Integer classroomId;
+
         /**
          * Creates a new GameSettings object with empty settings.
          */
@@ -327,6 +330,7 @@ public class StagedGameList implements Serializable {
             this.creatorRole = other.creatorRole;
             this.startGame = other.startGame;
             this.gameDurationMinutes = other.gameDurationMinutes;
+            this.classroomId = other.classroomId;
         }
 
         public GameType getGameType() {
@@ -459,6 +463,14 @@ public class StagedGameList implements Serializable {
             this.startGame = startGame;
         }
 
+        public Optional<Integer> getClassroomId() {
+            return Optional.ofNullable(classroomId);
+        }
+
+        public void setClassroomId(Integer classroomId) {
+            this.classroomId = classroomId;
+        }
+
         public static GameSettings getDefault() {
             GameSettings gameSettings = new GameSettings();
             gameSettings.setGameType(MULTIPLAYER);
@@ -472,6 +484,7 @@ public class StagedGameList implements Serializable {
             gameSettings.setLevel(HARD);
             gameSettings.setCreatorRole(OBSERVER);
             gameSettings.setStartGame(false);
+            gameSettings.setClassroomId(null);
 
             final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
@@ -480,19 +493,5 @@ public class StagedGameList implements Serializable {
             return gameSettings;
         }
 
-        public enum GameType {
-            MULTIPLAYER("Multiplayer"),
-            MELEE("Melee");
-
-            private final String name;
-
-            GameType(String name) {
-                this.name = name;
-            }
-
-            public String getName() {
-                return name;
-            }
-        }
     }
 }

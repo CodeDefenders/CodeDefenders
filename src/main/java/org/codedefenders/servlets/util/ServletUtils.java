@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.util;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -115,6 +116,26 @@ public final class ServletUtils {
      */
     public static Optional<String> getStringParameter(HttpServletRequest request, String parameter) {
         return Optional.ofNullable(request.getParameter(parameter)).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Extracts a given UUID URL parameter from a given request.
+     *
+     * <p>If the parameter is no valid UUID value, the method returns an empty {@link Optional}.
+     *
+     * @param request   the request, which the parameter is extracted from.
+     * @param parameter the given URL parameter.
+     * @return a valid UUID extracted for the parameter of the given request wrapped in an {@link Optional},
+     *     or {@link Optional#empty()}.
+     */
+    public static Optional<UUID> getUUIDParameter(HttpServletRequest request, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
+            try {
+                return UUID.fromString(s);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        });
     }
 
     /**

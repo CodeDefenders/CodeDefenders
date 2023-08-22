@@ -1,6 +1,6 @@
 services:
   database:
-    image: "mariadb:10.5"
+    image: "docker.io/library/mariadb:10.5"
     restart: always
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=YES
@@ -12,10 +12,11 @@ services:
     volumes:
       - dbvolume:/var/lib/mysql
   codedefenders:
-    image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION:?Please set a Codedefenders version via the .env file. Also see docs/Docker.md for more information.}"
+    image: "${CODEDEFENDERS_IMAGE:-quay.io/codedefenders/codedefenders}:${CODEDEFENDERS_VERSION:?Please set a Codedefenders version via the .env file. Also see docker/README.md for more information.}"
     environment:
-      # These two are already hardcoded in the image because they are determined by the image build layout, but we want to prevent them being overwritten by the .env file
+      # These three are already hardcoded in the image because they are determined by the image build layout, but we want to prevent them being overwritten by the .env file
       - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
+      - CODEDEFENDERS_LIB_DIR=/srv/codedefenders-lib
       - CODEDEFENDERS_ANT_HOME=/usr/share/ant
       # This one is hardcoded, because it is specific to this docker-compose file
       - CODEDEFENDERS_DB_HOST=database

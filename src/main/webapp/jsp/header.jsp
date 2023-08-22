@@ -52,6 +52,7 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="header-multiplayer">
                         <li><a class="dropdown-item" id="header-games" href="${url.forPath(Paths.GAMES_OVERVIEW)}">Games</a></li>
+                        <li><a class="dropdown-item" id="header-classrooms" href="${url.forPath(Paths.CLASSROOMS_OVERVIEW)}">Classrooms</a></li>
                         <li><a class="dropdown-item" id="header-games-history" href="${url.forPath(Paths.GAMES_HISTORY)}">History</a></li>
                         <li><a class="dropdown-item" id="header-leaderboard" href="${url.forPath(Paths.LEADERBOARD_PAGE)}">Leaderboard</a></li>
                     </ul>

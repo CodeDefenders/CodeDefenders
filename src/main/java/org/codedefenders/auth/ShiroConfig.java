@@ -166,6 +166,9 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
         fcMan.createChain("/admin/**", "authc, roles[admin]");
 
+        fcMan.createChain("/classroom/**", "authc");
+        fcMan.createChain("/classrooms", "authc");
+
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(fcMan);
         return resolver;

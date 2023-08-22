@@ -34,13 +34,8 @@ import org.codedefenders.configuration.Configuration;
  */
 public class Constants {
 
-    /**
-     * Deprecated. TODO Cannot be injected in static context !! Needs to be refactored !!
-     *
-     * @deprecated Use {@link Configuration#getDataDir()} instead.
-     */
-    @Deprecated
-    public static final String DATA_DIR = CDIUtil.getBeanFromCDI(Configuration.class).getDataDir().getAbsolutePath();
+    // TODO(Alex): Remove workaround when the *_CLASSPATH constants below are exposed in a better way
+    public static final Configuration config = CDIUtil.getBeanFromCDI(Configuration.class);
 
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;
@@ -50,13 +45,6 @@ public class Constants {
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getSourcesDir()} instead.
-     */
-    @Deprecated
-    public static final String CUTS_DIR = Paths.get(DATA_DIR, "sources").toString();
     // dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_DEPENDENCY_DIR = "dependencies";
     public static final String CUTS_MUTANTS_DIR = "mutants";
@@ -67,28 +55,12 @@ public class Constants {
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
 
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getMutantDir()} instead.
-     */
-    @Deprecated
-    public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
-
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getTestsDir()} instead.
-     */
-    @Deprecated
-    public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
-
     public static final String JACOCO_CLASSPATH = Stream.of(
                     "org.jacoco.core-0.8.8.jar",
                     "org.jacoco.report-0.8.8.jar",
                     "org.jacoco.agent-0.8.8.jar",
                     "org.jacoco.ant-0.8.8.jar"
-            ).map(jarName -> Paths.get(DATA_DIR, "lib", jarName))
+            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
             .map(Path::toString)
             .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
 
@@ -109,7 +81,7 @@ public class Constants {
                     "truth-1.1.3.jar",
                     "truth-java8-extension-1.1.3.jar",
                     "guava-31.1-jre.jar"
-            ).map(jarName -> Paths.get(DATA_DIR, "lib", jarName))
+            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
             .map(Path::toString)
             .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
 
@@ -134,8 +106,9 @@ public class Constants {
     public static final String USER_NOT_FOUND_JSP = Paths.get("jsp", "error_page_user_not_found.jsp").toString();
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
+    public static final String BATTLEGROUND_DETAILS_VIEW_JSP = "/jsp/battleground/details_view.jsp";
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";
-    public static final String MELEE_GAME_HISTORY_VIEW_JSP = "/jsp/melee/history_game_view.jsp";
+    public static final String MELEE_DETAILS_VIEW_JSP = "/jsp/melee/details_view.jsp";
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";

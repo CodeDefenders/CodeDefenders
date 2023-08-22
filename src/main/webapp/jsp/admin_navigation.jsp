@@ -52,6 +52,9 @@
         <a class="nav-link <%=active(activePage,"adminUserMgmt")%>" id="adminUserMgmt" href="${url.forPath(Paths.ADMIN_USERS)}">Users</a>
     </li>
     <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"classrooms")%>" id="classrooms" href="${url.forPath(Paths.ADMIN_CLASSROOMS)}">Classrooms</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link <%=active(activePage,"adminClasses")%>" id="adminClasses" href="${url.forPath(Paths.ADMIN_CLASSES)}">Classes</a>
     </li>
     <li class="nav-item dropdown">

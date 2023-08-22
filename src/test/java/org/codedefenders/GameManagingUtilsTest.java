@@ -29,9 +29,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -39,6 +41,8 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -86,7 +90,9 @@ public class GameManagingUtilsTest {
                     GameManagingUtilsTest.class,
                     TestSmellDetectorProducer.class,
                     NotificationService.class,
-                    MetricsRegistry.class)
+                    ExecutorServiceProvider.class,
+                    MetricsRegistry.class,
+                    Configuration.class)
             .inject(this)
             .activate(RequestScoped.class)
             .activate(ApplicationScoped.class)
@@ -110,6 +116,18 @@ public class GameManagingUtilsTest {
     BackendExecutorService produceBackend() {
         return Mockito.mock(BackendExecutorService.class);
     }
+
+    @Produces
+    @Singleton
+    Configuration produceConfiguration() {
+        return mock(Configuration.class);
+    }
+
+    @Produces
+    TransactionManager produceTransactionManager() {
+        return mock(TransactionManager.class);
+    }
+
 
     @Inject
     // Testing configuration ?

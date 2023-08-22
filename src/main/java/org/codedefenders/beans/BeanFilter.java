@@ -13,9 +13,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private PreviousSubmissionBean previousSubmission;
