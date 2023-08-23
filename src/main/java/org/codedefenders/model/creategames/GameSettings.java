@@ -63,7 +63,7 @@ public class GameSettings implements Serializable {
 
     /**
      * Creates a builder with the values from {@code other}.
-     * Useful for copying or changing game settings.
+     * Useful for editing game settings.
      */
     public static Builder from(GameSettings other) {
         return new Builder(

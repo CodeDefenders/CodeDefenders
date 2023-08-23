@@ -27,14 +27,14 @@ import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.gameassignment.RandomGameAssignmentStrategy;
-import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.SortedGameAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.MeleeRoleAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
-import org.codedefenders.servlets.admin.AdminCreateGames;
+import org.codedefenders.servlets.creategames.CreateGamesServlet;
 import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;
@@ -53,10 +53,11 @@ import static org.codedefenders.game.GameType.MELEE;
  * and wraps some operations of {@link StagedGameList} to add messages for the user.
  *
  * <p>It provides the consistencies of {@link StagedGameList} and additionally guarantees that all users
- * assigned to staged games are valid users (i.e. existing non-system users that are active).
+ * assigned to staged games are valid users (e.g. active non-system users for the admin page, or classroom members for
+ * the classroom page).
  *
  * @see StagedGameList
- * @see AdminCreateGames
+ * @see CreateGamesServlet
  */
 public abstract class CreateGamesBean implements Serializable {
     private final MessagesBean messages;
@@ -80,7 +81,7 @@ public abstract class CreateGamesBean implements Serializable {
     }
 
     /**
-     * Returns a monitor that can be used to synchronize operations on a specific game list.
+     * Returns a monitor that can be used to synchronize operations on this staged game context.
      */
     public Object getSynchronizer() {
         return stagedGames;
@@ -94,6 +95,10 @@ public abstract class CreateGamesBean implements Serializable {
         return stagedGames;
     }
 
+    /**
+     * Returns a staged game by its id.
+     * @return The staged game, or {@code null} if no game with the ID exists in the list.
+     */
     public StagedGame getStagedGame(int stagedGameId) {
         return stagedGames.getGame(stagedGameId);
     }
@@ -118,17 +123,22 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public abstract Set<Integer> getAssignedUsers();
 
+    /**
+     * Returns the kind of staged games page (currently ADMIN or CLASSROOM).
+     */
     public abstract Kind getKind();
 
     /**
-     * Returns user information for the given user ID.
+     * Returns the user information for the given user ID.
+     * @return The user information for the given user ID,
+     * or {@code null} if no user with the given id is managed by the bean.
      */
     public UserInfo getUserInfo(int userId) {
         return getUserInfos().get(userId);
     }
 
     /**
-     * Constructs the requested role assignment strategy.
+     * Constructs the role assignment strategy for the type.
      */
     public RoleAssignmentStrategy getRoleAssignment(RoleAssignmentStrategy.Type method) {
         switch (method) {
@@ -144,14 +154,14 @@ public abstract class CreateGamesBean implements Serializable {
     }
 
     /**
-     * Constructs the requested game assignment strategy.
+     * Constructs the game assignment strategy for the type.
      */
     public GameAssignmentStrategy getGameAssignment(GameAssignmentStrategy.Type method) {
         switch (method) {
             case RANDOM:
                 return new RandomGameAssignmentStrategy();
             case SCORE_DESCENDING:
-                return new ScoreGameAssignmentStrategy(
+                return new SortedGameAssignmentStrategy(
                         Comparator.comparingInt((Integer userId) -> getUserInfo(userId).getTotalScore()).reversed());
             default:
                 throw new IllegalStateException("Unknown game assignment method: " + method);
@@ -159,7 +169,6 @@ public abstract class CreateGamesBean implements Serializable {
     }
 
     /* ============================================================================================================== */
-
 
     /**
      * Assigns selected users to teams and adds staged games with these teams to the list.
@@ -438,7 +447,6 @@ public abstract class CreateGamesBean implements Serializable {
         return success ? Optional.of(users) : Optional.empty();
     }
 
-
     /* ============================================================================================================== */
 
     public String getUserInfosAsJSON() {
@@ -505,6 +513,8 @@ public abstract class CreateGamesBean implements Serializable {
                 .create();
         return gson.toJson(classes);
     }
+
+    /* ============================================================================================================== */
 
     public static class UserInfo {
         @Expose

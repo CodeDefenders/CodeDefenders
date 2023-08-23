@@ -66,6 +66,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
+    /**
+     * Returns the CreateGamesBean representing the context for the create-games page.
+     */
     protected abstract CreateGamesBean getContext();
 
     @Override
@@ -180,7 +183,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Clamps the game duration to the valid range defined by the system settings.
-     * If the value is out of bounds, an info message is returned.
+     * If the value is out of bounds, an info message shown to the user.
      *
      * @param duration The game duration in minutes
      */
@@ -206,6 +209,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Extracts players to be assigned to staged games from a request.
+     */
     private Optional<Set<UserInfo>> extractPlayers(HttpServletRequest request) {
         /* Extract user IDs from the table. */
         String userIdsStr = Optional.ofNullable(request.getParameter("userIds")).get();

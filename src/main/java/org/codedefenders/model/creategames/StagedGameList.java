@@ -206,9 +206,9 @@ public class StagedGameList implements Serializable {
     }
 
     /**
-     * Represents a staged game on the admin create-games page. This class does not differentiate between multiplayer
-     * games and melee games, always adding players as attackers or defenders. It is up to the servlet and JSP page to
-     * differentiate between staged multiplayer and melee games according to the game's settings.
+     * Represents a staged game on a create-games page. This class does not differentiate between multiplayer
+     * games and melee games, always adding players as attackers or defenders.
+     * For melee games, players should be added as attackers.
      */
     public class StagedGame implements Serializable {
         /**
@@ -223,6 +223,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * User IDs of users listed as attackers for the staged game.
+         * <p>For melee games, players are assigned as attackers.
          */
         @Expose private final Set<Integer> attackers;
 
@@ -289,7 +290,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the user IDs of users listed as players for the staged game.
-         * This includes both attackers and defenders.
+         * This includes both attackers and defenders (and players for melee games).
          *
          * @return The user IDs of users listed as players for the staged game.
          */
@@ -302,6 +303,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Assigns the given user ID to the game as an attacker.
+         * <p>For melee games this is used to add a player as {@link Role#PLAYER}.
          *
          * @param userId The user ID to add.
          * @return {@code true} if the user was added successfully,
@@ -330,6 +332,14 @@ public class StagedGameList implements Serializable {
             return true;
         }
 
+        /**
+         * Assigns the given user ID to the game as the given role.
+         *
+         * @param userId The user ID to add.
+         * @param role The role to add the user as.
+         * @return {@code true} if the user was added successfully,
+         * {@code false} if the user is already assigned to a staged game.
+         */
         public boolean addPlayer(int userId, Role role) {
             switch (role) {
                 case PLAYER:
@@ -342,6 +352,13 @@ public class StagedGameList implements Serializable {
             }
         }
 
+        /**
+         * Switches the role of a user.
+         *
+         * @param userId ID of the user to switch roles of.
+         * @return {@code true} if the role was switched successfully
+         * {@code false} if the user is not assigned to the game.
+         */
         public boolean switchRole(int userId) {
             if (attackers.remove(userId)) {
                 return defenders.add(userId);
@@ -352,6 +369,11 @@ public class StagedGameList implements Serializable {
             }
         }
 
+        /**
+         * Switches the creator's role in the game.
+         * @return {@code true} if the creator role could be switched (i.e. a playing role),
+         * {@code false} if the creator had a role that can't be switched.
+         */
         public boolean switchCreatorRole() {
             Role role = gameSettings.getCreatorRole();
             switch (role) {
@@ -373,10 +395,11 @@ public class StagedGameList implements Serializable {
         }
 
         /**
-         * Removes a user ID from the game's players.
+         * Removes a user from the game's players.
          *
-         * @param userId The user ID to remove.
-         * @return {@code true} if the user was assigned to the game, {@code false} if the user wasn't.
+         * @param userId The ID of the user to remove.
+         * @return {@code true} if the user was removed from the game,
+         * {@code false} if the user wasn't assigned to begin with.
          */
         public boolean removePlayer(int userId) {
             return attackers.remove(userId)
@@ -385,7 +408,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Removes any users that are not in the given set from the players.
-         * Useful to update a staged game when the users change.
+         * Useful to update a staged game when the users (possibly) change.
          */
         public void retainUsers(Collection<Integer> userIds) {
             attackers.retainAll(userIds);

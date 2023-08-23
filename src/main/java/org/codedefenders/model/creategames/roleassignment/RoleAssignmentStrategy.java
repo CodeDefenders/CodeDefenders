@@ -2,6 +2,10 @@ package org.codedefenders.model.creategames.roleassignment;
 
 import java.util.Collection;
 
+/**
+ * <p>Base class for role assignment strategies.
+ * <p>Role assignment strategies are used for assigning users to roles for staged games.
+ */
 public abstract class RoleAssignmentStrategy {
     /**
      * Assigns (attacker and defender) roles to a collection of users.
@@ -21,6 +25,7 @@ public abstract class RoleAssignmentStrategy {
 
         /**
          * Users are assigned the role opposite of the last role they played as.
+         * Users with no last role are assigned via the RANDOM strategy.
          */
         OPPOSITE
     }

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * <p>Base class for game assignment strategies.
+ * <p>Game assignment strategies are used for assigning lists of players to staged games.
+ */
 public abstract class GameAssignmentStrategy {
     public abstract List<List<Integer>> assignGames(Collection<Integer> userIds, int numGames);
 

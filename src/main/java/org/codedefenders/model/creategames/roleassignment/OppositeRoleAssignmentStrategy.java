@@ -16,6 +16,10 @@ public class OppositeRoleAssignmentStrategy extends RoleAssignmentStrategy {
         this.remaining = remaining;
     }
 
+    /**
+     * Assigns roles for staged games by assigning players to the opposite of their last played role.
+     * Users with not last played role are assigned roles randomly, trying to balance the team sizes out.
+     */
     @Override
     public void assignRoles(Collection<Integer> userIds,
                             int attackersPerGame, int defendersPerGame,

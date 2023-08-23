@@ -6,6 +6,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class RandomRoleAssignmentStrategy extends RoleAssignmentStrategy {
+    /**
+     * Assigns roles for staged games by assigning players to the opposite of their last played role.
+     * Users with not last played role are assigned roles randomly, trying to balance the team sizes out.
+     */
     @Override
     public void assignRoles(Collection<Integer> userIds, int attackersPerGame, int defendersPerGame,
                             Collection<Integer> attackers, Collection<Integer> defenders) {

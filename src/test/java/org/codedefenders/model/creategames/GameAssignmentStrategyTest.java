@@ -11,7 +11,7 @@ import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.gameassignment.RandomGameAssignmentStrategy;
-import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.SortedGameAssignmentStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,7 +70,7 @@ public class GameAssignmentStrategyTest {
 
     @Test
     public void testSplitIntoTeams_Score() {
-        GameAssignmentStrategy gameAssignment = new ScoreGameAssignmentStrategy(
+        GameAssignmentStrategy gameAssignment = new SortedGameAssignmentStrategy(
                 Comparator.comparingInt((Integer userId) -> userInfos.get(userId).getTotalScore()).reversed());
 
         /*
