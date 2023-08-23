@@ -48,7 +48,7 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
         assignedUsers = fetchAssignedUsers();
-        synchronized (getStagedGames()) {
+        synchronized (getSynchronizer()) {
             stagedGames.retainUsers(userInfos.keySet());
         }
     }
