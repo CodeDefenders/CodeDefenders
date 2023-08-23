@@ -149,14 +149,9 @@ public class StagedGameList implements Serializable {
         Set<Integer> defenders = new HashSet<>();
         roleAssignment.assignRoles(userIds, attackersPerGame, defendersPerGame, attackers, defenders);
 
-        int numGames = userIds.size() / (attackersPerGame + defendersPerGame);
-
-        /* Avoid empty games. */
-        if (numGames > attackers.size() && numGames > defenders.size())  {
-            int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
-            int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
-            numGames = Math.max(numGames1, numGames2);
-        }
+        int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
+        int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
+        int numGames = Math.max(numGames1, numGames2);
 
         /* Always create at least one game. */
         if (numGames == 0) {

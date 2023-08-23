@@ -269,19 +269,19 @@ public abstract class CreateGamesServlet extends HttpServlet {
             if (assignedUsers.contains(user.getId())) {
                 messages.add(format("ERROR: Cannot create staged games with user {0}. "
                         + "User is already assigned to a staged game.",
-                        user.getId()));
+                        user.getName()));
                 return;
             }
         }
 
         /* Validate team sizes. */
         if (gameSettings.getGameType() == MELEE) {
-            if (playersPerGame < 0) {
+            if (playersPerGame <= 0) {
                 messages.add(format("Invalid team sizes. Players per game: {0}.", playersPerGame));
             }
             attackersPerGame = playersPerGame;
         } else {
-            if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
+            if (attackersPerGame < 0 || defendersPerGame < 0 || (attackersPerGame == 0 && defendersPerGame == 0)) {
                 messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
                         attackersPerGame, defendersPerGame));
                 return;
