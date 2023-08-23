@@ -361,14 +361,12 @@ public class StagedGameList implements Serializable {
             Role role = gameSettings.getCreatorRole();
             switch (role) {
                 case ATTACKER:
-                    gameSettings = GameSettings.builder()
-                            .withSettings(gameSettings)
+                    gameSettings = GameSettings.from(gameSettings)
                             .setCreatorRole(Role.DEFENDER)
                             .build();
                     return true;
                 case DEFENDER:
-                    gameSettings = GameSettings.builder()
-                            .withSettings(gameSettings)
+                    gameSettings = GameSettings.from(gameSettings)
                             .setCreatorRole(Role.ATTACKER)
                             .build();
                     return true;

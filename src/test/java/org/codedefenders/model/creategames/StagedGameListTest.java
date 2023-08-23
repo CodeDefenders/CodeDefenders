@@ -16,23 +16,10 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 public class StagedGameListTest {
+    private final GameSettings defaultSettings = new GameSettings(GameType.MULTIPLAYER, -1, false, false, 3,
+            CodeValidatorLevel.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
+
     private StagedGameList stagedGameList;
-    private final GameSettings defaultSettings = GameSettings.builder()
-            .setGameType(GameType.MULTIPLAYER)
-            .setClassId(0)
-            .setWithMutants(false)
-            .setWithTests(false)
-            .setMaxAssertionsPerTest(3)
-            .setMutantValidatorLevel(CodeValidatorLevel.MODERATE)
-            .setChatEnabled(true)
-            .setCaptureIntentions(false)
-            .setEquivalenceThreshold(0)
-            .setLevel(GameLevel.HARD)
-            .setCreatorRole(Role.OBSERVER)
-            .setGameDurationMinutes(0)
-            .setStartGame(false)
-            .setClassroomId(null)
-            .build();
 
     @Before
     public void before() {

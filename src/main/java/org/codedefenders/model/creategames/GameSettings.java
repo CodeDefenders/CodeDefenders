@@ -3,11 +3,9 @@ package org.codedefenders.model.creategames;
 import java.io.Serializable;
 import java.util.Optional;
 
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
@@ -15,7 +13,7 @@ import com.google.gson.annotations.Expose;
 public class GameSettings implements Serializable {
     @Expose private final GameType gameType;
 
-    @Expose private final Integer classId;
+    @Expose private final int classId;
     @Expose private final boolean withMutants;
     @Expose private final boolean withTests;
 
@@ -34,7 +32,7 @@ public class GameSettings implements Serializable {
 
     public GameSettings(
             GameType gameType,
-            Integer classId,
+            int classId,
             boolean withMutants,
             boolean withTests,
             int maxAssertionsPerTest,
@@ -63,8 +61,27 @@ public class GameSettings implements Serializable {
         this.classroomId = classroomId;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    /**
+     * Creates a builder with the values from {@code other}.
+     * Useful for copying or changing game settings.
+     */
+    public static Builder from(GameSettings other) {
+        return new Builder(
+            other.gameType,
+            other.classId,
+            other.withMutants,
+            other.withTests,
+            other.maxAssertionsPerTest,
+            other.mutantValidatorLevel,
+            other.chatEnabled,
+            other.captureIntentions,
+            other.equivalenceThreshold,
+            other.level,
+            other.creatorRole,
+            other.gameDurationMinutes,
+            other.startGame,
+            other.classroomId
+        );
     }
 
     public GameType getGameType() {
@@ -125,7 +142,7 @@ public class GameSettings implements Serializable {
 
     public static class Builder {
         private GameType gameType;
-        private Integer classId;
+        private int classId;
         private boolean withMutants;
         private boolean withTests;
         private int maxAssertionsPerTest;
@@ -139,46 +156,35 @@ public class GameSettings implements Serializable {
         private boolean startGame;
         private Integer classroomId;
 
-        public Builder() {
-
-        }
-
-        public Builder withDefaultSettings() {
-            final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
-            this.gameType = GameType.MULTIPLAYER;
-            this.classId = null;
-            this.withMutants = false;
-            this.withTests = false;
-            this.maxAssertionsPerTest = 3;
-            this.mutantValidatorLevel = CodeValidatorLevel.MODERATE;
-            this.chatEnabled = true;
-            this.captureIntentions = false;
-            this.equivalenceThreshold = 0;
-            this.level = GameLevel.HARD;
-            this.creatorRole = Role.OBSERVER;
-            this.gameDurationMinutes = currentDefaultGameDurationMinutes;
-            this.startGame = false;
-            this.classroomId = null;
-            return this;
-        }
-
-        public Builder withSettings(GameSettings other) {
-            this.gameType = other.gameType;
-            this.classId = other.classId;
-            this.withMutants = other.withMutants;
-            this.withTests = other.withTests;
-            this.maxAssertionsPerTest = other.maxAssertionsPerTest;
-            this.mutantValidatorLevel = other.mutantValidatorLevel;
-            this.chatEnabled = other.chatEnabled;
-            this.captureIntentions = other.captureIntentions;
-            this.equivalenceThreshold = other.equivalenceThreshold;
-            this.level = other.level;
-            this.creatorRole = other.creatorRole;
-            this.gameDurationMinutes = other.gameDurationMinutes;
-            this.startGame = other.startGame;
-            this.classroomId = other.classroomId;
-            return this;
+        private Builder(
+                GameType gameType,
+                int classId,
+                boolean withMutants,
+                boolean withTests,
+                int maxAssertionsPerTest,
+                CodeValidatorLevel mutantValidatorLevel,
+                boolean chatEnabled,
+                boolean captureIntentions,
+                int equivalenceThreshold,
+                GameLevel level,
+                Role creatorRole,
+                int gameDurationMinutes,
+                boolean startGame,
+                Integer classroomId) {
+            this.gameType = gameType;
+            this.classId = classId;
+            this.withMutants = withMutants;
+            this.withTests = withTests;
+            this.maxAssertionsPerTest = maxAssertionsPerTest;
+            this.mutantValidatorLevel = mutantValidatorLevel;
+            this.chatEnabled = chatEnabled;
+            this.captureIntentions = captureIntentions;
+            this.equivalenceThreshold = equivalenceThreshold;
+            this.level = level;
+            this.creatorRole = creatorRole;
+            this.gameDurationMinutes = gameDurationMinutes;
+            this.startGame = startGame;
+            this.classroomId = classroomId;
         }
 
         public Builder setGameType(GameType gameType) {

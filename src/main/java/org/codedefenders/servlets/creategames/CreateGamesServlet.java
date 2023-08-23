@@ -130,56 +130,52 @@ public abstract class CreateGamesServlet extends HttpServlet {
      * @return The extracted game settings.
      */
     private GameSettings extractGameSettings(HttpServletRequest request) {
-        GameSettings.Builder builder = new GameSettings.Builder();
+        GameType gameType = getEnumParameter(request, GameType.class, "gameType").get();
 
-        builder.setGameType(
-                getEnumParameter(request, GameType.class, "gameType").get());
+        int classId = getIntParameter(request, "cut").get();
 
-        builder.setClassId(
-                getIntParameter(request, "cut").get());
+        boolean withMutants = request.getParameter("withMutants") != null;
 
-        builder.setWithMutants(
-                request.getParameter("withMutants") != null);
+        boolean withTests = request.getParameter("withTests") != null;
 
-        builder.setWithTests(
-                request.getParameter("withTests") != null);
+        int maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
 
-        builder.setMaxAssertionsPerTest(
-                getIntParameter(request, "maxAssertionsPerTest").get());
+        CodeValidatorLevel mutantValidatorLevel = getEnumParameter(
+                request, CodeValidatorLevel.class, "mutantValidatorLevel").get();
 
-        builder.setMutantValidatorLevel(
-                getEnumParameter(request, CodeValidatorLevel.class, "mutantValidatorLevel").get());
+        boolean chatEnabled = request.getParameter("chatEnabled") != null;
 
-        builder.setCreatorRole(
-                getEnumParameter(request, Role.class, "creatorRole").get());
+        boolean captureIntentions = request.getParameter("captureIntentions") != null;
 
-        builder.setChatEnabled(
-                request.getParameter("chatEnabled") != null);
+        int equivalenceThreshold = getIntParameter(request, "automaticEquivalenceTrigger").get();
 
-        builder.setCaptureIntentions(
-                request.getParameter("captureIntentions") != null);
+        GameLevel level = getEnumParameter(request, GameLevel.class, "level").get();
 
-        builder.setEquivalenceThreshold(
-                getIntParameter(request, "automaticEquivalenceTrigger").get());
+        Role creatorRole = getEnumParameter(request, Role.class, "creatorRole").get();
 
-        builder.setLevel(
-                getEnumParameter(request, GameLevel.class, "level").get());
+        int gameDurationMinutes = clampGameDuration(getIntParameter(request, "gameDurationMinutes").get());
 
-        builder.setLevel(
-                getEnumParameter(request, GameLevel.class, "level").get());
+        boolean startGame = request.getParameter("startGames") != null;
 
-        builder.setStartGame(
-                request.getParameter("startGames") != null);
+        Integer classroomId = request.getParameter("classroomId") != null
+                ? getIntParameter(request, "classroomId").get()
+                : null;
 
-        builder.setGameDurationMinutes(
-                clampGameDuration(getIntParameter(request, "gameDurationMinutes").get()));
-
-        if (request.getParameter("classroomId") != null) {
-            builder.setClassroomId(
-                    getIntParameter(request, "classroomId").get());
-        }
-
-        return builder.build();
+        return new GameSettings(
+                gameType,
+                classId,
+                withMutants,
+                withTests,
+                maxAssertionsPerTest,
+                mutantValidatorLevel,
+                chatEnabled,
+                captureIntentions,
+                equivalenceThreshold,
+                level,
+                creatorRole,
+                gameDurationMinutes,
+                startGame,
+                classroomId);
     }
 
     /**

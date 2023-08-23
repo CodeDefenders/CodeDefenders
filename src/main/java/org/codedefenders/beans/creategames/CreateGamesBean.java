@@ -257,8 +257,7 @@ public abstract class CreateGamesBean implements Serializable {
      * @param stagedGame The staged game.
      */
     public void removeCreatorFromStagedGame(StagedGame stagedGame) {
-        GameSettings gameSettings = GameSettings.builder()
-                .withSettings(stagedGame.getGameSettings())
+        GameSettings gameSettings = GameSettings.from(stagedGame.getGameSettings())
                 .setCreatorRole(Role.OBSERVER)
                 .build();
         stagedGame.setGameSettings(gameSettings);

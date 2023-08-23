@@ -42,6 +42,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 public class CreateGamesBeanTest {
+    private final GameSettings defaultSettings = new GameSettings(GameType.MULTIPLAYER, -1, false, false, 3,
+            CodeValidatorLevel.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
+
     private AdminCreateGamesBean createGamesBean;
     private StagedGameList stagedGameList;
 
@@ -49,23 +52,6 @@ public class CreateGamesBeanTest {
 
     private UserRepository userRepo;
     private CreateGamesService createGamesService;
-
-    private final GameSettings defaultSettings = GameSettings.builder()
-            .setGameType(GameType.MULTIPLAYER)
-            .setClassId(0)
-            .setWithMutants(false)
-            .setWithTests(false)
-            .setMaxAssertionsPerTest(3)
-            .setMutantValidatorLevel(CodeValidatorLevel.MODERATE)
-            .setChatEnabled(true)
-            .setCaptureIntentions(false)
-            .setEquivalenceThreshold(0)
-            .setLevel(GameLevel.HARD)
-            .setCreatorRole(Role.OBSERVER)
-            .setGameDurationMinutes(0)
-            .setStartGame(false)
-            .setClassroomId(null)
-            .build();
 
     /*
      * Initialize AdminCreateGamesBean and its dependencies manually,
@@ -140,8 +126,7 @@ public class CreateGamesBeanTest {
     @Test
     public void testStageGamesMultiplayer() {
         Set<Integer> userIds = new HashSet<>(this.userInfos.keySet());
-        GameSettings gameSettings = GameSettings.builder()
-                .withSettings(defaultSettings)
+        GameSettings gameSettings = GameSettings.from(defaultSettings)
                 .setGameType(MULTIPLAYER)
                 .build();
         RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
@@ -163,8 +148,7 @@ public class CreateGamesBeanTest {
     @Test
     public void testStageGamesMelee() {
         Set<Integer> userIds = new HashSet<>(this.userInfos.keySet());
-        GameSettings gameSettings = GameSettings.builder()
-                .withSettings(defaultSettings)
+        GameSettings gameSettings = GameSettings.from(defaultSettings)
                 .setGameType(MELEE)
                 .build();
         RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
@@ -187,8 +171,7 @@ public class CreateGamesBeanTest {
             add(1);
             add(2);
         }};
-        GameSettings gameSettings = GameSettings.builder()
-                .withSettings(defaultSettings)
+        GameSettings gameSettings = GameSettings.from(defaultSettings)
                 .setGameType(MULTIPLAYER)
                 .build();
         RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
@@ -226,8 +209,7 @@ public class CreateGamesBeanTest {
     public void testCreateStagedGames() throws Exception {
         Mockito.when(createGamesService.createGame(any())).thenReturn(true);
 
-        GameSettings gameSettings = GameSettings.builder()
-                .withSettings(defaultSettings)
+        GameSettings gameSettings = GameSettings.from(defaultSettings)
                 .setClassId(0)
                 .build();
 
