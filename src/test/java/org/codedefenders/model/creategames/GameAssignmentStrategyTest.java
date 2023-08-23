@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.creategames.gameassignment.GameAssignment;
-import org.codedefenders.model.creategames.gameassignment.RandomGameAssignment;
-import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignment;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.RandomGameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignmentStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 
-public class GameAssignmentTest {
+public class GameAssignmentStrategyTest {
     private HashMap<Integer, CreateGamesBean.UserInfo> userInfos;
 
     @BeforeEach
@@ -45,7 +45,7 @@ public class GameAssignmentTest {
 
     @Test
     public void testSplitIntoTeams_Random() {
-        GameAssignment gameAssignment = new RandomGameAssignment();
+        GameAssignmentStrategy gameAssignment = new RandomGameAssignmentStrategy();
 
         /* No remaining users. */
         List<List<Integer>> teams = gameAssignment.assignGames(set(1, 2, 3, 4, 5, 6, 7, 8), 2);
@@ -70,7 +70,7 @@ public class GameAssignmentTest {
 
     @Test
     public void testSplitIntoTeams_Score() {
-        GameAssignment gameAssignment = new ScoreGameAssignment(
+        GameAssignmentStrategy gameAssignment = new ScoreGameAssignmentStrategy(
                 Comparator.comparingInt((Integer userId) -> userInfos.get(userId).getTotalScore()).reversed());
 
         /*

@@ -7,11 +7,11 @@ import java.util.function.Function;
 
 import org.codedefenders.game.Role;
 
-public class OppositeRoleAssignment extends RoleAssignment {
-    private final RoleAssignment remaining;
+public class OppositeRoleAssignmentStrategy extends RoleAssignmentStrategy {
+    private final RoleAssignmentStrategy remaining;
     private final Function<Integer, Role> getLastRole;
 
-    public OppositeRoleAssignment(Function<Integer, Role> getLastRole, RoleAssignment remaining) {
+    public OppositeRoleAssignmentStrategy(Function<Integer, Role> getLastRole, RoleAssignmentStrategy remaining) {
         this.getLastRole = getLastRole;
         this.remaining = remaining;
     }

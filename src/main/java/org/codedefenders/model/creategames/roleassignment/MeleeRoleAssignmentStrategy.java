@@ -2,7 +2,7 @@ package org.codedefenders.model.creategames.roleassignment;
 
 import java.util.Collection;
 
-public class MeleeRoleAssignment extends RoleAssignment {
+public class MeleeRoleAssignmentStrategy extends RoleAssignmentStrategy {
     @Override
     public void assignRoles(Collection<Integer> userIds, int attackersPerGame, int defendersPerGame,
                             Collection<Integer> attackers, Collection<Integer> defenders) {

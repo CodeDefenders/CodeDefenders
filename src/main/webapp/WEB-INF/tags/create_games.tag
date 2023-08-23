@@ -5,10 +5,12 @@
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.util.Paths" %>
 <%@ tag import="org.codedefenders.game.GameLevel" %>
-<%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod" %>
-<%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod" %>
+<%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy.GameAssignmentMethod" %>
+<%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy.RoleAssignmentMethod" %>
 <%@ tag import="org.codedefenders.validation.code.CodeValidator" %>
 <%@ tag import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy" %>
+<%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -340,14 +342,14 @@
                                 <div class="form-check">
                                     <input type="radio" name="roleAssignmentMethod"
                                            class="form-check-input" id="roleAssignment-radio-random"
-                                           value="<%=RoleAssignmentMethod.RANDOM%>"
+                                           value="<%=RoleAssignmentStrategy.Type.RANDOM%>"
                                            checked>
                                     <label class="form-check-label" for="roleAssignment-radio-random">Random</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="roleAssignmentMethod"
                                            class="form-check-input" id="roleAssignment-radio-opposite"
-                                           value="<%=RoleAssignmentMethod.OPPOSITE%>">
+                                           value="<%=RoleAssignmentStrategy.Type.OPPOSITE%>">
                                     <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite Role</label>
                                 </div>
                             </div>
@@ -366,14 +368,14 @@
                                 <div class="form-check">
                                     <input type="radio" name="gameAssignmentMethod"
                                            class="form-check-input" id="gameAssignmentMethod-radio-random"
-                                           value="<%=GameAssignmentMethod.RANDOM%>"
+                                           value="<%=GameAssignmentStrategy.Type.RANDOM%>"
                                            checked>
                                     <label class="form-check-label" for="gameAssignmentMethod-radio-random">Random</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="gameAssignmentMethod"
                                            class="form-check-input" id="gameAssignmentMethod-radio-score-descending"
-                                           value="<%=GameAssignmentMethod.SCORE_DESCENDING%>">
+                                           value="<%=GameAssignmentStrategy.Type.SCORE_DESCENDING%>">
                                     <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">Score Descending</label>
                                 </div>
                             </div>

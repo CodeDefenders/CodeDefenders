@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class RandomRoleAssignment extends RoleAssignment {
+public class RandomRoleAssignmentStrategy extends RoleAssignmentStrategy {
     @Override
     public void assignRoles(Collection<Integer> userIds, int attackersPerGame, int defendersPerGame,
                             Collection<Integer> attackers, Collection<Integer> defenders) {

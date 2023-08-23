@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class GameAssignment {
+public abstract class GameAssignmentStrategy {
     public abstract List<List<Integer>> assignGames(Collection<Integer> userIds, int numGames);
 
     /**
@@ -37,5 +37,18 @@ public abstract class GameAssignment {
         }
 
         return games;
+    }
+
+    public enum Type {
+        /**
+         * Teams are assigned randomly.
+         */
+        RANDOM,
+
+        /**
+         * Teams are assigned based on the total score of users,
+         * putting users with similar total scores in the same team.
+         */
+        SCORE_DESCENDING
     }
 }

@@ -22,19 +22,16 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
-import org.codedefenders.model.creategames.gameassignment.GameAssignment;
-import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
-import org.codedefenders.model.creategames.gameassignment.RandomGameAssignment;
-import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignment;
-import org.codedefenders.model.creategames.roleassignment.MeleeRoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.RandomGameAssignmentStrategy;
+import org.codedefenders.model.creategames.gameassignment.ScoreGameAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.MeleeRoleAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
@@ -133,14 +130,14 @@ public abstract class CreateGamesBean implements Serializable {
     /**
      * Constructs the requested role assignment strategy.
      */
-    public RoleAssignment getRoleAssignment(RoleAssignmentMethod method) {
+    public RoleAssignmentStrategy getRoleAssignment(RoleAssignmentStrategy.Type method) {
         switch (method) {
             case RANDOM:
-                return new RandomRoleAssignment();
+                return new RandomRoleAssignmentStrategy();
             case OPPOSITE:
-                return new OppositeRoleAssignment(
+                return new OppositeRoleAssignmentStrategy(
                         userId -> getUserInfo(userId).getLastRole(),
-                        new RandomRoleAssignment());
+                        new RandomRoleAssignmentStrategy());
             default:
                 throw new IllegalStateException("Unknown role assignment method: " + method);
         }
@@ -149,12 +146,12 @@ public abstract class CreateGamesBean implements Serializable {
     /**
      * Constructs the requested game assignment strategy.
      */
-    public GameAssignment getGameAssignment(GameAssignmentMethod method) {
+    public GameAssignmentStrategy getGameAssignment(GameAssignmentStrategy.Type method) {
         switch (method) {
             case RANDOM:
-                return new RandomGameAssignment();
+                return new RandomGameAssignmentStrategy();
             case SCORE_DESCENDING:
-                return new ScoreGameAssignment(
+                return new ScoreGameAssignmentStrategy(
                         Comparator.comparingInt((Integer userId) -> getUserInfo(userId).getTotalScore()).reversed());
             default:
                 throw new IllegalStateException("Unknown game assignment method: " + method);
@@ -168,24 +165,24 @@ public abstract class CreateGamesBean implements Serializable {
      * Assigns selected users to teams and adds staged games with these teams to the list.
      * @param userIds The players for the staged games.
      * @param gameSettings The game settings.
-     * @param roleAssignmentMethod The method of assigning roles to users. Only relevant for non-melee games.
-     * @param gameAssignmentMethod The method of assigning users to teams.
+     * @param roleAssignmentType The method of assigning roles to users. Only relevant for non-melee games.
+     * @param gameAssignmentType The method of assigning users to teams.
      * @param attackersPerGame The number of attackers per game, or the number of players for melee games.
      * @param defendersPerGame The number of defenders per game. Only relevant for non-melee games.
-     * @see RoleAssignmentMethod
-     * @see GameAssignmentMethod
+     * @see RoleAssignmentStrategy.Type
+     * @see GameAssignmentStrategy.Type
      */
     public void stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
-                                    RoleAssignmentMethod roleAssignmentMethod,
-                                    GameAssignmentMethod gameAssignmentMethod,
+                                    RoleAssignmentStrategy.Type roleAssignmentType,
+                                    GameAssignmentStrategy.Type gameAssignmentType,
                                     int attackersPerGame, int defendersPerGame) {
-        RoleAssignment roleAssignment = gameSettings.getGameType() == MELEE
-                ? new MeleeRoleAssignment()
-                : getRoleAssignment(roleAssignmentMethod);
-        GameAssignment gameAssignment = getGameAssignment(gameAssignmentMethod);
+        RoleAssignmentStrategy roleAssignmentStrategy = gameSettings.getGameType() == MELEE
+                ? new MeleeRoleAssignmentStrategy()
+                : getRoleAssignment(roleAssignmentType);
+        GameAssignmentStrategy gameAssignmentStrategy = getGameAssignment(gameAssignmentType);
 
         List<StagedGame> newGames = stagedGames.stageGamesWithUsers(userIds, gameSettings,
-                roleAssignment, gameAssignment,
+                roleAssignmentStrategy, gameAssignmentStrategy,
                 attackersPerGame, defendersPerGame);
 
         messages.add(format("Created {0} staged games.", newGames.size()));

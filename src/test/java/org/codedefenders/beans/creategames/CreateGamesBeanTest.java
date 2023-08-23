@@ -12,17 +12,14 @@ import java.util.stream.Stream;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
-import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -147,8 +144,8 @@ public class CreateGamesBeanTest {
                 .withSettings(defaultSettings)
                 .setGameType(MULTIPLAYER)
                 .build();
-        RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
+        RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
+        GameAssignmentStrategy.Type gameAssignmentMethod = GameAssignmentStrategy.Type.RANDOM;
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
@@ -170,8 +167,8 @@ public class CreateGamesBeanTest {
                 .withSettings(defaultSettings)
                 .setGameType(MELEE)
                 .build();
-        RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
+        RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
+        GameAssignmentStrategy.Type gameAssignmentMethod = GameAssignmentStrategy.Type.RANDOM;
         int playersPerGame = 4;
 
         createGamesBean.stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
@@ -194,8 +191,8 @@ public class CreateGamesBeanTest {
                 .withSettings(defaultSettings)
                 .setGameType(MULTIPLAYER)
                 .build();
-        RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
+        RoleAssignmentStrategy.Type roleAssignmentMethod = RoleAssignmentStrategy.Type.RANDOM;
+        GameAssignmentStrategy.Type gameAssignmentMethod = GameAssignmentStrategy.Type.RANDOM;
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 

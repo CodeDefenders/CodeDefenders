@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.codedefenders.game.Role;
-import org.codedefenders.model.creategames.gameassignment.GameAssignment;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 
 import com.google.gson.annotations.Expose;
 
@@ -142,8 +142,8 @@ public class StagedGameList implements Serializable {
      * @return The number of staged games.
      */
     public List<StagedGame> stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
-                                   RoleAssignment roleAssignment, GameAssignment gameAssignment,
-                                   int attackersPerGame, int defendersPerGame) {
+                                                RoleAssignmentStrategy roleAssignment, GameAssignmentStrategy gameAssignment,
+                                                int attackersPerGame, int defendersPerGame) {
         /* Split users into attackers and defenders. */
         Set<Integer> attackers = new HashSet<>();
         Set<Integer> defenders = new HashSet<>();

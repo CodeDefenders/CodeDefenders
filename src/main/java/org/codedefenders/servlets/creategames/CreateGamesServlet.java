@@ -46,11 +46,10 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
-import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,16 +247,16 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, GameAssignmentMethod, int, int)}.
+     * GameSettings, RoleAssignmentStrategy.Type, GameAssignmentStrategy.Type, int, int)}.
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {
         GameSettings gameSettings = extractGameSettings(request);
 
         /* Extract game management settings settings. */
-        RoleAssignmentMethod roleAssignmentMethod = getEnumParameter(request, RoleAssignmentMethod.class,
+        RoleAssignmentStrategy.Type roleAssignmentType = getEnumParameter(request, RoleAssignmentStrategy.Type.class,
                 "roleAssignmentMethod").get();
-        GameAssignmentMethod gameAssignmentMethod = getEnumParameter(request, GameAssignmentMethod.class,
+        GameAssignmentStrategy.Type gameAssignmentType = getEnumParameter(request, GameAssignmentStrategy.Type.class,
                 "gameAssignmentMethod").get();
         int attackersPerGame = getIntParameter(request, "attackersPerGame").get();
         int defendersPerGame = getIntParameter(request, "defendersPerGame").get();
@@ -296,8 +295,8 @@ public abstract class CreateGamesServlet extends HttpServlet {
         Set<Integer> userIds = players.get().stream()
                 .map(UserInfo::getId)
                 .collect(Collectors.toSet());
-        getContext().stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod,
-                gameAssignmentMethod, attackersPerGame, defendersPerGame);
+        getContext().stageGamesWithUsers(userIds, gameSettings, roleAssignmentType,
+                gameAssignmentType, attackersPerGame, defendersPerGame);
     }
 
     /**

@@ -7,9 +7,9 @@ import java.util.stream.Stream;
 
 import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignment;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
+import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignmentStrategy;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
-public class RoleAssignmentTest {
+public class RoleAssignmentStrategyTest {
     private HashMap<Integer, CreateGamesBean.UserInfo> userInfos;
 
     @BeforeEach
@@ -48,7 +48,7 @@ public class RoleAssignmentTest {
         return userIds;
     }
 
-    private void testAssignRoles(RoleAssignment roleAssignment,
+    private void testAssignRoles(RoleAssignmentStrategy roleAssignment,
                                  Set<Integer> users, Set<Integer> attackers, Set<Integer> defenders,
                                  int attackersPerGame, int defendersPerGame,
                                  int expectedNumAttackers, int expectedNumDefenders,
@@ -77,7 +77,7 @@ public class RoleAssignmentTest {
     public void testAssignRoles_Random(Set<Integer> users, Set<Integer> attackers, Set<Integer> defenders,
                                         int attackersPerGame, int defendersPerGame,
                                         int expectedNumAttackers, int expectedNumDefenders) {
-        RoleAssignment roleAssignment = new RandomRoleAssignment();
+        RoleAssignmentStrategy roleAssignment = new RandomRoleAssignmentStrategy();
         testAssignRoles(roleAssignment, users, attackers, defenders, attackersPerGame, defendersPerGame,
                 expectedNumAttackers, expectedNumDefenders, new HashSet<>(), new HashSet<>());
     }
@@ -88,9 +88,9 @@ public class RoleAssignmentTest {
                                           int attackersPerGame, int defendersPerGame,
                                           int expectedNumAttackers, int expectedNumDefenders,
                                           Set<Integer> expectedAttackers, Set<Integer> expectedDefenders) {
-        RoleAssignment roleAssignment = new OppositeRoleAssignment(
+        RoleAssignmentStrategy roleAssignment = new OppositeRoleAssignmentStrategy(
                 userId -> userInfos.get(userId).getLastRole(),
-                new RandomRoleAssignment()
+                new RandomRoleAssignmentStrategy()
         );
         testAssignRoles(roleAssignment, users, attackers, defenders, attackersPerGame, defendersPerGame,
                 expectedNumAttackers, expectedNumDefenders, expectedAttackers, expectedDefenders);
