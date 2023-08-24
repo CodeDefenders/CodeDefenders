@@ -117,10 +117,7 @@
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                         <td>
                             <div class="form-check">
-                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input"
-                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMultiplayer')">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input">
                             </div>
                         </td>
                         <td><%=gid%></td>
@@ -341,10 +338,7 @@
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                         <td>
                             <div class="form-check">
-                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input"
-                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMelee')">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input">
                             </div>
                         </td>
                         <td><%=gid%></td>
@@ -514,8 +508,9 @@
                     .find('tbody')
                     .find(':checkbox')
                     .prop('checked', this.checked);
-            document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
         });
 
         $('#selectAllGamesMelee').click(function () {
@@ -523,8 +518,27 @@
                     .find('tbody')
                     .find(':checkbox')
                     .prop('checked', this.checked);
-            document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
+        });
+
+        document.getElementById('table-multiplayer').addEventListener('change', function (event) {
+            const checkbox = event.target.closest('[name="selectedGames"]');
+            if (checkbox === null) return;
+
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
+        });
+
+        document.getElementById('table-melee').addEventListener('change', function (event) {
+            const checkbox = event.target.closest('[name="selectedGames"]');
+            if (checkbox === null) return;
+
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
         });
 
         const showMultiplayerDetails = function (showDetails) {
