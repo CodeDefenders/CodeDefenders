@@ -54,6 +54,7 @@
 <%
     testEditor.setEditableLinesForClass(cut);
     testEditor.setMockingEnabled(cut.isMockingEnabled());
+    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
     if (previousSubmission.hasTest()) {
         testEditor.setPreviousTestCode(previousSubmission.getTestCode());
     } else {

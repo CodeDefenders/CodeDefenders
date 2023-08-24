@@ -42,6 +42,7 @@
     const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
     const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
     const mockingEnabled = ${testEditor.mockingEnabled};
+    const assertionLibrary = '${testEditor.assertionLibrary.name()}';
     const keymap = '${login.user.keyMap.CMName}';
 
     const editorElement = document.getElementById('test-code');
@@ -51,6 +52,7 @@
             editableLinesStart,
             editableLinesEnd,
             mockingEnabled,
+            assertionLibrary,
             keymap);
 
 

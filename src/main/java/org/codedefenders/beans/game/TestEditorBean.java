@@ -4,7 +4,9 @@ import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 
 /**
@@ -36,6 +38,11 @@ public class TestEditorBean {
      * Enable autocompletion for mockito methods.
      */
     private Boolean mockingEnabled;
+
+    /**
+     * Change autocompletion based on the assertion library used.
+     */
+    private AssertionLibrary assertionLibrary;
 
     public TestEditorBean() {
         testCode = null;
@@ -69,6 +76,10 @@ public class TestEditorBean {
         this.mockingEnabled = mockingEnabled;
     }
 
+    public void setAssertionLibrary(AssertionLibrary assertionLibrary) {
+        this.assertionLibrary = assertionLibrary;
+    }
+
     // --------------------------------------------------------------------------------
 
     /**
@@ -97,5 +108,9 @@ public class TestEditorBean {
 
     public boolean isMockingEnabled() {
         return mockingEnabled;
+    }
+
+    public AssertionLibrary getAssertionLibrary() {
+        return assertionLibrary;
     }
 }
