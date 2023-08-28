@@ -36,7 +36,6 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -46,12 +45,11 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -63,15 +61,12 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * This {@link HttpServlet} handles selection of {@link MultiplayerGame battleground games}.
@@ -104,7 +99,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private GameProducer gameProducer;
 
     @Inject
-    private GameService gameService;
+    private MultiplayerGameService gameService;
 
     @Inject
     private UserRepository userRepo;
@@ -202,7 +197,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
         boolean withMutants = parameterThenOrOther(request, "withMutants", true, false);
 
-        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
+        boolean success = gameService.createGame(newGame, withMutants, withTests, creatorRole);
 
         if (!success) {
             Redirect.redirectBack(request, response);
@@ -364,45 +359,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
     }
 
-    private boolean handleCreateGame(MultiplayerGame game, boolean withMutants, boolean withTests, Role creatorRole) {
-        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
-                    login.getUserId());
-            messages.add("Creating games is currently not enabled.");
-            return false;
-        }
-
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
-
-        int newGameId = MultiplayerGameDAO.storeMultiplayerGame(game);
-        game.setId(newGameId);
-
-        Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
-                EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        eventDAO.insert(event);
-
-        // Always add system player to send mutants and tests at runtime!
-        game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
-        game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
-
-
-        // Add selected role to game if the creator participates as attacker/defender
-        if (creatorRole.equals(Role.ATTACKER) || creatorRole.equals(Role.DEFENDER)) {
-            game.addPlayer(login.getUserId(), creatorRole);
-        }
-
-        gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests);
-
-        /* Publish the event that a new game started */
-        GameCreatedEvent gce = new GameCreatedEvent();
-        gce.setGameId(game.getId());
-        notificationService.post(gce);
-
-        return true;
-    }
-
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MultiplayerGame oldGame = gameProducer.getMultiplayerGame();
 
@@ -412,44 +368,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        MultiplayerGame newGame = new MultiplayerGame.Builder(
-                oldGame.getClassId(),
-                login.getUserId(),
-                oldGame.getMaxAssertionsPerTest())
-                .level(oldGame.getLevel())
-                .chatEnabled(oldGame.isChatEnabled())
-                .capturePlayersIntention(oldGame.isCapturePlayersIntention())
-                .lineCoverage(oldGame.getLineCoverage())
-                .mutantCoverage(oldGame.getMutantCoverage())
-                .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
-                .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
-                .gameDurationMinutes(oldGame.getGameDurationMinutes())
-                .classroomId(oldGame.getClassroomId().orElse(null))
-                .build();
-
-        boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
-        boolean withTests = gameManagingUtils.hasPredefinedTests(oldGame);
-        Role creatorRole = oldGame.getRole(oldGame.getCreatorId());
-
-        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
-
-        if (!success) {
+        Optional<MultiplayerGame> newGame = gameService.rematch(oldGame);
+        if (!newGame.isPresent()) {
             Redirect.redirectBack(request, response);
             return;
         }
 
-        for (Player player : oldGame.getAttackerPlayers()) {
-            if (player.getUser().getId() != oldGame.getCreatorId()) {
-                newGame.addPlayer(player.getUser().getId(), Role.DEFENDER);
-            }
-        }
-        for (Player player : oldGame.getDefenderPlayers()) {
-            if (player.getUser().getId() != oldGame.getCreatorId()) {
-                newGame.addPlayer(player.getUser().getId(), Role.ATTACKER);
-            }
-        }
-
-        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + newGame.getId());
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + newGame.get().getId());
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {

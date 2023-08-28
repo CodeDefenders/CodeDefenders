@@ -53,6 +53,7 @@ import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.game.MeleeGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -109,7 +110,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private GameProducer gameProducer;
 
     @Inject
-    private GameService gameService;
+    private MeleeGameService gameService;
 
     @Inject
     private URLUtils url;
@@ -204,7 +205,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
         boolean withMutants = parameterThenOrOther(request, "withMutants", true, false);
 
-        handleCreateGame(nGame, withMutants, withTests, selectedRole);
+        gameService.createGame(nGame, withMutants, withTests, selectedRole);
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
@@ -354,46 +355,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
     }
 
-    private boolean handleCreateGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {
-        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a melee game, but creating games is not permitted.",
-                    login.getUserId());
-            messages.add("Creating games is currently not enabled.");
-            return false;
-        }
-
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
-
-        int newGameId = MeleeGameDAO.storeMeleeGame(game);
-        game.setId(newGameId);
-
-        Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
-                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        eventDAO.insert(event);
-
-        // Always add system player to send mutants and tests at runtime!
-        game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
-        // TODO: Add two players or only one?
-        // TODO: If only one, then GameManagingUtils.addPredefinedMutantsAndTests needs to be changed.
-        game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER);
-
-        // Add selected role to game if the creator participates as non-observer (i.e., player)
-        if (creatorRole == Role.PLAYER) {
-            game.addPlayer(login.getUserId(), Role.PLAYER);
-        }
-
-        gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests);
-
-        /* Publish the event that a new game started */
-        GameCreatedEvent gce = new GameCreatedEvent();
-        gce.setGameId(game.getId());
-        notificationService.post(gce);
-
-        return true;
-    }
-
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame oldGame = gameProducer.getMeleeGame();
 
@@ -403,40 +364,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        MeleeGame newGame = new MeleeGame.Builder(
-                oldGame.getClassId(),
-                login.getUserId(),
-                oldGame.getMaxAssertionsPerTest())
-                .level(oldGame.getLevel())
-                .chatEnabled(oldGame.isChatEnabled())
-                .capturePlayersIntention(oldGame.isCapturePlayersIntention())
-                .lineCoverage(oldGame.getLineCoverage())
-                .mutantCoverage(oldGame.getMutantCoverage())
-                .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
-                .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
-                .gameDurationMinutes(oldGame.getGameDurationMinutes())
-                .classroomId(oldGame.getClassroomId().orElse(null))
-                .build();
-
-        boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
-        boolean withTests = gameManagingUtils.hasPredefinedTests(oldGame);
-        Role creatorRole = oldGame.getRole(oldGame.getCreatorId());
-
-        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
-
-        if (!success) {
+        Optional<MeleeGame> newGame = gameService.rematch(oldGame);
+        if (!newGame.isPresent()) {
             Redirect.redirectBack(request, response);
             return;
         }
 
-        for (Player player : oldGame.getPlayers()) {
-            if (player.getRole() == Role.PLAYER
-                    && player.getUser().getId() != oldGame.getCreatorId()) {
-                newGame.addPlayer(player.getUser().getId(), player.getRole());
-            }
-        }
-
-        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + newGame.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + newGame.get().getId());
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
