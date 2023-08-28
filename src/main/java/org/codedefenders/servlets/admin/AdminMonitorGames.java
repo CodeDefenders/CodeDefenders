@@ -54,6 +54,8 @@ import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.game.MeleeGameService;
+import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -79,6 +81,12 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private GameService gameService;
+
+    @Inject
+    private MultiplayerGameService multiplayerGameService;
+
+    @Inject
+    private MeleeGameService meleeGameService;
 
     @Inject
     private URLUtils url;
@@ -180,8 +188,9 @@ public class AdminMonitorGames extends HttpServlet {
 
             String[] selectedGames = request.getParameterValues("selectedGames");
             String gameSelectedViaPlayButton = request.getParameter("start_stop_btn");
+            String gameSelectedViaRematchButton = request.getParameter("rematch_btn");
 
-            if (selectedGames == null || gameSelectedViaPlayButton != null) {
+            if (gameSelectedViaPlayButton != null) {
                 // admin is starting or stopping a single game
                 int gameId = -1;
                 // Get the identifying information required to create a game from the submitted form.
@@ -195,7 +204,21 @@ public class AdminMonitorGames extends HttpServlet {
                 }
 
                 startStopGame(gameId, null);
-            } else {
+
+            } else if (gameSelectedViaRematchButton != null) {
+                // rematch for a single game
+                int gameId;
+                try {
+                    gameId = Integer.parseInt(gameSelectedViaRematchButton);
+                } catch (Exception e) {
+                    messages.add("There was a problem with the form.");
+                    response.sendRedirect(url.forPath("/admin"));
+                    return;
+                }
+
+                rematchGame(gameId);
+
+            } else if (selectedGames != null) {
                 GameState newState = request.getParameter("games_btn").equals("Start Games")
                         ? GameState.ACTIVE : GameState.FINISHED;
                 for (String gameId : selectedGames) {
@@ -234,6 +257,16 @@ public class AdminMonitorGames extends HttpServlet {
         }
     }
 
+    private void rematchGame(int gameId) {
+        AbstractGame game = GameDAO.getGame(gameId);
+        if (game instanceof MultiplayerGame) {
+            multiplayerGameService.rematch((MultiplayerGame) game);
+        } else if (game instanceof MeleeGame) {
+            meleeGameService.rematch((MeleeGame) game);
+        } else {
+            messages.add("Couldn't create a rematch game.");
+        }
+    }
 
     private boolean deletePlayer(int playerId, int gameId, int userId) {
         for (Test t : TestDAO.getTestsForGame(gameId)) {

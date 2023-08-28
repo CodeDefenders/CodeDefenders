@@ -143,10 +143,19 @@
                         <td><%=g.getDefenderPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
                         <td>
-                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                <i class="<%=startStopButtonIcon%>"></i>
-                            </button>
+                            <div class="d-flex gap-1">
+                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
+                                        title="Start/Stop Game">
+                                    <i class="<%=startStopButtonIcon%>"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
+                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        id="<%="rematch_"+g.getId()%>"
+                                        title="Rematch">
+                                    <i class="fa fa-repeat"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <%
@@ -363,10 +372,19 @@
                         <td><%=g.getPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
                         <td>
-                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                <i class="<%=startStopButtonIcon%>"></i>
-                            </button>
+                            <div class="d-flex gap-1">
+                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
+                                        title="Start/Stop Game">
+                                    <i class="<%=startStopButtonIcon%>"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
+                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        id="<%="rematch_"+g.getId()%>"
+                                        title="Rematch">
+                                    <i class="fa fa-repeat"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <%
