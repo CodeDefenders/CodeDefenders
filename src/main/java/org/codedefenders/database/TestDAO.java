@@ -155,35 +155,15 @@ public class TestDAO {
      */
     public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
             throws UncheckedSQLException, SQLMappingException {
-        List<Test> result = new ArrayList<>();
-
         String query = String.join("\n",
                 "SELECT t.*",
-                "FROM view_valid_tests t",
+                "FROM view_valid_game_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Game_ID=?",
                 (defendersOnly ? "AND (pl.Role='DEFENDER' OR pl.Role='PLAYER');" : ";")
         );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId)));
 
-        String systemDefenderQuery = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests",
-                "INNER JOIN players pl on tests.Player_ID = pl.ID",
-                "INNER JOIN users u on u.User_ID = pl.User_ID",
-                "WHERE tests.Game_ID = ?",
-                "  AND tests.ClassFile IS NOT NULL",
-                "  AND u.User_ID = ?;"
-        );
-
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(DUMMY_DEFENDER_USER_ID)
-        };
-
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, values));
-
-        return result;
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
     public static List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
@@ -197,7 +177,7 @@ public class TestDAO {
         // need to use some view instead...
         String query = String.join("\n",
                 "SELECT t.*",
-                "FROM view_valid_tests t",
+                "FROM view_valid_game_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? )",
                 "  AND t.Game_ID=? ",
@@ -217,28 +197,16 @@ public class TestDAO {
      * @return a {@link List} of valid tests for the given class.
      */
     public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
-        List<Test> result = new ArrayList<>();
-
         String query = String.join("\n",
-                "SELECT t.*",
-                "FROM view_valid_tests t, games",
-                "WHERE t.Game_ID = games.ID",
-                "  AND games.Class_ID = ?;"
-        );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId)));
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
 
-        // Include also those tests uploaded, i.e, player_id = -1
-        String systemDefenderQuery = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests, test_uploaded_with_class up",
-                "WHERE tests.Test_ID = up.Test_ID",
-                "  AND up.Class_ID = ?",
-                "  AND tests.ClassFile IS NOT NULL;"
+                "SELECT *",
+                "FROM tests_for_class tests",
+                "WHERE tests.Class_ID = ?;"
         );
 
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DatabaseValue.of(classId)));
-
-        return result;
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
     }
 
     /**

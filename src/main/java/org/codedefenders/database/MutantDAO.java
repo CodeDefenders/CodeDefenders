@@ -126,7 +126,7 @@ public class MutantDAO {
     public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM view_mutants_with_user m",
+                "SELECT * FROM view_valid_game_mutants m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.Player_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
@@ -139,7 +139,7 @@ public class MutantDAO {
     public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM view_mutants_with_user m",
+                "SELECT * FROM view_valid_game_mutants m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
@@ -152,7 +152,7 @@ public class MutantDAO {
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM view_valid_mutants m ",
+                "FROM view_valid_game_mutants m ",
                 "WHERE m.Game_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
     }
@@ -161,27 +161,15 @@ public class MutantDAO {
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
-        List<Mutant> result = new ArrayList<>();
-
         String query = String.join("\n",
-                "SELECT m.*",
-                "FROM view_valid_mutants m, games",
-                "WHERE m.Game_ID = games.ID",
-                "  AND games.Class_ID = ?");
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
 
-        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
+                "SELECT mutants.*",
+                "FROM mutants_for_class mutants",
+                "WHERE mutants.Class_ID = ?");
 
-        // Include also those mutants created during the upload. Player = -1
-        String systemAttackerQuery = String.join("\n",
-                "SELECT m.*",
-                "FROM view_valid_mutants m, mutant_uploaded_with_class up",
-                "WHERE m.Mutant_ID = up.Mutant_ID",
-                "  AND m.Class_ID = ?;");
-
-        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS,
-                DatabaseValue.of(classId)));
-
-        return result;
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
     }
 
     /**

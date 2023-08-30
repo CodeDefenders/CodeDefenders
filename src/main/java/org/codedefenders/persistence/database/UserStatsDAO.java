@@ -87,9 +87,9 @@ public class UserStatsDAO {
     private int getNumMutantsByUser(int userId, boolean alive, GameType gameType) {
         final String query = String.join("\n",
                 "SELECT count(Mutant_ID) AS mutants",
-                "FROM view_valid_mutants",
-                "JOIN " + getViewForGameType(gameType) + " AS g",
-                "ON view_valid_mutants.Game_ID = g.ID",
+                "FROM view_valid_user_mutants mutants",
+                "JOIN " + getViewForGameType(gameType) + " AS games",
+                "ON mutants.Game_ID = games.ID",
                 "WHERE User_ID = ?",
                 "AND Alive = ?;"
         );
@@ -132,9 +132,9 @@ public class UserStatsDAO {
     private int getNumTestsByUser(int userId, GameType gameType, boolean killingTest) {
         final String query = String.join("\n",
                 "SELECT count(Test_ID) AS tests",
-                "FROM view_valid_tests",
-                "JOIN " + getViewForGameType(gameType) + " AS g",
-                "ON view_valid_tests.Game_ID = g.ID",
+                "FROM view_valid_user_tests tests",
+                "JOIN " + getViewForGameType(gameType) + " AS games",
+                "ON tests.Game_ID = games.ID",
                 "WHERE User_ID = ?",
                 "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;"
         );
@@ -177,9 +177,9 @@ public class UserStatsDAO {
         final String acc = avg ? "avg" : "sum";
         final String query = String.join("\n",
                 "SELECT " + acc + "(Points) AS points",
-                "FROM view_valid_tests",
-                "JOIN " + getViewForGameType(gameType) + " AS g",
-                "ON view_valid_tests.Game_ID = g.ID",
+                "FROM view_valid_user_tests tests",
+                "JOIN " + getViewForGameType(gameType) + " AS games",
+                "ON tests.Game_ID = games.ID",
                 "WHERE User_ID = ?;"
         );
 
@@ -221,9 +221,9 @@ public class UserStatsDAO {
         final String acc = avg ? "avg" : "sum";
         final String query = String.join("\n",
                 "SELECT " + acc + "(Points) AS points",
-                "FROM view_valid_mutants",
-                "JOIN " + getViewForGameType(gameType) + " AS g",
-                "ON view_valid_mutants.Game_ID = g.ID",
+                "FROM view_valid_user_mutants mutants",
+                "JOIN " + getViewForGameType(gameType) + " AS games",
+                "ON mutants.Game_ID = games.ID",
                 "WHERE User_ID = ?;"
         );
 

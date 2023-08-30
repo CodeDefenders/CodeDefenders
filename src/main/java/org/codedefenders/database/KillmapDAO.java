@@ -79,9 +79,19 @@ public class KillmapDAO {
      */
     public static List<KillMapEntry> getKillMapEntriesForClass(int classId) {
         String query = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates),",
+                "mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT killmap.*",
-                "FROM killmap",
-                "WHERE killmap.Class_ID = ?");
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
+                "WHERE killmap.Class_ID = ?",
+                "  AND killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID;"
+        );
 
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
@@ -254,24 +264,33 @@ public class KillmapDAO {
                 "ORDER BY Class_ID;");
 
         String nrTestsQuery = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT Class_ID, COUNT(Test_ID)",
-                "FROM view_valid_tests",
-                "WHERE Game_ID >= 0",
+                "FROM tests_for_class",
                 "GROUP BY Class_ID;");
 
         String nrMutantsQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT Class_ID, COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
-                "WHERE Game_ID >= 0",
+                "FROM mutants_for_class",
                 "GROUP BY Class_ID;");
 
         String nrEntriesQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
+                "tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT killmap.Class_ID, COUNT(*)",
-                "FROM killmap, tests, mutants",
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
                 "WHERE killmap.Test_ID = tests.Test_ID",
                 "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND tests.Game_ID >= 0",
-                "  AND mutants.Game_ID >= 0",
                 "GROUP BY killmap.Class_ID;");
 
         List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
@@ -318,12 +337,12 @@ public class KillmapDAO {
 
         String nrTestsQuery = String.join("\n",
                 "SELECT Game_ID, COUNT(Test_ID)",
-                "FROM view_valid_tests",
+                "FROM view_valid_game_tests",
                 "GROUP BY Game_ID;");
 
         String nrMutantsQuery = String.join("\n",
                 "SELECT Game_ID, COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
+                "FROM view_valid_game_mutants",
                 "GROUP BY Game_ID;");
 
         String nrEntriesQuery = String.join("\n",
@@ -432,24 +451,34 @@ public class KillmapDAO {
      */
     public static KillMapProgress getKillMapProgressForClass(int classId) {
         String nrTestsQuery = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT COUNT(Test_ID)",
-                "FROM view_valid_tests",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
+                "FROM tests_for_class",
+                "WHERE Class_ID = ?;");
+
 
         String nrMutantsQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
+                "FROM mutants_for_class",
+                "WHERE Class_ID = ?;");
 
         String nrEntriesQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
+                "tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT COUNT(*)",
-                "FROM killmap, tests, mutants",
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
                 "WHERE killmap.Test_ID = tests.Test_ID",
                 "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND tests.Game_ID >= 0",
-                "  AND mutants.Game_ID >= 0",
                 "  AND killmap.Class_ID = ?;");
 
         int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
@@ -471,12 +500,12 @@ public class KillmapDAO {
     public static KillMapProgress getKillMapProgressForGame(int gameId) {
         String nrTestsQuery = String.join("\n",
                 "SELECT COUNT(Test_ID)",
-                "FROM view_valid_tests",
+                "FROM view_valid_game_tests",
                 "WHERE Game_ID = ?;");
 
         String nrMutantsQuery = String.join("\n",
                 "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
+                "FROM view_valid_game_mutants",
                 "WHERE Game_ID = ?;");
 
         String nrEntriesQuery = String.join("\n",
