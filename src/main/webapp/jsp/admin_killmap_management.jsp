@@ -121,7 +121,7 @@
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.AVAILABLE ? "active" : ""%>"
                href="${url.forPath(Paths.ADMIN_KILLMAPS)}/available">
-                Select Classes / Games
+                Select Classes / Games / Classrooms
             </a>
         </li>
         <li class="nav-item">
@@ -231,7 +231,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header d-flex justify-content-between flex-wrap gap-1">
                 Games
                 <div class="d-flex flex-wrap gap-2">
@@ -256,6 +256,34 @@
             </div>
             <div class="card-body">
                 <table id="table-games" class="table table-striped"></table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between flex-wrap gap-1">
+                Classrooms
+                <div class="d-flex flex-wrap gap-2">
+                    <div>
+                        <input type="checkbox" id="toggle-progress-classrooms" class="btn-check" autocomplete="off">
+                        <label for="toggle-progress-classrooms" class="btn btn-xs btn-outline-secondary">
+                            Show progress
+                            <i class="fa fa-check btn-check-active"></i>
+                        </label>
+                    </div>
+                    <button id="invert-selection-classrooms" class="btn btn-xs btn-secondary">Invert Selection</button>
+                    <% if (currentPage == KillmapPage.AVAILABLE) { %>
+                    <div class="text-nowrap">
+                        <button id="queue-selection-classrooms" class="btn btn-xs btn-primary">Queue Selected</button>
+                        <button id="delete-selection-classrooms" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                    </div>
+                    <% } else { %>
+                    <button id="cancel-selection-classrooms" class="btn btn-xs btn-primary">Cancel Selected</button>
+                    <% } %>
+                    <input type="search" id="search-classrooms" class="form-control input-xs" placeholder="Search">
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="table-classrooms" class="table table-striped"></table>
             </div>
         </div>
 
@@ -296,6 +324,26 @@
                     <a download="games.json"
                        href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=json"
                        class="btn btn-sm btn-outline-secondary" id="download-games-json">
+                        as JSON
+                    </a>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="btn-group">
+                    <a download="classrooms.csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=classroom&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-classrooms">
+                        <i class="fa fa-download me-1"></i>
+                        Download classrooms table
+                    </a>
+                    <a download="classrooms.csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=classroom&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-classrooms-csv">
+                        as CSV
+                    </a>
+                    <a download="classrooms.json"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=classroom&fileType=json"
+                       class="btn btn-sm btn-outline-secondary" id="download-classrooms-json">
                         as JSON
                     </a>
                 </div>
@@ -365,9 +413,8 @@
         const node = this.node();
         let percentage;
 
-        const expectedNrEntries = (data.nrTests * data.nrMutants);
-        if (expectedNrEntries !== 0) {
-            percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
+        if (data.nrExpectedEntries !== 0) {
+            percentage = ((data.nrEntries * 100) / data.nrExpectedEntries).toFixed(0);
         } else {
             percentage = 0;
         }
@@ -393,9 +440,8 @@
     };
 
     const progressFromRow = function (row) {
-        const expectedNrEntries = (row.nrTests * row.nrMutants);
-        if (expectedNrEntries !== 0) {
-            return ((row.nrEntries * 100) / expectedNrEntries).toFixed(0) + '%';
+        if (row.nrExpectedEntries !== 0) {
+            return ((row.nrEntries * 100) / row.nrExpectedEntries).toFixed(0) + '%';
         } else {
             return 'NA';
         }
@@ -411,13 +457,16 @@
 
     let emptyClassTableMessage;
     let emptyGameTableMessage;
+    let emptyClassroomTableMessage;
 
     <% if (currentPage == KillmapPage.AVAILABLE) { %>
         emptyClassTableMessage = 'No classes available.';
         emptyGameTableMessage = 'No games available.';
+        emptyClassroomTableMessage = 'No classrooms available.';
     <% } else { %>
         emptyClassTableMessage = 'No classes queued for killmap computation.';
         emptyGameTableMessage = 'No games queued for killmap computation.';
+        emptyClassroomTableMessage = 'No classrooms queued for killmap computation.';
     <% } %>
 
     $(document).ready(function() {
@@ -461,6 +510,34 @@
             language: {emptyTable: emptyGameTableMessage}
         });
 
+        const classroomTable = new DataTable('#table-classrooms', {
+            ajax: {
+                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=classroom&fileType=json',
+                dataSrc: 'data'
+            },
+            columns: [
+                {
+                    data: null,
+                    defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>'
+                },
+                {
+                    data: 'classroomName',
+                    type: 'string',
+                    title: 'Name',
+                    width: '25em',
+                    className: 'truncate'
+                },
+                { data: 'nrMutants',     title: 'Mutants' },
+                { data: 'nrTests',       title: 'Tests' },
+                { data: progressFromRow, title: 'Computed' },
+            ],
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: emptyClassroomTableMessage}
+        });
+
         $('#toggle-progress-classes').on('change', function () {
             const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
             classTable.rows().every(colorFun);
@@ -469,17 +546,25 @@
             const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
             gameTable.rows().every(colorFun);
         });
+        $('#toggle-progress-classrooms').on('change', function () {
+            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
+            classroomTable.rows().every(colorFun);
+        });
 
         $('#search-classes').on('keyup', function () { classTable.search(this.value).draw(); });
-        $('#search-games').on('keyup',   function () { gameTable.search(this.value).draw(); });
+        $('#search-games').on('keyup', function () { gameTable.search(this.value).draw(); });
+        $('#search-classrooms').on('keyup', function () { classroomTable.search(this.value).draw(); });
 
         $('#invert-selection-classes').on('click', () => invertSelection(classTable));
-        $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
+        $('#invert-selection-games').on('click', () => invertSelection(gameTable));
+        $('#invert-selection-classrooms').on('click', () => invertSelection(classroomTable));
 
-        $('#queue-selection-classes').on('click',  () => postTable(classTable, 'submitKillMapJobs', 'class'));
-        $('#queue-selection-games').on('click',    () => postTable(gameTable, 'submitKillMapJobs', 'game'));
+        $('#queue-selection-classes').on('click', () => postTable(classTable, 'submitKillMapJobs', 'class'));
+        $('#queue-selection-games').on('click', () => postTable(gameTable, 'submitKillMapJobs', 'game'));
+        $('#queue-selection-classrooms').on('click', () => postTable(classroomTable, 'submitKillMapJobs', 'classroom'));
         $('#cancel-selection-classes').on('click', () => postTable(classTable, 'cancelKillMapJobs', 'class'));
-        $('#cancel-selection-games').on('click',   () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
+        $('#cancel-selection-games').on('click', () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
+        $('#cancel-selection-classrooms').on('click', () => postTable(classroomTable, 'cancelKillMapJobs', 'classroom'));
 
         $('#delete-selection-classes').on('click', () => {
             if (confirm('Are you sure you want to delete the selected killmaps?'))
@@ -488,6 +573,10 @@
         $('#delete-selection-games').on('click', () => {
             if (confirm('Are you sure you want to delete the selected killmaps?'))
                 postTable(gameTable, 'deleteKillMaps', 'game')
+        });
+        $('#delete-selection-classrooms').on('click', () => {
+            if (confirm('Are you sure you want to delete the selected killmaps?'))
+                postTable(classroomTable, 'deleteKillMaps', 'classroom')
         });
     });
 

@@ -36,6 +36,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.http.HttpStatus;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.KillmapDAO.KillMapProgress;
+import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,18 @@ public class AdminKillmapManagementApi extends HttpServlet {
             return;
         }
 
-        String killmapType = request.getParameter("killmapType"); // class, game
-        if (killmapType == null) {
+        String killmapTypeStr = request.getParameter("killmapType"); // class, game
+        if (killmapTypeStr == null) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             logger.warn("Invalid request to killmap api: killmapType = null");
+            return;
+        }
+        KillMapType killmapType;
+        try {
+            killmapType = KillMapType.valueOf(killmapTypeStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logger.warn("Invalid request to killmap api: killmapType = " + killmapTypeStr);
             return;
         }
 
@@ -91,7 +100,7 @@ public class AdminKillmapManagementApi extends HttpServlet {
      * }
      * </pre>
      */
-    private void doGetJSON(HttpServletResponse response, String dataType, String killmapType) throws IOException {
+    private void doGetJSON(HttpServletResponse response, String dataType, KillMapType killmapType) throws IOException {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
@@ -120,7 +129,7 @@ public class AdminKillmapManagementApi extends HttpServlet {
      * Returns a CSV file containing the user analytics data.
      * The returned CSV will have a header.
      */
-    private void doGetCSV(HttpServletResponse response, String dataType, String killmapType) throws IOException {
+    private void doGetCSV(HttpServletResponse response, String dataType, KillMapType killmapType) throws IOException {
         response.setContentType("text/csv");
 
         List<? extends KillMapProgress> progresses = getData(dataType, killmapType);
@@ -130,23 +139,41 @@ public class AdminKillmapManagementApi extends HttpServlet {
         }
 
         String[] columns;
-        if (killmapType.equalsIgnoreCase("class")) {
-            columns = new String[]{
-                "classId",
-                "className",
-                "classAlias",
-                "nrTests",
-                "nrMutants",
-                "nrEntries"
-            };
-        } else {
-            columns = new String[]{
-                "gameId",
-                "gameMode",
-                "nrTests",
-                "nrMutants",
-                "nrEntries"
-            };
+        switch (killmapType) {
+            case CLASS:
+                columns = new String[]{
+                        "classId",
+                        "className",
+                        "classAlias",
+                        "nrTests",
+                        "nrMutants",
+                        "nrEntries",
+                        "nrExpectedEntries"
+                };
+                break;
+            case GAME:
+                columns = new String[]{
+                        "gameId",
+                        "gameMode",
+                        "nrTests",
+                        "nrMutants",
+                        "nrEntries",
+                        "nrExpectedEntries"
+                };
+                break;
+            case CLASSROOM:
+                columns = new String[]{
+                        "classroomId",
+                        "classroomName",
+                        "nrTests",
+                        "nrMutants",
+                        "nrEntries",
+                        "nrExpectedEntries"
+                };
+                break;
+            default:
+                logger.error("Unknown killmapType value: " + killmapType);
+                return;
         }
 
         PrintWriter out = response.getWriter();
@@ -166,22 +193,30 @@ public class AdminKillmapManagementApi extends HttpServlet {
         csvPrinter.flush();
     }
 
-    public List<? extends KillMapProgress> getData(String dataType, String killmapType) {
+    public List<? extends KillMapProgress> getData(String dataType, KillMapType killmapType) {
         if (dataType.equalsIgnoreCase("available")) {
-            if (killmapType.equalsIgnoreCase("class")) {
-                return KillmapDAO.getNonQueuedKillMapClassProgress();
-            } else if (killmapType.equalsIgnoreCase("game")) {
-                return KillmapDAO.getNonQueuedKillMapGameProgress();
-            } else {
-                logger.warn("Invalid request to killmap api: killmapType = " + killmapType);
+            switch (killmapType) {
+                case CLASS:
+                    return KillmapDAO.getNonQueuedKillMapClassProgress();
+                case GAME:
+                    return KillmapDAO.getNonQueuedKillMapGameProgress();
+                case CLASSROOM:
+                    return KillmapDAO.getNonQueuedKillMapClassroomProgress();
+                default:
+                    logger.error("Unknown killmap type: " + killmapType);
+                    return null;
             }
         } else if (dataType.equalsIgnoreCase("queue")) {
-            if (killmapType.equalsIgnoreCase("class")) {
-                return KillmapDAO.getQueuedKillMapClassProgress();
-            } else if (killmapType.equalsIgnoreCase("game")) {
-                return KillmapDAO.getQueuedKillMapGameProgress();
-            } else {
-                logger.warn("Invalid request to killmap api: killmapType = " + killmapType);
+            switch (killmapType) {
+                case CLASS:
+                    return KillmapDAO.getQueuedKillMapClassProgress();
+                case GAME:
+                    return KillmapDAO.getQueuedKillMapGameProgress();
+                case CLASSROOM:
+                    return KillmapDAO.getQueuedKillMapClassroomProgress();
+                default:
+                    logger.error("Unknown killmap type: " + killmapType);
+                    return null;
             }
         } else {
             logger.warn("Invalid request to killmap api: dataType = " + dataType);
