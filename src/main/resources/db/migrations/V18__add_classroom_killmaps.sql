@@ -1,0 +1,2 @@
+ALTER TABLE killmapjob
+ADD COLUMN Classroom_ID int(11) NULL DEFAULT NULL;
