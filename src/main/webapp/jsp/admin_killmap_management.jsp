@@ -227,7 +227,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table id="table-classes" class="table table-striped"></table>
+                <table id="table-classes" class="table"></table>
             </div>
         </div>
 
@@ -255,7 +255,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table id="table-games" class="table table-striped"></table>
+                <table id="table-games" class="table"></table>
             </div>
         </div>
 
@@ -283,7 +283,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <table id="table-classrooms" class="table table-striped"></table>
+                <table id="table-classrooms" class="table"></table>
             </div>
         </div>
 
@@ -392,19 +392,30 @@
 
 <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
+    /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
+    DataTable.ext.order['select-extension'] = function (settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+            const tr = td.closest('tr');
+            return tr.classList.contains('selected') ? '0' : '1';
+        });
+    };
+
+    const getIdFromData = function (rowData) {
+        return rowData.classId ?? rowData.gameId ?? rowData.classroomId;
+    };
+
+    /* Returns the selected entries from a data table. */
+    const getSelected = function (table) {
+        const entries = [];
+        table.rows({selected: true}).every(function () {
+            const data = this.data();
+            entries.push(data);
+        });
+        return entries;
+    };
+
     const postTable = function (table, formType, killmapType) {
-        const data = table.data();
-        const ids = [];
-
-        for (let i = 0; i < data.length; i++) {
-            const node = table.row(i).node();
-            const checkbox = $(node).find('input');
-
-            if (checkbox.is(':checked')) {
-                ids.push(data[i][killmapType + 'Id']);
-            }
-        }
-
+        const ids = getSelected(table).map(getIdFromData);
         postIds(JSON.stringify(ids), formType, killmapType);
     };
 
@@ -430,13 +441,17 @@
     };
 
     const invertSelection = function (table) {
-        const data = table.data();
+        const selectedIds = new Set(getSelected(table)
+                .map(getIdFromData));
 
-        for (let i = 0; i < data.length; i++) {
-            const node = table.row(i).node();
-            const checkbox = $(node).find('input');
-            checkbox.prop('checked', (_, checked) => !checked);
-        }
+        table.rows().every(function () {
+            const id = getIdFromData(this.data());
+            if (selectedIds.has(id)) {
+                this.deselect();
+            } else {
+                this.select();
+            }
+        });
     };
 
     const progressFromRow = function (row) {
@@ -476,13 +491,24 @@
                 dataSrc: 'data'
             },
             columns: [
-                { data: null,             defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>' },
+                {
+                    data: null,
+                    title: 'Select',
+                    defaultContent: '',
+                    className: 'select-checkbox align-middle',
+                    orderDataType: 'select-extension',
+                    width: '3em'
+                },
                 { data: 'classId',        title: 'Class' },
                 { data: classNameFromRow, title: 'Name' },
                 { data: 'nrMutants',      title: 'Mutants' },
                 { data: 'nrTests',        title: 'Tests' },
                 { data: progressFromRow,  title: 'Computed' },
             ],
+            select: {
+                style: 'multi',
+                className: 'selected'
+            },
             scrollY: '400px',
             scrollCollapse: true,
             paging: false,
@@ -496,13 +522,24 @@
                 dataSrc: 'data'
             },
             columns: [
-                { data: null,            defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>' },
+                {
+                    data: null,
+                    title: 'Select',
+                    defaultContent: '',
+                    className: 'select-checkbox align-middle',
+                    orderDataType: 'select-extension',
+                    width: '3em'
+                },
                 { data: 'gameId',        title: 'Game' },
                 { data: 'gameMode',      title: 'Mode' },
                 { data: 'nrMutants',     title: 'Mutants' },
                 { data: 'nrTests',       title: 'Tests' },
                 { data: progressFromRow, title: 'Computed' },
             ],
+            select: {
+                style: 'multi',
+                className: 'selected'
+            },
             scrollY: '400px',
             scrollCollapse: true,
             paging: false,
@@ -518,7 +555,11 @@
             columns: [
                 {
                     data: null,
-                    defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>'
+                    title: 'Select',
+                    defaultContent: '',
+                    className: 'select-checkbox align-middle',
+                    orderDataType: 'select-extension',
+                    width: '3em'
                 },
                 {
                     data: 'classroomName',
@@ -531,6 +572,10 @@
                 { data: 'nrTests',       title: 'Tests' },
                 { data: progressFromRow, title: 'Computed' },
             ],
+            select: {
+                style: 'multi',
+                className: 'selected'
+            },
             scrollY: '400px',
             scrollCollapse: true,
             paging: false,
