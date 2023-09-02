@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -214,66 +215,47 @@ public class KillmapDAO {
         String query = String.join("\n",
                 "DELETE FROM killmap",
                 "WHERE killmap.Game_ID = ?");
-        return DB.executeUpdateQuery(query);
+        return DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
     }
 
-    public static boolean removeClassKillmap(int gameId) {
-        String query = String.join("\n",
-                "WITH tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates),",
-                "mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+    public static boolean removeClassKillmap(int classId) {
+        List<Test> testsForClass = TestDAO.getValidTestsForClass(classId);
+        List<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClass(classId);
 
+        String testIds = testsForClass.stream()
+                .map(Test::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        String mutantIds = mutantsForClass.stream()
+                .map(Mutant::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String query = String.join("\n",
                 "DELETE FROM killmap",
-                "WHERE killmap.Test_ID IN (SELECT Test_ID FROM tests_for_class)",
-                "  AND killmap.Mutant_ID IN (SELECT Mutant_ID FROM mutants_for_class);"
+                "WHERE killmap.Test_ID IN (" + testIds + ")",
+                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
         );
         return DB.executeUpdateQuery(query);
     }
 
     public static boolean removeClassroomKillmap(int classroomId) {
-        String query = String.join("\n",
-                "WITH relevant_classes AS (",
-                "    SELECT DISTINCT games.Class_ID",
-                "    FROM games",
-                "    WHERE games.Classroom_ID = ?",
-                "),",
-                "classroom_system_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_system_mutant_templates mutants",
-                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_valid_user_mutants mutants, games",
-                "    WHERE mutants.Game_ID = games.ID",
-                "      AND games.Classroom_ID = ?",
-                "),",
-                "mutants_for_classroom AS (",
-                "    SELECT * FROM classroom_system_mutants",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_mutants",
-                "),",
-                "classroom_system_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_system_test_templates tests",
-                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_valid_user_tests tests, games",
-                "    WHERE tests.Game_ID = games.ID",
-                "    AND games.Classroom_ID = ?",
-                "),",
-                "tests_for_classroom AS (",
-                "    SELECT * FROM classroom_system_tests",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_tests",
-                ")",
+        Collection<Test> testsForClass = TestDAO.getValidTestsForClassroom(classroomId).values();
+        Collection<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClassroom(classroomId).values();
 
+        String testIds = testsForClass.stream()
+                .map(Test::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        String mutantIds = mutantsForClass.stream()
+                .map(Mutant::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String query = String.join("\n",
                 "DELETE FROM killmap",
-                "WHERE killmap.Test_ID IN (SELECT Test_ID FROM tests_for_classroom)",
-                "  AND killmap.Mutant_ID IN (SELECT Mutant_ID FROM mutants_for_classroom);"
+                "WHERE killmap.Test_ID IN (" + testIds + ")",
+                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
         );
         return DB.executeUpdateQuery(query);
     }
