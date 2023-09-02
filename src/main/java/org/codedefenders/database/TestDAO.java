@@ -41,6 +41,9 @@ import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
@@ -207,6 +210,43 @@ public class TestDAO {
         );
 
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
+    }
+
+    public static Multimap<Integer, Test> getValidTestsForClassroom(int classroomId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+
+                "classroom_system_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_system_test_templates tests",
+                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+
+                "classroom_user_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_valid_user_tests tests, games",
+                "    WHERE tests.Game_ID = games.ID",
+                "    AND games.Classroom_ID = ?",
+                ")",
+
+                "SELECT * FROM classroom_system_tests",
+                "UNION ALL",
+                "SELECT * FROM classroom_user_tests;"
+        );
+
+        List<Test> tests = DB.executeQueryReturnList(query, TestDAO::testFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+
+        Multimap<Integer, Test> testsMap = ArrayListMultimap.create();
+        for (Test test : tests) {
+            testsMap.put(test.getClassId(), test);
+        }
+        return testsMap;
     }
 
     /**

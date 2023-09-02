@@ -100,6 +100,64 @@ public class KillmapDAO {
     }
 
     /**
+     * Returns the killmap entries for the given class.
+     */
+    public static List<KillMapEntry> getKillMapEntriesForClassroom(int classroomId) {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+                "classroom_system_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_system_mutant_templates mutants",
+                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_valid_user_mutants mutants, games",
+                "    WHERE mutants.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                "),",
+                "mutants_for_classroom AS (",
+                "    SELECT * FROM classroom_system_mutants",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_mutants",
+                "),",
+                "classroom_system_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_system_test_templates tests",
+                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_valid_user_tests tests, games",
+                "    WHERE tests.Game_ID = games.ID",
+                "    AND games.Classroom_ID = ?",
+                "),",
+                "tests_for_classroom AS (",
+                "    SELECT * FROM classroom_system_tests",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_tests",
+                ")",
+
+                "SELECT killmap.*",
+                "FROM killmap,",
+                "   tests_for_classroom tests,",
+                "   mutants_for_classroom mutants",
+                "WHERE killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID"
+        );
+
+        List<Test> tests = TestDAO.getValidTestsForClassroom(classroomId);
+        List<Mutant> mutants = MutantDAO.getValidMutantsForClassroom(classroomId);
+
+        return getKillMapEntries(tests, mutants, query,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+    }
+
+    /**
      * Inserts a killmap entry into the database.
      */
     public static boolean insertKillMapEntry(KillMapEntry entry, int classId) {

@@ -32,11 +32,15 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.game.Test;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * This class handles the database logic for mutants.
@@ -170,6 +174,41 @@ public class MutantDAO {
                 "WHERE mutants.Class_ID = ?");
 
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+    }
+
+    public static Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+                "classroom_system_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_system_mutant_templates mutants",
+                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_valid_user_mutants mutants, games",
+                "    WHERE mutants.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                ")",
+
+                "SELECT * FROM classroom_system_mutants",
+                "UNION ALL",
+                "SELECT * FROM classroom_user_mutants;"
+        );
+
+        List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+
+        Multimap<Integer, Mutant> mutantsMap = ArrayListMultimap.create();
+        for (Mutant mutant : mutants) {
+            mutantsMap.put(mutant.getClassId(), mutant);
+        }
+        return mutantsMap;
     }
 
     /**
