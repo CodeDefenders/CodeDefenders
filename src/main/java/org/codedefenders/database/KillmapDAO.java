@@ -71,6 +71,9 @@ public class KillmapDAO {
 
     /**
      * Returns the killmap entries for the given game.
+     *
+     * <p>The killmap encompasses all mutants and tests as they appear in game.
+     * This means the instances of predefined mutants and tests are used iff they are used in game.
      */
     public static List<KillMapEntry> getKillMapEntriesForGame(int gameId) {
         String query = String.join("\n",
@@ -86,6 +89,9 @@ public class KillmapDAO {
 
     /**
      * Returns the killmap entries for the given class.
+     *
+     * <p>The killmap encompasses all valid user-submitted mutants and tests,
+     * as well as the templates of predefined mutants and tests (not the instances that are copied into games).
      */
     public static List<KillMapEntry> getKillMapEntriesForClass(int classId) {
         String query = String.join("\n",
@@ -110,7 +116,10 @@ public class KillmapDAO {
     }
 
     /**
-     * Returns the killmap entries for the given class.
+     * Returns the killmap entries for the given classroom.
+     *
+     * <p>The killmap encompasses all valid user-submitted mutants and tests from the classroom,
+     * as well as the templates of predefined mutants and tests of used classes.
      */
     public static List<KillMapEntry> getKillMapEntriesForClassroom(int classroomId) {
         String query = String.join("\n",

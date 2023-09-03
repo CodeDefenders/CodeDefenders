@@ -151,6 +151,8 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
+     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
+     *
      * @param gameId        the identifier of the given game.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
      *                      Include also the tests uploaded by the System Defender
@@ -194,7 +196,8 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
-     * <p>Include also the tests from the System Defender
+     * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
+     * (not the instances that are copied into games).
      *
      * @param classId the identifier of the given class.
      * @return a {@link List} of valid tests for the given class.
@@ -212,6 +215,12 @@ public class TestDAO {
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
     }
 
+    /**
+     * Returns the valid {@link Test Tests} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted tests from classroom games as well as templates of predefined tests
+     * for classes used in the classroom.
+     */
     public static Multimap<Integer, Test> getValidTestsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",

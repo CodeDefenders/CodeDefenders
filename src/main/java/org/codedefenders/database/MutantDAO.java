@@ -152,6 +152,8 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the given game.
+     *
+     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
      */
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -163,6 +165,9 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
+     * (not the instances that are copied into games).
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -176,6 +181,12 @@ public class MutantDAO {
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
     }
 
+    /**
+     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted mutants from classroom games as well as templates of predefined mutants
+     * for classes used in the classroom.
+     */
     public static Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
