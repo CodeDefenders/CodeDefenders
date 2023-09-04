@@ -48,16 +48,12 @@ public class AchievementService {
     }
 
     private Achievement.Id getGamePlayedAchievementIdForRole(Role role) {
-        switch (role) {
-            case DEFENDER:
-                return Achievement.Id.PLAY_AS_DEFENDER;
-            case ATTACKER:
-                return Achievement.Id.PLAY_AS_ATTACKER;
-            case PLAYER:
-                return Achievement.Id.PLAY_MELEE_GAMES;
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (role) {
+            case DEFENDER -> Achievement.Id.PLAY_AS_DEFENDER;
+            case ATTACKER -> Achievement.Id.PLAY_AS_ATTACKER;
+            case PLAYER -> Achievement.Id.PLAY_MELEE_GAMES;
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     private void addGamePlayed(List<Player> players, Role role) {
