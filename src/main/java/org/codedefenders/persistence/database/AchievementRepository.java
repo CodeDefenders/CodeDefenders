@@ -34,6 +34,7 @@ public class AchievementRepository {
                 rs.getInt("achievements.Level"),
                 rs.getString("achievements.Name"),
                 rs.getString("achievements.Description"),
+                rs.getString("achievements.ProgressText"),
                 rs.getInt("achievements.Metric"),
                 nextLevelMetricOptional,
                 rs.getInt("CurrentUserMetric")

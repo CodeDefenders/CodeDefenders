@@ -3,11 +3,12 @@ DROP TABLE IF EXISTS achievements;
 
 CREATE TABLE achievements
 (
-    `ID`          INT          NOT NULL,
-    `Level`       INT          NOT NULL,
-    `Name`        VARCHAR(255) NOT NULL,
-    `Description` VARCHAR(255) NOT NULL,
-    `Metric`      INT          NOT NULL,
+    `ID`           INT          NOT NULL,
+    `Level`        INT          NOT NULL,
+    `Name`         VARCHAR(255) NOT NULL,
+    `Description`  VARCHAR(255) NOT NULL,
+    `ProgressText` VARCHAR(255) NOT NULL,
+    `Metric`       INT          NOT NULL,
     PRIMARY KEY (`ID`, `Level`)
 );
 
@@ -23,38 +24,43 @@ CREATE TABLE has_achievement
 );
 
 INSERT INTO achievements
-VALUES (0, 0, 'No games played yet', 'Play your first game to unlock this achievement', 0),
-       (0, 1, 'Newbie', 'Play your first game!', 1),
-       (0, 2, 'Bronze Player', 'Play {0} games', 3),
-       (0, 3, 'Silver Player', 'Play {0} games', 10),
-       (0, 4, 'Gold Player', 'Play {0} games', 50),
+VALUES (0, 0, 'No games played yet', 'Play your first game to unlock this achievement', '{0} of {1} games played', 0),
+       (0, 1, 'Newbie', 'Play your first game!', '{0} of {1} games played to reach the next level', 1),
+       (0, 2, 'Bronze Player', 'Play {0} games', '{0} of {1} games played to reach the next level', 3),
+       (0, 3, 'Silver Player', 'Play {0} games', '{0} of {1} games played to reach the next level', 10),
+       (0, 4, 'Gold Player', 'Play {0} games', '{0} games played, max level reached', 50),
 
-       (1, 0, 'No game played as attacker yet', 'Play as attacker to unlock this achievement', 0),
-       (1, 1, 'Prepare to Attack', 'Play your first multiplayer game as attacker', 1),
-       (1, 2, 'Bronze Attacker', 'Play {0} games as attacker', 3),
-       (1, 3, 'Silver Attacker', 'Play {0} games as attacker', 10),
-       (1, 4, 'Gold Attacker', 'Play {0} games as attacker', 50),
+       (1, 0, 'No game played as attacker yet', 'Play as attacker to unlock this achievement',
+        '{0} of {1} games played', 0),
+       (1, 1, 'Prepare to Attack', 'Play your first multiplayer game as attacker',
+        '{0} of {1} games played to reach the next level', 1),
+       (1, 2, 'Bronze Attacker', 'Play {0} games as attacker', '{0} of {1} games played to reach the next level', 3),
+       (1, 3, 'Silver Attacker', 'Play {0} games as attacker', '{0} of {1} games played to reach the next level', 10),
+       (1, 4, 'Gold Attacker', 'Play {0} games as attacker', '{0} games played, max level reached', 50),
 
-       (2, 0, 'No game played as defender yet', 'Play as defender to unlock this achievement', 0),
-       (2, 1, 'Prepare Your Defenses', 'Play your first multiplayer game as defender', 1),
-       (2, 2, 'Bronze Defender', 'Play {0} games as defender', 3),
-       (2, 3, 'Silver Defender', 'Play {0} games as defender', 10),
-       (2, 4, 'Gold Defender', 'Play {0} games as defender', 50),
+       (2, 0, 'No game played as defender yet', 'Play as defender to unlock this achievement',
+        '{0} of {1} games played', 0),
+       (2, 1, 'Prepare Your Defenses', 'Play your first multiplayer game as defender',
+        '{0} of {1} games played to reach the next level', 1),
+       (2, 2, 'Bronze Defender', 'Play {0} games as defender', '{0} of {1} games played to reach the next level', 3),
+       (2, 3, 'Silver Defender', 'Play {0} games as defender', '{0} of {1} games played to reach the next level', 10),
+       (2, 4, 'Gold Defender', 'Play {0} games as defender', '{0} games played, max level reached', 50),
 
-       (3, 0, 'No melee game played yet', 'Try the melee mode to unlock this achievement', 0),
-       (3, 1, 'Melee Starter', 'Play your first melee game', 1),
-       (3, 2, 'Melee Bronze', 'Play {0} melee games', 3),
-       (3, 3, 'Melee Silver', 'Play {0} melee games', 10),
-       (3, 4, 'Melee Gold', 'Play {0} melee games', 50),
+       (3, 0, 'No melee game played yet', 'Try the melee mode to unlock this achievement', '{0} of {1} games played',
+        0),
+       (3, 1, 'Melee Starter', 'Play your first melee game', '{0} of {1} games played to reach the next level', 1),
+       (3, 2, 'Melee Bronze', 'Play {0} melee games', '{0} of {1} games played to reach the next level', 3),
+       (3, 3, 'Melee Silver', 'Play {0} melee games', '{0} of {1} games played to reach the next level', 10),
+       (3, 4, 'Melee Gold', 'Play {0} melee games', '{0} games played, max level reached', 50),
 
-       (4, 0, 'No tests written yet', 'Write tests to unlock this achievement', 0),
-       (4, 1, 'The First Test', 'Write your first test', 1),
-       (4, 2, 'Bronze Test Writer', 'Write {0} tests', 10),
-       (4, 3, 'Silver Test Writer', 'Write {0} tests', 50),
-       (4, 4, 'Gold Test Writer', 'Write {0} tests', 200),
+       (4, 0, 'No tests written yet', 'Write tests to unlock this achievement', '{0} of {1} test written', 0),
+       (4, 1, 'The First Test', 'Write your first test', '{0} of {1} tests written to reach the next level', 1),
+       (4, 2, 'Bronze Test Writer', 'Write {0} tests', '{0} of {1} tests written to reach the next level', 10),
+       (4, 3, 'Silver Test Writer', 'Write {0} tests', '{0} of {1} tests written to reach the next level', 50),
+       (4, 4, 'Gold Test Writer', 'Write {0} tests', '{0} tests written, max level reached', 200),
 
-       (5, 0, 'No mutants created yet', 'Create mutants to unlock this achievement', 0),
-       (5, 1, 'The First Mutant', 'Create your first mutant', 1),
-       (5, 2, 'Bronze Mutant Creator', 'Create {0} mutants', 10),
-       (5, 3, 'Silver Mutant Creator', 'Create {0} mutants', 50),
-       (5, 4, 'Gold Mutant Creator', 'Create {0} mutants', 200);
+       (5, 0, 'No mutants created yet', 'Create mutants to unlock this achievement', '{0} of {1} mutant created', 0),
+       (5, 1, 'The First Mutant', 'Create your first mutant', '{0} of {1} mutants created to reach the next level', 1),
+       (5, 2, 'Bronze Mutant Creator', 'Create {0} mutants', '{0} of {1} mutants created to reach the next level', 10),
+       (5, 3, 'Silver Mutant Creator', 'Create {0} mutants', '{0} of {1} mutants created to reach the next level', 50),
+       (5, 4, 'Gold Mutant Creator', 'Create {0} mutants', '{0} mutants created, max level reached', 200);

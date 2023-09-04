@@ -2,8 +2,10 @@ package org.codedefenders.model;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -12,23 +14,25 @@ public class Achievement implements Serializable {
     private final int level;
     private final String name;
     private final String description;
+    private final String progressText;
     private final int metricForCurrentLevel;
     private final Optional<Integer> metricForNextLevel;
     private int metricCurrent = 0;
 
-    public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
-                       Optional<Integer> metricForNextLevel) {
+    public Achievement(Id achievementId, int level, String name, String description, String progressText,
+                       int metricForCurrentLevel, Optional<Integer> metricForNextLevel) {
         this.achievementId = achievementId;
         this.level = level;
         this.name = name;
         this.description = MessageFormat.format(description, metricForCurrentLevel);
+        this.progressText = progressText;
         this.metricForCurrentLevel = metricForCurrentLevel;
         this.metricForNextLevel = metricForNextLevel;
     }
 
-    public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
-                       Optional<Integer> metricForNextLevel, int metricCurrent) {
-        this(achievementId, level, name, description, metricForCurrentLevel, metricForNextLevel);
+    public Achievement(Id achievementId, int level, String name, String description, String progressText,
+                       int metricForCurrentLevel, Optional<Integer> metricForNextLevel, int metricCurrent) {
+        this(achievementId, level, name, description, progressText, metricForCurrentLevel, metricForNextLevel);
         this.metricCurrent = metricCurrent;
     }
 
@@ -46,6 +50,13 @@ public class Achievement implements Serializable {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getProgressText() {
+        List<Integer> args = new ArrayList<>();
+        args.add(metricCurrent);
+        metricForNextLevel.ifPresent(args::add);
+        return MessageFormat.format(progressText, args.toArray());
     }
 
     public int getMetricForCurrentLevel() {
