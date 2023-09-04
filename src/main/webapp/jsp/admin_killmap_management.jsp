@@ -354,40 +354,48 @@
 
 <script type="module">
     import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import $ from '${url.forPath("/js/jquery.mjs")}';
+    import {parseHTML} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const postIds = function (idsString, formType, killmapType) {
-        const form = $(
-              '<form method="post">'
-            +     '<input type="hidden" name="formType" value="' + formType + '">'
-            +     '<input type="hidden" name="killmapType" value="' + killmapType + '">'
-            + '</form>'
-        );
+        const form = parseHTML(`
+            <form method="post">
+               <input type="hidden" name="formType" value="\${formType}">
+               <input type="hidden" name="killmapType" value="\${killmapType}">
+            </form>
+        `);
 
-        /* Construct form field with ids like this so we dont have to sanitize the ids. */
-        const idsField = $('<input type="hidden" name="ids" value="">');
+        /* Construct form field with ids like this, so we don't have to sanitize the ids. */
+        const idsField = parseHTML('<input type="hidden" name="ids" value="">')
         idsField.val(idsString);
         form.append(idsField);
 
-        $('body').append(form);
+        document.body.appendChild(form);
         form.submit();
     };
 
 <% if (currentPage == KillmapPage.MANUAL) { %>
 
-    $(document).ready(function() {
-        $('#queue-ids-classes').on('click',  () => postIds($("#class-ids").val(), 'submitKillMapJobs', 'class'));
-        $('#queue-ids-games').on('click',    () => postIds($("#game-ids").val(), 'submitKillMapJobs', 'game'));
+    document.getElementById('queue-ids-classes').addEventListener('click', event => {
+        const idsField = document.getElementById('class-ids');
+        postIds(idsField.value, 'submitKillmapJobs', 'class');
+    });
+    document.getElementById('queue-ids-games').addEventListener('click', event => {
+        const idsField = document.getElementById('game-ids');
+        postIds(idsField.value, 'submitKillmapJobs', 'game');
+    });
 
-        $('#delete-ids-classes').on('click', () => {
-            if (confirm('Are you sure you want to delete the specified killmaps?'))
-                postIds($("#class-ids").val(), 'deleteKillMaps', 'class');
-        });
-        $('#delete-ids-games').on('click', () => {
-            if (confirm('Are you sure you want to delete the specified killmaps?'))
-                postIds($("#game-ids").val(), 'deleteKillMaps', 'game');
-        });
+    document.getElementById('delete-ids-classes').addEventListener('click', event => {
+        const idsField = document.getElementById('class-ids');
+        if (confirm('Are you sure you want to delete the specified killmaps?')) {
+            postIds(idsField.value, 'deleteKillmaps', 'class');
+        }
+    });
+    document.getElementById('delete-ids-games').addEventListener('click', event => {
+        const idsField = document.getElementById('class-ids');
+        if (confirm('Are you sure you want to delete the specified killmaps?')) {
+            postIds(idsField.value, 'deleteKillmaps', 'game');
+        }
     });
 
 <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
@@ -484,145 +492,170 @@
         emptyClassroomTableMessage = 'No classrooms queued for killmap computation.';
     <% } %>
 
-    $(document).ready(function() {
-        const classTable = new DataTable('#table-classes', {
-            ajax: {
-                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=class&fileType=json',
-                dataSrc: 'data'
+    const classTable = new DataTable(document.getElementById('table-classes'), {
+        ajax: {
+            url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=class&fileType=json',
+            dataSrc: 'data'
+        },
+        columns: [
+            {
+                data: null,
+                title: 'Select',
+                defaultContent: '',
+                className: 'select-checkbox align-middle',
+                orderDataType: 'select-extension',
+                width: '3em'
             },
-            columns: [
-                {
-                    data: null,
-                    title: 'Select',
-                    defaultContent: '',
-                    className: 'select-checkbox align-middle',
-                    orderDataType: 'select-extension',
-                    width: '3em'
-                },
-                { data: 'classId',        title: 'Class' },
-                { data: classNameFromRow, title: 'Name' },
-                { data: 'nrMutants',      title: 'Mutants' },
-                { data: 'nrTests',        title: 'Tests' },
-                { data: progressFromRow,  title: 'Computed' },
-            ],
-            select: {
-                style: 'multi',
-                className: 'selected'
+            { data: 'classId',        title: 'Class' },
+            { data: classNameFromRow, title: 'Name' },
+            { data: 'nrMutants',      title: 'Mutants' },
+            { data: 'nrTests',        title: 'Tests' },
+            { data: progressFromRow,  title: 'Computed' },
+        ],
+        select: {
+            style: 'multi',
+            className: 'selected'
+        },
+        scrollY: '400px',
+        scrollCollapse: true,
+        paging: false,
+        dom: 't',
+        language: {emptyTable: emptyClassTableMessage}
+    });
+
+    const gameTable = new DataTable(document.getElementById('table-games'), {
+        ajax: {
+            url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=game&fileType=json',
+            dataSrc: 'data'
+        },
+        columns: [
+            {
+                data: null,
+                title: 'Select',
+                defaultContent: '',
+                className: 'select-checkbox align-middle',
+                orderDataType: 'select-extension',
+                width: '3em'
             },
-            scrollY: '400px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {emptyTable: emptyClassTableMessage}
-        });
+            { data: 'gameId',        title: 'Game' },
+            { data: 'gameMode',      title: 'Mode' },
+            { data: 'nrMutants',     title: 'Mutants' },
+            { data: 'nrTests',       title: 'Tests' },
+            { data: progressFromRow, title: 'Computed' },
+        ],
+        select: {
+            style: 'multi',
+            className: 'selected'
+        },
+        scrollY: '400px',
+        scrollCollapse: true,
+        paging: false,
+        dom: 't',
+        language: {emptyTable: emptyGameTableMessage}
+    });
 
-        const gameTable = new DataTable('#table-games', {
-            ajax: {
-                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=game&fileType=json',
-                dataSrc: 'data'
+    const classroomTable = new DataTable(document.getElementById('table-classrooms'), {
+        ajax: {
+            url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=classroom&fileType=json',
+            dataSrc: 'data'
+        },
+        columns: [
+            {
+                data: null,
+                title: 'Select',
+                defaultContent: '',
+                className: 'select-checkbox align-middle',
+                orderDataType: 'select-extension',
+                width: '3em'
             },
-            columns: [
-                {
-                    data: null,
-                    title: 'Select',
-                    defaultContent: '',
-                    className: 'select-checkbox align-middle',
-                    orderDataType: 'select-extension',
-                    width: '3em'
-                },
-                { data: 'gameId',        title: 'Game' },
-                { data: 'gameMode',      title: 'Mode' },
-                { data: 'nrMutants',     title: 'Mutants' },
-                { data: 'nrTests',       title: 'Tests' },
-                { data: progressFromRow, title: 'Computed' },
-            ],
-            select: {
-                style: 'multi',
-                className: 'selected'
+            {
+                data: 'classroomName',
+                type: 'string',
+                title: 'Name',
+                width: '25em',
+                className: 'truncate'
             },
-            scrollY: '400px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {emptyTable: emptyGameTableMessage}
-        });
+            { data: 'nrMutants',     title: 'Mutants' },
+            { data: 'nrTests',       title: 'Tests' },
+            { data: progressFromRow, title: 'Computed' },
+        ],
+        select: {
+            style: 'multi',
+            className: 'selected'
+        },
+        scrollY: '400px',
+        scrollCollapse: true,
+        paging: false,
+        dom: 't',
+        language: {emptyTable: emptyClassroomTableMessage}
+    });
 
-        const classroomTable = new DataTable('#table-classrooms', {
-            ajax: {
-                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=classroom&fileType=json',
-                dataSrc: 'data'
-            },
-            columns: [
-                {
-                    data: null,
-                    title: 'Select',
-                    defaultContent: '',
-                    className: 'select-checkbox align-middle',
-                    orderDataType: 'select-extension',
-                    width: '3em'
-                },
-                {
-                    data: 'classroomName',
-                    type: 'string',
-                    title: 'Name',
-                    width: '25em',
-                    className: 'truncate'
-                },
-                { data: 'nrMutants',     title: 'Mutants' },
-                { data: 'nrTests',       title: 'Tests' },
-                { data: progressFromRow, title: 'Computed' },
-            ],
-            select: {
-                style: 'multi',
-                className: 'selected'
-            },
-            scrollY: '400px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {emptyTable: emptyClassroomTableMessage}
-        });
+    document.getElementById('toggle-progress-classes').addEventListener('change', event => {
+        const colorFun = event.currentTarget.checked ? colorRow : uncolorRow;
+        classTable.rows().every(colorFun);
+    });
+    document.getElementById('toggle-progress-games').addEventListener('change', event => {
+        const colorFun = event.currentTarget.checked ? colorRow : uncolorRow;
+        gameTable.rows().every(colorFun);
+    });
+    document.getElementById('toggle-progress-classrooms').addEventListener('change', event => {
+        const colorFun = event.currentTarget.checked ? colorRow : uncolorRow;
+        classroomTable.rows().every(colorFun);
+    });
 
-        $('#toggle-progress-classes').on('change', function () {
-            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
-            classTable.rows().every(colorFun);
-        });
-        $('#toggle-progress-games').on('change', function () {
-            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
-            gameTable.rows().every(colorFun);
-        });
-        $('#toggle-progress-classrooms').on('change', function () {
-            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
-            classroomTable.rows().every(colorFun);
-        });
+    document.getElementById('search-classes').addEventListener('keyup', event => {
+        classTable.search(this.value).draw()
+    });
+    document.getElementById('search-games').addEventListener('keyup', event => {
+        gameTable.search(this.value).draw()
+    });
+    document.getElementById('search-classrooms').addEventListener('keyup', event => {
+        classroomTable.search(this.value).draw()
+    });
 
-        $('#search-classes').on('keyup', function () { classTable.search(this.value).draw(); });
-        $('#search-games').on('keyup', function () { gameTable.search(this.value).draw(); });
-        $('#search-classrooms').on('keyup', function () { classroomTable.search(this.value).draw(); });
+    document.getElementById('invert-selection-classes').addEventListener('click', event => {
+        invertSelection(classTable)
+    });
+    document.getElementById('invert-selection-games').addEventListener('click', event => {
+        invertSelection(gameTable)
+    });
+    document.getElementById('invert-selection-classrooms').addEventListener('click', event => {
+        invertSelection(classroomTable)
+    });
 
-        $('#invert-selection-classes').on('click', () => invertSelection(classTable));
-        $('#invert-selection-games').on('click', () => invertSelection(gameTable));
-        $('#invert-selection-classrooms').on('click', () => invertSelection(classroomTable));
+    document.getElementById('queue-selection-classes').addEventListener('click', event => {
+        postTable(classTable, 'submitKillMapJobs', 'class')
+    });
+    document.getElementById('queue-selection-games').addEventListener('click', event => {
+        postTable(gameTable, 'submitKillMapJobs', 'game')
+    });
+    document.getElementById('queue-selection-classrooms').addEventListener('click', event => {
+        postTable(classroomTable, 'submitKillMapJobs', 'classroom')
+    });
+    document.getElementById('cancel-selection-classes').addEventListener('click', event => {
+        postTable(classTable, 'cancelKillMapJobs', 'class')
+    });
+    document.getElementById('cancel-selection-games').addEventListener('click', event => {
+        postTable(gameTable, 'cancelKillMapJobs', 'game')
+    });
+    document.getElementById('cancel-selection-classrooms').addEventListener('click', event => {
+        postTable(classroomTable, 'cancelKillMapJobs', 'classroom')
+    });
 
-        $('#queue-selection-classes').on('click', () => postTable(classTable, 'submitKillMapJobs', 'class'));
-        $('#queue-selection-games').on('click', () => postTable(gameTable, 'submitKillMapJobs', 'game'));
-        $('#queue-selection-classrooms').on('click', () => postTable(classroomTable, 'submitKillMapJobs', 'classroom'));
-        $('#cancel-selection-classes').on('click', () => postTable(classTable, 'cancelKillMapJobs', 'class'));
-        $('#cancel-selection-games').on('click', () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
-        $('#cancel-selection-classrooms').on('click', () => postTable(classroomTable, 'cancelKillMapJobs', 'classroom'));
-
-        $('#delete-selection-classes').on('click', () => {
-            if (confirm('Are you sure you want to delete the selected killmaps?'))
-                postTable(classTable, 'deleteKillMaps', 'class')
-        });
-        $('#delete-selection-games').on('click', () => {
-            if (confirm('Are you sure you want to delete the selected killmaps?'))
-                postTable(gameTable, 'deleteKillMaps', 'game')
-        });
-        $('#delete-selection-classrooms').on('click', () => {
-            if (confirm('Are you sure you want to delete the selected killmaps?'))
-                postTable(classroomTable, 'deleteKillMaps', 'classroom')
-        });
+    document.getElementById('delete-selection-classes').addEventListener('click', event => {
+        if (confirm('Are you sure you want to delete the selected killmaps?')) {
+            postTable(classTable, 'deleteKillMaps', 'class');
+        }
+    });
+    document.getElementById('delete-selection-games').addEventListener('click', event => {
+        if (confirm('Are you sure you want to delete the selected killmaps?')) {
+            postTable(gameTable, 'deleteKillMaps', 'game');
+        }
+    });
+    document.getElementById('delete-selection-classrooms').addEventListener('click', event => {
+        if (confirm('Are you sure you want to delete the selected killmaps?')) {
+            postTable(classroomTable, 'deleteKillMaps', 'classroom');
+        }
     });
 
 <% } %>
