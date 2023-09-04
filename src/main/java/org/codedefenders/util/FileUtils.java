@@ -49,7 +49,9 @@ import static org.codedefenders.util.Constants.TEST_PREFIX;
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
-    private static final Configuration config = CDIUtil.getBeanFromCDI(Configuration.class);
+    private static Configuration getConfig() {
+        return CDIUtil.getBeanFromCDI(Configuration.class);
+    }
 
     /*
      * Some Notes regarding file organization of Code Defenders.
@@ -226,7 +228,7 @@ public class FileUtils {
         if (path.isAbsolute()) {
             return path;
         } else {
-            return Paths.get(config.getDataDir().toString(), path.toString());
+            return Paths.get(getConfig().getDataDir().toString(), path.toString());
         }
     }
 
@@ -249,6 +251,7 @@ public class FileUtils {
      * @return a path relative to {@link Configuration#getDataDir()}} or the path itself.
      */
     public static Path getRelativeDataPath(Path path) {
+        Configuration config = getConfig();
         if (path.startsWith(config.getDataDir().toString())) {
             return config.getDataDir().toPath().relativize(path);
         } else {

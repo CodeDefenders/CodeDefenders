@@ -86,7 +86,7 @@ public class Test {
     public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
         this.classId = classId;
         this.gameId = gameId;
-        this.roundCreated = GameDAO.getCurrentRound(gameId);
+        this.roundCreated = GameDAO.getCurrentRound(gameId); // TODO: this is overwritten by other constructors
         this.javaFile = javaFile;
         this.classFile = classFile;
         this.playerId = playerId;

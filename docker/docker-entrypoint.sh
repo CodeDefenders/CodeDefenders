@@ -18,18 +18,13 @@ gen_tomcat_users() {
     echo '</tomcat-users>' >> "${FILE}"
 }
 
-# TODO: Remove if execution dependency management is handled by CodeDefenders (GitLab #746)
-download_dependencies() {
-    DATA_DIR="$1"
-
-    mkdir -vp "$DATA_DIR/lib"
-
-    mvn --no-transfer-progress -f /installation-pom.xml clean package -Dconfig.properties=<(echo "data.dir=$DATA_DIR")
+config_tomcat_listening_port() {
+    sed -i -E -e "$(printf 's|^(.*<Connector port=")[0-9]*(" protocol="HTTP/1.1".*)$|\\1%d\\2|' "$1")" /etc/tomcat9/server.xml
 }
 
 main() {
     gen_tomcat_users "/etc/tomcat9/tomcat-users.xml" "${CODEDEFENDERS_ADMIN_USERNAME}" "${CODEDEFENDERS_AUTH_ADMIN_ROLE:-"codedefenders-admin"}"
-    download_dependencies "/srv/codedefenders"
+    config_tomcat_listening_port "${CODEDEFENDERS_TOMCAT_LISTENING_PORT:-8080}"
 }
 
 main

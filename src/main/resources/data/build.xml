@@ -6,7 +6,7 @@
 	</description>
 
 	<property name="policyfile" location="security.policy"/>
-	<property name="java.target.version" value="8"/>
+	<property name="java.release.version" value="16"/>
 
 	<!--
 	Properties set via System Properties in AntRunner.java:
@@ -46,13 +46,13 @@
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.target.version}" classpathref="nocut.cp"
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.release.version}" classpathref="nocut.cp"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
 	<!-- requires test to compile only -->
 	<target name="compile-test" description="compile a single test">
-		<javac srcdir="${test.file}" destdir="${test.file}" release="${java.target.version}" classpathref="test.cp"
+		<javac srcdir="${test.file}" destdir="${test.file}" release="${java.release.version}" classpathref="test.cp"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
@@ -109,7 +109,7 @@
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
 	<target name="recompile-test-with-mutant" description="compile a single test including the mutant in the classpath"
 			depends="compile-mutant, compile-test">
-		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.target.version}"
+		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.release.version}"
 			   classpathref="nocut.cp" classpath="${mutant.file}"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
