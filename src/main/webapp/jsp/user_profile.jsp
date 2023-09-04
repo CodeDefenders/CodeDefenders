@@ -48,7 +48,7 @@
             <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
             <c:forEach items="${profile.achievements}" var="achievement">
                 <div class="achievement-card achievement-level-${achievement.level}">
-                    <div class="pie animate" style="--percentage: ${achievement.progress}">
+                    <div class="pie animate" style="--percentage: ${achievement.progress.orElse(100)}">
                         <img src="${url.forPath("/images/achievements/")}codedefenders achievements 0 level ${achievement.level}.png"
                              alt="${achievement.name} (Level ${achievement.level})">
                     </div>
@@ -56,7 +56,10 @@
                         <strong>${achievement.name} <c:if test="${
                             achievement.level > 0}">(Level ${achievement.level})</c:if></strong><br>
                         ${achievement.description} <br>
-                            ${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel} for next level
+                        <c:choose>
+                            <c:when test="${achievement.maxLevel}">${achievement.metricCurrent}, highest level reached</c:when>
+                            <c:otherwise>${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel.get()} for next level</c:otherwise>
+                        </c:choose>
                     </p>
                 </div>
             </c:forEach>

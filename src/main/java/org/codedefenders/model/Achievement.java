@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Achievement implements Serializable {
     private final Id achievementId;
@@ -12,11 +13,11 @@ public class Achievement implements Serializable {
     private final String name;
     private final String description;
     private final int metricForCurrentLevel;
-    private final int metricForNextLevel;
+    private final Optional<Integer> metricForNextLevel;
     private int metricCurrent = 0;
 
     public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
-                       int metricForNextLevel) {
+                       Optional<Integer> metricForNextLevel) {
         this.achievementId = achievementId;
         this.level = level;
         this.name = name;
@@ -26,7 +27,7 @@ public class Achievement implements Serializable {
     }
 
     public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
-                       int metricForNextLevel, int metricCurrent) {
+                       Optional<Integer> metricForNextLevel, int metricCurrent) {
         this(achievementId, level, name, description, metricForCurrentLevel, metricForNextLevel);
         this.metricCurrent = metricCurrent;
     }
@@ -51,7 +52,7 @@ public class Achievement implements Serializable {
         return metricForCurrentLevel;
     }
 
-    public int getNumMetricNeededForNextLevel() {
+    public Optional<Integer> getNumMetricNeededForNextLevel() {
         return metricForNextLevel;
     }
 
@@ -59,8 +60,8 @@ public class Achievement implements Serializable {
         return metricCurrent;
     }
 
-    public float getProgress() {
-        return 100f * metricCurrent / metricForNextLevel;
+    public Optional<Float> getProgress() {
+        return metricForNextLevel.map(metricForNextLevel -> 100f * metricCurrent / metricForNextLevel);
     }
 
     public boolean updateCurrentMetric(int metricChange) {
@@ -69,7 +70,11 @@ public class Achievement implements Serializable {
     }
 
     public boolean reachedNextLevel() {
-        return metricCurrent >= metricForNextLevel;
+        return metricForNextLevel.map(metricForNextLevel -> metricCurrent >= metricForNextLevel).orElse(false);
+    }
+
+    public boolean isMaxLevel() {
+        return metricForNextLevel.isEmpty();
     }
 
     public enum Id {

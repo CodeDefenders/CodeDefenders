@@ -3,6 +3,7 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -26,13 +27,15 @@ public class AchievementRepository {
     }
 
     public Achievement achievementFromRS(ResultSet rs) throws SQLException {
+        int nextLevelMetric = rs.getInt("NextLevelMetric");
+        Optional<Integer> nextLevelMetricOptional = rs.wasNull() ? Optional.empty() : Optional.of(nextLevelMetric);
         return new Achievement(
                 Achievement.Id.fromInt(rs.getInt("achievements.ID")),
                 rs.getInt("achievements.Level"),
                 rs.getString("achievements.Name"),
                 rs.getString("achievements.Description"),
                 rs.getInt("achievements.Metric"),
-                rs.getInt("NextLevelMetric"),
+                nextLevelMetricOptional,
                 rs.getInt("CurrentUserMetric")
         );
     }
