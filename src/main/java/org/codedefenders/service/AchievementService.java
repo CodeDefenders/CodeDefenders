@@ -62,10 +62,12 @@ public class AchievementService {
 
     private void addGamePlayed(List<Player> players, Role role) {
         Achievement.Id achievementId = getGamePlayedAchievementIdForRole(role);
-        int affected = players.stream().map(Player::getUser).mapToInt(UserEntity::getId).map(userId ->
-                repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) +
-                        repo.updateAchievementForUser(userId, achievementId, 1)
-        ).sum();
+        int affected = players.stream()
+                .map(Player::getUser)
+                .mapToInt(UserEntity::getId)
+                .map(userId -> repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) +
+                        repo.updateAchievementForUser(userId, achievementId, 1))
+                .sum();
         if (affected > 0) {
             logger.info("Updated {} achievement levels for role {}", affected, role);
         }

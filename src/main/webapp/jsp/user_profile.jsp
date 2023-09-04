@@ -53,12 +53,20 @@
                              alt="${achievement.name} (Level ${achievement.level})">
                     </div>
                     <p>
-                        <strong>${achievement.name} <c:if test="${
-                            achievement.level > 0}">(Level ${achievement.level})</c:if></strong><br>
+                        <strong>
+                                ${achievement.name}
+                            <c:if test="${achievement.level > 0}">
+                                (Level ${achievement.level})
+                            </c:if>
+                        </strong><br>
                         ${achievement.description} <br>
                         <c:choose>
-                            <c:when test="${achievement.maxLevel}">${achievement.metricCurrent}, highest level reached</c:when>
-                            <c:otherwise>${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel.get()} for next level</c:otherwise>
+                            <c:when test="${achievement.maxLevel}">
+                                ${achievement.metricCurrent}, highest level reached
+                            </c:when>
+                            <c:otherwise>
+                                ${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel.get()} for next level
+                            </c:otherwise>
                         </c:choose>
                     </p>
                 </div>
