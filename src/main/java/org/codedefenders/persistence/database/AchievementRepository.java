@@ -49,21 +49,18 @@ public class AchievementRepository {
                 "    AND a.Level = achievements.Level + 1",
                 ") AS NextLevelMetric",
                 "FROM achievements LEFT OUTER JOIN has_achievement",
-                // get achievements with no progress tracked as well
                 "ON has_achievement.User_ID = ?",
                 "AND has_achievement.Achievement_ID = achievements.ID",
-                "AND has_achievement.Achievement_Level = achievements.Level",
-                "WHERE (achievements.Level = 0 AND achievements.ID NOT IN (",
-                // if no progress tracked, fetch only level 0
-                "    SELECT Achievement_ID FROM has_achievement WHERE User_ID = ?))",
-                "OR has_achievement.Achievement_Level IS NOT NULL"
+                "WHERE has_achievement.Achievement_Level = achievements.Level",
+                // get achievements with no progress tracked as well -> left outer join
+                "OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0"
         );
 
         try {
             return queryRunner.query(
                     query,
                     resultSet -> listFromRS(resultSet, this::achievementFromRS),
-                    userId, userId
+                    userId
             );
         } catch (SQLException e) {
             logger.error("Failed to get achievements for user {}", userId, e);
