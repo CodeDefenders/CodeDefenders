@@ -324,15 +324,15 @@ public class KillmapDAO {
         switch (theJob.getType()) {
             case CLASS:
                 return DB.executeUpdateQuery(
-                        "INSERT INTO killmapjob (Class_ID) VALUES (?);",
+                        "REPLACE INTO killmapjob (Class_ID) VALUES (?);",
                         DatabaseValue.of(theJob.getId()));
             case GAME:
                 return DB.executeUpdateQuery(
-                        "INSERT INTO killmapjob (Game_ID) VALUES (?);",
+                        "REPLACE INTO killmapjob (Game_ID) VALUES (?);",
                         DatabaseValue.of(theJob.getId()));
             case CLASSROOM:
                 return DB.executeUpdateQuery(
-                        "INSERT INTO killmapjob (Classroom_ID) VALUES (?);",
+                        "REPLACE INTO killmapjob (Classroom_ID) VALUES (?);",
                         DatabaseValue.of(theJob.getId()));
             default:
                 logger.warn("Unknown type of Killmap Job!");

@@ -19,6 +19,8 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -211,7 +213,9 @@ public class AdminKillmapManagement extends HttpServlet {
         response.sendRedirect(request.getRequestURI());
     }
 
-    private void submitKillMapJobs(KillMapType killmapType, List<Integer> ids) {
+    private void submitKillMapJobs(KillMapType killmapType, Collection<Integer> ids) {
+        ids = new HashSet<>(ids);
+
         /* Check if classes or games exist for the given ids. */
         List<Integer> existingIds;
         switch (killmapType) {

@@ -21,6 +21,7 @@ package org.codedefenders.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -462,7 +463,7 @@ public class GameClassDAO {
      * @param ids The class IDs to check.
      * @return The given class IDs for which classes exist.
      */
-    public static List<Integer> filterExistingClassIDs(List<Integer> ids) {
+    public static List<Integer> filterExistingClassIDs(Collection<Integer> ids) {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
