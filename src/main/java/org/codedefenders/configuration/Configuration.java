@@ -45,6 +45,7 @@ import javax.annotation.Nullable;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 
+import org.codedefenders.util.JavaVersionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,6 +190,14 @@ public class Configuration {
                     validationErrors.add(resolveAttributeName("antJavaHome") + " doesn't contain the java executable "
                             + javaExecutable);
                 }
+                Optional<Integer> antMajorJavaVersion = JavaVersionUtils.getMajorJavaVersionFromExecutable(
+                        javaExecutable.toPath());
+                if (antMajorJavaVersion.isEmpty()) {
+                    validationErrors.add(String.format("%s: got an error while running the java executable '%s'. Please check the logs.",
+                                    resolveAttributeName("antJavaHome"), javaExecutable));
+                } else if (antMajorJavaVersion.get() < 17) {
+                    validationErrors.add(resolveAttributeName("antJavaHome") + ": Ant Java version must be >= 17");
+                }
             }
 
             boolean dbvalid = true;
@@ -233,6 +242,10 @@ public class Configuration {
                 } catch (ClassNotFoundException e) {
                     validationErrors.add("Could not load the MySQL driver");
                 }
+            }
+
+            if (JavaVersionUtils.getJavaMajorVersion() < 17) {
+                validationErrors.add("Unsupported java version! CodeDefenders needs at least Java 17.");
             }
 
             /*

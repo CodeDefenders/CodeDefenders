@@ -23,10 +23,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.CompactConstructorDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
@@ -86,11 +90,41 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
+    public void visit(RecordDeclaration decl, Void args) {
+        if (!isValid) {
+            return;
+        }
+        super.visit(decl, args);
+        this.message = ValidationMessage.MUTATION_CLASS_DECLARATION;
+        isValid = false;
+    }
+
+    @Override
     public void visit(MethodDeclaration stmt, Void args) {
         if (!isValid) {
             return;
         }
         super.visit(stmt, args);
+        this.message = ValidationMessage.MUTATION_METHOD_DECLARATION;
+        isValid = false;
+    }
+
+    @Override
+    public void visit(ConstructorDeclaration decl, Void args) {
+        if (!isValid) {
+            return;
+        }
+        super.visit(decl, args);
+        this.message = ValidationMessage.MUTATION_METHOD_DECLARATION;
+        isValid = false;
+    }
+
+    @Override
+    public void visit(CompactConstructorDeclaration decl, Void args) {
+        if (!isValid) {
+            return;
+        }
+        super.visit(decl, args);
         this.message = ValidationMessage.MUTATION_METHOD_DECLARATION;
         isValid = false;
     }
@@ -186,6 +220,19 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
+    public void visit(SwitchExpr expr, Void args) {
+        if (!isValid) {
+            return;
+        }
+        super.visit(expr, args);
+        if (level.equals(CodeValidatorLevel.RELAXED)) {
+            return;
+        }
+        this.message = ValidationMessage.MUTATION_SWITCH_STATEMENT;
+        isValid = false;
+    }
+
+    @Override
     public void visit(MethodCallExpr stmt, Void args) {
         if (!isValid) {
             return;
@@ -203,9 +250,8 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        // TODO(Marvin): what is this even checking for? an expression cannot start with "System.*"
         if (stmt.getInitializer().isPresent()
-                && JavaParserUtils.unparse(stmt.getInitializer().get()).startsWith("System.*")) {
+                && JavaParserUtils.unparse(stmt.getInitializer().get()).startsWith("System.")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
             isValid = false;
         }

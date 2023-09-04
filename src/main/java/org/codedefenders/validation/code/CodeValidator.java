@@ -56,6 +56,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -420,10 +421,12 @@ public class CodeValidator {
         Set<String> methodSignatures = new HashSet<>();
         // Method signatures in the class including constructors
         for (Object bd : td.getMembers()) {
-            if (bd instanceof MethodDeclaration) {
-                methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
-            } else if (bd instanceof ConstructorDeclaration) {
-                methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
+            if (bd instanceof MethodDeclaration methodDecl) {
+                methodSignatures.add(methodDecl.getDeclarationAsString());
+            } else if (bd instanceof ConstructorDeclaration constructorDecl) {
+                methodSignatures.add(constructorDecl.getDeclarationAsString());
+            } else if (bd instanceof CompactConstructorDeclaration compactDecl) {
+                methodSignatures.add(compactDecl.getDeclarationAsString(true, true, true));
             } else if (bd instanceof TypeDeclaration) {
                 // Inner classes
                 methodSignatures.addAll(extractMethodSignaturesByType((TypeDeclaration<?>) bd));

@@ -21,68 +21,46 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.enterprise.inject.Produces;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
-import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({
-        // The next are required so that the Weld rule works properly with PowerMock
-        "org.jboss.weld.*",
-        "javax.enterprise.inject.*",
-        "javax.xml.*",
-        "org.apache.xerces.*",
-})
-@PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class, MultiplayerGameDAO.class})
+@ExtendWith(MockitoExtension.class)
 public class MutantTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    static Path tempDir;
 
-    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @Rule
-    public WeldInitiator weld = WeldInitiator.of(MutantTest.class);
-
-    @Produces
-    public Configuration produceConfiguration() {
-        return new Configuration() {};
-    }
-
-
-    @org.junit.Test
+    @Test
     public void testApplyPatch() throws IOException, PatchFailedException {
-
         List<String> originalCode = Arrays.asList("public class Lift {", "private int topFloor;",
                 "private int currentFloor = 0; // default", "private int capacity = 10;    // default",
                 "private int numRiders = 0;    // default", "public Lift(int highestFloor) { ",
@@ -109,42 +87,14 @@ public class MutantTest {
         assertEquals(mutantCode, patchedCode);
     }
 
-    @Test
-    public void exploratoryTest() {
-        List<Integer> mutatedLines = new ArrayList<>();
-        String s = StringUtils.join(mutatedLines, ",");
-        System.out.println("MutantTest.exploratoryTest() " + s);
-
-    }
-
-    @Test
-    public void testGetLinesForChangeSingleLine() throws IOException {
-        String originalCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {  topFloor = highestFloor;" + "\n" // 7 -Change this
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        File cutJavaFile = temporaryFolder.newFile();
+    @ParameterizedTest(name = "[{index}] {0}")
+    @ArgumentsSource(MutantTestArguments.class)
+    public void test(String name, String originalCode, String mutantCode, Consumer<Mutant> assertions)
+            throws IOException {
+        File cutJavaFile = tempDir.resolve("original.java").toFile();
         FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
+
+        File mutantJavaFile = tempDir.resolve("mutant.java").toFile();
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
@@ -152,490 +102,312 @@ public class MutantTest {
 
         int mockedClassId = 1;
         int mockedGameId = 1;
-
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
 
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        // This call causes the connection lookup
-        PowerMockito.when(MultiplayerGameDAO.getMultiplayerGame(mockedGameId)).thenReturn(mockedGame);
+        try (var mockedMultiDAO = mockStatic(MultiplayerGameDAO.class);
+             var mockedClassDAO = mockStatic(GameClassDAO.class)) {
+            mockedMultiDAO.when(() -> MultiplayerGameDAO.getMultiplayerGame(mockedGameId))
+                    .thenReturn(mockedGame);
+            mockedClassDAO.when(() -> GameClassDAO.getClassForId(mockedClassId))
+                    .thenReturn(mockedGameClass);
 
-
-        when(mockedGame.getClassId()).thenReturn(1);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedClassId, mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(1, p.getDeltas().size());
-        assertEquals(Arrays.asList(7), m.getLines());
-
-        for (AbstractDelta<String> d : p.getDeltas()) {
-            System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d.toString());
+            Mutant mutant = new Mutant(mockedGameId, mockedClassId, mutantJavaFile.getAbsolutePath(), null, true, 1, 2);
+            assertions.accept(mutant);
         }
     }
 
-    @Test
-    public void testGetLinesForChangeMultipleLines() throws IOException {
-        String originalCode =
-                "public class Lift {" + "\n"
-                        + "private int topFloor;" + "\n"
-                        + "private int currentFloor = 0; // default" + "\n"
-                        + "private int capacity = 10;    // default" + "\n"
-                        + "private int numRiders = 0;    // default" + "\n"
-                        + "\n"
-                        + "public Lift(int highestFloor) {" + "\n"
-                        + "topFloor = highestFloor;" + "\n"
-                        + "}" + "\n"
-                        + "}";
+    public static class MutantTestArguments implements ArgumentsProvider {
+        private Arguments testGetLinesForChangeSingleLine() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {  topFloor = " + "\n" // Change lines 7 - 10
-                + "" + "\n" //
-                + "" + "\n" //
-                + "highestFloor;" + "\n" //
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {  topFloor = highestFloor;" + "\n" // 7 -Change this
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(1, patch.getDeltas().size());
+                assertEquals(Arrays.asList(7), mutant.getLines());
+            };
 
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(1, p.getDeltas().size());
-        assertEquals(Arrays.asList(7), m.getLines());
-    }
-
-    @Test
-    public void testGetLinesForInsertSingeLine() throws IOException {
-        String originalCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n" // 8 - Add this
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
-
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(1, p.getDeltas().size());
-        assertEquals(Arrays.asList(9), m.getLines());
-    }
-
-    @Test
-    public void testGetLinesForInsertMultipleLines() throws IOException {
-        String originalCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor + 1;" + "\n" // 8 - Add this
-                + "topFloor = highestFloor + 1;" + "\n" // 9 - Add this
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
-
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(1, p.getDeltas().size());
-        assertEquals(Arrays.asList(8), m.getLines());
-
-        System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout());
-    }
-
-    @Test
-    public void testGetLinesForChangeLineAndInsertMultipleLines() throws IOException {
-        String originalCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) { topFloor = 0; " + "\n" // 7 - Change
-                + "topFloor = highestFloor;" + "\n"
-                + "topFloor = highestFloor + 1;" + "\n" // 9 - Insert
-                + "topFloor = highestFloor + 1;" + "\n" // 10 - Insert
-                + "}" + "\n"
-                + "}";
-
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
-
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(2, p.getDeltas().size()); // Change and insertion
-        assertEquals(2, m.getLines().size());  // Change line, and line of insertion
-        assertEquals(Arrays.asList(7, 9), m.getLines());
-
-        System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout());
-    }
-
-    @Test
-    public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException {
-        //int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
-        //GameClass sut = MultiplayerGameDAO.getClassForId(classId);
-
-        // Mock the class provide a temmp sourceFile with original content in it
-        String originalCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "}" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor, int maxRiders) {" + "\n"
-                + "this(highestFloor);" + "\n"
-                + "capacity = maxRiders;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        String mutantCode = "public class Lift {" + "\n"
-                + "private int topFloor;" + "\n"
-                + "private int currentFloor = 0; // default" + "\n"
-                + "private int capacity = 10;    // default" + "\n"
-                + "private int numRiders = 0;    // default" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor) {" + "\n"
-                + "topFloor = highestFloor;" + "\n"
-                + "topFloor = highestFloor;" + "\n" // Add line
-                + "}" + "\n"
-                + "\n"
-                + "public Lift(int highestFloor, int maxRiders) {" + "\n"
-                + "this(highestFloor);" + "\n"
-                + "topFloor = highestFloor;" + "\n" // Add line
-                + "capacity = maxRiders;" + "\n"
-                + "}" + "\n"
-                + "}";
-
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
-
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
-        System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(2, p.getDeltas().size()); // Change and insertion
-        assertEquals(Arrays.asList(9, 13), m.getLines());
-
-        for (AbstractDelta<String> d : p.getDeltas()) {
-            System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
+            return Arguments.of("testGetLinesForChangeSingleLine", originalCode, mutantCode, assertions);
         }
-    }
 
-    @Test
-    public void testGetLinesForEmptySpaces() throws IOException {
-        String originalCode = "public String toString(int doubleLength) {" + "\n"
-                + "StringBuffer temp = new StringBuffer();" + "\n"
-                + "temp.append(trim(real, doubleLength));" + "\n"
-                + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                + "temp.append(trim(-imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "} else {" + "\n"
-                + "temp.append(\" + \");" + "\n"
-                + "temp.append(trim(imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "\n"
-                + "}" + "\n"
-                + "return temp.toString();}";
+        private Arguments testGetLinesForChangeMultipleLines() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        String mutantCode = "public String toString(int doubleLength) {" + "\n"
-                + "StringBuffer temp = new StringBuffer();" + "\n"
-                + "temp.append(trim(real, doubleLength));" + "\n"
-                + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                + "temp.append(trim(-imag, doubleLength));" + "\n"
-                + "temp.append(\" i   \");" + "} else {" + "\n"
-                + "temp.append(\" + \");" + "\n"
-                + "temp.append(trim(imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "\n"
-                + "}" + "\n"
-                + "return temp.toString();}";
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {  topFloor = " + "\n" // Change lines 7 - 10
+                    + "" + "\n"
+                    + "" + "\n"
+                    + "highestFloor;" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(1, patch.getDeltas().size());
+                assertEquals(Arrays.asList(7), mutant.getLines());
+            };
 
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
-
-        int mockedClassId = 1;
-        int mockedGameId = 1;
-
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
-
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
-
-        Patch<String> p = m.getDifferences();
-
-        assertEquals(1, p.getDeltas().size());
-        //assertEquals(Arrays.asList(7), m.getLines());
-
-        for (AbstractDelta<String> d : p.getDeltas()) {
-            System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
+            return Arguments.of("testGetLinesForChangeMultipleLines", originalCode, mutantCode, assertions);
         }
-    }
 
-    @Test
-    public void testGetLinesForEmptySpacesOutsideStrings() throws IOException {
-        String originalCode = "public String toString(int doubleLength) {" + "\n"
-                + "StringBuffer temp = new StringBuffer();" + "\n"
-                + "temp.append(trim(real, doubleLength));" + "\n"
-                + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                + "temp.append(trim(-imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "} else {" + "\n"
-                + "temp.append(\" + \");" + "\n"
-                + "temp.append(trim(imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "\n"
-                + "}" + "\n"
-                + "return temp.toString();}";
+        private Arguments testGetLinesForInsertSingeLine() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        String mutantCode = "public String toString(int doubleLength) {" + "\n"
-                + "StringBuffer temp = new StringBuffer();" + "\n"
-                + "temp.append(trim(real, doubleLength));" + "\n"
-                + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                + "temp.append(trim(-imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "} else {" + "\n"
-                + "temp.append(\" + \");    " + "\n" // Add random spaces here. Those should be trimmed
-                + "temp.append(trim(imag, doubleLength));" + "\n"
-                + "temp.append(\" i\");" + "\n"
-                + "}" + "\n"
-                + "return temp.toString();}";
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n" // 8 - Add this
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
-        //
-        File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(1, patch.getDeltas().size());
+                assertEquals(Arrays.asList(9), mutant.getLines());
+            };
 
-        GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
+            return Arguments.of("testGetLinesForInsertSingeLine", originalCode, mutantCode, assertions);
+        }
 
-        int mockedClassId = 1;
-        int mockedGameId = 1;
+        private Arguments testGetLinesForInsertMultipleLines() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassId);
-        when(mockedGame.getClassId()).thenReturn(mockedClassId);
-        when(mockedGame.getId()).thenReturn(mockedGameId);
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor + 1;" + "\n" // 8 - Add this
+                    + "topFloor = highestFloor + 1;" + "\n" // 9 - Add this
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
 
-        PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        PowerMockito.mockStatic(GameClassDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
-        PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
-        //
-        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
-        //
-        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(1, patch.getDeltas().size());
+                assertEquals(Arrays.asList(8), mutant.getLines());
+            };
 
-        Patch<String> p = m.getDifferences();
+            return Arguments.of("testGetLinesForInsertMultipleLines", originalCode, mutantCode, assertions);
+        }
 
-        assertEquals(0, p.getDeltas().size());
+        private Arguments testGetLinesForChangeLineAndInsertMultipleLines() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "}";
+
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) { topFloor = 0; " + "\n" // 7 - Change
+                    + "topFloor = highestFloor;" + "\n"
+                    + "topFloor = highestFloor + 1;" + "\n" // 9 - Insert
+                    + "topFloor = highestFloor + 1;" + "\n" // 10 - Insert
+                    + "}" + "\n"
+                    + "}";
+
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(2, patch.getDeltas().size()); // Change and insertion
+                assertEquals(2, mutant.getLines().size());  // Change line, and line of insertion
+                assertEquals(Arrays.asList(7, 9), mutant.getLines());
+            };
+
+            return Arguments.of("testGetLinesForChangeLineAndInsertMultipleLines", originalCode, mutantCode, assertions);
+        }
+
+        private Arguments testGetLinesForInsertionMutantOnDisjointLines() {
+            String originalCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "}" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor, int maxRiders) {" + "\n"
+                    + "this(highestFloor);" + "\n"
+                    + "capacity = maxRiders;" + "\n"
+                    + "}" + "\n"
+                    + "}";
+
+            String mutantCode = "public class Lift {" + "\n"
+                    + "private int topFloor;" + "\n"
+                    + "private int currentFloor = 0; // default" + "\n"
+                    + "private int capacity = 10;    // default" + "\n"
+                    + "private int numRiders = 0;    // default" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor) {" + "\n"
+                    + "topFloor = highestFloor;" + "\n"
+                    + "topFloor = highestFloor;" + "\n" // Add line
+                    + "}" + "\n"
+                    + "\n"
+                    + "public Lift(int highestFloor, int maxRiders) {" + "\n"
+                    + "this(highestFloor);" + "\n"
+                    + "topFloor = highestFloor;" + "\n" // Add line
+                    + "capacity = maxRiders;" + "\n"
+                    + "}" + "\n"
+                    + "}";
+
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(2, patch.getDeltas().size()); // Change and insertion
+                assertEquals(Arrays.asList(9, 13), mutant.getLines());
+            };
+
+            return Arguments.of("testGetLinesForInsertionMutantOnDisjointLines", originalCode, mutantCode, assertions);
+        }
+
+        private Arguments testGetLinesForEmptySpaces() {
+            String originalCode = "public String toString(int doubleLength) {" + "\n"
+                    + "StringBuffer temp = new StringBuffer();" + "\n"
+                    + "temp.append(trim(real, doubleLength));" + "\n"
+                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
+                    + "temp.append(trim(-imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "} else {" + "\n"
+                    + "temp.append(\" + \");" + "\n"
+                    + "temp.append(trim(imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "\n"
+                    + "}" + "\n"
+                    + "return temp.toString();}";
+
+            String mutantCode = "public String toString(int doubleLength) {" + "\n"
+                    + "StringBuffer temp = new StringBuffer();" + "\n"
+                    + "temp.append(trim(real, doubleLength));" + "\n"
+                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
+                    + "temp.append(trim(-imag, doubleLength));" + "\n"
+                    + "temp.append(\" i   \");" + "} else {" + "\n"
+                    + "temp.append(\" + \");" + "\n"
+                    + "temp.append(trim(imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "\n"
+                    + "}" + "\n"
+                    + "return temp.toString();}";
+
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> p = mutant.getDifferences();
+                assertEquals(1, p.getDeltas().size());
+            };
+
+            return Arguments.of("testGetLinesForEmptySpaces", originalCode, mutantCode, assertions);
+        }
+
+        private Arguments testGetLinesForEmptySpacesOutsideStrings() {
+            String originalCode = "public String toString(int doubleLength) {" + "\n"
+                    + "StringBuffer temp = new StringBuffer();" + "\n"
+                    + "temp.append(trim(real, doubleLength));" + "\n"
+                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
+                    + "temp.append(trim(-imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "} else {" + "\n"
+                    + "temp.append(\" + \");" + "\n"
+                    + "temp.append(trim(imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "\n"
+                    + "}" + "\n"
+                    + "return temp.toString();}";
+
+            String mutantCode = "public String toString(int doubleLength) {" + "\n"
+                    + "StringBuffer temp = new StringBuffer();" + "\n"
+                    + "temp.append(trim(real, doubleLength));" + "\n"
+                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
+                    + "temp.append(trim(-imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "} else {" + "\n"
+                    + "temp.append(\" + \");    " + "\n" // Add random spaces here. Those should be trimmed
+                    + "temp.append(trim(imag, doubleLength));" + "\n"
+                    + "temp.append(\" i\");" + "\n"
+                    + "}" + "\n"
+                    + "return temp.toString();}";
+
+            Consumer<Mutant> assertions = mutant -> {
+                Patch<String> patch = mutant.getDifferences();
+                assertEquals(0, patch.getDeltas().size());
+            };
+
+            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+        }
+
+        @Override
+        public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
+            return Stream.of(
+                    testGetLinesForChangeSingleLine(),
+                    testGetLinesForChangeMultipleLines(),
+                    testGetLinesForInsertSingeLine(),
+                    testGetLinesForInsertMultipleLines(),
+                    testGetLinesForChangeLineAndInsertMultipleLines(),
+                    testGetLinesForInsertionMutantOnDisjointLines(),
+                    testGetLinesForEmptySpaces(),
+                    testGetLinesForEmptySpacesOutsideStrings()
+            );
+        }
     }
 }
