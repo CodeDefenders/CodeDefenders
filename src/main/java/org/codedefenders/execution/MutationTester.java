@@ -357,7 +357,7 @@ public class MutationTester implements IMutationTester {
             // Mutant survived
             return false;
         }
-        if (!mutant.kill(ASSUMED_NO)) {
+        if (!MutantDAO.killMutant(mutant, ASSUMED_NO)) {
             logger.info("Test {} would have killed Mutant {}, but Mutant {} was already dead!", test.getId(),
                     mutant.getId(), mutant.getId());
             return false;
@@ -392,7 +392,7 @@ public class MutationTester implements IMutationTester {
         if (executedTarget.status.equals(ERROR) || executedTarget.status.equals(FAIL)) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
-            if (mutant.kill(PROVEN_NO)) {
+            if (MutantDAO.killMutant(mutant, PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
                 test.killMutant();
                 mutant.setKillMessage(executedTarget.message);

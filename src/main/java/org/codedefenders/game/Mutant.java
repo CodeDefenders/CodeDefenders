@@ -275,14 +275,6 @@ public class Mutant implements Serializable {
     }
 
     public boolean kill() {
-        return kill(equivalent);
-    }
-
-    /**
-     * @deprecated Use {@link MutantDAO#killMutant(Mutant, Equivalence)} instead.
-     */
-    @Deprecated
-    public boolean kill(Equivalence equivalent) {
         return MutantDAO.killMutant(this, equivalent);
     }
 

@@ -705,7 +705,7 @@ public class MeleeGameManager extends HttpServlet {
             for (Mutant m : mutantsPending) {
                 // This might be replaced by m.getCreatorId() == userId
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    m.kill(Mutant.Equivalence.DECLARED_YES);
+                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
                     Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
@@ -878,7 +878,7 @@ public class MeleeGameManager extends HttpServlet {
                         // only kill the one mutant that was claimed
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
-                        mPending.kill(ASSUMED_YES);
+                        MutantDAO.killMutant(mPending, ASSUMED_YES);
                         final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("")
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,

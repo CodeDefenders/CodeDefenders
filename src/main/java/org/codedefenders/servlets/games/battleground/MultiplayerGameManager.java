@@ -748,7 +748,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // At this point we where not able to kill the mutant will all the covering
                     // tests on the same class from different games
-                    m.kill(Mutant.Equivalence.DECLARED_YES);
+                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
 
                     PlayerDAO.increasePlayerPoints(1, MutantDAO.getEquivalentDefenderId(m));
                     messages.add(message);
@@ -919,7 +919,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         }
 
                         // only kill the one mutant that was claimed
-                        mutPending.kill(ASSUMED_YES);
+                        MutantDAO.killMutant(mutPending, ASSUMED_YES);
 
                         Event notif = new Event(-1, gameId, login.getUserId(), notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
