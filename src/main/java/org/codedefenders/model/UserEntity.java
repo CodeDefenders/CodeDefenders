@@ -75,30 +75,6 @@ public class UserEntity implements Serializable {
         this.keyMap = keyMap;
     }
 
-    /**
-     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#insert(UserEntity)} instead.
-     */
-    @Deprecated
-    public boolean insert() {
-        // TODO: Remove workaround
-        Optional<Integer> result = CDI.current().select(UserRepository.class).get().insert(this);
-        if (!result.isPresent()) {
-            return false;
-        } else {
-            id = result.get();
-            return true;
-        }
-    }
-
-    /**
-     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#update(UserEntity)} instead.
-     */
-    @Deprecated
-    public boolean update() {
-        // TODO: Remove workaround
-        return CDI.current().select(UserRepository.class).get().update(this);
-    }
-
     public boolean isValidated() {
         return validated;
     }

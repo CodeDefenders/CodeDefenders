@@ -173,7 +173,7 @@ public class UserSettingsManager extends HttpServlet {
             return false;
         }
         user.setKeyMap(editorKeyMap);
-        return user.update();
+        return userRepo.update(user);
     }
 
     private boolean updateUserInformation(UserEntity user, Optional<String> email, boolean allowContact) {
@@ -184,7 +184,7 @@ public class UserSettingsManager extends HttpServlet {
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
-        return user.update();
+        return userRepo.update(user);
     }
 
     private boolean isPasswordValid(Optional<String> password) {
@@ -198,7 +198,7 @@ public class UserSettingsManager extends HttpServlet {
         }
 
         user.setEncodedPassword(UserEntity.encodePassword(password));
-        return user.update();
+        return userRepo.update(user);
     }
 
     private boolean removeUserInformation(UserEntity user) {
@@ -209,6 +209,6 @@ public class UserSettingsManager extends HttpServlet {
         user.setUsername(DELETED_USER_NAME);
         user.setEmail(String.format(DELETED_USER_EMAIL, UUID.randomUUID()));
         user.setEncodedPassword(DELETED_USER_PASSWORD);
-        return user.update() && userService.deleteRecordedSessions(user.getId());
+        return userRepo.update(user) && userService.deleteRecordedSessions(user.getId());
     }
 }

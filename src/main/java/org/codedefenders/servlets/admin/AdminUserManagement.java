@@ -194,7 +194,7 @@ public class AdminUserManagement extends HttpServlet {
             return false;
         }
         user.get().setActive(false);
-        return user.get().update();
+        return userRepo.update(user.get());
 
     }
 

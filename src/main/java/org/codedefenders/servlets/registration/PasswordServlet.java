@@ -115,7 +115,7 @@ public class PasswordServlet extends HttpServlet {
                         Optional<UserEntity> user = userRepo.getUserById(userId.get());
                         if (user.isPresent()) {
                             user.get().setEncodedPassword(UserEntity.encodePassword(password));
-                            if (user.get().update()) {
+                            if (userRepo.update(user.get())) {
                                 userRepo.setPasswordResetSecret(user.get().getId(), null);
                                 responseURL = url.forPath(Paths.LOGIN);
                                 messages.add("Successfully changed your password.");
