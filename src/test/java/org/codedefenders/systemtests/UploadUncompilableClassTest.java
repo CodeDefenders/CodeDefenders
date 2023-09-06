@@ -29,12 +29,11 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -43,7 +42,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * System tests which upload a non-compilable class to code defenders
@@ -53,8 +53,8 @@ import static org.junit.Assert.fail;
  * @author gambi
  */
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class UploadUncompilableClassTest {
 
     /*
@@ -80,7 +80,7 @@ public class UploadUncompilableClassTest {
     private WebDriver driver;
     private StringBuffer verificationErrors = new StringBuffer();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ChromeOptions options = new ChromeOptions();
         // This is hardcoded but we cannot do otherwise. The alternative would
@@ -148,9 +148,9 @@ public class UploadUncompilableClassTest {
         // the findBy fails
         List<WebElement> rows = driver.findElements(By.xpath("//table[@id='tableUploadedClasses']/tbody/tr"));
 
-        Assert.assertEquals(1, rows.size());
+        assertEquals(1, rows.size());
 
-        Assert.assertEquals("No classes uploaded.", rows.get(0).findElement(By.xpath("td")).getText());
+        assertEquals("No classes uploaded.", rows.get(0).findElement(By.xpath("td")).getText());
 
         /*
          * TODO: At the moment I assume that if the GUI does not show any file,
@@ -182,7 +182,7 @@ public class UploadUncompilableClassTest {
         // Assert.assertEquals(0, Integer.parseInt(output.readFully().trim()));
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         driver.quit();
         String verificationErrorString = verificationErrors.toString();

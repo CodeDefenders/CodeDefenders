@@ -23,16 +23,18 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import org.codedefenders.util.Paths;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class CheckCodeDefendersVersionTest extends AbstractEmptyDBSystemTest {
 
     private static String versionNumber = null;
@@ -45,27 +47,27 @@ public class CheckCodeDefendersVersionTest extends AbstractEmptyDBSystemTest {
             versionNumber = prop.getProperty("version");
         } catch (Throwable t) {
         }
-        Assume.assumeNotNull(versionNumber);
+        assumeTrue(versionNumber != null);
 
         // Navigate to About page - Sometimes if the element is not visible in
         // the page, we need to scroll to it otherwise selenium will complain:
         // Taken from: https://stackoverflow.com/questions/12035023/selenium-webdriver-cant-click-on-a-link-outside-the-page
-//        WebElement target = driver.findElement(By.id("footerAbout"));
-//        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", target);
-//        Thread.sleep(500); //not sure why the sleep was needed, but it was needed or it wouldnt work :(
-//        target.click();
+        //        WebElement target = driver.findElement(By.id("footerAbout"));
+        //        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", target);
+        //        Thread.sleep(500); //not sure why the sleep was needed, but it was needed or it wouldnt work :(
+        //        target.click();
 
         driver.get(codeDefendersHome + Paths.ABOUT_PAGE);
 
         // // Retrieve the element
         String versionString = driver.findElement(By.xpath("/html/body/div[2]/div[2]/div/div/p[1]")).getText();
 
-        Assert.assertNotNull("Cannot find version string on About Page!", versionString);
+        assertNotNull(versionString, "Cannot find version string on About Page!");
         versionString = versionString.trim();
 
         // This can be also String.contains(versionNumber)
-        Assert.assertTrue("Cannot find expected version number " + versionNumber,
-                versionString.endsWith(versionNumber + "."));
+        assertTrue(versionString.endsWith(versionNumber + "."),
+                "Cannot find expected version number " + versionNumber);
 
     }
 

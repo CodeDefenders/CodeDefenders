@@ -26,21 +26,21 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import java.util.List;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * System tests that create battlegrounds.
  */
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class CreateBattlegroundTest extends AbstractEmptyDBSystemTest {
     private static int nrOfRows = 1;
 

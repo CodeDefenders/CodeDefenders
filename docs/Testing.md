@@ -12,7 +12,7 @@ Since we use Docker containers which are not (yet) registered in any Docker publ
 mvn clean package integration-test -PST
 ```
 
-This command rebuilds and repackages the application using the `docker.properties` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium.
+This command rebuilds and repackages the application using the `docker.properties` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Tag(SYSTEM)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium.
 When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, all containers are disposed.
 
 There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.

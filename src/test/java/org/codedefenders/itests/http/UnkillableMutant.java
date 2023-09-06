@@ -33,9 +33,9 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.codedefenders.itests.http.utils.HelperUser;
 import org.codedefenders.model.UserEntity;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -53,7 +53,7 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
  *
  * @author gambi
  */
-//@Category(SystemTest.class)
+//@SystemTest
 public class UnkillableMutant {
 
     private static int TIMEOUT = 10000;
@@ -140,7 +140,7 @@ public class UnkillableMutant {
     }
 
 
-    @Ignore
+    @Disabled
     @Test
     public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         // // This test assumes an empty db !
@@ -202,7 +202,7 @@ public class UnkillableMutant {
         }
     }
 
-    @After
+    @AfterEach
     public void afterEachTest() throws Exception {
         WebClientFactory.closeAllClients();
     }

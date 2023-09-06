@@ -25,9 +25,9 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 */
 
 import org.codedefenders.util.Paths;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
 import static org.codedefenders.systemtests.SeleniumTestUtils.assertURLDoesntEndWith;
@@ -46,8 +46,8 @@ import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
  * </ul>
  */
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
     /*

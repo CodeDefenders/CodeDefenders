@@ -22,16 +22,16 @@ package org.codedefenders.persistence.database;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.DatabaseTest;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,17 +43,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
-@Category(DatabaseTest.class)
+@DatabaseTest
+@ExtendWith(DatabaseExtension.class)
 public class UserRepositoryIT {
-
-    @Rule
-    public DatabaseRule databaseRule = new DatabaseRule();
 
     private UserRepository userRepo;
 
-    @Before
-    public void setUp() throws Exception {
-        userRepo = new UserRepository(databaseRule.getQueryRunner(), mock(MetricsRegistry.class));
+    @BeforeEach
+    public void setUp(QueryRunner queryRunner) throws Exception {
+        userRepo = new UserRepository(queryRunner, mock(MetricsRegistry.class));
     }
 
     private final String username1 = "user";

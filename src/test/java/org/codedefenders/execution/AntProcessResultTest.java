@@ -21,7 +21,7 @@ package org.codedefenders.execution;
 import java.io.BufferedReader;
 import java.io.StringReader;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;

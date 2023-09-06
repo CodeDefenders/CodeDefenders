@@ -21,14 +21,14 @@ package org.codedefenders.systemtests;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /*
 import com.palantir.docker.compose.DockerComposeRule;
@@ -78,7 +78,7 @@ public abstract class AbstractEmptyDBSystemTest {
     // This was automatically generate by Katalon
     private StringBuffer verificationErrors = new StringBuffer();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ChromeOptions options = new ChromeOptions();
         /*
@@ -110,7 +110,7 @@ public abstract class AbstractEmptyDBSystemTest {
         driver.get(codeDefendersHome);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         driver.quit();
         String verificationErrorString = verificationErrors.toString();

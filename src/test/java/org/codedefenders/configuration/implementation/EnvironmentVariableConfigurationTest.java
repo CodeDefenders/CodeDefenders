@@ -24,10 +24,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class EnvironmentVariableConfigurationTest {
 
@@ -43,7 +43,7 @@ public class EnvironmentVariableConfigurationTest {
             config.init();
             assertEquals(newDbUser, config.getDbUsername());
         } catch (Exception e) {
-            assumeTrue(e.getMessage(), false);
+            assumeTrue(false, e.getMessage());
             // This is bad!
         }
     }

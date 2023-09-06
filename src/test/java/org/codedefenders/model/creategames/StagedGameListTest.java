@@ -4,8 +4,8 @@ import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -21,7 +21,7 @@ public class StagedGameListTest {
 
     private StagedGameList stagedGameList;
 
-    @Before
+    @BeforeEach
     public void before() {
         stagedGameList = new StagedGameList();
     }

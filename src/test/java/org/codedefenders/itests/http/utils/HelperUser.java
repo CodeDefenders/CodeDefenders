@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
-import org.junit.Assert;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
@@ -43,6 +42,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+
+import static com.github.javaparser.utils.Utils.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class HelperUser {
 
@@ -293,7 +295,7 @@ public class HelperUser {
         HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
         for (HtmlAnchor a : playPage.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
-                Assert.fail("On game " + gameId + " there is still an equivalence duel open");
+                fail("On game " + gameId + " there is still an equivalence duel open");
             }
         }
     }
@@ -306,7 +308,7 @@ public class HelperUser {
                 return;
             }
         }
-        Assert.fail("On game " + gameId + " there is no equivalence duels open");
+        fail("On game " + gameId + " there is no equivalence duels open");
 
     }
 
@@ -327,7 +329,7 @@ public class HelperUser {
         }
 
         HtmlForm form = (HtmlForm) uploadPage.getElementById("formUpload");
-        Assert.assertNotNull(form);
+        assertNotNull(form);
         form.setActionAttribute(codedefendersHome + Paths.CLASS_UPLOAD);
         form.getInputByName("fileUploadCUT").setValueAttribute(file.getAbsolutePath());
         form.<HtmlFileInput>getInputByName("fileUploadCUT").setContentType("image/png");// optional
@@ -348,7 +350,7 @@ public class HelperUser {
             }
         }
 
-        Assert.fail("Cannot find the ID of the new class !");
+        fail("Cannot find the ID of the new class !");
 
         return -1;
     }

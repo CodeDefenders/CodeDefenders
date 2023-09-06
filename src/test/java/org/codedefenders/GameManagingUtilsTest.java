@@ -21,6 +21,7 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,32 +43,52 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.WeldExtension;
+import org.codedefenders.util.WeldSetup;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(WeldExtension.class)
 public class GameManagingUtilsTest {
 
     private static TestSmellsDAO mockedTestSmellDAO;
+
+    @TempDir
+    public Path tempFolder;
+
+    @WeldSetup
+    public WeldInitiator weld = WeldInitiator
+                .from(GameManagingUtils.class,
+                        GameManagingUtilsTest.class,
+                        TestSmellDetectorProducer.class,
+                        NotificationService.class,
+                        ExecutorServiceProvider.class,
+                        MetricsRegistry.class,
+                        Configuration.class)
+                .inject(this)
+                .activate(RequestScoped.class)
+                .activate(ApplicationScoped.class)
+                .build();// ofTestPackage();
 
     /*
      * TODO At the moment I cannot find a better way to initialize TestSmellsDAO
      * before the weld rule call the producer
      */
-    @BeforeClass
+    @BeforeAll
     public static void setupTestSmellDao() {
         mockedTestSmellDAO = Mockito.mock(TestSmellsDAO.class);
     }
@@ -75,28 +96,10 @@ public class GameManagingUtilsTest {
     /*
      * Since the mock is static we need to explicitly reset it between tests
      */
-    @Before
+    @BeforeEach
     public void resetTestSmellsDAOMock() {
         Mockito.reset(mockedTestSmellDAO);
     }
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    // https://github.com/weld/weld-junit/blob/master/junit4/README.md
-    @Rule
-    public WeldInitiator weld = WeldInitiator
-            .from(GameManagingUtils.class,
-                    GameManagingUtilsTest.class,
-                    TestSmellDetectorProducer.class,
-                    NotificationService.class,
-                    ExecutorServiceProvider.class,
-                    MetricsRegistry.class,
-                    Configuration.class)
-            .inject(this)
-            .activate(RequestScoped.class)
-            .activate(ApplicationScoped.class)
-            .build();// ofTestPackage();
 
     @ApplicationScoped
     @Produces
@@ -144,7 +147,7 @@ public class GameManagingUtilsTest {
                 + "public int getTopFloor() { return topFloor;}" + "\n" //
                 + "}";
 
-        File cutJavaFile = temporaryFolder.newFile();
+        File cutJavaFile = tempFolder.resolve("Lift.java").toFile();
         FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
@@ -154,7 +157,7 @@ public class GameManagingUtilsTest {
     }
 
     private org.codedefenders.game.Test createMockedTest(String testCode) throws IOException {
-        File testJavaFile = temporaryFolder.newFile();
+        File testJavaFile = tempFolder.resolve("Test.java").toFile();
         FileUtils.writeStringToFile(testJavaFile, testCode, StandardCharsets.UTF_8);
 
         org.codedefenders.game.Test mockedTest = mock(org.codedefenders.game.Test.class);
@@ -194,7 +197,7 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(expectedSmells, actualSmells);
+        assertEquals(expectedSmells, actualSmells);
     }
 
     @Test
@@ -232,7 +235,7 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(noSmellsExpected, actualSmells);
+        assertEquals(noSmellsExpected, actualSmells);
     }
 
     @Test
@@ -274,7 +277,7 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(expectedSmells, actualSmells);
+        assertEquals(expectedSmells, actualSmells);
     }
 
 }

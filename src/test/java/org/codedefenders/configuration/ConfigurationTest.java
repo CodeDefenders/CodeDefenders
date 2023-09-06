@@ -19,17 +19,18 @@
 
 package org.codedefenders.configuration;
 
-import org.junit.Before;
-import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ConfigurationTest {
 
     Configuration config;
 
-    @Before
+    @BeforeEach
     public void prepareObjects() {
         // Setup configuration which will pass
         config = new Configuration();
@@ -37,7 +38,7 @@ public class ConfigurationTest {
         config.dbHost = "localhost";
     }
 
-    @Test()
+    @Test
     public void invalidDbHost() {
         config.dbHost = "157.1646846.456.568";
 
@@ -50,7 +51,7 @@ public class ConfigurationTest {
     }
 
 
-    @Test()
+    @Test
     public void invalidDbPort() {
         config.dbPort = 65537;
 

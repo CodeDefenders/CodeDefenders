@@ -21,16 +21,16 @@ package org.codedefenders.configuration.implementation;
 
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TieredConfigurationTest {
 
     private TieredConfiguration config;
 
-    @Before
+    @BeforeEach
     public void prepareObjects() {
         BaseConfiguration config1 = new BaseConfiguration() {
             @Override

@@ -28,27 +28,31 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.ClassAnalysisService;
+import org.codedefenders.util.WeldExtension;
+import org.codedefenders.util.WeldSetup;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Rule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(WeldExtension.class)
 public class AutomaticImportTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @Rule
+    @WeldSetup
     public WeldInitiator weld = WeldInitiator
-            .from(AutomaticImportTest.class,
-                    ClassAnalysisService.class,
-                    ClassCodeAnalyser.class)
-            .inject(this)
-            .activate(ApplicationScoped.class)
-            .build();
+                .from(AutomaticImportTest.class,
+                        ClassAnalysisService.class,
+                        ClassCodeAnalyser.class)
+                .inject(this)
+                .activate(ApplicationScoped.class)
+                .build();
 
     @Produces
     public Configuration produceConfiguration() {
@@ -61,7 +65,7 @@ public class AutomaticImportTest {
         return mock(MetricsRegistry.class);
     }
 
-    @org.junit.Test
+    @Test
     public void testAutomaticImportOfMockitoIfEnabled() {
         GameClass gc = GameClass.build()
                 .name("Lift")
@@ -77,7 +81,7 @@ public class AutomaticImportTest {
         assertThat(testTemplate, containsString("mockito"));
     }
 
-    @org.junit.Test
+    @Test
     public void testNoAutomaticImportOfMockitoIfDisabled() {
         GameClass gc = GameClass.build()
                 .name("Lift")
@@ -93,7 +97,7 @@ public class AutomaticImportTest {
         assertThat(testTemplate, not(containsString("mockito")));
     }
 
-    @org.junit.Test
+    @Test
     public void testAutomaticImportOnlyPrimitive() {
         GameClass gc = GameClass.build()
                 .name("Lift")
@@ -113,10 +117,11 @@ public class AutomaticImportTest {
         // We need -1 to get rid of the last token
         int expectedImports = 5;
         int actualImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals(expectedImports, actualImports,
+                "The test template has the wrong number of imports");
     }
 
-    @org.junit.Test
+    @Test
     public void testAutomaticImport() {
         GameClass gc = GameClass.build()
                 .name("XmlElement")
@@ -142,6 +147,7 @@ public class AutomaticImportTest {
         int expectedImports = 10;
         int actualImports = testTemplate.split("import").length - 1;
 
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals(expectedImports, actualImports,
+                "The test template has the wrong number of imports");
     }
 }

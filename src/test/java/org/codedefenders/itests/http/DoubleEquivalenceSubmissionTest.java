@@ -36,10 +36,9 @@ import java.util.logging.Level;
 
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -56,13 +55,15 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * This test assumes that the Web app is deployed at localhost:8080/ it's just
  * the client side
  *
  * @author gambi
  */
-//@Category(SystemTest.class)
+//@SystemTest
 public class DoubleEquivalenceSubmissionTest {
 
     // Use directly form submission, do not care about UI interactions, cannot
@@ -347,7 +348,7 @@ public class DoubleEquivalenceSubmissionTest {
             HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             for (HtmlAnchor a : playPage.getAnchors()) {
                 if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
-                    Assert.fail("On game " + gameId + " there is still an equivalence duel open");
+                    fail("On game " + gameId + " there is still an equivalence duel open");
                 }
             }
         }
@@ -360,13 +361,13 @@ public class DoubleEquivalenceSubmissionTest {
                     return;
                 }
             }
-            Assert.fail("On game " + gameId + " there is no equivalence duels open");
+            fail("On game " + gameId + " there is no equivalence duels open");
 
         }
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         UserEntity creatorUser = new UserEntity("creator");
@@ -456,7 +457,7 @@ public class DoubleEquivalenceSubmissionTest {
         attacker.assertNoMoreEquivalenceDuels(newGameId);
     }
 
-    @After
+    @AfterEach
     public void afterEachTest() throws Exception {
         WebClientFactory.closeAllClients();
     }

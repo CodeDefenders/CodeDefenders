@@ -28,9 +28,11 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.ClassAnalysisService;
+import org.codedefenders.util.WeldExtension;
+import org.codedefenders.util.WeldSetup;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -38,17 +40,18 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(WeldExtension.class)
 public class TestTemplateTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @Rule
+    @WeldSetup
     public WeldInitiator weld = WeldInitiator
-            .from(TestTemplateTest.class,
-                    ClassAnalysisService.class,
-                    ClassCodeAnalyser.class)
-            .inject(this)
-            .activate(ApplicationScoped.class)
-            .build();
+                .from(TestTemplateTest.class,
+                        ClassAnalysisService.class,
+                        ClassCodeAnalyser.class)
+                .inject(this)
+                .activate(ApplicationScoped.class)
+                .build();
 
     @Produces
     public Configuration produceConfiguration() {

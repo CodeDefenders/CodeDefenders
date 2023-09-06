@@ -19,8 +19,9 @@
 package org.codedefenders;
 
 import org.codedefenders.util.MutantUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MutantUtilsTest {
 
@@ -51,7 +52,7 @@ public class MutantUtilsTest {
 
         String cleanedCode = mutantUtils.cleanUpMutatedCode(originalCode, mutatedCode);
 
-        Assert.assertEquals(originalCode, cleanedCode);
+        assertEquals(originalCode, cleanedCode);
 
     }
 
@@ -82,7 +83,7 @@ public class MutantUtilsTest {
 
         String cleanedCode = mutantUtils.cleanUpMutatedCode(originalCode, mutatedCode);
 
-        Assert.assertEquals(originalCode, cleanedCode);
+        assertEquals(originalCode, cleanedCode);
 
     }
 
@@ -115,7 +116,7 @@ public class MutantUtilsTest {
 
         String cleanedCode = mutantUtils.cleanUpMutatedCode(originalCode, mutatedCode);
 
-        Assert.assertEquals(originalCode, cleanedCode);
+        assertEquals(originalCode, cleanedCode);
 
     }
 
@@ -172,9 +173,9 @@ public class MutantUtilsTest {
                 "public Complex(double real, double imag) {",
                 "  this.real = ",
                 // The following three lines are removed
-//                "",
-//                "",
-//                "",
+                // "",
+                // "",
+                // "",
                 // But this line is yet into a new one
                 "real;",
                 " this.imag = imag;",
@@ -183,7 +184,7 @@ public class MutantUtilsTest {
         String cleanedCode = mutantUtils.cleanUpMutatedCode(originalCode, mutatedCode);
 
         // Now
-        Assert.assertEquals(expectedCode, cleanedCode);
+        assertEquals(expectedCode, cleanedCode);
     }
 
 }

@@ -24,8 +24,8 @@ import java.net.URL;
 import java.util.Optional;
 
 import org.codedefenders.configuration.Configuration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +33,7 @@ public class URLUtilsTest {
 
     private URLUtils urlUtilsEmpty;
 
-    @Before
+    @BeforeEach
     public void setup() {
         urlUtilsEmpty = new URLUtils((new Configuration(){
             @Override

@@ -22,12 +22,12 @@ package org.codedefenders.configuration.implementation;
 import java.util.Arrays;
 
 import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertiesFileConfigurationTest {
 
@@ -35,7 +35,7 @@ public class PropertiesFileConfigurationTest {
     private PropertiesFileConfiguration config2;
     private PropertiesFileConfiguration configMerged;
 
-    @Before
+    @BeforeEach
     public void prepareObjects() {
         StubConfigFileResolver mCfgFileResolver1 = new StubConfigFileResolver();
         mCfgFileResolver1.setConfigFileContent(

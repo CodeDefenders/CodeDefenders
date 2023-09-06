@@ -21,27 +21,25 @@ package org.codedefenders.persistence.database;
 
 import java.sql.SQLException;
 
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.DatabaseTest;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Category(DatabaseTest.class)
+@DatabaseTest
+@ExtendWith(DatabaseExtension.class)
 public class LeaderboardRepositoryIT {
-
-    @Rule
-    public DatabaseRule databaseRule = new DatabaseRule();
 
     private LeaderboardRepository leaderboardRepo;
 
-    @Before
-    public void setup() throws SQLException {
-        leaderboardRepo = new LeaderboardRepository(databaseRule.getQueryRunner());
+    @BeforeEach
+    public void setup(QueryRunner queryRunner) throws SQLException {
+        leaderboardRepo = new LeaderboardRepository(queryRunner);
     }
 
     @Test
