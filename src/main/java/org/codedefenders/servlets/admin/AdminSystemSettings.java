@@ -303,10 +303,10 @@ public class AdminSystemSettings extends HttpServlet {
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
-                            connectionFactory.updateSize(Integer.parseInt(valueString));
+                            // connectionFactory.updateSize(Integer.parseInt(valueString));
                         }
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
-                            connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
+                            // connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
                         }
                         break;
                     case BOOL_VALUE:

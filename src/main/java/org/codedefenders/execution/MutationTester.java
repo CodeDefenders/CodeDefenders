@@ -25,12 +25,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -43,7 +43,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,13 +142,14 @@ public class MutationTester implements IMutationTester {
                 }
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
-                mutant.incrementScore(Scorer.score(game, mutant, missedTests));
+                int score = Scorer.score(game, mutant, missedTests);
+                MutantDAO.incrementMutantScore(mutant, score);
             }
         }
 
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
-        test.incrementScore(Scorer.score(game, test, killedMutants));
+        TestDAO.incrementTestScore(test, Scorer.score(game, test, killedMutants));
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -285,7 +285,8 @@ public class MutationTester implements IMutationTester {
                     // test.setScore(Scorer.score((MultiplayerGame) game, test,
                     // mlist));
                     // test.update();
-                    test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+                    int score = Scorer.score((MultiplayerGame) game, test, mlist);
+                    TestDAO.incrementTestScore(test, score);
                 }
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
@@ -311,7 +312,8 @@ public class MutationTester implements IMutationTester {
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
             // mutant.update();
-            mutant.incrementScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
+            int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            MutantDAO.incrementMutantScore(mutant, score);
         }
 
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",

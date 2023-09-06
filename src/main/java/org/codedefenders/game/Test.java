@@ -126,15 +126,6 @@ public class Test {
         return test;
     }
 
-    // TODO Check that increment score does not consider mutants that were killed already
-    /**
-     * @deprecated Use {@link TestDAO#incrementTestScore(Test, int)} instead.
-     */
-    @Deprecated
-    public void incrementScore(int score) {
-        TestDAO.incrementTestScore(this, score);
-    }
-
     @Deprecated
     public void setScore(int store) {
         score = store;

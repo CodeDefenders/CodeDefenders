@@ -270,14 +270,6 @@ public class Mutant implements Serializable {
         return classId;
     }
 
-    /**
-     * @deprecated Use {@link MutantDAO#incrementMutantScore(Mutant, int)} instead.
-     */
-    @Deprecated
-    public void incrementScore(int score) {
-        MutantDAO.incrementMutantScore(this, score);
-    }
-
     public void setScore(int score) {
         this.score = score;
     }

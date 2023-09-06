@@ -28,6 +28,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.codedefenders.util.CDIUtil;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class DB {
 
     public static synchronized Connection getConnection() {
         try {
-            return DatabaseConnection.getConnection();
+            return CDIUtil.getBeanFromCDI(ConnectionFactory.class).getConnection();
         } catch (SQLException e) {
             logger.error("Unable to acquire SQL connection", e);
             return null;
