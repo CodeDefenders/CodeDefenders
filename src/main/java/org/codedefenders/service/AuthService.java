@@ -38,13 +38,11 @@ public class AuthService implements CodeDefendersAuth {
     private final CodeDefendersRealm codeDefendersRealm;
 
     private final UserService userService;
-    private final UserRepository userRepo;
 
     @Inject
-    public AuthService(CodeDefendersRealm codeDefendersRealm, UserService userService, UserRepository userRepo) {
+    public AuthService(CodeDefendersRealm codeDefendersRealm, UserService userService) {
         this.codeDefendersRealm = codeDefendersRealm;
         this.userService = userService;
-        this.userRepo = userRepo;
     }
 
     @Override
@@ -70,12 +68,6 @@ public class AuthService implements CodeDefendersAuth {
     @Override
     public User getUser() {
         return userService.getUserById(getUserId()).orElse(null);
-    }
-
-    @Deprecated
-    @Override
-    public UserEntity getUserEntity() {
-        return userRepo.getUserById(getUserId()).orElse(null);
     }
 
     protected void invalidate(int userId) {

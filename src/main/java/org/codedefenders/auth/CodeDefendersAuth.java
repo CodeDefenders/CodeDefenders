@@ -34,8 +34,4 @@ public interface CodeDefendersAuth {
     SimpleUser getSimpleUser();
 
     User getUser();
-
-    // TODO(Alex): Do not expose UserEntity!
-    @Deprecated
-    UserEntity getUserEntity();
 }
