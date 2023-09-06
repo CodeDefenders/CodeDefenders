@@ -364,7 +364,7 @@ public class MutationTester implements IMutationTester {
         }
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
-        test.killMutant();
+        TestDAO.killMutant(test);
         mutant.setKillMessage(executedTarget.message);
         MutantDAO.updateMutantKillMessageForMutant(mutant);
 
@@ -394,7 +394,7 @@ public class MutationTester implements IMutationTester {
             // to be non-equivalent
             if (MutantDAO.killMutant(mutant, PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
-                test.killMutant();
+                TestDAO.killMutant(test);
                 mutant.setKillMessage(executedTarget.message);
                 MutantDAO.updateMutantKillMessageForMutant(mutant);
             } else {

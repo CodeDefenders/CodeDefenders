@@ -164,13 +164,6 @@ public class Test {
     // And update the local object. But it requires several queries/connections
     //
     // TODO Check that this method is never called for tests that kill a mutant that was already dead...
-    /**
-     * @deprecated Use {@link TestDAO#killMutant(Test)} instead.
-     */
-    @Deprecated
-    public void killMutant() {
-        TestDAO.killMutant(this);
-    }
 
     public boolean isMutantCovered(Mutant mutant) {
         return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
