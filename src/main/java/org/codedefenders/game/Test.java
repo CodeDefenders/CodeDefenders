@@ -94,13 +94,6 @@ public class Test {
         this.lineCoverage = LineCoverage.empty();
     }
 
-    @Deprecated
-    public Test(int testId, int classId, int gameId, String javaFile, String classFile,
-                int roundCreated,int mutantsKilled, int playerId) {
-        this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId,
-                Collections.emptyList(), Collections.emptyList(), 0);
-    }
-
     public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated,
                 int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
         this(classId, gameId, javaFile, classFile, playerId);
@@ -110,20 +103,6 @@ public class Test {
         this.mutantsKilled = mutantsKilled;
         this.score = score;
         lineCoverage = new LineCoverage(linesCovered, linesUncovered);
-    }
-
-    /**
-     * Creates a test from another test instance, but in a new game and for a new player.
-     *
-     * @param gameId   the game identifier of the new test.
-     * @param playerId the players identifier of the new test.
-     * @param other    the test instance the new is created for.
-     * @return a test based on another test instance, gameId and playerId.
-     */
-    public static Test newTestForGameAndPlayerIds(int gameId, int playerId, Test other) {
-        final Test test = new Test(other.classId, gameId, other.javaFile, other.classFile, playerId);
-        test.lineCoverage = other.lineCoverage;
-        return test;
     }
 
     @Deprecated
