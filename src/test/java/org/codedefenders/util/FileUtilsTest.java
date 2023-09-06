@@ -62,14 +62,14 @@ public class FileUtilsTest {
     @Test
     public void testCreateJavaTestFile() {
         String name = "Printer";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         File dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-").toFile();
@@ -128,14 +128,14 @@ public class FileUtilsTest {
     @Test
     public void testReadLines() {
         String name = "Printer";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         File file;
         try {
             file = Files.createTempFile(name, ".java").toFile();
@@ -221,14 +221,14 @@ public class FileUtilsTest {
     @Test
     public void testStoreFile() {
         String fileName = "Printer.java";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         Path dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-");
@@ -256,14 +256,14 @@ public class FileUtilsTest {
     @Test
     public void testStoreDuplicateFiles() {
         String fileName = "Printer.java";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+
+                }""".stripIndent();
         Path dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-");

@@ -137,16 +137,27 @@ public class GameManagingUtilsTest {
     private GameManagingUtils gameManagingUtils;
 
     private GameClass createMockedCUT() throws IOException {
-        String originalCode = "" //
-                + "public class Lift {" + "\n" //
-                + "private int topFloor;" + "\n"//
-                + "private int currentFloor=0;" + "\n"//
-                + "public Lift(int highestFloor) { this.topFloor = highestFloor;}" + "\n" //
-                + "public void goUp() {currentFloor++;}" + "\n" //
-                + "public void goDown() {currentFloor--;}" + "\n" //
-                + "public int getTopFloor() { return topFloor;}" + "\n" //
-                + "}";
+        String originalCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0;
 
+                    public Lift(int highestFloor) {
+                        this.topFloor = highestFloor;
+                    }
+
+                    public void goUp() {
+                        currentFloor++;
+                    }
+
+                    public void goDown() {
+                        currentFloor--;
+                    }
+
+                    public int getTopFloor() {
+                        return topFloor;
+                    }
+                }""".stripIndent();
         File cutJavaFile = tempFolder.resolve("Lift.java").toFile();
         FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
 
@@ -168,12 +179,19 @@ public class GameManagingUtilsTest {
 
     @Test
     public void testSmellGood() throws IOException {
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n" + "        assertEquals(50, l.getTopFloor());" + "\n"
-                + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();
@@ -204,17 +222,26 @@ public class GameManagingUtilsTest {
     public void testEagerSmellDoesNotTriggerIfProductionsMethodsAreLessThanThreshold() throws IOException {
         // This has 2 production calls instead of 4 {@link
         // TestSmellDetectorProducer.EAGER_TEST_THRESHOLD}
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n"
-                // 1 Production Method call
-                + "        l.goUp();" + "\n" //
-                // 2 Production Method call
-                + "        l.goUp();" + "\n" //
-                // Calls inside the assertions (or inside other calls?) are not counted
-                + "        assertEquals(50, l.getTopFloor());" + "\n" + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+
+                        // 1. Production Method call
+                        l.goUp();
+                        // 2. Production Method call
+                        l.goUp();
+
+                        // Calls inside the assertions (or inside other calls?) are not counted
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();
@@ -242,20 +269,30 @@ public class GameManagingUtilsTest {
     public void testEagerSmellTriggerIfProductionsMethodsAreEqualThanThreshold() throws IOException {
         // This has 3 production calls instead of 4 {@link
         // TestSmellDetectorProducer.EAGER_TEST_THRESHOLD}
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n"
-                // 1 Production Method call
-                + "        l.goUp();" + "\n" //
-                // 2 Production Method call
-                + "        l.goDown();" + "\n" //
-                // 3 Production Method call
-                + "        l.getTopFloor();" + "\n" //
-                // 4 Production Method call
-                + "        l.goUp();" + "\n" //
-                + "        assertEquals(50, l.getTopFloor());" + "\n" + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+
+                        // 1. Production Method call
+                        l.goUp();
+                        // 2. Production Method call
+                        l.goDown();
+                        // 3. Production Method call
+                        l.getTopFloor();
+                        // 4. Production Method call
+                        l.goUp();
+
+                        // Calls inside the assertions (or inside other calls?) are not counted
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();

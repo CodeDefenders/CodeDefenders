@@ -345,7 +345,7 @@ public class MutationTester implements IMutationTester {
         final TargetExecution executedTarget = backend.testMutant(mutant, test);
 
         Integer gameId = test.getGameId();
-        String scoringMessage = String.join(":", new String[]{"" + test.getId(), "" + mutant.getId()});
+        String scoringMessage = "%d:%d".formatted(test.getId(), mutant.getId());
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         // If the test did NOT pass, the mutant was detected and should be

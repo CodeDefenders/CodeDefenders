@@ -37,6 +37,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.util.CDIUtil;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,10 +77,11 @@ public class KillmapDAO {
      * This means the instances of predefined mutants and tests are used iff they are used in game.
      */
     public static List<KillMapEntry> getKillMapEntriesForGame(int gameId) {
-        String query = String.join("\n",
-                "SELECT killmap.*",
-                "FROM killmap",
-                "WHERE killmap.Game_ID = ?");
+        @Language("SQL") String query = """
+                SELECT killmap.*
+                FROM killmap
+                WHERE killmap.Game_ID = ?
+        """;
 
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
         List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
@@ -94,20 +96,20 @@ public class KillmapDAO {
      * as well as the templates of predefined mutants and tests (not the instances that are copied into games).
      */
     public static List<KillMapEntry> getKillMapEntriesForClass(int classId) {
-        String query = String.join("\n",
-                "WITH tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates),",
-                "mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+        @Language("SQL") String query = """
+                WITH tests_for_class AS
+                   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates),
+                mutants_for_class AS
+                   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)
 
-                "SELECT killmap.*",
-                "FROM killmap,",
-                "     tests_for_class tests,",
-                "     mutants_for_class mutants",
-                "WHERE killmap.Class_ID = ?",
-                "  AND killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID;"
-        );
+                SELECT killmap.*
+                FROM killmap,
+                     tests_for_class tests,
+                     mutants_for_class mutants
+                WHERE killmap.Class_ID = ?
+                  AND killmap.Test_ID = tests.Test_ID
+                  AND killmap.Mutant_ID = mutants.Mutant_ID;
+        """;
 
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
@@ -122,52 +124,52 @@ public class KillmapDAO {
      * as well as the templates of predefined mutants and tests of used classes.
      */
     public static List<KillMapEntry> getKillMapEntriesForClassroom(int classroomId) {
-        String query = String.join("\n",
-                "WITH relevant_classes AS (",
-                "    SELECT DISTINCT games.Class_ID",
-                "    FROM games",
-                "    WHERE games.Classroom_ID = ?",
-                "),",
-                "classroom_system_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_system_mutant_templates mutants",
-                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_valid_user_mutants mutants, games",
-                "    WHERE mutants.Game_ID = games.ID",
-                "      AND games.Classroom_ID = ?",
-                "),",
-                "mutants_for_classroom AS (",
-                "    SELECT * FROM classroom_system_mutants",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_mutants",
-                "),",
-                "classroom_system_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_system_test_templates tests",
-                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_valid_user_tests tests, games",
-                "    WHERE tests.Game_ID = games.ID",
-                "    AND games.Classroom_ID = ?",
-                "),",
-                "tests_for_classroom AS (",
-                "    SELECT * FROM classroom_system_tests",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_tests",
-                ")",
+        @Language("SQL") String query = """
+                WITH relevant_classes AS (
+                    SELECT DISTINCT games.Class_ID
+                    FROM games
+                    WHERE games.Classroom_ID = ?
+                ),
+                classroom_system_mutants AS (
+                    SELECT mutants.*
+                    FROM view_system_mutant_templates mutants
+                    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)
+                ),
+                classroom_user_mutants AS (
+                    SELECT mutants.*
+                    FROM view_valid_user_mutants mutants, games
+                    WHERE mutants.Game_ID = games.ID
+                      AND games.Classroom_ID = ?
+                ),
+                mutants_for_classroom AS (
+                    SELECT * FROM classroom_system_mutants
+                    UNION ALL
+                    SELECT * FROM classroom_user_mutants
+                ),
+                classroom_system_tests AS (
+                    SELECT tests.*
+                    FROM view_system_test_templates tests
+                    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)
+                ),
+                classroom_user_tests AS (
+                    SELECT tests.*
+                    FROM view_valid_user_tests tests, games
+                    WHERE tests.Game_ID = games.ID
+                    AND games.Classroom_ID = ?
+                ),
+                tests_for_classroom AS (
+                    SELECT * FROM classroom_system_tests
+                    UNION ALL
+                    SELECT * FROM classroom_user_tests
+                )
 
-                "SELECT killmap.*",
-                "FROM killmap,",
-                "   tests_for_classroom tests,",
-                "   mutants_for_classroom mutants",
-                "WHERE killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID"
-        );
+                SELECT killmap.*
+                FROM killmap,
+                   tests_for_classroom tests,
+                   mutants_for_classroom mutants
+                WHERE killmap.Test_ID = tests.Test_ID
+                  AND killmap.Mutant_ID = mutants.Mutant_ID
+        """;
 
         List<Test> tests = new ArrayList<>(TestDAO.getValidTestsForClassroom(classroomId).values());
         List<Mutant> mutants = new ArrayList<>(MutantDAO.getValidMutantsForClassroom(classroomId).values());
@@ -180,10 +182,11 @@ public class KillmapDAO {
      * Inserts a killmap entry into the database.
      */
     public static boolean insertKillMapEntry(KillMapEntry entry, int classId) {
-        String query = String.join("\n",
-                "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)",
-                "VALUES (?,?,?,?,?)",
-                "ON DUPLICATE KEY UPDATE Status = VALUES(Status);");
+        @Language("SQL") String query = """
+                INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)
+                VALUES (?,?,?,?,?)
+                ON DUPLICATE KEY UPDATE Status = VALUES(Status);
+        """;
         int testGameId = entry.test.getGameId();
         int mutantGameId = entry.mutant.getGameId();
 
@@ -201,10 +204,11 @@ public class KillmapDAO {
      * Inserts many killmap entries into the database.
      */
     public static void insertManyKillMapEntries(List<KillMapEntry> entries, int classId) {
-        String query = String.join("\n",
-                "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)",
-                "VALUES (?,?,?,?,?)",
-                "ON DUPLICATE KEY UPDATE Status = VALUES(Status);");
+        @Language("SQL") String query = """
+                INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)
+                VALUES (?,?,?,?,?)
+                ON DUPLICATE KEY UPDATE Status = VALUES(Status);
+        """;
 
         final DB.DBVExtractor<KillMapEntry> dbvExtractor = entry -> {
             int testGameId = entry.test.getGameId();
@@ -221,9 +225,10 @@ public class KillmapDAO {
     }
 
     public static boolean removeGameKillmap(int gameId) {
-        String query = String.join("\n",
-                "DELETE FROM killmap",
-                "WHERE killmap.Game_ID = ?");
+        @Language("SQL") String query = """
+                DELETE FROM killmap
+                WHERE killmap.Game_ID = ?
+        """;
         return DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
     }
 
@@ -240,10 +245,13 @@ public class KillmapDAO {
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
-        String query = String.join("\n",
-                "DELETE FROM killmap",
-                "WHERE killmap.Test_ID IN (" + testIds + ")",
-                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
+        @Language("SQL") String query = """
+                DELETE FROM killmap
+                WHERE killmap.Test_ID IN (%s)
+                  AND killmap.Mutant_ID IN (%s);
+        """.formatted(
+                testIds,
+                mutantIds
         );
         return DB.executeUpdateQuery(query);
     }
@@ -261,10 +269,13 @@ public class KillmapDAO {
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
-        String query = String.join("\n",
-                "DELETE FROM killmap",
-                "WHERE killmap.Test_ID IN (" + testIds + ")",
-                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
+        @Language("SQL") String query = """
+                DELETE FROM killmap
+                WHERE killmap.Test_ID IN (%s)
+                  AND killmap.Mutant_ID IN (%s);
+        """.formatted(
+                testIds,
+                mutantIds
         );
         return DB.executeUpdateQuery(query);
     }
@@ -289,10 +300,11 @@ public class KillmapDAO {
      * Return a list of pending killmap jobs ordered by timestamp.
      */
     public static List<KillMapJob> getPendingJobs() {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM killmapjob",
-                "ORDER BY Timestamp ASC;");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM killmapjob
+                ORDER BY Timestamp ASC;
+        """;
 
         return DB.executeQueryReturnList(query, rs -> {
             KillMapType type = null;
@@ -378,45 +390,49 @@ public class KillmapDAO {
         /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
          * most killmaps are not queued for computation and most of the data will be used. */
 
-        String classesQuery = String.join("\n",
-                "SELECT Class_ID, Name, Alias",
-                "FROM view_playable_classes classes",
-                "WHERE NOT EXISTS (",
-                "   SELECT *",
-                "   FROM killmapjob",
-                "   WHERE killmapjob.Class_ID = classes.Class_ID",
-                ")",
-                "ORDER BY Class_ID;");
+        @Language("SQL") String classesQuery = """
+                SELECT Class_ID, Name, Alias
+                FROM view_playable_classes classes
+                WHERE NOT EXISTS (
+                   SELECT *
+                   FROM killmapjob
+                   WHERE killmapjob.Class_ID = classes.Class_ID
+                )
+                ORDER BY Class_ID;
+        """;
 
-        String nrTestsQuery = String.join("\n",
-                "WITH tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+        @Language("SQL") String nrTestsQuery = """
+                WITH tests_for_class AS
+                   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)
 
-                "SELECT Class_ID, COUNT(Test_ID)",
-                "FROM tests_for_class",
-                "GROUP BY Class_ID;");
+                SELECT Class_ID, COUNT(Test_ID)
+                FROM tests_for_class
+                GROUP BY Class_ID;
+        """;
 
-        String nrMutantsQuery = String.join("\n",
-                "WITH mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+        @Language("SQL") String nrMutantsQuery = """
+                WITH mutants_for_class AS
+                   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)
 
-                "SELECT Class_ID, COUNT(Mutant_ID)",
-                "FROM mutants_for_class",
-                "GROUP BY Class_ID;");
+                SELECT Class_ID, COUNT(Mutant_ID)
+                FROM mutants_for_class
+                GROUP BY Class_ID;
+        """;
 
-        String nrEntriesQuery = String.join("\n",
-                "WITH mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
-                "tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+        @Language("SQL") String nrEntriesQuery = """
+                WITH mutants_for_class AS
+                   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),
+                tests_for_class AS
+                   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)
 
-                "SELECT killmap.Class_ID, COUNT(*)",
-                "FROM killmap,",
-                "     tests_for_class tests,",
-                "     mutants_for_class mutants",
-                "WHERE killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "GROUP BY killmap.Class_ID;");
+                SELECT killmap.Class_ID, COUNT(*)
+                FROM killmap,
+                     tests_for_class tests,
+                     mutants_for_class mutants
+                WHERE killmap.Test_ID = tests.Test_ID
+                  AND killmap.Mutant_ID = mutants.Mutant_ID
+                GROUP BY killmap.Class_ID;
+        """;
 
         Map<Integer, Integer> classIdToNrTests = new TreeMap<>();
         Map<Integer, Integer> classIdToNrMutants = new TreeMap<>();
@@ -445,32 +461,36 @@ public class KillmapDAO {
         /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
          * most killmaps are not queued for computation and most of the data will be used. */
 
-        String gamesQuery = String.join("\n",
-                "SELECT ID, Mode",
-                "FROM games",
-                "WHERE ID >= 0",
-                "  AND (Mode = 'DUEL' OR MODE = 'PARTY' OR MODE = 'MELEE')",
-                "  AND NOT EXISTS (",
-                "     SELECT *",
-                "     FROM killmapjob",
-                "     WHERE killmapjob.Game_ID = games.ID",
-                "  )",
-                "ORDER BY ID;");
+        @Language("SQL") String gamesQuery = """
+                SELECT ID, Mode
+                FROM games
+                WHERE ID >= 0
+                  AND (Mode = 'DUEL' OR MODE = 'PARTY' OR MODE = 'MELEE')
+                  AND NOT EXISTS (
+                     SELECT *
+                     FROM killmapjob
+                     WHERE killmapjob.Game_ID = games.ID
+                  )
+                ORDER BY ID;
+        """;
 
-        String nrTestsQuery = String.join("\n",
-                "SELECT Game_ID, COUNT(Test_ID)",
-                "FROM view_valid_game_tests",
-                "GROUP BY Game_ID;");
+        @Language("SQL") String nrTestsQuery = """
+                SELECT Game_ID, COUNT(Test_ID)
+                FROM view_valid_game_tests
+                GROUP BY Game_ID;
+        """;
 
-        String nrMutantsQuery = String.join("\n",
-                "SELECT Game_ID, COUNT(Mutant_ID)",
-                "FROM view_valid_game_mutants",
-                "GROUP BY Game_ID;");
+        @Language("SQL") String nrMutantsQuery = """
+                SELECT Game_ID, COUNT(Mutant_ID)
+                FROM view_valid_game_mutants
+                GROUP BY Game_ID;
+        """;
 
-        String nrEntriesQuery = String.join("\n",
-                "SELECT Game_ID, COUNT(*)",
-                "FROM killmap",
-                "GROUP BY Game_ID;");
+        @Language("SQL") String nrEntriesQuery = """
+                SELECT Game_ID, COUNT(*)
+                FROM killmap
+                GROUP BY Game_ID;
+        """;
 
         Map<Integer, Integer> gameIdToNrTests   = new TreeMap<>();
         Map<Integer, Integer> gameIdToNrMutants = new TreeMap<>();
@@ -494,16 +514,16 @@ public class KillmapDAO {
     }
 
     public static List<KillMapClassroomProgress> getNonQueuedKillMapClassroomProgress() {
-        String classroomsQuery = String.join("\n",
-                "SELECT ID",
-                "FROM classrooms",
-                "WHERE NOT EXISTS (",
-                "     SELECT *",
-                "     FROM killmapjob",
-                "     WHERE killmapjob.Classroom_ID = classrooms.ID",
-                "  )",
-                "ORDER BY ID;"
-        );
+        @Language("SQL") String classroomsQuery = """
+                SELECT ID
+                FROM classrooms
+                WHERE NOT EXISTS (
+                     SELECT *
+                     FROM killmapjob
+                     WHERE killmapjob.Classroom_ID = classrooms.ID
+                  )
+                ORDER BY ID;
+        """;
 
         List<Integer> classroomIds =  DB.executeQueryReturnList(classroomsQuery, rs -> rs.getInt(1));
 
@@ -517,11 +537,12 @@ public class KillmapDAO {
         /* First query the classes that are queued, then query the rest for each class,
            under the assumption that only a small fraction of classes are queued for computation. */
 
-        String classesQuery = String.join("\n",
-                "SELECT classes.Class_ID",
-                "FROM killmapjob, classes",
-                "WHERE killmapjob.Class_ID = classes.Class_ID",
-                "ORDER BY Class_ID;");
+        @Language("SQL") String classesQuery = """
+                SELECT classes.Class_ID
+                FROM killmapjob, classes
+                WHERE killmapjob.Class_ID = classes.Class_ID
+                ORDER BY Class_ID;
+        """;
 
         List<Integer> classIds = DB.executeQueryReturnList(classesQuery, rs -> rs.getInt(1));
 
@@ -535,11 +556,12 @@ public class KillmapDAO {
         /* First query the games that are queued, then query the rest for each game,
            under the assumption that only a small fraction of classes are queued for computation. */
 
-        String gamesQuery = String.join("\n",
-                "SELECT games.ID",
-                "FROM killmapjob, games",
-                "WHERE killmapjob.Game_ID = games.ID",
-                "ORDER BY Game_ID;");
+        @Language("SQL") String gamesQuery = """
+                SELECT games.ID
+                FROM killmapjob, games
+                WHERE killmapjob.Game_ID = games.ID
+                ORDER BY Game_ID;
+        """;
 
         List<Integer> gameIds = DB.executeQueryReturnList(gamesQuery, rs -> rs.getInt(1));
 
@@ -549,12 +571,12 @@ public class KillmapDAO {
     }
 
     public static List<KillMapClassroomProgress> getQueuedKillMapClassroomProgress() {
-        String classroomsQuery = String.join("\n",
-                "SELECT classrooms.ID",
-                "FROM killmapjob, classrooms",
-                "WHERE killmapjob.Classroom_ID = classrooms.ID",
-                "ORDER BY ID;"
-        );
+        @Language("SQL") String classroomsQuery = """
+                SELECT classrooms.ID
+                FROM killmapjob, classrooms
+                WHERE killmapjob.Classroom_ID = classrooms.ID
+                ORDER BY ID;
+        """;
 
         List<Integer> classroomIds =  DB.executeQueryReturnList(classroomsQuery, rs -> rs.getInt(1));
 
@@ -582,36 +604,39 @@ public class KillmapDAO {
      * @return The killmap progress for the class.
      */
     public static KillMapClassProgress getKillMapProgressForClass(int classId) {
-        String nrTestsQuery = String.join("\n",
-                "WITH tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+        @Language("SQL") String nrTestsQuery = """
+                WITH tests_for_class AS
+                   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)
 
-                "SELECT COUNT(Test_ID)",
-                "FROM tests_for_class",
-                "WHERE Class_ID = ?;");
+                SELECT COUNT(Test_ID)
+                FROM tests_for_class
+                WHERE Class_ID = ?;
+        """;
 
 
-        String nrMutantsQuery = String.join("\n",
-                "WITH mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+        @Language("SQL") String nrMutantsQuery = """
+                WITH mutants_for_class AS
+                   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)
 
-                "SELECT COUNT(Mutant_ID)",
-                "FROM mutants_for_class",
-                "WHERE Class_ID = ?;");
+                SELECT COUNT(Mutant_ID)
+                FROM mutants_for_class
+                WHERE Class_ID = ?;
+        """;
 
-        String nrEntriesQuery = String.join("\n",
-                "WITH mutants_for_class AS",
-                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
-                "tests_for_class AS",
-                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+        @Language("SQL") String nrEntriesQuery = """
+                WITH mutants_for_class AS
+                   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),
+                tests_for_class AS
+                   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)
 
-                "SELECT COUNT(*)",
-                "FROM killmap,",
-                "     tests_for_class tests,",
-                "     mutants_for_class mutants",
-                "WHERE killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND killmap.Class_ID = ?;");
+                SELECT COUNT(*)
+                FROM killmap,
+                     tests_for_class tests,
+                     mutants_for_class mutants
+                WHERE killmap.Test_ID = tests.Test_ID
+                  AND killmap.Mutant_ID = mutants.Mutant_ID
+                  AND killmap.Class_ID = ?;
+        """;
 
         int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
         int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
@@ -632,20 +657,23 @@ public class KillmapDAO {
      * @return The killmap progress for the game.
      */
     public static KillMapGameProgress getKillMapProgressForGame(int gameId) {
-        String nrTestsQuery = String.join("\n",
-                "SELECT COUNT(Test_ID)",
-                "FROM view_valid_game_tests",
-                "WHERE Game_ID = ?;");
+        @Language("SQL") String nrTestsQuery = """
+                SELECT COUNT(Test_ID)
+                FROM view_valid_game_tests
+                WHERE Game_ID = ?;
+        """;
 
-        String nrMutantsQuery = String.join("\n",
-                "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_game_mutants",
-                "WHERE Game_ID = ?;");
+        @Language("SQL") String nrMutantsQuery = """
+                SELECT COUNT(Mutant_ID)
+                FROM view_valid_game_mutants
+                WHERE Game_ID = ?;
+        """;
 
-        String nrEntriesQuery = String.join("\n",
-                "SELECT COUNT(*)",
-                "FROM killmap",
-                "WHERE Game_ID = ?;");
+        @Language("SQL") String nrEntriesQuery = """
+                SELECT COUNT(*)
+                FROM killmap
+                WHERE Game_ID = ?;
+        """;
 
         int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
         int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
@@ -661,51 +689,52 @@ public class KillmapDAO {
     }
 
     public static KillMapClassroomProgress getKillMapProgressForClassroom(int classroomId) {
-        String nrEntriesQuery = String.join("\n",
-                "WITH relevant_classes AS (",
-                "    SELECT DISTINCT games.Class_ID",
-                "    FROM games",
-                "    WHERE games.Classroom_ID = ?",
-                "),",
-                "classroom_system_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_system_mutant_templates mutants",
-                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_mutants AS (",
-                "    SELECT mutants.*",
-                "    FROM view_valid_user_mutants mutants, games",
-                "    WHERE mutants.Game_ID = games.ID",
-                "      AND games.Classroom_ID = ?",
-                "),",
-                "mutants_for_classroom AS (",
-                "    SELECT * FROM classroom_system_mutants",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_mutants",
-                "),",
-                "classroom_system_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_system_test_templates tests",
-                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
-                "),",
-                "classroom_user_tests AS (",
-                "    SELECT tests.*",
-                "    FROM view_valid_user_tests tests, games",
-                "    WHERE tests.Game_ID = games.ID",
-                "    AND games.Classroom_ID = ?",
-                "),",
-                "tests_for_classroom AS (",
-                "    SELECT * FROM classroom_system_tests",
-                "    UNION ALL",
-                "    SELECT * FROM classroom_user_tests",
-                ")",
+        @Language("SQL") String nrEntriesQuery = """
+                WITH relevant_classes AS (
+                    SELECT DISTINCT games.Class_ID
+                    FROM games
+                    WHERE games.Classroom_ID = ?
+                ),
+                classroom_system_mutants AS (
+                    SELECT mutants.*
+                    FROM view_system_mutant_templates mutants
+                    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)
+                ),
+                classroom_user_mutants AS (
+                    SELECT mutants.*
+                    FROM view_valid_user_mutants mutants, games
+                    WHERE mutants.Game_ID = games.ID
+                      AND games.Classroom_ID = ?
+                ),
+                mutants_for_classroom AS (
+                    SELECT * FROM classroom_system_mutants
+                    UNION ALL
+                    SELECT * FROM classroom_user_mutants
+                ),
+                classroom_system_tests AS (
+                    SELECT tests.*
+                    FROM view_system_test_templates tests
+                    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)
+                ),
+                classroom_user_tests AS (
+                    SELECT tests.*
+                    FROM view_valid_user_tests tests, games
+                    WHERE tests.Game_ID = games.ID
+                    AND games.Classroom_ID = ?
+                ),
+                tests_for_classroom AS (
+                    SELECT * FROM classroom_system_tests
+                    UNION ALL
+                    SELECT * FROM classroom_user_tests
+                )
 
-                "SELECT COUNT(*)",
-                "FROM killmap,",
-                "   tests_for_classroom tests,",
-                "   mutants_for_classroom mutants",
-                "WHERE killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID");
+                SELECT COUNT(*)
+                FROM killmap,
+                   tests_for_classroom tests,
+                   mutants_for_classroom mutants
+                WHERE killmap.Test_ID = tests.Test_ID
+                  AND killmap.Mutant_ID = mutants.Mutant_ID
+        """;
 
 
         Multimap<Integer, Test> tests = TestDAO.getValidTestsForClassroom(classroomId);

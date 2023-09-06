@@ -43,19 +43,18 @@ public class TestSmellDetectorTest {
     public void exploratoryTest() throws IOException {
         File testFile = tempFolder.resolve("TestLift.java").toFile();
         // Detect test smell
-        String testContent = ""
-                + "import org.junit.*;" + "\n"
-                + "import static org.junit.Assert.*;" + "\n"
-                + " " + "\n"
-                + "public class TestLift { " + "\n"
-                + "    @Test(timeout = 4000)" + "\n"
-                + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(5);" + "\n"
-                + "        l.getTopFloor(); // This cover the mutant" + "\n"
-                + "        assertEquals(0, l.getCurrentFloor());" + "\n"
-                + "    }" + "\n"
-                + "}"
-                + "";
+        String testContent = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(5);
+                        l.getTopFloor(); // This cover the mutant
+                        assertEquals(0, l.getCurrentFloor());
+                    }
+                }""".stripIndent();
 
         Files.write(testFile.toPath(), testContent.getBytes());
         String testFilePath = testFile.getAbsolutePath();
@@ -73,18 +72,17 @@ public class TestSmellDetectorTest {
     public void testUnknownSmellDetector() throws IOException {
         File testFile = tempFolder.resolve("TestLift.java").toFile();
         // Detect UnknownTest test smell: there are no assertions
-        String testContent = ""
-                + "import org.junit.*;" + "\n"
-                + "import static org.junit.Assert.*;" + "\n"
-                + " " + "\n"
-                + "public class TestLift { " + "\n"
-                + "    @Test(timeout = 4000)" + "\n"
-                + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(5);" + "\n"
-                + "        l.getTopFloor(); // This cover the mutant" + "\n"
-                + "    }" + "\n"
-                + "}"
-                + "";
+        String testContent = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(5);
+                        l.getTopFloor(); // This cover the mutant
+                    }
+                }""";
 
         Files.write(testFile.toPath(), testContent.getBytes());
         String testFilePath = testFile.getAbsolutePath();

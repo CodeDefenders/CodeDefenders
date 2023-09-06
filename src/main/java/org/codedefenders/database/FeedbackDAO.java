@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.model.Feedback;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,11 +53,15 @@ public class FeedbackDAO {
             values.add(DatabaseValue.of(clampedRating));
         }
 
-        String query = "INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ";
-        query += Stream.generate(() -> "(?, ?, ?, ?)")
+        String placeholders = Stream.generate(() -> "(?, ?, ?, ?)")
                 .limit(ratings.size())
-                .collect(Collectors.joining(",\n"));
-        query += " ON DUPLICATE KEY UPDATE value = VALUES(value);";
+                .collect(Collectors.joining(","));
+
+        @Language("SQL") String query = """
+                INSERT INTO ratings (User_ID, Game_ID, type, value)
+                VALUES %s
+                ON DUPLICATE KEY UPDATE value = VALUES(value);
+        """.formatted(placeholders);
 
         return DB.executeUpdateQuery(query, values.toArray(new DatabaseValue[0]));
     }
@@ -64,11 +69,12 @@ public class FeedbackDAO {
     public static Map<Feedback.Type, Integer> getFeedbackValues(int gameId, int userId) {
         Map<Feedback.Type, Integer> ratings = new HashMap<>();
 
-        final String query = String.join("\n",
-                "SELECT value, type",
-                "FROM ratings",
-                "WHERE Game_ID = ?",
-                "  AND User_ID = ?;");
+        @Language("SQL") final String query = """
+                SELECT value, type
+                FROM ratings
+                WHERE Game_ID = ?
+                  AND User_ID = ?;
+        """;
 
         DB.RSMapper<Void> mapper = rs -> {
             Feedback.Type type = Feedback.Type.valueOf(rs.getString("type"));
@@ -86,12 +92,13 @@ public class FeedbackDAO {
     public static Map<Feedback.Type, Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
         Map<Feedback.Type, Double> avgRatings = new HashMap<>();
 
-        String query = String.join("\n",
-                "SELECT AVG(value) AS 'average', type",
-                "FROM ratings",
-                "WHERE Game_ID = ?",
-                "  AND value > 0",
-                "GROUP BY type;");
+        @Language("SQL") String query = """
+                SELECT AVG(value) AS 'average', type
+                FROM ratings
+                WHERE Game_ID = ?
+                  AND value > 0
+                GROUP BY type;
+        """;
 
         DB.RSMapper<Void> mapper = rs -> {
             Feedback.Type type = Feedback.Type.valueOf(rs.getString("type"));
@@ -110,15 +117,16 @@ public class FeedbackDAO {
             throws UncheckedSQLException, SQLMappingException {
         Map<Integer, Double> avgClassRatings = new HashMap<>();
 
-        String query = String.join("\n",
-                "SELECT AVG(ratings.value) AS 'average',",
-                "       games.Class_ID AS classId,",
-                "       COUNT(ratings.value) AS 'votes'",
-                "FROM ratings, games",
-                "WHERE ratings.Game_ID = games.ID",
-                "  AND ratings.type = ?",
-                "  AND ratings.value > 0",
-                "GROUP BY games.Class_ID;");
+        @Language("SQL") String query = """
+                SELECT AVG(ratings.value) AS 'average',
+                       games.Class_ID AS classId,
+                       COUNT(ratings.value) AS 'votes'
+                FROM ratings, games
+                WHERE ratings.Game_ID = games.ID
+                  AND ratings.type = ?
+                  AND ratings.value > 0
+                GROUP BY games.Class_ID;
+        """;
 
         DB.executeQueryReturnList(query,
                 rs -> avgClassRatings.put(

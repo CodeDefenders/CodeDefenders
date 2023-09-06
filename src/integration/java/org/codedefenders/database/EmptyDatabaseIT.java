@@ -25,6 +25,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.codedefenders.util.DatabaseExtension;
 import org.codedefenders.util.tags.DatabaseTest;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -49,11 +50,11 @@ public class EmptyDatabaseIT {
             List<String> results = qr.query(conn, "SELECT * FROM classes;", new ColumnListHandler<>());
             assertEquals(0, results.size());
 
-            final String query2 = String.join("\n",
-                    "SELECT *",
-                    "FROM games",
-                    "WHERE ID > 0"
-            );
+            @Language("SQL") String query2 = """
+                    SELECT *
+                    FROM games
+                    WHERE ID > 0
+            """;
             results = qr.query(conn, query2, new ColumnListHandler<>());
             assertEquals(0, results.size());
 

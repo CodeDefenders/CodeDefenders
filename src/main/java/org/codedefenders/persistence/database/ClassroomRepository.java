@@ -38,10 +38,11 @@ public class ClassroomRepository {
             throw new IllegalArgumentException("Can't insert classroom with id > 0");
         }
 
-        @Language("SQL") String query = String.join("\n",
-                "INSERT INTO classrooms"
-                + "(UUID, Creator_ID, Name, Password, Open, Visible, Archived)"
-                + "VALUES (?, ?, ?, ?, ?, ?, ?);");
+        @Language("SQL") String query = """
+                INSERT INTO classrooms
+                (UUID, Creator_ID, Name, Password, Open, Visible, Archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+        """;
 
         try {
             return queryRunner.insert(query,
@@ -61,16 +62,17 @@ public class ClassroomRepository {
     }
 
     public void updateClassroom(Classroom classroom) {
-        @Language("SQL") String query = String.join("\n",
-                "UPDATE classrooms",
-                "SET UUID = ?,",
-                "  Creator_ID = ?,",
-                "  Name = ?,",
-                "  Password = ?,",
-                "  Open = ?,",
-                "  Visible = ?,",
-                "  Archived = ?",
-                "WHERE classrooms.ID = ?");
+        @Language("SQL") String query = """
+                UPDATE classrooms
+                SET UUID = ?,
+                  Creator_ID = ?,
+                  Name = ?,
+                  Password = ?,
+                  Open = ?,
+                  Visible = ?,
+                  Archived = ?
+                WHERE classrooms.ID = ?
+        """;
         try {
              int updatedRows = queryRunner.update(query,
                      classroom.getUUID().toString(),
@@ -92,10 +94,10 @@ public class ClassroomRepository {
     }
 
     public Optional<Classroom> getClassroomById(int id) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT * FROM classrooms",
-                "WHERE ID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT * FROM classrooms
+                WHERE ID = ?;
+        """;
         try {
             return queryRunner.query(query,
                     oneFromRS(this::classroomFromRS),
@@ -108,10 +110,10 @@ public class ClassroomRepository {
     }
 
     public Optional<Classroom> getClassroomByUUID(UUID uuid) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT * FROM classrooms",
-                "WHERE UUID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT * FROM classrooms
+                WHERE UUID = ?;
+        """;
         try {
             return queryRunner.query(query,
                     oneFromRS(this::classroomFromRS),
@@ -134,11 +136,11 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getAllClassroomsByMember(int userId) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT classrooms.* FROM classrooms, classroom_members",
-                "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT classrooms.* FROM classrooms, classroom_members
+                WHERE classrooms.ID = classroom_members.Classroom_ID
+                AND classroom_members.User_ID = ?;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),
@@ -161,12 +163,12 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getActiveClassroomsByMember(int userId) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT classrooms.* FROM classrooms, classroom_members",
-                "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?",
-                "AND classrooms.Archived = 0;"
-        );
+        @Language("SQL") String query = """
+                SELECT classrooms.* FROM classrooms, classroom_members
+                WHERE classrooms.ID = classroom_members.Classroom_ID
+                AND classroom_members.User_ID = ?
+                AND classrooms.Archived = 0;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),
@@ -179,13 +181,13 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getActiveClassroomsByMemberAndRole(int userId, ClassroomRole role) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT classrooms.* FROM classrooms, classroom_members",
-                "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?",
-                "AND classroom_members.Role = ?",
-                "AND classrooms.Archived = 0;"
-        );
+        @Language("SQL") String query = """
+                SELECT classrooms.* FROM classrooms, classroom_members
+                WHERE classrooms.ID = classroom_members.Classroom_ID
+                AND classroom_members.User_ID = ?
+                AND classroom_members.Role = ?
+                AND classrooms.Archived = 0;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),
@@ -219,12 +221,12 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getArchivedClassroomsByMember(int userId) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT classrooms.* FROM classrooms, classroom_members",
-                "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?",
-                "AND classrooms.Archived = 1;"
-        );
+        @Language("SQL") String query = """
+                SELECT classrooms.* FROM classrooms, classroom_members
+                WHERE classrooms.ID = classroom_members.Classroom_ID
+                AND classroom_members.User_ID = ?
+                AND classrooms.Archived = 1;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),
@@ -237,13 +239,13 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getArchivedClassroomsByMemberAndRole(int userId, ClassroomRole role) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT classrooms.* FROM classrooms, classroom_members",
-                "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?",
-                "AND classroom_members.Role = ?",
-                "AND classrooms.Archived = 1;"
-        );
+        @Language("SQL") String query = """
+                SELECT classrooms.* FROM classrooms, classroom_members
+                WHERE classrooms.ID = classroom_members.Classroom_ID
+                AND classroom_members.User_ID = ?
+                AND classroom_members.Role = ?
+                AND classrooms.Archived = 1;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),

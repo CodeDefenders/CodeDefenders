@@ -61,8 +61,13 @@ public class PasswordServlet extends HttpServlet {
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
 
-    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
-            + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
+    private static final String CHANGE_PASSWORD_MSG = """
+            Hello %s!
+
+            Change your password here: %s
+            This link is only valid for %d hours.
+
+            Greetings, your Code Defenders team""".stripIndent();
 
     private static final SecureRandom secureRandom = new SecureRandom();
 

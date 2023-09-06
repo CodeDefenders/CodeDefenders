@@ -72,13 +72,19 @@ public class AdminUserManagement extends HttpServlet {
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-    private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n "
-            + "An account has been created for you with Username %s and Password %s.\n"
-            + "You can log in at %s. \n\n Happy coding!";
+    private static final String NEW_ACCOUNT_MSG = """
+            Welcome to Code Defenders!
+
+            An account has been created for you with Username %s and Password %s.
+            You can log in at %s.
+
+            Happy coding!""".stripIndent();
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = "%s, \n\n"
-            + "your password has been reset to %s\n"
-            + "Please change it at your next convenience.";
+    private static final String PASSWORD_RESET_MSG = """
+            %s,
+
+            your password has been reset to %s
+            Please change it at your next convenience.""".stripIndent();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
