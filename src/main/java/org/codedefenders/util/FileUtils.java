@@ -270,7 +270,7 @@ public class FileUtils {
      */
     public static String getFullyQualifiedName(String javaClassFilePath) throws IOException {
         ClassPool classPool = ClassPool.getDefault();
-        CtClass cc = classPool.makeClass(new FileInputStream(new File(javaClassFilePath)));
+        CtClass cc = classPool.makeClass(new FileInputStream(javaClassFilePath));
         return cc.getName();
     }
 

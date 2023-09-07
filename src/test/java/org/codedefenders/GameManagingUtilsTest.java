@@ -305,7 +305,7 @@ public class GameManagingUtilsTest {
         Mockito.verify(mockedTestSmellDAO).storeSmell(Mockito.any(), argument.capture());
         // TODO Probably some smart argument matcher might be needed
         // TODO Matching by string is britlle, maybe match by "class/type"?
-        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[]{"Eager Test"}));
+        Set<String> expectedSmells = Set.of("Eager Test");
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {

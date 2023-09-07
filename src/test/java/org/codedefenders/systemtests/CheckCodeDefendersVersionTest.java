@@ -43,7 +43,7 @@ public class CheckCodeDefendersVersionTest extends AbstractEmptyDBSystemTest {
     public void testCheckVersion() throws Exception {
         try {
             Properties prop = new Properties();
-            prop.load(new FileInputStream(new File("target/maven-archiver/pom.properties")));
+            prop.load(new FileInputStream("target/maven-archiver/pom.properties"));
             versionNumber = prop.getProperty("version");
         } catch (Throwable t) {
         }

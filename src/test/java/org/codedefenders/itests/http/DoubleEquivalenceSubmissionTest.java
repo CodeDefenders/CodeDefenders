@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -186,9 +187,10 @@ public class DoubleEquivalenceSubmissionTest {
         public void doLogin() throws FailingHttpStatusCodeException, IOException {
             WebRequest loginRequest = new WebRequest(new URL("http://localhost:8080" + Paths.LOGIN), HttpMethod.POST);
             // // Then we set the request parameters
-            loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "login"), new NameValuePair("username", user.getUsername()),
-                    new NameValuePair("password", password),}));
+            loginRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "login"),
+                    new NameValuePair("username", user.getUsername()),
+                    new NameValuePair("password", password)));
             // Finally, we can get the page
             HtmlPage retunToGamePage = browser.getPage(loginRequest);
         }
@@ -206,14 +208,11 @@ public class DoubleEquivalenceSubmissionTest {
 
             WebRequest createGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer" + Paths.GAMES_OVERVIEW),
                     HttpMethod.POST);
-            createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createGame"), new NameValuePair("class", "221"), // This
-                    // is
-                    // hardcoded,
-                    // it's
-                    // Lift.class
+            createGameRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createGame"),
+                    new NameValuePair("class", "221") // This is hardcoded, it's Lift.class
                     // new NameValuePair("level", "true"),
-            }));
+            ));
 
             gameUsers = browser.getPage(createGameRequest);
             String newGameLink = null;
@@ -238,8 +237,10 @@ public class DoubleEquivalenceSubmissionTest {
             WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
-            startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
+            startGameRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "startGame"),
+                    new NameValuePair("gameId", "" + gameId)
+            ));
             // Finally, we can get the page
             // Not sure why this returns TextPage and not HtmlPage
             browser.getPage(startGameRequest);
@@ -269,10 +270,12 @@ public class DoubleEquivalenceSubmissionTest {
             WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
-            attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createMutant"), new NameValuePair("gameId", "" + gameId),
+            attackRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createMutant"),
+                    new NameValuePair("gameId", "" + gameId),
                     // TODO Encoded somehow ?
-                    new NameValuePair("mutant", "" + mutant)}));
+                    new NameValuePair("mutant", "" + mutant)
+            ));
             // curl -X POST \
             // --data "formType=createMutant&gameId=${gameId}" \
             // --data-urlencode mutant@${mutant} \
@@ -292,10 +295,12 @@ public class DoubleEquivalenceSubmissionTest {
             // --cookie "${cookie}" --cookie-jar "${cookie}" \
             // -w @curl-format.txt \
             // -s ${CODE_DEFENDER_URL}/multiplayergame
-            defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createTest"), new NameValuePair("gameId", "" + gameId),
+            defendRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createTest"),
+                    new NameValuePair("gameId", "" + gameId),
                     // TODO Encoded somehow ?
-                    new NameValuePair("test", "" + test)}));
+                    new NameValuePair("test", "" + test)
+            ));
             browser.getPage(defendRequest);
         }
 

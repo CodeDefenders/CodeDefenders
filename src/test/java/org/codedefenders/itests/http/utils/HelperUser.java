@@ -149,11 +149,11 @@ public class HelperUser {
 
         WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME),
                 HttpMethod.POST);
-        createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classId),
-                new NameValuePair("level", "true"),
-
-        }));
+        createGameRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createGame"),
+                new NameValuePair("class", "" + classId),
+                new NameValuePair("level", "true")
+        ));
 
         gameUsers = browser.getPage(createGameRequest);
         // Reload the game page
@@ -180,8 +180,10 @@ public class HelperUser {
 
         WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
         // // Then we set the request parameters
-        startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
+        startGameRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "startGame"),
+                new NameValuePair("gameId", "" + gameId)
+        ));
         // Finally, we can get the page
         return browser.getPage(startGameRequest);
 
@@ -213,10 +215,12 @@ public class HelperUser {
     public void attack(int gameId, String mutant) throws FailingHttpStatusCodeException, IOException {
         WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
         // // Then we set the request parameters
-        attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createMutant"), new NameValuePair("gameId", "" + gameId),
+        attackRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createMutant"),
+                new NameValuePair("gameId", "" + gameId),
                 // TODO Encoded somehow ?
-                new NameValuePair("mutant", "" + mutant)}));
+                new NameValuePair("mutant", "" + mutant)
+        ));
         // curl -X POST \
         // --data "formType=createMutant&gameId=${gameId}" \
         // --data-urlencode mutant@${mutant} \
@@ -235,10 +239,12 @@ public class HelperUser {
         // --cookie "${cookie}" --cookie-jar "${cookie}" \
         // -w @curl-format.txt \
         // -s ${CODE_DEFENDER_URL}/multiplayergame
-        defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createTest"), new NameValuePair("gameId", "" + gameId),
+        defendRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createTest"),
+                new NameValuePair("gameId", "" + gameId),
                 // TODO Encoded somehow ?
-                new NameValuePair("test", "" + test)}));
+                new NameValuePair("test", "" + test)
+        ));
         browser.getPage(defendRequest);
     }
 

@@ -111,7 +111,7 @@ public class EventDAO {
         """;
         DatabaseValue<?>[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                 DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
-                DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
+                DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getTimestamp()),
                 DatabaseValue.of(event.getId())};
 
         Connection conn = DB.getConnection();

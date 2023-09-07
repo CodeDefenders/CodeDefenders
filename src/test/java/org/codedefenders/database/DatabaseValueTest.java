@@ -110,7 +110,7 @@ public class DatabaseValueTest {
                 final Throwable cause = e.getCause();
                 if (cause instanceof IllegalArgumentException) {
                     // cause is the IllegalArgumentException thrown by DatabaseValue.Type#get(Object)
-                    throw ((IllegalArgumentException) cause);
+                    throw cause;
                 }
                 fail("No exception but the expected should be thrown:" + cause.getMessage());
             }

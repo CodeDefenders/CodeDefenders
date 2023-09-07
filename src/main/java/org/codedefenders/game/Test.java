@@ -201,7 +201,7 @@ public class Test {
         ClassPool classPool = ClassPool.getDefault();
         CtClass cc = null;
         try {
-            cc = classPool.makeClass(new FileInputStream(new File(classFile)));
+            cc = classPool.makeClass(new FileInputStream(classFile));
         } catch (IOException e) {
             logger.error("IO exception caught", e);
         }
