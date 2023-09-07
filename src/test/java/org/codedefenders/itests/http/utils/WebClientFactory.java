@@ -45,20 +45,20 @@ public class WebClientFactory {
 
         // webClient = new WebClient(BrowserVersion.CHROME);
         WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
-        //
+
         webClient.getOptions().setCssEnabled(true);
         webClient.setCssErrorHandler(new SilentCssErrorHandler());
-        //
+
         // Do not fail on status code ?
         webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
         // Disable test failing because of JS exceptions
         webClient.getOptions().setThrowExceptionOnScriptError(false);
-        //
+
         webClient.getOptions().setRedirectEnabled(true);
         webClient.getOptions().setAppletEnabled(false);
-        //
+
         webClient.getOptions().setJavaScriptEnabled(true);
-        //
+
         webClient.getOptions().setPopupBlockerEnabled(true);
         webClient.getOptions().setTimeout(TIMEOUT);
         webClient.getOptions().setPrintContentOnFailingStatusCode(false);

@@ -227,7 +227,6 @@ public class ParallelMutationTester extends MutationTester {
                 try {
                     hasTestkilledTheMutant = task.get();
                 } catch (CancellationException ce) {
-                    //
                     logger.warn("Swallowing ", ce);
                 }
 

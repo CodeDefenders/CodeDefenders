@@ -59,21 +59,21 @@ public class UploadUncompilableClassTest {
 
     /*
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()//
+    public static DockerComposeRule docker = DockerComposeRule.builder()
             // This allows to alter docker-compose and mount
             // /src/test/resources/systemtests/data folder inside the selenium
             // container
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
-                    "src/test/resources/systemtests/mount-sources-folder.yml")) //
-            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())//
+                    "src/test/resources/systemtests/mount-sources-folder.yml"))
+            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
             // .saveLogsTo("/tmp/test.log")// This is mostly for debugging
-            .waitingForService("db", HealthChecks.toHaveAllPortsOpen()) //
+            .waitingForService("db", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080, new Function<DockerPort, String>() {
                 @Override
                 public String apply(DockerPort t) {
                     return t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders");
                 }
-            })) //
+            }))
             .build();
      */
 

@@ -79,7 +79,7 @@ public class GameReplayer {
         this.traceFile = traceFile;
         this.testsFile = testsFile;
         this.mutantsFile = mutantsFile;
-        //
+
         actors = new HashMap<>();
         actions = new ArrayList<>();
         tests = new HashMap<>();
@@ -112,7 +112,7 @@ public class GameReplayer {
 
             String mutantID = tokens[0];
             String userID = tokens[1].split("/")[6];
-            //
+
             if (!actors.containsKey(userID)) {
                 System.out.println("GameReplayer.parse() FOUND ATTACKER " + userID);
                 actors.put(userID,
@@ -141,7 +141,7 @@ public class GameReplayer {
                 System.out.println("GameReplayer.parse() Skip test for resolving equivalence duel");
             } else {
                 tests.put(testID, userID);
-                //
+
                 if (!actors.containsKey(userID)) {
                     System.out.println("GameReplayer.parse() FOUND DEFENDER " + userID);
                     actors.put(userID,

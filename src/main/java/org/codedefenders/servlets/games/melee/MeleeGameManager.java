@@ -676,8 +676,8 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     @SuppressWarnings("Duplicates")
-    private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, //
-            int gameId, MeleeGame game, //
+    private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
+            int gameId, MeleeGame game,
             int playerId) throws IOException {
 
         final HttpSession session = request.getSession();
@@ -930,8 +930,8 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
-    private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, //
-            int gameId, MeleeGame game, //
+    private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
+            int gameId, MeleeGame game,
             int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {

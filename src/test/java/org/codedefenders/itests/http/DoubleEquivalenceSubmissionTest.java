@@ -105,20 +105,20 @@ public class DoubleEquivalenceSubmissionTest {
 
             // webClient = new WebClient(BrowserVersion.CHROME);
             WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
-            //
+
             webClient.getOptions().setCssEnabled(true);
             webClient.setCssErrorHandler(new SilentCssErrorHandler());
-            //
+
             // Do not fail on status code ?
             webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
             // Disable test failing because of JS exceptions
             webClient.getOptions().setThrowExceptionOnScriptError(false);
-            //
+
             webClient.getOptions().setRedirectEnabled(true);
             webClient.getOptions().setAppletEnabled(false);
-            //
+
             webClient.getOptions().setJavaScriptEnabled(true);
-            //
+
             webClient.getOptions().setPopupBlockerEnabled(true);
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
@@ -196,7 +196,7 @@ public class DoubleEquivalenceSubmissionTest {
         public int createNewGame() throws FailingHttpStatusCodeException, IOException {
             // List the games already there
             Set<String> myGames = new HashSet<>();
-            //
+
             HtmlPage gameUsers = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
             for (HtmlAnchor a : gameUsers.getAnchors()) {
                 if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -228,7 +228,7 @@ public class DoubleEquivalenceSubmissionTest {
             }
             // There's should be only one
 
-            //
+
             return Integer.parseInt(newGameLink.replaceAll("multiplayer/games\\?gameId=", ""));
 
         }

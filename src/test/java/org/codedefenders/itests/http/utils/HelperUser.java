@@ -88,7 +88,7 @@ public class HelperUser {
         HtmlPage retunToGamePage = browser.getPage(loginRequest);
     }
 
-    public int createNewGame(int classId, //
+    public int createNewGame(int classId,
             boolean isHardGame, // Level
             int maxAssertionsPerTest, // maxAssertionsPerTest
             int mutantValidatorLevel, // mutantValidatorLevel
@@ -97,7 +97,7 @@ public class HelperUser {
 
         // List the games already there
         Set<String> myGames = new HashSet<>();
-        //
+
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -131,7 +131,7 @@ public class HelperUser {
         }
         // There's should be only one
         System.out.println("HelperUser.createNewGame() " + newGameLink);
-        //
+
         return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
     }
 
@@ -139,7 +139,7 @@ public class HelperUser {
     public int createNewGame(int classId) throws FailingHttpStatusCodeException, IOException {
         // List the games already there
         Set<String> myGames = new HashSet<>();
-        //
+
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -150,8 +150,8 @@ public class HelperUser {
         WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME),
                 HttpMethod.POST);
         createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classId), //
-                new NameValuePair("level", "true"), //
+                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classId),
+                new NameValuePair("level", "true"),
 
         }));
 
@@ -171,7 +171,7 @@ public class HelperUser {
         }
         // There's should be only one
         System.out.println("UnkillableMutant.HelperUser.createNewGame() " + newGameLink);
-        //
+
         return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
 
     }
@@ -319,7 +319,7 @@ public class HelperUser {
         HtmlPage uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
         // Class IDs before
-        //
+
         List<String> classIds = new ArrayList<>();
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
             if (l instanceof HtmlTableDataCell) {

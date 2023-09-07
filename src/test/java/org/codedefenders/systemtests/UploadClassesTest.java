@@ -52,7 +52,7 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 
     /*
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()//
+    public static DockerComposeRule docker = DockerComposeRule.builder()
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
                     "src/test/resources/systemtests/insert-test-users.yml",
                     "src/test/resources/systemtests/mount-sources-folder.yml"))

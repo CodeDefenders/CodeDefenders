@@ -48,7 +48,7 @@ public class AntProcessResultTest {
 
         AntProcessResult result = new AntProcessResult();
         result.setInputStream(new BufferedReader(new StringReader(fullJUnitOutput)));
-        //
+
         String reducedJunitOutput = result.getJUnitMessage();
         assertThat(reducedJunitOutput.split("\n").length, is(lessThan(fullJUnitOutput.split("\n").length)));
     }

@@ -68,7 +68,7 @@ public class MeleeGameDAO {
         boolean requiresValidation = rs.getBoolean("RequiresValidation");
         float lineCoverage = rs.getFloat("Coverage_Goal");
         float mutantCoverage = rs.getFloat("Mutant_Goal");
-        //
+
         // These are read but never used. We always set them to 0
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");

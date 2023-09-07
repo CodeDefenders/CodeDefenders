@@ -487,7 +487,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // We introduce our decoration
             String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate).escape(false).fadeOut(false);
-            //
+
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             return;

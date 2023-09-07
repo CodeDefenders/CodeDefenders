@@ -49,22 +49,22 @@ public abstract class AbstractEmptyDBSystemTest {
 
     /*
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()//
+    public static DockerComposeRule docker = DockerComposeRule.builder()
      */
     /*
      * Replace docker-compose.yml with docker-compose-debug.yml to
      * access chrome with VNCViewer
      */
     /*
-            .file("src/test/resources/systemtests/docker-compose.yml")//
-            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())//
-            .waitingForService("db", HealthChecks.toHaveAllPortsOpen()) //
+            .file("src/test/resources/systemtests/docker-compose.yml")
+            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
+            .waitingForService("db", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080, new Function<DockerPort, String>() {
                 @Override
                 public String apply(DockerPort t) {
                     return t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders");
                 }
-            })) //
+            }))
             // .saveLogsTo("/tmp/test.log")// This is mostly for debugging
             .build();
     */

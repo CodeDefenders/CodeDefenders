@@ -78,7 +78,7 @@ public class PlayerDAO {
     }
 
     /**
-     * Retrieves the identifier of a player of a given user in a given game. //
+     * Retrieves the identifier of a player of a given user in a given game.
      * TODO: Return Integer instead of int, and null instead of -1?
      *
      * @param userId the user identifier as an {@code int}.
