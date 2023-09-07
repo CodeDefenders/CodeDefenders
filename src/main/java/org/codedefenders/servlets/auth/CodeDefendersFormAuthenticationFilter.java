@@ -113,10 +113,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         messages.add("Username not found or password incorrect.");
 
-        if (request instanceof HttpServletRequest
-                && response instanceof HttpServletResponse) {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (request instanceof HttpServletRequest httpRequest
+                && response instanceof HttpServletResponse httpResponse) {
 
             final String ipAddress = getClientIpAddress(httpRequest);
 

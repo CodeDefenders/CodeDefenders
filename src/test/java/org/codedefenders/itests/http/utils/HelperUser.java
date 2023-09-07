@@ -322,8 +322,7 @@ public class HelperUser {
 
         List<String> classIds = new ArrayList<>();
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
-            if (l instanceof HtmlTableDataCell) {
-                HtmlTableDataCell td = (HtmlTableDataCell) l;
+            if (l instanceof HtmlTableDataCell td) {
                 classIds.add(td.getTextContent());
             }
         }
@@ -340,13 +339,11 @@ public class HelperUser {
         uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
-            if (l instanceof HtmlTableDataCell) {
-                HtmlTableDataCell td = (HtmlTableDataCell) l;
+            if (l instanceof HtmlTableDataCell td) {
                 if (classIds.contains(td.getTextContent())) {
                     continue;
-                } else {
-                    return Integer.parseInt(td.getTextContent());
                 }
+                return Integer.parseInt(td.getTextContent());
             }
         }
 

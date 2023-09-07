@@ -278,8 +278,7 @@ public class CodeValidator {
             @Override
             public Visitable visit(IfStmt n, Void arg) {
                 // Extract elements from the condition
-                if (n.getCondition() instanceof InstanceOfExpr) {
-                    InstanceOfExpr expr = (InstanceOfExpr) n.getCondition();
+                if (n.getCondition() instanceof InstanceOfExpr expr) {
                     ReferenceType type = expr.getType();
 
                     // Accumulate instanceOF

@@ -184,8 +184,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
             throws AuthenticationException {
 
-        if (token instanceof UsernamePasswordToken) {
-            UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
+        if (token instanceof UsernamePasswordToken usernamePasswordToken) {
 
             Optional<UserEntity> activeUser = userRepo.getUserByName(usernamePasswordToken.getUsername());
 
