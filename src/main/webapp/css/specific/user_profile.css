@@ -212,20 +212,17 @@
     --color-secondary: #fff0;
 }
 
-.achievement-card.achievement-level-0 {
+.achievement-card.achievement-level-0,
+.achievement-card.achievement-level-1 {
     --color-primary: #3479a2;
 }
 
-.achievement-card.achievement-level-1 {
+.achievement-card.achievement-level-2 {
     --color-primary: #9d7943;
 }
 
-.achievement-card.achievement-level-2 {
-    --color-primary: #bcb9b6;
-}
-
 .achievement-card.achievement-level-3 {
-    --color-primary: #d2b615;
+    --color-primary: #bcb9b6;
 }
 
 .achievement-card.achievement-level-4 {
