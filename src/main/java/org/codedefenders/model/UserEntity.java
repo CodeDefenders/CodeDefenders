@@ -20,14 +20,9 @@ package org.codedefenders.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
 
-import javax.enterprise.inject.spi.CDI;
-
-import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Represents a user object in the database.

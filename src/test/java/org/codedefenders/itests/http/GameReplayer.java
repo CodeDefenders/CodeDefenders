@@ -41,7 +41,6 @@ import org.codedefenders.itests.http.utils.CodeDefenderAction;
 import org.codedefenders.itests.http.utils.DefendAction;
 import org.codedefenders.itests.http.utils.HelperUser;
 import org.codedefenders.model.UserEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;

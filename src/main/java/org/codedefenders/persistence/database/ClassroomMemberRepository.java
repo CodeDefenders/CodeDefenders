@@ -2,18 +2,12 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;

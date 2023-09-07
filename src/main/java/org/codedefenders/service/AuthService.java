@@ -28,8 +28,6 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
-import org.codedefenders.model.UserEntity;
-import org.codedefenders.persistence.database.UserRepository;
 
 @Named("auth")
 @ApplicationScoped

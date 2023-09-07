@@ -25,7 +25,6 @@ import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.validation.code.CodeValidator;
 
 public interface IGameManagingUtils {
 

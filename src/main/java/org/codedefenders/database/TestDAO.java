@@ -46,8 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 /**
  * This class handles the database logic for tests.
  *

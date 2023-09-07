@@ -19,7 +19,6 @@ import org.codedefenders.persistence.database.ClassroomRepository;
 import org.codedefenders.transaction.Transactional;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Transactional

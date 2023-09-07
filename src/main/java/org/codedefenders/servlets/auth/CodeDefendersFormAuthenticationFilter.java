@@ -20,7 +20,6 @@
 package org.codedefenders.servlets.auth;
 
 import java.io.IOException;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

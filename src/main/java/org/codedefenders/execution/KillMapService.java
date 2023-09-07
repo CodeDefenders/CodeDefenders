@@ -24,12 +24,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -37,7 +33,6 @@ import java.util.concurrent.Future;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.collections.map.DefaultedMap;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
@@ -52,7 +47,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.ERROR;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;

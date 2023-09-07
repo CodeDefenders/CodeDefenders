@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;

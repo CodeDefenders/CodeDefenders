@@ -24,9 +24,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.TransactionAwareQueryRunner;

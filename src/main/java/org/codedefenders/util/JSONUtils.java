@@ -24,11 +24,8 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
-import org.codedefenders.game.GameClass;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;

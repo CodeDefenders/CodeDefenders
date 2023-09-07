@@ -58,7 +58,6 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;

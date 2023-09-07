@@ -14,7 +14,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 /**
