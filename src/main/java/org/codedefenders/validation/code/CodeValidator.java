@@ -273,7 +273,7 @@ public class CodeValidator {
         final AtomicBoolean analyzingMutant = new AtomicBoolean(false);
 
 
-        ModifierVisitor<Void> visitor = new ModifierVisitor<Void>() {
+        ModifierVisitor<Void> visitor = new ModifierVisitor<>() {
 
             @Override
             public Visitable visit(IfStmt n, Void arg) {

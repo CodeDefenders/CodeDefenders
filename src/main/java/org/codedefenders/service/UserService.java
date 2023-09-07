@@ -72,7 +72,7 @@ public class UserService {
                 .maximumSize(200)
                 .recordStats()
                 .build(
-                        new CacheLoader<Integer, SimpleUser>() {
+                        new CacheLoader<>() {
                             @Nonnull
                             @Override
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {

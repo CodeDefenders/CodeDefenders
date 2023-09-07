@@ -69,7 +69,7 @@ public class UserRepository {
                 .maximumSize(400)
                 .recordStats()
                 .build(
-                        new CacheLoader<Integer, Integer>() {
+                        new CacheLoader<>() {
                             @Override
                             @Nonnull
                             public Integer load(@Nonnull Integer playerId) throws Exception {

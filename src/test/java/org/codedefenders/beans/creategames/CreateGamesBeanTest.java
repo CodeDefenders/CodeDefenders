@@ -163,7 +163,7 @@ public class CreateGamesBeanTest {
 
     @Test
     public void testStageGamesNotEnoughPlayersForOneGame() {
-        Set<Integer> userIds = new HashSet<Integer>() {{
+        Set<Integer> userIds = new HashSet<>() {{
             add(1);
             add(2);
         }};
