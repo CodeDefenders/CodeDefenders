@@ -202,17 +202,13 @@ public class UserService {
         return Optional.ofNullable(result);
     }
 
-    /**
-     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
-     */
     public void changeUsername(int userId, @Nonnull String newUsername) {
         simpleUserForUserIdCache.invalidate(userId);
         throw new NotImplementedException();
     }
 
     /**
-     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)} and
-     * {@link org.codedefenders.servlets.admin.AdminUserManagement#resetUserPW(int)}
+     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)}
      */
     public void changePassword(@Nonnull String newPassword) {
         throw new NotImplementedException();
@@ -220,7 +216,6 @@ public class UserService {
 
     /**
      * See {@link org.codedefenders.servlets.UserSettingsManager#updateUserInformation(UserEntity, Optional, boolean)}
-     * and {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
      */
     public void changeEmail(@Nonnull String newEmail) {
         throw new NotImplementedException();
@@ -228,7 +223,6 @@ public class UserService {
 
 
     /**
-     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}.
      * Admin only method!
      */
     @Nonnull
@@ -300,8 +294,7 @@ public class UserService {
 
 
     /**
-     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)} and
-     * {@link org.codedefenders.servlets.admin.AdminUserManagement#deleteUser(int)}.
+     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)}
      */
     public void deactivateAccount() {
         throw new NotImplementedException();

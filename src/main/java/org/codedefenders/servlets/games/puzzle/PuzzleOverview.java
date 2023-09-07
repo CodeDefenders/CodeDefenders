@@ -55,7 +55,6 @@ import org.slf4j.LoggerFactory;
  * <p>Serves under {@code /puzzles}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see PuzzleGameSelectionManager
  * @see PuzzleGame
  */
 @WebServlet(org.codedefenders.util.Paths.PUZZLE_OVERVIEW)

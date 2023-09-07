@@ -21,7 +21,7 @@ public class UserMeleeGameInfo extends GameInfo {
 
     /**
      * Use {@link #forOpen(int, MeleeGame, String) forActive()} and
-     * {@link #forActive(int, MeleeGame, String) forOpen()} methods.
+     * {@link #forActive(int, MeleeGame, Role, String) forOpen()} methods.
      */
     private UserMeleeGameInfo() {
     }
