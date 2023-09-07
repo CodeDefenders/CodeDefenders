@@ -424,7 +424,7 @@ public class Installer {
                 .map(Integer::parseInt)
                 .orElse(null);
         Optional<Integer> chapterIdOpt = Optional.ofNullable(cfg.getProperty("chapterId")).map(Integer::parseInt);
-        if (!chapterIdOpt.isPresent() || !puzzleChapters.contains(chapterIdOpt.get())) {
+        if (chapterIdOpt.isEmpty() || !puzzleChapters.contains(chapterIdOpt.get())) {
             logger.warn("Provided chapterId for puzzle was not provided or does not exist. Skipping this puzzle.");
             return;
         }

@@ -64,7 +64,7 @@ public class TestAPI extends HttpServlet {
         final Optional<TestDTO> test = ServletUtils.getIntParameter(request, "testId")
                 .map(id -> gameService.getTest(login.getUserId(), id));
 
-        if (!test.isPresent()) {
+        if (test.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

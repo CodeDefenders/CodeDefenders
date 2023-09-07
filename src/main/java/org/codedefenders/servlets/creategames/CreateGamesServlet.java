@@ -75,7 +75,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         synchronized (getContext().getSynchronizer()) {
             final Optional<String> action = getStringParameter(request, "formType");
-            if (!action.isPresent()) {
+            if (action.isEmpty()) {
                 logger.error("Missing parameter: formType.");
                 Redirect.redirectBack(request, response);
                 return;
@@ -232,13 +232,13 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         /* Map given user IDs to users and validate that all exist. */
         Optional<Set<UserInfo>> usersFromTable = getContext().getUserInfosForIds(userIdsFromTable);
-        if (!usersFromTable.isPresent()) {
+        if (usersFromTable.isEmpty()) {
             return Optional.empty();
         }
 
         /* Map given usernames/emails to users and validate that all exist. */
         Optional<Set<UserInfo>> usersFromTextArea = getContext().getUserInfosForNamesAndEmails(userNames);
-        if (!usersFromTextArea.isPresent()) {
+        if (usersFromTextArea.isEmpty()) {
             return Optional.empty();
         }
 
@@ -265,7 +265,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         int playersPerGame = getIntParameter(request, "playersPerGame").get();
 
         Optional<Set<UserInfo>> players = extractPlayers(request);
-        if (!players.isPresent()) {
+        if (players.isEmpty()) {
             return;
         }
 

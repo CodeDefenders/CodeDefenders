@@ -133,7 +133,7 @@ public class CodeValidator {
             CodeValidatorLevel level) {
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
-        if (!originalParseResult.isPresent() || !mutatedParseResult.isPresent()) {
+        if (originalParseResult.isEmpty() || mutatedParseResult.isEmpty()) {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
         CompilationUnit originalCU = originalParseResult.get();

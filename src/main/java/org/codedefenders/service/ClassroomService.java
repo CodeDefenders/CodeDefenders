@@ -201,7 +201,7 @@ public class ClassroomService {
 
         Optional<ClassroomMember> existingMember = getMemberForClassroomAndUser(
                 member.getClassroomId(), member.getUserId());
-        if (!existingMember.isPresent()) {
+        if (existingMember.isEmpty()) {
             memberRepository.storeMember(member);
         }
     }

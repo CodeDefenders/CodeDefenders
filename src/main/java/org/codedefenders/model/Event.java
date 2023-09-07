@@ -110,7 +110,7 @@ public class Event {
         if (procMessage.contains("@event_user")) {
             Optional<SimpleUser> user = userService.getSimpleUserById(userId);
 
-            String userLabel = (!user.isPresent()) ? "Unknown"
+            String userLabel = (user.isEmpty()) ? "Unknown"
                     : (user.get().getName().equals(currentUserName)) ? "You" : user.get().getName();
 
             String roleClass;

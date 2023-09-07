@@ -395,7 +395,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(MethodDeclaration decl, Void arg) {
         try (TokenInserter i = tokens.forNode(decl, () -> super.visit(decl, arg))) {
-            if (!decl.getBody().isPresent()) {
+            if (decl.getBody().isEmpty()) {
                 return;
             }
             handleMethodDeclaration(i, decl, decl.getBody().get(), astCoverage.get(decl));
@@ -788,7 +788,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
                     .coverStrong(status.status());
 
             int checkBeginLine = Math.max(keywordEndLine + 1, beginOf(stmt.getCheck()));
-            if (!stmt.getMessage().isPresent()) {
+            if (stmt.getMessage().isEmpty()) {
                 // cover lines after assert keyword until end of stmt with check status
                 i.lines(checkBeginLine, endOf(stmt))
                         .cover(checkStatus.status());

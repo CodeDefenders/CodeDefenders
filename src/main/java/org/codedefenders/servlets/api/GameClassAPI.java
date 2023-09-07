@@ -55,7 +55,7 @@ public class GameClassAPI extends HttpServlet {
         final Optional<GameClass> classId = ServletUtils.getIntParameter(request, "classId")
                 .map(GameClassDAO::getClassForId);
 
-        if (!classId.isPresent()) {
+        if (classId.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

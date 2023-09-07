@@ -104,7 +104,7 @@ public class MutationTester implements IMutationTester {
 
         // Acquire and release the connection
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -162,7 +162,7 @@ public class MutationTester implements IMutationTester {
 
         int testOwnerPlayerId = test.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(testOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -266,7 +266,7 @@ public class MutationTester implements IMutationTester {
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -420,7 +420,7 @@ public class MutationTester implements IMutationTester {
 
         int mutantOwnerPlayerId = mutant.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutantOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }

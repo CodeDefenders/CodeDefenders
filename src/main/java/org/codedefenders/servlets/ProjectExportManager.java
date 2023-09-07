@@ -77,7 +77,7 @@ public class ProjectExportManager extends HttpServlet {
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         final Optional<Integer> gameId = ServletUtils.gameId(request);
-        if (!gameId.isPresent()) {
+        if (gameId.isEmpty()) {
             Redirect.redirectBack(request, response);
             return;
         }

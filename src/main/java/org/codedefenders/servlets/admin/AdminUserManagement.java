@@ -138,7 +138,7 @@ public class AdminUserManagement extends HttpServlet {
             }
             case "createUsers": {
                 final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
-                if (!userList.isPresent()) {
+                if (userList.isEmpty()) {
                     logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
                     logger.info("Creating users....");
@@ -151,7 +151,7 @@ public class AdminUserManagement extends HttpServlet {
                 // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
                 //  'userid' from the session attributes
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
-                if (!userId.isPresent()) {
+                if (userId.isEmpty()) {
                     logger.error("Editing user failed. Missing request parameter 'uid'");
                 } else {
                     String newUsername = request.getParameter("name");
@@ -194,7 +194,7 @@ public class AdminUserManagement extends HttpServlet {
 
     private boolean setUserInactive(int userId) {
         final Optional<UserEntity> user = userRepo.getUserById(userId);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             return false;
         }
         user.get().setActive(false);

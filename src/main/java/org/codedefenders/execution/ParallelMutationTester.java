@@ -79,7 +79,7 @@ public class ParallelMutationTester extends MutationTester {
 
         // Acquire and release the connection
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -179,7 +179,7 @@ public class ParallelMutationTester extends MutationTester {
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }

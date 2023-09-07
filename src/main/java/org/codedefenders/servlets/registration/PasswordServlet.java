@@ -87,7 +87,7 @@ public class PasswordServlet extends HttpServlet {
                 String email = request.getParameter("accountEmail");
                 String username = request.getParameter("accountUsername");
                 Optional<UserEntity> u = userRepo.getUserByEmail(email);
-                if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
+                if (u.isEmpty() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();

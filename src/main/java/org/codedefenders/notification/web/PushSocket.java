@@ -124,7 +124,7 @@ public class PushSocket {
 
         Optional<SimpleUser> user = userService.getSimpleUserById(userId);
 
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             logger.info("Invalid user id for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid user id"));
             return;

@@ -53,7 +53,7 @@ public class ClassroomServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             Redirect.redirectBack(request, response);
             return;
@@ -82,14 +82,14 @@ public class ClassroomServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             Redirect.redirectBack(request, response);
             return;
         }
 
         Optional<String> action = ServletUtils.getStringParameter(request, "action");
-        if (!action.isPresent()) {
+        if (action.isEmpty()) {
             messages.add("Missing required parameter: action.");
             Redirect.redirectBack(request, response);
             return;
@@ -276,7 +276,7 @@ public class ClassroomServlet extends HttpServlet {
 
         Optional<ClassroomMember> kickedMember = classroomService.getMemberForClassroomAndUser(
                 classroom.getId(), userId);
-        if (!kickedMember.isPresent()) {
+        if (kickedMember.isEmpty()) {
             messages.add("Member not found.");
             Redirect.redirectBack(request, response);
         } else if (kickedMember.get().getRole() == ClassroomRole.MODERATOR) {

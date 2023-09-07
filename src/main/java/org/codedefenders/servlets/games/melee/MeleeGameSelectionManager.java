@@ -368,7 +368,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
-        if (!newDuration.isPresent()) {
+        if (newDuration.isEmpty()) {
             logger.debug("No duration value supplied.");
             Redirect.redirectBack(request, response);
             return;

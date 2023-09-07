@@ -56,7 +56,7 @@ public class ClassroomAPI extends HttpServlet {
         response.setContentType("application/json");
 
         Optional<String> type = ServletUtils.getStringParameter(request, "type");
-        if (!type.isPresent()) {
+        if (type.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -91,7 +91,7 @@ public class ClassroomAPI extends HttpServlet {
         String which = ServletUtils.getStringParameter(request, "which").orElse("all");
 
         Optional<List<ClassroomDTO>> classrooms = getClassroomsData(which);
-        if (!classrooms.isPresent()) {
+        if (classrooms.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -105,7 +105,7 @@ public class ClassroomAPI extends HttpServlet {
 
     private void handleMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -121,7 +121,7 @@ public class ClassroomAPI extends HttpServlet {
 
     private void handleGames(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

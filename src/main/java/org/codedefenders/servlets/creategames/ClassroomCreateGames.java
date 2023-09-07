@@ -63,7 +63,7 @@ public class ClassroomCreateGames extends CreateGamesServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
@@ -94,7 +94,7 @@ public class ClassroomCreateGames extends CreateGamesServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;

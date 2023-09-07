@@ -193,7 +193,7 @@ public class UserService {
             result = "Could not create user. Email has already been used. You can reset your password.";
         } else {
             UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email);
-            if (!userRepo.insert(newUser).isPresent()) {
+            if (userRepo.insert(newUser).isEmpty()) {
                 // TODO: How about some error handling?
                 result = "Could not create user.";
             }
@@ -237,7 +237,7 @@ public class UserService {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         Optional<UserEntity> u = userRepo.getUserById(userId);
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             return Optional.of("Error. User " + userId + " cannot be retrieved from database.");
         }
         UserEntity user = u.get();

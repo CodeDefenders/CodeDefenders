@@ -182,7 +182,7 @@ public class PuzzleGameManager extends HttpServlet {
             }
         } else {
             final Optional<Integer> puzzleIdOpt = getIntParameter(request, "puzzleId");
-            if (!puzzleIdOpt.isPresent()) {
+            if (puzzleIdOpt.isEmpty()) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId and puzzleId from request.");
                 response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
                 return;
@@ -240,7 +240,7 @@ public class PuzzleGameManager extends HttpServlet {
      */
     public void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
-        if (!puzzleId.isPresent()) {
+        if (puzzleId.isEmpty()) {
             logger.error("Failed to retrieve puzzleId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
@@ -363,7 +363,7 @@ public class PuzzleGameManager extends HttpServlet {
                             HttpServletResponse response,
                             HttpSession session) throws IOException {
         final Optional<Integer> gameIdOpt = gameId(request);
-        if (!gameIdOpt.isPresent()) {
+        if (gameIdOpt.isEmpty()) {
             logger.error("Cannot create test for this puzzle. Failed to retrieve gameId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
@@ -536,7 +536,7 @@ public class PuzzleGameManager extends HttpServlet {
                               HttpServletResponse response,
                               HttpSession session) throws IOException {
         final Optional<Integer> gameIdOpt = gameId(request);
-        if (!gameIdOpt.isPresent()) {
+        if (gameIdOpt.isEmpty()) {
             logger.error("Cannot create mutant for this puzzle. Failed to retrieve gameId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);

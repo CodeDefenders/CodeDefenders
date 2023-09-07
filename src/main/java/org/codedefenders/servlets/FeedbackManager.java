@@ -56,7 +56,7 @@ public class FeedbackManager extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
+        if (gameIdOpt.isEmpty()) {
             logger.error("No valid gameId parameter found");
             Redirect.redirectBack(request, response);
             return;

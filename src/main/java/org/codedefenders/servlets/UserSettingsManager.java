@@ -83,7 +83,7 @@ public class UserSettingsManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!userRepo.getUserById(login.getUserId()).isPresent()) {
+        if (userRepo.getUserById(login.getUserId()).isEmpty()) {
             response.sendRedirect(url.forPath("/"));
             return;
         }
