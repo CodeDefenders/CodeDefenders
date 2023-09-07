@@ -49,7 +49,7 @@
             <c:forEach items="${profile.achievements}" var="achievement">
                 <div class="achievement-card achievement-level-${achievement.level}">
                     <div class="pie animate" style="--percentage: ${achievement.progress.orElse(100)}">
-                        <img src="${url.forPath("/images/achievements/")}codedefenders achievements 0 level ${achievement.level}.png"
+                        <img src="${url.forPath("/images/achievements/")}codedefenders_achievements_${achievement.id.asInt}_lvl_${achievement.level}.png"
                              alt="${achievement.name} (Level ${achievement.level})">
                     </div>
                     <p>
@@ -58,8 +58,11 @@
                             <c:if test="${achievement.level > 0}">
                                 (Level ${achievement.level})
                             </c:if>
-                        </strong><br>
-                            ${achievement.description} <br> ${achievement.progressText}
+                        </strong>
+                        <br>
+                            ${achievement.description}
+                        <br>
+                            ${achievement.progressText}
                     </p>
                 </div>
             </c:forEach>
