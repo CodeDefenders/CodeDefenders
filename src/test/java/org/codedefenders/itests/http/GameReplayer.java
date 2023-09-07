@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.itests.http.UnkillableMutantTest.WebClientFactory;
 import org.codedefenders.itests.http.utils.AttackAction;
@@ -40,6 +41,8 @@ import org.codedefenders.itests.http.utils.CodeDefenderAction;
 import org.codedefenders.itests.http.utils.DefendAction;
 import org.codedefenders.itests.http.utils.HelperUser;
 import org.codedefenders.model.UserEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
@@ -68,6 +71,8 @@ public class GameReplayer {
     private Map<String, HelperUser> actors;
     private Map<String, String> tests;
     private Map<String, String> mutants;
+
+    private final PasswordEncoder passwordEncoder = PasswordEncoderProvider.getPasswordEncoder();
 
     public GameReplayer(String cutFile, String traceFile, String testsFile, String mutantsFile) {
         this.cutFile = cutFile;
@@ -112,7 +117,7 @@ public class GameReplayer {
                 System.out.println("GameReplayer.parse() FOUND ATTACKER " + userID);
                 actors.put(userID,
                         new HelperUser(
-                                new UserEntity("Attacker" + userID, UserEntity.encodePassword("test"), "Attacker" + userID + "@test.com"),
+                                new UserEntity("Attacker" + userID, passwordEncoder.encode("test"), "Attacker" + userID + "@test.com"),
                                 org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
             }
             System.out.println("GameReplayer.parse() Attack " + userID);
@@ -140,7 +145,7 @@ public class GameReplayer {
                 if (!actors.containsKey(userID)) {
                     System.out.println("GameReplayer.parse() FOUND DEFENDER " + userID);
                     actors.put(userID,
-                            new HelperUser(new UserEntity("Defender" + userID, UserEntity.encodePassword("test"), "Defender" + userID + "@test.com"),
+                            new HelperUser(new UserEntity("Defender" + userID, passwordEncoder.encode("test"), "Defender" + userID + "@test.com"),
                                     org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
                 }
             }
@@ -225,7 +230,7 @@ public class GameReplayer {
     // Raise assertions ?
     public void replay(int speedUp) throws FailingHttpStatusCodeException, IOException, InterruptedException {
         // Create a game -> we need the game ID
-        UserEntity creatorUser = new UserEntity("creator", UserEntity.encodePassword("test"), "creator@test.com");
+        UserEntity creatorUser = new UserEntity("creator", passwordEncoder.encode("test"), "creator@test.com");
         HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 
         // This fails if the user exists ?

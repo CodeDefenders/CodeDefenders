@@ -26,6 +26,7 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @WebServlet(Paths.CLASSROOM)
 public class ClassroomServlet extends HttpServlet {
@@ -44,6 +45,9 @@ public class ClassroomServlet extends HttpServlet {
 
     @Inject
     private PageInfoBean pageInfo;
+
+    @Inject
+    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -303,7 +307,7 @@ public class ClassroomServlet extends HttpServlet {
 
         if (classroom.getPassword().isPresent()) {
             String password = ServletUtils.getStringParameter(request, "password").get();
-            boolean matches = new BCryptPasswordEncoder().matches(password, classroom.getPassword().get());
+            boolean matches = passwordEncoder.matches(password, classroom.getPassword().get());
             if (!matches) {
                 messages.add("Wrong password");
                 Redirect.redirectBack(request, response);

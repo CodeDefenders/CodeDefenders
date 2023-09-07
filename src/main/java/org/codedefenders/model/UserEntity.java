@@ -47,10 +47,6 @@ public class UserEntity implements Serializable {
     private boolean allowContact;
     private KeyMap keyMap;
 
-    public UserEntity(String username) {
-        this(username, UserEntity.encodePassword(""));
-    }
-
     public UserEntity(String username, String encodedPassword) {
         this(username, encodedPassword, "");
     }
@@ -134,11 +130,6 @@ public class UserEntity implements Serializable {
 
     public void setKeyMap(KeyMap keyMap) {
         this.keyMap = keyMap;
-    }
-
-    @Deprecated // TODO(Alex): Where to put this method?
-    public static String encodePassword(String password) {
-        return new BCryptPasswordEncoder().encode(password);
     }
 
     @Override

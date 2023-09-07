@@ -40,6 +40,7 @@ import org.codedefenders.transaction.Transactional;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -56,10 +57,12 @@ public class UserService {
     private final LoadingCache<Integer, SimpleUser> simpleUserForUserIdCache;
 
     private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Inject
-    public UserService(UserRepository userRepo, MetricsRegistry metricsRegistry) {
+    public UserService(UserRepository userRepo, MetricsRegistry metricsRegistry, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
                 // Entries expire after a relative short time, since User(name) updates are not handled through this
@@ -189,7 +192,7 @@ public class UserService {
         } else if (userRepo.getUserByEmail(email).isPresent()) {
             result = "Could not create user. Email has already been used. You can reset your password.";
         } else {
-            UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
+            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email);
             if (!userRepo.insert(newUser).isPresent()) {
                 // TODO: How about some error handling?
                 result = "Could not create user.";
@@ -255,7 +258,7 @@ public class UserService {
             if (!validator.validPassword(newPassword)) {
                 return Optional.of("Password is not valid");
             }
-            user.setEncodedPassword(UserEntity.encodePassword(newPassword));
+            user.setEncodedPassword(passwordEncoder.encode(newPassword));
         }
         user.setUsername(newUsername);
         user.setEmail(newEmail);

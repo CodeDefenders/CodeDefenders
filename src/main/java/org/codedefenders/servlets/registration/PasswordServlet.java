@@ -41,6 +41,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
@@ -57,6 +58,9 @@ public class PasswordServlet extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private PasswordEncoder passwordEncoder;
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
@@ -114,7 +118,7 @@ public class PasswordServlet extends HttpServlet {
                     } else if (password.equals(confirm)) {
                         Optional<UserEntity> user = userRepo.getUserById(userId.get());
                         if (user.isPresent()) {
-                            user.get().setEncodedPassword(UserEntity.encodePassword(password));
+                            user.get().setEncodedPassword(passwordEncoder.encode(password));
                             if (userRepo.update(user.get())) {
                                 userRepo.setPasswordResetSecret(user.get().getId(), null);
                                 responseURL = url.forPath(Paths.LOGIN);

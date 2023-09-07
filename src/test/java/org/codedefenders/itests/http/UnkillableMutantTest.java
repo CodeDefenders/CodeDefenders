@@ -31,11 +31,13 @@ import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.itests.http.utils.HelperUser;
 import org.codedefenders.model.UserEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -56,7 +58,8 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 //@SystemTest
 public class UnkillableMutantTest {
 
-    private static int TIMEOUT = 10000;
+    private static final int TIMEOUT = 10000;
+    private static final String EMPTY_PW = PasswordEncoderProvider.getPasswordEncoder().encode("");
 
     static class WebClientFactory {
         private static Collection<WebClient> clients = new ArrayList<>();
@@ -144,7 +147,7 @@ public class UnkillableMutantTest {
     @Test
     public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         // // This test assumes an empty db !
-        UserEntity creatorUser = new UserEntity("creator");
+        UserEntity creatorUser = new UserEntity("creator", EMPTY_PW);
         HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         creator.doLogin();
         System.out.println("Creator Login");
@@ -160,7 +163,7 @@ public class UnkillableMutantTest {
         //
         creator.startGame(newGameId);
         //
-        UserEntity attackerUser = new UserEntity("demoattacker");
+        UserEntity attackerUser = new UserEntity("demoattacker", EMPTY_PW);
         HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         attacker.doLogin();
         System.out.println("Attacker Login");
@@ -175,7 +178,7 @@ public class UnkillableMutantTest {
                         Charset.defaultCharset()));
         System.out.println("Attacker attack in game " + newGameId);
         //
-        UserEntity defenderUser = new UserEntity("demodefender");
+        UserEntity defenderUser = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         defender.doLogin();
         //

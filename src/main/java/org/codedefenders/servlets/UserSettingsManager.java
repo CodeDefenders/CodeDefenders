@@ -43,6 +43,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
@@ -71,6 +72,9 @@ public class UserSettingsManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private PasswordEncoder passwordEncoder;
 
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
@@ -197,7 +201,7 @@ public class UserSettingsManager extends HttpServlet {
             return false;
         }
 
-        user.setEncodedPassword(UserEntity.encodePassword(password));
+        user.setEncodedPassword(passwordEncoder.encode(password));
         return userRepo.update(user);
     }
 

@@ -59,6 +59,7 @@ import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;
 
@@ -101,10 +102,17 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     }
 
     public static class CodeDefendersCredentialsMatcher implements CredentialsMatcher {
+        private final PasswordEncoder passwordEncoder;
+
+        @Inject
+        public CodeDefendersCredentialsMatcher(PasswordEncoder passwordEncoder) {
+            this.passwordEncoder = passwordEncoder;
+        }
+
         @Override
         public boolean doCredentialsMatch(AuthenticationToken authenticationToken,
                 AuthenticationInfo authenticationInfo) {
-            return passwordMatches(
+            return passwordEncoder.matches(
                     // authenticationToken.getCredentials returns char array so convert to String
                     new String((char[]) authenticationToken.getCredentials()),
                     (String) authenticationInfo.getCredentials()
@@ -134,10 +142,6 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         this.setCachingEnabled(true);
         this.setAuthenticationCachingEnabled(true);
-    }
-
-    public static boolean passwordMatches(CharSequence rawPassword, String encodedPassword) {
-        return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
     }
 
     protected Account getAccount(UserEntity userEntity) {

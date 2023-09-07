@@ -43,6 +43,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
@@ -68,6 +69,9 @@ public class AdminUserManagement extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private PasswordEncoder passwordEncoder;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
@@ -272,7 +276,7 @@ public class AdminUserManagement extends HttpServlet {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final UserEntity user = new UserEntity(username, UserEntity.encodePassword(password), email);
+        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email);
         final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {

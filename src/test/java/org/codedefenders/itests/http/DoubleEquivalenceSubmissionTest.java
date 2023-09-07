@@ -34,11 +34,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -90,7 +93,8 @@ public class DoubleEquivalenceSubmissionTest {
     // Do it in parallel
 
     // private WebClient webClient;
-    private static int TIMEOUT = 10000;
+    private static final int TIMEOUT = 10000;
+    private static final String EMPTY_PW = PasswordEncoderProvider.getPasswordEncoder().encode("");
 
     static class WebClientFactory {
         private static Collection<WebClient> clients = new ArrayList<>();
@@ -370,7 +374,7 @@ public class DoubleEquivalenceSubmissionTest {
     @Disabled
     @Test
     public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-        UserEntity creatorUser = new UserEntity("creator");
+        UserEntity creatorUser = new UserEntity("creator", EMPTY_PW);
         HelperUser creator = new HelperUser(creatorUser, "test");
         creator.doLogin();
         System.out.println("Creator Login");
@@ -380,7 +384,7 @@ public class DoubleEquivalenceSubmissionTest {
         //
         creator.startGame(newGameId);
         //
-        UserEntity attackerUser = new UserEntity("demoattacker");
+        UserEntity attackerUser = new UserEntity("demoattacker", EMPTY_PW);
         HelperUser attacker = new HelperUser(attackerUser, "test");
         attacker.doLogin();
         System.out.println("Attacker Login");
@@ -388,7 +392,7 @@ public class DoubleEquivalenceSubmissionTest {
         attacker.joinOpenGame(newGameId, true);
         System.out.println("Attacker Join game " + newGameId);
         //
-        UserEntity defenderUser = new UserEntity("demodefender");
+        UserEntity defenderUser = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender = new HelperUser(defenderUser, "test");
         defender.doLogin();
         //
@@ -398,7 +402,7 @@ public class DoubleEquivalenceSubmissionTest {
         //
         System.out.println("Defender Join game " + newGameId);
         //
-        UserEntity defender2User = new UserEntity("demodefender");
+        UserEntity defender2User = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender2 = new HelperUser(defender2User, "test");
         defender2.doLogin();
         //
