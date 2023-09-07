@@ -34,7 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.itests.http.UnkillableMutant.WebClientFactory;
+import org.codedefenders.itests.http.UnkillableMutantTest.WebClientFactory;
 import org.codedefenders.itests.http.utils.AttackAction;
 import org.codedefenders.itests.http.utils.CodeDefenderAction;
 import org.codedefenders.itests.http.utils.DefendAction;

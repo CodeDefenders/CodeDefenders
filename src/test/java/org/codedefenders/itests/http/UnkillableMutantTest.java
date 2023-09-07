@@ -54,7 +54,7 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
  * @author gambi
  */
 //@SystemTest
-public class UnkillableMutant {
+public class UnkillableMutantTest {
 
     private static int TIMEOUT = 10000;
 
