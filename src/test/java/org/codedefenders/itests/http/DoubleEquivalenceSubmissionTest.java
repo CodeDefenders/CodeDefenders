@@ -414,16 +414,14 @@ public class DoubleEquivalenceSubmissionTest {
         //
         // Create the mutant
         attacker.attack(newGameId,
-                new String(
-                        Files.readAllBytes(
-                                new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
+                Files.readString(
+                        new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath(),
                         Charset.defaultCharset()));
         System.out.println("Attacker attack in game " + newGameId);
 
         // // Cover the mutant with a non-mutant-killing test
-        String coveringButNotKillingTest = new String(
-                Files.readAllBytes(
-                        new File("src/test/resources/itests/tests/Lift/CoveringButNotKillingTest.java").toPath()),
+        String coveringButNotKillingTest = Files.readString(
+                new File("src/test/resources/itests/tests/Lift/CoveringButNotKillingTest.java").toPath(),
                 Charset.defaultCharset());
         defender.defend(newGameId, coveringButNotKillingTest);
         System.out.println("Defender defend in game " + newGameId);

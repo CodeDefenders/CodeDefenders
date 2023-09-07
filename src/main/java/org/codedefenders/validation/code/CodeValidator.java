@@ -104,7 +104,7 @@ public class CodeValidator {
 
     public static String getMD5FromFile(String filePath) {
         try {
-            String code = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8);
+            String code = Files.readString(Paths.get(filePath));
             return getMD5FromText(code);
         } catch (IOException e) {
             logger.error("Could not get MD5 hash for given file.", e);

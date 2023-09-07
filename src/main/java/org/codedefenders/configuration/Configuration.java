@@ -417,11 +417,7 @@ public class Configuration {
     }
 
     public int getClusterTimeout() {
-        if (clusterTimeout == null) {
-            return -1;
-        } else {
-            return clusterTimeout;
-        }
+        return Objects.requireNonNullElse(clusterTimeout, -1);
     }
 
     public boolean isForceLocalExecution() {
@@ -445,11 +441,8 @@ public class Configuration {
     }
 
     public int getNumberOfKillmapThreads() {
-        if (parallelizeKillmapCount == null) {
-            return Runtime.getRuntime().availableProcessors();
-        } else {
-            return parallelizeKillmapCount;
-        }
+        return Objects.requireNonNullElseGet(clusterTimeout,
+                () -> Runtime.getRuntime().availableProcessors());
     }
 
     public boolean isMetricsCollectionEnabled() {

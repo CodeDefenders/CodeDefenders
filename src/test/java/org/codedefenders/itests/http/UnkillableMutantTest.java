@@ -171,9 +171,8 @@ public class UnkillableMutantTest {
         System.out.println("Attacker Join game " + newGameId);
         // Submit the unkillable mutant
         attacker.attack(newGameId,
-                new String(
-                        Files.readAllBytes(
-                                new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
+                Files.readString(
+                        new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath(),
                         Charset.defaultCharset()));
         System.out.println("Attacker attack in game " + newGameId);
 
@@ -197,10 +196,7 @@ public class UnkillableMutantTest {
 
         for (File testFile : testFiles) {
             System.out.println("UnkillableMutant.testUnkillableMutant() Defending with " + testFile);
-            defender.defend(newGameId, new String(
-                    Files.readAllBytes(
-                            testFile.toPath()),
-                    Charset.defaultCharset()));
+            defender.defend(newGameId, Files.readString(testFile.toPath(), Charset.defaultCharset()));
         }
     }
 

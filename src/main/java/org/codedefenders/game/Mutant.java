@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -378,11 +379,7 @@ public class Mutant implements Serializable {
     }
 
     public String getKillMessage() {
-        if (killMessage != null) {
-            return killMessage;
-        } else {
-            return Constants.DEFAULT_KILL_MESSAGE;
-        }
+        return Objects.requireNonNullElse(killMessage, Constants.DEFAULT_KILL_MESSAGE);
     }
 
     public String getHTMLEscapedKillMessage() {

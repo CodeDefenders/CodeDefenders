@@ -41,7 +41,7 @@ public class Feedback {
         DEFENDER_FAIRNESS("Defender Fairness", "The defending team is playing fair"),
         GAME_ENGAGING("Game Engaging", "The game is engaging");
 
-        public static final List<Type> TYPES = Collections.unmodifiableList(Arrays.asList(values()));
+        public static final List<Type> TYPES = List.of(values());
 
         public static final List<Type> ATTACKER_TYPES = Arrays.asList(
                 Type.CUT_MUTATION_DIFFICULTY,

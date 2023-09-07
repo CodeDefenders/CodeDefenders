@@ -22,7 +22,7 @@ public class ResourceUtils {
         Path path = Paths.get(url.getPath());
 
         try {
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return Files.readString(path);
         } catch (IOException e) {
             assume().withMessage("IOException while reading file '%s'.", path.toString()).fail();
             return null;
