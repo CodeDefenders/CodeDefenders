@@ -36,14 +36,14 @@ public class ConsistentDateParameterValidator implements ConstraintValidator<Con
         // FIXME
         // Parse to date if possible and then compare with before/after
         return true;
-//
-//        if (!(value[0] instanceof LocalDate)
-//          || !(value[1] instanceof LocalDate)) {
-//            throw new IllegalArgumentException(
-//              "Illegal method signature, expected two parameters of type LocalDate.");
-//        }
-//
-//        return ((LocalDate) value[0]).isAfter(LocalDate.now())
-//          && ((LocalDate) value[0]).isBefore((LocalDate) value[1]);
+
+        // if (!(value[0] instanceof LocalDate)
+        //   || !(value[1] instanceof LocalDate)) {
+        //     throw new IllegalArgumentException(
+        //       "Illegal method signature, expected two parameters of type LocalDate.");
+        // }
+        //
+        // return ((LocalDate) value[0]).isAfter(LocalDate.now())
+        //   && ((LocalDate) value[0]).isBefore((LocalDate) value[1]);
     }
 }

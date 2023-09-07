@@ -97,16 +97,16 @@ public abstract class AbstractEmptyDBSystemTest {
          * This is important: docker-compose randomly assign ports and names to
          * those logical entities so we get them from the rule
          */
-//        DockerPort frontend = docker.containers().container("frontend").port(8080);
+        // DockerPort frontend = docker.containers().container("frontend").port(8080);
         /*
          * For some reason, I cannot link selenium with codedefender frontend
          * using docker compose. Since we cannot connect to "localhost" from
          * within the selenium-chrome, we rely on the host.docker.internal
          * (internal Docker DNS) to find out where codedefenders runs
          */
-//        String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
+        // String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
         codeDefendersHome = "http://frontend:8080/codedefenders";
-        //
+
         driver.get(codeDefendersHome);
     }
 

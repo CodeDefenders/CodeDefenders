@@ -184,16 +184,6 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
-//        public Builder defenderValue(int defenderValue) {
-//            this.defenderValue = defenderValue;
-//            return this;
-//        }
-//
-//        public Builder attackerValue(int attackerValue) {
-//            this.attackerValue = attackerValue;
-//            return this;
-//        }
-
         public Builder state(GameState state) {
             this.state = state;
             return this;

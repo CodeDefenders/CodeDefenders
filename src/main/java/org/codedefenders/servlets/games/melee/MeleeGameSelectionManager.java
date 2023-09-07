@@ -245,17 +245,16 @@ public class MeleeGameSelectionManager extends HttpServlet {
             gje.setUserName(login.getSimpleUser().getName());
             notificationService.post(gje);
 
-            // TODO The following notification is duplicated as MeleeGame.addPlayer also
-            // trigger that.
-            // I leave it here because I believe the problem is having notifications inside
-            // DataObjects like MeleeGame.
+            // TODO The following notification is duplicated as MeleeGame.addPlayer also trigger that.
+            // I leave it here because I believe the problem is having notifications inside DataObjects like MeleeGame.
             // Note that MeleeGame has more than one notification.
-//            final EventType notifType = EventType.PLAYER_JOINED;
-//            final String message = "You successfully joined the game.";
-//            final EventStatus eventStatus = EventStatus.NEW;
-//            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//            Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-//            eventDAO.insert(notif);
+
+            // final EventType notifType = EventType.PLAYER_JOINED;
+            // final String message = "You successfully joined the game.";
+            // final EventStatus eventStatus = EventStatus.NEW;
+            // final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            // Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
+            // eventDAO.insert(notif);
 
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
         } else {
