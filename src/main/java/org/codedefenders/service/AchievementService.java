@@ -2,7 +2,10 @@ package org.codedefenders.service;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
@@ -15,8 +18,7 @@ import org.codedefenders.model.Achievement;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.game.GameJoinedEvent;
-import org.codedefenders.notification.events.server.game.GameStartedEvent;
+import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
@@ -35,12 +37,14 @@ public class AchievementService {
     private final INotificationService notificationService;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
+    private final Map<Integer, List<Achievement>> notificationQueue;
 
     @Inject
     public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService) {
         repo = achievementRepository;
         this.notificationService = notificationService;
         handler = new AchievementEventHandler();
+        notificationQueue = new HashMap<>();
     }
 
     public Collection<Achievement> getAchievementsForUser(int userId) {
@@ -58,21 +62,27 @@ public class AchievementService {
 
     private void addGamePlayed(List<Player> players, Role role) {
         Achievement.Id achievementId = getGamePlayedAchievementIdForRole(role);
-        int affected = players.stream()
+        players.stream()
                 .map(Player::getUser)
                 .mapToInt(UserEntity::getId)
-                .map(userId -> repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) +
-                        repo.updateAchievementForUser(userId, achievementId, 1))
-                .sum();
-        if (affected > 0) {
-            logger.info("Updated {} achievement levels for role {}", affected, role);
-        }
+                .forEach(userId -> {
+                    if (repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) > 0) {
+                        logger.info("Updated achievement PLAY_GAMES for user with id {}", userId);
+                        enqueueAchievementNotification(userId, Achievement.Id.PLAY_GAMES);
+                    }
+
+                    if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
+                        logger.info("Updated achievement {} for user with id {}", achievementId, userId);
+                        enqueueAchievementNotification(userId, achievementId);
+                    }
+                });
     }
 
     private void addTestWritten(int userId) {
         int affected = repo.updateAchievementForUser(userId, Achievement.Id.WRITE_TESTS, 1);
         if (affected > 0) {
             logger.info("Updated achievement WRITE_TESTS for user with id {}", userId);
+            enqueueAchievementNotification(userId, Achievement.Id.WRITE_TESTS);
         }
     }
 
@@ -80,7 +90,28 @@ public class AchievementService {
         int affected = repo.updateAchievementForUser(userId, Achievement.Id.CREATE_MUTANTS, 1);
         if (affected > 0) {
             logger.info("Updated achievement CREATE_MUTANTS for user with id {}", userId);
+            enqueueAchievementNotification(userId, Achievement.Id.CREATE_MUTANTS);
         }
+    }
+
+    private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
+        Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
+        notificationQueue.computeIfAbsent(userId, k -> new LinkedList<>()).add(achievement);
+        logger.debug("Achievement unlocked & added to queue: {} (Level {})", achievement.getName(),
+                achievement.getLevel());
+    }
+
+    public void sendAchievementNotifications() {
+        notificationQueue.forEach((userId, achievements) -> {
+            achievements.forEach(achievement -> {
+                logger.debug("Sending achievement notification for user with id {} and achievement {}",
+                        userId, achievement.getId());
+                AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
+                newEvent.setAchievement(achievement);
+                newEvent.setUserId(userId);
+                notificationService.post(newEvent);
+            });
+        });
     }
 
     public void registerEventHandler() {
@@ -105,18 +136,6 @@ public class AchievementService {
     }
 
     public class AchievementEventHandler {
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleGameStarted(GameStartedEvent event) {
-
-        }
-
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handlePlayerJoined(GameJoinedEvent event) {
-
-        }
 
         @Subscribe
         @SuppressWarnings("unused")

@@ -7,12 +7,13 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.client.registration.AchievementRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.RegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
-import org.codedefenders.notification.events.server.game.GameLifecycleEvent;
+import org.codedefenders.notification.handling.server.AchievementEventHandler;
 import org.codedefenders.notification.handling.server.GameChatEventHandler;
 import org.codedefenders.notification.handling.server.GameLifecycleEventHandler;
 import org.codedefenders.notification.handling.server.MutantProgressBarEventHandler;
@@ -140,6 +141,15 @@ public class ServerEventHandlerContainer {
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
             removeHandler(new GameLifecycleEventHandler(socket, event.getGameId(), user.getId()));
+        }
+    }
+
+    public void handleRegistrationEvent(AchievementRegistrationEvent achievementRegistrationEvent) {
+        if (achievementRegistrationEvent.getAction() == RegistrationEvent.Action.REGISTER) {
+            addHandler(new AchievementEventHandler(socket, user.getId()));
+
+        } else if (achievementRegistrationEvent.getAction() == RegistrationEvent.Action.UNREGISTER) {
+            removeHandler(new AchievementEventHandler(socket, user.getId()));
         }
     }
 }

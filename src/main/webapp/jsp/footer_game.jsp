@@ -39,12 +39,20 @@
 
         socket.register('game.GameStoppedEvent', event => {
             console.log('Game with Id ' + event.gameId + ' was stopped.');
-            window.location.reload();
+            //window.location.reload();
         });
 
         socket.register('game.GameStartedEvent', event => {
             console.log('Game with Id ' + event.gameId + ' was started.');
             window.location.reload();
+        });
+
+        socket.subscribe('registration.AchievementRegistrationEvent', {
+            userId: ${login.userId}
+        });
+
+        socket.register('achievement.AchievementUnlockedEvent', event => {
+            console.log('Achievement unlocked.', event);
         });
     })();
 </script>
