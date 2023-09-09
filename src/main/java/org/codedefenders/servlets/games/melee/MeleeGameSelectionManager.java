@@ -267,13 +267,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
-
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can start the game.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
