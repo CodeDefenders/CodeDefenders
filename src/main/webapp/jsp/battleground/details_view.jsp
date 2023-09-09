@@ -73,16 +73,14 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<%-- HEADER --%>
-<link href="${url.forPath("css/specific/game.css")}" rel="stylesheet">
-<link href="${url.forPath("/css/specific/game_details_view.css")}" rel="stylesheet">
-<link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
-<link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
-
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Details of Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
 
 <jsp:include page="/jsp/header.jsp"/>
+<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_details_view.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
 	<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
