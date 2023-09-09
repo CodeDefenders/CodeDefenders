@@ -9,14 +9,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Achievement implements Serializable {
+    @Expose
     private final Id achievementId;
+    @Expose
     private final int level;
+    @Expose
     private final String name;
+    @Expose
     private final String description;
+    @Expose
     private final String progressText;
+    @Expose
     private final int metricForCurrentLevel;
+    @Expose
     private final Optional<Integer> metricForNextLevel;
+    @Expose
     private int metricCurrent = 0;
 
     public Achievement(Id achievementId, int level, String name, String description, String progressText,
@@ -89,11 +100,17 @@ public class Achievement implements Serializable {
     }
 
     public enum Id {
+        @SerializedName("0")
         PLAY_GAMES(0),
+        @SerializedName("1")
         PLAY_AS_ATTACKER(1),
+        @SerializedName("2")
         PLAY_AS_DEFENDER(2),
+        @SerializedName("3")
         PLAY_MELEE_GAMES(3),
+        @SerializedName("4")
         WRITE_TESTS(4),
+        @SerializedName("5")
         CREATE_MUTANTS(5);
 
         private final int id;
