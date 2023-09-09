@@ -42,6 +42,14 @@ public class AchievementRepository {
     }
 
     public Collection<Achievement> getAchievementsForUser(int userId) {
+        return getAchievementsForUser(userId, null);
+    }
+
+    public Optional<Achievement> getAchievementForUser(int userId, Achievement.Id achievementId) {
+        return getAchievementsForUser(userId, achievementId).stream().findFirst();
+    }
+
+    private Collection<Achievement> getAchievementsForUser(int userId, Achievement.Id achievementId) {
         @Language("SQL")
         String query = String.join("\n",
                 "SELECT achievements.*, COALESCE(has_achievement.Metric, 0) AS CurrentUserMetric, (",
@@ -52,22 +60,24 @@ public class AchievementRepository {
                 "FROM achievements LEFT OUTER JOIN has_achievement",
                 "ON has_achievement.User_ID = ?",
                 "AND has_achievement.Achievement_ID = achievements.ID",
-                "WHERE has_achievement.Achievement_Level = achievements.Level",
+                "WHERE (has_achievement.Achievement_Level = achievements.Level",
                 // get achievements with no progress tracked as well -> left outer join
-                "OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0"
+                "OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0)",
+                (achievementId != null ? "AND achievements.ID = ?" : "")
         );
 
         try {
             return queryRunner.query(
                     query,
                     resultSet -> listFromRS(resultSet, this::achievementFromRS),
-                    userId
+                    achievementId == null ? new Object[] {userId} : new Object[] {userId, achievementId.getAsInt()}
             );
         } catch (SQLException e) {
             logger.error("Failed to get achievements for user {}", userId, e);
             throw new UncheckedSQLException(e);
         }
     }
+
     public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
         int updated = updateAchievementMetricForUser(userId, achievementId, metricChange);
         return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
