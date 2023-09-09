@@ -39,7 +39,7 @@
 
         socket.register('game.GameStoppedEvent', event => {
             console.log('Game with Id ' + event.gameId + ' was stopped.');
-            //window.location.reload();
+            window.location.reload();
         });
 
         socket.register('game.GameStartedEvent', event => {
@@ -53,6 +53,9 @@
 
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);
+            socket.send('achievement.ClientAchievementNotificationShownEvent', {
+                achievementId: event.achievement.achievementId
+            });
         });
     })();
 </script>

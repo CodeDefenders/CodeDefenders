@@ -19,6 +19,7 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
+import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
@@ -114,6 +115,14 @@ public class AchievementService {
         });
     }
 
+    private void achievementNotificationSent(int userId, int achievementId) {
+        List<Achievement> achievements = notificationQueue.get(userId);
+        achievements.removeIf(achievement -> achievement.getId().getAsInt() == achievementId);
+        if (achievements.isEmpty()) {
+            notificationQueue.remove(userId);
+        }
+    }
+
     public void registerEventHandler() {
         if (isEventHandlerRegistered) {
             logger.warn("AchievementEventHandler is already registered");
@@ -164,6 +173,16 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleMutantTestedEvent(MutantTestedEvent event) {
             addMutantCreated(event.getUserId());
+        }
+
+        /**
+         * This event signals that the client has received the achievement notification and shown it to the user.
+         * We can therefore remove the achievement from the queue and prohibit it from being sent again.
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleAchievementNotificationShownEvent(ServerAchievementNotificationShownEvent event) {
+            achievementNotificationSent(event.getUserId(), event.getAchievementId());
         }
     }
 }
