@@ -26,7 +26,7 @@
 </div> <%-- closes #game-container --%>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */
@@ -51,8 +51,10 @@
             userId: ${login.userId}
         });
 
+        const achievementNotifications = new AchievementNotifications("${url.forPath("/images/achievements/")}");
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);
+            achievementNotifications.showAchievementNotification(event.achievement);
             socket.send('achievement.ClientAchievementNotificationShownEvent', {
                 achievementId: event.achievement.achievementId
             });
