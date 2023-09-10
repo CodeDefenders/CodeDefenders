@@ -26,7 +26,7 @@ public class Achievement implements Serializable {
     @Expose
     private final int metricForCurrentLevel;
     @Expose
-    private final Optional<Integer> metricForNextLevel;
+    private final Integer metricForNextLevel;
     @Expose
     private int metricCurrent = 0;
 
@@ -38,7 +38,7 @@ public class Achievement implements Serializable {
         this.description = MessageFormat.format(description, metricForCurrentLevel);
         this.progressText = progressText;
         this.metricForCurrentLevel = metricForCurrentLevel;
-        this.metricForNextLevel = metricForNextLevel;
+        this.metricForNextLevel = metricForNextLevel.orElse(null);
     }
 
     public Achievement(Id achievementId, int level, String name, String description, String progressText,
@@ -66,7 +66,7 @@ public class Achievement implements Serializable {
     public String getProgressText() {
         List<Integer> args = new ArrayList<>();
         args.add(metricCurrent);
-        metricForNextLevel.ifPresent(args::add);
+        getNumMetricNeededForNextLevel().ifPresent(args::add);
         return MessageFormat.format(progressText, args.toArray());
     }
 
@@ -75,7 +75,7 @@ public class Achievement implements Serializable {
     }
 
     public Optional<Integer> getNumMetricNeededForNextLevel() {
-        return metricForNextLevel;
+        return Optional.ofNullable(metricForNextLevel);
     }
 
     public int getMetricCurrent() {
@@ -83,7 +83,7 @@ public class Achievement implements Serializable {
     }
 
     public Optional<Float> getProgress() {
-        return metricForNextLevel.map(metricForNextLevel -> 100f * metricCurrent / metricForNextLevel);
+        return getNumMetricNeededForNextLevel().map(metricForNextLevel -> 100f * metricCurrent / metricForNextLevel);
     }
 
     public boolean updateCurrentMetric(int metricChange) {
@@ -92,11 +92,13 @@ public class Achievement implements Serializable {
     }
 
     public boolean reachedNextLevel() {
-        return metricForNextLevel.map(metricForNextLevel -> metricCurrent >= metricForNextLevel).orElse(false);
+        return getNumMetricNeededForNextLevel()
+                .map(metricForNextLevel -> metricCurrent >= metricForNextLevel)
+                .orElse(false);
     }
 
     public boolean isMaxLevel() {
-        return metricForNextLevel.isEmpty();
+        return getNumMetricNeededForNextLevel().isEmpty();
     }
 
     public enum Id {
