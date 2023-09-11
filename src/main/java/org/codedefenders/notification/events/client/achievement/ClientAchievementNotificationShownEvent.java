@@ -5,6 +5,11 @@ import org.codedefenders.notification.handling.ClientEventHandler;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * This event is sent by the client once it receives the achievement unlocked event from the server.
+ * It is used to notify the server that the achievement notification has been shown to the user and does not need to be
+ * sent again.
+ */
 public class ClientAchievementNotificationShownEvent extends ClientEvent {
 
     @Expose

@@ -1,9 +1,15 @@
 package org.codedefenders.notification.events.server.achievement;
 
+import org.codedefenders.notification.events.client.achievement.ClientAchievementNotificationShownEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * This event is fired once the client sends the {@link ClientAchievementNotificationShownEvent} to the server.
+ * It is used to notify the server that the achievement notification has been shown to the user and does not need to be
+ * sent again.
+ */
 public class ServerAchievementNotificationShownEvent extends ServerEvent {
 
     @Expose
