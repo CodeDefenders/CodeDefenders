@@ -25,8 +25,8 @@
 <c:set var="canLeave" value="${requestScope.canLeave}"/>
 <c:set var="canJoin" value="${requestScope.canJoin}"/>
 
-<c:set var="disabledIfArchved" value="${classroom.archived ? 'disabled' : ''}"/>
-<c:set var="mutedIfArchved" value="${classroom.archived ? 'text-muted' : ''}"/>
+<c:set var="disabledIfArchived" value="${classroom.archived ? 'disabled' : ''}"/>
+<c:set var="mutedIfArchived" value="${classroom.archived ? 'text-muted' : ''}"/>
 
 <jsp:include page="/jsp/header.jsp"/>
 
@@ -41,7 +41,7 @@
 
     <%-- Guest / admin info and join button --%>
     <c:if test="${member == null || (login.admin && member.role != ClassroomRole.OWNER)}">
-        <div class="p-4 border rounded border-warning d-flex align-items-baseline mb-4 ${mutedIfArchved}">
+        <div class="p-4 border rounded border-warning d-flex align-items-baseline mb-4 ${mutedIfArchived}">
 
             <c:choose>
                 <c:when test="${login.admin && member == null}">
@@ -73,7 +73,7 @@
             <div class="d-flex gap-3">
                 <c:if test="${canCreateGames}">
                     <a href="${url.forPath(Paths.CLASSROOM_CREATE_GAMES)}?classroomUid=${classroom.UUID}"
-                       class="btn btn-sm rounded-pill btn-primary ${disabledIfArchved}">
+                       class="btn btn-sm rounded-pill btn-primary ${disabledIfArchived}">
                         Create Games
                         <i class="fa fa-external-link ms-1"></i>
                     </a>
@@ -110,7 +110,7 @@
         <div class="col-lg-6 col-12 d-flex flex-column gap-4">
 
             <%-- Join Settigns --%>
-            <div class="p-4 border rounded ${mutedIfArchved}">
+            <div class="p-4 border rounded ${mutedIfArchived}">
 
                 <h4 class="mb-4">Join Settings</h4>
 
@@ -121,7 +121,7 @@
                             <c:if test="${canEditClassroom}">
                                 <button id="disable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
-                                    ${disabledIfArchved}>
+                                    ${disabledIfArchived}>
                                     Disable Joining
                                 </button>
                             </c:if>
@@ -131,7 +131,7 @@
                             <c:if test="${canEditClassroom}">
                                 <button id="enable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
-                                        ${disabledIfArchved}>
+                                        ${disabledIfArchived}>
                                     Enable Joining
                                 </button>
                             </c:if>
@@ -146,7 +146,7 @@
                             <c:if test="${canEditClassroom}">
                                 <button id="disable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#make-private-modal"
-                                        ${disabledIfArchved}>
+                                        ${disabledIfArchived}>
                                     Make Private
                                 </button>
                             </c:if>
@@ -156,7 +156,7 @@
                             <c:if test="${canEditClassroom}">
                                 <button id="enable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#make-public-modal"
-                                        ${disabledIfArchved}>
+                                        ${disabledIfArchived}>
                                     Make Public
                                 </button>
                             </c:if>
@@ -177,13 +177,13 @@
                         <div class="d-flex gap-0">
                             <button id="set-password" class="btn btn-xs btn-secondary me-1"
                                     data-bs-toggle="modal" data-bs-target="#set-password-modal"
-                                    ${disabledIfArchved}>
+                                    ${disabledIfArchived}>
                                 Set Password
                             </button>
                             <c:if test="${classroom.password.isPresent()}">
                                 <button id="remove-password" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#remove-password-modal"
-                                        ${disabledIfArchved}>
+                                        ${disabledIfArchived}>
                                     Remove Password
                                 </button>
                             </c:if>
@@ -211,14 +211,14 @@
 
             <%-- Classroom Settigns --%>
             <c:if test="${canEditClassroom}">
-                <div class="p-4 border rounded ${mutedIfArchved}">
+                <div class="p-4 border rounded ${mutedIfArchived}">
 
                     <h4 class="mb-4">Classroom Settings</h4>
 
                     <div class="mb-1">
                         <button id="change-name" class="btn btn-xs btn-secondary"
                                 data-bs-toggle="modal" data-bs-target="#change-name-modal"
-                                ${disabledIfArchved}>
+                                ${disabledIfArchived}>
                             Change Name
                         </button>
                     </div>
@@ -245,7 +245,7 @@
 
             <%-- Member Actions --%>
             <c:if test="${canLeave}">
-                <div class="p-4 border rounded ${mutedIfArchved}">
+                <div class="p-4 border rounded ${mutedIfArchived}">
 
                     <h4 class="mb-4">Member Actions</h4>
 
