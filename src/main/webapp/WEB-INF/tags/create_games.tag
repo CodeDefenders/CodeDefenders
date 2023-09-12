@@ -723,15 +723,10 @@
 
     const renderUserAddToGame = function (userInfo, type, row, meta) {
         const container = document.createElement('div');
-        container.classList.add('w-100');
-        container.classList.add('d-flex');
-        container.classList.add('align-items-center');
-        container.classList.add('gap-2');
+        container.classList.add('w-100', 'd-flex', 'align-items-center', 'gap-2');
 
         const gameIdSelect = document.createElement('select');
-        gameIdSelect.classList.add('add-player-game');
-        gameIdSelect.classList.add('form-select');
-        gameIdSelect.classList.add('form-select-sm');
+        gameIdSelect.classList.add('add-player-game', 'form-select', 'form-select-sm');
         gameIdSelect.style.flex = '1 1 25%';
         container.appendChild(gameIdSelect);
 
@@ -753,9 +748,7 @@
 
         /* The role select is generated empty, as options are set based on the type of the selected game. */
         const roleSelect = document.createElement('select');
-        roleSelect.classList.add('add-player-role');
-        roleSelect.classList.add('form-select');
-        roleSelect.classList.add('form-select-sm');
+        roleSelect.classList.add('add-player-role', 'form-select', 'form-select-sm');
         roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         container.appendChild(roleSelect);
@@ -902,10 +895,7 @@
 
         const controlsCell = tr.insertCell();
         const controlsContainer = document.createElement('div');
-        controlsContainer.classList.add('w-100')
-        controlsContainer.classList.add('d-flex')
-        controlsContainer.classList.add('align-items-center')
-        controlsContainer.classList.add('gap-2')
+        controlsContainer.classList.add('w-100', 'd-flex', 'align-items-center', 'gap-2');
         controlsCell.appendChild(controlsContainer);
 
         const switchRolesButton = parseHTML(`
@@ -967,10 +957,7 @@
 
         const controlsCell = tr.insertCell();
         const controlsContainer = document.createElement('div');
-        controlsContainer.classList.add('w-100')
-        controlsContainer.classList.add('d-flex')
-        controlsContainer.classList.add('align-items-center')
-        controlsContainer.classList.add('gap-2')
+        controlsContainer.classList.add('w-100', 'd-flex', 'align-items-center', 'gap-2');
         controlsCell.appendChild(controlsContainer);
 
         const switchRolesButton = parseHTML(`
@@ -993,10 +980,7 @@
         controlsContainer.appendChild(removeButton);
 
         const gameIdSelect = document.createElement('select');
-        gameIdSelect.classList.add('move-player-game');
-        gameIdSelect.classList.add('form-select');
-        gameIdSelect.classList.add('form-select-sm');
-        gameIdSelect.classList.add('ms-4');
+        gameIdSelect.classList.add('move-player-game', 'form-select', 'form-select-sm', 'ms-4');
         gameIdSelect.style.flex = '1 1 25%';
         controlsContainer.appendChild(gameIdSelect);
 
@@ -1013,9 +997,7 @@
         }
 
         const roleSelect = document.createElement('select');
-        roleSelect.classList.add('move-player-role');
-        roleSelect.classList.add('form-select');
-        roleSelect.classList.add('form-select-sm');
+        roleSelect.classList.add('move-player-role', 'form-select', 'form-select-sm');
         roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         controlsContainer.appendChild(roleSelect);
