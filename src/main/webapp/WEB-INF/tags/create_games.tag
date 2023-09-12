@@ -730,6 +730,12 @@
         gameIdSelect.style.flex = '1 1 25%';
         container.appendChild(gameIdSelect);
 
+        const gamePlaceholder = document.createElement('option');
+        gamePlaceholder.textContent = 'Game';
+        gamePlaceholder.value = '';
+        gamePlaceholder.disabled = true;
+        gameIdSelect.add(gamePlaceholder);
+
         for (const stagedGame of stagedGamesTableData) {
             const option = document.createElement('option');
             option.textContent = 'T' + stagedGame.id;
@@ -752,6 +758,12 @@
         roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         container.appendChild(roleSelect);
+
+        const rolePlaceholder = document.createElement('option');
+        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.value = '';
+        rolePlaceholder.disabled = true;
+        roleSelect.add(rolePlaceholder);
 
         const addToGameButton = parseHTML(`
             <button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
@@ -984,6 +996,12 @@
         gameIdSelect.style.flex = '1 1 25%';
         controlsContainer.appendChild(gameIdSelect);
 
+        const gamePlaceholder = document.createElement('option');
+        gamePlaceholder.textContent = 'Game';
+        gamePlaceholder.value = '';
+        gamePlaceholder.disabled = true;
+        gameIdSelect.add(gamePlaceholder);
+
         for (const otherStagedGame of stagedGames.values()) {
             if (otherStagedGame.id !== stagedGame.id) {
                 const option = document.createElement('option');
@@ -1002,6 +1020,12 @@
         roleSelect.disabled = true;
         controlsContainer.appendChild(roleSelect);
 
+        const rolePlaceholder = document.createElement('option');
+        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.value = '';
+        rolePlaceholder.disabled = true;
+        roleSelect.add(rolePlaceholder);
+
         const moveButton = parseHTML(`
             <button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
                 <i class="fa fa-arrow-right"></i>
@@ -1018,7 +1042,6 @@
      * @param {String} gameIdStr The formatted ID of the selected staged or existing game.
      */
     const adjustFormForGame = function (roleSelect, submitButton, gameIdStr) {
-        roleSelect.innerHTML = '';
         submitButton.disabled = true;
         roleSelect.disabled = true;
 
@@ -1035,25 +1058,35 @@
             }
         }
 
+        const rolePlaceholder = document.createElement('option');
+        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.value = '';
+        rolePlaceholder.disabled = true;
+
         if (gameType === GameType.MULTIPLAYER.name) {
+
             const attackerOption = document.createElement('option');
             attackerOption.textContent = Role.ATTACKER.display;
             attackerOption.value = Role.ATTACKER.name;
-            roleSelect.appendChild(attackerOption);
+
             const defenderOption = document.createElement('option');
             defenderOption.textContent = Role.DEFENDER.display;
             defenderOption.value = Role.DEFENDER.name;
-            roleSelect.appendChild(defenderOption);
-            roleSelect.disabled = false;
-            submitButton.disabled = false;
+
+            roleSelect.replaceChildren(rolePlaceholder, attackerOption, defenderOption);
+
         } else if (gameType === GameType.MELEE.name) {
+
             const playerOption = document.createElement('option');
             playerOption.textContent = Role.PLAYER.display;
             playerOption.value = Role.PLAYER.name;
-            roleSelect.appendChild(playerOption);
-            roleSelect.disabled = false;
-            submitButton.disabled = false;
+
+            roleSelect.replaceChildren(rolePlaceholder, playerOption);
         }
+
+        roleSelect.selectedIndex = 1;
+        roleSelect.disabled = false;
+        submitButton.disabled = false;
     };
 
     /**
@@ -1209,7 +1242,7 @@
 
             /* Select nothing in all selects in the table. */
             for (const select of table.querySelectorAll('select')) {
-                select.selectedIndex = -1;
+                select.selectedIndex = 0;
             }
 
             /* Setup popovers to display the game settings. */
@@ -1454,7 +1487,7 @@
 
             /* Select nothing in all selects in the table. */
             for (const select of table.querySelectorAll('select')) {
-                select.selectedIndex = -1;
+                select.selectedIndex = 0;
             }
         },
         order: kind === 'CLASSROOM'
