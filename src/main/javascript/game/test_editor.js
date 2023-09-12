@@ -132,12 +132,15 @@ class TestEditor {
             testMethods = testMethods.concat([
                     'assertArrayEquals',
                     'assertEquals',
-                    'assertTrue',
                     'assertFalse',
-                    'assertNull',
+                    'assertNotEquals',
                     'assertNotNull',
-                    'assertSame',
                     'assertNotSame',
+                    'assertNull',
+                    'assertSame',
+                    // 'assertThat',
+                    'assertThrows',
+                    'assertTrue',
                     'fail'
             ]);
         }
