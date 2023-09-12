@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -415,16 +416,14 @@ public abstract class CreateGamesBean implements Serializable {
      *         mapped to a valid user.
      */
     public Optional<Set<UserInfo>> getUserInfosForNamesAndEmails(Collection<String> userNames) {
-        /* Construct maps like this, because userInfos.stream().collect(Collectors.toMap(...)) produces a
-           NullPointerException for some reason. */
-        Map<String, UserInfo> userByName = new HashMap<>();
-        for (UserInfo userInfo : getUserInfos().values()) {
-            userByName.put(userInfo.getName(), userInfo);
-        }
-        Map<String, UserInfo> userByEmail = new HashMap<>();
-        for (UserInfo userInfo : getUserInfos().values()) {
-            userByEmail.put(userInfo.getEmail().toLowerCase(), userInfo);
-        }
+        Map<String, UserInfo> userByName = getUserInfos().values().stream().collect(Collectors.toMap(
+                UserInfo::getName,
+                Function.identity()
+        ));
+        Map<String, UserInfo> userByEmail = getUserInfos().values().stream().collect(Collectors.toMap(
+                user -> user.getEmail().toLowerCase(),
+                Function.identity()
+        ));
 
         boolean success = true;
         Set<UserInfo> users = new HashSet<>();
