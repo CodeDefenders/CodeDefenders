@@ -23,7 +23,6 @@ import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.Pair;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
@@ -60,10 +59,10 @@ public class CreateGamesService {
     private final Map<Integer, StagedGameList> adminStagedGames;
 
     /**
-     * Maps classroom ID to its staged games list.
+     * Maps user ID and classroom ID to its staged games list.
      */
-    private final Map<Pair<Integer, Integer>, StagedGameList> classroomStagedGames;
-
+    private final Map<UserIdClassroomId, StagedGameList> classroomStagedGames;
+    private record UserIdClassroomId(int userId, int classroomId){}
 
     public CreateGamesService() {
         adminStagedGames = new HashMap<>();
@@ -75,7 +74,7 @@ public class CreateGamesService {
     }
 
     public StagedGameList getStagedGamesForClassroom(int userId, int classroomId) {
-        Pair<Integer, Integer> key = Pair.of(userId, classroomId);
+        var key = new UserIdClassroomId(userId, classroomId);
         return classroomStagedGames.computeIfAbsent(key, id -> new StagedGameList());
     }
 
