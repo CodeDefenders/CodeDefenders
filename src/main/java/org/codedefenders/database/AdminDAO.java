@@ -347,8 +347,7 @@ public class AdminDAO {
                 // ignored
         }
 
-        @Language("SQL")
-        String query = """
+        @Language("SQL") String query = """
                 UPDATE settings
                 SET %s = ?
                 WHERE name = ?;

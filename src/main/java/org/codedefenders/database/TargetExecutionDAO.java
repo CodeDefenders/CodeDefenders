@@ -70,7 +70,7 @@ public class TargetExecutionDAO {
      * @throws UncheckedSQLException If storing the target execution was not successful.
      */
     public static int storeTargetExecution(TargetExecution targetExecution) {
-        final String query;
+        @Language("SQL") final String query;
         final DatabaseValue<?>[] values;
 
         final String insertedMessage = targetExecution.message == null ? ""

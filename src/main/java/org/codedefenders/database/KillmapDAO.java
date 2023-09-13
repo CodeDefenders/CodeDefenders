@@ -55,7 +55,7 @@ public class KillmapDAO {
      * Helper method to retrieve killmap entries from the database.
      */
     private static List<KillMapEntry> getKillMapEntries(List<Test> tests, List<Mutant> mutants,
-                                                        String query, DatabaseValue<?>... values)
+                                                        @Language("SQL") String query, DatabaseValue<?>... values)
             throws UncheckedSQLException, SQLMappingException {
         /* Set up mapping from test id to test / mutant id to mutant. */
         Map<Integer, Test> testMap = tests.stream().collect(Collectors.toMap(Test::getId, t -> t));
@@ -587,14 +587,14 @@ public class KillmapDAO {
 
     /** Returns the number of queued jobs for class killmaps. */
     public static int getNumClassKillmapJobsQueued() {
-        String query = "SELECT COUNT(DISTINCT Class_ID) from killmapjob WHERE Class_ID IS NOT NULL;";
+        @Language("SQL") String query = "SELECT COUNT(DISTINCT Class_ID) from killmapjob WHERE Class_ID IS NOT NULL;";
         return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
     }
 
 
     /** Returns the number of queued jobs for game killmaps. */
     public static int getNumGameKillmapJobsQueued() {
-        String query = "SELECT COUNT(DISTINCT Game_ID) from killmapjob WHERE Game_ID IS NOT NULL;";
+        @Language("SQL") String query = "SELECT COUNT(DISTINCT Game_ID) from killmapjob WHERE Game_ID IS NOT NULL;";
         return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
     }
 

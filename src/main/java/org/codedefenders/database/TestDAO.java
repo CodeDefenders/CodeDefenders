@@ -103,7 +103,7 @@ public class TestDAO {
      * Returns the {@link Test} for the given test id.
      */
     public static Test getTestById(int testId) throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM tests WHERE Test_ID = ?;";
+        @Language("SQL") String query = "SELECT * FROM tests WHERE Test_ID = ?;";
         return DB.executeQueryReturnValue(query, TestDAO::testFromRS, DatabaseValue.of(testId));
     }
 
@@ -111,7 +111,7 @@ public class TestDAO {
      * Returns the {@link Test Tests} from the given game.
      */
     public static List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM tests WHERE Game_ID = ?;";
+        @Language("SQL") String query = "SELECT * FROM tests WHERE Game_ID = ?;";
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
@@ -526,7 +526,7 @@ public class TestDAO {
             return;
         }
 
-        String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
+        @Language("SQL") String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
 
         try {
             boolean incremented = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
@@ -544,7 +544,7 @@ public class TestDAO {
         // update();
         logger.info("Test {} killed a new mutant", test.getId());
 
-        String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
+        @Language("SQL") String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
 
         try {
             boolean updated = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,1, test.getId()) > 0;

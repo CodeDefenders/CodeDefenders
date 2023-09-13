@@ -268,7 +268,7 @@ public class UserRepository {
      */
     @Nonnull
     public List<UserEntity> getUsers() {
-        String query = "SELECT * FROM  users;";
+        @Language("SQL") String query = "SELECT * FROM  users;";
         try {
             return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));

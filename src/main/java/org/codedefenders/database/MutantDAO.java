@@ -516,7 +516,7 @@ public class MutantDAO {
         mutant.setRoundKilled(roundKilled);
         mutant.setEquivalent(equivalence);
 
-        String query;
+        @Language("SQL") String query;
         if (equivalence.equals(Equivalence.DECLARED_YES) || equivalence.equals(Equivalence.ASSUMED_YES)) {
             // if mutant is equivalent, we need to set score to 0
             query = """

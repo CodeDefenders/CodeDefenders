@@ -80,7 +80,7 @@ public class LeaderboardRepository {
 
     @Nonnull
     public List<LeaderboardEntryEntity> getLeaderboard() {
-        String query = baseQuery + ";";
+        @Language("SQL") String query = baseQuery + ";";
 
         try {
             return queryRunner
@@ -94,7 +94,7 @@ public class LeaderboardRepository {
 
     @Nonnull
     public Optional<LeaderboardEntryEntity> getScore(int userId) {
-        String query = baseQuery
+        @Language("SQL") String query = baseQuery
                 + " WHERE U.user_id = ?;";
 
         try {

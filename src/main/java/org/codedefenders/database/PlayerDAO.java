@@ -154,7 +154,7 @@ public class PlayerDAO {
     }
 
     public static int getPlayerPoints(int playerId) {
-        String query = "SELECT Points FROM players WHERE ID = ?;";
+        @Language("SQL") String query = "SELECT Points FROM players WHERE ID = ?;";
         final Integer points = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);

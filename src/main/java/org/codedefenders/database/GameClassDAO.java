@@ -113,7 +113,7 @@ public class GameClassDAO {
      * @return a {@link GameClass} instance, or {@code null}.
      */
     public static GameClass getClassForId(int classId) {
-        String query = "SELECT * FROM classes WHERE Class_ID = ?;";
+        @Language("SQL") String query = "SELECT * FROM classes WHERE Class_ID = ?;";
 
         return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(classId));
     }
@@ -165,7 +165,7 @@ public class GameClassDAO {
      * @return all game classes.
      */
     public static List<GameClass> getAllPlayableClasses() {
-        String query = "SELECT * FROM view_playable_classes;";
+        @Language("SQL") String query = "SELECT * FROM view_playable_classes;";
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
     }
@@ -193,7 +193,7 @@ public class GameClassDAO {
      * @return {@code true} if alias does exist, {@code false} otherwise.
      */
     public static boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM classes WHERE Alias = ?";
+        @Language("SQL") String query = "SELECT * FROM classes WHERE Alias = ?";
         Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(alias));
         return rv != null;
     }
@@ -277,7 +277,7 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
+        @Language("SQL") String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DatabaseValue.of(classId));
     }
 
@@ -397,7 +397,7 @@ public class GameClassDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeClassForId(int id) {
-        String query = "DELETE FROM classes WHERE Class_ID = ?;";
+        @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
 
         return DB.executeUpdateQuery(query, DatabaseValue.of(id));
     }
