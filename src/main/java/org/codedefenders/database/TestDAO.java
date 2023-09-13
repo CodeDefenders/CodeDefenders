@@ -358,7 +358,14 @@ public class TestDAO {
         }
 
 
-        String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
+        @Language("SQL") String query = """
+            UPDATE tests
+            SET mutantsKilled = ?,
+                Lines_Covered = ?,
+                Lines_Uncovered = ?,
+                Points = ?
+            WHERE Test_ID = ?;
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(mutantsKilled),
                 DatabaseValue.of(linesCoveredString),

@@ -119,9 +119,11 @@ public class UserRepository {
             // TODO: Should we allow this?
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
-        String query = "INSERT INTO users "
-                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        @Language("SQL") String query = """
+                INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+        """;
+
         try {
             return queryRunner
                     .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
@@ -145,15 +147,17 @@ public class UserRepository {
      * @return Whether updating the provided {@code UserEntity} was successful or not.
      */
     public boolean update(@Nonnull UserEntity userEntity) {
-        String query = "UPDATE users "
-                + "SET Username = ?, "
-                + "  Email = ?, "
-                + "  Password = ?, "
-                + "  Validated = ?, "
-                + "  Active = ?, "
-                + "  AllowContact = ?, "
-                + "  KeyMap = ? "
-                + "WHERE User_ID = ?;";
+        @Language("SQL") String query = """
+                UPDATE users
+                SET Username = ?,
+                  Email = ?,
+                  Password = ?,
+                  Validated = ?,
+                  Active = ?,
+                  AllowContact = ?,
+                  KeyMap = ?
+                WHERE User_ID = ?;
+        """;
         try {
             return queryRunner.update(query,
                     userEntity.getUsername(),
@@ -175,9 +179,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserById(int userId) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE User_ID = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE User_ID = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), userId);
@@ -192,9 +198,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserByName(@Nonnull String username) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE Username = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE Username = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), username);
@@ -209,9 +217,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserByEmail(@Nonnull String email) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE Email = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE Email = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
@@ -236,10 +246,12 @@ public class UserRepository {
 
     @Nonnull
     Optional<Integer> getUserIdForPlayerIdInternal(int playerId) {
-        String query = "SELECT users.User_ID AS User_ID "
-                + "FROM users, players "
-                + "WHERE players.User_ID = users.User_ID "
-                + "AND players.ID = ?";
+        @Language("SQL") String query = """
+                SELECT users.User_ID AS User_ID
+                FROM users, players
+                WHERE players.User_ID = users.User_ID
+                  AND players.ID = ?;
+        """;
         try {
             return Optional.ofNullable(queryRunner
                     .query(query, new ScalarHandler<>(), playerId));
@@ -256,8 +268,7 @@ public class UserRepository {
      */
     @Nonnull
     public List<UserEntity> getUsers() {
-        String query = "SELECT * "
-                + "FROM  users;";
+        String query = "SELECT * FROM  users;";
         try {
             return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
