@@ -45,9 +45,13 @@ class EnvironmentVariableConfiguration extends BaseConfiguration {
         return "CODEDEFENDERS_" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
     }
 
+    protected String getenv(String name) {
+        return System.getenv(name);
+    }
+
     @Override
     protected String resolveAttribute(String camelCaseName) {
-        return System.getenv(resolveAttributeName(camelCaseName));
+        return getenv(resolveAttributeName(camelCaseName));
     }
 }
 

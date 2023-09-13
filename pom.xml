@@ -219,8 +219,6 @@
 					<!-- Sets the VM argument line used when unit tests are run. -->
 					<!--suppress UnresolvedMavenProperty -->
 					<argLine>${surefireArgLine}</argLine>
-					<argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
-					<argLine>--add-opens java.base/java.util=ALL-UNNAMED</argLine>
 				</configuration>
 			</plugin>
 
