@@ -115,8 +115,6 @@
 
 <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
-<jsp:include page="/jsp/push_socket.jsp"/>
-
 <div id="game-container" class="container-fluid">
 
     <h4><b><%=title%></b></h4>
