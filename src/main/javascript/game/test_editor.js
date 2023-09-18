@@ -15,10 +15,12 @@ class TestEditor {
      *      Null if the text should be editable to the end.
      * @param {boolean} mockingEnabled
      *      Given by [${testEditor.mockingEnabled}]
+     * @param {string} assertionLibrary
+     *      Given by [${testEditor.assertionLibrary}]
      * @param {string} keymap
      *      Given by [${login.user.keyMap.CMName}]
      */
-    constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, keymap) {
+    constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, assertionLibrary, keymap) {
         /**
          * The text area element of the editor.
          * @type {HTMLTextAreaElement}
@@ -52,6 +54,11 @@ class TestEditor {
          * @type {boolean}
          */
         this._mockingEnabled = mockingEnabled;
+        /**
+         * The assertion library for the class. Used to determine code completions.
+         * @type {string}
+         */
+        this._assertionLibrary = assertionLibrary;
         /**
          * Name of the keymap to be used in the editor.
          * @type {string}
@@ -118,41 +125,80 @@ class TestEditor {
     }
 
     /** @private */
-    _initCodeCompletion() {
-        this._codeCompletion = new CodeCompletion();
-        this._codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
+    _getTestMethods() {
+        let testMethods = [];
 
-        let testMethods = [
-            "assertArrayEquals",
-            "assertEquals",
-            "assertTrue",
-            "assertFalse",
-            "assertNull",
-            "assertNotNull",
-            "assertSame",
-            "assertNotSame",
-            "fail"
-        ];
+        if (this._assertionLibrary.includes('JUNIT4')) {
+            testMethods = testMethods.concat([
+                    'assertArrayEquals',
+                    'assertEquals',
+                    'assertFalse',
+                    'assertNotEquals',
+                    'assertNotNull',
+                    'assertNotSame',
+                    'assertNull',
+                    'assertSame',
+                    // 'assertThat',
+                    'assertThrows',
+                    'assertTrue',
+                    'fail'
+            ]);
+        }
+
+        if (this._assertionLibrary.includes('JUNIT5')) {
+            testMethods = testMethods.concat([
+                    'assertAll',
+                    'assertArrayEquals',
+                    'assertDoesNotThrow',
+                    'assertEquals',
+                    'assertFalse',
+                    'assertInstanceOf',
+                    'assertIterableEquals',
+                    'assertLinesMatch',
+                    'assertNotEquals',
+                    'assertNotNull',
+                    'assertNotSame',
+                    'assertNull',
+                    'assertSame',
+                    'assertThrows',
+                    'assertThrowsExactly',
+                    // 'assertTimeout',
+                    // 'assertTimeoutPreemptively',
+                    'assertTrue',
+                    'fail'
+            ]);
+        }
+
+        if (this._assertionLibrary.includes('HAMCREST') || this._assertionLibrary.includes('GOOGLE_TRUTH')) {
+            testMethods.push('assertThat');
+        }
 
         if (this._mockingEnabled) {
             // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
             // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
             // Behavior verification is currently not implemented (Mockito.verify)
 
-            let mockitoMethods = [
-                "mock",
-                "when",
-                "then",
-                "thenThrow",
-                "doThrow",
-                "doReturn",
-                "doNothing"
-            ];
-
-            testMethods = testMethods.concat(mockitoMethods);
+            testMethods = testMethods.concat([
+                    'mock',
+                    'when',
+                    'then',
+                    'thenThrow',
+                    'doThrow',
+                    'doReturn',
+                    'doNothing'
+            ]);
         }
 
-        this._codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
+        return testMethods;
+    }
+
+
+    /** @private */
+    _initCodeCompletion() {
+        this._codeCompletion = new CodeCompletion();
+        this._codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
+
+        this._codeCompletion.setCompletionPool('testMethods', new Set(this._getTestMethods()));
 
         /* Add class viewer code to completions. */
         objects.await('classViewer').then(classViewer => {

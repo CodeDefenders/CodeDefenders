@@ -19,10 +19,19 @@
 
 package org.codedefenders.service.game;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
@@ -31,17 +40,44 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.notification.events.server.game.GameCreatedEvent;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 @ApplicationScoped
 public class MultiplayerGameService extends AbstractGameService {
+    private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameService.class);
+
+    private final GameManagingUtils gameManagingUtils;
+    private final EventDAO eventDAO;
+    private final MessagesBean messages;
+    private final CodeDefendersAuth login;
+    private final NotificationService notificationService;
 
     @Inject
-    public MultiplayerGameService(UserService userService, UserRepository userRepository) {
+    public MultiplayerGameService(UserService userService, UserRepository userRepository,
+                                  GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
+                                  CodeDefendersAuth login, NotificationService notificationService) {
         super(userService, userRepository);
+        this.gameManagingUtils = gameManagingUtils;
+        this.eventDAO = eventDAO;
+        this.messages = messages;
+        this.login = login;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -98,5 +134,102 @@ public class MultiplayerGameService extends AbstractGameService {
             KillmapDAO.enqueueJob(new KillMap.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
         }
         return closed;
+    }
+
+    public boolean createGame(MultiplayerGame game, boolean withMutants, boolean withTests, Role creatorRole) {
+        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
+                    login.getUserId());
+            messages.add("Creating games is currently not enabled.");
+            return false;
+        }
+
+        game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepository);
+
+        int newGameId = MultiplayerGameDAO.storeMultiplayerGame(game);
+        game.setId(newGameId);
+
+        Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
+                EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+        eventDAO.insert(event);
+
+        // Always add system player to send mutants and tests at runtime!
+        if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)) {
+            return false;
+        }
+        if (!game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
+            return false;
+        }
+
+        // Add selected role to game if the creator participates as attacker/defender
+        if (creatorRole.equals(Role.ATTACKER) || creatorRole.equals(Role.DEFENDER)) {
+            if (!game.addPlayer(login.getUserId(), creatorRole)) {
+                return false;
+            }
+        }
+
+        if (!gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests)) {
+            return false;
+        }
+
+        /* Publish the event that a new game started */
+        GameCreatedEvent gce = new GameCreatedEvent();
+        gce.setGameId(game.getId());
+        notificationService.post(gce);
+
+        return true;
+    }
+
+
+    public Optional<MultiplayerGame> rematch(MultiplayerGame game) {
+        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
+                    login.getUserId());
+            messages.add("Creating games is currently not enabled.");
+            return Optional.empty();
+        }
+
+        MultiplayerGame newGame = new MultiplayerGame.Builder(
+                game.getClassId(),
+                login.getUserId(),
+                game.getMaxAssertionsPerTest())
+                .level(game.getLevel())
+                .chatEnabled(game.isChatEnabled())
+                .capturePlayersIntention(game.isCapturePlayersIntention())
+                .lineCoverage(game.getLineCoverage())
+                .mutantCoverage(game.getMutantCoverage())
+                .mutantValidatorLevel(game.getMutantValidatorLevel())
+                .automaticMutantEquivalenceThreshold(game.getAutomaticMutantEquivalenceThreshold())
+                .gameDurationMinutes(game.getGameDurationMinutes())
+                .classroomId(game.getClassroomId().orElse(null))
+                .build();
+
+        boolean withMutants = gameManagingUtils.hasPredefinedMutants(game);
+        boolean withTests = gameManagingUtils.hasPredefinedTests(game);
+        Role creatorRole = game.getRole(game.getCreatorId());
+
+        if (!createGame(newGame, withMutants, withTests, creatorRole)) {
+            return Optional.empty();
+        }
+
+        for (Player player : game.getAttackerPlayers()) {
+            if (player.getUser().getId() != game.getCreatorId()) {
+                if (!newGame.addPlayer(player.getUser().getId(), Role.DEFENDER)) {
+                    return Optional.empty();
+                }
+            }
+        }
+        for (Player player : game.getDefenderPlayers()) {
+            if (player.getUser().getId() != game.getCreatorId()) {
+                if (!newGame.addPlayer(player.getUser().getId(), Role.ATTACKER)) {
+                    return Optional.empty();
+                }
+            }
+        }
+
+        return Optional.of(newGame);
     }
 }

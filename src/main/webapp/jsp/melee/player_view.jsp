@@ -170,6 +170,7 @@
 <%
     testEditor.setEditableLinesForClass(cut);
     testEditor.setMockingEnabled(cut.isMockingEnabled());
+    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
     if (previousSubmission.hasTest()) { // TODO: don't display the wron previous submission for equivalence duels
         testEditor.setPreviousTestCode(previousSubmission.getTestCode());
     } else {

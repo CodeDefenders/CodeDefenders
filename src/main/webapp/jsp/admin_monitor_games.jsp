@@ -117,10 +117,7 @@
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                         <td>
                             <div class="form-check">
-                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input"
-                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMultiplayer')">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input">
                             </div>
                         </td>
                         <td><%=gid%></td>
@@ -146,10 +143,19 @@
                         <td><%=g.getDefenderPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
                         <td>
-                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                <i class="<%=startStopButtonIcon%>"></i>
-                            </button>
+                            <div class="d-flex gap-1">
+                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
+                                        title="Start/Stop Game">
+                                    <i class="<%=startStopButtonIcon%>"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
+                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        id="<%="rematch_"+g.getId()%>"
+                                        title="Rematch">
+                                    <i class="fa fa-repeat"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <%
@@ -341,10 +347,7 @@
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                         <td>
                             <div class="form-check">
-                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input"
-                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMelee')">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input">
                             </div>
                         </td>
                         <td><%=gid%></td>
@@ -369,10 +372,19 @@
                         <td><%=g.getPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
                         <td>
-                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                <i class="<%=startStopButtonIcon%>"></i>
-                            </button>
+                            <div class="d-flex gap-1">
+                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
+                                        title="Start/Stop Game">
+                                    <i class="<%=startStopButtonIcon%>"></i>
+                                </button>
+                                <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
+                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        id="<%="rematch_"+g.getId()%>"
+                                        title="Rematch">
+                                    <i class="fa fa-repeat"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <%
@@ -514,8 +526,9 @@
                     .find('tbody')
                     .find(':checkbox')
                     .prop('checked', this.checked);
-            document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
         });
 
         $('#selectAllGamesMelee').click(function () {
@@ -523,8 +536,27 @@
                     .find('tbody')
                     .find(':checkbox')
                     .prop('checked', this.checked);
-            document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
+        });
+
+        document.getElementById('table-multiplayer').addEventListener('change', function (event) {
+            const checkbox = event.target.closest('[name="selectedGames"]');
+            if (checkbox === null) return;
+
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
+        });
+
+        document.getElementById('table-melee').addEventListener('change', function (event) {
+            const checkbox = event.target.closest('[name="selectedGames"]');
+            if (checkbox === null) return;
+
+            const anyChecked = areAnyChecked('selectedGames');
+            document.getElementById('start_games_btn').disabled = !anyChecked;
+            document.getElementById('stop_games_btn').disabled = !anyChecked;
         });
 
         const showMultiplayerDetails = function (showDetails) {

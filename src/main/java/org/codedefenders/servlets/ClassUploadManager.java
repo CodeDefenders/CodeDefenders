@@ -124,7 +124,7 @@ public class ClassUploadManager extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final boolean classUploadEnabled = AdminDAO.getSystemSetting(CLASS_UPLOAD).getBoolValue();
-        if (classUploadEnabled) {
+        if (classUploadEnabled || login.isAdmin()) {
             RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
             dispatcher.forward(request, response);
         } else {
@@ -137,7 +137,7 @@ public class ClassUploadManager extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final boolean classUploadEnabled = AdminDAO.getSystemSetting(CLASS_UPLOAD).getBoolValue();
-        if (!classUploadEnabled) {
+        if (!classUploadEnabled && !login.isAdmin()) {
             logger.warn("User {} tried to upload a class, but class upload is disabled.", login.getUserId());
             return;
         }
