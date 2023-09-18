@@ -16,15 +16,33 @@
 }
 
 .achievement-notification {
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, .15);
-    border-radius: .25rem;
-    padding: 1rem;
-    padding-right: 2.5rem;
+    /* allow absolute button position */
+    position: relative;
+}
+
+.achievement-notification__link {
+    /* reset link styles */
+    text-decoration: none;
+    color: inherit;
+
+    /* layout */
     display: flex;
     align-items: center;
     gap: 1rem;
-    position: relative;
+    padding: 1rem;
+    padding-right: 2.5rem;
+
+    /* design */
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, .15);
+    border-radius: .25rem;
+    transition: background-color .2s, border-color .2s;
+}
+
+.achievement-notification__link:hover {
+    color: inherit;
+    background: #e6eaed;
+    border-color: var(--bg-codedefenders);
 }
 
 .achievement-notification__icon {

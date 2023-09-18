@@ -24,9 +24,10 @@ class AchievementNotifications {
 
     /**
      * @param {String} achievementIconPath
+     * @param {String} profilePath
      * @param {Number} notificationsVisibleTime time in seconds
      */
-    constructor(achievementIconPath, notificationsVisibleTime = 8) {
+    constructor(achievementIconPath, profilePath, notificationsVisibleTime = 8) {
         /** @type {HTMLElement} */
         this._notificationContainer = document.createElement('ul');
         this._notificationContainer.classList.add('achievement-notifications');
@@ -41,6 +42,8 @@ class AchievementNotifications {
 
         /** @type {String} */
         this._achievementIconPath = achievementIconPath;
+        /** @type {String} */
+        this._profilePath = profilePath;
     }
 
     /**
@@ -76,15 +79,18 @@ class AchievementNotifications {
         const element = document.createElement('li');
         element.classList.add('achievement-notification');
         element.innerHTML = `
-            <div class="achievement-notification__icon">
-                <img src="${this._achievementIconPath}codedefenders_achievements_${achievement.achievementId}_lvl_${achievement.level}.png" 
-                     alt="Icon ${achievement.name} (Level ${achievement.level})">
-            </div>
-            <div class="achievement-notification__text">
-                <p class="achievement-notification__title">${achievement.name} (Level ${achievement.level})</p>
-                <p class="achievement-notification__description">${this._getDescription(achievement)}</p>
-                <p class="achievement-notification__progress">${this._getProgressText(achievement)}</p>
-            </div>
+            <a href="${this._profilePath}" class="achievement-notification__link" target="_blank" rel="noopener" 
+                    title="Show all achievements on the profile page">
+                <div class="achievement-notification__icon">
+                    <img src="${this._achievementIconPath}codedefenders_achievements_${achievement.achievementId}_lvl_${achievement.level}.png" 
+                         alt="Icon ${achievement.name} (Level ${achievement.level})">
+                </div>
+                <div class="achievement-notification__text">
+                    <p class="achievement-notification__title">New Achievement Unlocked:<br>${achievement.name} (Level ${achievement.level})</p>
+                    <!--p class="achievement-notification__description">${this._getDescription(achievement)}</p-->
+                    <p class="achievement-notification__progress">${this._getProgressText(achievement)}</p>
+                </div>
+            </a>
             <button type="button" class="btn-close" aria-label="Close"></button>
         `;
         return element;

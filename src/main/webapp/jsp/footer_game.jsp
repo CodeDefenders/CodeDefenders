@@ -55,7 +55,11 @@
             userId: ${login.userId}
         });
 
-        const achievementNotifications = new AchievementNotifications("${url.forPath("/images/achievements/")}");
+        const achievementNotifications = new AchievementNotifications(
+            "${url.forPath("/images/achievements/")}",
+            "${url.forPath(Paths.USER_PROFILE)}"
+        );
+
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);
             achievementNotifications.showAchievementNotification(event.achievement);
