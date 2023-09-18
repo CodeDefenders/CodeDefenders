@@ -64,7 +64,7 @@
                 </a>
                 <a download="killmap-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                    as CS
+                    as CSV
                 </a>
                 <a download="killmap-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=json"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-json">

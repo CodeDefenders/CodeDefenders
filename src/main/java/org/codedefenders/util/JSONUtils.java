@@ -19,9 +19,19 @@
 package org.codedefenders.util;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
+
+import org.codedefenders.game.GameClass;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
@@ -80,6 +90,59 @@ public class JSONUtils {
             public Map<K, V> read(JsonReader jsonReader) {
                 throw new UnsupportedOperationException();
             }
+        }
+    }
+
+    /**
+     * Serializes a {@link Set} as a list.
+     */
+    public static class SetTypeAdapterFactory implements TypeAdapterFactory {
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (Set.class.isAssignableFrom(type.getRawType())) {
+                return (TypeAdapter<T>) new SetTypeAdapter<>(gson);
+            }
+            return null;
+        }
+
+        public static class SetTypeAdapter<T> extends TypeAdapter<Set<T>> {
+            private final Gson gson;
+
+            public SetTypeAdapter(Gson gson) {
+                this.gson = gson;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public void write(JsonWriter jsonWriter, Set<T> set) throws IOException {
+                if (set == null) {
+                    jsonWriter.nullValue();
+                    return;
+                }
+
+                jsonWriter.beginArray();
+                if (!set.isEmpty()) {
+                    T firstEntry = set.iterator().next();
+                    TypeAdapter<T> valueAdapter = (TypeAdapter<T>) gson.getAdapter(firstEntry.getClass());
+                    for (T entry : set) {
+                        valueAdapter.write(jsonWriter, entry);
+                    }
+                }
+                jsonWriter.endArray();
+            }
+
+            @Override
+            public Set<T> read(JsonReader jsonReader) {
+                throw new UnsupportedOperationException();
+            }
+        }
+    }
+
+    public static class InstantSerializer implements JsonSerializer<Instant> {
+        @Override
+        public JsonElement serialize(Instant instant, Type type, JsonSerializationContext context) {
+            return new JsonPrimitive(instant.getEpochSecond());
         }
     }
 }

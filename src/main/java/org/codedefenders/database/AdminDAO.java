@@ -25,7 +25,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.model.UserEntity;
@@ -142,8 +144,79 @@ public class AdminDAO {
                 "         tests",
                 "    WHERE players.id = tests.Player_ID",
                 "    GROUP BY players.User_ID",
-                ") AS defenderScore ON users.User_ID = defenderScore.User_ID;");
+                ") AS defenderScore ON users.User_ID = defenderScore.User_ID;"
+        );
         return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
+    }
+
+    public static List<UserInfo> getClassroomUsersInfo(int classroomId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT DISTINCT users.*,",
+                "                lastLogin.timeStamp AS lastLogin,",
+                "                lastRole.Role       AS lastRole,",
+                "                IFNULL(attackerScore.score, 0) + IFNULL(defenderScore.score, 0) AS TotalScore",
+                "FROM view_valid_users users",
+                "LEFT JOIN classroom_members ON classroom_members.User_ID = users.User_ID",
+
+                /* Last login. */
+                "LEFT JOIN (",
+                "    SELECT MAX(Timestamp) AS timeStamp,",
+                "           User_ID",
+                "    FROM sessions",
+                "    GROUP BY User_ID",
+                ") AS lastLogin ON lastLogin.User_ID = users.User_ID",
+
+                /* Last role. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           players.Role",
+                "    FROM players,",
+                "         (",
+                "             SELECT players.User_ID,",
+                "                    MAX(players.Game_ID) AS latestGameID",
+                "             FROM players, games",
+                "             WHERE games.ID = players.Game_ID",
+                "               AND games.Mode <> 'PUZZLE'",
+                "               AND (players.Role = 'ATTACKER' OR players.Role = 'DEFENDER')",
+                "               AND games.Classroom_ID = ?",
+                "             GROUP BY players.User_ID",
+                "         ) AS latestGame",
+                "    WHERE latestGame.User_ID = players.User_ID",
+                "      AND latestGame.latestGameID = players.Game_ID",
+                ") AS lastRole ON lastRole.User_ID = users.User_ID",
+
+                /* Attacker score. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           SUM(mutants.Points) AS score",
+                "    FROM players,",
+                "         mutants,",
+                "         games",
+                "    WHERE players.id = mutants.Player_ID",
+                "      AND players.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                "    GROUP BY players.User_ID",
+                ") AS attackerScore ON users.User_ID = attackerScore.User_ID",
+
+                /* Defender score. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           sum(tests.Points) AS score",
+                "    FROM players,",
+                "         tests,",
+                "         games",
+                "    WHERE players.id = tests.Player_ID",
+                "      AND players.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                "    GROUP BY players.User_ID",
+                ") AS defenderScore ON users.User_ID = defenderScore.User_ID",
+
+                "WHERE classroom_members.Classroom_ID = ?;"
+        );
+        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId),
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
     }
 
     public static List<List<String>> getPlayersInfo(int gameId) throws UncheckedSQLException, SQLMappingException {

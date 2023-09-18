@@ -49,4 +49,10 @@ public class SimpleUser {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof SimpleUser
+                && ((SimpleUser) other).getId() == getId();
+    }
 }

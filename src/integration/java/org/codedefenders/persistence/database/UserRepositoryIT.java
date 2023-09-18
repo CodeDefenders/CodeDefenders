@@ -205,6 +205,6 @@ public class UserRepositoryIT {
 
     @Test
     public void queryEmptyAssignedUsers() {
-        assertTrue(userRepo.getUnassignedUsers().isEmpty());
+        assertTrue(userRepo.getAssignedUsers().isEmpty());
     }
 }

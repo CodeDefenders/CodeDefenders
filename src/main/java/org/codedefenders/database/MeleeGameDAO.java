@@ -486,4 +486,14 @@ public class MeleeGameDAO {
         return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS,
                 DatabaseValue.of(classroomId));
     }
+
+    public static List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
+        final String query = String.join("\n",
+                "SELECT * FROM view_melee_games as games",
+                "WHERE games.Classroom_ID = ?",
+                "AND games.State != ?;"
+        );
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(GameState.FINISHED.name()));
+    }
 }
