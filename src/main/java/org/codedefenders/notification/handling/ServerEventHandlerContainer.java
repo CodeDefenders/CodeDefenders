@@ -61,7 +61,7 @@ public class ServerEventHandlerContainer {
 
     private synchronized boolean removeHandler(ServerEventHandler handler) {
         if (!handlers.containsKey(handler)) {
-            logger.warn("User {} tried to register {} that is already registered.",
+            logger.warn("User {} tried to remove {} that is not registered.",
                     user.getId(), handler.getClass().getSimpleName());
             return false;
         } else {
