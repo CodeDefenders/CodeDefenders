@@ -20,13 +20,14 @@
 --%>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
-<%@ tag import="org.codedefenders.database.TestRepository" %>
 <%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.model.Player" %>
 <%@ tag import="org.codedefenders.database.MutantDAO" %>
 <%@ tag import="java.util.Map" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
+<%@ tag import="org.codedefenders.util.CDIUtil" %>
+<%@ tag import="org.codedefenders.database.TestRepository" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -34,8 +35,9 @@
 <%@ attribute name="gameFinished" required="false" type="java.lang.Boolean" %>
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
-<jsp:useBean id="testRepo" class="org.codedefenders.database.TestRepository" scope="application"/>
 <%
+    TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+
     Map<Integer, PlayerScore> mutantScores = scoreboard.getMutantsScores();
     Map<Integer, PlayerScore> testScores = scoreboard.getTestScores();
 

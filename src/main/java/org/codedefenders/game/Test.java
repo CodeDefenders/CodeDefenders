@@ -189,13 +189,12 @@ public class Test {
     }
 
     @Deprecated
-    public boolean update() {
+    public void update() {
         try {
             TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-            return testRepo.updateTest(this);
+            testRepo.updateTest(this);
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store test to database.", e);
-            return false;
         }
     }
 

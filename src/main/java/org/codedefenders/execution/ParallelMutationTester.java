@@ -158,7 +158,7 @@ public class ParallelMutationTester extends MutationTester {
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
         int score = Scorer.score(game, test, killedMutants);
-        testRepo.incrementTestScore(test, score);
+        testRepo.incrementTestScore(test.getId(), score);
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -242,7 +242,7 @@ public class ParallelMutationTester extends MutationTester {
                                 mutant.isAlive());
 
                         int score = Scorer.score((MultiplayerGame) game, test, mlist);
-                        testRepo.incrementTestScore(test, score);
+                        testRepo.incrementTestScore(test.getId(), score);
                     }
 
                     Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.TargetExecution;
@@ -49,6 +50,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
+
 /**
  * This class handles the database logic for tests.
  *
@@ -59,6 +64,14 @@ import com.google.common.collect.Multimap;
 @ApplicationScoped
 public class TestRepository {
     private static final Logger logger = LoggerFactory.getLogger(TestRepository.class);
+
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public TestRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
+
 
     /**
      * Constructs a test from a {@link ResultSet} entry.
@@ -109,7 +122,12 @@ public class TestRepository {
      */
     public Test getTestById(int testId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = "SELECT * FROM tests WHERE Test_ID = ?;";
-        return DB.executeQueryReturnValue(query, TestRepository::testFromRS, DatabaseValue.of(testId));
+        try {
+            return queryRunner.query(query, oneFromRS(TestRepository::testFromRS), testId).orElse(null);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -117,7 +135,12 @@ public class TestRepository {
      */
     public List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = "SELECT * FROM tests WHERE Game_ID = ?;";
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(gameId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     public List<Test> getTestsForGameAndUser(int gameId, int userId)
@@ -129,10 +152,12 @@ public class TestRepository {
                 WHERE tests.Game_ID = ?
                   AND players.User_ID = ?;
         """;
-        return DB.executeQueryReturnList(query,
-                TestRepository::testFromRS,
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId, userId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
 
@@ -148,8 +173,12 @@ public class TestRepository {
                 WHERE tests.Game_ID = ?
                   AND tests.Player_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of(playerId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId, playerId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -175,8 +204,12 @@ public class TestRepository {
                 defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : "",
                 defendersOnly ? "AND (pl.Role = 'DEFENDER' OR pl.Role = 'PLAYER');" : ";"
         );
-
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(gameId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     public List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
@@ -199,9 +232,12 @@ public class TestRepository {
                 defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : "",
                 defendersOnly ? "AND pl.Role='DEFENDER';" : ";"
         );
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS,
-                DatabaseValue.of(aliveMutant.getId()),
-                DatabaseValue.of(gameId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), aliveMutant.getId(), gameId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -223,8 +259,12 @@ public class TestRepository {
                 FROM tests_for_class tests
                 WHERE tests.Class_ID = ?;
         """;
-
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(classId));
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), classId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -260,8 +300,13 @@ public class TestRepository {
                 SELECT * FROM classroom_user_tests;
         """;
 
-        List<Test> tests = DB.executeQueryReturnList(query, TestRepository::testFromRS,
-                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+        List<Test> tests;
+        try {
+            tests = queryRunner.query(query, listFromRS(TestRepository::testFromRS), classroomId, classroomId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
 
         Multimap<Integer, Test> testsMap = ArrayListMultimap.create();
         for (Test test : tests) {
@@ -309,28 +354,38 @@ public class TestRepository {
         }
 
         @Language("SQL") String query = """
-                INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID,
-                                   Points, Class_ID, Lines_Covered, Lines_Uncovered)
+                INSERT INTO tests (
+                    JavaFile,
+                    ClassFile,
+                    Game_ID,
+                    RoundCreated,
+                    MutantsKilled,
+                    Player_ID,
+                    Points,
+                    Class_ID,
+                    Lines_Covered,
+                    Lines_Uncovered
+                )
                 VALUES (?,?,?,?,?,?,?,?,?,?);
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(relativeJavaFile),
-                DatabaseValue.of(relativeClassFile),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(roundCreated),
-                DatabaseValue.of(mutantsKilled),
-                DatabaseValue.of(playerId),
-                DatabaseValue.of(score),
-                DatabaseValue.of(classId),
-                DatabaseValue.of(linesCovered),
-                DatabaseValue.of(linesUncovered)
-        };
 
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
-            return result;
-        } else {
-            throw new UncheckedSQLException("Could not store test to database.");
+        try {
+            return queryRunner.insert(query,
+                    oneFromRS(rs -> rs.getInt(1)),
+                    relativeJavaFile,
+                    relativeClassFile,
+                    gameId,
+                    roundCreated,
+                    mutantsKilled,
+                    playerId,
+                    score,
+                    classId,
+                    linesCovered,
+                    linesUncovered
+            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store test."));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -339,10 +394,9 @@ public class TestRepository {
      * updating was successful or not.
      *
      * @param test the given test as a {@link Test}.
-     * @return whether updating was successful or not
      * @throws UncheckedSQLException If storing the test was not successful.
      */
-    public boolean updateTest(Test test) throws UncheckedSQLException {
+    public void updateTest(Test test) throws UncheckedSQLException {
         final int testId = test.getId();
         final int mutantsKilled = test.getMutantsKilled();
         final int score = test.getScore();
@@ -371,15 +425,21 @@ public class TestRepository {
                 Points = ?
             WHERE Test_ID = ?;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(mutantsKilled),
-                DatabaseValue.of(linesCoveredString),
-                DatabaseValue.of(linesUncoveredString),
-                DatabaseValue.of(score),
-                DatabaseValue.of(testId)
-        };
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query,
+                    mutantsKilled,
+                    linesCoveredString,
+                    linesUncoveredString,
+                    score,
+                    testId
+            );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update test.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -387,45 +447,54 @@ public class TestRepository {
      *
      * @param testId  the identifier of the test.
      * @param classId the identifier of the class.
-     * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
-    public boolean mapTestToClass(int testId, int classId) {
+    public void mapTestToClass(int testId, int classId) {
         @Language("SQL") String query = """
                 INSERT INTO test_uploaded_with_class (Test_ID, Class_ID)
                 VALUES (?, ?);
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(testId),
-                DatabaseValue.of(classId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.insert(query, rs -> null,
+                    testId,
+                    classId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Removes a test for a given identifier.
      *
      * @param id the identifier of the test to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public boolean removeTestForId(Integer id) {
+    public void removeTestForId(Integer id) {
         @Language("SQL") String query = """
                 DELETE FROM tests WHERE Test_ID = ?;
                 DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;
         """;
 
-        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+        try {
+            int updatedRows = queryRunner.update(query, id);
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't remove test.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Removes multiple tests for a given list of identifiers.
      *
      * @param tests the identifiers of the tests to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public boolean removeTestsForIds(List<Integer> tests) {
+    public void removeTestsForIds(List<Integer> tests) {
         if (tests.isEmpty()) {
-            return false;
+            return;
         }
 
         String range = Stream.generate(() -> "?")
@@ -445,9 +514,13 @@ public class TestRepository {
 
         // Hack to make sure all values are listed in both 'ranges'.
         tests.addAll(new LinkedList<>(tests));
-        DatabaseValue<?>[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.update(query, tests.toArray());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -466,14 +539,20 @@ public class TestRepository {
                 ORDER BY te.TargetExecution_ID LIMIT 1;
         """;
 
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
-                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
-                DatabaseValue.of(mutantId)
-        };
-        TargetExecution targ = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
+        Optional<TargetExecution> targ;
+        try {
+            targ = queryRunner.query(query, nextFromRS(TargetExecutionDAO::targetExecutionFromRS),
+                    TargetExecution.Target.TEST_MUTANT.name(),
+                    TargetExecution.Status.SUCCESS.name(),
+                    mutantId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+
         // TODO: We shouldn't give away that we don't know which test killed the mutant?
-        return Optional.ofNullable(targ).map(t -> t.testId).orElse(-1);
+        return targ.map(t -> t.testId).orElse(-1);
     }
 
     /**
@@ -513,31 +592,42 @@ public class TestRepository {
                 ) tmp
                 WHERE Test_ID = ? AND ranks = 1;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
-                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
-                DatabaseValue.of(testId),
-                DatabaseValue.of(testId)
-        };
-        final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
-        return new HashSet<>(mutants);
+        try {
+            List<Mutant> mutants = queryRunner.query(query, listFromRS(MutantDAO::mutantFromRS),
+                    TargetExecution.Target.TEST_MUTANT.name(),
+                    TargetExecution.Status.SUCCESS.name(),
+                    testId,
+                    testId
+            );
+            return new HashSet<>(mutants);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    public void incrementTestScore(Test test, int score) {
+    public void incrementTestScore(int testId, int score) {
         if (score == 0) {
             // Why this is happening?
             // Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
-            logger.warn("Do not increment score for test {} when score is zero", test.getId());
+            logger.warn("Do not increment score for test {} when score is zero", testId);
             return;
         }
 
-        @Language("SQL") String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
+        @Language("SQL") String query = """
+            UPDATE tests
+            SET Points = Points + ?
+            WHERE Test_ID = ?;
+        """;
 
         try {
-            boolean incremented = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
-                    score, test.getId()) > 0;
-
-            logger.info("Increment score for {} by {}. Update? {} ", test, score, incremented);
+            int updatedRows = queryRunner.update(query,
+                    score,
+                    testId);
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update test.");
+            }
+            logger.info("Increment score for {} by {}.", testId, score);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -549,16 +639,23 @@ public class TestRepository {
         // update();
         logger.info("Test {} killed a new mutant", test.getId());
 
-        @Language("SQL") String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
+        @Language("SQL") String query = """
+            UPDATE tests
+            SET MutantsKilled = MutantsKilled + ?
+            WHERE Test_ID = ?;
+        """;
 
         try {
-            boolean updated = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,1, test.getId()) > 0;
+            int updatedRows = queryRunner.update(query, 1, test.getId());
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update test.");
+            }
 
             // Eventually update the kill count from the DB
             int mutantsKilled = getTestById(test.getId()).getMutantsKilled();
             test.setMutantsKilled(mutantsKilled);
 
-            logger.info("Test {} new killcount is {}. Was updated ? {} ", test, mutantsKilled, updated);
+            logger.info("Test {} new killcount is {}.", test, mutantsKilled);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

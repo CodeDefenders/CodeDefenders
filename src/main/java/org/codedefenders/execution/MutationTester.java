@@ -151,7 +151,7 @@ public class MutationTester implements IMutationTester {
 
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
-        testRepo.incrementTestScore(test, Scorer.score(game, test, killedMutants));
+        testRepo.incrementTestScore(test.getId(), Scorer.score(game, test, killedMutants));
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -288,7 +288,7 @@ public class MutationTester implements IMutationTester {
                     // mlist));
                     // test.update();
                     int score = Scorer.score((MultiplayerGame) game, test, mlist);
-                    testRepo.incrementTestScore(test, score);
+                    testRepo.incrementTestScore(test.getId(), score);
                 }
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
