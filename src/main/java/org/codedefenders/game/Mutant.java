@@ -33,7 +33,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.CDIUtil;
@@ -277,7 +277,8 @@ public class Mutant implements Serializable {
     }
 
     public boolean kill() {
-        return MutantDAO.killMutant(this, equivalent);
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+        return mutantRepo.killMutant(this, equivalent);
     }
 
     public boolean isCovered() {
@@ -394,8 +395,9 @@ public class Mutant implements Serializable {
 
 
     public boolean insert() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
         try {
-            this.id = MutantDAO.storeMutant(this);
+            this.id = mutantRepo.storeMutant(this);
             return true;
         } catch (Exception e) {
             logger.error("Inserting mutants resulted in error.", e);
@@ -404,8 +406,9 @@ public class Mutant implements Serializable {
     }
 
     public boolean update() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
         try {
-            return MutantDAO.updateMutant(this);
+            return mutantRepo.updateMutant(this);
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store mutant to database.", e);
             return false;

@@ -40,7 +40,7 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -93,6 +93,10 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
+
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -276,7 +280,7 @@ public class AdminMonitorGames extends HttpServlet {
                 AdminDAO.deleteTestTargetExecutions(t.getId());
             }
         }
-        for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant m : mutantRepo.getValidMutantsForGame(gameId)) {
             if (m.getPlayerId() == playerId) {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
             }

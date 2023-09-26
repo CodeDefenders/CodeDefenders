@@ -41,7 +41,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.transaction.Transactional;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -593,7 +592,7 @@ public class TestRepository {
                 WHERE Test_ID = ? AND ranks = 1;
         """;
         try {
-            List<Mutant> mutants = queryRunner.query(query, listFromRS(MutantDAO::mutantFromRS),
+            List<Mutant> mutants = queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS),
                     TargetExecution.Target.TEST_MUTANT.name(),
                     TargetExecution.Status.SUCCESS.name(),
                     testId,

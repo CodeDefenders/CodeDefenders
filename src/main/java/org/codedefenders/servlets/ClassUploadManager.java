@@ -54,7 +54,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
@@ -118,6 +118,9 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
 
 
     private static List<String> reservedClassNames = Arrays.asList(
@@ -699,8 +702,8 @@ public class ClassUploadManager extends HttpServlet {
             final String md5 = CodeValidator.getMD5FromText(fileContent);
             final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
             try {
-                mutantId = MutantDAO.storeMutant(mutant);
-                MutantDAO.mapMutantToClass(mutantId, cutId);
+                mutantId = mutantRepo.storeMutant(mutant);
+                mutantRepo.mapMutantToClass(mutantId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store mutant to database.");
                 messages.add("Class upload failed. Seems like you uploaded two identical mutants.");
@@ -917,7 +920,7 @@ public class ClassUploadManager extends HttpServlet {
                 }
             }
 
-            MutantDAO.removeMutantsForIds(mutants);
+            mutantRepo.removeMutantsForIds(mutants);
             testRepo.removeTestsForIds(tests);
             DependencyDAO.removeDependenciesForIds(dependencies);
             GameClassDAO.removeClassesForIds(cuts);

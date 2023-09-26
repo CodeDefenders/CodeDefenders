@@ -44,7 +44,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -173,6 +173,10 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private MutantRepository mutantRepo;
+
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -206,7 +210,7 @@ public class MeleeGameManager extends HttpServlet {
         game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == playerId).findFirst()
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
-                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
+                    int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
                     // TODO This should be a better name
                     request.setAttribute("equivDefender", defender.orElse(null));
@@ -339,7 +343,7 @@ public class MeleeGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                mutantRepo.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -705,7 +709,7 @@ public class MeleeGameManager extends HttpServlet {
             for (Mutant m : mutantsPending) {
                 // This might be replaced by m.getCreatorId() == userId
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
+                    mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
                     Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
@@ -878,7 +882,7 @@ public class MeleeGameManager extends HttpServlet {
                         // only kill the one mutant that was claimed
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
-                        MutantDAO.killMutant(mPending, ASSUMED_YES);
+                        mutantRepo.killMutant(mPending, ASSUMED_YES);
                         final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("")
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,
@@ -986,7 +990,7 @@ public class MeleeGameManager extends HttpServlet {
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
-                                MutantDAO.insertEquivalence(m, playerId);
+                                mutantRepo.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });

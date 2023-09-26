@@ -32,7 +32,7 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -65,8 +65,9 @@ public class ParallelMutationTester extends MutationTester {
 
     // TODO Move the Executor service before useMutantCoverage
     public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            TestRepository testRepo, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
-        super(backend, userRepo, eventDAO, testRepo, useMutantCoverage);
+            TestRepository testRepo, MutantRepository mutantRepo, boolean useMutantCoverage,
+                                  ExecutorService testExecutorThreadPool) {
+        super(backend, userRepo, eventDAO, testRepo, mutantRepo, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -151,7 +152,7 @@ public class ParallelMutationTester extends MutationTester {
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
                 int score = Scorer.score(game, mutant, missedTests);
-                MutantDAO.incrementMutantScore(mutant, score);
+                mutantRepo.incrementMutantScore(mutant, score);
             }
         }
 
@@ -274,7 +275,7 @@ public class ParallelMutationTester extends MutationTester {
             // missedTests));
             // mutant.update();
             int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
-            MutantDAO.incrementMutantScore(mutant, score);
+            mutantRepo.incrementMutantScore(mutant, score);
         }
 
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",

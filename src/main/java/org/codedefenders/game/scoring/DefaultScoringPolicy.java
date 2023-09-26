@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -47,6 +47,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     private static final Logger logger = LoggerFactory.getLogger(DefaultScoringPolicy.class);
 
     private EventDAO eventDAO;
+    private MutantRepository mutantRepo;
 
     // TODO Convert this to PlayerScore so we can keep track of won/lost equivalence
     // duels !
@@ -59,8 +60,9 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     // MutantID, PlayerClaimingEquivalence
     private Map<Integer, Integer> flaggedMutants = new HashMap<>();
 
-    public DefaultScoringPolicy(EventDAO eventDAO) {
+    public DefaultScoringPolicy(EventDAO eventDAO, MutantRepository mutantRepo) {
         this.eventDAO = eventDAO;
+        this.mutantRepo = mutantRepo;
     }
 
     // TODO This can be easily cached!
@@ -114,7 +116,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         // Remove the mutant from the flagged mutants
                         flaggedMutants.remove(mutantId);
                         // Mutant is killed: we keep the mutant's points and we get an extra point as duels point
-                        int mutantOwnerPlayerId = MutantDAO.getMutantById(mutantId).getPlayerId();
+                        int mutantOwnerPlayerId = mutantRepo.getMutantById(mutantId).getPlayerId();
                         // Give one point to the player claiming the equivalence
                         int duelScoreWin = duelsScore.getOrDefault(mutantOwnerPlayerId, 0);
                         duelScoreWin = duelScoreWin + 1;

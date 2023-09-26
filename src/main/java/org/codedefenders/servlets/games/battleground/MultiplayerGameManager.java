@@ -44,7 +44,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestRepository;
@@ -196,6 +196,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private TestRepository testRepo;
 
+    @Inject
+    private MutantRepository mutantRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -222,7 +225,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
-                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
+                    int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
 
                     // TODO
@@ -338,7 +341,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                mutantRepo.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -751,9 +754,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // At this point we where not able to kill the mutant will all the covering
                     // tests on the same class from different games
-                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
+                    mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
 
-                    PlayerDAO.increasePlayerPoints(1, MutantDAO.getEquivalentDefenderId(m));
+                    PlayerDAO.increasePlayerPoints(1, mutantRepo.getEquivalentDefenderId(m));
                     messages.add(message);
 
                     // Notify the attacker
@@ -766,7 +769,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
-                        int defenderId = MutantDAO.getEquivalentDefenderId(m);
+                        int defenderId = mutantRepo.getEquivalentDefenderId(m);
                         Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getSimpleUser().getName() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
@@ -922,7 +925,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         }
 
                         // only kill the one mutant that was claimed
-                        MutantDAO.killMutant(mutPending, ASSUMED_YES);
+                        mutantRepo.killMutant(mutPending, ASSUMED_YES);
 
                         Event notif = new Event(-1, gameId, login.getUserId(), notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
@@ -1022,7 +1025,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
 
-                                MutantDAO.insertEquivalence(m, playerId);
+                                mutantRepo.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });

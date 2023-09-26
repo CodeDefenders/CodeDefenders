@@ -46,7 +46,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.execution.BackendExecutorService;
@@ -88,18 +88,21 @@ public class Installer {
     private final KillMapService killMapService;
     private final Configuration config;
     private final TestRepository testRepo;
+    private final MutantRepository mutantRepo;
 
     @Inject
     public Installer(BackendExecutorService backend,
                      CoverageGenerator coverageGenerator,
                      KillMapService killMapService,
             @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
-                     TestRepository testRepo) {
+                     TestRepository testRepo,
+                     MutantRepository mutantRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
         this.config = config;
         this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
     }
 
     /**
@@ -278,8 +281,8 @@ public class Installer {
         String md5 = CodeValidator.getMD5FromText(mutantFileContent);
         Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cut.getId());
 
-        int mutantId = MutantDAO.storeMutant(mutant);
-        MutantDAO.mapMutantToClass(mutantId, cut.getId());
+        int mutantId = mutantRepo.storeMutant(mutant);
+        mutantRepo.mapMutantToClass(mutantId, cut.getId());
 
         logger.info("installMutant(): Stored mutant " + mutant.getId() + " in position " + targetPosition);
 
@@ -449,7 +452,7 @@ public class Installer {
         for (Mutant m : originalMutants) {
             Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
             puzzleMutant.insert();
-            MutantDAO.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
+            mutantRepo.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Mutant " + puzzleMutant.getId());
             puzzleMutants.add(puzzleMutant);
         }

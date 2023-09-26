@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.Mutant;
@@ -31,12 +31,14 @@ public class ScoreCalculator {
 
     private final IScoringPolicy scoringPolicy;
     private final TestRepository testRepo;
+    private final MutantRepository mutantRepo;
 
     @Inject
     public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy,
-                           TestRepository testRepo) {
+                           TestRepository testRepo, MutantRepository mutantRepo) {
         this.scoringPolicy = scoringPolicy;
         this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
     }
 
     /**
@@ -51,7 +53,7 @@ public class ScoreCalculator {
             mutantScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
-        for (Mutant mutant : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
             // Compute the score for the mutant and store it inside the mutant object
             scoringPolicy.scoreMutant(mutant);
             // Update the Map
@@ -117,10 +119,10 @@ public class ScoreCalculator {
     }
 
     public void storeScoresToDB(int gameId) {
-        for (Mutant mutant : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
             // Compute the score for the mutant and store it inside the mutant object
             scoringPolicy.scoreMutant(mutant);
-            MutantDAO.updateMutantScore(mutant);
+            mutantRepo.updateMutantScore(mutant);
         }
         for (Test test : testRepo.getTestsForGame(gameId)) {
             // Compute the score for the test and store it inside the test object

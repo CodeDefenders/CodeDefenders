@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -182,7 +182,8 @@ public abstract class AbstractGame {
 
     public List<Mutant> getMutants() {
         if (mutants == null) {
-            mutants = MutantDAO.getValidMutantsForGame(id);
+            MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+            mutants = mutantRepo.getValidMutantsForGame(id);
         }
         return mutants;
     }

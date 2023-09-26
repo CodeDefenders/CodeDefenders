@@ -32,6 +32,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap;
@@ -75,8 +76,8 @@ public class MultiplayerGameService extends AbstractGameService {
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
                                   GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                                   CodeDefendersAuth login, NotificationService notificationService,
-                                  TestRepository testRepo) {
-        super(userService, userRepository, testRepo);
+                                  TestRepository testRepo, MutantRepository mutantRepo) {
+        super(userService, userRepository, testRepo, mutantRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.messages = messages;

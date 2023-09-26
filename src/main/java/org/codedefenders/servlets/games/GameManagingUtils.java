@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestRepository;
@@ -117,13 +117,16 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private TestRepository testRepo;
 
+    @Inject
+    private MutantRepository mutantRepo;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Mutant existingMutant(int gameId, String mutatedCode) {
         String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
-        return MutantDAO.getMutantByGameAndMd5(gameId, md5Mutant);
+        return mutantRepo.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
     /**
@@ -131,7 +134,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      */
     @Override
     public boolean hasAttackerPendingMutantsInGame(int gameId, int attackerId) {
-        for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant m : mutantRepo.getValidMutantsForGame(gameId)) {
             if (m.getPlayerId() == attackerId && m.getEquivalent() == Mutant.Equivalence.PENDING_TEST) {
                 return true;
             }
@@ -298,7 +301,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                     testRepo.killMutant(test);
                     mutant.kill();
                     mutant.setKillMessage(targetExecution.message);
-                    MutantDAO.updateMutantKillMessageForMutant(mutant);
+                    mutantRepo.updateMutantKillMessageForMutant(mutant);
                 }
 
                 targetExecution.insert();

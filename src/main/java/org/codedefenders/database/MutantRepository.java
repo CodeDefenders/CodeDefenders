@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
@@ -47,8 +49,9 @@ import com.google.common.collect.Multimap;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Mutant
  */
-public class MutantDAO {
-    private static final Logger logger = LoggerFactory.getLogger(MutantDAO.class);
+@ApplicationScoped
+public class MutantRepository {
+    private static final Logger logger = LoggerFactory.getLogger(MutantRepository.class);
 
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
@@ -104,52 +107,52 @@ public class MutantDAO {
     /**
      * Returns the {@link Mutant} for the given mutant id.
      */
-    public static Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
+    public Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Mutant_ID = ?;
         """;
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(mutantId));
+        return DB.executeQueryReturnValue(query, MutantRepository::mutantFromRS, DatabaseValue.of(mutantId));
     }
 
     /**
      * Returns the {@link Mutant} with the given md5 sum from the given game.
      */
-    public static Mutant getMutantByGameAndMd5(int gameId, String md5)
+    public Mutant getMutantByGameAndMd5(int gameId, String md5)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Game_ID = ? AND m.MD5 = ?;
         """;
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS,
+        return DB.executeQueryReturnValue(query, MutantRepository::mutantFromRS,
                 DatabaseValue.of(gameId), DatabaseValue.of(md5));
     }
 
     /**
      * Returns the {@link Mutant Mutants} from the given game for the given player.
      */
-    public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
+    public List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?
                   AND m.Player_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS,
                 DatabaseValue.of(gameId), DatabaseValue.of(playerId));
     }
 
     /**
      * Returns the {@link Mutant Mutants} from the given game for the given user.
      */
-    public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
+    public List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?
                   AND m.User_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS,
                 DatabaseValue.of(gameId), DatabaseValue.of(userId));
     }
 
@@ -158,13 +161,13 @@ public class MutantDAO {
      *
      * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
      */
-    public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+    public List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(gameId));
     }
 
     /**
@@ -173,7 +176,7 @@ public class MutantDAO {
      * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
      * (not the instances that are copied into games).
      */
-    public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
+    public List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 WITH mutants_for_class AS
                    (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)
@@ -183,7 +186,7 @@ public class MutantDAO {
                 WHERE mutants.Class_ID = ?
         """;
 
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(classId));
     }
 
     /**
@@ -192,7 +195,7 @@ public class MutantDAO {
      * <p>This includes valid user-submitted mutants from classroom games as well as templates of predefined mutants
      * for classes used in the classroom.
      */
-    public static Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
+    public Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 WITH relevant_classes AS (
@@ -217,7 +220,7 @@ public class MutantDAO {
                 SELECT * FROM classroom_user_mutants;
         """;
 
-        List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+        List<Mutant> mutants = DB.executeQueryReturnList(query, MutantRepository::mutantFromRS,
                 DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
 
         Multimap<Integer, Mutant> mutantsMap = ArrayListMultimap.create();
@@ -230,14 +233,14 @@ public class MutantDAO {
     /**
      * Returns the compilable {@link Mutant Mutants} submitted by the given player.
      */
-    public static List<Mutant> getValidMutantsForPlayer(int playerId)
+    public List<Mutant> getValidMutantsForPlayer(int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_valid_mutants m
                 WHERE Player_ID = ?
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(playerId));
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(playerId));
     }
 
     /**
@@ -250,7 +253,7 @@ public class MutantDAO {
      * @return the generated identifier of the mutant as an {@code int}.
      * @throws Exception If storing the mutant was not successful.
      */
-    public static int storeMutant(Mutant mutant) throws Exception {
+    public int storeMutant(Mutant mutant) throws Exception {
         String relativeJavaFile = FileUtils.getRelativeDataPath(mutant.getJavaFile()).toString();
         String relativeClassFile = mutant.getClassFile()
                 == null ? null : FileUtils.getRelativeDataPath(mutant.getClassFile()).toString();
@@ -299,7 +302,7 @@ public class MutantDAO {
      * @return whether updating was successful or not
      * @throws UncheckedSQLException If storing the mutant was not successful.
      */
-    public static boolean updateMutant(Mutant mutant) throws UncheckedSQLException {
+    public boolean updateMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
 
         Equivalence equivalent = mutant.getEquivalent() == null ? Equivalence.ASSUMED_NO : mutant.getEquivalent();
@@ -326,7 +329,7 @@ public class MutantDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
-    public static boolean updateMutantScore(Mutant mutant) throws UncheckedSQLException {
+    public boolean updateMutantScore(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
 
         int score = mutant.getScore();
@@ -352,7 +355,7 @@ public class MutantDAO {
      * @return whether updating was successful or not
      * @throws UncheckedSQLException If storing the mutant was not successful.
      */
-    public static boolean updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
+    public boolean updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
 
         String killMessage = mutant.getKillMessage();
@@ -377,7 +380,7 @@ public class MutantDAO {
      * @param classId  the identifier of the class.
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
-    public static boolean mapMutantToClass(int mutantId, int classId) {
+    public boolean mapMutantToClass(int mutantId, int classId) {
         @Language("SQL") String query = """
                 INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)
                 VALUES (?, ?);
@@ -396,7 +399,7 @@ public class MutantDAO {
      * @param id the identifier of the mutant to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeMutantForId(Integer id) {
+    public boolean removeMutantForId(Integer id) {
         @Language("SQL") String query = """
                 DELETE FROM mutants WHERE Mutant_ID = ?;
                 DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?
@@ -414,7 +417,7 @@ public class MutantDAO {
      * @param mutants the identifiers of the mutants to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeMutantsForIds(List<Integer> mutants) {
+    public boolean removeMutantsForIds(List<Integer> mutants) {
         if (mutants.isEmpty()) {
             return false;
         }
@@ -446,7 +449,7 @@ public class MutantDAO {
      * @param mutantId The mutant ID of the mutant.
      * @return The class ID for the given mutant.
      */
-    public static Integer getClassIdForMutant(int mutantId) {
+    public Integer getClassIdForMutant(int mutantId) {
         @Language("SQL") String query = """
                 SELECT games.Class_ID
                 FROM mutants, games
@@ -463,21 +466,21 @@ public class MutantDAO {
      * @param mutantId the identifier of the mutant.
      * @return number of killed AI tests, or {@code 0} if none found.
      */
-    public static int getNumTestsKillMutant(int mutantId) {
+    public int getNumTestsKillMutant(int mutantId) {
         @Language("SQL") String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
         final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"),
                 DatabaseValue.of(mutantId));
         return Optional.ofNullable(kills).orElse(0);
     }
 
-    public static int getEquivalentDefenderId(Mutant m) {
+    public int getEquivalentDefenderId(Mutant m) {
         @Language("SQL") String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
         final Integer id = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
         return Optional.ofNullable(id).orElse(-1);
     }
 
-    public static boolean insertEquivalence(Mutant mutant, int defender) {
+    public boolean insertEquivalence(Mutant mutant, int defender) {
         @Language("SQL") String query = """
                 INSERT INTO equivalences (Mutant_ID, Defender_ID, Mutant_Points)
                 VALUES (?, ?, ?)
@@ -490,7 +493,7 @@ public class MutantDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
-    public static void incrementMutantScore(Mutant mutant, int score) {
+    public void incrementMutantScore(Mutant mutant, int score) {
         if (score == 0) {
             logger.debug("Do not update mutant {} score by 0", mutant.getId());
             return;
@@ -510,7 +513,7 @@ public class MutantDAO {
         }
     }
 
-    public static boolean killMutant(Mutant mutant, Equivalence equivalence) {
+    public boolean killMutant(Mutant mutant, Equivalence equivalence) {
         mutant.setAlive(false);
         int roundKilled = GameDAO.getCurrentRound(mutant.getGameId());
         mutant.setRoundKilled(roundKilled);

@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
@@ -41,6 +41,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -463,6 +464,8 @@ public class MultiplayerGame extends AbstractGame {
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+
         final HashMap<Integer, PlayerScore> testScores = new HashMap<>();
         final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
 
@@ -528,21 +531,21 @@ public class MultiplayerGame extends AbstractGame {
                 continue;
             }
 
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);

@@ -22,7 +22,7 @@
 <%@ tag import="org.codedefenders.util.Constants" %>
 <%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.model.Player" %>
-<%@ tag import="org.codedefenders.database.MutantDAO" %>
+<%@ tag import="org.codedefenders.database.MutantRepository" %>
 <%@ tag import="java.util.Map" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
@@ -37,6 +37,7 @@
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
 <%
     TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+    MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
 
     Map<Integer, PlayerScore> mutantScores = scoreboard.getMutantsScores();
     Map<Integer, PlayerScore> testScores = scoreboard.getTestScores();
@@ -99,7 +100,7 @@
             // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
             // For system generated mutants,  mutant.playerID == userID, which is wrong...
             if (attackerUser.getId() == Constants.DUMMY_ATTACKER_USER_ID &&
-                    MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty()) {
+                    mutantRepo.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty()) {
                 continue;
             }
 

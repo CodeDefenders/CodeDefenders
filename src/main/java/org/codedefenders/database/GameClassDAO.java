@@ -230,7 +230,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Mutant_ID = mutants.Mutant_ID
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(classId));
     }
 
     /**
