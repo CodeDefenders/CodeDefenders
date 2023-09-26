@@ -166,7 +166,7 @@ public class TestRepository {
     public List<Test> getTestsForGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
-                SELECT * FROM tests
+                SELECT * FROM view_valid_game_tests tests
                 LEFT JOIN players ON players.ID = tests.Player_ID
                 LEFT JOIN users ON players.User_ID = users.User_ID
                 WHERE tests.Game_ID = ?
@@ -476,10 +476,7 @@ public class TestRepository {
         """;
 
         try {
-            int updatedRows = queryRunner.update(query, id);
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't remove test.");
-            }
+            queryRunner.update(query, id, id);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

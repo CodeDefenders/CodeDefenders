@@ -394,25 +394,14 @@ public class Mutant implements Serializable {
     }
 
 
-    public boolean insert() {
+    public void insert() {
         MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        try {
-            this.id = mutantRepo.storeMutant(this);
-            return true;
-        } catch (Exception e) {
-            logger.error("Inserting mutants resulted in error.", e);
-            return false;
-        }
+        this.id = mutantRepo.storeMutant(this);
     }
 
-    public boolean update() {
+    public void update() {
         MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        try {
-            return mutantRepo.updateMutant(this);
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store mutant to database.", e);
-            return false;
-        }
+        mutantRepo.updateMutant(this);
     }
 
     // Does this every get called if mutant is not stored to DB ?
