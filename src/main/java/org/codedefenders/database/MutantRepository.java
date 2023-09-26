@@ -464,13 +464,11 @@ public class MutantRepository {
      * @param id the identifier of the mutant to be removed.
      */
     public void removeMutantForId(Integer id) {
-        @Language("SQL") String query = """
-                DELETE FROM mutants WHERE Mutant_ID = ?;
-                DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?
-        """;
-
+        @Language("SQL") String query1 = "DELETE FROM mutants WHERE Mutant_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?;";
         try {
-            queryRunner.update(query, id, id);
+            queryRunner.update(query1, id, id);
+            queryRunner.update(query2, id, id);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -491,22 +489,14 @@ public class MutantRepository {
                 .limit(mutants.size())
                 .collect(Collectors.joining(","));
 
-        @Language("SQL") String query = """
-                DELETE FROM mutants
-                WHERE Mutant_ID in (%s);
-
-                DELETE FROM mutant_uploaded_with_class
-                WHERE Mutant_ID in (%s);
-        """.formatted(
-                range,
-                range
-        );
-
-        // Hack to make sure all values are listed in both 'ranges'.
-        mutants.addAll(new LinkedList<>(mutants));
+        @Language("SQL") String query1 = "DELETE FROM mutants WHERE Mutant_ID in (%s);"
+                .formatted(range);
+        @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID in (%s);"
+                .formatted(range);
 
         try {
-            queryRunner.update(query, mutants.toArray());
+            queryRunner.update(query1, mutants.toArray());
+            queryRunner.update(query2, mutants.toArray());
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

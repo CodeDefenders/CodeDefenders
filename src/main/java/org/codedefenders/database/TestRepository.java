@@ -470,13 +470,12 @@ public class TestRepository {
      * @param id the identifier of the test to be removed.
      */
     public void removeTestForId(Integer id) {
-        @Language("SQL") String query = """
-                DELETE FROM tests WHERE Test_ID = ?;
-                DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;
-        """;
+        @Language("SQL") String query1 = "DELETE FROM tests WHERE Test_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;";
 
         try {
-            queryRunner.update(query, id, id);
+            queryRunner.update(query1, id);
+            queryRunner.update(query2, id);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -497,22 +496,14 @@ public class TestRepository {
                 .limit(tests.size())
                 .collect(Collectors.joining(","));
 
-        @Language("SQL") String query = """
-                DELETE FROM tests
-                WHERE Test_ID in (%s);
-
-                DELETE FROM test_uploaded_with_class
-                WHERE Test_ID in (%s);
-        """.formatted(
-                range,
-                range
-        );
-
-        // Hack to make sure all values are listed in both 'ranges'.
-        tests.addAll(new LinkedList<>(tests));
+        @Language("SQL") String query1 = "DELETE FROM tests WHERE Test_ID in (%s);"
+                .formatted(range);
+        @Language("SQL") String query2 = "DELETE FROM test_uploaded_with_class WHERE Test_ID in (%s);"
+                .formatted(range);
 
         try {
-            queryRunner.update(query, tests.toArray());
+            queryRunner.update(query1, tests.toArray());
+            queryRunner.update(query2, tests.toArray());
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
