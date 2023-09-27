@@ -368,7 +368,7 @@ public class MutationTester implements IMutationTester {
         }
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
-        testRepo.killMutant(test);
+        testRepo.incrementMutantsKilled(test);
         mutant.setKillMessage(executedTarget.message);
         mutantRepo.updateMutantKillMessageForMutant(mutant);
 
@@ -398,7 +398,7 @@ public class MutationTester implements IMutationTester {
             // to be non-equivalent
             if (mutantRepo.killMutant(mutant, PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
-                testRepo.killMutant(test);
+                testRepo.incrementMutantsKilled(test);
                 mutant.setKillMessage(executedTarget.message);
                 mutantRepo.updateMutantKillMessageForMutant(mutant);
             } else {
@@ -431,7 +431,8 @@ public class MutationTester implements IMutationTester {
 
         // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
         // Note we need to return the test for all the roles to include PLAYER
-        List<Test> testsToExecute = game.getAllTests().stream().filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
+        List<Test> testsToExecute = testRepo.getValidTestsForGame(game.getId()).stream()
+                .filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
                 .collect(Collectors.toList());
         List<Test> tests = scheduler.scheduleTests(testsToExecute);
 

@@ -7,7 +7,10 @@ import java.util.function.Predicate;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
+import org.codedefenders.database.MutantRepository;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
 
@@ -26,7 +29,13 @@ public class ScoreboardBean {
     private List<Player> attackers;
     private List<Player> defenders;
 
-    public ScoreboardBean() {
+    private final TestRepository testRepo;
+    private final MutantRepository mutantRepo;
+
+    @Inject
+    public ScoreboardBean(TestRepository testRepo, MutantRepository mutantRepo) {
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
         gameId = null;
         mutantsScores = null;
         testScores = null;
@@ -99,6 +108,14 @@ public class ScoreboardBean {
             return isDefender ? PlayerStatus.WINNING_DEFENDER : PlayerStatus.LOSING_ATTACKER;
         }
         return isDefender ? PlayerStatus.TIE_DEFENDER : PlayerStatus.TIE_ATTACKER;
+    }
+
+    public boolean gameHasPredefinedTests() {
+        return testRepo.gameHasPredefinedTests(gameId);
+    }
+
+    public boolean gameHasPredefinedMutants() {
+        return mutantRepo.gameHasPredefinedMutants(gameId);
     }
 
     public enum PlayerStatus {

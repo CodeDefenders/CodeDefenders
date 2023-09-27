@@ -312,9 +312,8 @@ public class MultiplayerGameManager extends HttpServlet {
                     .map(Test::getId)
                     .collect(Collectors.toSet());
 
-            boolean considerOnlydefenders = false;
             Set<Integer> testSubmittedAfterMutant =
-                    testRepo.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant)
+                    testRepo.getValidTestsForGameSubmittedAfterMutant(game.getId(), aliveMutant)
                             .stream()
                             .map(Test::getId)
                             .collect(Collectors.toSet());

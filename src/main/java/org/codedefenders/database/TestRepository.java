@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -33,11 +32,11 @@ import java.util.stream.Stream;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.transaction.Transactional;
@@ -53,12 +52,6 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.listFro
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
-/**
- * This class handles the database logic for tests.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see Test
- */
 @Transactional
 @ApplicationScoped
 public class TestRepository {
@@ -71,13 +64,8 @@ public class TestRepository {
         this.queryRunner = queryRunner;
     }
 
-
     /**
-     * Constructs a test from a {@link ResultSet} entry.
-     *
-     * @param rs The {@link ResultSet}.
-     * @return The constructed test.
-     * @see RSMapper
+     * Constructs a test from a {@link ResultSet} row.
      */
     public static Test testFromRS(ResultSet rs) throws SQLException {
         int testId = rs.getInt("Test_ID");
@@ -132,6 +120,7 @@ public class TestRepository {
     /**
      * Returns the {@link Test Tests} from the given game.
      */
+    @Deprecated
     public List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = "SELECT * FROM tests WHERE Game_ID = ?;";
         try {
@@ -142,17 +131,14 @@ public class TestRepository {
         }
     }
 
-    public List<Test> getTestsForGameAndUser(int gameId, int userId)
-            throws UncheckedSQLException, SQLMappingException {
+    public boolean gameHasPredefinedTests(int gameId) {
         @Language("SQL") String query = """
-                SELECT * FROM tests
-                LEFT JOIN players ON players.ID = tests.Player_ID
-                LEFT JOIN users ON players.User_ID = users.User_ID
+                SELECT * FROM view_system_test_instances tests
                 WHERE tests.Game_ID = ?
-                  AND players.User_ID = ?;
+                LIMIT 1;
         """;
         try {
-            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId, userId);
+            return queryRunner.query(query, nextFromRS(rs -> true), gameId).orElse(false);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -168,7 +154,6 @@ public class TestRepository {
         @Language("SQL") String query = """
                 SELECT * FROM view_valid_game_tests tests
                 LEFT JOIN players ON players.ID = tests.Player_ID
-                LEFT JOIN users ON players.User_ID = users.User_ID
                 WHERE tests.Game_ID = ?
                   AND tests.Player_ID = ?;
         """;
@@ -185,24 +170,13 @@ public class TestRepository {
      * Valid tests are compilable and do not fail when executed against the original class.
      *
      * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
-     *
-     * @param gameId        the identifier of the given game.
-     * @param defendersOnly If {@code true}, only return tests that were written by defenders.
-     *                      Include also the tests uploaded by the System Defender
-     * @return a {@link List} of valid tests for the given game.
      */
-    public List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
-            throws UncheckedSQLException, SQLMappingException {
+    public List<Test> getValidTestsForGame(int gameId) {
         @Language("SQL") String query = """
-                SELECT t.*
-                FROM view_valid_game_tests t
-                %s
-                WHERE t.Game_ID = ?
-                %s
-        """.formatted(
-                defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : "",
-                defendersOnly ? "AND (pl.Role = 'DEFENDER' OR pl.Role = 'PLAYER');" : ";"
-        );
+                SELECT tests.*
+                FROM view_valid_game_tests tests
+                WHERE tests.Game_ID = ?;
+        """;
         try {
             return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId);
         } catch (SQLException e) {
@@ -211,26 +185,39 @@ public class TestRepository {
         }
     }
 
-    public List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
-            Mutant aliveMutant) {
-        /*
-         * ATM, we do not consider system generated tests, as they will be
-         * automatically ruled out by the timestamp Unless, we allow new system
-         * tests to be submitted also after the game started (#102)
-         */
-        // TODO Not sure if using table 'mutants' here is correct or we
-        // need to use some view instead...
+    /**
+     * Returns the defender-written valid {@link Test Tests} from the given game.
+     * Valid tests are compilable and do not fail when executed against the original class.
+     *
+     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
+     */
+    public List<Test> getValidDefenderTestsForGame(int gameId) {
         @Language("SQL") String query = """
-                SELECT t.*
-                FROM view_valid_game_tests t
-                %s,
-                WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? )
-                  AND t.Game_ID=?
-                %s
-        """.formatted(
-                defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : "",
-                defendersOnly ? "AND pl.Role='DEFENDER';" : ";"
-        );
+                SELECT tests.*
+                FROM view_valid_game_tests tests
+                INNER JOIN players on tests.Player_ID = players.ID
+                WHERE tests.Game_ID = ?
+                  AND players.Role IN (%s, %s);
+        """;
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS),
+                    gameId,
+                    Role.DEFENDER.name(),
+                    Role.PLAYER.name());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, Mutant aliveMutant) {
+        // ATM, we do not consider system generated tests.
+        @Language("SQL") String query = """
+                SELECT tests.*
+                FROM view_valid_game_tests tests
+                WHERE tests.Timestamp >= (SELECT mutants.Timestamp FROM mutants WHERE mutants.Mutant_ID = ?)
+                  AND tests.Game_ID = ?;
+        """;
         try {
             return queryRunner.query(query, listFromRS(TestRepository::testFromRS), aliveMutant.getId(), gameId);
         } catch (SQLException e) {
@@ -245,9 +232,6 @@ public class TestRepository {
      *
      * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
      * (not the instances that are copied into games).
-     *
-     * @param classId the identifier of the given class.
-     * @return a {@link List} of valid tests for the given class.
      */
     public List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
@@ -267,10 +251,12 @@ public class TestRepository {
     }
 
     /**
-     * Returns the valid {@link Test Tests} from the games played on the given class.
+     * Returns the valid {@link Test Tests} from the games played in the given classroom.
      *
      * <p>This includes valid user-submitted tests from classroom games as well as templates of predefined tests
      * for classes used in the classroom.
+     *
+     * @return The tests, partitioned by Class ID.
      */
     public Multimap<Integer, Test> getValidTestsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
@@ -317,12 +303,8 @@ public class TestRepository {
     /**
      * Stores a given {@link Test} in the database.
      *
-     * <p>This method does not update the given test object.
-     * Use {@link Test#insert()} instead.
-     *
-     * @param test the given test as a {@link Test}.
-     * @return the generated identifier of the test as an {@code int}.
-     * @throws UncheckedSQLException If storing the test was not successful.
+     * @param test The test to store.
+     * @return The generated test ID.
      */
     public int storeTest(Test test) throws UncheckedSQLException {
         String relativeJavaFile = FileUtils.getRelativeDataPath(test.getJavaFile()).toString();
@@ -389,11 +371,9 @@ public class TestRepository {
     }
 
     /**
-     * Updates a given {@link Test} in the database and returns whether
-     * updating was successful or not.
+     * Updates a given {@link Test} in the database.
      *
-     * @param test the given test as a {@link Test}.
-     * @throws UncheckedSQLException If storing the test was not successful.
+     * @param test The test to update.
      */
     public void updateTest(Test test) throws UncheckedSQLException {
         final int testId = test.getId();
@@ -444,8 +424,8 @@ public class TestRepository {
     /**
      * Stores a mapping between a {@link Test} and a {@link GameClass} in the database.
      *
-     * @param testId  the identifier of the test.
-     * @param classId the identifier of the class.
+     * @param testId The test ID.
+     * @param classId The class ID.
      */
     public void mapTestToClass(int testId, int classId) {
         @Language("SQL") String query = """
@@ -465,17 +445,15 @@ public class TestRepository {
     }
 
     /**
-     * Removes a test for a given identifier.
-     *
-     * @param id the identifier of the test to be removed.
+     * Removes a test for a given ID.
      */
-    public void removeTestForId(Integer id) {
+    public void removeTestForId(int testId) {
         @Language("SQL") String query1 = "DELETE FROM tests WHERE Test_ID = ?;";
         @Language("SQL") String query2 = "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;";
 
         try {
-            queryRunner.update(query1, id);
-            queryRunner.update(query2, id);
+            queryRunner.update(query1, testId);
+            queryRunner.update(query2, testId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -511,7 +489,7 @@ public class TestRepository {
     }
 
     /**
-     * Returns the id of the first Test (from the same game) that killed the mutant with the provided ID.
+     * Returns the ID of the first Test (from the same game) that killed the mutant with the provided ID.
      */
     public int getKillingTestIdForMutant(int mutantId) {
         @Language("SQL") String query = """
@@ -595,8 +573,6 @@ public class TestRepository {
 
     public void incrementTestScore(int testId, int score) {
         if (score == 0) {
-            // Why this is happening?
-            // Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
             logger.warn("Do not increment score for test {} when score is zero", testId);
             return;
         }
@@ -620,10 +596,7 @@ public class TestRepository {
         }
     }
 
-    public void killMutant(Test test) {
-        // TODO Phil 06/08/19: Why isn't the out-commented code called?
-        // mutantsKilled++;
-        // update();
+    public void incrementMutantsKilled(Test test) {
         logger.info("Test {} killed a new mutant", test.getId());
 
         @Language("SQL") String query = """
@@ -642,7 +615,7 @@ public class TestRepository {
             int mutantsKilled = getTestById(test.getId()).getMutantsKilled();
             test.setMutantsKilled(mutantsKilled);
 
-            logger.info("Test {} new killcount is {}.", test, mutantsKilled);
+            logger.info("Test {} new kill count is {}.", test, mutantsKilled);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

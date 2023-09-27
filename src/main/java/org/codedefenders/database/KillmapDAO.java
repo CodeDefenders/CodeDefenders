@@ -85,7 +85,7 @@ public class KillmapDAO {
 
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
         MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        List<Test> tests = testRepo.getValidTestsForGame(gameId, false);
+        List<Test> tests = testRepo.getValidTestsForGame(gameId);
         List<Mutant> mutants = mutantRepo.getValidMutantsForGame(gameId);
 
         return getKillMapEntries(tests, mutants, query, DatabaseValue.of(gameId));

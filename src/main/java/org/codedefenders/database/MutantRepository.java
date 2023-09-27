@@ -20,7 +20,6 @@ package org.codedefenders.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +28,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
@@ -43,14 +41,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
-/**
- * This class handles the database logic for mutants.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see Mutant
- */
 @ApplicationScoped
 public class MutantRepository {
     private static final Logger logger = LoggerFactory.getLogger(MutantRepository.class);
@@ -64,10 +57,6 @@ public class MutantRepository {
 
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
-     *
-     * @param rs The {@link ResultSet}.
-     * @return The constructed mutant.
-     * @see RSMapper
      */
     static Mutant mutantFromRS(ResultSet rs) throws SQLException {
         int mutantId = rs.getInt("Mutant_ID");
@@ -164,18 +153,14 @@ public class MutantRepository {
         }
     }
 
-    /**
-     * Returns the {@link Mutant Mutants} from the given game for the given user.
-     */
-    public List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
-            throws UncheckedSQLException, SQLMappingException {
+    public boolean gameHasPredefinedMutants(int gameId) {
         @Language("SQL") String query = """
-                SELECT * FROM view_valid_game_mutants m
-                WHERE m.Game_ID = ?
-                  AND m.User_ID = ?;
+                SELECT * FROM view_system_mutant_instances mutants
+                WHERE mutants.Game_ID = ?
+                LIMIT 1;
         """;
         try {
-            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId, userId);
+            return queryRunner.query(query, nextFromRS(rs -> true), gameId).orElse(false);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -225,10 +210,12 @@ public class MutantRepository {
     }
 
     /**
-     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     * Returns the compilable {@link Mutant Mutants} from the games played in the given classroom.
      *
      * <p>This includes valid user-submitted mutants from classroom games as well as templates of predefined mutants
      * for classes used in the classroom.
+     *
+     * @return The mutants, partitioned by Class ID.
      */
     public Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
@@ -271,14 +258,14 @@ public class MutantRepository {
     }
 
     /**
-     * Returns the compilable {@link Mutant Mutants} submitted by the given player.
+     * Returns the valid {@link Mutant Mutants} submitted by the given player.
      */
     public List<Mutant> getValidMutantsForPlayer(int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_valid_mutants m
-                WHERE Player_ID = ?
+                WHERE Player_ID = ?;
         """;
         try {
             return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), playerId);
@@ -291,12 +278,8 @@ public class MutantRepository {
     /**
      * Stores a given {@link Mutant} in the database.
      *
-     * <p>This method does not update the given mutant object.
-     * Use {@link Mutant#insert()} instead.
-     *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @return the generated identifier of the mutant as an {@code int}.
-     * @throws Exception If storing the mutant was not successful.
+     * @param mutant The mutant to store.
+     * @return The generated mutant ID.
      */
     public int storeMutant(Mutant mutant) {
         String relativeJavaFile = FileUtils.getRelativeDataPath(mutant.getJavaFile()).toString();
@@ -340,11 +323,9 @@ public class MutantRepository {
     }
 
     /**
-     * Updates a given {@link Mutant} in the database and returns whether
-     * updating was successful or not.
+     * Updates a given {@link Mutant} in the database.
      *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @throws UncheckedSQLException If storing the mutant was not successful.
+     * @param mutant The mutant to update.
      */
     public void updateMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
@@ -380,6 +361,11 @@ public class MutantRepository {
         }
     }
 
+    /**
+     * Update the score for a given {@link Mutant} in the database.
+     *
+     * @param mutant The mutant to update.
+     */
     public void updateMutantScore(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
         int score = mutant.getScore();
@@ -405,11 +391,9 @@ public class MutantRepository {
     }
 
     /**
-     * Updates a given {@link Mutant} in the database and returns whether
-     * updating was successful or not.
+     * Update the kill message for a given {@link Mutant} in the database.
      *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @throws UncheckedSQLException If storing the mutant was not successful.
+     * @param mutant The mutant to update.
      */
     public void updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
@@ -459,16 +443,14 @@ public class MutantRepository {
 
 
     /**
-     * Removes a mutant for a given identifier.
-     *
-     * @param id the identifier of the mutant to be removed.
+     * Removes a mutant for a given ID.
      */
-    public void removeMutantForId(Integer id) {
+    public void removeMutantForId(int mutantId) {
         @Language("SQL") String query1 = "DELETE FROM mutants WHERE Mutant_ID = ?;";
         @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?;";
         try {
-            queryRunner.update(query1, id, id);
-            queryRunner.update(query2, id, id);
+            queryRunner.update(query1, mutantId);
+            queryRunner.update(query2, mutantId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -541,6 +523,7 @@ public class MutantRepository {
             return;
         }
 
+        // Do we really need to check Alive = 1 here?
         @Language("SQL") String query = """
                 UPDATE mutants
                 SET Points = Points + ?

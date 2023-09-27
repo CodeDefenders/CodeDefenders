@@ -284,7 +284,7 @@ public class Mutant implements Serializable {
     public boolean isCovered() {
         // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        List<Test> tests = testRepo.getValidTestsForGame(gameId, true);
+        List<Test> tests = testRepo.getValidDefenderTestsForGame(gameId);
         return isCovered(tests);
     }
 
@@ -299,7 +299,7 @@ public class Mutant implements Serializable {
     @Deprecated // Get tests through service instead and cache them
     public Set<Test> getCoveringTests() {
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        List<Test> tests = testRepo.getValidTestsForGame(gameId, false);
+        List<Test> tests = testRepo.getValidTestsForGame(gameId);
         return getCoveringTests(tests);
     }
 

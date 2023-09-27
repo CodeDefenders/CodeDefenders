@@ -83,7 +83,7 @@ public class ScoreCalculator {
             testScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
-        for (Test test : testRepo.getTestsForGame(gameId)) {
+        for (Test test : testRepo.getValidTestsForGame(gameId)) {
             // Compute the score for the test and store it inside the test object
             scoringPolicy.scoreTest(test);
             // Update the map
@@ -124,7 +124,7 @@ public class ScoreCalculator {
             scoringPolicy.scoreMutant(mutant);
             mutantRepo.updateMutantScore(mutant);
         }
-        for (Test test : testRepo.getTestsForGame(gameId)) {
+        for (Test test : testRepo.getValidTestsForGame(gameId)) {
             // Compute the score for the test and store it inside the test object
             scoringPolicy.scoreTest(test);
             testRepo.updateTest(test);

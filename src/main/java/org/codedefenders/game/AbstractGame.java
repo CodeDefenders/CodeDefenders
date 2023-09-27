@@ -161,24 +161,16 @@ public abstract class AbstractGame {
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
         if (defendersOnly) {
             if (testsDefendersOnly == null) {
-                testsDefendersOnly = testRepo.getValidTestsForGame(this.id, true);
+                testsDefendersOnly = testRepo.getValidDefenderTestsForGame(this.id);
             }
             return testsDefendersOnly;
         } else {
             if (tests == null) {
-                tests = testRepo.getValidTestsForGame(this.id, false);
+                tests = testRepo.getValidTestsForGame(this.id);
             }
             return tests;
         }
     }
-
-    // NOTE: I do not want to break compatibility so I define yet another method...
-    @Deprecated // Get tests through service instead and cache them
-    public List<Test> getAllTests() {
-        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        return testRepo.getValidTestsForGame(this.id, false);
-    }
-
 
     public List<Mutant> getMutants() {
         if (mutants == null) {
