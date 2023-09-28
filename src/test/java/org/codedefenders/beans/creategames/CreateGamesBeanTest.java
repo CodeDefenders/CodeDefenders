@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
@@ -51,6 +52,7 @@ public class CreateGamesBeanTest {
     private HashMap<Integer, CreateGamesBean.UserInfo> userInfos;
 
     private UserRepository userRepo;
+    private MeleeGameRepository meleeGameRepo;
     private CreateGamesService createGamesService;
 
 
@@ -71,6 +73,7 @@ public class CreateGamesBeanTest {
         MessagesBean messagesBean = Mockito.mock(MessagesBean.class);
         EventDAO eventDAO = Mockito.mock(EventDAO.class);
         userRepo = Mockito.mock(UserRepository.class);
+        meleeGameRepo = Mockito.mock(MeleeGameRepository.class);
         createGamesService = Mockito.mock(CreateGamesService.class);
 
         /* Initialize bean. */
@@ -80,6 +83,7 @@ public class CreateGamesBeanTest {
                 messagesBean,
                 eventDAO,
                 userRepo,
+                meleeGameRepo,
                 createGamesService
         ) {
             @Override

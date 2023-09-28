@@ -36,6 +36,7 @@ import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameRepository;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
@@ -86,7 +87,8 @@ public class GameManagingUtilsTest {
                         Configuration.class,
                         TestRepository.class,
                         MutantRepository.class,
-                        GameRepository.class)
+                        GameRepository.class,
+                        MeleeGameRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)

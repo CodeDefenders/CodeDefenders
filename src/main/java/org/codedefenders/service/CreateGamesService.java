@@ -12,6 +12,7 @@ import org.codedefenders.beans.creategames.ClassroomCreateGamesBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
@@ -53,6 +54,9 @@ public class CreateGamesService {
     @Inject
     private GameService gameService;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
     /**
      * Maps user ID to their admin staged games list.
      */
@@ -80,13 +84,13 @@ public class CreateGamesService {
 
     public AdminCreateGamesBean getContextForAdmin(int userId) {
         StagedGameList stagedGames = getStagedGamesForAdmin(userId);
-        return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, this);
+        return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, meleeGameRepo, this);
     }
 
     public ClassroomCreateGamesBean getContextForClassroom(int userId, int classroomId) {
         StagedGameList stagedGames = getStagedGamesForClassroom(userId, classroomId);
         return new ClassroomCreateGamesBean(classroomId, stagedGames, messages, eventDAO, userRepo, this,
-                classroomService);
+                classroomService, meleeGameRepo);
     }
 
     /**

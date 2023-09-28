@@ -22,14 +22,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Role;
@@ -57,10 +55,12 @@ public class GameRepository {
     private static final Logger logger = LoggerFactory.getLogger(GameRepository.class);
 
     private final QueryRunner queryRunner;
+    private final MeleeGameRepository meleeGameRepo;
 
     @Inject
-    public GameRepository(QueryRunner queryRunner) {
+    public GameRepository(QueryRunner queryRunner, MeleeGameRepository meleeGameRepo) {
         this.queryRunner = queryRunner;
+        this.meleeGameRepo = meleeGameRepo;
     }
 
     /**
@@ -77,7 +77,7 @@ public class GameRepository {
 
         return switch (gameMode) {
             case PARTY -> MultiplayerGameDAO.getMultiplayerGame(gameId);
-            case MELEE -> MeleeGameDAO.getMeleeGame(gameId);
+            case MELEE -> meleeGameRepo.getMeleeGame(gameId);
             case PUZZLE -> PuzzleDAO.getPuzzleGameForId(gameId);
             default -> null;
         };
@@ -196,7 +196,7 @@ public class GameRepository {
         """;
 
         try {
-            var currentRound = queryRunner.insert(query,
+            var currentRound = queryRunner.query(query,
                     oneFromRS(rs -> rs.getInt("CurrentRound")),
                     gameId);
             return currentRound.orElseThrow();
@@ -225,7 +225,7 @@ public class GameRepository {
                 .formatted(range);
 
         try {
-            return queryRunner.insert(query,
+            return queryRunner.query(query,
                     listFromRS(rs -> rs.getInt("ID")),
                     ids.toArray());
         } catch (SQLException e) {
@@ -263,7 +263,7 @@ public class GameRepository {
     public List<AbstractGame> getExpiredGames() {
         List<AbstractGame> games = new ArrayList<>();
         games.addAll(MultiplayerGameDAO.getExpiredGames());
-        games.addAll(MeleeGameDAO.getExpiredGames());
+        games.addAll(meleeGameRepo.getExpiredGames());
         return games;
     }
 

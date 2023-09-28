@@ -30,7 +30,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
@@ -72,18 +72,21 @@ public class MeleeGameService extends AbstractGameService {
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
+    private final MeleeGameRepository meleeGameRepo;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,
-                                  GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
-                                  CodeDefendersAuth login, NotificationService notificationService,
-                                  TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo) {
+                            GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
+                            CodeDefendersAuth login, NotificationService notificationService,
+                            TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+                            MeleeGameRepository meleeGameRepo) {
         super(userService, userRepository, testRepo, mutantRepo, gameRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.gameManagingUtils = gameManagingUtils;
+        this.meleeGameRepo = meleeGameRepo;
     }
 
     @Override
@@ -162,7 +165,7 @@ public class MeleeGameService extends AbstractGameService {
         game.setEventDAO(eventDAO);
         game.setUserRepository(userRepository);
 
-        int newGameId = MeleeGameDAO.storeMeleeGame(game);
+        int newGameId = meleeGameRepo.storeMeleeGame(game);
         game.setId(newGameId);
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,

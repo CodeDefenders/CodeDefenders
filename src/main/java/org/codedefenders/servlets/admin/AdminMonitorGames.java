@@ -38,7 +38,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
@@ -100,6 +100,9 @@ public class AdminMonitorGames extends HttpServlet {
     @Inject
     private GameRepository gameRepo;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -127,7 +130,7 @@ public class AdminMonitorGames extends HttpServlet {
         request.setAttribute("multiplayerPlayersInfoForGame", multiplayerPlayersInfoForGame);
         request.setAttribute("multiplayerUserIdForPlayerIds", multiplayerUserIdForPlayerIds);
 
-        List<MeleeGame> meleeGames = MeleeGameDAO.getAvailableMeleeGames();
+        List<MeleeGame> meleeGames = meleeGameRepo.getAvailableMeleeGames();
         Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
                         game -> userService.getSimpleUserById(game.getCreatorId())

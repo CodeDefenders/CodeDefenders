@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -69,13 +69,6 @@ public class MeleeGame extends AbstractGame {
     //public void setEventDAO(EventDAO eventDAO) {
     //    this.eventDAO = eventDAO;
     //}
-
-    //@Inject
-    private MeleeGameDAO meleeGameDAO;
-
-    public void setMeleeGameDAO(MeleeGameDAO meleeGameDAO) {
-        this.meleeGameDAO = meleeGameDAO;
-    }
 
     @Deprecated
     private int defenderValue;
@@ -467,7 +460,8 @@ public class MeleeGame extends AbstractGame {
     @Override
     public boolean insert() {
         try {
-            this.id = meleeGameDAO.storeMeleeGame(this);
+            MeleeGameRepository meleeGameRepo = CDIUtil.getBeanFromCDI(MeleeGameRepository.class);
+            this.id = meleeGameRepo.storeMeleeGame(this);
             return true;
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store multiplayer game to database.", e);
@@ -477,7 +471,8 @@ public class MeleeGame extends AbstractGame {
 
     @Override
     public boolean update() {
-        return meleeGameDAO.updateMeleeGame(this);
+        MeleeGameRepository meleeGameRepo = CDIUtil.getBeanFromCDI(MeleeGameRepository.class);
+        return meleeGameRepo.updateMeleeGame(this);
     }
 
     public boolean isLineCovered(int lineNumber) {

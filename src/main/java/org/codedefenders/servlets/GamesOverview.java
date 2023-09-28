@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -60,6 +60,9 @@ public class GamesOverview extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -68,7 +71,7 @@ public class GamesOverview extends HttpServlet {
         request.setAttribute("activeGames", activeGames);
 
         List<UserMeleeGameInfo> activeMeleeGames =
-                MeleeGameDAO.getActiveMeleeGamesWithInfoForUser(login.getUserId());
+                meleeGameRepo.getActiveMeleeGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeMeleeGames", activeMeleeGames);
 
         List<UserMultiplayerGameInfo> openGames =
@@ -76,7 +79,7 @@ public class GamesOverview extends HttpServlet {
         request.setAttribute("openGames", openGames);
 
         List<UserMeleeGameInfo> openMeleeGames =
-                MeleeGameDAO.getOpenMeleeGamesWithInfoForUser(login.getUserId());
+                meleeGameRepo.getOpenMeleeGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openMeleeGames", openMeleeGames);
 
         boolean gamesJoinable = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();

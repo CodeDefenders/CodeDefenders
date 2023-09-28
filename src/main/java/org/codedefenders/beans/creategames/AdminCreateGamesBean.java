@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.UserEntity;
@@ -22,14 +22,17 @@ public class AdminCreateGamesBean extends CreateGamesBean {
     private final Set<Integer> assignedUsers;
 
     private final UserRepository userRepo;
+    private final MeleeGameRepository meleeGameRepo;
 
     public AdminCreateGamesBean(StagedGameList stagedGames,
                                 MessagesBean messages,
                                 EventDAO eventDAO,
                                 UserRepository userRepo,
+                                MeleeGameRepository meleeGameRepo,
                                 CreateGamesService createGamesService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
         this.userRepo = userRepo;
+        this.meleeGameRepo = meleeGameRepo;
         userInfos = fetchUserInfos();
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
@@ -61,7 +64,7 @@ public class AdminCreateGamesBean extends CreateGamesBean {
     }
 
     protected Set<Integer> fetchAvailableMeleeGames() {
-        return MeleeGameDAO.getAvailableMeleeGames().stream()
+        return meleeGameRepo.getAvailableMeleeGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }

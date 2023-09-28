@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
@@ -28,11 +28,14 @@ public class GameHistoryOverview extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<UserMultiplayerGameInfo> games = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(login.getUserId());
         request.setAttribute("finishedBattlegroundGames", games);
-        List<UserMeleeGameInfo> meleeGames = MeleeGameDAO.getFinishedMeleeGamesForUser(login.getUserId());
+        List<UserMeleeGameInfo> meleeGames = meleeGameRepo.getFinishedMeleeGamesForUser(login.getUserId());
         request.setAttribute("finishedMeleeGames", meleeGames);
 
         request.getRequestDispatcher(Constants.GAMES_HISTORY_JSP).forward(request, response);

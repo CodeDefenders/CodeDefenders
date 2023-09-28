@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -41,18 +40,18 @@ import org.intellij.lang.annotations.Language;
  * @author gambi
  * @see MeleeGame
  */
-public class MeleeGameDAO {
+public class MeleeGameRepository {
 
     /**
      * Constructs a {@link MeleeGame} from a {@link ResultSet} entry.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed melee game, or {@code null} if the game is no melee game.
-     * @see RSMapper
      */
     static MeleeGame meleeGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.MELEE) {
+            // TODO: This should probably throw instead of returning null.
             return null;
         }
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
@@ -159,7 +158,7 @@ public class MeleeGameDAO {
      * @return the generated identifier of the game as an {@code int}.
      * @throws UncheckedSQLException If storing the game was not successful.
      */
-    public static int storeMeleeGame(MeleeGame game) throws UncheckedSQLException {
+    public int storeMeleeGame(MeleeGame game) throws UncheckedSQLException {
         int classId = game.getClassId();
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
@@ -241,7 +240,7 @@ public class MeleeGameDAO {
      * @param game the given game as a {@link MeleeGame}.
      * @return {@code true} if updating was successful, {@code false} otherwise.
      */
-    public static boolean updateMeleeGame(MeleeGame game) {
+    public boolean updateMeleeGame(MeleeGame game) {
         int classId = game.getClassId();
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
@@ -293,14 +292,14 @@ public class MeleeGameDAO {
      * @param gameId the game identifier.
      * @return a {@link MeleeGame} instance or {@code null} if none matching game was found.
      */
-    public static MeleeGame getMeleeGame(int gameId) {
+    public MeleeGame getMeleeGame(int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_melee_games
                 WHERE ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS,
+        return DB.executeQueryReturnValue(query, MeleeGameRepository::meleeGameFromRS,
                 DatabaseValue.of(gameId));
     }
 
@@ -310,13 +309,13 @@ public class MeleeGameDAO {
      *
      * @return a list of {@link MeleeGame}, empty if none are found.
      */
-    public static List<MeleeGame> getAvailableMeleeGames() {
+    public List<MeleeGame> getAvailableMeleeGames() {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_melee_games
                 WHERE State != ?;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS,
+        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS,
                 DatabaseValue.of(GameState.FINISHED.name()));
     }
 
@@ -327,7 +326,7 @@ public class MeleeGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
-    public static List<UserMeleeGameInfo> getOpenMeleeGamesWithInfoForUser(int userId) {
+    public List<UserMeleeGameInfo> getOpenMeleeGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT DISTINCT g.*,
                     u.User_ID AS `userId`,
@@ -348,7 +347,7 @@ public class MeleeGameDAO {
                 ;
         """;
 
-        return DB.executeQueryReturnList(query, MeleeGameDAO::openMeleeGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MeleeGameRepository::openMeleeGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -358,7 +357,7 @@ public class MeleeGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
-    public static List<UserMeleeGameInfo> getActiveMeleeGamesWithInfoForUser(int userId) {
+    public List<UserMeleeGameInfo> getActiveMeleeGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT g.*,
                   cu.User_ID as userId,
@@ -379,7 +378,7 @@ public class MeleeGameDAO {
                 GROUP BY g.ID
         """;
 
-        return DB.executeQueryReturnList(query, MeleeGameDAO::activeMeleeGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MeleeGameRepository::activeMeleeGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -389,7 +388,7 @@ public class MeleeGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link MeleeGame MeleeGames}, empty if none are found.
      */
-    public static List<MeleeGame> getJoinedMeleeGamesForUser(int userId) {
+    public List<MeleeGame> getJoinedMeleeGamesForUser(int userId) {
         @Language("SQL") String query = """
                 SELECT DISTINCT m.*
                 FROM view_melee_games AS m
@@ -399,7 +398,7 @@ public class MeleeGameDAO {
         """;
 
         DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(userId)};
-        return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS, values);
+        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS, values);
     }
 
     /**
@@ -409,7 +408,7 @@ public class MeleeGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
-    public static List<UserMeleeGameInfo> getFinishedMeleeGamesForUser(int userId) {
+    public List<UserMeleeGameInfo> getFinishedMeleeGamesForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT g.*,
                        cu.User_ID                 as userId,
@@ -428,7 +427,7 @@ public class MeleeGameDAO {
                         OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))
                 GROUP BY g.ID;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameDAO::finishedGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MeleeGameRepository::finishedGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -438,7 +437,7 @@ public class MeleeGameDAO {
      * @param creatorId the creator identifier the games are retrieved for.
      * @return a list of {@link MeleeGame MeleeGames}, empty if none are found.
      */
-    public static List<MeleeGame> getUnfinishedMeleeGamesCreatedBy(int creatorId) {
+    public List<MeleeGame> getUnfinishedMeleeGamesCreatedBy(int creatorId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_melee_games
@@ -450,7 +449,7 @@ public class MeleeGameDAO {
                 DatabaseValue.of(GameState.CREATED.name()),
                 DatabaseValue.of(creatorId)
         };
-        return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS, values);
+        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS, values);
     }
 
 
@@ -459,7 +458,7 @@ public class MeleeGameDAO {
      *
      * @return the expired melee games.
      */
-    public static List<MeleeGame> getExpiredGames() {
+    public List<MeleeGame> getExpiredGames() {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
         @Language("SQL") String sql = """
                 SELECT *
@@ -469,19 +468,19 @@ public class MeleeGameDAO {
         """;
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
-        return DB.executeQueryReturnList(sql, MeleeGameDAO::meleeGameFromRS, state);
+        return DB.executeQueryReturnList(sql, MeleeGameRepository::meleeGameFromRS, state);
     }
 
-    public static List<MeleeGame> getClassroomGames(int classroomId) {
+    public List<MeleeGame> getClassroomGames(int classroomId) {
         @Language("SQL") final String query = """
                 SELECT * FROM view_melee_games as games
                 WHERE games.Classroom_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS,
+        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS,
                 DatabaseValue.of(classroomId));
     }
 
-    public static List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
+    public List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
         @Language("SQL") final String query = """
                 SELECT * FROM view_melee_games as games
                 WHERE games.Classroom_ID = ?
