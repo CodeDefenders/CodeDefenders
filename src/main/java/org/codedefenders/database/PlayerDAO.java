@@ -22,11 +22,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.intellij.lang.annotations.Language;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * This class handles the database logic for players.
@@ -35,6 +42,7 @@ import org.intellij.lang.annotations.Language;
  * @see Player
  */
 public class PlayerDAO {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerDAO.class);
 
     /**
      * Constructs a player from a {@link ResultSet} entry.
@@ -158,5 +166,40 @@ public class PlayerDAO {
         final Integer points = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);
+    }
+
+    public static Role getRole(int userId, int gameId) {
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
+        @Language("SQL") String query = """
+                SELECT *
+                FROM players
+                WHERE players.Active = TRUE
+                  AND players.User_ID = ?
+                  AND players.Game_ID = ?
+        """;
+
+        Optional<Role> role;
+        try {
+            role = queryRunner.query(query,
+                    oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
+                    userId,
+                    gameId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+
+        // TODO: The game for the creator role should be queried in a service, not here
+        if (role.isEmpty()) {
+            AbstractGame game = gameRepo.getGame(gameId);
+            if (game != null && game.getCreatorId() == userId) {
+                return Role.OBSERVER;
+            }
+        }
+
+        return role.orElse(Role.NONE);
     }
 }

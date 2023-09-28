@@ -34,6 +34,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameRepository;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
@@ -50,9 +51,6 @@ public class FeedbackManager extends HttpServlet {
 
     @Inject
     private CodeDefendersAuth login;
-
-    @Inject
-    private GameRepository gameRepo;
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
@@ -81,7 +79,7 @@ public class FeedbackManager extends HttpServlet {
     }
 
     private boolean saveFeedback(HttpServletRequest request, int userId, int gameId) {
-        Role role = gameRepo.getRole(userId, gameId);
+        Role role = PlayerDAO.getRole(userId, gameId);
         Map<Feedback.Type, Integer> ratings = new HashMap<>();
 
         for (Feedback.Type ratingType : Feedback.Type.getFeedbackTypesForRole(role)) {

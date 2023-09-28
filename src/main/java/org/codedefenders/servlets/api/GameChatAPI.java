@@ -33,6 +33,7 @@ import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.database.GameRepository;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -67,9 +68,6 @@ public class GameChatAPI extends HttpServlet {
     @Inject
     private GameChatDAO gameChatDAO;
 
-    @Inject
-    private GameRepository gameRepo;
-
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
@@ -84,7 +82,7 @@ public class GameChatAPI extends HttpServlet {
         final int limit = ServletUtils.getIntParameter(request, "limit").orElse(DEFAULT_LIMIT);
         final int gameId = gameIdOpt.get();
 
-        final Role role = gameRepo.getRole(login.getUserId(), gameId);
+        final Role role = PlayerDAO.getRole(login.getUserId(), gameId);
         if (role == Role.NONE || role == null) {
             logger.warn("Requesting user is not part of game.");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

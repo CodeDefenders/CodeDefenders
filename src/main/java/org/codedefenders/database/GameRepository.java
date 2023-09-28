@@ -296,42 +296,6 @@ public class GameRepository {
         }
     }
 
-    // Should this rather be in PlayerDAO / PlayerRepository?
-    public Role getRole(int userId, int gameId) {
-        @Language("SQL") String query = """
-                SELECT *
-                FROM games AS m
-                LEFT JOIN players AS p
-                  ON p.Game_ID = m.ID
-                  AND p.Active=TRUE
-                WHERE m.ID = ?
-                  AND (p.User_ID=?
-                      AND p.Game_ID=?)
-        """;
-
-        Optional<Role> role;
-        try {
-            role = queryRunner.query(query,
-                    oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
-                    gameId,
-                    userId,
-                    gameId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
-
-        if (role.isEmpty()) {
-            AbstractGame game = getGame(gameId);
-            if (game != null && game.getCreatorId() == userId) {
-                return Role.OBSERVER;
-            }
-        }
-
-        return role.orElse(Role.NONE);
-    }
-
     public boolean storeStartTime(int gameId) {
         @Language("SQL") String query = """
                 UPDATE games
