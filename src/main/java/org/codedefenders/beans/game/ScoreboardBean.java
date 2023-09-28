@@ -13,6 +13,7 @@ import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
+import org.codedefenders.util.CDIUtil;
 
 /**
  * <p>Provides data for the scoreboard game component.</p>
@@ -29,13 +30,8 @@ public class ScoreboardBean {
     private List<Player> attackers;
     private List<Player> defenders;
 
-    private final TestRepository testRepo;
-    private final MutantRepository mutantRepo;
-
     @Inject
-    public ScoreboardBean(TestRepository testRepo, MutantRepository mutantRepo) {
-        this.testRepo = testRepo;
-        this.mutantRepo = mutantRepo;
+    public ScoreboardBean() {
         gameId = null;
         mutantsScores = null;
         testScores = null;
@@ -111,10 +107,12 @@ public class ScoreboardBean {
     }
 
     public boolean gameHasPredefinedTests() {
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
         return testRepo.gameHasPredefinedTests(gameId);
     }
 
     public boolean gameHasPredefinedMutants() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
         return mutantRepo.gameHasPredefinedMutants(gameId);
     }
 
