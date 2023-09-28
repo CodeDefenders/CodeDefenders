@@ -35,6 +35,8 @@ import javax.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.GameRepository;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
@@ -42,8 +44,10 @@ import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.DatabaseExtension;
 import org.codedefenders.util.WeldExtension;
 import org.codedefenders.util.WeldSetup;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
@@ -80,7 +84,9 @@ public class GameManagingUtilsTest {
                         ExecutorServiceProvider.class,
                         MetricsRegistry.class,
                         Configuration.class,
-                        TestRepository.class)
+                        TestRepository.class,
+                        MutantRepository.class,
+                        GameRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)
@@ -131,6 +137,11 @@ public class GameManagingUtilsTest {
     @Produces
     TransactionManager produceTransactionManager() {
         return mock(TransactionManager.class);
+    }
+
+    @Produces
+    QueryRunner produceQueryRunner() {
+        return mock(QueryRunner.class);
     }
 
 
