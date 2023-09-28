@@ -6,15 +6,17 @@ import java.util.Map;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.CDIUtil;
 
 /**
  * <p>Provides data for the player feedback game component.</p>
@@ -91,9 +93,11 @@ public class PlayerFeedbackBean {
     }
 
     public Map<Player, Map<Feedback.Type, Integer>> getAllRatings() {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (ratingsPerPlayer == null) {
             ratingsPerPlayer = new HashMap<>();
-            for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+            for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
                 ratingsPerPlayer.put(player, FeedbackDAO.getFeedbackValues(gameId, player.getUser().getId()));
             }
         }

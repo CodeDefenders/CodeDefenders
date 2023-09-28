@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
@@ -39,6 +39,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 public class MeleeGame extends AbstractGame {
@@ -341,7 +342,9 @@ public class MeleeGame extends AbstractGame {
      * Every user has two players, one as defender and one as attacker
      */
     public List<Player> getPlayers() {
-        List<Player> players = GameDAO.getPlayersForGame(getId(), Role.PLAYER);
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
+        List<Player> players = gameRepo.getPlayersForGame(getId(), Role.PLAYER);
         return players;
     }
 
@@ -355,11 +358,13 @@ public class MeleeGame extends AbstractGame {
     }
 
     public boolean addPlayerForce(int userId, Role role) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.FINISHED) {
             return false;
         }
 
-        if (!GameDAO.addPlayerToGame(id, userId, role)) {
+        if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
         Optional<UserEntity> u = userRepository.getUserById(userId);
@@ -375,15 +380,19 @@ public class MeleeGame extends AbstractGame {
     }
 
     public boolean removePlayer(int userId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.CREATED) {
-            return GameDAO.removeUserFromGame(id, userId);
+            return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
     }
 
     // We do not check that the user is in both roles !!
     public boolean hasUserJoined(int userId) {
-        for (Player p : GameDAO.getValidPlayersForGame(this.getId())) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
+        for (Player p : gameRepo.getValidPlayersForGame(this.getId())) {
             if (p.getUser().getId() == userId) {
                 return true;
             }

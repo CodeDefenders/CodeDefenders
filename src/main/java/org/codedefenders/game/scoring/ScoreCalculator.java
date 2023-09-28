@@ -8,7 +8,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestRepository;
@@ -32,13 +32,15 @@ public class ScoreCalculator {
     private final IScoringPolicy scoringPolicy;
     private final TestRepository testRepo;
     private final MutantRepository mutantRepo;
+    private final GameRepository gameRepo;
 
     @Inject
     public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy,
-                           TestRepository testRepo, MutantRepository mutantRepo) {
+                           TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo) {
         this.scoringPolicy = scoringPolicy;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
     }
 
     /**
@@ -49,7 +51,7 @@ public class ScoreCalculator {
         Map<Integer, PlayerScore> mutantScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             mutantScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
@@ -79,7 +81,7 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> testScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             testScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
@@ -109,7 +111,7 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> duelScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
             duelScores.put(player.getId(), playerScore);
@@ -129,7 +131,7 @@ public class ScoreCalculator {
             scoringPolicy.scoreTest(test);
             testRepo.updateTest(test);
         }
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
             PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());

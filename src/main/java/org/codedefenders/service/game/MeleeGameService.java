@@ -29,6 +29,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
@@ -42,6 +43,7 @@ import org.codedefenders.game.Mutant.State;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.scoring.IScoringPolicy;
 import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Event;
@@ -75,8 +77,8 @@ public class MeleeGameService extends AbstractGameService {
     public MeleeGameService(UserService userService, UserRepository userRepository,
                                   GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                                   CodeDefendersAuth login, NotificationService notificationService,
-                                  TestRepository testRepo, MutantRepository mutantRepo) {
-        super(userService, userRepository, testRepo, mutantRepo);
+                                  TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
@@ -144,7 +146,8 @@ public class MeleeGameService extends AbstractGameService {
 
     private ScoreCalculator createScoreCalculator() {
         ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
-        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo), testRepo, mutantRepo);
+        IScoringPolicy policy = scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo, gameRepo);
+        return new ScoreCalculator(policy, testRepo, mutantRepo, gameRepo);
     }
 
     public boolean createGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {

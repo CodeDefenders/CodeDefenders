@@ -24,7 +24,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.MutantDTO;
@@ -50,15 +50,18 @@ public class GameService implements IGameService {
     private final PuzzleGameService puzzleGameService;
     protected TestRepository testRepo;
     protected MutantRepository mutantRepo;
+    protected GameRepository gameRepo;
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-                       PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo) {
+                       PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo,
+                       GameRepository gameRepo) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
     }
 
     @Override
@@ -174,7 +177,7 @@ public class GameService implements IGameService {
      * @return the amount of games closed.
      */
     public int closeExpiredGames() {
-        final List<AbstractGame> expiredGames = GameDAO.getExpiredGames();
+        final List<AbstractGame> expiredGames = gameRepo.getExpiredGames();
         int closedGames = 0;
 
         for (AbstractGame game : expiredGames) {
@@ -185,7 +188,7 @@ public class GameService implements IGameService {
     }
 
     private IGameService getGameServiceForGameId(int gameId) {
-        GameMode mode = GameDAO.getGameMode(gameId);
+        GameMode mode = gameRepo.getGameMode(gameId);
         switch (mode) {
             case PARTY:
                 return multiplayerGameService;

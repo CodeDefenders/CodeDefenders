@@ -29,7 +29,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.CDIUtil;
@@ -84,9 +84,11 @@ public class Test {
     }
 
     public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         this.classId = classId;
         this.gameId = gameId;
-        this.roundCreated = GameDAO.getCurrentRound(gameId); // TODO: this is overwritten by other constructors
+        this.roundCreated = gameRepo.getCurrentRound(gameId);
         this.javaFile = javaFile;
         this.classFile = classFile;
         this.playerId = playerId;
@@ -96,13 +98,16 @@ public class Test {
 
     public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated,
                 int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
-        this(classId, gameId, javaFile, classFile, playerId);
-
+        this.classId = classId;
+        this.gameId = gameId;
+        this.javaFile = javaFile;
+        this.classFile = classFile;
+        this.playerId = playerId;
         this.id = testId;
         this.roundCreated = roundCreated;
         this.mutantsKilled = mutantsKilled;
         this.score = score;
-        lineCoverage = new LineCoverage(linesCovered, linesUncovered);
+        this.lineCoverage = new LineCoverage(linesCovered, linesUncovered);
     }
 
     @Deprecated

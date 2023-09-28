@@ -38,7 +38,7 @@ import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.beans.creategames.CreateGamesBean.UserInfo;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
@@ -65,6 +65,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private GameRepository gameRepo;
 
     /**
      * Returns the CreateGamesBean representing the context for the create-games page.
@@ -552,7 +555,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 return;
             }
 
-            AbstractGame game = GameDAO.getGame(gameId);
+            AbstractGame game = gameRepo.getGame(gameId);
             if (game == null) {
                 messages.add(format("ERROR: Cannot add user {0} to existing game {1}. Game does not exist.",
                         userId, gameId));

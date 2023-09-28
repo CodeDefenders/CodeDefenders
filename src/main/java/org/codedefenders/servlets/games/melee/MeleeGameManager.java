@@ -43,7 +43,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -176,6 +176,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private MutantRepository mutantRepo;
 
+    @Inject
+    private GameRepository gameRepo;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -240,7 +243,7 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED || GameDAO.isGameExpired(gameId);
+        final boolean isGameClosed = game.getState() == GameState.FINISHED || gameRepo.isGameExpired(gameId);
         final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
         request.getRequestDispatcher(jspPath).forward(request, response);
     }

@@ -49,10 +49,12 @@ public class MutantRepository {
     private static final Logger logger = LoggerFactory.getLogger(MutantRepository.class);
 
     private final QueryRunner queryRunner;
+    private final GameRepository gameRepo;
 
     @Inject
-    public MutantRepository(QueryRunner queryRunner) {
+    public MutantRepository(QueryRunner queryRunner, GameRepository gameRepo) {
         this.queryRunner = queryRunner;
+        this.gameRepo = gameRepo;
     }
 
     /**
@@ -264,7 +266,7 @@ public class MutantRepository {
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
-                FROM view_valid_mutants m
+                FROM view_valid_game_mutants m
                 WHERE Player_ID = ?;
         """;
         try {
@@ -540,7 +542,7 @@ public class MutantRepository {
 
     public boolean killMutant(Mutant mutant, Equivalence equivalence) {
         mutant.setAlive(false);
-        int roundKilled = GameDAO.getCurrentRound(mutant.getGameId());
+        int roundKilled = gameRepo.getCurrentRound(mutant.getGameId());
         mutant.setRoundKilled(roundKilled);
         mutant.setEquivalent(equivalence);
 

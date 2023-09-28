@@ -32,6 +32,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
@@ -88,6 +89,7 @@ public class PushSocket {
     private final ITicketingService ticketingServices;
 
     private final UserService userService;
+    private final GameRepository gameRepo;
 
     // Authorization
     private SimpleUser user;
@@ -107,6 +109,7 @@ public class PushSocket {
         ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
         userService = CDIUtil.getBeanFromCDI(UserService.class);
+        gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
 
         open = false;
     }
@@ -132,8 +135,10 @@ public class PushSocket {
 
         this.user = user.get();
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user.get(), ticket);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user.get(), ticket);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(
+                notificationService, gameRepo, this, user.get(), ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, gameRepo,
+                user.get(), ticket);
         this.session = session;
 
         open = true;

@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -46,8 +47,9 @@ import org.slf4j.LoggerFactory;
 public class DefaultScoringPolicy implements IScoringPolicy {
     private static final Logger logger = LoggerFactory.getLogger(DefaultScoringPolicy.class);
 
-    private EventDAO eventDAO;
-    private MutantRepository mutantRepo;
+    private final EventDAO eventDAO;
+    private final MutantRepository mutantRepo;
+    private final GameRepository gameRepo;
 
     // TODO Convert this to PlayerScore so we can keep track of won/lost equivalence
     // duels !
@@ -60,9 +62,10 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     // MutantID, PlayerClaimingEquivalence
     private Map<Integer, Integer> flaggedMutants = new HashMap<>();
 
-    public DefaultScoringPolicy(EventDAO eventDAO, MutantRepository mutantRepo) {
+    public DefaultScoringPolicy(EventDAO eventDAO, MutantRepository mutantRepo, GameRepository gameRepo) {
         this.eventDAO = eventDAO;
         this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
     }
 
     // TODO This can be easily cached!
@@ -181,7 +184,8 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     @Override
     public void scoreDuels(PlayerScore duelScore) {
         if (duelsScore.isEmpty()) { // Refresh Game Scoring
-            AbstractGame game = GameDAO.getGameWherePlayerPlays(duelScore.getPlayerId());
+            int gameId = PlayerDAO.getPlayer(duelScore.getPlayerId()).getGameId();
+            AbstractGame game = gameRepo.getGame(gameId);
             if (game != null) {
                 computeScoreForGame(game.getId());
             } else {

@@ -43,7 +43,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -199,6 +199,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private MutantRepository mutantRepo;
 
+    @Inject
+    private GameRepository gameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -238,7 +241,7 @@ public class MultiplayerGameManager extends HttpServlet {
         request.setAttribute("playerId", playerId);
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || (game.getState() == GameState.ACTIVE && GameDAO.isGameExpired(gameId));
+                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
         final String jspPath = isGameClosed
                 ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;

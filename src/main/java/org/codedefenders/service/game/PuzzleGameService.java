@@ -22,6 +22,7 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
@@ -38,8 +39,8 @@ public class PuzzleGameService extends AbstractGameService {
 
     @Inject
     public PuzzleGameService(UserService userService, UserRepository userRepository, TestRepository testRepo,
-                             MutantRepository mutantRepo) {
-        super(userService, userRepository, testRepo, mutantRepo);
+                             MutantRepository mutantRepo, GameRepository gameRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo);
     }
 
     @Override

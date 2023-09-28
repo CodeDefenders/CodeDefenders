@@ -450,23 +450,6 @@ public class MultiplayerGameDAO {
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
 
-    /**
-     * Retrieves the game in which the player plays.
-     *
-     * @param playerId The id of the player for which we lookup a game
-     */
-    public static AbstractGame getGameWherePlayerPlays(int playerId) {
-        @Language("SQL") String query = """
-                SELECT DISTINCT m.*
-                FROM view_battleground_games AS m
-                LEFT JOIN players AS p
-                  ON p.Game_ID = m.ID
-                WHERE (p.ID = ?);
-        """;
-
-        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
-        return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
-    }
 
     /**
      * Fetches all expired multiplayer games.

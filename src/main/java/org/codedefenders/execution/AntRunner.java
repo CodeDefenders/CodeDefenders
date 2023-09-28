@@ -37,7 +37,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -70,12 +70,14 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
 
     private final Configuration config;
     private final CoverageGenerator coverageGenerator;
+    private final GameRepository gameRepo;
 
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
-                     CoverageGenerator coverageGenerator) {
+                     CoverageGenerator coverageGenerator, GameRepository gameRepo) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
+        this.gameRepo = gameRepo;
     }
 
     /**
@@ -205,7 +207,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
             String classFile = matchingFiles.get(0).getAbsolutePath();
             int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, GameDAO.getCurrentRound(gameId));
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, gameRepo.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
@@ -216,7 +218,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             String message = result.getCompilerOutput();
             logger.error("Failed to compile mutant {}: {}", javaFile, message);
             int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, GameDAO.getCurrentRound(gameId));
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, gameRepo.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);

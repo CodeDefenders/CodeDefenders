@@ -37,7 +37,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -119,6 +119,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private MutantRepository mutantRepo;
+
+    @Inject
+    private GameRepository gameRepo;
 
     /**
      * {@inheritDoc}
@@ -246,7 +249,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
         int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
-        int currentRound = GameDAO.getCurrentRound(game.getId());
+        int currentRound = gameRepo.getCurrentRound(game.getId());
 
         if (dummyAttackerPlayerId == -1) {
             logger.error("System attacker was not added to the game " + game.getId() + ".");

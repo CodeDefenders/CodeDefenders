@@ -37,7 +37,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantRepository;
@@ -96,6 +96,9 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private MutantRepository mutantRepo;
+
+    @Inject
+    private GameRepository gameRepo;
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -178,7 +181,7 @@ public class AdminMonitorGames extends HttpServlet {
             } else if (switchUser && userId.isPresent()) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
-                game = GameDAO.getGame(gameToRemoveFromId);
+                game = gameRepo.getGame(gameToRemoveFromId);
                 if (game != null) {
                     game.setEventDAO(eventDAO);
                     game.setUserRepository(userRepo);
@@ -236,7 +239,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     private void startStopGame(int gameId, GameState pNewState) {
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         boolean updated = false;
 
         if (game != null) {
@@ -264,7 +267,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     private void rematchGame(int gameId) {
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         if (game instanceof MultiplayerGame) {
             multiplayerGameService.rematch((MultiplayerGame) game);
         } else if (game instanceof MeleeGame) {

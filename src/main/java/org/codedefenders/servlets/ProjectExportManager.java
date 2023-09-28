@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Dependency;
@@ -73,6 +73,9 @@ public class ProjectExportManager extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private GameRepository gameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -82,7 +85,7 @@ public class ProjectExportManager extends HttpServlet {
             return;
         }
 
-        if (GameDAO.getRole(login.getUserId(), gameId.get()) == Role.NONE) {
+        if (gameRepo.getRole(login.getUserId(), gameId.get()) == Role.NONE) {
             Redirect.redirectBack(request, response);
             return;
         }

@@ -453,23 +453,6 @@ public class MeleeGameDAO {
         return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 
-    /**
-     * Retrieves the game in which the player plays.
-     *
-     * @param playerId The id of the player we get the game for.
-     */
-    public static AbstractGame getGameWherePlayerPlays(int playerId) {
-        @Language("SQL") String query = """
-                SELECT DISTINCT m.*
-                FROM view_melee_games AS m
-                LEFT JOIN players AS p
-                  ON p.Game_ID = m.ID
-                WHERE (p.ID = ?);
-        """;
-
-        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
-        return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
-    }
 
     /**
      * Fetches all expired melee games.

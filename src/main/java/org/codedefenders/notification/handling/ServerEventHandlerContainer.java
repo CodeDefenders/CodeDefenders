@@ -3,7 +3,7 @@ package org.codedefenders.notification.handling;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
@@ -32,16 +32,18 @@ import org.slf4j.LoggerFactory;
 public class ServerEventHandlerContainer {
     private static final Logger logger = LoggerFactory.getLogger(ServerEventHandlerContainer.class);
 
-    private INotificationService notificationService;
-    private PushSocket socket;
-    private SimpleUser user;
-    private String ticket;
+    private final INotificationService notificationService;
+    private final GameRepository gameRepo;
+    private final PushSocket socket;
+    private final SimpleUser user;
+    private final String ticket;
 
     private Map<ServerEventHandler, ServerEventHandler> handlers;
 
-    public ServerEventHandlerContainer(INotificationService notificationService, PushSocket socket, SimpleUser user,
-            String ticket) {
+    public ServerEventHandlerContainer(INotificationService notificationService, GameRepository gameRepo,
+                                       PushSocket socket, SimpleUser user, String ticket) {
         this.notificationService = notificationService;
+        this.gameRepo = gameRepo;
         this.socket = socket;
         this.user = user;
         this.ticket = ticket;
@@ -81,7 +83,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(GameChatRegistrationEvent event) {
-        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        Role role = gameRepo.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), GameChatEventHandler.class.getSimpleName(), event.getGameId());
@@ -97,7 +99,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(MutantProgressBarRegistrationEvent event) {
-        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        Role role = gameRepo.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), MutantProgressBarEventHandler.class.getSimpleName(), event.getGameId());
@@ -113,7 +115,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(TestProgressBarRegistrationEvent event) {
-        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        Role role = gameRepo.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), TestProgressBarEventHandler.class.getSimpleName(), event.getGameId());
@@ -129,7 +131,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(GameLifecycleRegistrationEvent event) {
-        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        Role role = gameRepo.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), GameLifecycleEventHandler.class.getSimpleName(), event.getGameId());

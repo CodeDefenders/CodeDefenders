@@ -39,7 +39,7 @@ import org.intellij.lang.annotations.Language;
  * @see MultiplayerGame
  * @see PuzzleGame
  */
-public class GameDAO {
+public class GameRepository {
 
     /**
      * Retrieves a game for which we don't know the type yet.
@@ -47,7 +47,7 @@ public class GameDAO {
      * @param gameId The game ID we want to query a game.
      * @return The {@link AbstractGame} with the given ID or null if no game found.
      */
-    public static AbstractGame getGame(int gameId) {
+    public AbstractGame getGame(int gameId) {
         GameMode gameMode = getGameMode(gameId);
         if (gameMode == null) {
             return null;
@@ -65,27 +65,6 @@ public class GameDAO {
         }
     }
 
-    /**
-     * Retrieves a game for which we don't know the type yet, from the playerID.
-     *
-     * @param playerId The id of the player for who we want to query a game.
-     * @return The {@link AbstractGame} with the given ID or null if no game found.
-     */
-    public static AbstractGame getGameWherePlayerPlays(int playerId) {
-        // TODO This can be improved
-        AbstractGame game = MultiplayerGameDAO.getGameWherePlayerPlays(playerId);
-        if (game != null) {
-            return game;
-        }
-        game = MeleeGameDAO.getGameWherePlayerPlays(playerId);
-        if (game != null) {
-            return game;
-        }
-        // Not sure we need to check for PUzzle games
-        return null;
-
-    }
-
 
     /**
      * Adds a player with the given user ID and {@link Role} to the game.
@@ -96,7 +75,7 @@ public class GameDAO {
      * @param role   The role.
      * @return {@code true} if the player was successfully added, {@code false} otherwise.
      */
-    public static boolean addPlayerToGame(int gameId, int userId, Role role) {
+    public boolean addPlayerToGame(int gameId, int userId, Role role) {
         @Language("SQL") String query = """
                 INSERT INTO players (Game_ID,User_ID, Points, Role)
                 VALUES (?, ?, 0, ?)
@@ -120,7 +99,7 @@ public class GameDAO {
      * @param role the queried player role.
      * @return a list of player identifiers as {@link Integer Integers}, can be empty but never {@code null}.
      */
-    public static List<Player> getPlayersForGame(int gameId, Role role) {
+    public List<Player> getPlayersForGame(int gameId, Role role) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_players_with_userdata
@@ -142,7 +121,7 @@ public class GameDAO {
      * @param gameId The id of the game the players are retrieved for.
      * @return A list of {@link Player Players}, that belong to valid users. Can be empty but never {@code null}.
      */
-    public static List<Player> getValidPlayersForGame(int gameId) {
+    public List<Player> getValidPlayersForGame(int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_players_with_userdata
@@ -160,7 +139,7 @@ public class GameDAO {
      * @param userId the user that is removed.
      * @return whether removing was successful or not.
      */
-    public static boolean removeUserFromGame(int gameId, int userId) {
+    public boolean removeUserFromGame(int gameId, int userId) {
         @Language("SQL") String query = """
                 UPDATE players
                 SET Active = FALSE
@@ -175,7 +154,7 @@ public class GameDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
-    public static Integer getCurrentRound(int gameId) {
+    public int getCurrentRound(int gameId) {
         @Language("SQL") String query = """
                 SELECT CurrentRound
                 FROM games
@@ -190,7 +169,7 @@ public class GameDAO {
      * @param ids The game IDs to check.
      * @return The given game IDs for which games exist.
      */
-    public static List<Integer> filterExistingGameIDs(Collection<Integer> ids) {
+    public List<Integer> filterExistingGameIDs(Collection<Integer> ids) {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
@@ -206,7 +185,7 @@ public class GameDAO {
      * @param gameId the identifier of the game.
      * @return the game mode of the queried game.
      */
-    public static GameMode getGameMode(int gameId) {
+    public GameMode getGameMode(int gameId) {
         @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
         return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
                 DatabaseValue.of(gameId));
@@ -217,7 +196,7 @@ public class GameDAO {
      *
      * @return the expired games.
      */
-    public static List<AbstractGame> getExpiredGames() {
+    public List<AbstractGame> getExpiredGames() {
         List<AbstractGame> games = new ArrayList<>();
         games.addAll(MultiplayerGameDAO.getExpiredGames());
         games.addAll(MeleeGameDAO.getExpiredGames());
@@ -230,7 +209,7 @@ public class GameDAO {
      * @param gameId the game to check.
      * @return {@code true} if the game is active but expired.
      */
-    public static boolean isGameExpired(int gameId) {
+    public boolean isGameExpired(int gameId) {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
         @Language("SQL") final String sql = """
                 SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired
@@ -243,7 +222,8 @@ public class GameDAO {
         );
     }
 
-    public static Role getRole(int userId, int gameId) {
+    // Should this rather be in PlayerDAO / PlayerRepository?
+    public Role getRole(int userId, int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM games AS m
@@ -273,7 +253,7 @@ public class GameDAO {
         return Optional.ofNullable(role).orElse(Role.NONE);
     }
 
-    public static boolean storeStartTime(int gameId) {
+    public boolean storeStartTime(int gameId) {
         @Language("SQL") String query = """
                 UPDATE games
                 SET Start_Time = NOW()

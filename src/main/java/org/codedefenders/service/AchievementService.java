@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
@@ -45,14 +45,17 @@ public class AchievementService {
     private static final Logger logger = LoggerFactory.getLogger(AchievementService.class);
     private final AchievementRepository repo;
     private final INotificationService notificationService;
+    private final GameRepository gameRepo;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
     @Inject
-    public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService) {
+    public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
+                              GameRepository gameRepo) {
         repo = achievementRepository;
         this.notificationService = notificationService;
+        this.gameRepo = gameRepo;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
     }
@@ -199,13 +202,13 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleGameStopped(GameStoppedEvent event) {
             Function<Role, List<Player>> getPlayersWithRole =
-                    role -> GameDAO.getPlayersForGame(event.getGameId(), role);
+                    role -> gameRepo.getPlayersForGame(event.getGameId(), role);
 
             List.of(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
                 addGamePlayed(getPlayersWithRole.apply(role), role);
             });
 
-            AbstractGame abstractGame = GameDAO.getGame(event.getGameId());
+            AbstractGame abstractGame = gameRepo.getGame(event.getGameId());
             if (abstractGame instanceof MultiplayerGame game) {
                 ScoreboardBean scoreboard = new ScoreboardBean();
                 scoreboard.setGameId(event.getGameId());

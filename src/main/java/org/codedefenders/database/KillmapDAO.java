@@ -667,6 +667,8 @@ public class KillmapDAO {
      * @return The killmap progress for the game.
      */
     public static KillMapGameProgress getKillMapProgressForGame(int gameId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         @Language("SQL") String nrTestsQuery = """
                 SELECT COUNT(Test_ID)
                 FROM view_valid_game_tests
@@ -690,7 +692,7 @@ public class KillmapDAO {
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
 
         int nrExpectedEntries = nrMutants * nrTests;
-        GameMode gameMode = GameDAO.getGameMode(gameId);
+        GameMode gameMode = gameRepo.getGameMode(gameId);
 
         return new KillMapGameProgress(
                 nrTests, nrMutants, nrEntries, nrExpectedEntries,

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
@@ -304,15 +304,19 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public List<Player> getDefenderPlayers() {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (defenders == null) {
-            defenders = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
+            defenders = gameRepo.getPlayersForGame(getId(), Role.DEFENDER);
         }
         return defenders;
     }
 
     public List<Player> getAttackerPlayers() {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (attackers == null) {
-            attackers = GameDAO.getPlayersForGame(getId(), Role.ATTACKER);
+            attackers = gameRepo.getPlayersForGame(getId(), Role.ATTACKER);
         }
         return attackers;
     }
@@ -323,10 +327,12 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public boolean addPlayerForce(int userId, Role role) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.FINISHED) {
             return false;
         }
-        if (!GameDAO.addPlayerToGame(id, userId, role)) {
+        if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
         Optional<UserEntity> u = userRepository.getUserById(userId);
@@ -344,8 +350,10 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public boolean removePlayer(int userId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.CREATED) {
-            return GameDAO.removeUserFromGame(id, userId);
+            return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
     }
