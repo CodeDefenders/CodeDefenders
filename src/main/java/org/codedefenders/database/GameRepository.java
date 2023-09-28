@@ -18,19 +18,32 @@
  */
 package org.codedefenders.database;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * This class handles the common database logic between games types.
@@ -39,7 +52,16 @@ import org.intellij.lang.annotations.Language;
  * @see MultiplayerGame
  * @see PuzzleGame
  */
+@ApplicationScoped
 public class GameRepository {
+    private static final Logger logger = LoggerFactory.getLogger(GameRepository.class);
+
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public GameRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
 
     /**
      * Retrieves a game for which we don't know the type yet.
@@ -77,19 +99,25 @@ public class GameRepository {
      */
     public boolean addPlayerToGame(int gameId, int userId, Role role) {
         @Language("SQL") String query = """
-                INSERT INTO players (Game_ID,User_ID, Points, Role)
+                INSERT INTO players (Game_ID, User_ID, Points, Role)
                 VALUES (?, ?, 0, ?)
                 ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
         """;
 
-        DatabaseValue<?>[] values = {
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(role.toString()),
-                DatabaseValue.of(role.toString())
-        };
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            var key = queryRunner.insert(query, nextFromRS(rs -> rs.getInt(1)),
+                    gameId,
+                    userId,
+                    role.toString(),
+                    role.toString()
+            );
+            key.ifPresent(System.out::println);
+            // TODO: This will return false if a player with the same values already exists
+            return key.isPresent();
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -105,14 +133,17 @@ public class GameRepository {
                 FROM view_players_with_userdata
                 WHERE Game_ID = ?
                   AND Role = ?
-                  AND Active=TRUE;
+                  AND Active = TRUE;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(role.toString())
-        };
 
-        return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, values);
+        try {
+            return queryRunner.query(query, listFromRS(PlayerDAO::playerWithUserFromRS),
+                    gameId,
+                    role.toString());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -129,7 +160,12 @@ public class GameRepository {
                   AND Active = TRUE;
         """;
 
-        return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId));
+        try {
+            return queryRunner.query(query, listFromRS(PlayerDAO::playerWithUserFromRS), gameId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -146,12 +182,14 @@ public class GameRepository {
                 WHERE Game_ID = ?
                   AND User_ID = ?;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query, gameId, userId);
+            return updatedRows > 0;
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     public int getCurrentRound(int gameId) {
@@ -160,7 +198,16 @@ public class GameRepository {
                 FROM games
                 WHERE games.ID = ?;
         """;
-        return DB.executeQueryReturnValue(query, rs -> rs.getInt("CurrentRound"), DatabaseValue.of(gameId));
+
+        try {
+            var currentRound = queryRunner.insert(query,
+                    oneFromRS(rs -> rs.getInt("CurrentRound")),
+                    gameId);
+            return currentRound.orElseThrow();
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -173,9 +220,22 @@ public class GameRepository {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
-        String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-        @Language("SQL") String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
+
+        String range = Stream.generate(() -> "?")
+                .limit(ids.size())
+                .collect(Collectors.joining(","));
+
+        @Language("SQL") String query = "SELECT ID FROM games WHERE ID in (%s)"
+                .formatted(range);
+
+        try {
+            return queryRunner.insert(query,
+                    listFromRS(rs -> rs.getInt("ID")),
+                    ids.toArray());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
 
@@ -187,8 +247,16 @@ public class GameRepository {
      */
     public GameMode getGameMode(int gameId) {
         @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
-        return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
-                DatabaseValue.of(gameId));
+
+        try {
+            var gameMode = queryRunner.query(query,
+                    oneFromRS(rs -> GameMode.valueOf(rs.getString("Mode"))),
+                    gameId);
+            return gameMode.orElseThrow();
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -211,15 +279,21 @@ public class GameRepository {
      */
     public boolean isGameExpired(int gameId) {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
-        @Language("SQL") final String sql = """
+        @Language("SQL") final String query = """
                 SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired
                 FROM games
                 WHERE ID = ?;
         """;
-        return DB.executeQueryReturnValue(sql,
-                l -> l.getBoolean("isExpired"),
-                DatabaseValue.of(gameId)
-        );
+        try {
+            var isExpired = queryRunner.query(query,
+                    oneFromRS(l -> l.getBoolean("isExpired")),
+                    gameId
+            );
+            return isExpired.orElseThrow();
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     // Should this rather be in PlayerDAO / PlayerRepository?
@@ -234,23 +308,28 @@ public class GameRepository {
                   AND (p.User_ID=?
                       AND p.Game_ID=?)
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(gameId)};
 
-        DB.RSMapper<Role> mapper = rs -> Role.valueOrNull(rs.getString("Role"));
+        Optional<Role> role;
+        try {
+            role = queryRunner.query(query,
+                    oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
+                    gameId,
+                    userId,
+                    gameId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
 
-        final Role role = DB.executeQueryReturnValue(query, mapper, values);
-
-        if (role == null) {
+        if (role.isEmpty()) {
             AbstractGame game = getGame(gameId);
             if (game != null && game.getCreatorId() == userId) {
                 return Role.OBSERVER;
             }
         }
 
-        return Optional.ofNullable(role).orElse(Role.NONE);
+        return role.orElse(Role.NONE);
     }
 
     public boolean storeStartTime(int gameId) {
@@ -259,7 +338,12 @@ public class GameRepository {
                 SET Start_Time = NOW()
                 WHERE ID = ?
         """;
-        DatabaseValue<?>[] values = {DatabaseValue.of(gameId)};
-        return DB.executeUpdateQuery(query, values);
+
+        try {
+            int updatedRows = queryRunner.update(query, gameId);
+            return updatedRows > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
