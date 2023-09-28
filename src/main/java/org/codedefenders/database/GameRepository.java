@@ -66,7 +66,7 @@ public class GameRepository {
     /**
      * Retrieves a game for which we don't know the type yet.
      *
-     * @param gameId The game ID we want to query a game.
+     * @param gameId The game ID.
      * @return The {@link AbstractGame} with the given ID or null if no game found.
      */
     public AbstractGame getGame(int gameId) {
@@ -75,16 +75,12 @@ public class GameRepository {
             return null;
         }
 
-        switch (gameMode) {
-            case PARTY:
-                return MultiplayerGameDAO.getMultiplayerGame(gameId);
-            case MELEE:
-                return MeleeGameDAO.getMeleeGame(gameId);
-            case PUZZLE:
-                return PuzzleDAO.getPuzzleGameForId(gameId);
-            default:
-                return null;
-        }
+        return switch (gameMode) {
+            case PARTY -> MultiplayerGameDAO.getMultiplayerGame(gameId);
+            case MELEE -> MeleeGameDAO.getMeleeGame(gameId);
+            case PUZZLE -> PuzzleDAO.getPuzzleGameForId(gameId);
+            default -> null;
+        };
     }
 
 
@@ -121,11 +117,11 @@ public class GameRepository {
     }
 
     /**
-     * Retrieves all players identifiers for a given game identifier and {@link Role}.
+     * Retrieves all players identifiers for a given game ID and {@link Role}.
      *
-     * @param gameId the game the players are retrieved for as an {@code int}.
-     * @param role the queried player role.
-     * @return a list of player identifiers as {@link Integer Integers}, can be empty but never {@code null}.
+     * @param gameId The game ID.
+     * @param role The role to get players for.
+     * @return The list of players.
      */
     public List<Player> getPlayersForGame(int gameId, Role role) {
         @Language("SQL") String query = """
@@ -150,7 +146,7 @@ public class GameRepository {
      * Retrieves all {@link Player Players}, that belong to valid users, for a given game id.
      *
      * @param gameId The id of the game the players are retrieved for.
-     * @return A list of {@link Player Players}, that belong to valid users. Can be empty but never {@code null}.
+     * @return The list of players.
      */
     public List<Player> getValidPlayersForGame(int gameId) {
         @Language("SQL") String query = """
@@ -171,8 +167,8 @@ public class GameRepository {
     /**
      * Removes given user from a given game.
      *
-     * @param gameId the game the given user is removed from.
-     * @param userId the user that is removed.
+     * @param gameId The game ID.
+     * @param userId The user ID that is removed.
      * @return whether removing was successful or not.
      */
     public boolean removeUserFromGame(int gameId, int userId) {
@@ -214,7 +210,7 @@ public class GameRepository {
      * Checks for which of the given IDs games exist in the database.
      *
      * @param ids The game IDs to check.
-     * @return The given game IDs for which games exist.
+     * @return The game IDs for which games exist.
      */
     public List<Integer> filterExistingGameIDs(Collection<Integer> ids) {
         if (ids.isEmpty()) {
@@ -240,10 +236,10 @@ public class GameRepository {
 
 
     /**
-     * Returns a game's mode for given game identifier.
+     * Returns the game mode for given game ID.
      *
-     * @param gameId the identifier of the game.
-     * @return the game mode of the queried game.
+     * @param gameId The game ID.
+     * @return The game mode.
      */
     public GameMode getGameMode(int gameId) {
         @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
