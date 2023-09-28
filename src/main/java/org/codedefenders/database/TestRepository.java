@@ -197,7 +197,7 @@ public class TestRepository {
                 FROM view_valid_game_tests tests
                 INNER JOIN players on tests.Player_ID = players.ID
                 WHERE tests.Game_ID = ?
-                  AND players.Role IN (%s, %s);
+                  AND players.Role IN (?, ?);
         """;
         try {
             return queryRunner.query(query, listFromRS(TestRepository::testFromRS),
