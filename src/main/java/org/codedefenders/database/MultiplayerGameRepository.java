@@ -16,23 +16,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codedefenders.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
@@ -66,11 +64,11 @@ public class MultiplayerGameRepository {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game, or {@code null} if the game is no multiplayer game.
-     * @see RSMapper
      */
     static MultiplayerGame multiplayerGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.PARTY) {
+            // TODO: This should probably throw an IllegalArgumentException instead of returning null.
             return null;
         }
 
@@ -121,11 +119,10 @@ public class MultiplayerGameRepository {
 
     /**
      * Constructs an open {@link UserMultiplayerGameInfo}, i.e. a game the user can join,
-     * from a {@link ResultSet} entry.
+     * from a {@link ResultSet} row.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game information.
-     * @see RSMapper
      */
     static UserMultiplayerGameInfo openGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -137,11 +134,10 @@ public class MultiplayerGameRepository {
 
     /**
      * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user participates in,
-     * from a {@link ResultSet} entry.
+     * from a {@link ResultSet} row.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game information.
-     * @see RSMapper
      */
     static UserMultiplayerGameInfo activeGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -154,11 +150,10 @@ public class MultiplayerGameRepository {
 
     /**
      * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user did participate,
-     * from a {@link ResultSet} entry.
+     * from a {@link ResultSet} row.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game information.
-     * @see RSMapper
      */
     static UserMultiplayerGameInfo finishedGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -171,12 +166,8 @@ public class MultiplayerGameRepository {
     /**
      * Stores a given {@link MultiplayerGame} in the database.
      *
-     * <p>This method does not update the given game object.
-     * Use {@link MultiplayerGame#insert()} instead.
-     *
      * @param game the given game as a {@link MultiplayerGame}.
-     * @return the generated identifier of the game as an {@code int}.
-     * @throws UncheckedSQLException If storing the game was not successful.
+     * @return The generated game ID.
      */
     public int storeMultiplayerGame(MultiplayerGame game) throws UncheckedSQLException {
         int classId = game.getClassId();
@@ -305,7 +296,7 @@ public class MultiplayerGameRepository {
      * Returns a {@link MultiplayerGame} for a given game identifier or
      * {@code null} if no game was found or the game mode differs.
      *
-     * @param gameId the game identifier.
+     * @param gameId The game ID.
      * @return a {@link MultiplayerGame} instance or {@code null} if none matching game was found.
      */
     public MultiplayerGame getMultiplayerGame(int gameId) {
@@ -351,10 +342,9 @@ public class MultiplayerGameRepository {
     }
 
     /**
-     * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games which are joinable
-     * for a given user identifier.
+     * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} which the given user can join.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The user ID the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
     public List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
@@ -392,7 +382,7 @@ public class MultiplayerGameRepository {
      * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games
      * a given user has created or joined.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The user ID the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
     public List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
@@ -430,7 +420,7 @@ public class MultiplayerGameRepository {
      * Retrieves a list of active {@link MultiplayerGame MultiplayerGames}, which are
      * played by a given user.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The user ID the games are retrieved for.
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
     public List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
@@ -457,7 +447,7 @@ public class MultiplayerGameRepository {
      * Retrieves a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfo objects},
      * which were created or played by a given user, but are finished.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The ID identifier the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
     public List<UserMultiplayerGameInfo> getFinishedMultiplayerGamesForUser(int userId) {
@@ -495,7 +485,7 @@ public class MultiplayerGameRepository {
      * Retrieves a list of {@link MultiplayerGame MultiplayerGames}, which were created by a
      * given user and are not yet finished.
      *
-     * @param creatorId the creator identifier the games are retrieved for.
+     * @param creatorId The user ID of the creator.
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
     public List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int creatorId) {
