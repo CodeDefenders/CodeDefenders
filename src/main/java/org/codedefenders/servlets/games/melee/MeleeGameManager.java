@@ -47,6 +47,7 @@ import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
@@ -175,6 +176,9 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private MutantRepository mutantRepo;
+
+    @Inject
+    private TestRepository testRepo;
 
     @Inject
     private GameRepository gameRepo;
@@ -336,7 +340,7 @@ public class MeleeGameManager extends HttpServlet {
                 automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                aliveMutant.update();
+                mutantRepo.updateMutant(aliveMutant);
                 // Send the notification about the flagged mutant to attacker
                 int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
@@ -929,7 +933,7 @@ public class MeleeGameManager extends HttpServlet {
             ttme.setTestId(newTest.getId());
             notificationService.post(ttme);
 
-            newTest.update();
+            testRepo.updateTest(newTest);
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
@@ -974,7 +978,7 @@ public class MeleeGameManager extends HttpServlet {
                             .filter(m -> m.getCreatorId() != login.getUserId())
                             .forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                                m.update();
+                                mutantRepo.updateMutant(m);
 
                                 Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 

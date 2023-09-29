@@ -393,15 +393,8 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml4(getKillMessage());
     }
 
-
-    public void insert() {
-        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        this.id = mutantRepo.storeMutant(this);
-    }
-
-    public void update() {
-        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        mutantRepo.updateMutant(this);
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Does this every get called if mutant is not stored to DB ?

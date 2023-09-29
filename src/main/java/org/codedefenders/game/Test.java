@@ -181,26 +181,8 @@ public class Test {
         return StringEscapeUtils.escapeHtml4(getAsString());
     }
 
-    @Deprecated
-    public boolean insert() {
-        try {
-            TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-            this.id = testRepo.storeTest(this);
-            return true;
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store test to database.", e);
-            return false;
-        }
-    }
-
-    @Deprecated
-    public void update() {
-        try {
-            TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-            testRepo.updateTest(this);
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store test to database.", e);
-        }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFullyQualifiedClassName() {

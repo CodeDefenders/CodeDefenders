@@ -332,7 +332,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                aliveMutant.update();
+                mutantRepo.updateMutant(aliveMutant);
                 // Send the notification about the flagged mutant to attacker
                 Optional<Integer> mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
                 Event event = new Event(-1, game.getId(), mutantOwnerId.orElse(0),
@@ -966,7 +966,7 @@ public class MultiplayerGameManager extends HttpServlet {
             ttme.setTestId(newTest.getId());
             notificationService.post(ttme);
 
-            newTest.update();
+            testRepo.updateTest(newTest);
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
@@ -1020,7 +1020,7 @@ public class MultiplayerGameManager extends HttpServlet {
                             .filter(m -> m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
                             .forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                                m.update();
+                                mutantRepo.updateMutant(m);
 
                                 Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 

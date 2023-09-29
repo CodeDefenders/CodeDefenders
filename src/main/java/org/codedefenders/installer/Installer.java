@@ -454,7 +454,10 @@ public class Installer {
         List<Mutant> puzzleMutants = new ArrayList<>();
         for (Mutant m : originalMutants) {
             Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
-            puzzleMutant.insert();
+
+            int mutantId = mutantRepo.storeMutant(puzzleMutant);
+            puzzleMutant.setId(mutantId);
+
             mutantRepo.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Mutant " + puzzleMutant.getId());
             puzzleMutants.add(puzzleMutant);
@@ -463,7 +466,10 @@ public class Installer {
         List<Test> puzzleTests = new ArrayList<>();
         for (Test t : originalTests) {
             Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
-            puzzleTest.insert();
+
+            int testId = testRepo.storeTest(puzzleTest);
+            puzzleTest.setId(testId);
+
             testRepo.mapTestToClass(puzzleTest.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Test " + puzzleTest.getId());
             puzzleTests.add(puzzleTest);

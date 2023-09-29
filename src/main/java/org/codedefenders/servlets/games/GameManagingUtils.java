@@ -277,7 +277,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                         true, // Alive be default
                         dummyAttackerPlayerId,
                         currentRound);
-                newMutant.insert();
+
+                int mutantId = mutantRepo.storeMutant(newMutant);
+                newMutant.setId(mutantId);
+
                 mutantMap.put(mutant.getId(), newMutant);
             }
         }
@@ -288,7 +291,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                 Test newTest = new Test(-1, game.getClassId(), game.getId(), test.getJavaFile(),
                         test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
-                newTest.insert();
+
+                int testId = testRepo.storeTest(newTest);
+                newTest.setId(testId);
+
                 testMap.put(test.getId(), newTest);
             }
         }

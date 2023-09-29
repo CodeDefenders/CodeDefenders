@@ -38,7 +38,9 @@ import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorEx
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameRepository;
+import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerRepository;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -72,14 +74,19 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final CoverageGenerator coverageGenerator;
     private final GameRepository gameRepo;
     private final PlayerRepository playerRepo;
+    private final MutantRepository mutantRepo;
+    private final TestRepository testRepo;
 
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
-                     CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo) {
+                     CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
+                     MutantRepository mutantRepo, TestRepository testRepo) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
+        this.mutantRepo = mutantRepo;
+        this.testRepo = testRepo;
     }
 
     /**
@@ -165,7 +172,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             coverage = LineCoverage.empty();
         }
         t.setLineCoverage(coverage);
-        t.update();
+        testRepo.updateTest(t);
 
         // record test execution
         TargetExecution.Status status;
@@ -210,7 +217,10 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             String classFile = matchingFiles.get(0).getAbsolutePath();
             int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
             newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, gameRepo.getCurrentRound(gameId));
-            newMutant.insert();
+
+            int mutantId = mutantRepo.storeMutant(newMutant);
+            newMutant.setId(mutantId);
+
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
             newExec.insert();
@@ -221,7 +231,10 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             logger.error("Failed to compile mutant {}: {}", javaFile, message);
             int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
             newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, gameRepo.getCurrentRound(gameId));
-            newMutant.insert();
+
+            int mutantId = mutantRepo.storeMutant(newMutant);
+            newMutant.setId(mutantId);
+
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);
             newExec.insert();
@@ -252,8 +265,10 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             String classFile = matchingFiles.get(0).getAbsolutePath();
             logger.info("Compiled test {}", compiledClassName);
             Test newTest = new Test(cut.getId(), gameId, javaFile, classFile, playerId);
-            boolean inserted = newTest.insert();
-            assert (inserted); // if compilation was successful, .class file must exist
+
+            int testId = testRepo.storeTest(newTest);
+            newTest.setId(testId);
+
             TargetExecution newExec = new TargetExecution(newTest.getId(), 0,
                     TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
             newExec.insert();
@@ -264,7 +279,10 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             String message = result.getCompilerOutput();
             logger.error("Failed to compile test {}: {}", javaFile, message);
             Test newTest = new Test(cut.getId(), gameId, javaFile, null, playerId);
-            newTest.insert();
+
+            int testId = testRepo.storeTest(newTest);
+            newTest.setId(testId);
+
             TargetExecution newExec = new TargetExecution(newTest.getId(), 0,
                     TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.FAIL, message);
             newExec.insert();
