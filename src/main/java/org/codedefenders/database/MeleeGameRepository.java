@@ -22,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -29,10 +31,15 @@ import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMeleeGameInfo;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * This class handles the database logic for melee games.
@@ -41,6 +48,14 @@ import org.intellij.lang.annotations.Language;
  * @see MeleeGame
  */
 public class MeleeGameRepository {
+    private static final Logger logger = LoggerFactory.getLogger(GameRepository.class);
+
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public MeleeGameRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
 
     /**
      * Constructs a {@link MeleeGame} from a {@link ResultSet} entry.
@@ -204,31 +219,30 @@ public class MeleeGameRepository {
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
         """;
 
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(classId),
-                DatabaseValue.of(level.name()),
-                DatabaseValue.of(prize),
-                DatabaseValue.of(defenderValue),
-                DatabaseValue.of(attackerValue),
-                DatabaseValue.of(lineCoverage),
-                DatabaseValue.of(mutantCoverage),
-                DatabaseValue.of(creatorId),
-                DatabaseValue.of(state.name()),
-                DatabaseValue.of(mode.name()),
-                DatabaseValue.of(maxAssertionsPerTest),
-                DatabaseValue.of(chatEnabled),
-                DatabaseValue.of(mutantValidatorLevel.name()),
-                DatabaseValue.of(capturePlayersIntention),
-                DatabaseValue.of(automaticMutantEquivalenceThreshold),
-                DatabaseValue.of(gameDurationMinutes),
-                DatabaseValue.of(classroomId),
-        };
-
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
-            return result;
-        } else {
-            throw new UncheckedSQLException("Could not store melee game to database.");
+        try {
+            return queryRunner.insert(query,
+                    oneFromRS(rs -> rs.getInt(1)),
+                    classId,
+                    level.name(),
+                    prize,
+                    defenderValue,
+                    attackerValue,
+                    lineCoverage,
+                    mutantCoverage,
+                    creatorId,
+                    state.name(),
+                    mode.name(),
+                    maxAssertionsPerTest,
+                    chatEnabled,
+                    mutantValidatorLevel.name(),
+                    capturePlayersIntention,
+                    automaticMutantEquivalenceThreshold,
+                    gameDurationMinutes,
+                    classroomId
+            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -269,20 +283,25 @@ public class MeleeGameRepository {
                     Game_Duration_Minutes = ?
                 WHERE ID = ?
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[] {
-                DatabaseValue.of(classId),
-                DatabaseValue.of(level.name()),
-                DatabaseValue.of(prize),
-                DatabaseValue.of(defenderValue),
-                DatabaseValue.of(attackerValue),
-                DatabaseValue.of(lineCoverage),
-                DatabaseValue.of(mutantCoverage),
-                DatabaseValue.of(state.name()),
-                DatabaseValue.of(duration),
-                DatabaseValue.of(id)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query,
+                    classId,
+                    level.name(),
+                    prize,
+                    defenderValue,
+                    attackerValue,
+                    lineCoverage,
+                    mutantCoverage,
+                    state.name(),
+                    duration,
+                    id
+            );
+            return updatedRows > 0;
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -299,8 +318,13 @@ public class MeleeGameRepository {
                 WHERE ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, MeleeGameRepository::meleeGameFromRS,
-                DatabaseValue.of(gameId));
+        try {
+            var game = queryRunner.query(query, oneFromRS(MeleeGameRepository::meleeGameFromRS), gameId);
+            return game.orElse(null);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -315,8 +339,14 @@ public class MeleeGameRepository {
                 FROM view_melee_games
                 WHERE State != ?;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS,
-                DatabaseValue.of(GameState.FINISHED.name()));
+
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    GameState.FINISHED.name());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -347,7 +377,13 @@ public class MeleeGameRepository {
                 ;
         """;
 
-        return DB.executeQueryReturnList(query, MeleeGameRepository::openMeleeGameInfoFromRS, DatabaseValue.of(userId));
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::openMeleeGameInfoFromRS),
+                    userId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -378,7 +414,13 @@ public class MeleeGameRepository {
                 GROUP BY g.ID
         """;
 
-        return DB.executeQueryReturnList(query, MeleeGameRepository::activeMeleeGameInfoFromRS, DatabaseValue.of(userId));
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::activeMeleeGameInfoFromRS),
+                    userId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -397,8 +439,13 @@ public class MeleeGameRepository {
                 WHERE (p.User_ID = ?);
         """;
 
-        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(userId)};
-        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS, values);
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    userId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -427,7 +474,14 @@ public class MeleeGameRepository {
                         OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))
                 GROUP BY g.ID;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameRepository::finishedGameInfoFromRS, DatabaseValue.of(userId));
+
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::finishedGameInfoFromRS),
+                    userId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -444,12 +498,16 @@ public class MeleeGameRepository {
                 WHERE (State = ? OR State = ?)
                   AND Creator_ID = ?;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(GameState.ACTIVE.name()),
-                DatabaseValue.of(GameState.CREATED.name()),
-                DatabaseValue.of(creatorId)
-        };
-        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS, values);
+
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    GameState.ACTIVE.name(),
+                    GameState.CREATED.name(),
+                    creatorId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
 
@@ -460,15 +518,20 @@ public class MeleeGameRepository {
      */
     public List<MeleeGame> getExpiredGames() {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
-        @Language("SQL") String sql = """
+        @Language("SQL") String query = """
                 SELECT *
                 FROM view_melee_games
                 WHERE State = ?
                 AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();
         """;
 
-        DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
-        return DB.executeQueryReturnList(sql, MeleeGameRepository::meleeGameFromRS, state);
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    GameState.ACTIVE.toString());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     public List<MeleeGame> getClassroomGames(int classroomId) {
@@ -476,17 +539,28 @@ public class MeleeGameRepository {
                 SELECT * FROM view_melee_games as games
                 WHERE games.Classroom_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MeleeGameRepository::meleeGameFromRS,
-                DatabaseValue.of(classroomId));
+
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    classroomId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    public List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
+    public List<MeleeGame> getAvailableClassroomGames(int classroomId) {
         @Language("SQL") final String query = """
                 SELECT * FROM view_melee_games as games
                 WHERE games.Classroom_ID = ?
                 AND games.State != ?;
         """;
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
-                DatabaseValue.of(classroomId), DatabaseValue.of(GameState.FINISHED.name()));
+        try {
+            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                    classroomId, GameState.FINISHED.name());
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 }
