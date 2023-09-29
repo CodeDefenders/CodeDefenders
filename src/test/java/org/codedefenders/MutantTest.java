@@ -29,7 +29,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -120,16 +120,12 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassId = 1;
         int mockedGameId = 1;
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-        try (var mockedMultiDAO = mockStatic(MultiplayerGameDAO.class);
-             var mockedClassDAO = mockStatic(GameClassDAO.class)) {
-            mockedMultiDAO.when(() -> MultiplayerGameDAO.getMultiplayerGame(mockedGameId))
-                    .thenReturn(mockedGame);
+        try (var mockedClassDAO = mockStatic(GameClassDAO.class)) {
             mockedClassDAO.when(() -> GameClassDAO.getClassForId(mockedClassId))
                     .thenReturn(mockedGameClass);
 

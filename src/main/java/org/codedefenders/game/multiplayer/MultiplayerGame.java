@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -364,8 +364,9 @@ public class MultiplayerGame extends AbstractGame {
 
     @Override
     public boolean insert() {
+        var multiplayerGameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
         try {
-            this.id = MultiplayerGameDAO.storeMultiplayerGame(this);
+            this.id = multiplayerGameRepo.storeMultiplayerGame(this);
             return true;
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store multiplayer game to database.", e);
@@ -375,7 +376,8 @@ public class MultiplayerGame extends AbstractGame {
 
     @Override
     public boolean update() {
-        return MultiplayerGameDAO.updateMultiplayerGame(this);
+        var multiplayerGameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
+        return multiplayerGameRepo.updateMultiplayerGame(this);
     }
 
     /**

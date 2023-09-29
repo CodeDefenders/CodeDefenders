@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMeleeGameInfo;
@@ -63,11 +63,14 @@ public class GamesOverview extends HttpServlet {
     @Inject
     private MeleeGameRepository meleeGameRepo;
 
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         List<UserMultiplayerGameInfo> activeGames =
-                MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
+                multiplayerGameRepo.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeGames", activeGames);
 
         List<UserMeleeGameInfo> activeMeleeGames =
@@ -75,7 +78,7 @@ public class GamesOverview extends HttpServlet {
         request.setAttribute("activeMeleeGames", activeMeleeGames);
 
         List<UserMultiplayerGameInfo> openGames =
-                MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
+                multiplayerGameRepo.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openGames", openGames);
 
         List<UserMeleeGameInfo> openMeleeGames =

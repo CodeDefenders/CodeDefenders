@@ -36,6 +36,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -43,7 +44,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -102,6 +102,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private UserRepository userRepo;
+
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
 
     @Inject
     private URLUtils url;

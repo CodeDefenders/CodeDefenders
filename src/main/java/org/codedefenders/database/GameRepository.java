@@ -56,11 +56,14 @@ public class GameRepository {
 
     private final QueryRunner queryRunner;
     private final MeleeGameRepository meleeGameRepo;
+    private final MultiplayerGameRepository multiplayerGameRepo;
 
     @Inject
-    public GameRepository(QueryRunner queryRunner, MeleeGameRepository meleeGameRepo) {
+    public GameRepository(QueryRunner queryRunner, MeleeGameRepository meleeGameRepo,
+                          MultiplayerGameRepository multiplayerGameRepo) {
         this.queryRunner = queryRunner;
         this.meleeGameRepo = meleeGameRepo;
+        this.multiplayerGameRepo = multiplayerGameRepo;
     }
 
     /**
@@ -76,7 +79,7 @@ public class GameRepository {
         }
 
         return switch (gameMode) {
-            case PARTY -> MultiplayerGameDAO.getMultiplayerGame(gameId);
+            case PARTY -> multiplayerGameRepo.getMultiplayerGame(gameId);
             case MELEE -> meleeGameRepo.getMeleeGame(gameId);
             case PUZZLE -> PuzzleDAO.getPuzzleGameForId(gameId);
             default -> null;
@@ -262,7 +265,7 @@ public class GameRepository {
      */
     public List<AbstractGame> getExpiredGames() {
         List<AbstractGame> games = new ArrayList<>();
-        games.addAll(MultiplayerGameDAO.getExpiredGames());
+        games.addAll(multiplayerGameRepo.getExpiredGames());
         games.addAll(meleeGameRepo.getExpiredGames());
         return games;
     }

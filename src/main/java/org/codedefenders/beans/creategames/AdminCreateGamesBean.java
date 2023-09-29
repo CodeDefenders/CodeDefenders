@@ -8,7 +8,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
@@ -23,16 +23,19 @@ public class AdminCreateGamesBean extends CreateGamesBean {
 
     private final UserRepository userRepo;
     private final MeleeGameRepository meleeGameRepo;
+    private final MultiplayerGameRepository multiplayerGameRepo;
 
     public AdminCreateGamesBean(StagedGameList stagedGames,
                                 MessagesBean messages,
                                 EventDAO eventDAO,
                                 UserRepository userRepo,
                                 MeleeGameRepository meleeGameRepo,
+                                MultiplayerGameRepository multiplayerGameRepo,
                                 CreateGamesService createGamesService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
         this.userRepo = userRepo;
         this.meleeGameRepo = meleeGameRepo;
+        this.multiplayerGameRepo = multiplayerGameRepo;
         userInfos = fetchUserInfos();
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
         availableMeleeGames = fetchAvailableMeleeGames();
@@ -58,7 +61,7 @@ public class AdminCreateGamesBean extends CreateGamesBean {
     }
 
     protected Set<Integer> fetchAvailableMultiplayerGames() {
-        return MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
+        return multiplayerGameRepo.getAvailableMultiplayerGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }

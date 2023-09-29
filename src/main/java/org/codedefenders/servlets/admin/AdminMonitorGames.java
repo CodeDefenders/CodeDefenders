@@ -39,7 +39,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
@@ -103,10 +103,13 @@ public class AdminMonitorGames extends HttpServlet {
     @Inject
     private MeleeGameRepository meleeGameRepo;
 
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+        List<MultiplayerGame> multiplayerGames = multiplayerGameRepo.getAvailableMultiplayerGames();
 
         Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,

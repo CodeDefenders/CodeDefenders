@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -66,6 +66,9 @@ public class LandingPage extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
@@ -75,7 +78,7 @@ public class LandingPage extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         } else {
             // User logged not in? Show him the landing page.
-            List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+            List<MultiplayerGame> availableMultiplayerGames = multiplayerGameRepo.getAvailableMultiplayerGames();
             Collections.shuffle(availableMultiplayerGames, new Random(LocalDate.now().getLong(ChronoField.EPOCH_DAY)));
             availableMultiplayerGames = availableMultiplayerGames
                     .stream()

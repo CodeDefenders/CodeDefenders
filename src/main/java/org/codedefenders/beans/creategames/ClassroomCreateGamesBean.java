@@ -10,7 +10,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.ClassroomMember;
@@ -32,6 +32,7 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
     private final ClassroomService classroomService;
     private final UserRepository userRepo;
     private final MeleeGameRepository meleeGameRepo;
+    private final MultiplayerGameRepository multiplayerGameRepo;
     private final int classroomId;
 
     public ClassroomCreateGamesBean(int classroomId,
@@ -39,13 +40,15 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
                                     MessagesBean messages,
                                     EventDAO eventDAO,
                                     UserRepository userRepo,
-                                    CreateGamesService createGamesService,
                                     ClassroomService classroomService,
-                                    MeleeGameRepository meleeGameRepo) {
+                                    MeleeGameRepository meleeGameRepo,
+                                    MultiplayerGameRepository multiplayerGameRepo,
+                                    CreateGamesService createGamesService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
         this.classroomService = classroomService;
         this.userRepo = userRepo;
         this.meleeGameRepo = meleeGameRepo;
+        this.multiplayerGameRepo = multiplayerGameRepo;
         this.classroomId = classroomId;
         userInfos = fetchUserInfos();
         availableMultiplayerGames = fetchAvailableMultiplayerGames();
@@ -79,7 +82,7 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
     }
 
     protected Set<Integer> fetchAvailableMultiplayerGames() {
-        return MultiplayerGameDAO.getAvailableClassroomGames(classroomId).stream()
+        return multiplayerGameRepo.getAvailableClassroomGames(classroomId).stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }

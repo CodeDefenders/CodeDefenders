@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -37,10 +36,9 @@ import org.intellij.lang.annotations.Language;
 /**
  * This class handles the database logic for multiplayer games.
  *
- * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see MultiplayerGame
  */
-public class MultiplayerGameDAO {
+public class MultiplayerGameRepository {
 
     /**
      * Constructs a {@link MultiplayerGame} from a {@link ResultSet} entry.
@@ -159,7 +157,7 @@ public class MultiplayerGameDAO {
      * @return the generated identifier of the game as an {@code int}.
      * @throws UncheckedSQLException If storing the game was not successful.
      */
-    public static int storeMultiplayerGame(MultiplayerGame game) throws UncheckedSQLException {
+    public int storeMultiplayerGame(MultiplayerGame game) throws UncheckedSQLException {
         int classId = game.getClassId();
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
@@ -237,7 +235,7 @@ public class MultiplayerGameDAO {
      * @param game the given game as a {@link MultiplayerGame}.
      * @return {@code true} if updating was successful, {@code false} otherwise.
      */
-    public static boolean updateMultiplayerGame(MultiplayerGame game) {
+    public boolean updateMultiplayerGame(MultiplayerGame game) {
         int classId = game.getClassId();
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
@@ -285,7 +283,7 @@ public class MultiplayerGameDAO {
      * @param gameId the game identifier.
      * @return a {@link MultiplayerGame} instance or {@code null} if none matching game was found.
      */
-    public static MultiplayerGame getMultiplayerGame(int gameId) {
+    public MultiplayerGame getMultiplayerGame(int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_battleground_games
@@ -296,7 +294,7 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(gameId)
         };
 
-        return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+        return DB.executeQueryReturnValue(query, MultiplayerGameRepository::multiplayerGameFromRS, values);
     }
 
     /**
@@ -304,7 +302,7 @@ public class MultiplayerGameDAO {
      *
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
-    public static List<MultiplayerGame> getAvailableMultiplayerGames() {
+    public List<MultiplayerGame> getAvailableMultiplayerGames() {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_battleground_games
@@ -313,7 +311,7 @@ public class MultiplayerGameDAO {
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.FINISHED.name())
         };
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::multiplayerGameFromRS, values);
     }
 
     /**
@@ -323,7 +321,7 @@ public class MultiplayerGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
+    public List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT DISTINCT g.*,
                     u.User_ID AS `userId`,
@@ -343,7 +341,7 @@ public class MultiplayerGameDAO {
                     AND p.Active = TRUE);
         """;
 
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::openGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::openGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -353,7 +351,7 @@ public class MultiplayerGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
+    public List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT g.*,
                        cu.User_ID                 as userId,
@@ -373,7 +371,7 @@ public class MultiplayerGameDAO {
                 GROUP BY g.ID;
         """;
 
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::activeGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -383,7 +381,7 @@ public class MultiplayerGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
-    public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
+    public List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
         @Language("SQL") String query = """
                 SELECT DISTINCT m.*
                 FROM view_battleground_games AS m
@@ -395,7 +393,7 @@ public class MultiplayerGameDAO {
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(userId)
         };
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::multiplayerGameFromRS, values);
     }
 
     /**
@@ -405,7 +403,7 @@ public class MultiplayerGameDAO {
      * @param userId the user identifier the games are retrieved for.
      * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<UserMultiplayerGameInfo> getFinishedMultiplayerGamesForUser(int userId) {
+    public List<UserMultiplayerGameInfo> getFinishedMultiplayerGamesForUser(int userId) {
         @Language("SQL") final String query = """
                 SELECT g.*,
                        cu.User_ID                 as userId,
@@ -424,7 +422,7 @@ public class MultiplayerGameDAO {
                         OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))
                 GROUP BY g.ID;
         """;
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::finishedGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::finishedGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -434,7 +432,7 @@ public class MultiplayerGameDAO {
      * @param creatorId the creator identifier the games are retrieved for.
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
-    public static List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int creatorId) {
+    public List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int creatorId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_battleground_games
@@ -447,7 +445,7 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(GameState.CREATED.name()),
                 DatabaseValue.of(creatorId)
         };
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::multiplayerGameFromRS, values);
     }
 
 
@@ -456,7 +454,7 @@ public class MultiplayerGameDAO {
      *
      * @return the expired multiplayer games.
      */
-    public static List<MultiplayerGame> getExpiredGames() {
+    public List<MultiplayerGame> getExpiredGames() {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
         @Language("SQL") String sql = """
                 SELECT *
@@ -466,25 +464,25 @@ public class MultiplayerGameDAO {
         """;
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
-        return DB.executeQueryReturnList(sql, MultiplayerGameDAO::multiplayerGameFromRS, state);
+        return DB.executeQueryReturnList(sql, MultiplayerGameRepository::multiplayerGameFromRS, state);
     }
 
-    public static List<MultiplayerGame> getClassroomGames(int classroomId) {
+    public List<MultiplayerGame> getClassroomGames(int classroomId) {
         @Language("SQL") String query = """
                 SELECT * FROM view_battleground_games as games
                 WHERE games.Classroom_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::multiplayerGameFromRS,
                 DatabaseValue.of(classroomId));
     }
 
-    public static List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
+    public List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
         @Language("SQL") String query = """
                 SELECT * FROM view_battleground_games as games
                 WHERE games.Classroom_ID = ?
                 AND games.State != ?;
         """;
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
+        return DB.executeQueryReturnList(query, MultiplayerGameRepository::multiplayerGameFromRS,
                 DatabaseValue.of(classroomId), DatabaseValue.of(GameState.FINISHED.name()));
     }
 }

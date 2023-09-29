@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameRepository;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
@@ -53,6 +54,7 @@ public class CreateGamesBeanTest {
 
     private UserRepository userRepo;
     private MeleeGameRepository meleeGameRepo;
+    private MultiplayerGameRepository multiplayerGameRepo;
     private CreateGamesService createGamesService;
 
 
@@ -74,6 +76,7 @@ public class CreateGamesBeanTest {
         EventDAO eventDAO = Mockito.mock(EventDAO.class);
         userRepo = Mockito.mock(UserRepository.class);
         meleeGameRepo = Mockito.mock(MeleeGameRepository.class);
+        multiplayerGameRepo = Mockito.mock(MultiplayerGameRepository.class);
         createGamesService = Mockito.mock(CreateGamesService.class);
 
         /* Initialize bean. */
@@ -84,6 +87,7 @@ public class CreateGamesBeanTest {
                 eventDAO,
                 userRepo,
                 meleeGameRepo,
+                multiplayerGameRepo,
                 createGamesService
         ) {
             @Override

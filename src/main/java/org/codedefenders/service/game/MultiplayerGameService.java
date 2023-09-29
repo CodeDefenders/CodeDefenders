@@ -19,7 +19,6 @@
 
 package org.codedefenders.service.game;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
@@ -72,18 +71,22 @@ public class MultiplayerGameService extends AbstractGameService {
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
+    private final MultiplayerGameRepository multiplayerGameRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
                                   GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                                   CodeDefendersAuth login, NotificationService notificationService,
-                                  TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo) {
+                                  TestRepository testRepo, MutantRepository mutantRepo,
+                                  GameRepository gameRepo,
+                                  MultiplayerGameRepository multiplayerGameRepo) {
         super(userService, userRepository, testRepo, mutantRepo, gameRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
+        this.multiplayerGameRepo = multiplayerGameRepo;
     }
 
     @Override
@@ -161,7 +164,7 @@ public class MultiplayerGameService extends AbstractGameService {
         game.setEventDAO(eventDAO);
         game.setUserRepository(userRepository);
 
-        int newGameId = MultiplayerGameDAO.storeMultiplayerGame(game);
+        int newGameId = multiplayerGameRepo.storeMultiplayerGame(game);
         game.setId(newGameId);
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
