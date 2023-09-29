@@ -189,8 +189,6 @@ public class AdminMonitorGames extends HttpServlet {
                         ? Role.DEFENDER : Role.ATTACKER;
                 game = gameRepo.getGame(gameToRemoveFromId);
                 if (game != null) {
-                    game.setEventDAO(eventDAO);
-                    game.setUserRepository(userRepo);
                     if (!game.addPlayer(userId.get(), newRole)) {
                         messages.add("Changing role of user " + userId.get() + " failed! \n Please check the logs!");
                     } else {

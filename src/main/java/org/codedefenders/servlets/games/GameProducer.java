@@ -53,10 +53,7 @@ public class GameProducer implements Serializable {
         if (game == null && !gameQueried) {
             game = gameRepo.getGame(gameId);
             gameQueried = true;
-            if (game != null) {
-                game.setEventDAO(eventDAO);
-                game.setUserRepository(userRepo);
-            } else {
+            if (game == null) {
                 logger.debug("Could not retrieve game with id {} from database", gameId);
             }
         }

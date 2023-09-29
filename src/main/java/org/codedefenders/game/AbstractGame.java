@@ -68,25 +68,12 @@ public abstract class AbstractGame {
      * Maximum number of allowed assertions per submitted test.
      */
     protected int maxAssertionsPerTest;
-    // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
-    // Consider to move this into a setEvents method instead !
-    // This tells us that AbstractGame is not the right place for any logic!!!
-    protected EventDAO eventDAO;
-    protected UserRepository userRepository;
 
     public abstract boolean addPlayer(int userId, Role role);
 
     public abstract boolean insert();
 
     public abstract boolean update();
-
-    public void setEventDAO(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-    }
-
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public int getId() {
         return id;
@@ -98,6 +85,7 @@ public abstract class AbstractGame {
 
     public List<Event> getEvents() {
         if (events == null) {
+            EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
             events = eventDAO.getEventsForGame(getId());
         }
         return events;

@@ -163,9 +163,6 @@ public class MeleeGameService extends AbstractGameService {
             return false;
         }
 
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepository);
-
         int newGameId = meleeGameRepo.storeMeleeGame(game);
         game.setId(newGameId);
 

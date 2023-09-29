@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.UncheckedSQLException;
@@ -39,6 +40,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
@@ -342,7 +344,8 @@ public class MeleeGame extends AbstractGame {
     }
 
     protected boolean canJoinGame(int userId) {
-        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override
@@ -352,6 +355,8 @@ public class MeleeGame extends AbstractGame {
 
     public boolean addPlayerForce(int userId, Role role) {
         GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
 
         if (state == GameState.FINISHED) {
             return false;
@@ -360,7 +365,7 @@ public class MeleeGame extends AbstractGame {
         if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
-        Optional<UserEntity> u = userRepository.getUserById(userId);
+        Optional<UserEntity> u = userRepo.getUserById(userId);
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
                 EventStatus.GAME, timestamp);
@@ -436,6 +441,7 @@ public class MeleeGame extends AbstractGame {
     }
 
     private void notifyPlayers(String message, EventType et) {
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         for (Player player : getPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
@@ -445,6 +451,7 @@ public class MeleeGame extends AbstractGame {
 
     private void notifyCreator(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
@@ -452,6 +459,7 @@ public class MeleeGame extends AbstractGame {
 
     private void notifyGame(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);

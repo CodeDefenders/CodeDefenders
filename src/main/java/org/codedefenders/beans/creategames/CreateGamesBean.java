@@ -374,8 +374,6 @@ public abstract class CreateGamesBean implements Serializable {
      * @return {@code true} if the user could be added, {@code false} if not.
      */
     public boolean addPlayerToExistingGame(AbstractGame game, int userId, Role role) {
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
         if (!game.addPlayer(userId, role)) {
             messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
                     userId, game.getId(), role));

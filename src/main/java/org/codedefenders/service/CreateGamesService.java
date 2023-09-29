@@ -146,8 +146,6 @@ public class CreateGamesService {
         }
 
         /* Insert the game. */
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
         if (!game.insert()) {
             messages.add(format("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));

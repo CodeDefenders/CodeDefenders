@@ -163,9 +163,6 @@ public class MultiplayerGameService extends AbstractGameService {
             return false;
         }
 
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepository);
-
         int newGameId = multiplayerGameRepo.storeMultiplayerGame(game);
         game.setId(newGameId);
 
