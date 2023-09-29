@@ -26,7 +26,7 @@ import java.util.Optional;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -475,6 +475,7 @@ public class MultiplayerGame extends AbstractGame {
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
         MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+        PlayerRepository playerRepo = CDIUtil.getBeanFromCDI(PlayerRepository.class);
 
         final HashMap<Integer, PlayerScore> testScores = new HashMap<>();
         final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
@@ -529,7 +530,7 @@ public class MultiplayerGame extends AbstractGame {
             int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
-            int playerScore = PlayerDAO.getPlayerPoints(playerId);
+            int playerScore = playerRepo.getPlayerPoints(playerId);
             ps.increaseTotalScore(playerScore);
 
             PlayerScore ts = testScores.get(teamKey);

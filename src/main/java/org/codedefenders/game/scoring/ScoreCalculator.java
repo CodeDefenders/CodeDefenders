@@ -10,7 +10,7 @@ import javax.inject.Named;
 
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -33,14 +33,17 @@ public class ScoreCalculator {
     private final TestRepository testRepo;
     private final MutantRepository mutantRepo;
     private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
 
     @Inject
     public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy,
-                           TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo) {
+                           TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+                           PlayerRepository playerRepo) {
         this.scoringPolicy = scoringPolicy;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
         this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
     }
 
     /**
@@ -134,7 +137,7 @@ public class ScoreCalculator {
         for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
-            PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());
+            playerRepo.setPlayerPoints(playerScore.getTotalScore(), player.getId());
         }
     }
 }

@@ -45,7 +45,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
@@ -179,6 +179,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private GameRepository gameRepo;
 
+    @Inject
+    private PlayerRepository playerRepo;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -200,7 +203,7 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        final int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
+        final int playerId = playerRepo.getPlayerIdForUserAndGame(userId, gameId);
 
         if (game.getCreatorId() != userId && playerId == -1) {
             // Something odd with the registration - TODO
@@ -269,7 +272,7 @@ public class MeleeGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         final Optional<SimpleUser> user = userService.getSimpleUserById(login.getUserId());
 
-        final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        final int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 || user.isEmpty()) {
             // Something odd with the registration - TODO
@@ -982,7 +985,7 @@ public class MeleeGameManager extends HttpServlet {
                                 eventDAO.insert(event);
 
                                 // Retrieve an user for the player in this game
-                                Player claimingPlayer = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), gameId);
+                                Player claimingPlayer = playerRepo.getPlayerForUserAndGame(login.getUserId(), gameId);
 
                                 // TODO We need a score event to hackishly include data about mutants and tests
                                 Event scoreEvent = new Event(-1, gameId, Constants.DUMMY_CREATOR_USER_ID,

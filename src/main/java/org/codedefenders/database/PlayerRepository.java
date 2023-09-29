@@ -41,8 +41,8 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Player
  */
-public class PlayerDAO {
-    private static final Logger logger = LoggerFactory.getLogger(PlayerDAO.class);
+public class PlayerRepository {
+    private static final Logger logger = LoggerFactory.getLogger(PlayerRepository.class);
 
     /**
      * Constructs a player from a {@link ResultSet} entry.
@@ -62,7 +62,6 @@ public class PlayerDAO {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed player together with an {@link UserEntity} instance.
-     * @see DB.RSMapper
      */
     static Player playerWithUserFromRS(ResultSet rs) throws SQLException {
         int id = rs.getInt("ID");
@@ -93,7 +92,7 @@ public class PlayerDAO {
      * @param gameId the game identifier as an {@code int}.
      * @return the playerId for a user in a game.
      */
-    public static int getPlayerIdForUserAndGame(int userId, int gameId) {
+    public int getPlayerIdForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
                 SELECT players.ID
                 FROM players
@@ -113,14 +112,14 @@ public class PlayerDAO {
      * @param playerId the player identifier as an {@code int}.
      * @return player instance
      */
-    public static Player getPlayer(int playerId) {
+    public Player getPlayer(int playerId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_players_with_userdata
                 WHERE ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(playerId));
+        return DB.executeQueryReturnValue(query, PlayerRepository::playerWithUserFromRS, DatabaseValue.of(playerId));
 
     }
 
@@ -131,7 +130,7 @@ public class PlayerDAO {
      * @param gameId The game identifier as an {@code int}.
      * @return The player for a user in a game.
      */
-    public static Player getPlayerForUserAndGame(int userId, int gameId) {
+    public Player getPlayerForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_players_with_userdata
@@ -139,11 +138,11 @@ public class PlayerDAO {
                   AND User_ID = ?
                   AND Active = TRUE;
         """;
-        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId),
+        return DB.executeQueryReturnValue(query, PlayerRepository::playerWithUserFromRS, DatabaseValue.of(gameId),
                 DatabaseValue.of(userId));
     }
 
-    public static void setPlayerPoints(int points, int player) {
+    public void setPlayerPoints(int points, int player) {
         @Language("SQL") String query = "UPDATE players SET Points = ? WHERE ID = ?";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
@@ -152,7 +151,7 @@ public class PlayerDAO {
         DB.executeUpdateQuery(query, values);
     }
 
-    public static void increasePlayerPoints(int points, int player) {
+    public void increasePlayerPoints(int points, int player) {
         @Language("SQL") String query = "UPDATE players SET Points = Points + ? WHERE ID = ?";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
@@ -161,14 +160,14 @@ public class PlayerDAO {
         DB.executeUpdateQuery(query, values);
     }
 
-    public static int getPlayerPoints(int playerId) {
+    public int getPlayerPoints(int playerId) {
         @Language("SQL") String query = "SELECT Points FROM players WHERE ID = ?;";
         final Integer points = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);
     }
 
-    public static Role getRole(int userId, int gameId) {
+    public Role getRole(int userId, int gameId) {
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
         GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
 

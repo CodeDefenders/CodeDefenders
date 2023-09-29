@@ -45,7 +45,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
@@ -202,6 +202,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private GameRepository gameRepo;
 
+    @Inject
+    private PlayerRepository playerRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -214,7 +217,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         int gameId = game.getId();
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
@@ -561,7 +564,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String mutantText = mutant.get();
 
-        int attackerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int attackerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
@@ -737,7 +740,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             int mutantId = equivMutantId.get();
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+            int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
             for (Mutant m : mutantsPending) {
@@ -758,7 +761,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // tests on the same class from different games
                     mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
 
-                    PlayerDAO.increasePlayerPoints(1, mutantRepo.getEquivalentDefenderId(m));
+                    playerRepo.increasePlayerPoints(1, mutantRepo.getEquivalentDefenderId(m));
                     messages.add(message);
 
                     // Notify the attacker
@@ -1002,7 +1005,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
         AtomicInteger claimedMutants = new AtomicInteger();
         AtomicBoolean noneCovered = new AtomicBoolean(true);
         List<Mutant> mutantsAlive = game.getAliveMutants();

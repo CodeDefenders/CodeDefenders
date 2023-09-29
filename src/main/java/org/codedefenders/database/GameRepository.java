@@ -138,7 +138,7 @@ public class GameRepository {
         """;
 
         try {
-            return queryRunner.query(query, listFromRS(PlayerDAO::playerWithUserFromRS),
+            return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS),
                     gameId,
                     role.toString());
         } catch (SQLException e) {
@@ -162,7 +162,7 @@ public class GameRepository {
         """;
 
         try {
-            return queryRunner.query(query, listFromRS(PlayerDAO::playerWithUserFromRS), gameId);
+            return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS), gameId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

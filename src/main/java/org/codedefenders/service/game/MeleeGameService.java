@@ -32,6 +32,7 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MutantRepository;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -79,8 +80,8 @@ public class MeleeGameService extends AbstractGameService {
                             GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                             CodeDefendersAuth login, NotificationService notificationService,
                             TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
-                            MeleeGameRepository meleeGameRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo);
+                            MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
@@ -149,8 +150,8 @@ public class MeleeGameService extends AbstractGameService {
 
     private ScoreCalculator createScoreCalculator() {
         ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
-        IScoringPolicy policy = scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo, gameRepo);
-        return new ScoreCalculator(policy, testRepo, mutantRepo, gameRepo);
+        IScoringPolicy policy = scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo, gameRepo, playerRepo);
+        return new ScoreCalculator(policy, testRepo, mutantRepo, gameRepo, playerRepo);
     }
 
     public boolean createGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {

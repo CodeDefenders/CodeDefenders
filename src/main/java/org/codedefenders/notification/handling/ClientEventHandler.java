@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
@@ -39,6 +39,7 @@ public class ClientEventHandler {
     private final INotificationService notificationService;
     private final ServerEventHandlerContainer serverEventHandlerContainer;
     private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
     private final SimpleUser user;
     private final String ticket;
 
@@ -46,11 +47,13 @@ public class ClientEventHandler {
             INotificationService notificationService,
             ServerEventHandlerContainer serverEventHandlerContainer,
             GameRepository gameRepo,
+            PlayerRepository playerRepo,
             SimpleUser user,
             String ticket) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
         this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
         this.user = user;
         this.ticket = ticket;
     }
@@ -68,7 +71,7 @@ public class ClientEventHandler {
 
     public void visit(ClientGameChatEvent event) {
         GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
-        Role role = PlayerDAO.getRole(user.getId(), event.getGameId());
+        Role role = playerRepo.getRole(user.getId(), event.getGameId());
 
         AbstractGame game = gameRepo.getGame(event.getGameId());
         if (game == null) {

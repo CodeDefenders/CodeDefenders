@@ -39,6 +39,8 @@ import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.database.MutantRepository;
+import org.codedefenders.database.PlayerRepository;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
@@ -90,7 +92,9 @@ public class GameManagingUtilsTest {
                         MutantRepository.class,
                         GameRepository.class,
                         MeleeGameRepository.class,
-                        MultiplayerGameRepository.class)
+                        MultiplayerGameRepository.class,
+                        PuzzleRepository.class,
+                        PlayerRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)

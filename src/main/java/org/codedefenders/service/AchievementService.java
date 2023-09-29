@@ -17,7 +17,7 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -46,16 +46,18 @@ public class AchievementService {
     private final AchievementRepository repo;
     private final INotificationService notificationService;
     private final GameRepository gameRepo;
+    private final PuzzleRepository puzzleRepo;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
     @Inject
     public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
-                              GameRepository gameRepo) {
+                              GameRepository gameRepo, PuzzleRepository puzzleRepo) {
         repo = achievementRepository;
         this.notificationService = notificationService;
         this.gameRepo = gameRepo;
+        this.puzzleRepo = puzzleRepo;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
     }
@@ -234,7 +236,7 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handlePuzzleGameSolvedEvent(GameSolvedEvent event) {
-            int userId = PuzzleDAO.getPuzzleGameForId(event.getGameId()).getCreatorId();
+            int userId = puzzleRepo.getPuzzleGameForId(event.getGameId()).getCreatorId();
             Achievement.Id achievementId = Achievement.Id.SOLVE_PUZZLES;
             if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
                 logger.info("Updated achievement {} for user with id {}", achievementId, userId);

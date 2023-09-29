@@ -39,7 +39,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
@@ -122,6 +122,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private GameRepository gameRepo;
+
+    @Inject
+    private PlayerRepository playerRepo;
 
     /**
      * {@inheritDoc}
@@ -247,8 +250,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     public boolean addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
         List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(game.getClassId());
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        int dummyDefenderPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         int currentRound = gameRepo.getCurrentRound(game.getId());
 
         if (dummyAttackerPlayerId == -1) {
@@ -347,13 +350,13 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public boolean hasPredefinedMutants(AbstractGame game) {
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         return game.getMutants().stream()
                 .anyMatch(mutant -> mutant.getPlayerId() == dummyAttackerPlayerId);
     }
 
     public boolean hasPredefinedTests(AbstractGame game) {
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        int dummyDefenderPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         return game.getMutants().stream()
                 .anyMatch(mutant -> mutant.getPlayerId() == dummyDefenderPlayerId);
     }

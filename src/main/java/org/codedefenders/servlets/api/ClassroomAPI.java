@@ -17,7 +17,7 @@ import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.MultiplayerGameRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
@@ -51,6 +51,8 @@ public class ClassroomAPI extends HttpServlet {
     private MeleeGameRepository meleeGameRepo;
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
+    @Inject
+    private PlayerRepository playerRepo;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -185,7 +187,7 @@ public class ClassroomAPI extends HttpServlet {
 
         return games.stream()
                 .map(game -> {
-                    Player player = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), game.getId());
+                    Player player = playerRepo.getPlayerForUserAndGame(login.getUserId(), game.getId());
                     Role role;
                     if (player != null) {
                         role = player.getRole();

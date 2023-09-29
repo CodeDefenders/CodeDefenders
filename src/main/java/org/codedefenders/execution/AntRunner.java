@@ -38,7 +38,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorEx
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -71,13 +71,15 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final Configuration config;
     private final CoverageGenerator coverageGenerator;
     private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
 
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
-                     CoverageGenerator coverageGenerator, GameRepository gameRepo) {
+                     CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
     }
 
     /**
@@ -206,7 +208,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                     dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
             String classFile = matchingFiles.get(0).getAbsolutePath();
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
+            int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
             newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, gameRepo.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
@@ -217,7 +219,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
             logger.error("Failed to compile mutant {}: {}", javaFile, message);
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
+            int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
             newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, gameRepo.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
@@ -236,7 +238,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(),
                 cut, null, config.isForceLocalExecution());
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
+        int playerId = playerRepo.getPlayerIdForUserAndGame(ownerId, gameId);
 
         // If the input stream returned a 'successful build' message, the test compiled correctly
         if (result.compiled()) {
