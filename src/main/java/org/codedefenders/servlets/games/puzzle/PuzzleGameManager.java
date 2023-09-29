@@ -37,7 +37,7 @@ import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -147,10 +147,13 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PuzzleRepository puzzleRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        if (!checkEnabled()) {
+        if (!puzzleRepo.checkPuzzlesEnabled() || !puzzleRepo.checkActivePuzzlesExist()) {
             // Send users to the home page
             response.sendRedirect(url.forPath("/"));
             return;
@@ -162,7 +165,7 @@ public class PuzzleGameManager extends HttpServlet {
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
             gameProducer.setGameId(gameId);
-            game = PuzzleDAO.getPuzzleGameForId(gameId);
+            game = puzzleRepo.getPuzzleGameForId(gameId);
 
             if (game == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database"
@@ -188,7 +191,7 @@ public class PuzzleGameManager extends HttpServlet {
                 return;
             }
             final int puzzleId = puzzleIdOpt.get();
-            game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
+            game = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
                         puzzleId, login.getUserId());
@@ -219,15 +222,6 @@ public class PuzzleGameManager extends HttpServlet {
     }
 
     /**
-     * Checks whether users can play puzzles.
-     *
-     * @return {@code true} when users can play puzzles, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
-    }
-
-    /**
      * Creates a puzzle game for a given request for the required parameter {@code puzzleId}.
      *
      * <p>If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
@@ -247,7 +241,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId.get());
+        final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId.get());
         if (puzzle == null) {
             logger.error("Failed to retrieve puzzle from database for puzzleId: {}.", puzzleId);
             response.setStatus(SC_BAD_REQUEST);
@@ -371,7 +365,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+        final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
 
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
@@ -512,7 +506,7 @@ public class PuzzleGameManager extends HttpServlet {
             gse.setAttackPuzzle(isAnAttackGame);
             notificationService.post(gse);
         }
-        PuzzleDAO.updatePuzzleGame(game);
+        puzzleRepo.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
 
@@ -544,7 +538,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+        final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
 
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}. Aborting.", gameId);
@@ -717,7 +711,7 @@ public class PuzzleGameManager extends HttpServlet {
             gse.setAttackPuzzle(isAnAttackGame);
             notificationService.post(gse);
         }
-        PuzzleDAO.updatePuzzleGame(game);
+        puzzleRepo.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
 
@@ -738,7 +732,7 @@ public class PuzzleGameManager extends HttpServlet {
          * Find the next puzzle in the same chapter or the first puzzle in the
          * next not empty chapters
          */
-        for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
+        for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
             // Skip chapters before this one
             if (puzzleChapter.getChapterId() < currentChapter) {
                 continue;
@@ -748,7 +742,7 @@ public class PuzzleGameManager extends HttpServlet {
                  * This returns the puzzles ordered by position and (hopefully)
                  * and empty, not-null list if there's not puzzles
                  */
-                for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
                     if (puzzleChapter.getChapterId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
@@ -756,7 +750,7 @@ public class PuzzleGameManager extends HttpServlet {
                     }
                     // Skip already solved puzzles
                     // TODO Should he make PuzzleDAO inject dependencies instead
-                    PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
+                    PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
                             login.getUserId());
 
                     // Not yet played this puzzle

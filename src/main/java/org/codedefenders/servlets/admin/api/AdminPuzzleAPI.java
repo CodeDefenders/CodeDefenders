@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
@@ -88,6 +89,9 @@ import com.google.gson.stream.JsonWriter;
 @WebServlet({Paths.API_ADMIN_PUZZLES_ALL, Paths.API_ADMIN_PUZZLE, Paths.API_ADMIN_PUZZLECHAPTER})
 public class AdminPuzzleAPI extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleAPI.class);
+
+    @Inject
+    private PuzzleRepository puzzleRepo;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -196,14 +200,14 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     private void handleDeletePuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
-        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+        final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         String message;
-        if (PuzzleDAO.gamesExistsForPuzzle(puzzle)) {
-            if (PuzzleDAO.setPuzzleActive(puzzle, false)) {
+        if (puzzleRepo.gamesExistsForPuzzle(puzzle)) {
+            if (puzzleRepo.setPuzzleActive(puzzle, false)) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 message = "Set puzzle " + puzzleId + " as inactive";
             } else {
@@ -211,12 +215,12 @@ public class AdminPuzzleAPI extends HttpServlet {
                 message = "Failed to set puzzle " + puzzleId + " as inactive";
             }
         } else {
-            GameClass parentGameClass = PuzzleDAO.getParentGameClass(puzzle.getClassId());
+            GameClass parentGameClass = puzzleRepo.getParentGameClass(puzzle.getClassId());
 
             // Uses 'cascade delete'. Deleted the puzzles, too.
             boolean classRemoved = GameClassDAO.forceRemoveClassForId(puzzle.getClassId());
             if (classRemoved) {
-                if (PuzzleDAO.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
+                if (puzzleRepo.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
                     logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
                             puzzle.getClassId(), parentGameClass.getId());
                 } else {
@@ -252,13 +256,13 @@ public class AdminPuzzleAPI extends HttpServlet {
 
     private void handleDeletePuzzleChapterRequest(HttpServletResponse response,
                                                   int puzzleChapterId) throws IOException {
-        final PuzzleChapter puzzleChapter = PuzzleDAO.getPuzzleChapterForId(puzzleChapterId);
+        final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
         String message;
-        if (PuzzleDAO.removePuzzleChapter(puzzleChapter)) {
+        if (puzzleRepo.removePuzzleChapter(puzzleChapter)) {
             response.setStatus(HttpServletResponse.SC_OK);
             message = "Removed puzzle chapter " + puzzleChapterId + " successfully";
         } else {
@@ -272,8 +276,8 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     private void handleGetAllPuzzlesRequest(HttpServletResponse response) throws IOException {
-        final List<PuzzleChapter> puzzleChapters = PuzzleDAO.getPuzzleChapters();
-        final List<Puzzle> puzzles = PuzzleDAO.getPuzzles();
+        final List<PuzzleChapter> puzzleChapters = puzzleRepo.getPuzzleChapters();
+        final List<Puzzle> puzzles = puzzleRepo.getPuzzles();
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
@@ -301,7 +305,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     private void handleGetPuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
-        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+        final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -317,7 +321,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     private void handleGetPuzzleChapterRequest(HttpServletResponse response, int puzzleChapterId) throws IOException {
-        final PuzzleChapter puzzleChapter = PuzzleDAO.getPuzzleChapterForId(puzzleChapterId);
+        final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -335,7 +339,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     private void handleUpdatePuzzle(HttpServletRequest request,
                                     HttpServletResponse response,
                                     int puzzleId) throws IOException {
-        Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+        Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -355,7 +359,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 message = "Identifier from URL and body do not match.";
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             } else {
-                boolean updateSuccess = PuzzleDAO.updatePuzzle(PuzzleInfo.of(parsedPuzzle));
+                boolean updateSuccess = puzzleRepo.updatePuzzle(PuzzleInfo.of(parsedPuzzle));
 
                 if (updateSuccess) {
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -377,7 +381,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     private void handleUpdatePuzzleChapter(HttpServletRequest request,
                                            HttpServletResponse response,
                                            int puzzleChapterId) throws IOException {
-        final PuzzleChapter puzzleChapter = PuzzleDAO.getPuzzleChapterForId(puzzleChapterId);
+        final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -396,7 +400,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 message = "Identifier from URL and body do not match.";
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             } else {
-                boolean updateSuccess = PuzzleDAO.updatePuzzleChapter(parsedPuzzleChapter);
+                boolean updateSuccess = puzzleRepo.updatePuzzleChapter(parsedPuzzleChapter);
                 if (updateSuccess) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     message = "Updated puzzle chapter " + puzzleChapterId + " successfully.";

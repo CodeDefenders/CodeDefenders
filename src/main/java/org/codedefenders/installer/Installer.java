@@ -47,7 +47,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
@@ -89,6 +89,7 @@ public class Installer {
     private final Configuration config;
     private final TestRepository testRepo;
     private final MutantRepository mutantRepo;
+    private final PuzzleRepository puzzleRepo;
 
     @Inject
     public Installer(BackendExecutorService backend,
@@ -96,13 +97,15 @@ public class Installer {
                      KillMapService killMapService,
             @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
                      TestRepository testRepo,
-                     MutantRepository mutantRepo) {
+                     MutantRepository mutantRepo,
+                     PuzzleRepository puzzleRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
         this.config = config;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
+        this.puzzleRepo = puzzleRepo;
     }
 
     /**
@@ -360,7 +363,7 @@ public class Installer {
         String description = cfg.getProperty("description");
 
         PuzzleChapter chapter = new PuzzleChapter(chapterId, position, title, description);
-        PuzzleDAO.storePuzzleChapter(chapter);
+        puzzleRepo.storePuzzleChapter(chapter);
 
         logger.info("installPuzzleChapter() Stored puzzle chapter with id " + chapterId);
 
@@ -446,7 +449,7 @@ public class Installer {
 
         Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest,
                 mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
-        int puzzleId = PuzzleDAO.storePuzzle(puzzle);
+        int puzzleId = puzzleRepo.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
         for (Mutant m : originalMutants) {

@@ -20,13 +20,13 @@
 --%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
-<%@ page import="org.codedefenders.database.PuzzleDAO" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
 <%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
 <%@ page import="java.util.SortedSet" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.Set" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
@@ -47,6 +47,7 @@
 
 <%
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
+    Set<Integer> solvedPuzzles = (Set<Integer>) request.getAttribute("solvedPuzzles");
 %>
 
 <div class="container">
@@ -103,8 +104,8 @@
                                 <%
                                         } else if (!puzzleEntry.isLocked()) {
                                             final int puzzleId = puzzleEntry.getPuzzleId();
-                                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
-                                            String color = playedGame != null && playedGame.getState().equals(GameState.SOLVED)
+                                            boolean puzzleSolved = solvedPuzzles.contains(puzzleId);
+                                            String color = puzzleSolved
                                                     ? "btn-success"
                                                     : "btn-primary";
                                 %>

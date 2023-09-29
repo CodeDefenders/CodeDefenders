@@ -22,12 +22,9 @@
 <%@ tag import="org.codedefenders.util.Constants" %>
 <%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.model.Player" %>
-<%@ tag import="org.codedefenders.database.MutantRepository" %>
 <%@ tag import="java.util.Map" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
-<%@ tag import="org.codedefenders.util.CDIUtil" %>
-<%@ tag import="org.codedefenders.database.TestRepository" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 

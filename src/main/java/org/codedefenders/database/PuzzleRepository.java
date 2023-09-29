@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -32,10 +34,15 @@ import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleInfo;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 
 /**
  * This class handles the database logic for puzzles.
@@ -44,8 +51,10 @@ import org.slf4j.LoggerFactory;
  * @see PuzzleChapter
  * @see PuzzleGame
  */
-public class PuzzleDAO {
-    private static final Logger logger = LoggerFactory.getLogger(PuzzleDAO.class);
+@Named("puzzleRepo")
+@ApplicationScoped
+public class PuzzleRepository {
+    private static final Logger logger = LoggerFactory.getLogger(PuzzleRepository.class);
 
     /**
      * Returns the {@link PuzzleChapter} for the given chapter ID.
@@ -53,14 +62,14 @@ public class PuzzleDAO {
      * @param chapterId The chapter ID.
      * @return The {@link PuzzleChapter} for the given chapter ID.
      */
-    public static PuzzleChapter getPuzzleChapterForId(int chapterId) {
+    public PuzzleChapter getPuzzleChapterForId(int chapterId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM puzzle_chapters
                 WHERE Chapter_ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleChapterFromResultSet, DatabaseValue.of(chapterId));
+        return DB.executeQueryReturnValue(query, PuzzleRepository::getPuzzleChapterFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -68,14 +77,14 @@ public class PuzzleDAO {
      *
      * @return A {@link List} of all {@link PuzzleChapter PuzzleChapters}, sorted by the position in the chapter list.
      */
-    public static List<PuzzleChapter> getPuzzleChapters() {
+    public List<PuzzleChapter> getPuzzleChapters() {
         @Language("SQL") String query = """
                 SELECT *
                 FROM puzzle_chapters
                 ORDER BY Position;
         """;
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleChapterFromResultSet);
+        return DB.executeQueryReturnList(query, PuzzleRepository::getPuzzleChapterFromResultSet);
     }
 
     /**
@@ -84,14 +93,14 @@ public class PuzzleDAO {
      * @param puzzleId The puzzle ID.
      * @return The {@link Puzzle} for the given puzzle ID.
      */
-    public static Puzzle getPuzzleForId(int puzzleId) {
+    public Puzzle getPuzzleForId(int puzzleId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM puzzles
                 WHERE Puzzle_ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(puzzleId));
+        return DB.executeQueryReturnValue(query, PuzzleRepository::getPuzzleFromResultSet, DatabaseValue.of(puzzleId));
     }
 
     /**
@@ -99,14 +108,14 @@ public class PuzzleDAO {
      *
      * @return A {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
      */
-    public static List<Puzzle> getPuzzles() {
+    public List<Puzzle> getPuzzles() {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_active_puzzles as puzzles
                 ORDER BY Chapter_ID, Position;
         """;
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet);
+        return DB.executeQueryReturnList(query, PuzzleRepository::getPuzzleFromResultSet);
     }
 
     /**
@@ -117,7 +126,7 @@ public class PuzzleDAO {
      * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
      *     in the chapter.
      */
-    public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
+    public List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_active_puzzles as puzzles
@@ -125,7 +134,7 @@ public class PuzzleDAO {
                 ORDER BY Position;
         """;
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(chapterId));
+        return DB.executeQueryReturnList(query, PuzzleRepository::getPuzzleFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -134,14 +143,14 @@ public class PuzzleDAO {
      * @param gameId The game ID.
      * @return The {@link PuzzleGame} for the given game ID.
      */
-    public static PuzzleGame getPuzzleGameForId(int gameId) {
+    public PuzzleGame getPuzzleGameForId(int gameId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
                 WHERE ID = ?;
         """;
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(gameId));
+        return DB.executeQueryReturnValue(query, PuzzleRepository::getPuzzleGameFromResultSet, DatabaseValue.of(gameId));
     }
 
     /**
@@ -151,7 +160,7 @@ public class PuzzleDAO {
      * @param userId   The user ID.
      * @return The {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
      */
-    public static PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
+    public PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
@@ -161,7 +170,7 @@ public class PuzzleDAO {
         """;
 
         return DB.executeQueryReturnValue(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
+                PuzzleRepository::getPuzzleGameFromResultSet,
                 DatabaseValue.of(puzzleId),
                 DatabaseValue.of(userId));
     }
@@ -175,7 +184,7 @@ public class PuzzleDAO {
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
      *     given user. The list is sorted by the the timestamp of the games.
      */
-    public static List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
+    public List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
@@ -185,7 +194,7 @@ public class PuzzleDAO {
         """;
 
         return DB.executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
+                PuzzleRepository::getPuzzleGameFromResultSet,
                 DatabaseValue.of(puzzleId),
                 DatabaseValue.of(userId));
     }
@@ -198,7 +207,7 @@ public class PuzzleDAO {
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
      *     The list is sorted by the the timestamp of the games.
      */
-    public static List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
+    public List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_puzzle_games games
@@ -207,7 +216,7 @@ public class PuzzleDAO {
                 ORDER BY Timestamp DESC;
         """;
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, PuzzleRepository::getPuzzleGameFromResultSet, DatabaseValue.of(userId));
     }
 
     /**
@@ -258,7 +267,7 @@ public class PuzzleDAO {
      * @param chapter The {@link PuzzleChapter}.
      * @return The ID of the stored puzzle chapter, or -1 if the insert failed.
      */
-    public static int storePuzzleChapter(PuzzleChapter chapter) {
+    public int storePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
                 INSERT INTO puzzle_chapters
 
@@ -286,7 +295,7 @@ public class PuzzleDAO {
      * @param game The {@link PuzzleGame}.
      * @return The game ID of the stored game, or -1 if the insert failed.
      */
-    public static int storePuzzleGame(PuzzleGame game) {
+    public int storePuzzleGame(PuzzleGame game) {
         @Language("SQL") String query = """
                 INSERT INTO games
 
@@ -327,7 +336,7 @@ public class PuzzleDAO {
      * @param puzzle The {@link PuzzleInfo}.
      * @return {@code true} if the update was successful, {@code false} otherwise.
      */
-    public static boolean updatePuzzle(PuzzleInfo puzzle) {
+    public boolean updatePuzzle(PuzzleInfo puzzle) {
         @Language("SQL") String query = """
                 UPDATE puzzles
                 SET Chapter_ID           = ?,
@@ -360,7 +369,7 @@ public class PuzzleDAO {
      * @param chapter The {@link PuzzleChapter}.
      * @return {@code true} if the update was successful, {@code false} otherwise.
      */
-    public static boolean updatePuzzleChapter(PuzzleChapter chapter) {
+    public boolean updatePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
                 UPDATE puzzle_chapters
                 SET Position    = ?,
@@ -386,7 +395,7 @@ public class PuzzleDAO {
      * @param game The {@link PuzzleGame}.
      * @return {@code true} if the update was successful, {@code false} otherwise.
      */
-    public static boolean updatePuzzleGame(PuzzleGame game) {
+    public boolean updatePuzzleGame(PuzzleGame game) {
         @Language("SQL") String query = """
                 UPDATE games
 
@@ -426,7 +435,7 @@ public class PuzzleDAO {
      * @param puzzle the checked puzzle.
      * @return {@code true} if at least one game does exist, {@code false} otherwise.
      */
-    public static boolean gamesExistsForPuzzle(@Nonnull Puzzle puzzle) {
+    public boolean gamesExistsForPuzzle(@Nonnull Puzzle puzzle) {
         @Language("SQL") String query = """
                     SELECT (COUNT(games.ID) > 0) AS games_exist
                     FROM games, puzzles
@@ -445,7 +454,7 @@ public class PuzzleDAO {
      * @param active whether the puzzle is active or not.
      * @return {@code true} if setting active was successful, {@code false} otherwise.
      */
-    public static boolean setPuzzleActive(@Nonnull Puzzle puzzle, boolean active) {
+    public boolean setPuzzleActive(@Nonnull Puzzle puzzle, boolean active) {
         @Language("SQL") String query = """
                 UPDATE puzzles
                     SET ACTIVE = ?
@@ -468,7 +477,7 @@ public class PuzzleDAO {
      * @param chapter the puzzle chapter to be removed.
      * @return {@code true} when the removal was successful, {@code false} otherwise.
      */
-    public static boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
+    public boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
         @Language("SQL") String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
         return DB.executeUpdateQuery(query, DatabaseValue.of(chapter.getChapterId()));
     }
@@ -481,7 +490,7 @@ public class PuzzleDAO {
      * @param puzzleClassId the identifier of the puzzle child class.
      * @return the parent class of the given puzzle class.
      */
-    public static GameClass getParentGameClass(int puzzleClassId) {
+    public GameClass getParentGameClass(int puzzleClassId) {
         @Language("SQL") String query = """
                 SELECT classes.*
                 FROM classes,
@@ -499,7 +508,7 @@ public class PuzzleDAO {
      * @param classId the identifier of the checked game class.
      * @return {@code true} if class files are used, {@code false} otherwise.
      */
-    public static boolean classSourceUsedForPuzzleClasses(int classId) {
+    public boolean classSourceUsedForPuzzleClasses(int classId) {
         @Language("SQL") String query = """
                 SELECT (COUNT(c1.Class_ID)) > 0 as class_used
                 FROM classes c1,
@@ -512,6 +521,27 @@ public class PuzzleDAO {
                 DatabaseValue.of(classId));
     }
 
+    public boolean checkPuzzlesEnabled() {
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue();
+    }
+
+    public boolean checkActivePuzzlesExist() {
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
+
+        @Language("SQL") String query = """
+                SELECT *
+                FROM view_active_puzzles as puzzles
+                LIMIT 1;
+        """;
+
+        try {
+            var puzzle = queryRunner.query(query, nextFromRS(rs -> rs.getInt("Puzzle_ID")));
+            return puzzle.isPresent();
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
 
     /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.

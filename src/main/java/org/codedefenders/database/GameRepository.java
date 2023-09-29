@@ -57,13 +57,15 @@ public class GameRepository {
     private final QueryRunner queryRunner;
     private final MeleeGameRepository meleeGameRepo;
     private final MultiplayerGameRepository multiplayerGameRepo;
+    private final PuzzleRepository puzzleRepo;
 
     @Inject
     public GameRepository(QueryRunner queryRunner, MeleeGameRepository meleeGameRepo,
-                          MultiplayerGameRepository multiplayerGameRepo) {
+                          MultiplayerGameRepository multiplayerGameRepo, PuzzleRepository puzzleRepo) {
         this.queryRunner = queryRunner;
         this.meleeGameRepo = meleeGameRepo;
         this.multiplayerGameRepo = multiplayerGameRepo;
+        this.puzzleRepo = puzzleRepo;
     }
 
     /**
@@ -81,7 +83,7 @@ public class GameRepository {
         return switch (gameMode) {
             case PARTY -> multiplayerGameRepo.getMultiplayerGame(gameId);
             case MELEE -> meleeGameRepo.getMeleeGame(gameId);
-            case PUZZLE -> PuzzleDAO.getPuzzleGameForId(gameId);
+            case PUZZLE -> puzzleRepo.getPuzzleGameForId(gameId);
             default -> null;
         };
     }

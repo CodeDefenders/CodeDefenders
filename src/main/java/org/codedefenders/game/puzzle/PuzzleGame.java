@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -233,7 +233,8 @@ public class PuzzleGame extends AbstractGame {
      */
     public Puzzle getPuzzle() {
         if (puzzle == null) {
-            puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+            var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+            puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         }
         return puzzle;
     }
@@ -293,13 +294,15 @@ public class PuzzleGame extends AbstractGame {
 
     @Override
     public boolean insert() {
-        id = PuzzleDAO.storePuzzleGame(this);
+        var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+        id = puzzleRepo.storePuzzleGame(this);
         return id != -1;
     }
 
     @Override
     public boolean update() {
-        return PuzzleDAO.updatePuzzleGame(this);
+        var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+        return puzzleRepo.updatePuzzleGame(this);
     }
 
     @Override

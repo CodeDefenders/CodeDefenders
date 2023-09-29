@@ -19,7 +19,9 @@
 package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -35,7 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.PuzzleRepository;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -67,22 +70,42 @@ public class PuzzleOverview extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PuzzleRepository puzzleRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        if (!checkEnabled()) {
+        if (!puzzleRepo.checkPuzzlesEnabled() || !puzzleRepo.checkActivePuzzlesExist()) {
             // Send users to the home page
             response.sendRedirect(url.forPath("/"));
             return;
         }
-        final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
+        final Set<PuzzleGame> activePuzzles = new HashSet<>(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
 
-        final SortedSet<PuzzleChapterEntry> puzzles = PuzzleDAO.getPuzzleChapters()
+        final SortedSet<PuzzleChapterEntry> puzzles = puzzleRepo.getPuzzleChapters()
                 .stream()
                 .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        // TODO: replace this with something more efficient
+        // This is just a quick hack from making PuzzleDAO non-static
+        final Set<Integer> solvedPuzzles = new TreeSet<>();
+        for (var chapter : puzzles) {
+            for (var puzzle : chapter.getPuzzleEntries()) {
+                if (puzzle.getType() == PuzzleEntry.Type.PUZZLE && !puzzle.isLocked()) {
+                    PuzzleGame game = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
+                            puzzle.getPuzzleId(), login.getUserId());
+                    if (game != null && game.getState() == GameState.SOLVED) {
+                        solvedPuzzles.add(puzzle.getPuzzleId());
+                    }
+                }
+
+            }
+        }
+
         request.setAttribute("puzzleChapterEntries", puzzles);
+        request.setAttribute("solvedPuzzles", solvedPuzzles);
 
         request.getRequestDispatcher(Constants.PUZZLE_OVERVIEW_VIEW_JSP).forward(request, response);
     }
@@ -92,15 +115,6 @@ public class PuzzleOverview extends HttpServlet {
         logger.info("Unsupported POST request to /puzzles");
         // aborts request and sends 400
         super.doPost(req, resp);
-    }
-
-    /**
-     * Checks whether users can play puzzles.
-     *
-     * @return {@code true} when users can play puzzles, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**
@@ -119,7 +133,7 @@ public class PuzzleOverview extends HttpServlet {
     private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId,
                                                                              Set<PuzzleGame> activePuzzles) {
         return puzzleChapter -> {
-            final Set<PuzzleEntry> puzzleEntries = PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())
+            final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())
                     .stream()
                     .map(toPuzzleEntry(userId, activePuzzles))
                     .collect(Collectors.toSet());

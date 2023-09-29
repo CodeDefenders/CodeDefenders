@@ -21,10 +21,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="puzzleRepo" type="org.codedefenders.database.PuzzleRepository"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -57,7 +57,7 @@
                         <li><a class="dropdown-item" id="header-leaderboard" href="${url.forPath(Paths.LEADERBOARD_PAGE)}">Leaderboard</a></li>
                     </ul>
                 </li>
-                <c:if test="${PuzzleGameManager.checkEnabled()}">
+                <c:if test="${puzzleRepo.checkPuzzlesEnabled() && puzzleRepo.checkActivePuzzlesExist()}">
                     <li class="nav-item nav-item-highlight me-3">
                     <a class="nav-link" id="header-puzzle" href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Puzzles</a>
                     </li>
