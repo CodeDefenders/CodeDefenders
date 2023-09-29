@@ -242,12 +242,12 @@ public class PuzzleRepository {
 
     /**
      * Returns a {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     * given user. The list is sorted by the the timestamp of the games.
+     * given user. The list is sorted by the timestamp of the games.
      *
      * @param puzzleId The puzzle ID.
      * @param userId   The user ID.
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     *     given user. The list is sorted by the the timestamp of the games.
+     *     given user. The list is sorted by the timestamp of the games.
      */
     public List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         @Language("SQL") String query = """
@@ -272,11 +272,11 @@ public class PuzzleRepository {
 
     /**
      * Returns a {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
-     * The list is sorted by the the timestamp of the games.
+     * The list is sorted by the timestamp of the games.
      *
      * @param userId The user ID.
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
-     *     The list is sorted by the the timestamp of the games.
+     *     The list is sorted by the timestamp of the games.
      */
     public List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         @Language("SQL") String query = """

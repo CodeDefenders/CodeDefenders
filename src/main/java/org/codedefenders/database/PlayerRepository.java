@@ -94,12 +94,7 @@ public class PlayerRepository {
     }
 
     /**
-     * Retrieves the identifier of a player of a given user in a given game.
-     * TODO: Return Integer instead of int, and null instead of -1?
-     *
-     * @param userId the user identifier as an {@code int}.
-     * @param gameId the game identifier as an {@code int}.
-     * @return the playerId for a user in a game.
+     * Retrieves the player ID of a given user in a given game.
      */
     public int getPlayerIdForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
@@ -110,6 +105,7 @@ public class PlayerRepository {
         """;
 
         try {
+            // TODO: Return optional here
             var playerId = queryRunner.query(query,
                     oneFromRS(rs -> rs.getInt("ID")),
                     userId,
@@ -123,12 +119,7 @@ public class PlayerRepository {
     }
 
     /**
-     * Retrieves a player given its id.
-     *
-     * <p>TODO What happens if the player does not exist?
-     *
-     * @param playerId the player identifier as an {@code int}.
-     * @return player instance
+     * Retrieves a player given its ID.
      */
     public Player getPlayer(int playerId) {
         @Language("SQL") String query = """
@@ -151,10 +142,6 @@ public class PlayerRepository {
 
     /**
      * Retrieves the player of a given user in a given game.
-     *
-     * @param userId The user identifier as an {@code int}.
-     * @param gameId The game identifier as an {@code int}.
-     * @return The player for a user in a game.
      */
     public Player getPlayerForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
