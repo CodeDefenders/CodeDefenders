@@ -44,7 +44,6 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
 /**
  * This class handles the database logic for melee games.
  *
- * @author gambi
  * @see MeleeGame
  */
 public class MeleeGameRepository {
@@ -58,7 +57,7 @@ public class MeleeGameRepository {
     }
 
     /**
-     * Constructs a {@link MeleeGame} from a {@link ResultSet} entry.
+     * Constructs a {@link MeleeGame} from a {@link ResultSet} row.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed melee game, or {@code null} if the game is no melee game.
@@ -66,7 +65,7 @@ public class MeleeGameRepository {
     static MeleeGame meleeGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.MELEE) {
-            // TODO: This should probably throw instead of returning null.
+            // TODO: This should probably throw an IllegalArgumentException instead of returning null.
             return null;
         }
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
@@ -121,7 +120,6 @@ public class MeleeGameRepository {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed melee game information.
-     * @see RSMapper
      */
     static UserMeleeGameInfo openMeleeGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -137,7 +135,6 @@ public class MeleeGameRepository {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed melee game information.
-     * @see RSMapper
      */
     static UserMeleeGameInfo activeMeleeGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -153,7 +150,6 @@ public class MeleeGameRepository {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed melee game information.
-     * @see RSMapper
      */
     static UserMeleeGameInfo finishedGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
@@ -166,12 +162,8 @@ public class MeleeGameRepository {
     /**
      * Stores a given {@link MeleeGame} in the database.
      *
-     * <p>This method does not update the given game object. Use
-     * {@link MeleeGame#insert()} instead.
-     *
-     * @param game the given game as a {@link MeleeGame}.
-     * @return the generated identifier of the game as an {@code int}.
-     * @throws UncheckedSQLException If storing the game was not successful.
+     * @param game The given game.
+     * @return The generated ID.
      */
     public int storeMeleeGame(MeleeGame game) throws UncheckedSQLException {
         int classId = game.getClassId();
@@ -251,7 +243,7 @@ public class MeleeGameRepository {
      *
      * <p>This method does not update the given game object.
      *
-     * @param game the given game as a {@link MeleeGame}.
+     * @param game The given game.
      * @return {@code true} if updating was successful, {@code false} otherwise.
      */
     public boolean updateMeleeGame(MeleeGame game) {
@@ -305,11 +297,11 @@ public class MeleeGameRepository {
     }
 
     /**
-     * Returns a {@link MeleeGame} for a given game identifier or {@code null} if no
+     * Returns a {@link MeleeGame} for a given game ID or {@code null} if no
      * game was found or the game mode differs.
      *
-     * @param gameId the game identifier.
-     * @return a {@link MeleeGame} instance or {@code null} if none matching game was found.
+     * @param gameId The game ID.
+     * @return The game or {@code null} if none matching game was found.
      */
     public MeleeGame getMeleeGame(int gameId) {
         @Language("SQL") String query = """
@@ -351,9 +343,9 @@ public class MeleeGameRepository {
 
     /**
      * Retrieves a list of all {@link UserMeleeGameInfo UserMeleeGameInfos} for
-     * games which are joinable for a given user identifier.
+     * games which the given user can join.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The user ID the games are retrieved for.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
     public List<UserMeleeGameInfo> getOpenMeleeGamesWithInfoForUser(int userId) {
@@ -387,10 +379,11 @@ public class MeleeGameRepository {
     }
 
     /**
-     * Retrieves a list of all {@link UserMeleeGameInfo UserMeleeGameInfos} for
-     * games a given user has created or joined.
+     * Retrieves a list of all active {@link UserMeleeGameInfo UserMeleeGameInfos} for the given user.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * <p>This includes games the user created and games the user joined.
+     *
+     * @param userId The user ID.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
     public List<UserMeleeGameInfo> getActiveMeleeGamesWithInfoForUser(int userId) {
@@ -427,7 +420,9 @@ public class MeleeGameRepository {
      * Retrieves a list of active {@link MeleeGame MeleeGames}, which are played by
      * a given user.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * <p>This does not include games created by the user.
+     *
+     * @param userId The user ID.
      * @return a list of {@link MeleeGame MeleeGames}, empty if none are found.
      */
     public List<MeleeGame> getJoinedMeleeGamesForUser(int userId) {
@@ -452,7 +447,7 @@ public class MeleeGameRepository {
      * Retrieves a list of {@link UserMeleeGameInfo UserMeleeGameInfo objects},
      * which were created or played by a given user, but are finished.
      *
-     * @param userId the user identifier the games are retrieved for.
+     * @param userId The user ID.
      * @return a list of {@link UserMeleeGameInfo UserMeleeGameInfos}, empty if none are found.
      */
     public List<UserMeleeGameInfo> getFinishedMeleeGamesForUser(int userId) {
@@ -488,7 +483,7 @@ public class MeleeGameRepository {
      * Retrieves a list of {@link MeleeGame MeleeGames}, which were created by a
      * given user and are not yet finished.
      *
-     * @param creatorId the creator identifier the games are retrieved for.
+     * @param creatorId The user ID of the creator.
      * @return a list of {@link MeleeGame MeleeGames}, empty if none are found.
      */
     public List<MeleeGame> getUnfinishedMeleeGamesCreatedBy(int creatorId) {
