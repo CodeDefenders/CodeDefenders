@@ -85,4 +85,12 @@ VALUES (0, 0, 'No games played yet', 'Play your first game to unlock this achiev
        (8, 1, 'The First Mutant', 'Create your first mutant', '{0} of {1} mutants created to reach the next level', 1),
        (8, 2, 'Bronze Mutant Creator', 'Create {0} mutants', '{0} of {1} mutants created to reach the next level', 10),
        (8, 3, 'Silver Mutant Creator', 'Create {0} mutants', '{0} of {1} mutants created to reach the next level', 50),
-       (8, 4, 'Gold Mutant Creator', 'Create {0} mutants', '{0} mutants created, max level reached', 200);
+       (8, 4, 'Gold Mutant Creator', 'Create {0} mutants', '{0} mutants created, max level reached', 200),
+
+       (9, 0, 'No puzzles solved yet', 'Solve puzzles to unlock this achievement', '{0} of {1} puzzles solved', 0),
+       (9, 1, 'The First Puzzle', 'Solve your first puzzle', '{0} of {1} puzzles solved to reach the next level', 1),
+       (9, 2, 'Bronze Puzzle Solver', 'Solve {0} puzzles', '{0} of {1} puzzles solved to reach the next level', 5),
+       (9, 3, 'Silver Puzzle Solver', 'Solve {0} puzzles', '{0} of {1} puzzles solved to reach the next level', 15),
+       (9, 4, 'Puzzle Expert', 'Solve all {0} puzzles', 'All {0} puzzles solved', 19);
+
+#TODO: add already solved puzzles to count.

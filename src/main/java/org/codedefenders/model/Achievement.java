@@ -120,6 +120,8 @@ public class Achievement implements Serializable {
         WRITE_TESTS(7),
         @SerializedName("8")
         CREATE_MUTANTS(8),
+        @SerializedName("9")
+        SOLVE_PUZZLES(9),
         ; // format for better git diffs
 
         private final int id;

@@ -17,6 +17,7 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -27,6 +28,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
 import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
+import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
@@ -178,6 +180,11 @@ public class AchievementService {
 
     public class AchievementEventHandler {
 
+        /**
+         * The {@link GameStoppedEvent} is fired when a game is finished. It is used to count the amount of games
+         * someone has played in total, as attacker and defender. It is also used to determine how often someone has won
+         * a game in total, as attacker and defender.
+         */
         @Subscribe
         @SuppressWarnings("unused")
         public void handleGameStopped(GameStoppedEvent event) {
@@ -204,6 +211,21 @@ public class AchievementService {
                         )).forEach(AchievementService.this::addMultiplayerGameResult);
             } else if (abstractGame instanceof MeleeGame game) {
                 // Achievement if a player has the most points in the game?
+            }
+        }
+
+        /**
+         * The {@link GameSolvedEvent} is fired when a puzzle is solved.
+         * It is used to count the amount of solved puzzles.
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handlePuzzleGameSolvedEvent(GameSolvedEvent event) {
+            int userId = PuzzleDAO.getPuzzleGameForId(event.getGameId()).getCreatorId();
+            Achievement.Id achievementId = Achievement.Id.SOLVE_PUZZLES;
+            if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
+                logger.info("Updated achievement {} for user with id {}", achievementId, userId);
+                enqueueAchievementNotification(userId, achievementId);
             }
         }
 
