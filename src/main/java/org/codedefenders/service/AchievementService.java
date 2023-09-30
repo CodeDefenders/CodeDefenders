@@ -1,19 +1,26 @@
 package org.codedefenders.service;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Achievement;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
@@ -77,6 +84,31 @@ public class AchievementService {
                         enqueueAchievementNotification(userId, achievementId);
                     }
                 });
+    }
+
+    private List<Achievement.Id> getMultiplayerGameResultAchievementIdForStatus(ScoreboardBean.PlayerStatus status) {
+        List<Achievement.Id> ids = new ArrayList<>();
+        switch (status) {
+            case WINNING_ATTACKER -> {
+                ids.add(Achievement.Id.WIN_GAMES_AS_ATTACKER);
+                ids.add(Achievement.Id.WIN_GAMES);
+            }
+            case WINNING_DEFENDER -> {
+                ids.add(Achievement.Id.WIN_GAMES_AS_DEFENDER);
+                ids.add(Achievement.Id.WIN_GAMES);
+            }
+        }
+        return ids;
+    }
+
+    private void addMultiplayerGameResult(int userId, ScoreboardBean.PlayerStatus status) {
+        getMultiplayerGameResultAchievementIdForStatus(status).forEach(achievementId -> {
+                    if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
+                        logger.info("Updated achievement {} for user with id {}", achievementId, userId);
+                        enqueueAchievementNotification(userId, achievementId);
+                    }
+                }
+        );
     }
 
     private void addTestWritten(int userId) {
@@ -149,10 +181,30 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handleGameStopped(GameStoppedEvent event) {
-            Arrays.asList(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
-                List<Player> players = GameDAO.getPlayersForGame(event.getGameId(), role);
-                addGamePlayed(players, role);
+            Function<Role, List<Player>> getPlayersWithRole =
+                    role -> GameDAO.getPlayersForGame(event.getGameId(), role);
+
+            List.of(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
+                addGamePlayed(getPlayersWithRole.apply(role), role);
             });
+
+            AbstractGame abstractGame = GameDAO.getGame(event.getGameId());
+            if (abstractGame instanceof MultiplayerGame game) {
+                ScoreboardBean scoreboard = new ScoreboardBean();
+                scoreboard.setGameId(event.getGameId());
+                scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+                scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+
+                Stream.of(Role.DEFENDER, Role.ATTACKER)
+                        .map(getPlayersWithRole)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toMap(
+                                player -> player.getUser().getId(),
+                                player -> scoreboard.getStatusForPlayer(player.getId())
+                        )).forEach(AchievementService.this::addMultiplayerGameResult);
+            } else if (abstractGame instanceof MeleeGame game) {
+                // Achievement if a player has the most points in the game?
+            }
         }
 
         /**

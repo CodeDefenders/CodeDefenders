@@ -111,9 +111,16 @@ public class Achievement implements Serializable {
         @SerializedName("3")
         PLAY_MELEE_GAMES(3),
         @SerializedName("4")
-        WRITE_TESTS(4),
+        WIN_GAMES(4),
         @SerializedName("5")
-        CREATE_MUTANTS(5);
+        WIN_GAMES_AS_ATTACKER(5),
+        @SerializedName("6")
+        WIN_GAMES_AS_DEFENDER(6),
+        @SerializedName("7")
+        WRITE_TESTS(7),
+        @SerializedName("8")
+        CREATE_MUTANTS(8),
+        ; // format for better git diffs
 
         private final int id;
         private static final Map<Integer, Id> MAP = new HashMap<>();
