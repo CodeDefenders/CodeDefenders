@@ -91,6 +91,18 @@ public class UserProfileBean {
         return achievements;
     }
 
+    public Collection<Achievement> getUnlockedAchievements() {
+        return achievements.stream()
+                .filter(achievement -> achievement.getLevel() > 0)
+                .toList();
+    }
+
+    public Collection<Achievement> getLockedAchievements() {
+        return achievements.stream()
+                .filter(achievement -> achievement.getLevel() == 0)
+                .toList();
+    }
+
     public void setAchievements(Collection<Achievement> achievements) {
         this.achievements = achievements.stream()
                 .sorted(Comparator.comparingInt(Achievement::getIndex))

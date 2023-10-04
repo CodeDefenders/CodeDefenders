@@ -229,6 +229,10 @@
     --color-primary: #d2b615;
 }
 
+.locked-achievements.hidden {
+    display: none;
+}
+
 
 /* Media queries */
 

@@ -46,27 +46,25 @@
         <h2>Achievements</h2>
         <div class="achievements">
             <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
-            <c:forEach items="${profile.achievements}" var="achievement">
-                <div class="achievement-card achievement-level-${achievement.level}">
-                    <div class="pie animate" style="--percentage: ${achievement.progress.orElse(100)}">
-                        <img src="${url.forPath("/images/achievements/")}codedefenders_achievements_${achievement.id.asInt}_lvl_${achievement.level}.png"
-                             alt="${achievement.name} (Level ${achievement.level})">
-                    </div>
-                    <p>
-                        <strong>
-                                ${achievement.name}
-                            <c:if test="${achievement.level > 0}">
-                                (Level ${achievement.level})
-                            </c:if>
-                        </strong>
-                        <br>
-                            ${achievement.description}
-                        <br>
-                            ${achievement.progressText}
-                    </p>
-                </div>
+            <c:if test="${profile.unlockedAchievements.size() == 0}">
+                <div class="no-achievements">No achievement unlocked yet.</div>
+            </c:if>
+            <c:forEach items="${profile.unlockedAchievements}" var="achievement">
+                <t:achievement_badge achievement="${achievement}"/>
             </c:forEach>
         </div>
+        <c:if test="${profile.lockedAchievements.size() > 0}">
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="
+                document.querySelector('.locked-achievements').classList.toggle('hidden');
+                this.innerText = this.innerText === 'Show all achievements' ? 'Hide locked achievements' : 'Show all achievements';
+            ">Show all achievements
+            </button>
+            <div class="achievements locked-achievements hidden">
+                <c:forEach items="${profile.lockedAchievements}" var="achievement">
+                    <t:achievement_badge achievement="${achievement}"/>
+                </c:forEach>
+            </div>
+        </c:if>
     </section>
 
     <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
