@@ -40,6 +40,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -90,6 +92,11 @@ public class AdminUserManagementIT {
             fieldMessages.setAccessible(true);
             MessagesBean messagesBean = mock(MessagesBean.class);
             fieldMessages.set(adminUserManagement, messagesBean);
+
+            Field fieldPasswordEncoder = AdminUserManagement.class.getDeclaredField("passwordEncoder");
+            fieldPasswordEncoder.setAccessible(true);
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            fieldPasswordEncoder.set(adminUserManagement, passwordEncoder);
 
             Field fieldURLUtils = AdminUserManagement.class.getDeclaredField("url");
             fieldURLUtils.setAccessible(true);
