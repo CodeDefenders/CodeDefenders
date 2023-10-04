@@ -18,6 +18,8 @@ public class Achievement implements Serializable {
     @Expose
     private final int level;
     @Expose
+    private final int index;
+    @Expose
     private final String name;
     @Expose
     private final String description;
@@ -30,10 +32,11 @@ public class Achievement implements Serializable {
     @Expose
     private int metricCurrent = 0;
 
-    public Achievement(Id achievementId, int level, String name, String description, String progressText,
+    public Achievement(Id achievementId, int level, int index, String name, String description, String progressText,
                        int metricForCurrentLevel, Optional<Integer> metricForNextLevel) {
         this.achievementId = achievementId;
         this.level = level;
+        this.index = index;
         this.name = name;
         this.description = MessageFormat.format(description, metricForCurrentLevel);
         this.progressText = progressText;
@@ -41,9 +44,9 @@ public class Achievement implements Serializable {
         this.metricForNextLevel = metricForNextLevel.orElse(null);
     }
 
-    public Achievement(Id achievementId, int level, String name, String description, String progressText,
+    public Achievement(Id achievementId, int level, int index, String name, String description, String progressText,
                        int metricForCurrentLevel, Optional<Integer> metricForNextLevel, int metricCurrent) {
-        this(achievementId, level, name, description, progressText, metricForCurrentLevel, metricForNextLevel);
+        this(achievementId, level, index, name, description, progressText, metricForCurrentLevel, metricForNextLevel);
         this.metricCurrent = metricCurrent;
     }
 
@@ -53,6 +56,10 @@ public class Achievement implements Serializable {
 
     public int getLevel() {
         return level;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public String getName() {
@@ -111,15 +118,15 @@ public class Achievement implements Serializable {
         @SerializedName("3")
         PLAY_MELEE_GAMES(3),
         @SerializedName("4")
-        WIN_GAMES(4),
+        WRITE_TESTS(4),
         @SerializedName("5")
-        WIN_GAMES_AS_ATTACKER(5),
+        CREATE_MUTANTS(5),
         @SerializedName("6")
-        WIN_GAMES_AS_DEFENDER(6),
+        WIN_GAMES(6),
         @SerializedName("7")
-        WRITE_TESTS(7),
+        WIN_GAMES_AS_ATTACKER(7),
         @SerializedName("8")
-        CREATE_MUTANTS(8),
+        WIN_GAMES_AS_DEFENDER(8),
         @SerializedName("9")
         SOLVE_PUZZLES(9),
         ; // format for better git diffs

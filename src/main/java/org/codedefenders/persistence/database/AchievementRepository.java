@@ -32,6 +32,7 @@ public class AchievementRepository {
         return new Achievement(
                 Achievement.Id.fromInt(rs.getInt("achievements.ID")),
                 rs.getInt("achievements.Level"),
+                rs.getInt("achievements.Index"),
                 rs.getString("achievements.Name"),
                 rs.getString("achievements.Description"),
                 rs.getString("achievements.ProgressText"),

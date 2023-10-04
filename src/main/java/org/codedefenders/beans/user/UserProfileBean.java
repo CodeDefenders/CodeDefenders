@@ -19,6 +19,7 @@
 package org.codedefenders.beans.user;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 
 import javax.annotation.ManagedBean;
@@ -91,6 +92,8 @@ public class UserProfileBean {
     }
 
     public void setAchievements(Collection<Achievement> achievements) {
-        this.achievements = achievements;
+        this.achievements = achievements.stream()
+                .sorted(Comparator.comparingInt(Achievement::getIndex))
+                .toList();
     }
 }
