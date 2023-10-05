@@ -123,6 +123,7 @@ class AchievementNotifications {
     _removeNotification(notification) {
         this._notificationContainer.removeChild(notification.element);
         this._currentNotifications.splice(this._currentNotifications.indexOf(notification), 1);
+        clearTimeout(notification.timer);
     }
 }
 
