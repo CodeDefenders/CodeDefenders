@@ -107,16 +107,9 @@ GROUP BY Creator_ID
 ON DUPLICATE KEY UPDATE Metric = VALUES(Metric);
 
 # Update achievement level for the puzzle achievement.
-DELIMITER //
-FOR i IN 1..4
-    DO
-        UPDATE `has_achievement`
-        SET `Achievement_Level` = i
-        WHERE `Achievement_ID` = 9
-          AND `Metric` >= (SELECT `Metric`
+UPDATE `has_achievement`
+SET `Achievement_Level` = (SELECT MAX(`Level`)
                            FROM `achievements`
                            WHERE `ID` = 9
-                             AND `Level` = i);
-    END FOR;
-//
-DELIMITER ;
+                             AND `Metric` <= `has_achievement`.`Metric`)
+WHERE `Achievement_ID` = 9;
