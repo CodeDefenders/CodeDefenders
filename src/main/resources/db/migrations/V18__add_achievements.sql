@@ -1,6 +1,3 @@
-DROP TABLE IF EXISTS has_achievement;
-DROP TABLE IF EXISTS achievements;
-
 CREATE TABLE achievements
 (
     `ID`           INT          NOT NULL,
@@ -15,10 +12,9 @@ CREATE TABLE achievements
 
 CREATE TABLE has_achievement
 (
-    `Achievement_ID`     INT NOT NULL,
+    `Achievement_ID` INT NOT NULL,
     `Achievement_level` INT DEFAULT 0,
-    `User_ID`            INT REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-    `Notification_Shown` BOOL DEFAULT FALSE,
+    `User_ID`        INT REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
     `Metric`            INT NOT NULL,
     PRIMARY KEY (`Achievement_ID`, `User_ID`),
     CONSTRAINT `achievement_user` FOREIGN KEY (`Achievement_ID`, `Achievement_level`) REFERENCES `achievements` (`ID`, `level`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -100,4 +96,27 @@ VALUES (0, 0, 0, 'No games played yet', 'Play your first game to unlock this ach
        (9, 3, 7, 'Silver Puzzle Solver', 'Solve {0} puzzles', '{0} of {1} puzzles solved to reach the next level', 15),
        (9, 4, 7, 'Puzzle Expert', 'Solve all {0} puzzles', 'All {0} puzzles solved', 19);
 
-#TODO: add already solved puzzles to count.
+
+# Update the metric of the puzzle achievement according to the number of solved puzzles.
+INSERT INTO `has_achievement` (Achievement_ID, User_ID, Metric)
+SELECT 9, Creator_ID AS user, COUNT(*) AS count
+FROM `games`
+WHERE Mode = 'PUZZLE'
+  AND State = 'SOLVED'
+GROUP BY Creator_ID
+ON DUPLICATE KEY UPDATE Metric = VALUES(Metric);
+
+# Update achievement level for the puzzle achievement.
+DELIMITER //
+FOR i IN 1..4
+    DO
+        UPDATE `has_achievement`
+        SET `Achievement_Level` = i
+        WHERE `Achievement_ID` = 9
+          AND `Metric` >= (SELECT `Metric`
+                           FROM `achievements`
+                           WHERE `ID` = 9
+                             AND `Level` = i);
+    END FOR;
+//
+DELIMITER ;
