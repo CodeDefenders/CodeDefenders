@@ -365,12 +365,11 @@ public class KillmapDAO {
     }
 
     public static boolean removeKillmapJobsByIds(KillMapType jobType, List<Integer> ids) {
+        boolean success = true;
         for (int id : ids) {
-            if (!removeJob(jobType, id)) {
-                return false;
-            }
+            success &= removeJob(jobType, id);
         }
-        return true;
+        return success;
     }
 
 
