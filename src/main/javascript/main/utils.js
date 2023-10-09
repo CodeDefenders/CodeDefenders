@@ -10,7 +10,7 @@ const parseHTML = function (html) {
 };
 
 /**
- * Creates and posts a for with the given data.
+ * Creates and posts a form with the given data.
  * @param {Object.<string, string>} formData Object with [name: value] pairs of form data.
  * @param {string?} action The URL to post to.
  */
