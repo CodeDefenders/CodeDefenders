@@ -228,8 +228,7 @@ public class AdminKillmapManagement extends HttpServlet {
             case CLASSROOM:
                 existingIds = ids.stream()
                         .map(classroomService::getClassroomById)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
+                        .flatMap(Optional::stream)
                         .map(Classroom::getId)
                         .collect(Collectors.toList());
                 break;
