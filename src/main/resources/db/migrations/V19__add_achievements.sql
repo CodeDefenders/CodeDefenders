@@ -94,8 +94,16 @@ VALUES (0, 0, 0, 'No games played yet', 'Play your first game to unlock this ach
        (9, 1, 7, 'The First Puzzle', 'Solve your first puzzle', '{0} of {1} puzzles solved to reach the next level', 1),
        (9, 2, 7, 'Bronze Puzzle Solver', 'Solve {0} puzzles', '{0} of {1} puzzles solved to reach the next level', 5),
        (9, 3, 7, 'Silver Puzzle Solver', 'Solve {0} puzzles', '{0} of {1} puzzles solved to reach the next level', 15),
-       (9, 4, 7, 'Puzzle Expert', 'Solve all {0} puzzles', 'All {0} puzzles solved', 19);
+       (9, 4, 7, 'Puzzle Expert', 'Solve {0} puzzles', '{0} puzzles solved, max level reached', 20);
 
+
+# Set the max metric of the puzzle achievement to the amount of currently active puzzles.
+UPDATE `achievements`
+SET `Metric` = (SELECT COUNT(*)
+                FROM `puzzles`
+                WHERE `Active` = 1)
+WHERE `ID` = 9
+  AND `Level` = 4;
 
 # Update the metric of the puzzle achievement according to the number of solved puzzles.
 INSERT INTO `has_achievement` (Achievement_ID, User_ID, Metric)
