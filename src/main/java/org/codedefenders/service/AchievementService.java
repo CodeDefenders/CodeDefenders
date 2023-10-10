@@ -131,29 +131,39 @@ public class AchievementService {
 
     private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
         Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
-        notificationQueue.computeIfAbsent(userId, k -> new LinkedList<>()).add(achievement);
+        synchronized (notificationQueue) {
+            notificationQueue.computeIfAbsent(userId, k -> new LinkedList<>()).add(achievement);
+        }
         logger.debug("Achievement unlocked & added to queue: {} (Level {})", achievement.getName(),
                 achievement.getLevel());
     }
 
     public void sendAchievementNotifications() {
-        notificationQueue.forEach((userId, achievements) -> {
-            achievements.forEach(achievement -> {
-                logger.debug("Sending achievement notification for user with id {} and achievement {}",
-                        userId, achievement.getId());
-                AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
-                newEvent.setAchievement(achievement);
-                newEvent.setUserId(userId);
-                notificationService.post(newEvent);
+        synchronized (notificationQueue) {
+            notificationQueue.forEach((userId, achievements) -> {
+                achievements.forEach(achievement -> {
+                    logger.debug("Sending achievement notification for user with id {} and achievement {}",
+                            userId, achievement.getId());
+                    AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
+                    newEvent.setAchievement(achievement);
+                    newEvent.setUserId(userId);
+                    notificationService.post(newEvent);
+                });
             });
-        });
+        }
     }
 
     private void achievementNotificationSent(int userId, int achievementId) {
-        List<Achievement> achievements = notificationQueue.get(userId);
-        achievements.removeIf(achievement -> achievement.getId().getAsInt() == achievementId);
-        if (achievements.isEmpty()) {
-            notificationQueue.remove(userId);
+        synchronized (notificationQueue) {
+            List<Achievement> achievements = notificationQueue.get(userId);
+            if (achievements == null) {
+                return;
+            }
+
+            achievements.removeIf(achievement -> achievement.getId().getAsInt() == achievementId);
+            if (achievements.isEmpty()) {
+                notificationQueue.remove(userId);
+            }
         }
     }
 
