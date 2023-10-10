@@ -211,7 +211,7 @@ public class KillMap {
      * The killmap types. Game or class killmap.
      */
     public enum KillMapType {
-        CLASS, GAME
+        CLASS, GAME, CLASSROOM
     }
 
     /**

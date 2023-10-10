@@ -32,11 +32,15 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.game.Test;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * This class handles the database logic for mutants.
@@ -126,7 +130,7 @@ public class MutantDAO {
     public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM view_mutants_with_user m",
+                "SELECT * FROM view_valid_game_mutants m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.Player_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
@@ -139,7 +143,7 @@ public class MutantDAO {
     public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
             throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM view_mutants_with_user m",
+                "SELECT * FROM view_valid_game_mutants m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
@@ -148,40 +152,74 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the given game.
+     *
+     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
      */
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM view_valid_mutants m ",
+                "FROM view_valid_game_mutants m ",
                 "WHERE m.Game_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
     }
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
+     * (not the instances that are copied into games).
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
-        List<Mutant> result = new ArrayList<>();
-
         String query = String.join("\n",
-                "SELECT m.*",
-                "FROM view_valid_mutants m, games",
-                "WHERE m.Game_ID = games.ID",
-                "  AND games.Class_ID = ?");
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
 
-        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
+                "SELECT mutants.*",
+                "FROM mutants_for_class mutants",
+                "WHERE mutants.Class_ID = ?");
 
-        // Include also those mutants created during the upload. Player = -1
-        String systemAttackerQuery = String.join("\n",
-                "SELECT m.*",
-                "FROM view_valid_mutants m, mutant_uploaded_with_class up",
-                "WHERE m.Mutant_ID = up.Mutant_ID",
-                "  AND m.Class_ID = ?;");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+    }
 
-        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS,
-                DatabaseValue.of(classId)));
+    /**
+     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted mutants from classroom games as well as templates of predefined mutants
+     * for classes used in the classroom.
+     */
+    public static Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+                "classroom_system_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_system_mutant_templates mutants",
+                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_valid_user_mutants mutants, games",
+                "    WHERE mutants.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                ")",
 
-        return result;
+                "SELECT * FROM classroom_system_mutants",
+                "UNION ALL",
+                "SELECT * FROM classroom_user_mutants;"
+        );
+
+        List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+
+        Multimap<Integer, Mutant> mutantsMap = ArrayListMultimap.create();
+        for (Mutant mutant : mutants) {
+            mutantsMap.put(mutant.getClassId(), mutant);
+        }
+        return mutantsMap;
     }
 
     /**

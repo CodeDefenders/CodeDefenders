@@ -41,6 +41,9 @@ import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
@@ -148,6 +151,8 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
+     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
+     *
      * @param gameId        the identifier of the given game.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
      *                      Include also the tests uploaded by the System Defender
@@ -155,35 +160,15 @@ public class TestDAO {
      */
     public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
             throws UncheckedSQLException, SQLMappingException {
-        List<Test> result = new ArrayList<>();
-
         String query = String.join("\n",
                 "SELECT t.*",
-                "FROM view_valid_tests t",
+                "FROM view_valid_game_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Game_ID=?",
                 (defendersOnly ? "AND (pl.Role='DEFENDER' OR pl.Role='PLAYER');" : ";")
         );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId)));
 
-        String systemDefenderQuery = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests",
-                "INNER JOIN players pl on tests.Player_ID = pl.ID",
-                "INNER JOIN users u on u.User_ID = pl.User_ID",
-                "WHERE tests.Game_ID = ?",
-                "  AND tests.ClassFile IS NOT NULL",
-                "  AND u.User_ID = ?;"
-        );
-
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(DUMMY_DEFENDER_USER_ID)
-        };
-
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, values));
-
-        return result;
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
     public static List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
@@ -197,7 +182,7 @@ public class TestDAO {
         // need to use some view instead...
         String query = String.join("\n",
                 "SELECT t.*",
-                "FROM view_valid_tests t",
+                "FROM view_valid_game_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? )",
                 "  AND t.Game_ID=? ",
@@ -211,34 +196,66 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
-     * <p>Include also the tests from the System Defender
+     * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
+     * (not the instances that are copied into games).
      *
      * @param classId the identifier of the given class.
      * @return a {@link List} of valid tests for the given class.
      */
     public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
-        List<Test> result = new ArrayList<>();
-
         String query = String.join("\n",
-                "SELECT t.*",
-                "FROM view_valid_tests t, games",
-                "WHERE t.Game_ID = games.ID",
-                "  AND games.Class_ID = ?;"
-        );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId)));
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
 
-        // Include also those tests uploaded, i.e, player_id = -1
-        String systemDefenderQuery = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests, test_uploaded_with_class up",
-                "WHERE tests.Test_ID = up.Test_ID",
-                "  AND up.Class_ID = ?",
-                "  AND tests.ClassFile IS NOT NULL;"
+                "SELECT *",
+                "FROM tests_for_class tests",
+                "WHERE tests.Class_ID = ?;"
         );
 
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DatabaseValue.of(classId)));
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
+    }
 
-        return result;
+    /**
+     * Returns the valid {@link Test Tests} from the games played on the given class.
+     *
+     * <p>This includes valid user-submitted tests from classroom games as well as templates of predefined tests
+     * for classes used in the classroom.
+     */
+    public static Multimap<Integer, Test> getValidTestsForClassroom(int classroomId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+
+                "classroom_system_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_system_test_templates tests",
+                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+
+                "classroom_user_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_valid_user_tests tests, games",
+                "    WHERE tests.Game_ID = games.ID",
+                "    AND games.Classroom_ID = ?",
+                ")",
+
+                "SELECT * FROM classroom_system_tests",
+                "UNION ALL",
+                "SELECT * FROM classroom_user_tests;"
+        );
+
+        List<Test> tests = DB.executeQueryReturnList(query, TestDAO::testFromRS,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+
+        Multimap<Integer, Test> testsMap = ArrayListMultimap.create();
+        for (Test test : tests) {
+            testsMap.put(test.getClassId(), test);
+        }
+        return testsMap;
     }
 
     /**

@@ -18,6 +18,8 @@
  */
 package org.codedefenders.database;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,11 +28,19 @@ import java.util.stream.Collectors;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.execution.KillMap.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapType;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.Classroom;
+import org.codedefenders.service.ClassroomService;
+import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Multimap;
 
 /**
  * This class handles the database logic for killmaps.
@@ -61,6 +71,9 @@ public class KillmapDAO {
 
     /**
      * Returns the killmap entries for the given game.
+     *
+     * <p>The killmap encompasses all mutants and tests as they appear in game.
+     * This means the instances of predefined mutants and tests are used iff they are used in game.
      */
     public static List<KillMapEntry> getKillMapEntriesForGame(int gameId) {
         String query = String.join("\n",
@@ -76,17 +89,91 @@ public class KillmapDAO {
 
     /**
      * Returns the killmap entries for the given class.
+     *
+     * <p>The killmap encompasses all valid user-submitted mutants and tests,
+     * as well as the templates of predefined mutants and tests (not the instances that are copied into games).
      */
     public static List<KillMapEntry> getKillMapEntriesForClass(int classId) {
         String query = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates),",
+                "mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT killmap.*",
-                "FROM killmap",
-                "WHERE killmap.Class_ID = ?");
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
+                "WHERE killmap.Class_ID = ?",
+                "  AND killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID;"
+        );
 
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
 
         return getKillMapEntries(tests, mutants, query, DatabaseValue.of(classId));
+    }
+
+    /**
+     * Returns the killmap entries for the given classroom.
+     *
+     * <p>The killmap encompasses all valid user-submitted mutants and tests from the classroom,
+     * as well as the templates of predefined mutants and tests of used classes.
+     */
+    public static List<KillMapEntry> getKillMapEntriesForClassroom(int classroomId) {
+        String query = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+                "classroom_system_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_system_mutant_templates mutants",
+                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_valid_user_mutants mutants, games",
+                "    WHERE mutants.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                "),",
+                "mutants_for_classroom AS (",
+                "    SELECT * FROM classroom_system_mutants",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_mutants",
+                "),",
+                "classroom_system_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_system_test_templates tests",
+                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_valid_user_tests tests, games",
+                "    WHERE tests.Game_ID = games.ID",
+                "    AND games.Classroom_ID = ?",
+                "),",
+                "tests_for_classroom AS (",
+                "    SELECT * FROM classroom_system_tests",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_tests",
+                ")",
+
+                "SELECT killmap.*",
+                "FROM killmap,",
+                "   tests_for_classroom tests,",
+                "   mutants_for_classroom mutants",
+                "WHERE killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID"
+        );
+
+        List<Test> tests = new ArrayList<>(TestDAO.getValidTestsForClassroom(classroomId).values());
+        List<Mutant> mutants = new ArrayList<>(MutantDAO.getValidMutantsForClassroom(classroomId).values());
+
+        return getKillMapEntries(tests, mutants, query,
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
     }
 
     /**
@@ -133,115 +220,163 @@ public class KillmapDAO {
         DB.executeBatchQueryReturnKeys(query, entries, dbvExtractor);
     }
 
-    public static boolean removeKillmapsByIds(KillMap.KillMapType killmapType, List<Integer> ids) {
-        if (ids.isEmpty()) {
-            return true;
-        }
+    public static boolean removeGameKillmap(int gameId) {
+        String query = String.join("\n",
+                "DELETE FROM killmap",
+                "WHERE killmap.Game_ID = ?");
+        return DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
+    }
 
-        String idName;
-        switch (killmapType) {
-            case CLASS:
-                idName = "Class_ID";
-                break;
-            case GAME:
-                idName = "Game_ID";
-                break;
-            default:
-                logger.warn("Unknown type of Killmap Job!");
-                return false;
-        }
+    public static boolean removeClassKillmap(int classId) {
+        List<Test> testsForClass = TestDAO.getValidTestsForClass(classId);
+        List<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClass(classId);
 
-        String idsString = ids.stream()
+        String testIds = testsForClass.stream()
+                .map(Test::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        String mutantIds = mutantsForClass.stream()
+                .map(Mutant::getId)
                 .map(String::valueOf)
                 .collect(Collectors.joining(","));
 
-        String query = "DELETE FROM killmap WHERE " + idName + " in (" + idsString + ")";
+        String query = String.join("\n",
+                "DELETE FROM killmap",
+                "WHERE killmap.Test_ID IN (" + testIds + ")",
+                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
+        );
         return DB.executeUpdateQuery(query);
+    }
+
+    public static boolean removeClassroomKillmap(int classroomId) {
+        Collection<Test> testsForClass = TestDAO.getValidTestsForClassroom(classroomId).values();
+        Collection<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClassroom(classroomId).values();
+
+        String testIds = testsForClass.stream()
+                .map(Test::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        String mutantIds = mutantsForClass.stream()
+                .map(Mutant::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String query = String.join("\n",
+                "DELETE FROM killmap",
+                "WHERE killmap.Test_ID IN (" + testIds + ")",
+                "  AND killmap.Mutant_ID IN (" + mutantIds + ");"
+        );
+        return DB.executeUpdateQuery(query);
+    }
+
+    public static void removeKillmapsByIds(KillMapType killmapType, List<Integer> ids) {
+        switch (killmapType) {
+            case CLASS:
+                ids.forEach(KillmapDAO::removeClassKillmap);
+                break;
+            case GAME:
+                ids.forEach(KillmapDAO::removeGameKillmap);
+                break;
+            case CLASSROOM:
+                ids.forEach(KillmapDAO::removeClassroomKillmap);
+                break;
+            default:
+                logger.warn("Unknown type of Killmap Job!");
+        }
     }
 
     /**
      * Return a list of pending killmap jobs ordered by timestamp.
      */
-    public static List<KillMap.KillMapJob> getPendingJobs() {
+    public static List<KillMapJob> getPendingJobs() {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM killmapjob",
                 "ORDER BY Timestamp ASC;");
 
         return DB.executeQueryReturnList(query, rs -> {
+            KillMapType type = null;
+            Integer id = null;
+
             int gameId = rs.getInt("Game_ID");
+            if (!rs.wasNull()) {
+                type = KillMapType.GAME;
+                id = gameId;
+            }
+
             int classId = rs.getInt("Class_ID");
-            // if SQL NULL then int is 0
-            KillMap.KillMapType type = (classId != 0) ? KillMap.KillMapType.CLASS : KillMap.KillMapType.GAME;
-            int reference = (classId != 0) ? classId : gameId;
-            return new KillMap.KillMapJob(type, reference);
+            if (!rs.wasNull()) {
+                type = KillMapType.CLASS;
+                id = classId;
+            }
+
+            int classroomId = rs.getInt("Classroom_ID");
+            if (!rs.wasNull()) {
+                type = KillMapType.CLASSROOM;
+                id = classroomId;
+            }
+
+            return new KillMapJob(type, id);
         });
     }
 
-    public static boolean enqueueJob(KillMap.KillMapJob theJob) {
-        String query;
+    public static boolean enqueueJob(KillMapJob theJob) {
         switch (theJob.getType()) {
             case CLASS:
-                query = "INSERT INTO killmapjob (Class_ID) VALUES (?)";
-                break;
+                return DB.executeUpdateQuery(
+                        "REPLACE INTO killmapjob (Class_ID) VALUES (?);",
+                        DatabaseValue.of(theJob.getId()));
             case GAME:
-                query = "INSERT INTO killmapjob (Game_ID) VALUES (?)";
-                break;
-            default:
-                logger.warn("Unknown type of Killmap Job !");
-                return false;
-        }
-
-        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
-    }
-
-    public static boolean removeJob(KillMap.KillMapJob theJob) {
-        String query;
-        switch (theJob.getType()) {
-            case CLASS:
-                query = "DELETE FROM killmapjob WHERE Class_ID = ?";
-                break;
-            case GAME:
-                query = "DELETE FROM killmapjob WHERE Game_ID = ?";
-                break;
+                return DB.executeUpdateQuery(
+                        "REPLACE INTO killmapjob (Game_ID) VALUES (?);",
+                        DatabaseValue.of(theJob.getId()));
+            case CLASSROOM:
+                return DB.executeUpdateQuery(
+                        "REPLACE INTO killmapjob (Classroom_ID) VALUES (?);",
+                        DatabaseValue.of(theJob.getId()));
             default:
                 logger.warn("Unknown type of Killmap Job!");
                 return false;
         }
-        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
-    public static boolean removeKillmapJobsByIds(KillMap.KillMapType jobType, List<Integer> ids) {
-        if (ids.isEmpty()) {
-            return true;
-        }
-
-        String idName;
-        switch (jobType) {
+    public static boolean removeJob(KillMapType type, int id) {
+        switch (type) {
             case CLASS:
-                idName = "Class_ID";
-                break;
+                return DB.executeUpdateQuery(
+                        "DELETE FROM killmapjob WHERE Class_ID = ?;",
+                        DatabaseValue.of(id));
             case GAME:
-                idName = "Game_ID";
-                break;
+                return DB.executeUpdateQuery(
+                        "DELETE FROM killmapjob WHERE Game_ID = ?;",
+                        DatabaseValue.of(id));
+            case CLASSROOM:
+                return DB.executeUpdateQuery(
+                        "DELETE FROM killmapjob WHERE Classroom_ID = ?;",
+                        DatabaseValue.of(id));
             default:
                 logger.warn("Unknown type of Killmap Job!");
                 return false;
         }
+    }
 
-        String idsString = ids.stream()
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
+    public static boolean removeJob(KillMapJob theJob) {
+        return removeJob(theJob.getType(), theJob.getId());
+    }
 
-        String query = "DELETE FROM killmapjob WHERE " + idName + " in (" + idsString + ")";
-        return DB.executeUpdateQuery(query);
+    public static boolean removeKillmapJobsByIds(KillMapType jobType, List<Integer> ids) {
+        boolean success = true;
+        for (int id : ids) {
+            success &= removeJob(jobType, id);
+        }
+        return success;
     }
 
 
     /** Returns the killmaps progress for all class killmaps not queued for processing. */
     public static List<KillMapClassProgress> getNonQueuedKillMapClassProgress() {
         /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
-         * most most killmaps are not queued for computation and most of the data will be used. */
+         * most killmaps are not queued for computation and most of the data will be used. */
 
         String classesQuery = String.join("\n",
                 "SELECT Class_ID, Name, Alias",
@@ -254,55 +389,61 @@ public class KillmapDAO {
                 "ORDER BY Class_ID;");
 
         String nrTestsQuery = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT Class_ID, COUNT(Test_ID)",
-                "FROM view_valid_tests",
-                "WHERE Game_ID >= 0",
+                "FROM tests_for_class",
                 "GROUP BY Class_ID;");
 
         String nrMutantsQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT Class_ID, COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
-                "WHERE Game_ID >= 0",
+                "FROM mutants_for_class",
                 "GROUP BY Class_ID;");
 
         String nrEntriesQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
+                "tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT killmap.Class_ID, COUNT(*)",
-                "FROM killmap, tests, mutants",
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
                 "WHERE killmap.Test_ID = tests.Test_ID",
                 "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND tests.Game_ID >= 0",
-                "  AND mutants.Game_ID >= 0",
                 "GROUP BY killmap.Class_ID;");
-
-        List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
-            KillMapClassProgress progress = new KillMapClassProgress();
-            progress.setClassId(rs.getInt("Class_ID"));
-            progress.setClassName(rs.getString("Name"));
-            progress.setClassAlias(rs.getString("Alias"));
-            return progress;
-        });
 
         Map<Integer, Integer> classIdToNrTests = new TreeMap<>();
         Map<Integer, Integer> classIdToNrMutants = new TreeMap<>();
         Map<Integer, Integer> classIdToNrEntries = new TreeMap<>();
-
         DB.executeQueryReturnList(nrTestsQuery, rs -> classIdToNrTests.put(rs.getInt(1), rs.getInt(2)));
         DB.executeQueryReturnList(nrMutantsQuery, rs -> classIdToNrMutants.put(rs.getInt(1), rs.getInt(2)));
         DB.executeQueryReturnList(nrEntriesQuery, rs -> classIdToNrEntries.put(rs.getInt(1), rs.getInt(2)));
 
-        for (KillMapClassProgress progress : progresses) {
-            progress.setNrTests(classIdToNrTests.getOrDefault(progress.classId, 0));
-            progress.setNrMutants(classIdToNrMutants.getOrDefault(progress.classId, 0));
-            progress.setNrEntries(classIdToNrEntries.getOrDefault(progress.classId, 0));
-        }
-
-        return progresses;
+        return DB.executeQueryReturnList(classesQuery, rs -> {
+            int classId = rs.getInt("Class_ID");
+            String className = rs.getString("Name");
+            String classAlias = rs.getString("Alias");
+            int nrTests = classIdToNrTests.getOrDefault(classId, 0);
+            int nrMutants = classIdToNrMutants.getOrDefault(classId, 0);
+            int nrEntries = classIdToNrEntries.getOrDefault(classId, 0);
+            int nrExpectedEntries = nrTests * nrMutants;
+            return new KillMapClassProgress(
+                    nrTests, nrMutants, nrEntries, nrExpectedEntries,
+                    classId, className, classAlias
+            );
+        });
     }
 
     /** Returns the killmaps progress for all game killmaps not queued for processing. */
     public static List<KillMapGameProgress> getNonQueuedKillMapGameProgress() {
         /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
-         * most most killmaps are not queued for computation and most of the data will be used. */
+         * most killmaps are not queued for computation and most of the data will be used. */
 
         String gamesQuery = String.join("\n",
                 "SELECT ID, Mode",
@@ -318,12 +459,12 @@ public class KillmapDAO {
 
         String nrTestsQuery = String.join("\n",
                 "SELECT Game_ID, COUNT(Test_ID)",
-                "FROM view_valid_tests",
+                "FROM view_valid_game_tests",
                 "GROUP BY Game_ID;");
 
         String nrMutantsQuery = String.join("\n",
                 "SELECT Game_ID, COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
+                "FROM view_valid_game_mutants",
                 "GROUP BY Game_ID;");
 
         String nrEntriesQuery = String.join("\n",
@@ -331,28 +472,44 @@ public class KillmapDAO {
                 "FROM killmap",
                 "GROUP BY Game_ID;");
 
-        List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gamesQuery, rs -> {
-            KillMapGameProgress progress = new KillMapGameProgress();
-            progress.gameId = rs.getInt("ID");
-            progress.gameMode = GameMode.valueOf(rs.getString("Mode"));
-            return progress;
-        });
-
         Map<Integer, Integer> gameIdToNrTests   = new TreeMap<>();
         Map<Integer, Integer> gameIdToNrMutants = new TreeMap<>();
         Map<Integer, Integer> gameIdToNrEntries = new TreeMap<>();
-
         DB.executeQueryReturnList(nrTestsQuery,   rs -> gameIdToNrTests.put(rs.getInt(1), rs.getInt(2)));
         DB.executeQueryReturnList(nrMutantsQuery, rs -> gameIdToNrMutants.put(rs.getInt(1), rs.getInt(2)));
         DB.executeQueryReturnList(nrEntriesQuery, rs -> gameIdToNrEntries.put(rs.getInt(1), rs.getInt(2)));
 
-        for (KillMapGameProgress progress : progresses) {
-            progress.setNrTests(gameIdToNrTests.getOrDefault(progress.gameId, 0));
-            progress.setNrMutants(gameIdToNrMutants.getOrDefault(progress.gameId, 0));
-            progress.setNrEntries(gameIdToNrEntries.getOrDefault(progress.gameId, 0));
-        }
+        return DB.executeQueryReturnList(gamesQuery, rs -> {
+            int gameId = rs.getInt("ID");
+            GameMode gameMode = GameMode.valueOf(rs.getString("Mode"));
+            int nrTests = gameIdToNrTests.getOrDefault(gameId, 0);
+            int nrMutants = gameIdToNrMutants.getOrDefault(gameId, 0);
+            int nrEntries = gameIdToNrEntries.getOrDefault(gameId, 0);
+            int nrExpectedEntries = nrTests * nrMutants;
+            return new KillMapGameProgress(
+                    nrTests, nrMutants, nrEntries, nrExpectedEntries,
+                    gameId, gameMode
+            );
+        });
+    }
 
-        return progresses;
+    public static List<KillMapClassroomProgress> getNonQueuedKillMapClassroomProgress() {
+        String classroomsQuery = String.join("\n",
+                "SELECT ID",
+                "FROM classrooms",
+                "WHERE NOT EXISTS (",
+                "     SELECT *",
+                "     FROM killmapjob",
+                "     WHERE killmapjob.Classroom_ID = classrooms.ID",
+                "  )",
+                "ORDER BY ID;"
+        );
+
+        List<Integer> classroomIds =  DB.executeQueryReturnList(classroomsQuery, rs -> rs.getInt(1));
+
+        return classroomIds.stream()
+                .map(KillmapDAO::getKillMapProgressForClassroom)
+                .collect(Collectors.toList());
     }
 
     /** Returns the killmaps progress for all class killmaps queued for processing. */
@@ -361,27 +518,16 @@ public class KillmapDAO {
            under the assumption that only a small fraction of classes are queued for computation. */
 
         String classesQuery = String.join("\n",
-                "SELECT classes.Class_ID, classes.Name, classes.Alias",
+                "SELECT classes.Class_ID",
                 "FROM killmapjob, classes",
                 "WHERE killmapjob.Class_ID = classes.Class_ID",
                 "ORDER BY Class_ID;");
 
-        List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
-            KillMapClassProgress progress = new KillMapClassProgress();
-            progress.setClassId(rs.getInt("Class_ID"));
-            progress.setClassName(rs.getString("Name"));
-            progress.setClassAlias(rs.getString("Alias"));
-            return progress;
-        });
+        List<Integer> classIds = DB.executeQueryReturnList(classesQuery, rs -> rs.getInt(1));
 
-        for (KillMapClassProgress progress : progresses) {
-            KillMapProgress values = getKillMapProgressForClass(progress.getClassId());
-            progress.setNrTests(values.getNrTests());
-            progress.setNrMutants(values.getNrMutants());
-            progress.setNrEntries(values.getNrEntries());
-        }
-
-        return progresses;
+        return classIds.stream()
+                .map(KillmapDAO::getKillMapProgressForClass)
+                .collect(Collectors.toList());
     }
 
     /** Returns the killmaps progress for all game killmaps queued for processing. */
@@ -390,26 +536,31 @@ public class KillmapDAO {
            under the assumption that only a small fraction of classes are queued for computation. */
 
         String gamesQuery = String.join("\n",
-                "SELECT games.ID, games.Mode",
+                "SELECT games.ID",
                 "FROM killmapjob, games",
                 "WHERE killmapjob.Game_ID = games.ID",
                 "ORDER BY Game_ID;");
 
-        List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gamesQuery, rs -> {
-            KillMapGameProgress progress = new KillMapGameProgress();
-            progress.setGameId(rs.getInt("ID"));
-            progress.setGameMode(GameMode.valueOf(rs.getString("Mode")));
-            return progress;
-        });
+        List<Integer> gameIds = DB.executeQueryReturnList(gamesQuery, rs -> rs.getInt(1));
 
-        for (KillMapGameProgress progress : progresses) {
-            KillMapProgress values = getKillMapProgressForGame(progress.gameId);
-            progress.setNrTests(values.getNrTests());
-            progress.setNrMutants(values.getNrMutants());
-            progress.setNrEntries(values.getNrEntries());
-        }
+        return gameIds.stream()
+                .map(KillmapDAO::getKillMapProgressForGame)
+                .collect(Collectors.toList());
+    }
 
-        return progresses;
+    public static List<KillMapClassroomProgress> getQueuedKillMapClassroomProgress() {
+        String classroomsQuery = String.join("\n",
+                "SELECT classrooms.ID",
+                "FROM killmapjob, classrooms",
+                "WHERE killmapjob.Classroom_ID = classrooms.ID",
+                "ORDER BY ID;"
+        );
+
+        List<Integer> classroomIds =  DB.executeQueryReturnList(classroomsQuery, rs -> rs.getInt(1));
+
+        return classroomIds.stream()
+                .map(KillmapDAO::getKillMapProgressForClassroom)
+                .collect(Collectors.toList());
     }
 
     /** Returns the number of queued jobs for class killmaps. */
@@ -430,37 +581,49 @@ public class KillmapDAO {
      * @param classId The class id.
      * @return The killmap progress for the class.
      */
-    public static KillMapProgress getKillMapProgressForClass(int classId) {
+    public static KillMapClassProgress getKillMapProgressForClass(int classId) {
         String nrTestsQuery = String.join("\n",
+                "WITH tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT COUNT(Test_ID)",
-                "FROM view_valid_tests",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
+                "FROM tests_for_class",
+                "WHERE Class_ID = ?;");
+
 
         String nrMutantsQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)",
+
                 "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
+                "FROM mutants_for_class",
+                "WHERE Class_ID = ?;");
 
         String nrEntriesQuery = String.join("\n",
+                "WITH mutants_for_class AS",
+                "   (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates),",
+                "tests_for_class AS",
+                "   (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)",
+
                 "SELECT COUNT(*)",
-                "FROM killmap, tests, mutants",
+                "FROM killmap,",
+                "     tests_for_class tests,",
+                "     mutants_for_class mutants",
                 "WHERE killmap.Test_ID = tests.Test_ID",
                 "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND tests.Game_ID >= 0",
-                "  AND mutants.Game_ID >= 0",
                 "  AND killmap.Class_ID = ?;");
 
         int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
         int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
 
-        KillMapProgress progress = new KillMapProgress();
-        progress.setNrTests(nrTests);
-        progress.setNrMutants(nrMutants);
-        progress.setNrEntries(nrEntries);
-        return progress;
+        int nrExpectedEntries = nrMutants * nrTests;
+        GameClass cut = GameClassDAO.getClassForId(classId);
+
+        return new KillMapClassProgress(
+                nrTests, nrMutants, nrEntries, nrExpectedEntries,
+                classId, cut.getName(), cut.getAlias()
+        );
     }
 
     /**
@@ -468,15 +631,15 @@ public class KillmapDAO {
      * @param gameId The game id.
      * @return The killmap progress for the game.
      */
-    public static KillMapProgress getKillMapProgressForGame(int gameId) {
+    public static KillMapGameProgress getKillMapProgressForGame(int gameId) {
         String nrTestsQuery = String.join("\n",
                 "SELECT COUNT(Test_ID)",
-                "FROM view_valid_tests",
+                "FROM view_valid_game_tests",
                 "WHERE Game_ID = ?;");
 
         String nrMutantsQuery = String.join("\n",
                 "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
+                "FROM view_valid_game_mutants",
                 "WHERE Game_ID = ?;");
 
         String nrEntriesQuery = String.join("\n",
@@ -488,11 +651,82 @@ public class KillmapDAO {
         int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
 
-        KillMapProgress progress = new KillMapProgress();
-        progress.setNrTests(nrTests);
-        progress.setNrMutants(nrMutants);
-        progress.setNrEntries(nrEntries);
-        return progress;
+        int nrExpectedEntries = nrMutants * nrTests;
+        GameMode gameMode = GameDAO.getGameMode(gameId);
+
+        return new KillMapGameProgress(
+                nrTests, nrMutants, nrEntries, nrExpectedEntries,
+                gameId, gameMode
+        );
+    }
+
+    public static KillMapClassroomProgress getKillMapProgressForClassroom(int classroomId) {
+        String nrEntriesQuery = String.join("\n",
+                "WITH relevant_classes AS (",
+                "    SELECT DISTINCT games.Class_ID",
+                "    FROM games",
+                "    WHERE games.Classroom_ID = ?",
+                "),",
+                "classroom_system_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_system_mutant_templates mutants",
+                "    WHERE mutants.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_mutants AS (",
+                "    SELECT mutants.*",
+                "    FROM view_valid_user_mutants mutants, games",
+                "    WHERE mutants.Game_ID = games.ID",
+                "      AND games.Classroom_ID = ?",
+                "),",
+                "mutants_for_classroom AS (",
+                "    SELECT * FROM classroom_system_mutants",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_mutants",
+                "),",
+                "classroom_system_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_system_test_templates tests",
+                "    WHERE tests.Class_ID IN (SELECT * FROM relevant_classes)",
+                "),",
+                "classroom_user_tests AS (",
+                "    SELECT tests.*",
+                "    FROM view_valid_user_tests tests, games",
+                "    WHERE tests.Game_ID = games.ID",
+                "    AND games.Classroom_ID = ?",
+                "),",
+                "tests_for_classroom AS (",
+                "    SELECT * FROM classroom_system_tests",
+                "    UNION ALL",
+                "    SELECT * FROM classroom_user_tests",
+                ")",
+
+                "SELECT COUNT(*)",
+                "FROM killmap,",
+                "   tests_for_classroom tests,",
+                "   mutants_for_classroom mutants",
+                "WHERE killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID");
+
+
+        Multimap<Integer, Test> tests = TestDAO.getValidTestsForClassroom(classroomId);
+        Multimap<Integer, Mutant> mutants = MutantDAO.getValidMutantsForClassroom(classroomId);
+
+        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1),
+                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+
+        int expectedNrEntries = 0;
+        for (int classId : tests.keySet()) {
+            expectedNrEntries += tests.get(classId).size() * mutants.get(classId).size();
+        }
+
+        ClassroomService classroomService = CDIUtil.getBeanFromCDI(ClassroomService.class);
+        Classroom classroom = classroomService.getClassroomById(classroomId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        return new KillMapClassroomProgress(
+                tests.size(), mutants.size(), nrEntries, expectedNrEntries,
+                classroomId, classroom.getName()
+        );
     }
 
     /**
@@ -502,85 +736,101 @@ public class KillmapDAO {
      * <p>Used to display the progress on the killmap management page.
      */
     public static class KillMapProgress {
-        private int nrTests;
-        private int nrMutants;
-        private int nrEntries;
+        private final int nrTests;
+        private final int nrMutants;
+        private final int nrEntries;
+        private final int nrExpectedEntries;
+
+        public KillMapProgress(int nrTests, int nrMutants, int nrEntries, int nrExpectedEntries) {
+            this.nrTests = nrTests;
+            this.nrMutants = nrMutants;
+            this.nrEntries = nrEntries;
+            this.nrExpectedEntries = nrExpectedEntries;
+        }
 
         public int getNrTests() {
             return nrTests;
-        }
-
-        public void setNrTests(int nrTests) {
-            this.nrTests = nrTests;
         }
 
         public int getNrMutants() {
             return nrMutants;
         }
 
-        public void setNrMutants(int nrMutants) {
-            this.nrMutants = nrMutants;
-        }
-
         public int getNrEntries() {
             return nrEntries;
         }
 
-        public void setNrEntries(int nrEntries) {
-            this.nrEntries = nrEntries;
+        public int getNrExpectedEntries() {
+            return nrExpectedEntries;
         }
     }
 
     /** Represents the progress of a game killmap. */
     public static class KillMapGameProgress extends KillMapProgress {
-        private int gameId;
-        private GameMode gameMode;
+        private final int gameId;
+        private final GameMode gameMode;
+
+        public KillMapGameProgress(int nrTests, int nrMutants, int nrEntries, int nrExpectedEntries,
+                                   int gameId, GameMode gameMode) {
+            super(nrTests, nrMutants, nrEntries, nrExpectedEntries);
+            this.gameId = gameId;
+            this.gameMode = gameMode;
+        }
 
         public int getGameId() {
             return gameId;
         }
 
-        public void setGameId(int gameId) {
-            this.gameId = gameId;
-        }
-
         public GameMode getGameMode() {
             return gameMode;
-        }
-
-        public void setGameMode(GameMode gameMode) {
-            this.gameMode = gameMode;
         }
     }
 
     /** Represents the progress of a class killmap. */
     public static class KillMapClassProgress extends KillMapProgress {
-        private int classId;
-        private String className;
-        private String classAlias;
+        private final int classId;
+        private final String className;
+        private final String classAlias;
+
+        public KillMapClassProgress(int nrTests, int nrMutants, int nrEntries, int nrExpectedEntries,
+                                    int classId, String className, String classAlias) {
+            super(nrTests, nrMutants, nrEntries, nrExpectedEntries);
+            this.classId = classId;
+            this.className = className;
+            this.classAlias = classAlias;
+        }
 
         public int getClassId() {
             return classId;
-        }
-
-        public void setClassId(int classId) {
-            this.classId = classId;
         }
 
         public String getClassName() {
             return className;
         }
 
-        public void setClassName(String className) {
-            this.className = className;
-        }
-
         public String getClassAlias() {
             return classAlias;
         }
+    }
 
-        public void setClassAlias(String classAlias) {
-            this.classAlias = classAlias;
+    /** Represents the progress of a class killmap. */
+    public static class KillMapClassroomProgress extends KillMapProgress {
+        private final int classroomId;
+        private final String classroomName;
+
+        public KillMapClassroomProgress(int nrTests, int nrMutants, int nrEntries, int nrExpectedEntries,
+                                        int classroomId, String classroomName) {
+            super(nrTests, nrMutants, nrEntries, nrExpectedEntries);
+            this.classroomId = classroomId;
+            this.classroomName = classroomName;
+        }
+
+        public int getClassroomId() {
+            return classroomId;
+        }
+
+        public String getClassroomName() {
+            return classroomName;
         }
     }
 }

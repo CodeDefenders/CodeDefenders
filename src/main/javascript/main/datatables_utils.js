@@ -129,6 +129,38 @@ class DataTablesUtils {
                     }
                 });
     };
+
+    /**
+     * Returns the selected entries from a data table with the select extension enabled.
+     * @param {DataTable} table The table.
+     * @return {object[]} The data entries of the selected rows.
+     */
+    static getSelected (table) {
+        const entries = [];
+        table.rows({selected: true}).every(function () {
+            const data = this.data();
+            entries.push(data);
+        });
+        return entries;
+    };
+
+    /**
+     * Registers a sorting method that sort DataTables rows by whether they are selected by the select extension.
+     * The sort method has to specified for the column like
+     * {
+     *   name: ...,
+     *   data: ...,
+     *   orderDataType: 'select-extension'
+     * }
+     */
+    static registerSortBySelected () {
+        DataTable.ext.order['select-extension'] = function (settings, col) {
+            return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+                const tr = td.closest('tr');
+                return tr.classList.contains('selected') ? '0' : '1';
+            });
+        };
+    }
 }
 
 

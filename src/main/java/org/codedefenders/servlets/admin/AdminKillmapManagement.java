@@ -19,8 +19,11 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -42,6 +45,8 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapType;
+import org.codedefenders.model.Classroom;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
 import org.codedefenders.util.Constants;
@@ -97,6 +102,9 @@ public class AdminKillmapManagement extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private ClassroomService classroomService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -205,13 +213,28 @@ public class AdminKillmapManagement extends HttpServlet {
         response.sendRedirect(request.getRequestURI());
     }
 
-    private void submitKillMapJobs(KillMapType killmapType, List<Integer> ids) {
+    private void submitKillMapJobs(KillMapType killmapType, Collection<Integer> ids) {
+        ids = new HashSet<>(ids);
+
         /* Check if classes or games exist for the given ids. */
         List<Integer> existingIds;
-        if (killmapType == KillMapType.CLASS) {
-            existingIds = GameClassDAO.filterExistingClassIDs(ids);
-        } else {
-            existingIds = GameDAO.filterExistingGameIDs(ids);
+        switch (killmapType) {
+            case CLASS:
+                existingIds = GameClassDAO.filterExistingClassIDs(ids);
+                break;
+            case GAME:
+                existingIds = GameDAO.filterExistingGameIDs(ids);
+                break;
+            case CLASSROOM:
+                existingIds = ids.stream()
+                        .map(classroomService::getClassroomById)
+                        .flatMap(Optional::stream)
+                        .map(Classroom::getId)
+                        .collect(Collectors.toList());
+                break;
+            default:
+                logger.error("Unknown killmap type: " + killmapType);
+                return;
         }
 
         /* If all classes / games exist, queue the jobs. */
@@ -242,10 +265,19 @@ public class AdminKillmapManagement extends HttpServlet {
 
             int count = ids.size() - existingIds.size();
             String type;
-            if (killmapType == KillMapType.CLASS) {
-                type = pluralize(count, "class", "classes");
-            } else {
-                type = pluralize(count, "game", "games");
+            switch (killmapType) {
+                case CLASS:
+                    type = pluralize(count, "class", "classes");
+                    break;
+                case GAME:
+                    type = pluralize(count, "game", "games");
+                    break;
+                case CLASSROOM:
+                    type = pluralize(count, "classroom", "classrooms");
+                    break;
+                default:
+                    logger.error("Unknown killmap type: " + killmapType);
+                    return;
             }
 
             messages.add(String.format("Invalid request. No %s for %s %s exist. No killmaps were queued.",

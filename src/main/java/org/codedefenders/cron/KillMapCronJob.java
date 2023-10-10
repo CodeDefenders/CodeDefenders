@@ -126,6 +126,17 @@ public class KillMapCronJob extends FixedDelayCronJob {
                         KillmapDAO.removeJob(theJob);
                     }
                     break;
+                case CLASSROOM:
+                    try {
+                        killMapService.forClassroom(theJob.getId());
+                    } catch (Throwable e) {
+                        logger.warn("Killmap computation failed!", e);
+                    } finally {
+                        // If the job fails and we leave it in the database,
+                        // we risk to create an infinite loop. So we remove it every time !
+                        KillmapDAO.removeJob(theJob);
+                    }
+                    break;
                 default:
                     // ignored
             }

@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -185,7 +186,7 @@ public class GameDAO {
      * @param ids The game IDs to check.
      * @return The given game IDs for which games exist.
      */
-    public static List<Integer> filterExistingGameIDs(List<Integer> ids) {
+    public static List<Integer> filterExistingGameIDs(Collection<Integer> ids) {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }

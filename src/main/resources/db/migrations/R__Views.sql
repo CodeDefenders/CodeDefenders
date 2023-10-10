@@ -47,17 +47,6 @@ FROM games,
 WHERE Mode = 'PUZZLE'
   AND games.Class_ID = classes.Class_ID;
 
-CREATE OR REPLACE VIEW `view_mutants_with_user` AS
-SELECT mutants.*, users.*
-FROM mutants
-         LEFT JOIN players ON players.ID = mutants.Player_ID
-         LEFT JOIN users ON players.User_ID = users.User_ID;
-
-CREATE OR REPLACE VIEW `view_valid_mutants` AS
-SELECT *
-FROM view_mutants_with_user
-WHERE ClassFile IS NOT NULL;
-
 CREATE OR REPLACE VIEW `view_players` AS
 SELECT *
 FROM players
@@ -81,16 +70,95 @@ FROM players AS p,
      view_valid_users AS u
 WHERE p.User_ID = u.User_ID;
 
-CREATE OR REPLACE VIEW `view_valid_tests` AS
-SELECT tests.*, users.User_ID
+
+-- Mutant views
+
+-- Mutants with User Info
+CREATE OR REPLACE VIEW `view_mutants_with_user` AS
+SELECT mutants.*, users.*
+FROM mutants
+     LEFT JOIN players ON players.ID = mutants.Player_ID
+     LEFT JOIN users ON players.User_ID = users.User_ID;
+
+-- Valid mutants created by users
+CREATE OR REPLACE VIEW `view_valid_user_mutants` AS
+SELECT mutants.*
+FROM view_mutants_with_user mutants, players
+WHERE mutants.ClassFile IS NOT NULL     -- Only valid mutants
+  AND mutants.Player_ID = players.ID
+  AND players.ID <> -1                  -- Exclude templates of predefined mutants
+  AND players.User_ID > 4;              -- Exclude instances of predefined mutants
+
+-- Templates of predefined mutants, also stored to the mutants table
+CREATE OR REPLACE VIEW `view_system_mutant_templates` AS
+SELECT mutants.*
+FROM view_mutants_with_user mutants
+WHERE mutants.ClassFile IS NOT NULL     -- Only valid mutants
+  AND Player_ID = -1;                   -- Only templates of predefined mutants
+
+-- Instances of predefined mutants in games
+CREATE OR REPLACE VIEW `view_system_mutant_instances` AS
+SELECT mutants.*
+FROM view_mutants_with_user mutants, players
+WHERE mutants.ClassFile IS NOT NULL     -- Only valid mutants
+  AND mutants.Player_ID = players.ID
+  AND players.User_ID = 3;              -- Only instances of predefined mutants
+
+-- Mutants as they appear in games
+CREATE OR REPLACE VIEW `view_valid_game_mutants` AS
+    SELECT * FROM view_valid_user_mutants
+    UNION ALL
+    SELECT * FROM view_system_mutant_instances;
+
+
+-- Test views
+
+-- Tests with User Info
+CREATE OR REPLACE VIEW `view_tests_with_user` AS
+SELECT tests.*, users.*
 FROM tests
-         LEFT JOIN players ON players.ID = tests.Player_ID AND tests.Game_ID = players.Game_ID
-         LEFT JOIN users ON players.User_ID = users.User_ID
+     LEFT JOIN players ON players.ID = tests.Player_ID
+     LEFT JOIN users ON players.User_ID = users.User_ID;
+
+-- Valid tests created by users
+CREATE OR REPLACE VIEW `view_valid_user_tests` AS
+SELECT tests.*
+FROM view_tests_with_user tests, players
 WHERE tests.ClassFile IS NOT NULL
   AND EXISTS(
-        SELECT *
-        FROM targetexecutions ex
-        WHERE ex.Test_ID = tests.Test_ID
-          AND ex.Target = 'TEST_ORIGINAL'
-          AND ex.Status = 'SUCCESS'
-    );
+    SELECT *
+    FROM targetexecutions ex
+    WHERE ex.Test_ID = tests.Test_ID
+      AND ex.Target = 'TEST_ORIGINAL'   -- Note: TEST_ORIGINAL execution does not exist for predefined tests.
+      AND ex.Status = 'SUCCESS'         -- We still filter by player/user ID to be sure though.
+  )
+  AND tests.Player_ID = players.ID
+  AND players.ID <> -1      -- Exclude original predefined tests
+  AND players.User_ID > 4;  -- Exclude instances of predefined tests
+
+-- Templates of predefined tests, also stored to the tests table
+CREATE OR REPLACE VIEW `view_system_test_templates` AS
+SELECT tests.*
+FROM view_tests_with_user tests
+WHERE ClassFile IS NOT NULL
+  AND Player_ID = -1;       -- Only original predefined tests
+
+-- Instances of predefined tests in games
+CREATE OR REPLACE VIEW `view_system_test_instances` AS
+SELECT tests.*
+FROM view_tests_with_user tests, players
+WHERE ClassFile IS NOT NULL
+  AND tests.Player_ID = players.ID
+  AND players.User_ID = 4;  -- Only instances of predefined tests
+
+-- Tests as they appear in games
+CREATE OR REPLACE VIEW `view_valid_game_tests` AS
+    SELECT * FROM view_valid_user_tests
+    UNION ALL
+    SELECT * FROM view_system_test_instances;
+
+
+-- Drop old views
+
+DROP VIEW IF EXISTS `view_valid_mutants`;
+DROP VIEW IF EXISTS `view_valid_tests`;

@@ -23,8 +23,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -32,16 +37,22 @@ import java.util.concurrent.Future;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.collections.map.DefaultedMap;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.ERROR;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
@@ -84,7 +95,7 @@ public class KillMapService {
     public KillMap forGame(AbstractGame game) throws InterruptedException, ExecutionException {
         List<Test> tests = game.getTests();
         List<Mutant> mutants = game.getMutants();
-        List<KillMap.KillMapEntry> entries = KillmapDAO.getKillMapEntriesForGame(game.getId());
+        List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForGame(game.getId());
         KillMap killmap = new KillMap(tests, mutants, game.getClassId(), entries);
 
         if (tests.size() * mutants.size() != entries.size()) {
@@ -113,7 +124,7 @@ public class KillMapService {
     public KillMap forClass(int classId) throws InterruptedException, ExecutionException {
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
-        List<KillMap.KillMapEntry> entries = KillmapDAO.getKillMapEntriesForClass(classId);
+        List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForClass(classId);
         KillMap killmap = new KillMap(tests, mutants, classId, entries);
 
         if (tests.size() * mutants.size() != entries.size()) {
@@ -132,6 +143,30 @@ public class KillMapService {
     }
 
     /**
+     * Computes killmaps for the mutants/tests of a given classroom.
+     * This operation is blocking and may take a long time.
+     *
+     * @param classroomId The classroom to compute killmaps for.
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException   If an error occurred during an execution.
+     */
+    public void forClassroom(int classroomId) throws InterruptedException, ExecutionException {
+        Multimap<Integer, Test> testsByClass = TestDAO.getValidTestsForClassroom(classroomId);
+        Multimap<Integer, Mutant> mutantsByClass = MutantDAO.getValidMutantsForClassroom(classroomId);
+        Multimap<Integer, KillMapEntry> entriesByClass = ArrayListMultimap.create();
+        for (KillMapEntry entry : KillmapDAO.getKillMapEntriesForClassroom(classroomId)) {
+            entriesByClass.put(entry.mutant.getClassId(), entry);
+        }
+
+        for (int classId : testsByClass.keySet()) { // sufficient to iterate over test
+            Collection<Test> tests = testsByClass.get(classId);
+            Collection<Mutant> mutants = mutantsByClass.get(classId);
+            Collection<KillMapEntry> entries = entriesByClass.get(classId);
+            forCustom(new ArrayList<>(tests), new ArrayList<>(mutants), classId, new ArrayList<>(entries));
+        }
+    }
+
+    /**
      * Returns the killmap for the given test and mutants.
      * The tests and mutants must belong to the same class (with the same class id).
      * This operation is blocking and may take a long time,
@@ -143,7 +178,7 @@ public class KillMapService {
      * @throws InterruptedException If the computation is interrupted.
      * @throws ExecutionException   If an error occurred during an execution.
      */
-    public KillMap forCustom(List<Test> tests, List<Mutant> mutants, int classId, List<KillMap.KillMapEntry> entries)
+    public KillMap forCustom(List<Test> tests, List<Mutant> mutants, int classId, List<KillMapEntry> entries)
             throws InterruptedException, ExecutionException {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
@@ -179,7 +214,7 @@ public class KillMapService {
      * @param classId The class id of the class the tests and mutants belong to.
      */
     public KillMap forMutantValidation(List<Test> tests, Mutant mutant, int classId) {
-        List<KillMap.KillMapEntry> entries = new ArrayList<>();
+        List<KillMapEntry> entries = new ArrayList<>();
         KillMap killmap = new KillMap(tests, Arrays.asList(mutant), classId, entries);
         logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests",
                 mutant, tests.size());
@@ -211,7 +246,7 @@ public class KillMapService {
     void compute(KillMap killMap, ExecutorService executor) throws InterruptedException, ExecutionException {
         Instant startTime = Instant.now();
 
-        List<Future<KillMap.KillMapEntry>> executionResults = new LinkedList<>();
+        List<Future<KillMapEntry>> executionResults = new LinkedList<>();
 
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException("Got interrupted before submitting tasks");
@@ -223,14 +258,14 @@ public class KillMapService {
                 Mutant mutant = killMap.getMutants().get(m);
                 if ((killMap.getMatrix()[t][m] == null)) {
                     executionResults.add(executor.submit(() -> {
-                        KillMap.KillMapEntry entry;
+                        KillMapEntry entry;
 
                         if (config.isMutantCoverage() && !test.isMutantCovered(mutant)) {
-                            entry = new KillMap.KillMapEntry(test, mutant, KillMap.KillMapEntry.Status.NO_COVERAGE);
+                            entry = new KillMapEntry(test, mutant, KillMapEntry.Status.NO_COVERAGE);
 
                         } else {
                             TargetExecution executedTarget = backendExecutorService.testMutant(mutant, test);
-                            KillMap.KillMapEntry.Status status;
+                            KillMapEntry.Status status;
 
                             switch (executedTarget.status) {
                                 case FAIL:
@@ -247,7 +282,7 @@ public class KillMapService {
                                     break;
                             }
 
-                            entry = new KillMap.KillMapEntry(test, mutant, status);
+                            entry = new KillMapEntry(test, mutant, status);
                         }
 
                         // TODO(Alex): Move out of Lambda/Method?!
@@ -266,9 +301,9 @@ public class KillMapService {
             throw new InterruptedException("Got interrupted after submitting tasks");
         }
 
-        for (Future<KillMap.KillMapEntry> result : executionResults) {
+        for (Future<KillMapEntry> result : executionResults) {
             try {
-                KillMap.KillMapEntry entry = result.get();
+                KillMapEntry entry = result.get();
                 killMap.getEntries().add(entry);
                 killMap.getMatrix()[killMap.indexOf(entry.test)][killMap.indexOf(entry.mutant)] = entry;
             } catch (InterruptedException e) {
