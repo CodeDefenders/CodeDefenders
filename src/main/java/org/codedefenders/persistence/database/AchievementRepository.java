@@ -42,10 +42,25 @@ public class AchievementRepository {
         );
     }
 
+    /**
+     * Returns all achievements for a user with the given id. It always returns Achievement objects with the current
+     * level and the current metric, even for achievements the user has not yet unlocked.
+     *
+     * @param userId The id of the user to get the achievements for.
+     * @return The achievements for the user.
+     */
     public Collection<Achievement> getAchievementsForUser(int userId) {
         return getAchievementsForUser(userId, null);
     }
 
+    /**
+     * Returns the achievement for a user with the given id and the given achievement id. It always returns an Achievement
+     * object with the current level and the current metric, even when the user has not yet unlocked the achievement.
+     *
+     * @param userId        The id of the user to get the achievement for.
+     * @param achievementId The id of the achievement to get.
+     * @return The achievement for the user.
+     */
     public Optional<Achievement> getAchievementForUser(int userId, Achievement.Id achievementId) {
         return getAchievementsForUser(userId, achievementId).stream().findFirst();
     }
@@ -79,6 +94,16 @@ public class AchievementRepository {
         }
     }
 
+    /**
+     * Updates the achievement for a user by a given amount. It increments the metric first and then updates the level
+     * if necessary.
+     * The return value indicates whether the level was updated or not.
+     *
+     * @param userId The user to update the achievement for.
+     * @param achievementId The achievement type to update.
+     * @param metricChange The amount to change the metric by.
+     * @return The number of rows for which the achievement level was updated (should be either 0 or 1).
+     */
     public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
         int updated = updateAchievementMetricForUser(userId, achievementId, metricChange);
         return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
