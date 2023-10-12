@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -67,10 +68,10 @@ public class DatabaseRule extends ExternalResource {
 
     public ConnectionFactory getConnectionFactory() throws SQLException {
         DataSource dataSourceMock = mock(DataSource.class);
-        doAnswer(invocation -> getConnection()).when(dataSourceMock).getConnection();
+        lenient().doAnswer(invocation -> getConnection()).when(dataSourceMock).getConnection();
 
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        doAnswer(invocation -> getConnection()).when(connectionFactory).getConnection();
+        lenient().doAnswer(invocation -> getConnection()).when(connectionFactory).getConnection();
         return connectionFactory;
     }
 
