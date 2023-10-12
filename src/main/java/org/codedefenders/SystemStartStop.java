@@ -32,6 +32,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.CronJobManager;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.service.AchievementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private CronJobManager cronJobManager;
+
+    @Inject
+    private AchievementService achievementService;
 
     @Inject
     private MetricsRegistry metricsRegistry;
@@ -77,6 +81,7 @@ public class SystemStartStop implements ServletContextListener {
         }
 
         cronJobManager.startup();
+        achievementService.registerEventHandler();
     }
 
     /**

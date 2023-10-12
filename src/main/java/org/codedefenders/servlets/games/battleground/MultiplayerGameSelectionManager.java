@@ -47,7 +47,6 @@ import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
-import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -327,13 +326,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", gameId);
             gameService.startGame(game);
         }
-
-        /*
-         * Publish the event about the user
-         */
-        GameStartedEvent gse = new GameStartedEvent();
-        gse.setGameId(game.getId());
-        notificationService.post(gse);
 
         response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
     }

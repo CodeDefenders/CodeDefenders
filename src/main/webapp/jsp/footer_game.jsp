@@ -25,8 +25,12 @@
 
 </div> <%-- closes #game-container --%>
 
+<%-- Push notifications using WebSocket --%>
+<jsp:include page="/jsp/push_socket.jsp"/>
+
+<%-- Recieve events from the server --%>
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */
@@ -45,6 +49,23 @@
         socket.register('game.GameStartedEvent', event => {
             console.log('Game with Id ' + event.gameId + ' was started.');
             window.location.reload();
+        });
+
+        socket.subscribe('registration.AchievementRegistrationEvent', {
+            userId: ${login.userId}
+        });
+
+        const achievementNotifications = new AchievementNotifications(
+            "${url.forPath("/images/achievements/")}",
+            "${url.forPath(Paths.USER_PROFILE)}"
+        );
+
+        socket.register('achievement.AchievementUnlockedEvent', event => {
+            console.log('Achievement unlocked.', event);
+            achievementNotifications.showAchievementNotification(event.achievement);
+            socket.send('achievement.ClientAchievementNotificationShownEvent', {
+                achievementId: event.achievement.achievementId
+            });
         });
     })();
 </script>

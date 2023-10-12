@@ -96,18 +96,6 @@
     gap: 2rem;
 }
 
-@media screen and (min-width: 40rem) {
-    .dashboards {
-        --cols: 2;
-    }
-}
-
-@media screen and (min-width: 85rem) {
-    .dashboards {
-        --cols: 4;
-    }
-}
-
 .dashboard-box {
     background-color: #f8f9fa; /* .bg-light */
     border-radius: .3rem; /* .rounded-3 */
@@ -183,4 +171,87 @@
 .dashboard-games {
     --color-primary: var(--bg-codedefenders-lighter, #008080);
     --color-secondary: var(--bg-attacker-contrast-dark, #730000);
+}
+
+
+/* Achievements */
+
+.achievements {
+    --cols: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 2rem;
+}
+
+.achievement-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.achievement-card .pie {
+    --width: 5rem;
+    --border-width: 2px;
+
+    background: var(--bs-light, #f8f9fa);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.achievement-card img {
+    object-fit: contain;
+    width: 100%;
+    padding: 1rem;
+}
+
+.achievement-card p {
+    margin: 0;
+}
+
+.achievement-card {
+    --color-secondary: #fff0;
+}
+
+.achievement-card.achievement-level-0,
+.achievement-card.achievement-level-1 {
+    --color-primary: #3479a2;
+}
+
+.achievement-card.achievement-level-2 {
+    --color-primary: #9d7943;
+}
+
+.achievement-card.achievement-level-3 {
+    --color-primary: #bcb9b6;
+}
+
+.achievement-card.achievement-level-4 {
+    --color-primary: #d2b615;
+}
+
+.locked-achievements.hidden {
+    display: none;
+}
+
+
+/* Media queries */
+
+@media screen and (min-width: 40rem) {
+    .dashboards {
+        --cols: 2;
+    }
+
+    .achievements {
+        --cols: 2;
+    }
+}
+
+@media screen and (min-width: 85rem) {
+    .dashboards {
+        --cols: 4;
+    }
+
+    .achievements {
+        --cols: 3;
+    }
 }

@@ -52,6 +52,7 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -500,10 +501,16 @@ public class PuzzleGameManager extends HttpServlet {
             game.incrementCurrentRound();
         } else {
             game.setState(GameState.SOLVED);
+
             messages.clear();
             boolean isAnAttackGame = false;
             Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
                     .escape(false).fadeOut(false);
+
+            GameSolvedEvent gse = new GameSolvedEvent();
+            gse.setGameId(gameId);
+            gse.setAttackPuzzle(isAnAttackGame);
+            notificationService.post(gse);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -699,10 +706,16 @@ public class PuzzleGameManager extends HttpServlet {
             game.incrementCurrentRound();
         } else {
             game.setState(GameState.SOLVED);
+
             messages.clear();
             boolean isAnAttackGame = true;
             messages.add(generateWinningMessage(request, game, isAnAttackGame))
                     .escape(false).fadeOut(false);
+
+            GameSolvedEvent gse = new GameSolvedEvent();
+            gse.setGameId(gameId);
+            gse.setAttackPuzzle(isAnAttackGame);
+            notificationService.post(gse);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);

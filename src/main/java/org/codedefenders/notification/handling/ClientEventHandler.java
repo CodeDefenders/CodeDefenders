@@ -10,11 +10,14 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.client.achievement.ClientAchievementNotificationShownEvent;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
+import org.codedefenders.notification.events.client.registration.AchievementRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
+import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
 import org.codedefenders.notification.web.PushSocket;
@@ -127,6 +130,13 @@ public class ClientEventHandler {
         notificationService.post(serverEvent);
     }
 
+    public void visit(ClientAchievementNotificationShownEvent clientEvent) {
+        ServerAchievementNotificationShownEvent serverEvent = new ServerAchievementNotificationShownEvent();
+        serverEvent.setAchievementId(clientEvent.getAchievementId());
+        serverEvent.setUserId(user.getId());
+        notificationService.post(serverEvent);
+    }
+
     public void visit(GameChatRegistrationEvent event) {
         serverEventHandlerContainer.handleRegistrationEvent(event);
     }
@@ -141,5 +151,9 @@ public class ClientEventHandler {
 
     public void visit(GameLifecycleRegistrationEvent event) {
         serverEventHandlerContainer.handleRegistrationEvent(event);
+    }
+
+    public void visit(AchievementRegistrationEvent achievementRegistrationEvent) {
+        serverEventHandlerContainer.handleRegistrationEvent(achievementRegistrationEvent);
     }
 }

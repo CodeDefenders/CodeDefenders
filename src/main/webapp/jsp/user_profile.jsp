@@ -37,10 +37,35 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<link rel="stylesheet" href="${url.forPath("/css/specific/dashboard.css")}">
+<link rel="stylesheet" href="${url.forPath("/css/specific/user_profile.css")}">
 
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
+
+    <section>
+        <h2>Achievements</h2>
+        <div class="achievements">
+            <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
+            <c:if test="${profile.unlockedAchievements.size() == 0}">
+                <div class="no-achievements">No achievement unlocked yet.</div>
+            </c:if>
+            <c:forEach items="${profile.unlockedAchievements}" var="achievement">
+                <t:achievement_badge achievement="${achievement}"/>
+            </c:forEach>
+        </div>
+        <c:if test="${profile.lockedAchievements.size() > 0}">
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="
+                document.querySelector('.locked-achievements').classList.toggle('hidden');
+                this.innerText = this.innerText === 'Show all achievements' ? 'Hide locked achievements' : 'Show all achievements';
+            ">Show all achievements
+            </button>
+            <div class="achievements locked-achievements hidden">
+                <c:forEach items="${profile.lockedAchievements}" var="achievement">
+                    <t:achievement_badge achievement="${achievement}"/>
+                </c:forEach>
+            </div>
+        </c:if>
+    </section>
 
     <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
         <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
