@@ -231,7 +231,8 @@ public class MultiplayerGameManager extends HttpServlet {
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED || GameDAO.isGameExpired(gameId);
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || (game.getState() == GameState.ACTIVE && GameDAO.isGameExpired(gameId));
         final String jspPath = isGameClosed
                 ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;

@@ -116,7 +116,13 @@
                 </div>
 
                 <fieldset class="row mb-3">
-                    <legend class="col-4 col-form-label pt-0" id="level-label">Game Level</legend>
+                    <legend class="col-4 col-form-label pt-0" id="level-label">
+                        <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
+                           data-bs-toggle="modal" data-bs-target="#levelExplanation">
+                            Game Level
+                            <i class="fa fa-question-circle ms-1"></i>
+                        </a>
+                    </legend>
                     <div class="col-8">
                         <div class="form-check">
                             <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
@@ -280,7 +286,13 @@
 
             </form>
 
-            <t:modal id="validatorExplanation" title="Validator Explanations">
+            <t:modal id="levelExplanation" title="Level Explanation">
+                <jsp:attribute name="content">
+                    <t:level_explanation_multiplayer/>
+                </jsp:attribute>
+            </t:modal>
+
+            <t:modal id="validatorExplanation" title="Validator Explanation">
                 <jsp:attribute name="content">
                     <t:validator_explanation_mutant/>
                     <div class="mt-3"></div> <%-- spacing --%>
@@ -288,22 +300,11 @@
                 </jsp:attribute>
             </t:modal>
 
-            <div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Auto Equivalence Duel Threshold Explanation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <t:modal id="automaticEquivalenceTriggerExplanation" title="Auto Equivalence Duel Threshold Explanation">
+                <jsp:attribute name="content">
+                    <t:automatic_duels_explanation/>
+                </jsp:attribute>
+            </t:modal>
         </div>
 
         <div class="form-width w-100">

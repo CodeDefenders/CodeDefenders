@@ -35,6 +35,10 @@
     background-color: var(--bg-player-light) !important;
 }
 
+.bg-battleground {
+    background: linear-gradient(90deg, var(--bg-attacker) 40%, var(--bg-defender) 60%) !important;
+}
+
 .fg-attacker {
     color: var(--fg-attacker) !important;
 }

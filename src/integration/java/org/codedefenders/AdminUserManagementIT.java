@@ -18,11 +18,9 @@
  */
 package org.codedefenders;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -45,13 +43,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -67,6 +64,7 @@ public class AdminUserManagementIT {
 
     @BeforeEach
     public void mockDBConnections() throws Exception {
+        db.before();
         mockedDatabaseConnection = mockStatic(DatabaseConnection.class);
         mockedDatabaseConnection.when(DatabaseConnection::getConnection).thenAnswer((Answer<Connection>) invocation -> {
             // Return a new connection from the rule instead
@@ -89,6 +87,8 @@ public class AdminUserManagementIT {
                     .thenReturn(new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED, true));
             mockedAdminDAO.when(() -> AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS))
                     .thenReturn(new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS, "test@fake.test"));
+            mockedAdminDAO.when(() -> AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH))
+                    .thenReturn(new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH, 8));
             mockedEmailUtils.when(() -> EmailUtils.sendEmail(anyString(), anyString(), anyString()))
                     .thenAnswer((Answer<Boolean>) invocation -> true);
 
@@ -96,14 +96,14 @@ public class AdminUserManagementIT {
             HttpServletResponse response = mock(HttpServletResponse.class);
             HttpSession mockedHttpSession = mock(HttpSession.class);
 
-            when(request.getSession()).thenReturn(mockedHttpSession);
-            when(request.getParameter("formType")).thenReturn("createUsers");
-            when(request.getScheme()).thenReturn("http");
-            when(request.getServerName()).thenReturn("localhost");
-            when(request.getServerPort()).thenReturn(8080);
-            when(request.getContextPath()).thenReturn("/");
-            when(request.getServletPath()).thenReturn(Paths.ADMIN_USERS);
-            when(request.getParameter("user_name_list")).thenReturn(userNameList);
+            lenient().when(request.getSession()).thenReturn(mockedHttpSession);
+            lenient().when(request.getParameter("formType")).thenReturn("createUsers");
+            lenient().when(request.getScheme()).thenReturn("http");
+            lenient().when(request.getServerName()).thenReturn("localhost");
+            lenient().when(request.getServerPort()).thenReturn(8080);
+            lenient().when(request.getContextPath()).thenReturn("/");
+            lenient().when(request.getServletPath()).thenReturn(Paths.ADMIN_USERS);
+            lenient().when(request.getParameter("user_name_list")).thenReturn(userNameList);
 
             AdminUserManagement adminUserManagement = new AdminUserManagement();
 

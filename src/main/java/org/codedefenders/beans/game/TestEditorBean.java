@@ -67,11 +67,6 @@ public class TestEditorBean {
         this.editableLinesStart = clazz.getTestTemplateFirstEditLine();
     }
 
-    public void setEditableLinesForPuzzle(Puzzle puzzle) {
-        this.editableLinesStart = puzzle.getEditableLinesStart();
-        this.editableLinesEnd = puzzle.getEditableLinesEnd();
-    }
-
     public void setMockingEnabled(boolean mockingEnabled) {
         this.mockingEnabled = mockingEnabled;
     }

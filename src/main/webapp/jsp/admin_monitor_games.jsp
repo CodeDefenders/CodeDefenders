@@ -577,13 +577,13 @@
 
         $('#togglePlayersActiveMultiplayer').on('change', function () {
             const showPlayers = this.checked;
-            localStorage.setItem("showActivePlayersMultiplayer", JSON.stringify(showPlayers));
+            sessionStorage.setItem("showActivePlayersMultiplayer", JSON.stringify(showPlayers));
             showMultiplayerDetails(showPlayers);
         });
 
         $('#togglePlayersActiveMelee').on('change', function () {
             const showPlayers = this.checked;
-            localStorage.setItem("showActivePlayersMelee", JSON.stringify(showPlayers));
+            sessionStorage.setItem("showActivePlayersMelee", JSON.stringify(showPlayers));
             showMeleeDetails(showPlayers);
         });
 
@@ -611,11 +611,11 @@
         }
 
         $(document).ready(function () {
-            const showMultiplayer = localStorage.getItem("showActivePlayersMultiplayer") === "true";
+            const showMultiplayer = sessionStorage.getItem("showActivePlayersMultiplayer") === "true";
             document.getElementById('togglePlayersActiveMultiplayer').checked = showMultiplayer;
             showMultiplayerDetails(showMultiplayer);
 
-            const showMelee = localStorage.getItem("showActivePlayersMelee") === "true";
+            const showMelee = sessionStorage.getItem("showActivePlayersMelee") === "true";
             document.getElementById('togglePlayersActiveMelee').checked = showMelee;
             showMeleeDetails(showMelee);
         });

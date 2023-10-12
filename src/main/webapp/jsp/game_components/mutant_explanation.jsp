@@ -80,7 +80,7 @@
 </div>
 
 
-<t:modal id="validator-explanation-modal" title="Validator Explanations">
+<t:modal id="validator-explanation-modal" title="Validator Explanation">
         <jsp:attribute name="content">
             <t:validator_explanation_mutant/>
             <div class="mt-3"></div> <%-- spacing --%>

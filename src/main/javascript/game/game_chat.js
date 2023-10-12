@@ -669,7 +669,7 @@ class GameChat {
         this._indicatorElement.addEventListener('click', function (event) {
             if (!self._chatElement.hasAttribute('hidden')) {
                 self._chatElement.setAttribute('hidden', '');
-                localStorage.setItem('showChat', JSON.stringify(false))
+                sessionStorage.setItem('showChat', JSON.stringify(false))
             } else {
                 self._chatElement.style.top = null;
                 self._chatElement.style.right = null;
@@ -678,15 +678,15 @@ class GameChat {
                 self._messageCount.setCount(0);
                 self._chatElement.removeAttribute('hidden');
                 self._messages.scrollToBottom();
-                localStorage.setItem('showChat', JSON.stringify(true))
+                sessionStorage.setItem('showChat', JSON.stringify(true))
             }
-            localStorage.removeItem('chatPos');
+            sessionStorage.removeItem('chatPos');
         });
 
         /* Close chat when the X on the chat window is clicked. */
         this._closeButton.addEventListener('click', function (event) {
             self._chatElement.setAttribute('hidden', '');
-            localStorage.setItem('showChat', JSON.stringify(false))
+            sessionStorage.setItem('showChat', JSON.stringify(false))
         });
 
         /* Make the chat window draggable. */
@@ -696,7 +696,7 @@ class GameChat {
                 top: self._chatElement.style.top,
                 left: self._chatElement.style.left
             });
-            localStorage.setItem('chatPos', chatPos);
+            sessionStorage.setItem('chatPos', chatPos);
         });
     }
 
@@ -705,8 +705,8 @@ class GameChat {
      * @private
      */
     _loadSettings () {
-        let showChat = JSON.parse(localStorage.getItem('showChat')) || false;
-        let chatPos = JSON.parse(localStorage.getItem('chatPos'));
+        let showChat = JSON.parse(sessionStorage.getItem('showChat')) || false;
+        let chatPos = JSON.parse(sessionStorage.getItem('chatPos'));
 
         if (showChat) {
             if (chatPos !== null) {

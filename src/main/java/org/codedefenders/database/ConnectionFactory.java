@@ -120,31 +120,26 @@ public class ConnectionFactory {
     private Map<String, Boolean> checkDatabase(String dbName) {
         Map<String, Boolean> result = new HashMap<>();
         result.put("databaseEmpty",
-                checkDatabase(metaData -> metaData.getTables(dbName, null, null, null), true));
+                !checkNonEmpty(metaData -> metaData.getTables(dbName, null, null, null)));
         result.put("flywayHistoryExists",
-                checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_history", null)));
+                checkNonEmpty(metaData -> metaData.getTables(null, null, "flyway_schema_history", null)));
         result.put("databaseBaseline1.6",
-                checkDatabase(metaData -> metaData.getColumns(null, null, "mutants", "KillMessage")));
+                checkNonEmpty(metaData -> metaData.getColumns(null, null, "mutants", "KillMessage")));
         result.put("databaseBaseline1.7",
-                checkDatabase(metaData -> metaData.getColumns(null, null, "puzzles", "Active")));
+                checkNonEmpty(metaData -> metaData.getColumns(null, null, "puzzles", "Active")));
         return result;
     }
 
-    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction) {
-        return checkDatabase(checkFunction, false);
-    }
-
-    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction, boolean noResult) {
-        Boolean result = null;
+    private boolean checkNonEmpty(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction) {
         try (Connection conn = getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
             try (ResultSet rs = checkFunction.check(metaData)) {
-                result = rs.next() == !noResult;
+                return rs.next();
             }
         } catch (SQLException e) {
             logger.error("Exception while trying to access database", e);
+            return false;
         }
-        return result;
     }
 
     /**

@@ -1,5 +1,5 @@
 <%--
-  ~ Copyright (C) 2021 Code Defenders contributors
+  ~ Copyright (C) 2023 Code Defenders contributors
   ~
   ~ This file is part of Code Defenders.
   ~
@@ -18,22 +18,13 @@
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<h3>Mutation rules</h3>
-<b>Relaxed</b> <br>
+<b>Easy</b>
 <ul>
-    <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-    <li>No mutants with only changes to comments or formatting</li>
+    <li>Players are allowed to view other players' submissions.</li>
 </ul>
-<b>Moderate</b> <br>
-<ul>
-    <li>No changes to comments</li>
-    <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-    <li>No ternary operators</li>
-    <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
-</ul>
-<b>Strict</b> <br>
+
+<b>Hard</b>
 <ul class="mb-0">
-    <li>No reflection</li>
-    <li>No bitwise operators (bitshifts and logical)</li>
-    <li>No signature changes</li>
+    <li>Players are <b>not</b> allowed to view other players' submissions.</li>
+    <li>But: Players can still view others' mutants after they have been killed or accepted as equivalent.</li>
 </ul>

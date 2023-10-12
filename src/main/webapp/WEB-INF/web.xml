@@ -65,15 +65,9 @@
 		<param-value>org.codedefenders.auth.CodeDefendersWebEnvironment</param-value>
 	</context-param>
 
-	<!-- Begin WebFilter Section -->
-	<!-- Begin Filter Declarations -->
-	<filter><!-- Set character encoding -->
-		<filter-name>RequestCharacterEncoding</filter-name>
-		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
+	<filter>
+		<filter-name>PathFilter</filter-name>
+		<filter-class>org.codedefenders.PathFilter</filter-class>
 	</filter>
 
 	<filter>
@@ -99,9 +93,15 @@
 	<!-- End Filter Declarations -->
 
 	<!-- Begin Filter Mapping/Ordering -->
+	<filter-mapping>
+		<filter-name>PathFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!-- You will most likely want this to be the first filter in the chain
 	(therefore the first <filter-mapping> in the web.xml file), so that you can get
 	the most accurate measurement of latency. -->
+	<!-- I've put PathFilter first, so redirected requests don't show up twice in the metrics. -Marvin -->
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>metricsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -114,16 +114,6 @@
 
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>TransactionCleanupFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping> <!-- See: Filter Declarations above -->
-		<filter-name>RequestCharacterEncoding</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
-		<filter-name>ResponseCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 

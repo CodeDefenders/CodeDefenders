@@ -38,6 +38,8 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.game.Mutant.State;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -87,26 +89,33 @@ public class MultiplayerGameService extends AbstractGameService {
 
     // TODO: This could use some tests
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
-            Role playerRole) {
-        return playerRole != Role.NONE // User must participate in the Game
-                // Defender can see Mutants if the game is over or its an easy Game
-                && (game.isFinished() || game.getLevel() == GameLevel.EASY
-                || (game.getLevel() == GameLevel.HARD
-                // In Hard Games the User must either be an Attacker or Observer
-                && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
-                // Or the mutant must be killed or equivalent
-                || mutant.getState().equals(Mutant.State.KILLED)
-                || mutant.getState().equals(Mutant.State.EQUIVALENT))));
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
+        // User must participate in the Game
+        if (playerRole == Role.NONE) {
+            return false;
+        }
+        // Anybody can see Mutants if the game is over, or it's an easy Game
+        if (game.isFinished() || game.getLevel() == GameLevel.EASY) {
+            return true;
+        }
+        if (game.getLevel() == GameLevel.HARD) {
+            return mutant.getCreatorId() == user.getId()
+                    // In Hard Games the User must either be an Attacker or Observer
+                    || playerRole == Role.ATTACKER
+                    || playerRole == Role.OBSERVER
+                    // Or the mutant must be killed or equivalent
+                    || mutant.getState() == State.KILLED
+                    || mutant.getState() == State.EQUIVALENT;
+        }
+        return false;
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
-            Role playerRole) {
-        return game.getState().equals(GameState.ACTIVE)
-                && mutant.getState().equals(Mutant.State.ALIVE)
-                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                && playerRole.equals(Role.DEFENDER)
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user, Role playerRole) {
+        return game.getState() == GameState.ACTIVE
+                && mutant.getState() == State.ALIVE
+                && mutant.getEquivalent() == Equivalence.ASSUMED_NO
+                && playerRole == Role.DEFENDER
                 && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                 && mutant.getCreatorId() != user.getId()
                 && mutant.getLines().size() >= 1;

@@ -35,6 +35,8 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.game.Mutant.State;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -49,6 +51,7 @@ import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,25 +88,29 @@ public class MeleeGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
-            Role playerRole) {
-        return playerRole != Role.NONE
-                && (game.isFinished()
-                || game.getLevel() == GameLevel.EASY
-                || (game.getLevel() == GameLevel.HARD
-                && (mutant.getCreatorId() == user.getId()
-                || playerRole.equals(Role.OBSERVER)
-                || mutant.getState().equals(Mutant.State.KILLED)
-                || mutant.getState().equals(Mutant.State.EQUIVALENT))));
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player, Role playerRole) {
+        if (playerRole == Role.NONE) {
+            return false;
+        }
+        if (game.isFinished() || game.getLevel() == GameLevel.EASY) {
+            return true;
+        }
+        if (game.getLevel() == GameLevel.HARD) {
+            return mutant.getCreatorId() == user.getId()
+                    || playerRole == Role.OBSERVER
+                    || mutant.getState() == State.KILLED
+                    || mutant.getState() == State.EQUIVALENT;
+        }
+        return false;
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
-            Role playerRole) {
-        return game.getState().equals(GameState.ACTIVE)
-                && mutant.getState().equals(Mutant.State.ALIVE)
-                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                && mutant.getCreatorId() != DUMMY_ATTACKER_USER_ID
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user, Role playerRole) {
+        return playerRole != Role.NONE
+                && game.getState() == GameState.ACTIVE
+                && mutant.getState() == State.ALIVE
+                && mutant.getEquivalent() == Equivalence.ASSUMED_NO
+                && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                 && mutant.getCreatorId() != user.getId()
                 && mutant.getLines().size() >= 1;
     }

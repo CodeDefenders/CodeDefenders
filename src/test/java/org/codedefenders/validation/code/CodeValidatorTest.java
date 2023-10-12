@@ -317,15 +317,15 @@ public class CodeValidatorTest {
                     testCase("classSignature/changedPublicClassToPublicFinalClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
 
                     // MUTANT_VALIDATION_COMMENT
-                    testCases("comments/addedAnotherCommentAtEndOfLine", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedAnotherCommentInNewLine", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedMultiLineCommentAtEndOfLine", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedSingleLineCommentAtEndOfLine", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedSingleLineCommentInNewLine", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedComment", MODERATE, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedAnotherCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/addedAnotherCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/addedMultiLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/addedSingleLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/addedSingleLineCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/modifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
                     testCases("comments/modifiedCommentAndChangedCode", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedMultiLineComment", MODERATE, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
 
                     // MUTANT_VALIDATION_FIELD_NAME - is only forbidden with STRICT validation
                     testCases("fields/changedName", STRICT, MUTANT_VALIDATION_FIELD_NAME),

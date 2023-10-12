@@ -28,26 +28,26 @@
     <div class="game-component-header">
         <h3>Existing Mutants</h3>
         <div id="ma-filter">
-            <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked>
+            <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="all">
                 <span class="align-middle">All</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE">
+            <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="alive">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
                 <span class="align-middle">Alive</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED">
+            <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="killed">
                 <span class="mutantCUTImage mutantImageKilled align-middle"></span>
                 <span class="align-middle">Killed</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED">
+            <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="marked">
                 <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
                 <span class="align-middle">Claimed Equivalent</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT">
+            <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="equivalent">
                 <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
                 <span class="align-middle">Equivalent</span>

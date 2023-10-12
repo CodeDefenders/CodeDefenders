@@ -28,16 +28,16 @@ import org.codedefenders.model.KeyMap;
  */
 public class User extends SimpleUser {
 
-    private final Boolean active;
+    private final boolean active;
 
     private final String email;
-    private final Boolean emailValidated;
-    private final Boolean contactingAllowed;
+    private final boolean emailValidated;
+    private final boolean contactingAllowed;
 
     private final KeyMap keyMap;
 
-    public User(int id, String name, Boolean active, String email, Boolean emailValidated,
-            Boolean contactingAllowed, KeyMap keyMap) {
+    public User(int id, String name, boolean active, String email, boolean emailValidated,
+            boolean contactingAllowed, KeyMap keyMap) {
         super(id, name);
         this.active = active;
         this.email = email;
@@ -46,7 +46,7 @@ public class User extends SimpleUser {
         this.keyMap = keyMap;
     }
 
-    public Boolean isActive() {
+    public boolean isActive() {
         return active;
     }
 
@@ -54,11 +54,11 @@ public class User extends SimpleUser {
         return email;
     }
 
-    public Boolean isEmailValidated() {
+    public boolean isEmailValidated() {
         return emailValidated;
     }
 
-    public Boolean isContactingAllowed() {
+    public boolean isContactingAllowed() {
         return contactingAllowed;
     }
 
