@@ -1,4 +1,4 @@
-FROM docker.io/library/maven:3.8-openjdk-11 AS build-webapp
+FROM docker.io/library/maven:3.9-eclipse-temurin-17 AS build-webapp
 
 COPY ./local-repo ./local-repo/
 COPY pom.xml .
@@ -10,7 +10,7 @@ COPY ./src ./src/
 RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
 
 
-FROM docker.io/library/maven:3.8-openjdk-11 as bundle-libs
+FROM docker.io/library/maven:3.9-eclipse-temurin-17 as bundle-libs
 
 RUN mkdir /installation/
 COPY ./installation/installation-pom.xml ./installation/
@@ -23,7 +23,7 @@ FROM docker.io/library/debian:11-slim AS debian-java-layer
 
 # Install Java
 RUN apt-get update && \
-    DEBIAN_FRONTEND='noninteractive' apt-get install -y --no-install-recommends openjdk-11-jre-headless && \
+    DEBIAN_FRONTEND='noninteractive' apt-get install -y --no-install-recommends openjdk-17-jre-headless && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /var/cache/apt/* && \
     rm -rf /tmp/* && \
