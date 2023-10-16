@@ -43,6 +43,10 @@
         associated puzzles. The set is sorted ascendingly on puzzle chapters position.
         Associated puzzles are sorted on the puzzle identifier.
 
+    @param Optional<PuzzleEntry> nextPuzzle
+        The next puzzle to be solved by the user. This puzzle is the first puzzle
+        in the set of puzzles that was not solved yet.
+
 --%>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzles"); %>
@@ -132,93 +136,6 @@
             </div>
         </div>
     </c:forEach>
-
-    <table id="puzzles" class="table table-striped table-v-align-middle">
-        <thead>
-            <tr>
-                <th>Lecture</th>
-                <th>Levels</th>
-            </tr>
-        </thead>
-        <%
-            if (puzzleChapterEntries.isEmpty()) {
-        %>
-            <tbody>
-                <tr><td colspan="100" class="text-center">There are currently no puzzles available.</td></tr>
-            </tbody>
-        <%
-            } else {
-        %>
-            <tbody>
-                <%
-                    for (PuzzleChapterEntry puzzleChapterEntry : puzzleChapterEntries) {
-                        final PuzzleChapter chapter = puzzleChapterEntry.getChapter();
-
-                %>
-                    <tr>
-                        <td>
-                            <div data-bs-toggle="tooltip"
-                                 title="<%=chapter.getDescription()%>">
-                                <%=chapter.getTitle()%>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="d-flex flex-wrap gap-1">
-                                <%
-                                    for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
-                                        final String title = puzzleEntry.getPuzzle().getTitle();
-                                        final String description = puzzleEntry.getPuzzle().getDescription();
-
-                                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME) {
-                                            final String color = puzzleEntry.getState().equals(GameState.ACTIVE)
-                                                    ? "btn-info"
-                                                    : "btn-primary";
-                                            final int puzzleId = puzzleEntry.getPuzzleId();
-                                %>
-                                                <a class="btn btn-sm <%=color%>"
-                                                   href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=<%=puzzleId%>"
-                                                   data-bs-toggle="tooltip"
-                                                   title="<%=description%>">
-                                                    <%=title%>
-                                                </a>
-                                <%
-                                        } else if (!puzzleEntry.isLocked()) {
-                                            final int puzzleId = puzzleEntry.getPuzzleId();
-                                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
-                                            String color = playedGame != null && playedGame.getState().equals(GameState.SOLVED)
-                                                    ? "btn-success"
-                                                    : "btn-primary";
-                                %>
-                                            <a class="btn btn-sm <%=color%>"
-                                               href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=<%=puzzleId%>"
-                                               data-bs-toggle="tooltip"
-                                               title="<%=description%>">
-                                                <%=title%>
-                                            </a>
-                                <%
-                                        } else {
-                                %>
-                                            <a disabled class="btn btn-sm btn-secondary"
-                                               data-bs-toggle="tooltip"
-                                               title="<%=description%>">
-                                                <%=title%>
-                                            </a>
-                                <%
-                                        }
-                                    }
-                                %>
-                            </div>
-                        </td>
-                    </tr>
-                <%
-                    }
-                %>
-            </tbody>
-        <%
-            }
-        %>
-    </table>
-
 </div>
 
 <%@include file="/jsp/footer.jsp" %>
