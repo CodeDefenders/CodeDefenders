@@ -18,6 +18,7 @@ import javax.inject.Named;
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -44,14 +45,17 @@ public class AchievementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementService.class);
     private final AchievementRepository repo;
+    private final TestSmellsDAO testSmellsDAO;
     private final INotificationService notificationService;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
     @Inject
-    public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService) {
+    public AchievementService(AchievementRepository achievementRepository, TestSmellsDAO testSmellsDAO,
+                              INotificationService notificationService) {
         repo = achievementRepository;
+        this.testSmellsDAO = testSmellsDAO;
         this.notificationService = notificationService;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
@@ -126,6 +130,17 @@ public class AchievementService {
         if (affected > 0) {
             logger.info("Updated achievement CREATE_MUTANTS for user with id {}", userId);
             enqueueAchievementNotification(userId, Achievement.Id.CREATE_MUTANTS);
+        }
+    }
+
+    private void checkTestSmells(int userId, int testId) {
+        List<String> smells = testSmellsDAO.getDetectedTestSmellsForTest(testId);
+        if (smells.isEmpty()) {
+            int affected = repo.updateAchievementForUser(userId, Achievement.Id.WRITE_CLEAN_TESTS, 1);
+            if (affected > 0) {
+                logger.info("Updated achievement WRITE_CLEAN_TESTS for user with id {}", userId);
+                enqueueAchievementNotification(userId, Achievement.Id.WRITE_CLEAN_TESTS);
+            }
         }
     }
 
@@ -246,6 +261,7 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handleTestTestedMutantsEvent(TestTestedMutantsEvent event) {
+            checkTestSmells(event.getUserId(), event.getTestId());
             addTestWritten(event.getUserId());
         }
 

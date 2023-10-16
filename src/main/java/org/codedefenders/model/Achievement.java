@@ -129,6 +129,8 @@ public class Achievement implements Serializable {
         WIN_GAMES_AS_DEFENDER(8),
         @SerializedName("9")
         SOLVE_PUZZLES(9),
+        @SerializedName("10")
+        WRITE_CLEAN_TESTS(10),
         ; // format for better git diffs
 
         private final int id;
