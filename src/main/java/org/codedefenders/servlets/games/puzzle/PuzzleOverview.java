@@ -20,10 +20,12 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -83,7 +85,13 @@ public class PuzzleOverview extends HttpServlet {
                 .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        final Optional<PuzzleEntry> nextPuzzle = puzzles.stream()
+                .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
+                .filter(Predicate.not(PuzzleEntry::isSolved))
+                .findFirst();
+
         request.setAttribute("puzzleChapterEntries", puzzles);
+        request.setAttribute("nextPuzzle", nextPuzzle);
 
         request.getRequestDispatcher(Constants.PUZZLE_OVERVIEW_VIEW_JSP).forward(request, response);
     }
