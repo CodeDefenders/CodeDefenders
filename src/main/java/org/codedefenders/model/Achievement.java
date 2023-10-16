@@ -131,6 +131,8 @@ public class Achievement implements Serializable {
         SOLVE_PUZZLES(9),
         @SerializedName("10")
         WRITE_CLEAN_TESTS(10),
+        @SerializedName("11")
+        KILL_MUTANTS(11),
         ; // format for better git diffs
 
         private final int id;

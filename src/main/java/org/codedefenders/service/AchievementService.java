@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,10 +18,14 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Achievement;
@@ -144,6 +149,31 @@ public class AchievementService {
         }
     }
 
+    private void checkOldMutantsKilledByTest(int userId, int testId) {
+        Set<Mutant> killedMutants = TestDAO.getKilledMutantsForTestId(testId);
+        int killCount = killedMutants.size();
+        if (killCount > 0) {
+            int affected = repo.updateAchievementForUser(userId, Achievement.Id.KILL_MUTANTS, killCount);
+            if (affected > 0) {
+                logger.info("Updated achievement KILL_MUTANTS for user with id {}", userId);
+                enqueueAchievementNotification(userId, Achievement.Id.KILL_MUTANTS);
+            }
+        }
+    }
+
+    private void checkNewMutantKilledByTest(int mutantId) {
+        Test test = TestDAO.getKillingTestForMutantId(mutantId);
+        if (test != null) {
+            int playerId = test.getPlayerId();
+            int userId = PlayerDAO.getPlayer(playerId).getUser().getId();
+            int affected = repo.updateAchievementForUser(userId, Achievement.Id.KILL_MUTANTS, 1);
+            if (affected > 0) {
+                logger.info("Updated achievement KILL_MUTANTS for user with id {}", userId);
+                enqueueAchievementNotification(userId, Achievement.Id.KILL_MUTANTS);
+            }
+        }
+    }
+
     private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
         Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
         synchronized (notificationQueue) {
@@ -261,8 +291,9 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handleTestTestedMutantsEvent(TestTestedMutantsEvent event) {
-            checkTestSmells(event.getUserId(), event.getTestId());
             addTestWritten(event.getUserId());
+            checkTestSmells(event.getUserId(), event.getTestId());
+            checkOldMutantsKilledByTest(event.getUserId(), event.getTestId());
         }
 
         /**
@@ -273,6 +304,7 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleMutantTestedEvent(MutantTestedEvent event) {
             addMutantCreated(event.getUserId());
+            checkNewMutantKilledByTest(event.getMutantId());
         }
 
         /**

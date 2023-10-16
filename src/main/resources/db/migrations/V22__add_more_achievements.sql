@@ -1,5 +1,5 @@
 INSERT INTO achievements
-VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test smells',
+VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test smells to unlock this achievement',
         '{0} of {1} smell free tests written', 0),
        (10, 1, 10, 'This smells good', 'Write the first test without smells',
         '{0} of {1} smell free tests written to reach the next level', 1),
@@ -8,4 +8,13 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
        (10, 3, 10, 'Silver Perfumer', 'Write {0} smell free tests',
         '{0} of {1} smell free tests written to reach the next level', 25),
        (10, 4, 10, 'Perfume Expert', 'Write {0} smell free tests', '{0} smell free tests written, max level reached',
-        100);
+        100),
+
+       (11, 0, 11, 'No mutants killed', 'Kill a mutant to unlock this achievement', '{0} of {1} mutant killed', 0),
+       (11, 1, 11, 'Get the mutants!', 'Kill the first mutant with a test',
+        '{0} of {1} mutants killed to reach the next level', 1),
+       (11, 2, 11, 'Bronze Mutant Killer', 'Kill {0} mutants with tests',
+        '{0} of {1} mutants killed to reach the next level', 10),
+       (11, 3, 11, 'Silver Mutant Killer', 'Kill {0} mutants with tests',
+        '{0} of {1} mutants killed to reach the next level', 50),
+       (11, 4, 11, 'Mutant Executioner', 'Kill {0} mutants with tests', '{0} mutants killed, max level reached', 200);
