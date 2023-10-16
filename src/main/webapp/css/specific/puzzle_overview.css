@@ -69,7 +69,7 @@
 }
 
 .next-puzzle__title {
-    padding: 1.5rem 1.5rem 2.5rem;
+    padding: .5rem 1.5rem 1.5rem;
 }
 
 .next-puzzle__title__chapter,
@@ -141,7 +141,7 @@
 }
 
 .chapter__level__image {
-    transform: translateY(-.25rem);
+    transform: translateY(-.5rem);
 }
 
 .chapter__level__image svg {
