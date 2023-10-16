@@ -513,6 +513,7 @@ public class MeleeGameManager extends HttpServlet {
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(game.getId());
         ttme.setUserId(login.getUserId());
+        ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
         // Clean up the session

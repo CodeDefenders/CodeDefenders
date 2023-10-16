@@ -526,6 +526,7 @@ public class MultiplayerGameManager extends HttpServlet {
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(gameId);
         ttme.setUserId(login.getUserId());
+        ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
         // Clean up the session
