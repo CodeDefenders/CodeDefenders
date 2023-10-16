@@ -1,0 +1,85 @@
+.next-puzzle, .no-puzzles, .chapter {
+    margin-block-end: 3.5rem;
+}
+
+.next-puzzle {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background-color: var(--bg-codedefenders);
+    border-radius: 4px;
+    overflow: hidden;
+
+    --play-btn-fill: white;
+    --play-btn-size: 5rem;
+    --img-blur: 1px;
+    --img-scale: 1.05;
+}
+
+.next-puzzle__image {
+    position: relative;
+    overflow: hidden;
+}
+
+.next-puzzle__image img {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    transform: scale(var(--img-scale)); /* to hide edges of blur */
+    filter: blur(var(--img-blur));
+    transition: transform .2s;
+}
+
+.next-puzzle__image::after {
+    position: absolute;
+    content: '';
+    inset: 0;
+    background-color: #0005;
+}
+
+.next-puzzle__play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+
+.next-puzzle__play-btn svg {
+    width: var(--play-btn-size);
+    height: var(--play-btn-size);
+    transition: width .2s, height .2s;
+}
+
+.next-puzzle__play-btn svg path {
+    fill: var(--play-btn-fill);
+    transition: fill .2s;
+}
+
+.next-puzzle:hover, .next-puzzle:focus, .next-puzzle:focus-within {
+    color: white;
+    --img-scale: 1.1;
+}
+
+.next-puzzle__title {
+    padding: 1.5rem 1.5rem 2.5rem;
+}
+
+.next-puzzle__title .chapter,
+.next-puzzle__title .title {
+    font-weight: bold;
+}
+
+.next-puzzle__title p {
+    margin: 0;
+}
+
+@media (min-width: 992px) {
+    .next-puzzle {
+        width: 50%;
+    }
+
+    .next-puzzle, .no-puzzles, .chapter {
+        margin-block-end: 5.5rem;
+    }
+}

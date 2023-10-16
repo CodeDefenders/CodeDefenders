@@ -49,6 +49,8 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
+<link href="${url.forPath("/css/specific/puzzle_overview.css")}" rel="stylesheet">
+
 <%
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
 %>
