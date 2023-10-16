@@ -1067,7 +1067,7 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
+        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest.getId());
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));
