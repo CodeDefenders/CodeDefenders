@@ -19,6 +19,10 @@
 
 --%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="puzzleChapterEntries" type="java.util.SortedSet"--%>
+<%--@elvariable id="nextPuzzle" type="java.util.Optional"--%>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="org.codedefenders.database.PuzzleDAO" %>
@@ -51,7 +55,66 @@
 
 <div class="container">
 
-    <h2 class="mb-3">${pageInfo.pageTitle}</h2>
+    <h1 class="mb-3">${pageInfo.pageTitle}</h1>
+
+    <c:if test="${nextPuzzle.present}">
+        <%--@elvariable id="nextPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
+        <c:set var="nextPuzzleObj" value="${nextPuzzle.get()}"/>
+        <a class="next-puzzle" href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}">
+            <div class="next-puzzle__image">
+                <img src="${url.forPath("/images/defender_puzzle.png")}" alt="Preview Image Puzzle Game">
+                <div class="next-puzzle__play-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                        <path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="next-puzzle__title">
+                <h2>
+                    Next puzzle:
+                    <span class="chapter">${nextPuzzleObj.puzzle.chapter.title}</span>,
+                    <span class="title">${nextPuzzleObj.puzzle.title}</span>
+                </h2>
+                <p>${nextPuzzleObj.puzzle.description}</p>
+            </div>
+        </a>
+    </c:if>
+    <c:if test="${puzzleChapterEntries.size() == 0}">
+        <div class="no-puzzles">There are currently no puzzles available.</div>
+    </c:if>
+    <c:forEach items="${puzzleChapterEntries}" var="ChapterEntry">
+        <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
+        <c:set var="chapter" value="${ChapterEntry.chapter}"/>
+        <div class="chapter">
+            <div class="chapter__title">
+                <h2>${chapter.title}</h2>
+            </div>
+            <a class="chapter__levels">
+                <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
+                    <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
+                    <a class="chapter__level puzzle-${puzzleEntry.solved ? 'solved' : 'unsolved'}"
+                            <c:choose>
+                                <c:when test="${puzzleEntry.type == 'GAME' || !puzzleEntry.locked}">
+                                    href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${puzzle.puzzleId}"
+                                </c:when>
+                                <c:otherwise>
+                                    disabled="disabled"
+                                </c:otherwise>
+                            </c:choose>
+                    >
+                        <div class="chapter__level__image">
+
+                        </div>
+                        <div class="chapter__level__title">
+                            <h3>${puzzle.title}</h3>
+                            <p>${puzzle.description}</p>
+                        </div>
+                    </a>
+                </c:forEach>
+            </a>
+        </div>
+    </c:forEach>
+
     <table id="puzzles" class="table table-striped table-v-align-middle">
         <thead>
             <tr>
