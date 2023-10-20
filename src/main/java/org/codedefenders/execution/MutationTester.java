@@ -25,12 +25,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -43,7 +43,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +104,7 @@ public class MutationTester implements IMutationTester {
 
         // Acquire and release the connection
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -143,13 +142,14 @@ public class MutationTester implements IMutationTester {
                 }
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
-                mutant.incrementScore(Scorer.score(game, mutant, missedTests));
+                int score = Scorer.score(game, mutant, missedTests);
+                MutantDAO.incrementMutantScore(mutant, score);
             }
         }
 
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
-        test.incrementScore(Scorer.score(game, test, killedMutants));
+        TestDAO.incrementTestScore(test, Scorer.score(game, test, killedMutants));
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -162,7 +162,7 @@ public class MutationTester implements IMutationTester {
 
         int testOwnerPlayerId = test.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(testOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -266,7 +266,7 @@ public class MutationTester implements IMutationTester {
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -285,7 +285,8 @@ public class MutationTester implements IMutationTester {
                     // test.setScore(Scorer.score((MultiplayerGame) game, test,
                     // mlist));
                     // test.update();
-                    test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+                    int score = Scorer.score((MultiplayerGame) game, test, mlist);
+                    TestDAO.incrementTestScore(test, score);
                 }
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
@@ -311,7 +312,8 @@ public class MutationTester implements IMutationTester {
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
             // mutant.update();
-            mutant.incrementScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
+            int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            MutantDAO.incrementMutantScore(mutant, score);
         }
 
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
@@ -345,7 +347,7 @@ public class MutationTester implements IMutationTester {
         final TargetExecution executedTarget = backend.testMutant(mutant, test);
 
         Integer gameId = test.getGameId();
-        String scoringMessage = String.join(":", new String[]{"" + test.getId(), "" + mutant.getId()});
+        String scoringMessage = "%d:%d".formatted(test.getId(), mutant.getId());
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         // If the test did NOT pass, the mutant was detected and should be
@@ -355,14 +357,14 @@ public class MutationTester implements IMutationTester {
             // Mutant survived
             return false;
         }
-        if (!mutant.kill(ASSUMED_NO)) {
+        if (!MutantDAO.killMutant(mutant, ASSUMED_NO)) {
             logger.info("Test {} would have killed Mutant {}, but Mutant {} was already dead!", test.getId(),
                     mutant.getId(), mutant.getId());
             return false;
         }
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
-        test.killMutant();
+        TestDAO.killMutant(test);
         mutant.setKillMessage(executedTarget.message);
         MutantDAO.updateMutantKillMessageForMutant(mutant);
 
@@ -390,9 +392,9 @@ public class MutationTester implements IMutationTester {
         if (executedTarget.status.equals(ERROR) || executedTarget.status.equals(FAIL)) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
-            if (mutant.kill(PROVEN_NO)) {
+            if (MutantDAO.killMutant(mutant, PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
-                test.killMutant();
+                TestDAO.killMutant(test);
                 mutant.setKillMessage(executedTarget.message);
                 MutantDAO.updateMutantKillMessageForMutant(mutant);
             } else {
@@ -418,7 +420,7 @@ public class MutationTester implements IMutationTester {
 
         int mutantOwnerPlayerId = mutant.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutantOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }

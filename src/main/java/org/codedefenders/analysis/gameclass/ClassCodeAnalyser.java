@@ -106,7 +106,7 @@ public class ClassCodeAnalyser {
         public void visit(MethodDeclaration methodDecl, ClassAnalysisResult result) {
             super.visit(methodDecl, result);
 
-            if (!methodDecl.getBody().isPresent()) {
+            if (methodDecl.getBody().isEmpty()) {
                 return;
             }
 

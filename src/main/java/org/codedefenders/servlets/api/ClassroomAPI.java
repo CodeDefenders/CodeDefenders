@@ -3,7 +3,6 @@ package org.codedefenders.servlets.api;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -56,7 +54,7 @@ public class ClassroomAPI extends HttpServlet {
         response.setContentType("application/json");
 
         Optional<String> type = ServletUtils.getStringParameter(request, "type");
-        if (!type.isPresent()) {
+        if (type.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -91,7 +89,7 @@ public class ClassroomAPI extends HttpServlet {
         String which = ServletUtils.getStringParameter(request, "which").orElse("all");
 
         Optional<List<ClassroomDTO>> classrooms = getClassroomsData(which);
-        if (!classrooms.isPresent()) {
+        if (classrooms.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -105,7 +103,7 @@ public class ClassroomAPI extends HttpServlet {
 
     private void handleMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
@@ -121,7 +119,7 @@ public class ClassroomAPI extends HttpServlet {
 
     private void handleGames(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

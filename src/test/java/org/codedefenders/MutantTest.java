@@ -61,24 +61,46 @@ public class MutantTest {
 
     @Test
     public void testApplyPatch() throws IOException, PatchFailedException {
-        List<String> originalCode = Arrays.asList("public class Lift {", "private int topFloor;",
-                "private int currentFloor = 0; // default", "private int capacity = 10;    // default",
-                "private int numRiders = 0;    // default", "public Lift(int highestFloor) { ",
-                "topFloor = highestFloor;", "}", "}");
+        List<String> originalCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0; // default
+                    private int capacity = 10;    // default
+                    private int numRiders = 0;    // default
 
-        List<String> mutantCode = Arrays.asList("public class Lift {", "private int topFloor;",
-                "private int currentFloor = 0; // default", "private int capacity = 10;    // default",
-                "private int numRiders = 0;    // default", "public Lift(int highestFloor) { topFloor = highestFloor;", // Here's the change
-                "topFloor = highestFloor;", "}", "}");
+                    public Lift(int highestFloor) {
+                        topFloor = highestFloor;
+                    }
+                }""".stripIndent().lines().toList();
+
+        List<String> mutantCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0; // default
+                    private int capacity = 10;    // default
+                    private int numRiders = 0;    // default
+
+                    public Lift(int highestFloor) { topFloor = highestFloor;
+                        topFloor = highestFloor;
+                    }
+                }""".stripIndent().lines().toList();
 
         // generating diff information.
         Patch<String> thePatch = DiffUtils.diff(originalCode, mutantCode);
         List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, originalCode, thePatch, 3);
         System.out.println("MutantTest.testApplyPatch() " + unifiedPatches);
-        List<String> diff = Arrays.asList("--- null", "+++ null", "@@ -3,7 +3,7 @@",
-                " private int currentFloor = 0; // default", " private int capacity = 10;    // default",
-                " private int numRiders = 0;    // default", "-public Lift(int highestFloor) { ",
-                "+public Lift(int highestFloor) { topFloor = highestFloor;", " topFloor = highestFloor;", " }", " }");
+        List<String> diff = """
+                --- null
+                +++ null
+                @@ -4,7 +4,7 @@
+                     private int capacity = 10;    // default
+                     private int numRiders = 0;    // default
+
+                -    public Lift(int highestFloor) {
+                +    public Lift(int highestFloor) { topFloor = highestFloor;
+                         topFloor = highestFloor;
+                     }
+                 }""".stripIndent().lines().toList();
 
         Patch<String> patch = UnifiedDiffUtils.parseUnifiedDiff(diff);
 
@@ -118,27 +140,29 @@ public class MutantTest {
 
     public static class MutantTestArguments implements ArgumentsProvider {
         private Arguments testGetLinesForChangeSingleLine() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0; // default
+                    private int capacity = 10;    // default
+                    private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {  topFloor = highestFloor;" + "\n" // 7 -Change this
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+                    public Lift(int highestFloor) {
+                        topFloor = highestFloor;
+                    }
+                }""".stripIndent();
+
+            String mutantCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0; // default
+                    private int capacity = 10;    // default
+                    private int numRiders = 0;    // default
+
+                    public Lift(int highestFloor) { topFloor = highestFloor;
+                        topFloor = highestFloor;
+                    }
+                }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -150,30 +174,32 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForChangeMultipleLines() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {  topFloor = " + "\n" // Change lines 7 - 10
-                    + "" + "\n"
-                    + "" + "\n"
-                    + "highestFloor;" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
+
+            String mutantCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
+
+                        public Lift(int highestFloor) { topFloor =
+
+
+                            highestFloor;
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -185,28 +211,30 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForInsertSingeLine() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n" // 8 - Add this
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
+
+            String mutantCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
+
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -218,29 +246,31 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForInsertMultipleLines() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor + 1;" + "\n" // 8 - Add this
-                    + "topFloor = highestFloor + 1;" + "\n" // 9 - Add this
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
+
+            String mutantCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
+
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor + 1;
+                            topFloor = highestFloor + 1;
+                            topFloor = highestFloor;
+                        }
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -252,29 +282,31 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForChangeLineAndInsertMultipleLines() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                     public class Lift {
+                         private int topFloor;
+                         private int currentFloor = 0; // default
+                         private int capacity = 10;    // default
+                         private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) { topFloor = 0; " + "\n" // 7 - Change
-                    + "topFloor = highestFloor;" + "\n"
-                    + "topFloor = highestFloor + 1;" + "\n" // 9 - Insert
-                    + "topFloor = highestFloor + 1;" + "\n" // 10 - Insert
-                    + "}" + "\n"
-                    + "}";
+                         public Lift(int highestFloor) {
+                             topFloor = highestFloor;
+                         }
+                     }""".stripIndent();
+
+            String mutantCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
+
+                        public Lift(int highestFloor) { topFloor = 0;
+                            topFloor = highestFloor;
+                            topFloor = highestFloor + 1;
+                            topFloor = highestFloor + 1;
+                        }
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -287,39 +319,41 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForInsertionMutantOnDisjointLines() {
-            String originalCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "}" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor, int maxRiders) {" + "\n"
-                    + "this(highestFloor);" + "\n"
-                    + "capacity = maxRiders;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+            String originalCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
 
-            String mutantCode = "public class Lift {" + "\n"
-                    + "private int topFloor;" + "\n"
-                    + "private int currentFloor = 0; // default" + "\n"
-                    + "private int capacity = 10;    // default" + "\n"
-                    + "private int numRiders = 0;    // default" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor) {" + "\n"
-                    + "topFloor = highestFloor;" + "\n"
-                    + "topFloor = highestFloor;" + "\n" // Add line
-                    + "}" + "\n"
-                    + "\n"
-                    + "public Lift(int highestFloor, int maxRiders) {" + "\n"
-                    + "this(highestFloor);" + "\n"
-                    + "topFloor = highestFloor;" + "\n" // Add line
-                    + "capacity = maxRiders;" + "\n"
-                    + "}" + "\n"
-                    + "}";
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                        }
+
+                        public Lift(int highestFloor, int maxRiders) {
+                            this(highestFloor);
+                            capacity = maxRiders;
+                        }
+                    }""".stripIndent();
+
+            String mutantCode = """
+                    public class Lift {
+                        private int topFloor;
+                        private int currentFloor = 0; // default
+                        private int capacity = 10;    // default
+                        private int numRiders = 0;    // default
+
+                        public Lift(int highestFloor) {
+                            topFloor = highestFloor;
+                            topFloor = highestFloor;
+                        }
+
+                        public Lift(int highestFloor, int maxRiders) {
+                            this(highestFloor);
+                            topFloor = highestFloor;
+                            capacity = maxRiders;
+                        }
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();
@@ -331,29 +365,37 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForEmptySpaces() {
-            String originalCode = "public String toString(int doubleLength) {" + "\n"
-                    + "StringBuffer temp = new StringBuffer();" + "\n"
-                    + "temp.append(trim(real, doubleLength));" + "\n"
-                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                    + "temp.append(trim(-imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "} else {" + "\n"
-                    + "temp.append(\" + \");" + "\n"
-                    + "temp.append(trim(imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "\n"
-                    + "}" + "\n"
-                    + "return temp.toString();}";
+            String originalCode = """
+                    public String toString(int doubleLength) {
+                        StringBuffer temp = new StringBuffer();
+                        temp.append(trim(real, doubleLength));
+                        if (imag < 0.0) {
+                            temp.append(" - ");
+                            temp.append(trim(-imag, doubleLength));
+                            temp.append(" i");
+                        } else {
+                            temp.append(" + ");
+                            temp.append(trim(imag, doubleLength));
+                            temp.append(" i");
+                        }
+                        return temp.toString();
+                    }""".stripIndent();
 
-            String mutantCode = "public String toString(int doubleLength) {" + "\n"
-                    + "StringBuffer temp = new StringBuffer();" + "\n"
-                    + "temp.append(trim(real, doubleLength));" + "\n"
-                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                    + "temp.append(trim(-imag, doubleLength));" + "\n"
-                    + "temp.append(\" i   \");" + "} else {" + "\n"
-                    + "temp.append(\" + \");" + "\n"
-                    + "temp.append(trim(imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "\n"
-                    + "}" + "\n"
-                    + "return temp.toString();}";
+            String mutantCode = """
+                    public String toString(int doubleLength) {
+                        StringBuffer temp = new StringBuffer();
+                        temp.append(trim(real, doubleLength));
+                        if (imag < 0.0) {
+                            temp.append(" - ");
+                            temp.append(trim(-imag, doubleLength));
+                            temp.append(" i   ");
+                        } else {
+                            temp.append(" + ");
+                            temp.append(trim(imag, doubleLength));
+                            temp.append(" i");
+                        }
+                        return temp.toString();
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> p = mutant.getDifferences();
@@ -364,29 +406,37 @@ public class MutantTest {
         }
 
         private Arguments testGetLinesForEmptySpacesOutsideStrings() {
-            String originalCode = "public String toString(int doubleLength) {" + "\n"
-                    + "StringBuffer temp = new StringBuffer();" + "\n"
-                    + "temp.append(trim(real, doubleLength));" + "\n"
-                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                    + "temp.append(trim(-imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "} else {" + "\n"
-                    + "temp.append(\" + \");" + "\n"
-                    + "temp.append(trim(imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "\n"
-                    + "}" + "\n"
-                    + "return temp.toString();}";
+            String originalCode = """
+                    public String toString(int doubleLength) {
+                        StringBuffer temp = new StringBuffer();
+                        temp.append(trim(real, doubleLength));
+                        if (imag < 0.0) {
+                            temp.append(" - ");
+                            temp.append(trim(-imag, doubleLength));
+                            temp.append(" i");
+                        } else {
+                            temp.append(" + ");
+                            temp.append(trim(imag, doubleLength));
+                            temp.append(" i");
+                        }
+                        return temp.toString();
+                    }""".stripIndent();
 
-            String mutantCode = "public String toString(int doubleLength) {" + "\n"
-                    + "StringBuffer temp = new StringBuffer();" + "\n"
-                    + "temp.append(trim(real, doubleLength));" + "\n"
-                    + "if(imag < 0.0) {" + "temp.append(\" - \");" + "\n"
-                    + "temp.append(trim(-imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "} else {" + "\n"
-                    + "temp.append(\" + \");    " + "\n" // Add random spaces here. Those should be trimmed
-                    + "temp.append(trim(imag, doubleLength));" + "\n"
-                    + "temp.append(\" i\");" + "\n"
-                    + "}" + "\n"
-                    + "return temp.toString();}";
+            String mutantCode = """
+                    public String toString(int doubleLength) {
+                        StringBuffer temp = new StringBuffer();
+                        temp.append(trim(real, doubleLength));
+                        if (imag < 0.0) {
+                            temp.append(" - ");
+                            temp.append(trim(-imag, doubleLength));
+                            temp.append(" i");
+                        } else {
+                            temp.append(" + ");\s\s\s\s
+                            temp.append(trim(imag, doubleLength));
+                            temp.append(" i");
+                        }
+                        return temp.toString();
+                    }""".stripIndent();
 
             Consumer<Mutant> assertions = mutant -> {
                 Patch<String> patch = mutant.getDifferences();

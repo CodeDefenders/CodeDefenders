@@ -8,7 +8,7 @@
 		<powermock.version>2.0.9</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<slf4j.version>1.7.36</slf4j.version>
-		<junit5.version>5.8.2</junit5.version>
+		<junit5.version>5.10.0</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
 		<prometheus-client.version>0.16.0</prometheus-client.version>
 
@@ -306,8 +306,6 @@
 						<additionalClasspathElement>${project.basedir}/src/integration/resources
 						</additionalClasspathElement>
 					</additionalClasspathElements>
-					<!-- DatabaseTests need to be enabled manually via the it-database-only profile -->
-					<excludedGroups>org.codedefenders.DatabaseTest</excludedGroups>
 				</configuration>
 			</plugin>
 
@@ -633,9 +631,7 @@
 								<additionalClasspathElement>${project.basedir}/src/integration/resources
 								</additionalClasspathElement>
 							</additionalClasspathElements>
-							<groups>org.codedefenders.DatabaseTest</groups>
-							<!-- Need to overwrite the excluded groups of the default invocation -->
-							<excludedGroups>org.codedefenders</excludedGroups>
+							<groups>database</groups>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -690,7 +686,7 @@
 							<forkCount>1</forkCount>
 							<reuseForks>false</reuseForks>
 							<!-- Only consider tests marked as IntegrationTest -->
-							<groups>org.codedefenders.itests.IntegrationTest</groups>
+							<groups>integration</groups>
 							<!-- Do not clog the console but write to output files -->
 							<redirectTestOutputToFile>true</redirectTestOutputToFile>
 						</configuration>
@@ -724,13 +720,6 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.22.2</version>
-						<dependencies>
-							<dependency>
-								<groupId>org.apache.maven.surefire</groupId>
-								<artifactId>surefire-junit47</artifactId>
-								<version>2.22.2</version>
-							</dependency>
-						</dependencies>
 						<configuration>
 							<skipTests>true</skipTests>
 						</configuration>
@@ -743,20 +732,13 @@
 								<phase>integration-test</phase>
 								<configuration>
 									<skipTests>false</skipTests>
-									<includes>
-										<include>**/systemtests/*.class</include>
-									</includes>
-									<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
-									<!-- Exclude resources for integration tests. Note that those are
-										actual java and class files for mutants and tests -->
-									<excludes>
-										<exclude>**/itests/**/*.*</exclude>
-									</excludes>
+
+									<!-- Only consider tests marked with @SystemTest -->
+									<groups>system</groups>
+
 									<!-- Do not parallelize, but just fork a new JVM each time -->
 									<forkCount>1</forkCount>
 									<reuseForks>false</reuseForks>
-									<!-- Only consider tests marked as IntegrationTest -->
-									<groups>org.codedefenders.systemtests.SystemTest</groups>
 									<!-- Do not clog the console but write to output files -->
 									<redirectTestOutputToFile>true</redirectTestOutputToFile>
 								</configuration>

@@ -32,6 +32,8 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -77,7 +79,7 @@ public class ParallelMutationTester extends MutationTester {
 
         // Acquire and release the connection
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -148,13 +150,15 @@ public class ParallelMutationTester extends MutationTester {
                 }
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
-                mutant.incrementScore(Scorer.score(game, mutant, missedTests));
+                int score = Scorer.score(game, mutant, missedTests);
+                MutantDAO.incrementMutantScore(mutant, score);
             }
         }
 
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
-        test.incrementScore(Scorer.score(game, test, killedMutants));
+        int score = Scorer.score(game, test, killedMutants);
+        TestDAO.incrementTestScore(test, score);
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -175,7 +179,7 @@ public class ParallelMutationTester extends MutationTester {
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             // TODO
             throw new RuntimeException();
         }
@@ -223,7 +227,6 @@ public class ParallelMutationTester extends MutationTester {
                 try {
                     hasTestkilledTheMutant = task.get();
                 } catch (CancellationException ce) {
-                    //
                     logger.warn("Swallowing ", ce);
                 }
 
@@ -238,7 +241,8 @@ public class ParallelMutationTester extends MutationTester {
                                 test.getId(), mutant.getId(), Scorer.score((MultiplayerGame) game, test, mlist),
                                 mutant.isAlive());
 
-                        test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+                        int score = Scorer.score((MultiplayerGame) game, test, mlist);
+                        TestDAO.incrementTestScore(test, score);
                     }
 
                     Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
@@ -269,7 +273,8 @@ public class ParallelMutationTester extends MutationTester {
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
             // mutant.update();
-            mutant.incrementScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
+            int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            MutantDAO.incrementMutantScore(mutant, score);
         }
 
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",

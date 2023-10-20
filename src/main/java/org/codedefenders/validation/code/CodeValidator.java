@@ -21,7 +21,6 @@ package org.codedefenders.validation.code;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -51,10 +50,8 @@ import org.slf4j.LoggerFactory;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Chunk;
-import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -104,7 +101,7 @@ public class CodeValidator {
 
     public static String getMD5FromFile(String filePath) {
         try {
-            String code = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8);
+            String code = Files.readString(Paths.get(filePath));
             return getMD5FromText(code);
         } catch (IOException e) {
             logger.error("Could not get MD5 hash for given file.", e);
@@ -133,7 +130,7 @@ public class CodeValidator {
             CodeValidatorLevel level) {
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
-        if (!originalParseResult.isPresent() || !mutatedParseResult.isPresent()) {
+        if (originalParseResult.isEmpty() || mutatedParseResult.isEmpty()) {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
         CompilationUnit originalCU = originalParseResult.get();
@@ -273,13 +270,12 @@ public class CodeValidator {
         final AtomicBoolean analyzingMutant = new AtomicBoolean(false);
 
 
-        ModifierVisitor<Void> visitor = new ModifierVisitor<Void>() {
+        ModifierVisitor<Void> visitor = new ModifierVisitor<>() {
 
             @Override
             public Visitable visit(IfStmt n, Void arg) {
                 // Extract elements from the condition
-                if (n.getCondition() instanceof InstanceOfExpr) {
-                    InstanceOfExpr expr = (InstanceOfExpr) n.getCondition();
+                if (n.getCondition() instanceof InstanceOfExpr expr) {
                     ReferenceType type = expr.getType();
 
                     // Accumulate instanceOF

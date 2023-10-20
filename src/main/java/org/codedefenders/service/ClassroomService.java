@@ -19,7 +19,7 @@ import org.codedefenders.persistence.database.ClassroomRepository;
 import org.codedefenders.transaction.Transactional;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Transactional
 @ApplicationScoped
@@ -30,16 +30,19 @@ public class ClassroomService {
     private final URLUtils url;
 
     private final AuthService login;
+    private final PasswordEncoder passwordEncoder;
 
     @Inject
     public ClassroomService(ClassroomRepository classroomRepository,
                             ClassroomMemberRepository memberRepository,
                             URLUtils urlUtils,
-                            AuthService login) {
+                            AuthService login,
+                            PasswordEncoder passwordEncoder) {
         this.classroomRepository = classroomRepository;
         this.memberRepository = memberRepository;
         this.url = urlUtils;
         this.login = login;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public int addClassroom(String name) throws ValidationException {
@@ -73,7 +76,7 @@ public class ClassroomService {
     public void setPassword(int classroomId, String newPassword) throws ValidationException {
         validatePassword(newPassword);
         String encryptedPassword = newPassword != null
-                ? new BCryptPasswordEncoder().encode(newPassword)
+                ? passwordEncoder.encode(newPassword)
                 : null;
         updateClassroom(classroomId, builder -> builder.setPassword(encryptedPassword));
     }
@@ -197,7 +200,7 @@ public class ClassroomService {
 
         Optional<ClassroomMember> existingMember = getMemberForClassroomAndUser(
                 member.getClassroomId(), member.getUserId());
-        if (!existingMember.isPresent()) {
+        if (existingMember.isEmpty()) {
             memberRepository.storeMember(member);
         }
     }

@@ -41,6 +41,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
@@ -58,11 +59,19 @@ public class PasswordServlet extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
 
-    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
-            + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
+    private static final String CHANGE_PASSWORD_MSG = """
+            Hello %s!
+
+            Change your password here: %s
+            This link is only valid for %d hours.
+
+            Greetings, your Code Defenders team""".stripIndent();
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -78,7 +87,7 @@ public class PasswordServlet extends HttpServlet {
                 String email = request.getParameter("accountEmail");
                 String username = request.getParameter("accountUsername");
                 Optional<UserEntity> u = userRepo.getUserByEmail(email);
-                if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
+                if (u.isEmpty() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
@@ -109,8 +118,8 @@ public class PasswordServlet extends HttpServlet {
                     } else if (password.equals(confirm)) {
                         Optional<UserEntity> user = userRepo.getUserById(userId.get());
                         if (user.isPresent()) {
-                            user.get().setEncodedPassword(UserEntity.encodePassword(password));
-                            if (user.get().update()) {
+                            user.get().setEncodedPassword(passwordEncoder.encode(password));
+                            if (userRepo.update(user.get())) {
                                 userRepo.setPasswordResetSecret(user.get().getId(), null);
                                 responseURL = url.forPath(Paths.LOGIN);
                                 messages.add("Successfully changed your password.");

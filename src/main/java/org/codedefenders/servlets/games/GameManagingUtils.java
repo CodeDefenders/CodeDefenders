@@ -41,6 +41,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -291,7 +292,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 targetExecution.mutantId = mutant.getId();
 
                 if (targetExecution.status == TargetExecution.Status.FAIL) {
-                    test.killMutant();
+                    TestDAO.killMutant(test);
                     mutant.kill();
                     mutant.setKillMessage(targetExecution.message);
                     MutantDAO.updateMutantKillMessageForMutant(mutant);

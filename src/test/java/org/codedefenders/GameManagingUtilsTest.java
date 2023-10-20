@@ -21,6 +21,7 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,32 +43,52 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.WeldExtension;
+import org.codedefenders.util.WeldSetup;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(WeldExtension.class)
 public class GameManagingUtilsTest {
 
     private static TestSmellsDAO mockedTestSmellDAO;
+
+    @TempDir
+    public Path tempFolder;
+
+    @WeldSetup
+    public WeldInitiator weld = WeldInitiator
+                .from(GameManagingUtils.class,
+                        GameManagingUtilsTest.class,
+                        TestSmellDetectorProducer.class,
+                        NotificationService.class,
+                        ExecutorServiceProvider.class,
+                        MetricsRegistry.class,
+                        Configuration.class)
+                .inject(this)
+                .activate(RequestScoped.class)
+                .activate(ApplicationScoped.class)
+                .build();// ofTestPackage();
 
     /*
      * TODO At the moment I cannot find a better way to initialize TestSmellsDAO
      * before the weld rule call the producer
      */
-    @BeforeClass
+    @BeforeAll
     public static void setupTestSmellDao() {
         mockedTestSmellDAO = Mockito.mock(TestSmellsDAO.class);
     }
@@ -75,28 +96,10 @@ public class GameManagingUtilsTest {
     /*
      * Since the mock is static we need to explicitly reset it between tests
      */
-    @Before
+    @BeforeEach
     public void resetTestSmellsDAOMock() {
         Mockito.reset(mockedTestSmellDAO);
     }
-
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    // https://github.com/weld/weld-junit/blob/master/junit4/README.md
-    @Rule
-    public WeldInitiator weld = WeldInitiator
-            .from(GameManagingUtils.class,
-                    GameManagingUtilsTest.class,
-                    TestSmellDetectorProducer.class,
-                    NotificationService.class,
-                    ExecutorServiceProvider.class,
-                    MetricsRegistry.class,
-                    Configuration.class)
-            .inject(this)
-            .activate(RequestScoped.class)
-            .activate(ApplicationScoped.class)
-            .build();// ofTestPackage();
 
     @ApplicationScoped
     @Produces
@@ -134,17 +137,28 @@ public class GameManagingUtilsTest {
     private GameManagingUtils gameManagingUtils;
 
     private GameClass createMockedCUT() throws IOException {
-        String originalCode = "" //
-                + "public class Lift {" + "\n" //
-                + "private int topFloor;" + "\n"//
-                + "private int currentFloor=0;" + "\n"//
-                + "public Lift(int highestFloor) { this.topFloor = highestFloor;}" + "\n" //
-                + "public void goUp() {currentFloor++;}" + "\n" //
-                + "public void goDown() {currentFloor--;}" + "\n" //
-                + "public int getTopFloor() { return topFloor;}" + "\n" //
-                + "}";
+        String originalCode = """
+                public class Lift {
+                    private int topFloor;
+                    private int currentFloor = 0;
 
-        File cutJavaFile = temporaryFolder.newFile();
+                    public Lift(int highestFloor) {
+                        this.topFloor = highestFloor;
+                    }
+
+                    public void goUp() {
+                        currentFloor++;
+                    }
+
+                    public void goDown() {
+                        currentFloor--;
+                    }
+
+                    public int getTopFloor() {
+                        return topFloor;
+                    }
+                }""".stripIndent();
+        File cutJavaFile = tempFolder.resolve("Lift.java").toFile();
         FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
@@ -154,7 +168,7 @@ public class GameManagingUtilsTest {
     }
 
     private org.codedefenders.game.Test createMockedTest(String testCode) throws IOException {
-        File testJavaFile = temporaryFolder.newFile();
+        File testJavaFile = tempFolder.resolve("Test.java").toFile();
         FileUtils.writeStringToFile(testJavaFile, testCode, StandardCharsets.UTF_8);
 
         org.codedefenders.game.Test mockedTest = mock(org.codedefenders.game.Test.class);
@@ -165,12 +179,19 @@ public class GameManagingUtilsTest {
 
     @Test
     public void testSmellGood() throws IOException {
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n" + "        assertEquals(50, l.getTopFloor());" + "\n"
-                + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();
@@ -194,24 +215,33 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(expectedSmells, actualSmells);
+        assertEquals(expectedSmells, actualSmells);
     }
 
     @Test
     public void testEagerSmellDoesNotTriggerIfProductionsMethodsAreLessThanThreshold() throws IOException {
         // This has 2 production calls instead of 4 {@link
         // TestSmellDetectorProducer.EAGER_TEST_THRESHOLD}
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n"
-                // 1 Production Method call
-                + "        l.goUp();" + "\n" //
-                // 2 Production Method call
-                + "        l.goUp();" + "\n" //
-                // Calls inside the assertions (or inside other calls?) are not counted
-                + "        assertEquals(50, l.getTopFloor());" + "\n" + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+
+                        // 1. Production Method call
+                        l.goUp();
+                        // 2. Production Method call
+                        l.goUp();
+
+                        // Calls inside the assertions (or inside other calls?) are not counted
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();
@@ -232,27 +262,37 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(noSmellsExpected, actualSmells);
+        assertEquals(noSmellsExpected, actualSmells);
     }
 
     @Test
     public void testEagerSmellTriggerIfProductionsMethodsAreEqualThanThreshold() throws IOException {
         // This has 3 production calls instead of 4 {@link
         // TestSmellDetectorProducer.EAGER_TEST_THRESHOLD}
-        String testCode = "" + "import org.junit.*;" + "\n" + "import static org.junit.Assert.*;" + "\n"
-                + "import static org.hamcrest.MatcherAssert.assertThat;" + "\n"
-                + "import static org.hamcrest.Matchers.*;" + "\n" + "public class TestLift {" + "\n"
-                + "    @Test(timeout = 4000)" + "\n" + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(50);" + "\n"
-                // 1 Production Method call
-                + "        l.goUp();" + "\n" //
-                // 2 Production Method call
-                + "        l.goDown();" + "\n" //
-                // 3 Production Method call
-                + "        l.getTopFloor();" + "\n" //
-                // 4 Production Method call
-                + "        l.goUp();" + "\n" //
-                + "        assertEquals(50, l.getTopFloor());" + "\n" + "    }" + "\n" + "}";
+        String testCode = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                import static org.hamcrest.MatcherAssert.assertThat;
+                import static org.hamcrest.Matchers.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(50);
+
+                        // 1. Production Method call
+                        l.goUp();
+                        // 2. Production Method call
+                        l.goDown();
+                        // 3. Production Method call
+                        l.getTopFloor();
+                        // 4. Production Method call
+                        l.goUp();
+
+                        // Calls inside the assertions (or inside other calls?) are not counted
+                        assertEquals(50, l.getTopFloor());
+                    }
+                }""".stripIndent();
 
         org.codedefenders.game.Test newTest = createMockedTest(testCode);
         GameClass cut = createMockedCUT();
@@ -265,7 +305,7 @@ public class GameManagingUtilsTest {
         Mockito.verify(mockedTestSmellDAO).storeSmell(Mockito.any(), argument.capture());
         // TODO Probably some smart argument matcher might be needed
         // TODO Matching by string is britlle, maybe match by "class/type"?
-        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[]{"Eager Test"}));
+        Set<String> expectedSmells = Set.of("Eager Test");
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
@@ -274,7 +314,7 @@ public class GameManagingUtilsTest {
             }
         }
 
-        Assert.assertEquals(expectedSmells, actualSmells);
+        assertEquals(expectedSmells, actualSmells);
     }
 
 }

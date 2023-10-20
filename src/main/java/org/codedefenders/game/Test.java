@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -94,13 +93,6 @@ public class Test {
         this.lineCoverage = LineCoverage.empty();
     }
 
-    @Deprecated
-    public Test(int testId, int classId, int gameId, String javaFile, String classFile,
-                int roundCreated,int mutantsKilled, int playerId) {
-        this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId,
-                Collections.emptyList(), Collections.emptyList(), 0);
-    }
-
     public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated,
                 int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
         this(classId, gameId, javaFile, classFile, playerId);
@@ -110,29 +102,6 @@ public class Test {
         this.mutantsKilled = mutantsKilled;
         this.score = score;
         lineCoverage = new LineCoverage(linesCovered, linesUncovered);
-    }
-
-    /**
-     * Creates a test from another test instance, but in a new game and for a new player.
-     *
-     * @param gameId   the game identifier of the new test.
-     * @param playerId the players identifier of the new test.
-     * @param other    the test instance the new is created for.
-     * @return a test based on another test instance, gameId and playerId.
-     */
-    public static Test newTestForGameAndPlayerIds(int gameId, int playerId, Test other) {
-        final Test test = new Test(other.classId, gameId, other.javaFile, other.classFile, playerId);
-        test.lineCoverage = other.lineCoverage;
-        return test;
-    }
-
-    // TODO Check that increment score does not consider mutants that were killed already
-    /**
-     * @deprecated Use {@link TestDAO#incrementTestScore(Test, int)} instead.
-     */
-    @Deprecated
-    public void incrementScore(int score) {
-        TestDAO.incrementTestScore(this, score);
     }
 
     @Deprecated
@@ -173,13 +142,6 @@ public class Test {
     // And update the local object. But it requires several queries/connections
     //
     // TODO Check that this method is never called for tests that kill a mutant that was already dead...
-    /**
-     * @deprecated Use {@link TestDAO#killMutant(Test)} instead.
-     */
-    @Deprecated
-    public void killMutant() {
-        TestDAO.killMutant(this);
-    }
 
     public boolean isMutantCovered(Mutant mutant) {
         return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
@@ -238,7 +200,7 @@ public class Test {
         ClassPool classPool = ClassPool.getDefault();
         CtClass cc = null;
         try {
-            cc = classPool.makeClass(new FileInputStream(new File(classFile)));
+            cc = classPool.makeClass(new FileInputStream(classFile));
         } catch (IOException e) {
             logger.error("IO exception caught", e);
         }

@@ -18,8 +18,6 @@
  */
 package org.codedefenders.servlets.util;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,7 +43,7 @@ public final class ServletUtils {
      */
     public static String formType(HttpServletRequest request) {
         final Optional<String> formType = getStringParameter(request, "formType");
-        if (!formType.isPresent()) {
+        if (formType.isEmpty()) {
             throw new IllegalStateException("Could not retrieve 'formType' from request."
                     + "Aborting request. Making sure the request parameters are set correctly.");
         }

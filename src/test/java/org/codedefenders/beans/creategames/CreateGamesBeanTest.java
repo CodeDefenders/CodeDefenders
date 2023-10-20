@@ -23,8 +23,8 @@ import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.codedefenders.game.GameType.MELEE;
@@ -53,18 +53,27 @@ public class CreateGamesBeanTest {
     private UserRepository userRepo;
     private CreateGamesService createGamesService;
 
-    /*
-     * Initialize AdminCreateGamesBean and its dependencies manually,
-     * because I couldn't get WeldInitiator to work with PowerMockito.
-     */
-    @Before
-    public void initializeBean() {
+
+    @BeforeEach
+    public void init() {
+        /* Create data. */
+        userInfos = new HashMap<>();
+        userInfos.put(1, new CreateGamesBean.UserInfo(1, "userA", "userA@email.com", null, Role.ATTACKER, 1));
+        userInfos.put(2, new CreateGamesBean.UserInfo(2, "userB", "userB@email.com", null, Role.ATTACKER, 2));
+        userInfos.put(3, new CreateGamesBean.UserInfo(3, "userC", "userC@email.com", null, Role.ATTACKER, 3));
+        userInfos.put(4, new CreateGamesBean.UserInfo(4, "userD", "userD@email.com", null, Role.ATTACKER, 4));
+        userInfos.put(5, new CreateGamesBean.UserInfo(5, "userE", "userE@email.com", null, Role.PLAYER, 5));
+        userInfos.put(6, new CreateGamesBean.UserInfo(6, "userF", "userF@email.com", null, Role.PLAYER, 6));
+        userInfos.put(7, new CreateGamesBean.UserInfo(7, "userG", "userG@email.com", null, Role.DEFENDER, 7));
+        userInfos.put(8, new CreateGamesBean.UserInfo(8, "userH", "userH@email.com", null, Role.DEFENDER, 8));
+
         /* Mock bean dependencies of AdminCreateGamesBean. */
         MessagesBean messagesBean = Mockito.mock(MessagesBean.class);
         EventDAO eventDAO = Mockito.mock(EventDAO.class);
         userRepo = Mockito.mock(UserRepository.class);
         createGamesService = Mockito.mock(CreateGamesService.class);
 
+        /* Initialize bean. */
         stagedGameList = new StagedGameList();
         createGamesBean = new AdminCreateGamesBean(
                 stagedGameList,
@@ -93,19 +102,6 @@ public class CreateGamesBeanTest {
                 return new HashSet<>();
             }
         };
-    }
-
-    @Before
-    public void initializeData() {
-        userInfos = new HashMap<>();
-        userInfos.put(1, new CreateGamesBean.UserInfo(1, "userA", "userA@email.com", null, Role.ATTACKER, 1));
-        userInfos.put(2, new CreateGamesBean.UserInfo(2, "userB", "userB@email.com", null, Role.ATTACKER, 2));
-        userInfos.put(3, new CreateGamesBean.UserInfo(3, "userC", "userC@email.com", null, Role.ATTACKER, 3));
-        userInfos.put(4, new CreateGamesBean.UserInfo(4, "userD", "userD@email.com", null, Role.ATTACKER, 4));
-        userInfos.put(5, new CreateGamesBean.UserInfo(5, "userE", "userE@email.com", null, Role.PLAYER, 5));
-        userInfos.put(6, new CreateGamesBean.UserInfo(6, "userF", "userF@email.com", null, Role.PLAYER, 6));
-        userInfos.put(7, new CreateGamesBean.UserInfo(7, "userG", "userG@email.com", null, Role.DEFENDER, 7));
-        userInfos.put(8, new CreateGamesBean.UserInfo(8, "userH", "userH@email.com", null, Role.DEFENDER, 8));
     }
 
     @Test
@@ -167,7 +163,7 @@ public class CreateGamesBeanTest {
 
     @Test
     public void testStageGamesNotEnoughPlayersForOneGame() {
-        Set<Integer> userIds = new HashSet<Integer>() {{
+        Set<Integer> userIds = new HashSet<>() {{
             add(1);
             add(2);
         }};

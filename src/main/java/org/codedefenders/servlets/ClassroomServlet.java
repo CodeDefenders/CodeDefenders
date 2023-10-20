@@ -1,7 +1,6 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,7 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @WebServlet(Paths.CLASSROOM)
 public class ClassroomServlet extends HttpServlet {
@@ -45,11 +44,14 @@ public class ClassroomServlet extends HttpServlet {
     @Inject
     private PageInfoBean pageInfo;
 
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             Redirect.redirectBack(request, response);
             return;
@@ -78,14 +80,14 @@ public class ClassroomServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             Redirect.redirectBack(request, response);
             return;
         }
 
         Optional<String> action = ServletUtils.getStringParameter(request, "action");
-        if (!action.isPresent()) {
+        if (action.isEmpty()) {
             messages.add("Missing required parameter: action.");
             Redirect.redirectBack(request, response);
             return;
@@ -272,7 +274,7 @@ public class ClassroomServlet extends HttpServlet {
 
         Optional<ClassroomMember> kickedMember = classroomService.getMemberForClassroomAndUser(
                 classroom.getId(), userId);
-        if (!kickedMember.isPresent()) {
+        if (kickedMember.isEmpty()) {
             messages.add("Member not found.");
             Redirect.redirectBack(request, response);
         } else if (kickedMember.get().getRole() == ClassroomRole.MODERATOR) {
@@ -303,7 +305,7 @@ public class ClassroomServlet extends HttpServlet {
 
         if (classroom.getPassword().isPresent()) {
             String password = ServletUtils.getStringParameter(request, "password").get();
-            boolean matches = new BCryptPasswordEncoder().matches(password, classroom.getPassword().get());
+            boolean matches = passwordEncoder.matches(password, classroom.getPassword().get());
             if (!matches) {
                 messages.add("Wrong password");
                 Redirect.redirectBack(request, response);

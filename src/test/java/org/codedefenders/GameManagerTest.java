@@ -26,19 +26,22 @@ import javax.servlet.ServletException;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.WeldExtension;
+import org.codedefenders.util.WeldSetup;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Jose Rojas
  */
+@ExtendWith(WeldExtension.class)
 public class GameManagerTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils.
-    @Rule
+    @WeldSetup
     public WeldInitiator weld = WeldInitiator.of(GameManagerTest.class);
 
     @Produces

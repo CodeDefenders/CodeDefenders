@@ -172,11 +172,7 @@ public class ClassUploadManager extends HttpServlet {
         // request.getParameter before fetching the file
         List<FileItem> items;
         try {
-            if (servletFileUpload == null) {
-                items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-            } else {
-                items = servletFileUpload.parseRequest(request);
-            }
+            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to upload class. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
@@ -993,13 +989,5 @@ public class ClassUploadManager extends HttpServlet {
         DEPENDENCY,
         MUTANT,
         TEST
-    }
-
-    private ServletFileUpload servletFileUpload;
-
-    // Enable minimal testing
-    @Deprecated
-    void setServletFileUpload(ServletFileUpload servletFileUpload) {
-        this.servletFileUpload = servletFileUpload;
     }
 }

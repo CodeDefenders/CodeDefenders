@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
@@ -35,6 +36,7 @@ import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +113,7 @@ public class GameClassDAO {
      * @return a {@link GameClass} instance, or {@code null}.
      */
     public static GameClass getClassForId(int classId) {
-        String query = "SELECT * FROM classes WHERE Class_ID = ?;";
+        @Language("SQL") String query = "SELECT * FROM classes WHERE Class_ID = ?;";
 
         return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(classId));
     }
@@ -123,13 +125,13 @@ public class GameClassDAO {
      * @return a {@link GameClass} instance, or {@code null}.
      */
     public static GameClass getClassForGameId(int gameId) {
-        String query = String.join("\n",
-                "SELECT classes.*",
-                "FROM classes",
-                "INNER JOIN games",
-                "  ON classes.Class_ID = games.Class_ID",
-                "WHERE games.ID=?;"
-        );
+        @Language("SQL") String query = """
+                SELECT classes.*
+                FROM classes
+                INNER JOIN games
+                  ON classes.Class_ID = games.Class_ID
+                WHERE games.ID=?;
+        """;
         return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(gameId));
     }
 
@@ -143,13 +145,13 @@ public class GameClassDAO {
      * @return all game classes.
      */
     public static List<GameClassInfo> getAllClassInfos() {
-        String query = String.join("\n",
-                "SELECT classes.*,",
-                "    (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
-                "FROM classes",
-                "WHERE Puzzle != 1",
-                "GROUP BY classes.Class_ID;"
-        );
+        @Language("SQL") String query = """
+                SELECT classes.*,
+                    (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count
+                FROM classes
+                WHERE Puzzle != 1
+                GROUP BY classes.Class_ID;
+        """;
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassInfoFromRS);
     }
@@ -163,7 +165,7 @@ public class GameClassDAO {
      * @return all game classes.
      */
     public static List<GameClass> getAllPlayableClasses() {
-        String query = "SELECT * FROM view_playable_classes;";
+        @Language("SQL") String query = "SELECT * FROM view_playable_classes;";
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
     }
@@ -176,10 +178,11 @@ public class GameClassDAO {
      * @return {@code true} if at least one game does exist, {@code false} otherwise.
      */
     public static boolean gamesExistsForClass(Integer classId) {
-        String query = String.join("\n",
-                "SELECT (COUNT(games.ID) > 0) AS games_exist",
-                "FROM games",
-                "WHERE games.Class_ID = ?");
+        @Language("SQL") String query = """
+                SELECT (COUNT(games.ID) > 0) AS games_exist
+                FROM games
+                WHERE games.Class_ID = ?
+        """;
         return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("games_exist"), DatabaseValue.of(classId));
     }
 
@@ -190,7 +193,7 @@ public class GameClassDAO {
      * @return {@code true} if alias does exist, {@code false} otherwise.
      */
     public static boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM classes WHERE Alias = ?";
+        @Language("SQL") String query = "SELECT * FROM classes WHERE Alias = ?";
         Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(alias));
         return rv != null;
     }
@@ -204,11 +207,11 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedMutantIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        final String query = String.join("\n",
-                "SELECT Mutant_ID",
-                "FROM mutant_uploaded_with_class",
-                "WHERE Class_ID = ?"
-        );
+        @Language("SQL") String query = """
+                SELECT Mutant_ID
+                FROM mutant_uploaded_with_class
+                WHERE Class_ID = ?
+        """;
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DatabaseValue.of(classId));
     }
 
@@ -221,12 +224,12 @@ public class GameClassDAO {
      */
     public static List<Mutant> getMappedMutantsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        final String query = String.join("\n",
-                "SELECT mutants.*",
-                "FROM mutants, mutant_uploaded_with_class up",
-                "WHERE up.Class_ID = ?",
-                "   AND up.Mutant_ID = mutants.Mutant_ID"
-        );
+        @Language("SQL") String query = """
+                SELECT mutants.*
+                FROM mutants, mutant_uploaded_with_class up
+                WHERE up.Class_ID = ?
+                   AND up.Mutant_ID = mutants.Mutant_ID
+        """;
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
     }
 
@@ -239,11 +242,11 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedTestIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        final String query = String.join("\n",
-                "SELECT Test_ID",
-                "FROM test_uploaded_with_class",
-                "WHERE Class_ID = ?"
-        );
+        @Language("SQL") String query = """
+                SELECT Test_ID
+                FROM test_uploaded_with_class
+                WHERE Class_ID = ?;
+        """;
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID"), DatabaseValue.of(classId));
     }
 
@@ -256,12 +259,12 @@ public class GameClassDAO {
      */
     public static List<Test> getMappedTestsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        final String query = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests, test_uploaded_with_class up",
-                "WHERE up.Class_ID = ?",
-                "   AND up.Test_ID = tests.Test_ID"
-                );
+        @Language("SQL") String query = """
+                SELECT tests.*
+                FROM tests, test_uploaded_with_class up
+                WHERE up.Class_ID = ?
+                   AND up.Test_ID = tests.Test_ID
+        """;
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
     }
 
@@ -274,7 +277,7 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
+        @Language("SQL") String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DatabaseValue.of(classId));
     }
 
@@ -287,12 +290,13 @@ public class GameClassDAO {
      */
     public static List<Dependency> getMappedDependenciesForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT",
-                "   Dependency_ID,",
-                "   JavaFile,",
-                "   ClassFile",
-                "FROM dependencies WHERE Class_ID = ?;");
+        @Language("SQL") String query = """
+                SELECT
+                   Dependency_ID,
+                   JavaFile,
+                   ClassFile
+                FROM dependencies WHERE Class_ID = ?;
+        """;
         return DB.executeQueryReturnList(query,
                 rs -> DependencyDAO.dependencyFromRS(rs, classId),
                 DatabaseValue.of(classId));
@@ -318,19 +322,20 @@ public class GameClassDAO {
         Integer parentClassId = cut.getParentClassId();
         boolean isActive = cut.isActive();
 
-        String query = String.join("",
-                "INSERT INTO classes (",
-                "Name,",
-                "Alias,",
-                "JavaFile,",
-                "ClassFile,",
-                "RequireMocking,",
-                "TestingFramework,",
-                "AssertionLibrary,",
-                "Puzzle,",
-                "Parent_Class,",
-                "Active",
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        @Language("SQL") String query = """
+                INSERT INTO classes (
+                    Name,
+                    Alias,
+                    JavaFile,
+                    ClassFile,
+                    RequireMocking,
+                    TestingFramework,
+                    AssertionLibrary,
+                    Puzzle,
+                    Parent_Class,
+                    Active
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
@@ -367,15 +372,14 @@ public class GameClassDAO {
         boolean isMockingEnabled = cut.isMockingEnabled();
         boolean isActive = cut.isActive();
 
-        String query = String.join("\n",
-                "UPDATE classes",
-                "  SET",
-                "  Alias = ? ,",
-                "  RequireMocking = ? ,",
-                "  Active = ?",
-                "WHERE class_ID = ?"
-
-        );
+        @Language("SQL") String query = """
+                UPDATE classes
+                  SET
+                  Alias = ? ,
+                  RequireMocking = ? ,
+                  Active = ?
+                WHERE class_ID = ?
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(alias),
                 DatabaseValue.of(isMockingEnabled),
@@ -393,7 +397,7 @@ public class GameClassDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeClassForId(int id) {
-        String query = "DELETE FROM classes WHERE Class_ID = ?;";
+        @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
 
         return DB.executeUpdateQuery(query, DatabaseValue.of(id));
     }
@@ -414,15 +418,16 @@ public class GameClassDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean forceRemoveClassForId(int id) {
-        final String query1 = "DELETE FROM dependencies WHERE Class_ID = ?;";
-        final String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
-        final String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";
-        final String query4 = String.join("\n",
-                "DELETE FROM targetexecutions",
-                "WHERE Mutant_ID IN",
-                "(SELECT Mutant_ID FROM mutants WHERE Class_ID = ?);");
-        final String query5 = "DELETE FROM mutants WHERE Class_ID = ?;";
-        final String query6 = "DELETE FROM tests WHERE Class_ID = ?;";
+        @Language("SQL") String query1 = "DELETE FROM dependencies WHERE Class_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
+        @Language("SQL") String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";
+        @Language("SQL") String query4 = """
+                DELETE FROM targetexecutions
+                WHERE Mutant_ID IN
+                (SELECT Mutant_ID FROM mutants WHERE Class_ID = ?);
+        """;
+        @Language("SQL") String query5 = "DELETE FROM mutants WHERE Class_ID = ?;";
+        @Language("SQL") String query6 = "DELETE FROM tests WHERE Class_ID = ?;";
 
         DB.executeUpdateQuery(query1, DatabaseValue.of(id));
         DB.executeUpdateQuery(query2, DatabaseValue.of(id));
@@ -445,14 +450,15 @@ public class GameClassDAO {
             return false;
         }
 
-        final StringBuilder bob = new StringBuilder("DELETE FROM classes WHERE Class_ID in (");
-        for (int i = 0; i < classes.size() - 1; i++) {
-            bob.append("?,");
-        }
-        bob.append("?);");
+        String placeholders = Stream.generate(() -> "(?, ?, ?, ?)")
+                .limit(classes.size())
+                .collect(Collectors.joining(","));
+        @Language("SQL") String query =
+                "DELETE FROM classes WHERE Class_ID in (%s);".formatted(placeholders);
 
-        String query = bob.toString();
-        DatabaseValue<?>[] values = classes.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
+        DatabaseValue<?>[] values = classes.stream()
+                .map(DatabaseValue::of)
+                .toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -467,8 +473,11 @@ public class GameClassDAO {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
-        String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-        String query = "SELECT Class_ID FROM classes WHERE Class_ID in (" + idsString + ")";
+        String idsString = ids.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        @Language("SQL") String query =
+                "SELECT Class_ID FROM classes WHERE Class_ID in (%s);".formatted(idsString);
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Class_ID"));
     }
 }

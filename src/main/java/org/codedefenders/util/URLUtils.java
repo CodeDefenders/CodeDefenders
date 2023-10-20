@@ -51,7 +51,7 @@ public class URLUtils {
      * to construct the application url.
      */
     public synchronized void setAppURI(@Nonnull URL url) {
-        if (!appURI.isPresent()) {
+        if (appURI.isEmpty()) {
             try {
                 // Ensure path always ends with a leading "/"
                 String path = url.getPath() + (url.getPath().endsWith("/") ? "" : "/");

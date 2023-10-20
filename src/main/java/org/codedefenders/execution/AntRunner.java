@@ -366,7 +366,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             if (!testMutantFileDir.exists()) {
                 testMutantFileDir.mkdirs();
             }
-            //
+
             command.add("-Dmutant.test.file=" + testMutantFile);
         }
         // Execute whichever command was build

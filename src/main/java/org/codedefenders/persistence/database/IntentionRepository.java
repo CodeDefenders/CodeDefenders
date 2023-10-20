@@ -31,6 +31,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.intellij.lang.annotations.Language;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 
@@ -67,7 +68,10 @@ public class IntentionRepository {
 
         final String targetLines = intention.getLines().stream().map(String::valueOf).collect(Collectors.joining(","));
 
-        final String query = "INSERT INTO intention (Test_ID, Game_ID, Target_Lines) VALUES (?,?,?);";
+        @Language("SQL") final String query = """
+            INSERT INTO intention (Test_ID, Game_ID, Target_Lines)
+            VALUES (?, ?, ?);
+        """;
 
         try {
             return queryRunner.insert(query,
@@ -90,7 +94,10 @@ public class IntentionRepository {
      * @throws UncheckedSQLException If an SQLException occurs while trying to store the intention.
      */
     public Optional<Integer> storeIntentionForMutant(Mutant mutant, AttackerIntention intention) {
-        final String query = "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type) VALUES (?,?,?);";
+        @Language("SQL") final String query = """
+            INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type)
+            VALUES (?, ?, ?);
+        """;
 
         try {
             return queryRunner.insert(query,

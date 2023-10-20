@@ -25,57 +25,58 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.DatabaseTest;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.transaction.Transaction;
 import org.codedefenders.transaction.TransactionManager;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@Category(DatabaseTest.class)
+@DatabaseTest
+@ExtendWith(DatabaseExtension.class)
 public class TransactionAwareQueryRunnerIT {
 
-    @Rule
-    public DatabaseRule databaseRule = new DatabaseRule();
-
-    private QueryRunner queryRunner;
     private TransactionManager transactionManager;
+    private QueryRunner queryRunner;
 
     private Connection connection;
 
 
-    @Before
-    public void setup() throws Exception {
-        ConnectionFactory connectionFactory = databaseRule.getConnectionFactory();
-        doAnswer(invocation -> {
-            connection = spy(databaseRule.getConnection());
-            return connection;
-        }).when(connectionFactory).getConnection();
+    @BeforeEach
+    public void setup(ConnectionFactory connectionFactory) throws Exception {
+        // Expose the requested connection from ConnectionFactory
+        ConnectionFactory mockedConnectionFactory = mock(ConnectionFactory.class);
+        when(mockedConnectionFactory.getConnection())
+                .thenAnswer(invocation -> {
+                    connection = connectionFactory.getConnection();
+                    return connection;
+                });
 
-        TransactionAwareQueryRunner transactionAwareQueryRunner = new TransactionAwareQueryRunner(connectionFactory);
+        // Construct the query runner
+        TransactionAwareQueryRunner transactionAwareQueryRunner = new TransactionAwareQueryRunner(
+                mockedConnectionFactory);
         queryRunner = transactionAwareQueryRunner;
         transactionManager = transactionAwareQueryRunner;
 
-        // Setup database table for testing
-        queryRunner.execute("CREATE TABLE test ( "
-                + " id INT PRIMARY KEY AUTO_INCREMENT, "
-                + " name VARCHAR(255) NOT NULL, "
-                + " number INT UNIQUE NULL DEFAULT NULL"
-                + ");"
-        );
+        // Setup database table for testing.
+        queryRunner.execute("""
+             CREATE TABLE test (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                name VARCHAR(255) NOT NULL,
+                number INT UNIQUE NULL DEFAULT NULL
+             );
+        """);
     }
-
 
     @Test
     public void nestedTransactions() throws Exception {

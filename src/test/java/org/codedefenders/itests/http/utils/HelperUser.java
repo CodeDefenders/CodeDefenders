@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
-import org.junit.Assert;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
@@ -43,6 +42,9 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
+
+import static com.github.javaparser.utils.Utils.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class HelperUser {
 
@@ -86,7 +88,7 @@ public class HelperUser {
         HtmlPage retunToGamePage = browser.getPage(loginRequest);
     }
 
-    public int createNewGame(int classId, //
+    public int createNewGame(int classId,
             boolean isHardGame, // Level
             int maxAssertionsPerTest, // maxAssertionsPerTest
             int mutantValidatorLevel, // mutantValidatorLevel
@@ -95,7 +97,7 @@ public class HelperUser {
 
         // List the games already there
         Set<String> myGames = new HashSet<>();
-        //
+
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -129,7 +131,7 @@ public class HelperUser {
         }
         // There's should be only one
         System.out.println("HelperUser.createNewGame() " + newGameLink);
-        //
+
         return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
     }
 
@@ -137,7 +139,7 @@ public class HelperUser {
     public int createNewGame(int classId) throws FailingHttpStatusCodeException, IOException {
         // List the games already there
         Set<String> myGames = new HashSet<>();
-        //
+
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -147,11 +149,11 @@ public class HelperUser {
 
         WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME),
                 HttpMethod.POST);
-        createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classId), //
-                new NameValuePair("level", "true"), //
-
-        }));
+        createGameRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createGame"),
+                new NameValuePair("class", "" + classId),
+                new NameValuePair("level", "true")
+        ));
 
         gameUsers = browser.getPage(createGameRequest);
         // Reload the game page
@@ -169,7 +171,7 @@ public class HelperUser {
         }
         // There's should be only one
         System.out.println("UnkillableMutant.HelperUser.createNewGame() " + newGameLink);
-        //
+
         return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
 
     }
@@ -178,8 +180,10 @@ public class HelperUser {
 
         WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
         // // Then we set the request parameters
-        startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
+        startGameRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "startGame"),
+                new NameValuePair("gameId", "" + gameId)
+        ));
         // Finally, we can get the page
         return browser.getPage(startGameRequest);
 
@@ -211,10 +215,12 @@ public class HelperUser {
     public void attack(int gameId, String mutant) throws FailingHttpStatusCodeException, IOException {
         WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
         // // Then we set the request parameters
-        attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createMutant"), new NameValuePair("gameId", "" + gameId),
+        attackRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createMutant"),
+                new NameValuePair("gameId", "" + gameId),
                 // TODO Encoded somehow ?
-                new NameValuePair("mutant", "" + mutant)}));
+                new NameValuePair("mutant", "" + mutant)
+        ));
         // curl -X POST \
         // --data "formType=createMutant&gameId=${gameId}" \
         // --data-urlencode mutant@${mutant} \
@@ -233,10 +239,12 @@ public class HelperUser {
         // --cookie "${cookie}" --cookie-jar "${cookie}" \
         // -w @curl-format.txt \
         // -s ${CODE_DEFENDER_URL}/multiplayergame
-        defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createTest"), new NameValuePair("gameId", "" + gameId),
+        defendRequest.setRequestParameters(List.of(
+                new NameValuePair("formType", "createTest"),
+                new NameValuePair("gameId", "" + gameId),
                 // TODO Encoded somehow ?
-                new NameValuePair("test", "" + test)}));
+                new NameValuePair("test", "" + test)
+        ));
         browser.getPage(defendRequest);
     }
 
@@ -293,7 +301,7 @@ public class HelperUser {
         HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
         for (HtmlAnchor a : playPage.getAnchors()) {
             if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
-                Assert.fail("On game " + gameId + " there is still an equivalence duel open");
+                fail("On game " + gameId + " there is still an equivalence duel open");
             }
         }
     }
@@ -306,7 +314,7 @@ public class HelperUser {
                 return;
             }
         }
-        Assert.fail("On game " + gameId + " there is no equivalence duels open");
+        fail("On game " + gameId + " there is no equivalence duels open");
 
     }
 
@@ -317,17 +325,16 @@ public class HelperUser {
         HtmlPage uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
         // Class IDs before
-        //
+
         List<String> classIds = new ArrayList<>();
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
-            if (l instanceof HtmlTableDataCell) {
-                HtmlTableDataCell td = (HtmlTableDataCell) l;
+            if (l instanceof HtmlTableDataCell td) {
                 classIds.add(td.getTextContent());
             }
         }
 
         HtmlForm form = (HtmlForm) uploadPage.getElementById("formUpload");
-        Assert.assertNotNull(form);
+        assertNotNull(form);
         form.setActionAttribute(codedefendersHome + Paths.CLASS_UPLOAD);
         form.getInputByName("fileUploadCUT").setValueAttribute(file.getAbsolutePath());
         form.<HtmlFileInput>getInputByName("fileUploadCUT").setContentType("image/png");// optional
@@ -338,17 +345,15 @@ public class HelperUser {
         uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
-            if (l instanceof HtmlTableDataCell) {
-                HtmlTableDataCell td = (HtmlTableDataCell) l;
+            if (l instanceof HtmlTableDataCell td) {
                 if (classIds.contains(td.getTextContent())) {
                     continue;
-                } else {
-                    return Integer.parseInt(td.getTextContent());
                 }
+                return Integer.parseInt(td.getTextContent());
             }
         }
 
-        Assert.fail("Cannot find the ID of the new class !");
+        fail("Cannot find the ID of the new class !");
 
         return -1;
     }

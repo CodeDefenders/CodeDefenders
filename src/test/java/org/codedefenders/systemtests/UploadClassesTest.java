@@ -24,9 +24,9 @@ import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
  */
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -46,13 +46,13 @@ import static org.junit.Assert.assertTrue;
  * </ul>
  */
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 
     /*
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()//
+    public static DockerComposeRule docker = DockerComposeRule.builder()
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
                     "src/test/resources/systemtests/insert-test-users.yml",
                     "src/test/resources/systemtests/mount-sources-folder.yml"))

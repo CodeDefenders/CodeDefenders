@@ -141,18 +141,4 @@ public class ConnectionFactory {
             return false;
         }
     }
-
-    /**
-     * @deprecated Set this via the configuration
-     */
-    @Deprecated
-    public void updateSize(int maxTotalConnections) {
-    }
-
-    /**
-     * @deprecated Set this via the configuration
-     */
-    @Deprecated
-    public void updateWaitingTime(int parseInt) {
-    }
 }

@@ -536,7 +536,7 @@ class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if the method doesn't have a body -> EMPTY
         Optional<BlockStmt> optBody = decl.getBody();
-        if (!optBody.isPresent()) {
+        if (optBody.isEmpty()) {
             astCoverage.put(decl, AstCoverageStatus.empty());
             return;
         }
@@ -1408,7 +1408,7 @@ class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(VariableDeclarator decl, Void arg) {
         super.visit(decl, arg);
 
-        if (!decl.getInitializer().isPresent()) {
+        if (decl.getInitializer().isEmpty()) {
             astCoverage.put(decl, AstCoverageStatus.empty());
             return;
         }

@@ -43,6 +43,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
@@ -69,16 +70,25 @@ public class AdminUserManagement extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-    private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n "
-            + "An account has been created for you with Username %s and Password %s.\n"
-            + "You can log in at %s. \n\n Happy coding!";
+    private static final String NEW_ACCOUNT_MSG = """
+            Welcome to Code Defenders!
+
+            An account has been created for you with Username %s and Password %s.
+            You can log in at %s.
+
+            Happy coding!""".stripIndent();
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = "%s, \n\n"
-            + "your password has been reset to %s\n"
-            + "Please change it at your next convenience.";
+    private static final String PASSWORD_RESET_MSG = """
+            %s,
+
+            your password has been reset to %s
+            Please change it at your next convenience.""".stripIndent();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -128,7 +138,7 @@ public class AdminUserManagement extends HttpServlet {
             }
             case "createUsers": {
                 final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
-                if (!userList.isPresent()) {
+                if (userList.isEmpty()) {
                     logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
                     logger.info("Creating users....");
@@ -141,7 +151,7 @@ public class AdminUserManagement extends HttpServlet {
                 // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
                 //  'userid' from the session attributes
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
-                if (!userId.isPresent()) {
+                if (userId.isEmpty()) {
                     logger.error("Editing user failed. Missing request parameter 'uid'");
                 } else {
                     String newUsername = request.getParameter("name");
@@ -184,11 +194,11 @@ public class AdminUserManagement extends HttpServlet {
 
     private boolean setUserInactive(int userId) {
         final Optional<UserEntity> user = userRepo.getUserById(userId);
-        if (!user.isPresent()) {
+        if (user.isEmpty()) {
             return false;
         }
         user.get().setActive(false);
-        return user.get().update();
+        return userRepo.update(user.get());
 
     }
 
@@ -266,7 +276,7 @@ public class AdminUserManagement extends HttpServlet {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final UserEntity user = new UserEntity(username, UserEntity.encodePassword(password), email);
+        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email);
         final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {

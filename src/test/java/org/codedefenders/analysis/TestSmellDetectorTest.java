@@ -21,11 +21,10 @@ package org.codedefenders.analysis;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
@@ -33,28 +32,29 @@ import testsmell.TestSmellDetector;
 import testsmell.smell.UnknownTest;
 import thresholds.DefaultThresholds;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class TestSmellDetectorTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public Path tempFolder;
 
     @Test
     public void exploratoryTest() throws IOException {
-        File testFile = temporaryFolder.newFile("TestLift.java");
+        File testFile = tempFolder.resolve("TestLift.java").toFile();
         // Detect test smell
-        String testContent = ""
-                + "import org.junit.*;" + "\n"
-                + "import static org.junit.Assert.*;" + "\n"
-                + " " + "\n"
-                + "public class TestLift { " + "\n"
-                + "    @Test(timeout = 4000)" + "\n"
-                + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(5);" + "\n"
-                + "        l.getTopFloor(); // This cover the mutant" + "\n"
-                + "        assertEquals(0, l.getCurrentFloor());" + "\n"
-                + "    }" + "\n"
-                + "}"
-                + "";
+        String testContent = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(5);
+                        l.getTopFloor(); // This cover the mutant
+                        assertEquals(0, l.getCurrentFloor());
+                    }
+                }""".stripIndent();
 
         Files.write(testFile.toPath(), testContent.getBytes());
         String testFilePath = testFile.getAbsolutePath();
@@ -70,20 +70,19 @@ public class TestSmellDetectorTest {
 
     @Test
     public void testUnknownSmellDetector() throws IOException {
-        File testFile = temporaryFolder.newFile("TestLift.java");
+        File testFile = tempFolder.resolve("TestLift.java").toFile();
         // Detect UnknownTest test smell: there are no assertions
-        String testContent = ""
-                + "import org.junit.*;" + "\n"
-                + "import static org.junit.Assert.*;" + "\n"
-                + " " + "\n"
-                + "public class TestLift { " + "\n"
-                + "    @Test(timeout = 4000)" + "\n"
-                + "    public void test() throws Throwable {" + "\n"
-                + "        Lift l = new Lift(5);" + "\n"
-                + "        l.getTopFloor(); // This cover the mutant" + "\n"
-                + "    }" + "\n"
-                + "}"
-                + "";
+        String testContent = """
+                import org.junit.*;
+                import static org.junit.Assert.*;
+
+                public class TestLift {
+                    @Test(timeout = 4000)
+                    public void test() throws Throwable {
+                        Lift l = new Lift(5);
+                        l.getTopFloor(); // This cover the mutant
+                    }
+                }""";
 
         Files.write(testFile.toPath(), testContent.getBytes());
         String testFilePath = testFile.getAbsolutePath();
@@ -97,7 +96,7 @@ public class TestSmellDetectorTest {
 
         for (AbstractSmell smell : testSmellFile.getTestSmells()) {
             if (smell instanceof UnknownTest) {
-                Assert.assertTrue(smell.hasSmell());
+                assertTrue(smell.hasSmell());
             }
 
         }

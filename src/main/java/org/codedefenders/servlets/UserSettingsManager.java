@@ -43,6 +43,7 @@ import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
@@ -72,6 +73,9 @@ public class UserSettingsManager extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PasswordEncoder passwordEncoder;
+
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
     private static final String DELETED_USER_PASSWORD = "DELETED";
@@ -79,7 +83,7 @@ public class UserSettingsManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!userRepo.getUserById(login.getUserId()).isPresent()) {
+        if (userRepo.getUserById(login.getUserId()).isEmpty()) {
             response.sendRedirect(url.forPath("/"));
             return;
         }
@@ -91,14 +95,14 @@ public class UserSettingsManager extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String responsePath = url.forPath(Paths.USER_SETTINGS);
+        final UserEntity user = userRepo.getUserById(login.getUserId()).get();
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
             case "updateKeyMap": {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
-                if (updateUserKeyMap(login.getUserEntity(), editorKeyMap)) {
-                    login.getUserEntity().setKeyMap(editorKeyMap);
+                if (updateUserKeyMap(user, editorKeyMap)) {
                     messages.add("Successfully updated editor preference.");
                 } else {
                     logger.info("Failed to update editor preference for user {}.", login.getUserId());
@@ -111,7 +115,7 @@ public class UserSettingsManager extends HttpServlet {
             case "updateProfile": {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(login.getUserEntity(), email, allowContact);
+                final boolean success = updateUserInformation(user, email, allowContact);
                 if (success) {
                     messages.add("Successfully updated profile information.");
                 } else {
@@ -126,7 +130,7 @@ public class UserSettingsManager extends HttpServlet {
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
 
                 if (isPasswordValid(password)) {
-                    final boolean success = changeUserPassword(login.getUserEntity(), password.get());
+                    final boolean success = changeUserPassword(user, password.get());
                     if (success) {
                         messages.add("Successfully changed password.");
                     } else {
@@ -143,7 +147,7 @@ public class UserSettingsManager extends HttpServlet {
 
             case "deleteAccount": {
                 // Does not actually delete the account but pseudomizes it
-                final boolean success = removeUserInformation(login.getUserEntity());
+                final boolean success = removeUserInformation(user);
                 if (success) {
                     logger.info("User {} successfully set themselves as inactive.", login.getUserId());
                     /*
@@ -173,7 +177,7 @@ public class UserSettingsManager extends HttpServlet {
             return false;
         }
         user.setKeyMap(editorKeyMap);
-        return user.update();
+        return userRepo.update(user);
     }
 
     private boolean updateUserInformation(UserEntity user, Optional<String> email, boolean allowContact) {
@@ -184,7 +188,7 @@ public class UserSettingsManager extends HttpServlet {
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
-        return user.update();
+        return userRepo.update(user);
     }
 
     private boolean isPasswordValid(Optional<String> password) {
@@ -197,8 +201,8 @@ public class UserSettingsManager extends HttpServlet {
             return false;
         }
 
-        user.setEncodedPassword(UserEntity.encodePassword(password));
-        return user.update();
+        user.setEncodedPassword(passwordEncoder.encode(password));
+        return userRepo.update(user);
     }
 
     private boolean removeUserInformation(UserEntity user) {
@@ -209,6 +213,6 @@ public class UserSettingsManager extends HttpServlet {
         user.setUsername(DELETED_USER_NAME);
         user.setEmail(String.format(DELETED_USER_EMAIL, UUID.randomUUID()));
         user.setEncodedPassword(DELETED_USER_PASSWORD);
-        return user.update() && userService.deleteRecordedSessions(user.getId());
+        return userRepo.update(user) && userService.deleteRecordedSessions(user.getId());
     }
 }

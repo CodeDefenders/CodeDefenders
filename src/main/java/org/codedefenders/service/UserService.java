@@ -40,6 +40,7 @@ import org.codedefenders.transaction.Transactional;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -56,10 +57,12 @@ public class UserService {
     private final LoadingCache<Integer, SimpleUser> simpleUserForUserIdCache;
 
     private final UserRepository userRepo;
+    private final PasswordEncoder passwordEncoder;
 
     @Inject
-    public UserService(UserRepository userRepo, MetricsRegistry metricsRegistry) {
+    public UserService(UserRepository userRepo, MetricsRegistry metricsRegistry, PasswordEncoder passwordEncoder) {
         this.userRepo = userRepo;
+        this.passwordEncoder = passwordEncoder;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
                 // Entries expire after a relative short time, since User(name) updates are not handled through this
@@ -69,7 +72,7 @@ public class UserService {
                 .maximumSize(200)
                 .recordStats()
                 .build(
-                        new CacheLoader<Integer, SimpleUser>() {
+                        new CacheLoader<>() {
                             @Nonnull
                             @Override
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {
@@ -189,8 +192,8 @@ public class UserService {
         } else if (userRepo.getUserByEmail(email).isPresent()) {
             result = "Could not create user. Email has already been used. You can reset your password.";
         } else {
-            UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
-            if (!userRepo.insert(newUser).isPresent()) {
+            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email);
+            if (userRepo.insert(newUser).isEmpty()) {
                 // TODO: How about some error handling?
                 result = "Could not create user.";
             }
@@ -199,17 +202,13 @@ public class UserService {
         return Optional.ofNullable(result);
     }
 
-    /**
-     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
-     */
     public void changeUsername(int userId, @Nonnull String newUsername) {
         simpleUserForUserIdCache.invalidate(userId);
         throw new NotImplementedException();
     }
 
     /**
-     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)} and
-     * {@link org.codedefenders.servlets.admin.AdminUserManagement#resetUserPW(int)}
+     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)}
      */
     public void changePassword(@Nonnull String newPassword) {
         throw new NotImplementedException();
@@ -217,7 +216,6 @@ public class UserService {
 
     /**
      * See {@link org.codedefenders.servlets.UserSettingsManager#updateUserInformation(UserEntity, Optional, boolean)}
-     * and {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
      */
     public void changeEmail(@Nonnull String newEmail) {
         throw new NotImplementedException();
@@ -225,7 +223,6 @@ public class UserService {
 
 
     /**
-     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}.
      * Admin only method!
      */
     @Nonnull
@@ -234,7 +231,7 @@ public class UserService {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         Optional<UserEntity> u = userRepo.getUserById(userId);
-        if (!u.isPresent()) {
+        if (u.isEmpty()) {
             return Optional.of("Error. User " + userId + " cannot be retrieved from database.");
         }
         UserEntity user = u.get();
@@ -255,7 +252,7 @@ public class UserService {
             if (!validator.validPassword(newPassword)) {
                 return Optional.of("Password is not valid");
             }
-            user.setEncodedPassword(UserEntity.encodePassword(newPassword));
+            user.setEncodedPassword(passwordEncoder.encode(newPassword));
         }
         user.setUsername(newUsername);
         user.setEmail(newEmail);
@@ -297,8 +294,7 @@ public class UserService {
 
 
     /**
-     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)} and
-     * {@link org.codedefenders.servlets.admin.AdminUserManagement#deleteUser(int)}.
+     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)}
      */
     public void deactivateAccount() {
         throw new NotImplementedException();

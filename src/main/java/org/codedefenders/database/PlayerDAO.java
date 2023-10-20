@@ -26,6 +26,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.intellij.lang.annotations.Language;
 
 /**
  * This class handles the database logic for players.
@@ -77,7 +78,7 @@ public class PlayerDAO {
     }
 
     /**
-     * Retrieves the identifier of a player of a given user in a given game. //
+     * Retrieves the identifier of a player of a given user in a given game.
      * TODO: Return Integer instead of int, and null instead of -1?
      *
      * @param userId the user identifier as an {@code int}.
@@ -85,7 +86,12 @@ public class PlayerDAO {
      * @return the playerId for a user in a game.
      */
     public static int getPlayerIdForUserAndGame(int userId, int gameId) {
-        String query = String.join("\n", "SELECT players.ID", "FROM players", "WHERE User_ID = ?", "  AND Game_ID = ?");
+        @Language("SQL") String query = """
+                SELECT players.ID
+                FROM players
+                WHERE User_ID = ?
+                  AND Game_ID = ?
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[] { DatabaseValue.of(userId), DatabaseValue.of(gameId) };
         final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
         return Optional.ofNullable(id).orElse(-1);
@@ -100,7 +106,11 @@ public class PlayerDAO {
      * @return player instance
      */
     public static Player getPlayer(int playerId) {
-        String query = String.join("\n", "SELECT *", "FROM view_players_with_userdata", "WHERE ID = ?;");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM view_players_with_userdata
+                WHERE ID = ?;
+        """;
 
         return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(playerId));
 
@@ -114,14 +124,19 @@ public class PlayerDAO {
      * @return The player for a user in a game.
      */
     public static Player getPlayerForUserAndGame(int userId, int gameId) {
-        String query = String.join("\n", "SELECT *", "FROM view_players_with_userdata", "WHERE Game_ID = ?",
-                "  AND User_ID = ?", "  AND Active=TRUE;");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM view_players_with_userdata
+                WHERE Game_ID = ?
+                  AND User_ID = ?
+                  AND Active = TRUE;
+        """;
         return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId),
                 DatabaseValue.of(userId));
     }
 
     public static void setPlayerPoints(int points, int player) {
-        String query = "UPDATE players SET Points=? WHERE ID=?";
+        @Language("SQL") String query = "UPDATE players SET Points = ? WHERE ID = ?";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
                 DatabaseValue.of(player)
@@ -130,7 +145,7 @@ public class PlayerDAO {
     }
 
     public static void increasePlayerPoints(int points, int player) {
-        String query = "UPDATE players SET Points=Points+? WHERE ID=?";
+        @Language("SQL") String query = "UPDATE players SET Points = Points + ? WHERE ID = ?";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
                 DatabaseValue.of(player)
@@ -139,7 +154,7 @@ public class PlayerDAO {
     }
 
     public static int getPlayerPoints(int playerId) {
-        String query = "SELECT Points FROM players WHERE ID=?;";
+        @Language("SQL") String query = "SELECT Points FROM players WHERE ID = ?;";
         final Integer points = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);

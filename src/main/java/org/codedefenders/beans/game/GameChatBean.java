@@ -55,8 +55,7 @@ public class GameChatBean {
      * @return Whether the tabs should be shown.
      */
     public boolean isShowTabs() {
-        if (game instanceof MultiplayerGame) {
-            MultiplayerGame multiplayerGame = (MultiplayerGame) game;
+        if (game instanceof MultiplayerGame multiplayerGame) {
             Role role = multiplayerGame.getRole(login.getUserId());
             return role == Role.OBSERVER;
         } else {
@@ -69,8 +68,7 @@ public class GameChatBean {
      * @return Whether the channels should be shown.
      */
     public boolean isShowChannel() {
-        if (game instanceof MultiplayerGame) {
-            MultiplayerGame multiplayerGame = (MultiplayerGame) game;
+        if (game instanceof MultiplayerGame multiplayerGame) {
             Role role = multiplayerGame.getRole(login.getUserId());
             return role != Role.OBSERVER;
         } else {

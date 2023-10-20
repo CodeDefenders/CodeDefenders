@@ -4,8 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.codedefenders.servlets.UserProfileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -27,6 +27,7 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.intellij.lang.annotations.Language;
 
 /**
  * This class handles the database logic for target executions.
@@ -69,7 +70,7 @@ public class TargetExecutionDAO {
      * @throws UncheckedSQLException If storing the target execution was not successful.
      */
     public static int storeTargetExecution(TargetExecution targetExecution) {
-        final String query;
+        @Language("SQL") final String query;
         final DatabaseValue<?>[] values;
 
         final String insertedMessage = targetExecution.message == null ? ""
@@ -128,12 +129,12 @@ public class TargetExecutionDAO {
      * @return the target execution for the given test and mutant if found, {@link null} otherwise.
      */
     public static TargetExecution getTargetExecutionForPair(int testId, int mutantId) {
-        String query = String.join("\n",
-                "SELECT *",
-                        "FROM targetexecutions",
-                        "WHERE Test_ID = ?",
-                        "  AND Mutant_ID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT *
+                FROM targetexecutions
+                WHERE Test_ID = ?
+                  AND Mutant_ID = ?;
+        """;
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(testId),
@@ -151,12 +152,12 @@ public class TargetExecutionDAO {
      * @return the target execution for the given test and target if found, {@link null} otherwise.
      */
     public static TargetExecution getTargetExecutionForTest(Test test, TargetExecution.Target target) {
-        final String query = String.join("\n",
-                "SELECT *",
-                "FROM targetexecutions",
-                "WHERE Test_ID = ?",
-                "  AND Target = ?;"
-        );
+        @Language("SQL") final String query = """
+                SELECT *
+                FROM targetexecutions
+                WHERE Test_ID = ?
+                  AND Target = ?;
+        """;
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(test.getId()),
@@ -174,12 +175,12 @@ public class TargetExecutionDAO {
      * @return the target execution for the given mutant and target if found, {@link null} otherwise.
      */
     public static TargetExecution getTargetExecutionForMutant(Mutant mutant, TargetExecution.Target target) {
-        final String query = String.join("\n",
-                "SELECT *",
-                "FROM targetexecutions",
-                "WHERE Mutant_ID = ?",
-                "  AND Target = ?;"
-        );
+        @Language("SQL") final String query = """
+                SELECT *
+                FROM targetexecutions
+                WHERE Mutant_ID = ?
+                  AND Target = ?;
+        """;
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(mutant.getId()),
@@ -197,14 +198,13 @@ public class TargetExecutionDAO {
      * @return a list of target executions of mutants and tests which were uploaded together with the same given class.
      */
     public static List<TargetExecution> getTargetExecutionsForUploadedWithClass(int classId) {
-        final String query = String.join("\n",
-                "SELECT te.*",
-                "FROM targetexecutions te, classes c",
-                "WHERE c.Class_ID = ?",
-                "  AND te.Mutant_ID IN (SELECT Mutant_ID FROM mutant_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
-                "  AND te.Test_ID IN (SELECT Test_ID FROM test_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
-                ";"
-        );
+        @Language("SQL") final String query = """
+                SELECT te.*
+                FROM targetexecutions te, classes c
+                WHERE c.Class_ID = ?
+                  AND te.Mutant_ID IN (SELECT Mutant_ID FROM mutant_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)
+                  AND te.Test_ID IN (SELECT Test_ID FROM test_uploaded_with_class up WHERE up.Class_ID = c.Class_ID);
+        """;
 
         return DB.executeQueryReturnList(query, TargetExecutionDAO::targetExecutionFromRS, DatabaseValue.of(classId));
     }

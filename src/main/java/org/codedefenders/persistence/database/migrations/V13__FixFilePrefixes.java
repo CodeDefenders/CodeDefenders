@@ -30,6 +30,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.codedefenders.configuration.Configuration;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
+import org.intellij.lang.annotations.Language;
 
 // Using @Singleton should lead to only the name of this class showing up in the flyway_schema_history_table script
 // column instead of also including some WeldClientProxy foo.
@@ -54,18 +55,20 @@ public class V13__FixFilePrefixes extends BaseJavaMigration {
         // Note it is important to NOT close this connection!!
         Connection conn = context.getConnection();
 
-        // TODO(Java 9+): Switch this to a simple List.of(…) call
-        List<String> tables = new java.util.ArrayList<>();
-        tables.add("classes");
-        tables.add("dependencies");
-        tables.add("mutants");
-        tables.add("tests");
+        var tables = List.of(
+                "classes",
+                "dependencies",
+                "mutants",
+                "tests"
+        );
         for (String table : tables) {
             // We explicitly want to update all rows in the table
             //noinspection SqlWithoutWhere
-            String query = "UPDATE " + table + "\n"
-                    + "SET JavaFile = REGEXP_REPLACE(JavaFile, CONCAT('^', ?), ''),\n"
-                    + "    ClassFile = REGEXP_REPLACE(ClassFile, CONCAT('^', ?), '');";
+            @Language("SQL") String query = """
+                    UPDATE %s
+                    SET JavaFile = REGEXP_REPLACE(JavaFile, CONCAT('^', ?), ''),
+                        ClassFile = REGEXP_REPLACE(ClassFile, CONCAT('^', ?), '');
+            """.formatted(table);
             queryRunner.update(conn, query, Pattern.quote(dataDir), Pattern.quote(dataDir));
         }
     }

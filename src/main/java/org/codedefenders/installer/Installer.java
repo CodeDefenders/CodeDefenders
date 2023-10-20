@@ -218,7 +218,7 @@ public class Installer {
             return;
         }
 
-        String fileContent = new String(Files.readAllBytes(cutFile.toPath()), Charset.defaultCharset());
+        String fileContent = Files.readString(cutFile.toPath(), Charset.defaultCharset());
 
         Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         String cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
@@ -265,7 +265,7 @@ public class Installer {
             throw new IllegalArgumentException("No valid position provided.");
         }
 
-        String mutantFileContent = new String(Files.readAllBytes(mutantFile.toPath()), Charset.defaultCharset());
+        String mutantFileContent = Files.readString(mutantFile.toPath(), Charset.defaultCharset());
 
         Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         Path folderPath = cutDir.resolve(Constants.CUTS_MUTANTS_DIR).resolve(String.valueOf(targetPosition));
@@ -307,7 +307,7 @@ public class Installer {
         // All the tests require the same dependency on the CUT
         List<JavaFileObject> dependencies = Collections.singletonList(new JavaFileObject(cut.getJavaFile()));
 
-        String testFileContent = new String(Files.readAllBytes(testFile.toPath()), Charset.defaultCharset());
+        String testFileContent = Files.readString(testFile.toPath(), Charset.defaultCharset());
 
         Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         Path folderPath = cutDir.resolve(Constants.CUTS_TESTS_DIR).resolve(String.valueOf(targetPosition));
@@ -424,7 +424,7 @@ public class Installer {
                 .map(Integer::parseInt)
                 .orElse(null);
         Optional<Integer> chapterIdOpt = Optional.ofNullable(cfg.getProperty("chapterId")).map(Integer::parseInt);
-        if (!chapterIdOpt.isPresent() || !puzzleChapters.contains(chapterIdOpt.get())) {
+        if (chapterIdOpt.isEmpty() || !puzzleChapters.contains(chapterIdOpt.get())) {
             logger.warn("Provided chapterId for puzzle was not provided or does not exist. Skipping this puzzle.");
             return;
         }

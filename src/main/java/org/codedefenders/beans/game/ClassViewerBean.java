@@ -44,7 +44,7 @@ public class ClassViewerBean {
     }
 
     /**
-     * Sets the className and classCode. Since the {@link GameClass#name} contains the fully qualified name, the
+     * Sets the className and classCode. Since {@link GameClass#getName()} contains the fully qualified name, the
      * package information must be removed.
      * @param clazz The class under test
      */

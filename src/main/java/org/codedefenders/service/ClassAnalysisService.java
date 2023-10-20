@@ -51,7 +51,7 @@ public class ClassAnalysisService {
                 .maximumSize(200)
                 .recordStats()
                 .build(
-                        new CacheLoader<Integer, ClassAnalysisResult>() {
+                        new CacheLoader<>() {
                             @Nonnull
                             @Override
                             public ClassAnalysisResult load(@Nonnull Integer classId) throws Exception {

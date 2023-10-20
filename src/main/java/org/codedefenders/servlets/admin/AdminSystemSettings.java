@@ -94,17 +94,19 @@ public class AdminSystemSettings extends HttpServlet {
         CONNECTION_POOL_CONNECTIONS {
             @Override
             public String toString() {
-                return "NOT USED, SET THIS VIA THE CONFIGURATION. \n"
-                        + "Number of permanently open connections. Recommended: >20 \n"
-                        + "Lowering this number closes the delta in connections!";
+                return """
+                        NOT USED, SET THIS VIA THE CONFIGURATION.
+                        Number of permanently open connections. Recommended: >20
+                        Lowering this number closes the delta in connections!""".stripIndent();
             }
         },
         CONNECTION_WAITING_TIME {
             @Override
             public String toString() {
-                return "NOT USED, SET THIS VIA THE CONFIGURATION. \n"
-                        + "Amount of time in ms a thread waits to be notified of newly available connections."
-                        + "Recommended: ~5000ms";
+                return """
+                        NOT USED, SET THIS VIA THE CONFIGURATION.
+                        Amount of time in ms a thread waits to be notified of newly available connections.
+                        Recommended: ~5000ms""".stripIndent();
             }
         },
         SITE_NOTICE {
@@ -301,10 +303,10 @@ public class AdminSystemSettings extends HttpServlet {
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
-                            connectionFactory.updateSize(Integer.parseInt(valueString));
+                            // connectionFactory.updateSize(Integer.parseInt(valueString));
                         }
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
-                            connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
+                            // connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
                         }
                         break;
                     case BOOL_VALUE:

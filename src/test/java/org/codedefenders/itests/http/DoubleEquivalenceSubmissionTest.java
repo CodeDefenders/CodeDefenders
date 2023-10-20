@@ -25,21 +25,21 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -56,13 +56,15 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 /**
  * This test assumes that the Web app is deployed at localhost:8080/ it's just
  * the client side
  *
  * @author gambi
  */
-//@Category(SystemTest.class)
+//@SystemTest
 public class DoubleEquivalenceSubmissionTest {
 
     // Use directly form submission, do not care about UI interactions, cannot
@@ -89,7 +91,8 @@ public class DoubleEquivalenceSubmissionTest {
     // Do it in parallel
 
     // private WebClient webClient;
-    private static int TIMEOUT = 10000;
+    private static final int TIMEOUT = 10000;
+    private static final String EMPTY_PW = PasswordEncoderProvider.getPasswordEncoder().encode("");
 
     static class WebClientFactory {
         private static Collection<WebClient> clients = new ArrayList<>();
@@ -100,20 +103,20 @@ public class DoubleEquivalenceSubmissionTest {
 
             // webClient = new WebClient(BrowserVersion.CHROME);
             WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
-            //
+
             webClient.getOptions().setCssEnabled(true);
             webClient.setCssErrorHandler(new SilentCssErrorHandler());
-            //
+
             // Do not fail on status code ?
             webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
             // Disable test failing because of JS exceptions
             webClient.getOptions().setThrowExceptionOnScriptError(false);
-            //
+
             webClient.getOptions().setRedirectEnabled(true);
             webClient.getOptions().setAppletEnabled(false);
-            //
+
             webClient.getOptions().setJavaScriptEnabled(true);
-            //
+
             webClient.getOptions().setPopupBlockerEnabled(true);
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
@@ -181,9 +184,10 @@ public class DoubleEquivalenceSubmissionTest {
         public void doLogin() throws FailingHttpStatusCodeException, IOException {
             WebRequest loginRequest = new WebRequest(new URL("http://localhost:8080" + Paths.LOGIN), HttpMethod.POST);
             // // Then we set the request parameters
-            loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "login"), new NameValuePair("username", user.getUsername()),
-                    new NameValuePair("password", password),}));
+            loginRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "login"),
+                    new NameValuePair("username", user.getUsername()),
+                    new NameValuePair("password", password)));
             // Finally, we can get the page
             HtmlPage retunToGamePage = browser.getPage(loginRequest);
         }
@@ -191,7 +195,7 @@ public class DoubleEquivalenceSubmissionTest {
         public int createNewGame() throws FailingHttpStatusCodeException, IOException {
             // List the games already there
             Set<String> myGames = new HashSet<>();
-            //
+
             HtmlPage gameUsers = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
             for (HtmlAnchor a : gameUsers.getAnchors()) {
                 if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?gameId=")) {
@@ -201,14 +205,11 @@ public class DoubleEquivalenceSubmissionTest {
 
             WebRequest createGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer" + Paths.GAMES_OVERVIEW),
                     HttpMethod.POST);
-            createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createGame"), new NameValuePair("class", "221"), // This
-                    // is
-                    // hardcoded,
-                    // it's
-                    // Lift.class
+            createGameRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createGame"),
+                    new NameValuePair("class", "221") // This is hardcoded, it's Lift.class
                     // new NameValuePair("level", "true"),
-            }));
+            ));
 
             gameUsers = browser.getPage(createGameRequest);
             String newGameLink = null;
@@ -223,7 +224,7 @@ public class DoubleEquivalenceSubmissionTest {
             }
             // There's should be only one
 
-            //
+
             return Integer.parseInt(newGameLink.replaceAll("multiplayer/games\\?gameId=", ""));
 
         }
@@ -233,8 +234,10 @@ public class DoubleEquivalenceSubmissionTest {
             WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
-            startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
+            startGameRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "startGame"),
+                    new NameValuePair("gameId", "" + gameId)
+            ));
             // Finally, we can get the page
             // Not sure why this returns TextPage and not HtmlPage
             browser.getPage(startGameRequest);
@@ -264,10 +267,12 @@ public class DoubleEquivalenceSubmissionTest {
             WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
-            attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createMutant"), new NameValuePair("gameId", "" + gameId),
+            attackRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createMutant"),
+                    new NameValuePair("gameId", "" + gameId),
                     // TODO Encoded somehow ?
-                    new NameValuePair("mutant", "" + mutant)}));
+                    new NameValuePair("mutant", "" + mutant)
+            ));
             // curl -X POST \
             // --data "formType=createMutant&gameId=${gameId}" \
             // --data-urlencode mutant@${mutant} \
@@ -287,10 +292,12 @@ public class DoubleEquivalenceSubmissionTest {
             // --cookie "${cookie}" --cookie-jar "${cookie}" \
             // -w @curl-format.txt \
             // -s ${CODE_DEFENDER_URL}/multiplayergame
-            defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "createTest"), new NameValuePair("gameId", "" + gameId),
+            defendRequest.setRequestParameters(List.of(
+                    new NameValuePair("formType", "createTest"),
+                    new NameValuePair("gameId", "" + gameId),
                     // TODO Encoded somehow ?
-                    new NameValuePair("test", "" + test)}));
+                    new NameValuePair("test", "" + test)
+            ));
             browser.getPage(defendRequest);
         }
 
@@ -347,7 +354,7 @@ public class DoubleEquivalenceSubmissionTest {
             HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             for (HtmlAnchor a : playPage.getAnchors()) {
                 if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
-                    Assert.fail("On game " + gameId + " there is still an equivalence duel open");
+                    fail("On game " + gameId + " there is still an equivalence duel open");
                 }
             }
         }
@@ -360,16 +367,16 @@ public class DoubleEquivalenceSubmissionTest {
                     return;
                 }
             }
-            Assert.fail("On game " + gameId + " there is no equivalence duels open");
+            fail("On game " + gameId + " there is no equivalence duels open");
 
         }
 
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-        UserEntity creatorUser = new UserEntity("creator");
+        UserEntity creatorUser = new UserEntity("creator", EMPTY_PW);
         HelperUser creator = new HelperUser(creatorUser, "test");
         creator.doLogin();
         System.out.println("Creator Login");
@@ -379,7 +386,7 @@ public class DoubleEquivalenceSubmissionTest {
         //
         creator.startGame(newGameId);
         //
-        UserEntity attackerUser = new UserEntity("demoattacker");
+        UserEntity attackerUser = new UserEntity("demoattacker", EMPTY_PW);
         HelperUser attacker = new HelperUser(attackerUser, "test");
         attacker.doLogin();
         System.out.println("Attacker Login");
@@ -387,7 +394,7 @@ public class DoubleEquivalenceSubmissionTest {
         attacker.joinOpenGame(newGameId, true);
         System.out.println("Attacker Join game " + newGameId);
         //
-        UserEntity defenderUser = new UserEntity("demodefender");
+        UserEntity defenderUser = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender = new HelperUser(defenderUser, "test");
         defender.doLogin();
         //
@@ -397,7 +404,7 @@ public class DoubleEquivalenceSubmissionTest {
         //
         System.out.println("Defender Join game " + newGameId);
         //
-        UserEntity defender2User = new UserEntity("demodefender");
+        UserEntity defender2User = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender2 = new HelperUser(defender2User, "test");
         defender2.doLogin();
         //
@@ -409,16 +416,14 @@ public class DoubleEquivalenceSubmissionTest {
         //
         // Create the mutant
         attacker.attack(newGameId,
-                new String(
-                        Files.readAllBytes(
-                                new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
+                Files.readString(
+                        new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath(),
                         Charset.defaultCharset()));
         System.out.println("Attacker attack in game " + newGameId);
 
         // // Cover the mutant with a non-mutant-killing test
-        String coveringButNotKillingTest = new String(
-                Files.readAllBytes(
-                        new File("src/test/resources/itests/tests/Lift/CoveringButNotKillingTest.java").toPath()),
+        String coveringButNotKillingTest = Files.readString(
+                new File("src/test/resources/itests/tests/Lift/CoveringButNotKillingTest.java").toPath(),
                 Charset.defaultCharset());
         defender.defend(newGameId, coveringButNotKillingTest);
         System.out.println("Defender defend in game " + newGameId);
@@ -456,7 +461,7 @@ public class DoubleEquivalenceSubmissionTest {
         attacker.assertNoMoreEquivalenceDuels(newGameId);
     }
 
-    @After
+    @AfterEach
     public void afterEachTest() throws Exception {
         WebClientFactory.closeAllClients();
     }

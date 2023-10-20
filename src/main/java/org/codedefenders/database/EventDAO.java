@@ -14,6 +14,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.intellij.lang.annotations.Language;
 
 // TODO Probably this should expose some specific functions, like handleChatEvent, handle gameEvent, and the like
 @ApplicationScoped
@@ -27,8 +28,19 @@ public class EventDAO {
      * @implNote Even if the database table column is called {@code Player_ID} it stores User_IDs!
      */
     public void removePlayerEventsForGame(int gameId, int userId) {
-        String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=? "
-                + "AND Event_Type NOT IN ('GAME_CREATED', 'GAME_STARTED', 'GAME_FINISHED', 'GAME_GRACE_ONE', 'GAME_GRACE_TWO');";
+        @Language("SQL") String query = """
+                UPDATE events
+                SET Event_Status = ?
+                WHERE Game_ID = ?
+                  AND Player_ID = ?
+                AND Event_Type NOT IN (
+                    'GAME_CREATED',
+                    'GAME_STARTED',
+                    'GAME_FINISHED',
+                    'GAME_GRACE_ONE',
+                    'GAME_GRACE_TWO'
+                );
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(EventStatus.DELETED.toString()),
                 DatabaseValue.of(gameId),
@@ -39,7 +51,7 @@ public class EventDAO {
     // Split this is possibly different calls, maybe there no need to expose Event
     // class to callers
     public boolean insert(Event event) {
-        String query;
+        @Language("SQL") String query;
         DatabaseValue<?>[] valueList;
 
         EventType eventType = event.getEventType();
@@ -48,9 +60,10 @@ public class EventDAO {
                 || eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT)
                 || eventType.equals(EventType.PLAYER_MUTANT_EQUIVALENT)
                 || eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)) {
-            query = String.join("\n",
-                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
-                    "VALUES (?, ?, ?, ?, ?);");
+            query = """
+                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)
+                    VALUES (?, ?, ?, ?, ?);
+            """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
@@ -59,15 +72,18 @@ public class EventDAO {
                 || eventType.equals(EventType.PLAYER_KILLED_MUTANT)
                 || eventType.equals(EventType.PLAYER_MUTANT_SURVIVED)
                 || eventType.equals(EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT)) {
-            query = String.join("\n",
-                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
-                    "VALUES (?, ?, ?, ?, ?);");
+            query = """
+                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)
+                    VALUES (?, ?, ?, ?, ?);
+            """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else {
-            query = String.join("\n", "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
-                    "VALUES (?, ?, ?, ?);");
+            query = """
+                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)
+                    VALUES (?, ?, ?, ?);
+            """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString())};
@@ -84,12 +100,18 @@ public class EventDAO {
     public boolean update(Event event) {
         EventType eventType = event.getEventType();
 
-        String query = String.join("\n", "UPDATE events",
-                "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
-                "WHERE Event_ID=?");
+        @Language("SQL") String query = """
+                UPDATE events
+                SET Game_ID = ?,
+                    Player_ID = ?,
+                    Event_Type=?,
+                    Event_Status = ?,
+                    Timestamp = FROM_UNIXTIME(?)
+                WHERE Event_ID = ?;
+        """;
         DatabaseValue<?>[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                 DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
-                DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
+                DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getTimestamp()),
                 DatabaseValue.of(event.getId())};
 
         Connection conn = DB.getConnection();
@@ -114,19 +136,21 @@ public class EventDAO {
 
     public List<Event> getEventsForGame(Integer gameId) {
         // TODO Use SOME VIEW INSTEAD OF EVENT TABLE?
-        String query = String.join("\n", "SELECT * from events", "WHERE Game_ID=?");
+        @Language("SQL") String query = "SELECT * from events WHERE Game_ID = ?;";
         DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(gameId)};
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
     }
 
     public List<Event> getNewEventsForGame(int gameId, long timestamp, Role role) {
-        String query = String.join("\n", "SELECT *",
-                "FROM events",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Game_ID=?",
-                "  AND Event_Status=? ",
-                "  AND Timestamp >= FROM_UNIXTIME(?)");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM events
+                LEFT JOIN event_messages AS em
+                  ON events.Event_Type = em.Event_Type
+                WHERE Game_ID=?
+                  AND Event_Status=?
+                  AND Timestamp >= FROM_UNIXTIME(?)
+        """;
         if (role.equals(Role.ATTACKER)) {
             query += " AND events.Event_Type!='DEFENDER_MESSAGE'";
         } else if (role.equals(Role.DEFENDER)) {

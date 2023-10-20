@@ -42,7 +42,7 @@ public enum EventType {
     PLAYER_MUTANT_SURVIVED,
     // Test killed someone else's mutant
     PLAYER_KILLED_MUTANT,
-    //
+
     PLAYER_MUTANT_CLAIMED_EQUIVALENT,
 
     PLAYER_TEST_CREATED, PLAYER_TEST_ERROR, PLAYER_TEST_READY,

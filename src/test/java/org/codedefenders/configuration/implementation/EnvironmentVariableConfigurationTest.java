@@ -19,66 +19,27 @@
 
 package org.codedefenders.configuration.implementation;
 
-import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EnvironmentVariableConfigurationTest {
 
     @Test
     public void resolvingStringValue() {
-        String newDbUser = "SomeOne";
+        String dbUser = "SomeOne";
 
-        Map<String, String> environmentVariables = new HashMap<>();
-        environmentVariables.put("CODEDEFENDERS_DB_USERNAME", newDbUser);
-        try {
-            setEnv(environmentVariables);
-            EnvironmentVariableConfiguration config = new EnvironmentVariableConfiguration();
-            config.init();
-            assertEquals(newDbUser, config.getDbUsername());
-        } catch (Exception e) {
-            assumeTrue(e.getMessage(), false);
-            // This is bad!
-        }
-    }
-
-    /**
-     * This is taken from: <a href="https://stackoverflow.com/a/7201825/13653257">Stackoverflow</a>
-     * TODO: Maybe instead of this bad hack we simply don't test environment variable configuration?
-     *
-     * @param newenv The environment variables to add to
-     * @throws Exception Mostly bad ones
-     */
-    protected static void setEnv(Map<String, String> newenv) throws Exception {
-        try {
-            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-            Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            theEnvironmentField.setAccessible(true);
-            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-            env.putAll(newenv);
-            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            theCaseInsensitiveEnvironmentField.setAccessible(true);
-            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-            cienv.putAll(newenv);
-        } catch (NoSuchFieldException e) {
-            Class<?>[] classes = Collections.class.getDeclaredClasses();
-            Map<String, String> env = System.getenv();
-            for (Class<?> cl : classes) {
-                if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-                    Field field = cl.getDeclaredField("m");
-                    field.setAccessible(true);
-                    Object obj = field.get(env);
-                    Map<String, String> map = (Map<String, String>) obj;
-                    map.clear();
-                    map.putAll(newenv);
+        EnvironmentVariableConfiguration config = new EnvironmentVariableConfiguration() {
+            @Override
+            protected String getenv(String name) {
+                if (name.equals("CODEDEFENDERS_DB_USERNAME")) {
+                    return dbUser;
+                } else {
+                    return super.getenv(name);
                 }
             }
-        }
+        };
+        config.init();
+        assertEquals(dbUser, config.getDbUsername());
     }
 }

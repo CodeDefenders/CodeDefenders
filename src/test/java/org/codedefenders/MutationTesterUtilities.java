@@ -54,8 +54,7 @@ public class MutationTesterUtilities {
             @Override
             public void run() {
                 try {
-                    String mutantText = new String(Files.readAllBytes(new File(mutantFile).toPath()),
-                            Charset.defaultCharset());
+                    String mutantText = Files.readString(new File(mutantFile).toPath(), Charset.defaultCharset());
                     Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
@@ -87,7 +86,7 @@ public class MutationTesterUtilities {
                 try {
                     // Compile and test original
                     String testText;
-                    testText = new String(Files.readAllBytes(new File(testFile).toPath()), Charset.defaultCharset());
+                    testText = Files.readString(new File(testFile).toPath(), Charset.defaultCharset());
                     org.codedefenders.game.Test newTest = gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(),
                             testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
 

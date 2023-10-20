@@ -2,18 +2,12 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
@@ -39,10 +33,11 @@ public class ClassroomMemberRepository {
     }
 
     public void storeMember(ClassroomMember member) {
-        @Language("SQL") String query = String.join("\n",
-                "INSERT INTO classroom_members"
-                        + "(User_ID, Classroom_ID, Role)"
-                        + "VALUES (?, ?, ?);");
+        @Language("SQL") String query = """
+                INSERT INTO classroom_members
+                    (User_ID, Classroom_ID, Role)
+                VALUES (?, ?, ?);
+        """;
 
         try {
             queryRunner.insert(query,
@@ -58,11 +53,12 @@ public class ClassroomMemberRepository {
     }
 
     public void updateMember(ClassroomMember member) {
-        @Language("SQL") String query = String.join("\n",
-                "UPDATE classroom_members",
-                "SET Role = ?",
-                "WHERE User_ID = ?",
-                "  AND Classroom_ID = ?;");
+        @Language("SQL") String query = """
+                UPDATE classroom_members
+                SET Role = ?
+                WHERE User_ID = ?
+                  AND Classroom_ID = ?;
+        """;
         try {
             int updatedRows = queryRunner.update(query,
                     member.getRole().name(),
@@ -79,10 +75,11 @@ public class ClassroomMemberRepository {
     }
 
     public void deleteMember(int classroomId, int userId) {
-        @Language("SQL") String query = String.join("\n",
-                "DELETE FROM classroom_members",
-                "WHERE User_ID = ?",
-                "  AND Classroom_ID = ?;");
+        @Language("SQL") String query = """
+                DELETE FROM classroom_members
+                WHERE User_ID = ?
+                  AND Classroom_ID = ?;
+        """;
         try {
             int updatedRows = queryRunner.update(query,
                     userId,
@@ -98,10 +95,10 @@ public class ClassroomMemberRepository {
     }
 
     public List<ClassroomMember> getMembersForClassroom(int id) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT * FROM classroom_members",
-                "WHERE Classroom_ID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT * FROM classroom_members
+                WHERE Classroom_ID = ?;
+        """;
         try {
             return queryRunner.query(query,
                     listFromRS(this::classroomMemberFromRS),
@@ -114,11 +111,11 @@ public class ClassroomMemberRepository {
     }
 
     public Optional<ClassroomMember> getMemberForClassroomAndUser(int classroomId, int userId) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT * FROM classroom_members",
-                "WHERE Classroom_ID = ?",
-                "AND User_ID = ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT * FROM classroom_members
+                WHERE Classroom_ID = ?
+                AND User_ID = ?;
+        """;
         try {
             return queryRunner.query(query,
                     nextFromRS(this::classroomMemberFromRS),

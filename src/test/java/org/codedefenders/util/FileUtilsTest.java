@@ -29,19 +29,29 @@ import javax.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
 import org.jboss.weld.junit4.WeldInitiator;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Testing {@link FileUtils}.
  */
+@ExtendWith(WeldExtension.class)
 public class FileUtilsTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @Rule
-    public WeldInitiator weld = WeldInitiator.of(FileUtilsTest.class);
+    @WeldSetup
+    public WeldInitiator weld =WeldInitiator.of(FileUtilsTest.class);
 
     @Produces
     public Configuration produceConfiguration() {
@@ -52,19 +62,19 @@ public class FileUtilsTest {
     @Test
     public void testCreateJavaTestFile() {
         String name = "Printer";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         File dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-").toFile();
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
 
@@ -74,15 +84,15 @@ public class FileUtilsTest {
             Path path = Paths.get(filePath);
 
             final String fileContent = new String(Files.readAllBytes(path));
-            Assert.assertEquals(sourceCode, fileContent);
+            assertEquals(sourceCode, fileContent);
 
             final String expectedName = "Test" + name + ".java";
-            Assert.assertEquals(expectedName, path.getFileName().toString());
+            Assertions.assertEquals(expectedName, path.getFileName().toString());
 
-            Assume.assumeTrue(path.toFile().delete());
-            Assume.assumeTrue(dir.delete());
+            assumeTrue(path.toFile().delete());
+            Assumptions.assumeTrue(dir.delete());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -94,52 +104,52 @@ public class FileUtilsTest {
             dummyDirectory = Files.createTempDirectory("dummyDirectory");
             dir = Files.createDirectory(dummyDirectory.resolve("000000021"));
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
         File nextSubDir = FileUtils.getNextSubDir(dummyDirectory);
 
         String expected = dir.toString();
-        Assert.assertNotEquals(expected, nextSubDir.toString());
+        assertNotEquals(expected, nextSubDir.toString());
         expected = expected.replaceAll("000000021", "00000022");
-        Assert.assertEquals(expected, nextSubDir.toString());
+        assertEquals(expected, nextSubDir.toString());
 
-        Assume.assumeTrue(dir.toFile().delete());
-        Assume.assumeTrue(nextSubDir.delete());
-        Assume.assumeTrue(dummyDirectory.toFile().delete());
+        assumeTrue(dir.toFile().delete());
+        assumeTrue(nextSubDir.delete());
+        assumeTrue(dummyDirectory.toFile().delete());
     }
 
     @Test
     public void testReadEmptyLines() {
         final List<String> strings = FileUtils.readLines(Paths.get("doesnotexist/Test.java"));
-        Assert.assertTrue(strings.isEmpty());
+        assertTrue(strings.isEmpty());
     }
 
     @Test
     public void testReadLines() {
         String name = "Printer";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         File file;
         try {
             file = Files.createTempFile(name, ".java").toFile();
             Files.write(file.toPath(), sourceCode.getBytes());
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
 
         final List<String> strings = FileUtils.readLines(file.toPath());
-        Assert.assertFalse(strings.isEmpty());
-        Assert.assertArrayEquals(sourceCode.split("\n"), strings.toArray(new String[0]));
+        assertFalse(strings.isEmpty());
+        assertArrayEquals(sourceCode.split("\n"), strings.toArray(new String[0]));
 
-        Assume.assumeTrue(file.delete());
+        assumeTrue(file.delete());
     }
 
     @Test
@@ -150,15 +160,15 @@ public class FileUtilsTest {
         try {
             tempDirectory = Files.createTempDirectory("extension-test");
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
         File file = new File(tempDirectory.toFile(), name);
         String result = FileUtils.extractFileNameNoExtension(file.toPath());
 
-        Assert.assertEquals(name, result);
+        assertEquals(name, result);
 
-        Assume.assumeTrue(tempDirectory.toFile().delete());
+        assumeTrue(tempDirectory.toFile().delete());
     }
 
     @Test
@@ -170,15 +180,15 @@ public class FileUtilsTest {
         try {
             tempDirectory = Files.createTempDirectory("extension-test");
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
         File file = new File(tempDirectory.toFile(), fileName);
         String result = FileUtils.extractFileNameNoExtension(file.toPath());
 
-        Assert.assertEquals(name, result);
+        assertEquals(name, result);
 
-        Assume.assumeTrue(tempDirectory.toFile().delete());
+        assumeTrue(tempDirectory.toFile().delete());
     }
 
     @Test
@@ -188,10 +198,10 @@ public class FileUtilsTest {
             final String fullyQualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
 
             final String expected = "org.codedefenders.util.Qualified";
-            Assert.assertEquals(expected, fullyQualifiedName);
+            assertEquals(expected, fullyQualifiedName);
 
         } catch (IOException e) {
-            Assume.assumeNoException("Qualified.class file should exist.", e);
+            assumeTrue(false, e.getMessage());
         }
     }
 
@@ -202,28 +212,28 @@ public class FileUtilsTest {
 
         try {
             fullyQualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
-            Assert.fail("Shouldn't be able to read non existing file.");
+            fail("Shouldn't be able to read non existing file.");
         } catch (IOException e) {
-            Assert.assertNull(fullyQualifiedName);
+            assertNull(fullyQualifiedName);
         }
     }
 
     @Test
     public void testStoreFile() {
         String fileName = "Printer.java";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+                   }
+                }""".stripIndent();
         Path dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-");
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
 
@@ -232,33 +242,33 @@ public class FileUtilsTest {
             final Path path = FileUtils.storeFile(dir, fileName, sourceCode);
 
             final String fileContent = new String(Files.readAllBytes(path));
-            Assert.assertEquals(sourceCode, fileContent);
+            assertEquals(sourceCode, fileContent);
 
-            Assert.assertEquals(fileName, path.getFileName().toString());
+            assertEquals(fileName, path.getFileName().toString());
 
-            Assume.assumeTrue(path.toFile().delete());
-            Assume.assumeTrue(dir.toFile().delete());
+            assumeTrue(path.toFile().delete());
+            assumeTrue(dir.toFile().delete());
         } catch (IOException e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
     @Test
     public void testStoreDuplicateFiles() {
         String fileName = "Printer.java";
-        String sourceCode = String.join("\n",
-                "public class Printer {",
-                "   public static void main(String[] args) {",
-                "       if (2 == 2) {",
-                "           System.out.println(\"Hello World\");",
-                "       }",
-                "   }",
-                "}");
+        String sourceCode = """
+                public class Printer {
+                   public static void main(String[] args) {
+                       if (2 == 2) {
+                           System.out.println("Hello World");
+                       }
+
+                }""".stripIndent();
         Path dir;
         try {
             dir = Files.createTempDirectory("codedefenders-testdir-");
         } catch (IOException e) {
-            Assume.assumeNoException(e);
+            assumeTrue(false, e.getMessage());
             return;
         }
 
@@ -266,21 +276,21 @@ public class FileUtilsTest {
         try {
             path = FileUtils.storeFile(dir, fileName, sourceCode);
         } catch (IOException e) {
-            Assume.assumeNoException(e);
-            Assume.assumeTrue(dir.toFile().delete());
+            assumeTrue(false, e.getMessage());
+            assumeTrue(dir.toFile().delete());
             return;
         }
         Path path2 = null;
         try {
             path2 = FileUtils.storeFile(dir, fileName, sourceCode);
-            Assert.fail("Shouldn't be able to create duplicate file.");
+            fail("Shouldn't be able to create duplicate file.");
         } catch (IOException e) {
-            Assert.assertNull(path2);
+            assertNull(path2);
         }
         // storeFiles() shouldn't have deleted the directory since another file exists.
-        Assert.assertTrue(dir.toFile().exists());
+        assertTrue(dir.toFile().exists());
 
-        Assume.assumeTrue(path.toFile().delete());
-        Assume.assumeTrue(dir.toFile().delete());
+        assumeTrue(path.toFile().delete());
+        assumeTrue(dir.toFile().delete());
     }
 }

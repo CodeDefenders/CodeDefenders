@@ -71,7 +71,7 @@ public class AdminClassesManagement extends HttpServlet {
                 String newState = active ? "active" : "inactive";
 
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
-                if (!classId.isPresent()) {
+                if (classId.isEmpty()) {
                     logger.warn("Setting class as " + newState + " failed. Missing request parameter 'classId'.");
                     messages.add("Failed to set class as " + newState + ".");
                     break;
@@ -89,7 +89,7 @@ public class AdminClassesManagement extends HttpServlet {
             }
             case "classRemoval": {
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
-                if (!classId.isPresent()) {
+                if (classId.isEmpty()) {
                     logger.warn("Removing class failed. Missing request parameter 'classId'.");
                     messages.add("Failed to remove class.");
                     break;

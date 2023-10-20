@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -270,27 +271,11 @@ public class Mutant implements Serializable {
         return classId;
     }
 
-    /**
-     * @deprecated Use {@link MutantDAO#incrementMutantScore(Mutant, int)} instead.
-     */
-    @Deprecated
-    public void incrementScore(int score) {
-        MutantDAO.incrementMutantScore(this, score);
-    }
-
     public void setScore(int score) {
         this.score = score;
     }
 
     public boolean kill() {
-        return kill(equivalent);
-    }
-
-    /**
-     * @deprecated Use {@link MutantDAO#killMutant(Mutant, Equivalence)} instead.
-     */
-    @Deprecated
-    public boolean kill(Equivalence equivalent) {
         return MutantDAO.killMutant(this, equivalent);
     }
 
@@ -394,11 +379,7 @@ public class Mutant implements Serializable {
     }
 
     public String getKillMessage() {
-        if (killMessage != null) {
-            return killMessage;
-        } else {
-            return Constants.DEFAULT_KILL_MESSAGE;
-        }
+        return Objects.requireNonNullElse(killMessage, Constants.DEFAULT_KILL_MESSAGE);
     }
 
     public String getHTMLEscapedKillMessage() {

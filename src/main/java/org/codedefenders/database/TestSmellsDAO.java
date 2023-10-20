@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import javax.annotation.ManagedBean;
 
 import org.codedefenders.game.Test;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,16 +40,16 @@ import testsmell.TestFile;
 public class TestSmellsDAO {
     private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
 
-    private final String INSERT_SMELL_QUERY = String.join("\n",
-            "INSERT INTO test_smell (Test_ID, smell_name)",
-            "VALUES (?, ?);"
-    );
+    @Language("SQL") private final String INSERT_SMELL_QUERY = """
+            INSERT INTO test_smell (Test_ID, smell_name)
+            VALUES (?, ?);
+    """;
 
-    private final String GET_SMELL_QUERY = String.join("\n",
-            "SELECT smell_name",
-            "FROM test_smell",
-            "WHERE Test_ID = ?;"
-    );
+    @Language("SQL") private final String GET_SMELL_QUERY = """
+            SELECT smell_name
+            FROM test_smell
+            WHERE Test_ID = ?;
+    """;
 
     /**
      * Stores all test smells of a test to the database.

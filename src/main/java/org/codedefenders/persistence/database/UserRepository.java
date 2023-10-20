@@ -37,6 +37,7 @@ import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.transaction.Transactional;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class UserRepository {
                 .maximumSize(400)
                 .recordStats()
                 .build(
-                        new CacheLoader<Integer, Integer>() {
+                        new CacheLoader<>() {
                             @Override
                             @Nonnull
                             public Integer load(@Nonnull Integer playerId) throws Exception {
@@ -118,9 +119,11 @@ public class UserRepository {
             // TODO: Should we allow this?
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
-        String query = "INSERT INTO users "
-                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        @Language("SQL") String query = """
+                INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap)
+                VALUES (?, ?, ?, ?, ?, ?, ?);
+        """;
+
         try {
             return queryRunner
                     .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
@@ -144,15 +147,17 @@ public class UserRepository {
      * @return Whether updating the provided {@code UserEntity} was successful or not.
      */
     public boolean update(@Nonnull UserEntity userEntity) {
-        String query = "UPDATE users "
-                + "SET Username = ?, "
-                + "  Email = ?, "
-                + "  Password = ?, "
-                + "  Validated = ?, "
-                + "  Active = ?, "
-                + "  AllowContact = ?, "
-                + "  KeyMap = ? "
-                + "WHERE User_ID = ?;";
+        @Language("SQL") String query = """
+                UPDATE users
+                SET Username = ?,
+                  Email = ?,
+                  Password = ?,
+                  Validated = ?,
+                  Active = ?,
+                  AllowContact = ?,
+                  KeyMap = ?
+                WHERE User_ID = ?;
+        """;
         try {
             return queryRunner.update(query,
                     userEntity.getUsername(),
@@ -174,9 +179,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserById(int userId) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE User_ID = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE User_ID = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), userId);
@@ -191,9 +198,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserByName(@Nonnull String username) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE Username = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE Username = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), username);
@@ -208,9 +217,11 @@ public class UserRepository {
      */
     @Nonnull
     public Optional<UserEntity> getUserByEmail(@Nonnull String email) {
-        String query = "SELECT * "
-                + "FROM  users "
-                + "WHERE Email = ?;";
+        @Language("SQL") String query = """
+                SELECT *
+                FROM  users
+                WHERE Email = ?;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
@@ -235,10 +246,12 @@ public class UserRepository {
 
     @Nonnull
     Optional<Integer> getUserIdForPlayerIdInternal(int playerId) {
-        String query = "SELECT users.User_ID AS User_ID "
-                + "FROM users, players "
-                + "WHERE players.User_ID = users.User_ID "
-                + "AND players.ID = ?";
+        @Language("SQL") String query = """
+                SELECT users.User_ID AS User_ID
+                FROM users, players
+                WHERE players.User_ID = users.User_ID
+                  AND players.ID = ?;
+        """;
         try {
             return Optional.ofNullable(queryRunner
                     .query(query, new ScalarHandler<>(), playerId));
@@ -255,8 +268,7 @@ public class UserRepository {
      */
     @Nonnull
     public List<UserEntity> getUsers() {
-        String query = "SELECT * "
-                + "FROM  users;";
+        @Language("SQL") String query = "SELECT * FROM  users;";
         try {
             return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
@@ -268,17 +280,17 @@ public class UserRepository {
 
     @Nonnull
     public List<UserEntity> getAssignedUsers() {
-        String query = String.join("\n",
-                "SELECT DISTINCT users.*",
-                "FROM view_valid_users users",
-                "LEFT JOIN players on players.User_ID = users.User_ID",
-                "LEFT JOIN games on games.ID = players.Game_ID",
-                "WHERE games.Mode <> 'PUZZLE'",
-                "  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
-                "  AND players.Role IN ('ATTACKER', 'DEFENDER')",
-                "  AND users.Active = TRUE",
-                "ORDER BY User_ID;"
-        );
+        @Language("SQL") String query = """
+                SELECT DISTINCT users.*
+                FROM view_valid_users users
+                LEFT JOIN players on players.User_ID = users.User_ID
+                LEFT JOIN games on games.ID = players.Game_ID
+                WHERE games.Mode <> 'PUZZLE'
+                  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')
+                  AND players.Role IN ('ATTACKER', 'DEFENDER')
+                  AND users.Active = TRUE
+                ORDER BY User_ID;
+        """;
         try {
             return queryRunner.query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
@@ -289,18 +301,18 @@ public class UserRepository {
 
     @Nonnull
     public List<UserEntity> getAssignedUsersForClassroom(int classroomId) {
-        String query = String.join("\n",
-                "SELECT DISTINCT users.*",
-                "FROM view_valid_users users",
-                "LEFT JOIN players on players.User_ID = users.User_ID",
-                "LEFT JOIN games on games.ID = players.Game_ID",
-                "WHERE games.Mode <> 'PUZZLE'",
-                "  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
-                "  AND players.Role IN ('ATTACKER', 'DEFENDER')",
-                "  AND users.Active = TRUE",
-                "  AND games.Classroom_ID = ?",
-                "ORDER BY User_ID;"
-        );
+        @Language("SQL") String query = """
+                SELECT DISTINCT users.*
+                FROM view_valid_users users
+                LEFT JOIN players on players.User_ID = users.User_ID
+                LEFT JOIN games on games.ID = players.Game_ID
+                WHERE games.Mode <> 'PUZZLE'
+                  AND (games.State = 'ACTIVE' OR games.State = 'CREATED')
+                  AND players.Role IN ('ATTACKER', 'DEFENDER')
+                  AND users.Active = TRUE
+                  AND games.Classroom_ID = ?
+                ORDER BY User_ID;
+        """;
         try {
             return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS), classroomId);
@@ -311,7 +323,7 @@ public class UserRepository {
     }
 
     public boolean insertSession(int userId, String ipAddress) {
-        String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
+        @Language("SQL") String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
 
         try {
             queryRunner.update(query, userId, ipAddress);
@@ -323,7 +335,7 @@ public class UserRepository {
     }
 
     public boolean deleteSessions(int userId) {
-        String query = "DELETE FROM sessions WHERE User_ID = ?;";
+        @Language("SQL") String query = "DELETE FROM sessions WHERE User_ID = ?;";
 
         try {
             queryRunner.update(query, userId);
@@ -335,10 +347,12 @@ public class UserRepository {
     }
 
     public boolean setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
-        String query = "UPDATE users \n"
-                + "SET pw_reset_secret = ?, \n"
-                + "    pw_reset_timestamp = CURRENT_TIMESTAMP \n"
-                + "WHERE User_ID = ?;";
+        @Language("SQL") String query = """
+                UPDATE users
+                SET pw_reset_secret = ?,
+                    pw_reset_timestamp = CURRENT_TIMESTAMP
+                WHERE User_ID = ?;
+        """;
 
         try {
             queryRunner.update(query, passwordResetSecret, userId);
@@ -351,13 +365,15 @@ public class UserRepository {
 
     @Nonnull
     public Optional<Integer> getUserIdForPasswordResetSecret(@Nullable String passwordResetSecret) {
-        String query = "SELECT User_ID \n"
-                + "FROM users \n"
-                + "WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < ("
-                + "         SELECT INT_VALUE \n"
-                + "         FROM settings \n"
-                + "         WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN'"
-                + ") AND pw_reset_secret = ?;";
+        @Language("SQL") String query = """
+                SELECT User_ID
+                FROM users
+                WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < (
+                         SELECT INT_VALUE
+                         FROM settings
+                         WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN'
+                ) AND pw_reset_secret = ?;
+        """;
 
         try {
             return Optional.ofNullable(queryRunner

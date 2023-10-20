@@ -19,9 +19,9 @@
 package org.codedefenders.systemtests;
 
 import org.codedefenders.util.Paths;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.util.tags.SystemTest;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
 import static org.codedefenders.systemtests.SeleniumTestUtils.assertURLEndsWith;
@@ -31,8 +31,8 @@ import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
  * System test which tests successful account registration, login, and logout.
  */
 //FIXME
-@Ignore
-@Category(SystemTest.class)
+@Disabled
+@SystemTest
 public class SuccessfulRegisterLogoutAndLoginTest extends AbstractEmptyDBSystemTest {
 
     /**

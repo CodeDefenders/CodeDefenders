@@ -21,10 +21,13 @@ package org.codedefenders.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
+import org.intellij.lang.annotations.Language;
 
 /**
  * This class handles the database logic for dependencies.
@@ -61,7 +64,7 @@ public class DependencyDAO {
         String relativeJavaFile = FileUtils.getRelativeDataPath(dependency.getJavaFile()).toString();
         String relativeClassFile = FileUtils.getRelativeDataPath(dependency.getClassFile()).toString();
 
-        String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
+        @Language("SQL") String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(relativeJavaFile),
@@ -83,7 +86,7 @@ public class DependencyDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeDependencyForId(Integer id) {
-        String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
+        @Language("SQL") String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(id),
         };
@@ -102,14 +105,11 @@ public class DependencyDAO {
             return false;
         }
 
-        final StringBuilder bob = new StringBuilder("(");
-        for (int i = 0; i < dependencies.size() - 1; i++) {
-            bob.append("?,");
-        }
-        bob.append("?);");
+        String range = Stream.generate(() -> "?")
+                .limit(dependencies.size())
+                .collect(Collectors.joining(","));
 
-        final String range = bob.toString();
-        String query = "DELETE FROM dependencies WHERE Dependency_ID in " + range;
+        @Language("SQL") String query = "DELETE FROM dependencies WHERE Dependency_ID in (%s);".formatted(range);
 
         DatabaseValue<?>[] values = dependencies.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 

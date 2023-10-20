@@ -22,16 +22,17 @@ package org.codedefenders.persistence.database;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.DatabaseTest;
-import org.codedefenders.auth.CodeDefendersRealm;
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,17 +44,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 
-@Category(DatabaseTest.class)
+@DatabaseTest
+@ExtendWith(DatabaseExtension.class)
 public class UserRepositoryIT {
-
-    @Rule
-    public DatabaseRule databaseRule = new DatabaseRule();
 
     private UserRepository userRepo;
 
-    @Before
-    public void setUp() throws Exception {
-        userRepo = new UserRepository(databaseRule.getQueryRunner(), mock(MetricsRegistry.class));
+    @BeforeEach
+    public void setUp(QueryRunner queryRunner) throws Exception {
+        userRepo = new UserRepository(queryRunner, mock(MetricsRegistry.class));
     }
 
     private final String username1 = "user";
@@ -62,6 +61,8 @@ public class UserRepositoryIT {
     private final String password2 = "F7596A8258ABE15B03DA5FA44E6DE370";
     private final String email1 = "user@example.com";
     private final String email2 = "another_user@example.com";
+
+    private final PasswordEncoder passwordEncoder = PasswordEncoderProvider.getPasswordEncoder();
 
     private static void assertEntityAttributesEqual(UserEntity expected, UserEntity actual) {
         assertAll(
@@ -73,14 +74,14 @@ public class UserRepositoryIT {
         );
     }
 
-    private static void assertSanePassword(String rawPassword, UserEntity actual) {
+    private void assertSanePassword(String rawPassword, UserEntity actual) {
         assertNotEquals("Password should not be stored in plain text", rawPassword, actual.getEncodedPassword());
-        assertTrue(CodeDefendersRealm.passwordMatches(rawPassword, actual.getEncodedPassword()));
+        assertTrue(passwordEncoder.matches(rawPassword, actual.getEncodedPassword()));
     }
 
     @Test
     public void insertAndQueryUserById() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
 
         Integer userId = userRepo.insert(user).get();
         assertNotNull(userId, "Couldn't store user to the database");
@@ -95,7 +96,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertAndQueryUserByName() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
 
         Optional<Integer> userId = userRepo.insert(user);
         assertTrue(userId.isPresent(), "Couldn't store user to the database");
@@ -110,7 +111,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertAndQueryUserByEmail() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assertNotNull(userId, "Couldn't store user to the database");
@@ -130,7 +131,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertUserTwice() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
@@ -140,7 +141,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertUserWithValidId() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
         user.setId(1);
 
         assertThrows(IllegalArgumentException.class, () -> userRepo.insert(user));
@@ -148,12 +149,12 @@ public class UserRepositoryIT {
 
     @Test
     public void updateUser() {
-        UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
         user.setId(userId);
-        user.setEncodedPassword(UserEntity.encodePassword(password2));
+        user.setEncodedPassword(passwordEncoder.encode(password2));
         user.setUsername(username2);
         user.setEmail(email2);
 
@@ -168,11 +169,11 @@ public class UserRepositoryIT {
 
     @Test
     public void updateUserViolatesDBConstraint() {
-        UserEntity user1 = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1);
         Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
         user1.setId(userId1);
-        UserEntity user2 = new UserEntity(username2, UserEntity.encodePassword(password2), email2);
+        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2);
         Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
         user2.setId(userId2);
@@ -184,10 +185,10 @@ public class UserRepositoryIT {
 
     @Test
     public void queryUserList() {
-        UserEntity user1 = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
+        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1);
         Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
-        UserEntity user2 = new UserEntity(username2, UserEntity.encodePassword(password2), email2);
+        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2);
         Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
 

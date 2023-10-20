@@ -264,7 +264,7 @@ public class MeleeGameManager extends HttpServlet {
 
         final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
-        if (playerId == -1 || !user.isPresent()) {
+        if (playerId == -1 || user.isEmpty()) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
             Redirect.redirectBack(request, response);
@@ -366,7 +366,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
-        if (!test.isPresent()) {
+        if (test.isEmpty()) {
             previousSubmission.clear();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -523,7 +523,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
-        if (!mutant.isPresent()) {
+        if (mutant.isEmpty()) {
             previousSubmission.clear();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -676,8 +676,8 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     @SuppressWarnings("Duplicates")
-    private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, //
-            int gameId, MeleeGame game, //
+    private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
+            int gameId, MeleeGame game,
             int playerId) throws IOException {
 
         final HttpSession session = request.getSession();
@@ -694,7 +694,7 @@ public class MeleeGameManager extends HttpServlet {
         if ("accept".equals(resolveAction)) {
             // Accepting equivalence
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
-            if (!equivMutantId.isPresent()) {
+            if (equivMutantId.isEmpty()) {
                 logger.debug("Missing equivMutantId parameter.");
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
@@ -705,7 +705,7 @@ public class MeleeGameManager extends HttpServlet {
             for (Mutant m : mutantsPending) {
                 // This might be replaced by m.getCreatorId() == userId
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    m.kill(Mutant.Equivalence.DECLARED_YES);
+                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
                     Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
@@ -736,7 +736,7 @@ public class MeleeGameManager extends HttpServlet {
         } else if ("reject".equals(resolveAction)) {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
-            if (!test.isPresent()) {
+            if (test.isEmpty()) {
                 previousSubmission.clear();
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
@@ -783,7 +783,7 @@ public class MeleeGameManager extends HttpServlet {
             }
 
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
-            if (!equivMutantId.isPresent()) {
+            if (equivMutantId.isEmpty()) {
                 logger.info("Missing equivMutantId parameter.");
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
@@ -878,7 +878,7 @@ public class MeleeGameManager extends HttpServlet {
                         // only kill the one mutant that was claimed
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
-                        mPending.kill(ASSUMED_YES);
+                        MutantDAO.killMutant(mPending, ASSUMED_YES);
                         final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("")
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,
@@ -930,8 +930,8 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
-    private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, //
-            int gameId, MeleeGame game, //
+    private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
+            int gameId, MeleeGame game,
             int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
@@ -942,7 +942,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");
-        if (!equivLinesParam.isPresent()) {
+        if (equivLinesParam.isEmpty()) {
             logger.debug("Missing 'equivLines' parameter.");
             Redirect.redirectBack(request, response);
             return;

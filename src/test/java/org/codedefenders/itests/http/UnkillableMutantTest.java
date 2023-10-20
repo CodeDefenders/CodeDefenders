@@ -31,11 +31,12 @@ import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.codedefenders.auth.PasswordEncoderProvider;
 import org.codedefenders.itests.http.utils.HelperUser;
 import org.codedefenders.model.UserEntity;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
@@ -53,10 +54,11 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
  *
  * @author gambi
  */
-//@Category(SystemTest.class)
-public class UnkillableMutant {
+//@SystemTest
+public class UnkillableMutantTest {
 
-    private static int TIMEOUT = 10000;
+    private static final int TIMEOUT = 10000;
+    private static final String EMPTY_PW = PasswordEncoderProvider.getPasswordEncoder().encode("");
 
     static class WebClientFactory {
         private static Collection<WebClient> clients = new ArrayList<>();
@@ -67,20 +69,20 @@ public class UnkillableMutant {
 
             // webClient = new WebClient(BrowserVersion.CHROME);
             WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
-            //
+
             webClient.getOptions().setCssEnabled(true);
             webClient.setCssErrorHandler(new SilentCssErrorHandler());
-            //
+
             // Do not fail on status code ?
             webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
             // Disable test failing because of JS exceptions
             webClient.getOptions().setThrowExceptionOnScriptError(false);
-            //
+
             webClient.getOptions().setRedirectEnabled(true);
             webClient.getOptions().setAppletEnabled(false);
-            //
+
             webClient.getOptions().setJavaScriptEnabled(true);
-            //
+
             webClient.getOptions().setPopupBlockerEnabled(true);
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
@@ -140,11 +142,11 @@ public class UnkillableMutant {
     }
 
 
-    @Ignore
+    @Disabled
     @Test
     public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         // // This test assumes an empty db !
-        UserEntity creatorUser = new UserEntity("creator");
+        UserEntity creatorUser = new UserEntity("creator", EMPTY_PW);
         HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         creator.doLogin();
         System.out.println("Creator Login");
@@ -154,35 +156,33 @@ public class UnkillableMutant {
 
         System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classId);
 
-        //
         int newGameId = creator.createNewGame(classId);
         System.out.println("Creator Create new Game: " + newGameId);
-        //
+
         creator.startGame(newGameId);
-        //
-        UserEntity attackerUser = new UserEntity("demoattacker");
+
+        UserEntity attackerUser = new UserEntity("demoattacker", EMPTY_PW);
         HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         attacker.doLogin();
         System.out.println("Attacker Login");
-        //
+
         attacker.joinOpenGame(newGameId, true);
         System.out.println("Attacker Join game " + newGameId);
         // Submit the unkillable mutant
         attacker.attack(newGameId,
-                new String(
-                        Files.readAllBytes(
-                                new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
+                Files.readString(
+                        new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath(),
                         Charset.defaultCharset()));
         System.out.println("Attacker attack in game " + newGameId);
-        //
-        UserEntity defenderUser = new UserEntity("demodefender");
+
+        UserEntity defenderUser = new UserEntity("demodefender", EMPTY_PW);
         HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost", "test");
         defender.doLogin();
-        //
+
         System.out.println("Defender Login");
-        //
+
         defender.joinOpenGame(newGameId, false);
-        //
+
         System.out.println("Defender Join game " + newGameId);
 
 
@@ -195,14 +195,11 @@ public class UnkillableMutant {
 
         for (File testFile : testFiles) {
             System.out.println("UnkillableMutant.testUnkillableMutant() Defending with " + testFile);
-            defender.defend(newGameId, new String(
-                    Files.readAllBytes(
-                            testFile.toPath()),
-                    Charset.defaultCharset()));
+            defender.defend(newGameId, Files.readString(testFile.toPath(), Charset.defaultCharset()));
         }
     }
 
-    @After
+    @AfterEach
     public void afterEachTest() throws Exception {
         WebClientFactory.closeAllClients();
     }

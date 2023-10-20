@@ -72,7 +72,7 @@ public class GameChatAPI extends HttpServlet {
             HttpServletResponse response) throws ServletException, IOException {
 
         final Optional<Integer> gameIdOpt = ServletUtils.getIntParameter(request, "gameId");
-        if (!gameIdOpt.isPresent()) {
+        if (gameIdOpt.isEmpty()) {
             logger.warn("Missing parameter: gameId.");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;

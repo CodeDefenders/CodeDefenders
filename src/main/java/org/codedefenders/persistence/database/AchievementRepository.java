@@ -67,20 +67,23 @@ public class AchievementRepository {
 
     private Collection<Achievement> getAchievementsForUser(int userId, Achievement.Id achievementId) {
         @Language("SQL")
-        String query = String.join("\n",
-                "SELECT achievements.*, COALESCE(has_achievement.Metric, 0) AS CurrentUserMetric, (",
-                "    SELECT a.Metric FROM achievements a ",
-                "    WHERE a.ID = achievements.ID ",
-                "    AND a.Level = achievements.Level + 1",
-                ") AS NextLevelMetric",
-                "FROM achievements LEFT OUTER JOIN has_achievement",
-                "ON has_achievement.User_ID = ?",
-                "AND has_achievement.Achievement_ID = achievements.ID",
-                "WHERE (has_achievement.Achievement_Level = achievements.Level",
-                // get achievements with no progress tracked as well -> left outer join
-                "OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0)",
-                (achievementId != null ? "AND achievements.ID = ?" : "")
-        );
+        String query = """
+                SELECT achievements.*, COALESCE(has_achievement.Metric, 0) AS CurrentUserMetric, (
+                    SELECT a.Metric FROM achievements a
+                    WHERE a.ID = achievements.ID
+                    AND a.Level = achievements.Level + 1
+                ) AS NextLevelMetric
+                FROM achievements LEFT OUTER JOIN has_achievement
+                ON has_achievement.User_ID = ?
+                AND has_achievement.Achievement_ID = achievements.ID
+                WHERE (
+                    has_achievement.Achievement_Level = achievements.Level
+                    -- get achievements with no progress tracked as well -> left outer join
+                    OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0
+                )
+                %s;
+
+        """.formatted(achievementId != null ? "AND achievements.ID = ?" : "");
 
         try {
             return queryRunner.query(
@@ -111,12 +114,12 @@ public class AchievementRepository {
 
     private int updateAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricChange) {
         @Language("SQL")
-        String query = String.join("\n",
-                "INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)",
-                "VALUES (?, ?, ?)",
-                "ON DUPLICATE KEY UPDATE",
-                "Metric = Metric + ?"
-        );
+        String query = """
+                INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE
+                Metric = Metric + ?;
+        """;
 
         try {
             return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
@@ -129,17 +132,18 @@ public class AchievementRepository {
 
     private int updateAchievementLevelForUser(int userId, Achievement.Id achievementId) {
         @Language("SQL")
-        String query = String.join("\n",
-                "UPDATE has_achievement",
-                "SET Achievement_Level = Achievement_Level + 1",
-                "WHERE User_ID = ?",
-                "AND Achievement_ID = ?",
-                "AND Metric >= (SELECT Metric ",
-                "FROM achievements",
-                "WHERE ID = ? ",
-                "AND Level = Achievement_Level + 1",
-                ")"
-        );
+        String query = """
+                UPDATE has_achievement
+                SET Achievement_Level = Achievement_Level + 1
+                WHERE User_ID = ?
+                AND Achievement_ID = ?
+                AND Metric >= (
+                    SELECT Metric
+                    FROM achievements
+                    WHERE ID = ?
+                    AND Level = Achievement_Level + 1
+                );
+        """;
 
         try {
             return queryRunner.update(query, userId, achievementId.getAsInt(), achievementId.getAsInt());

@@ -21,14 +21,14 @@ package org.codedefenders.systemtests;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /*
 import com.palantir.docker.compose.DockerComposeRule;
@@ -49,22 +49,22 @@ public abstract class AbstractEmptyDBSystemTest {
 
     /*
     @ClassRule
-    public static DockerComposeRule docker = DockerComposeRule.builder()//
+    public static DockerComposeRule docker = DockerComposeRule.builder()
      */
     /*
      * Replace docker-compose.yml with docker-compose-debug.yml to
      * access chrome with VNCViewer
      */
     /*
-            .file("src/test/resources/systemtests/docker-compose.yml")//
-            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())//
-            .waitingForService("db", HealthChecks.toHaveAllPortsOpen()) //
+            .file("src/test/resources/systemtests/docker-compose.yml")
+            .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
+            .waitingForService("db", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080, new Function<DockerPort, String>() {
                 @Override
                 public String apply(DockerPort t) {
                     return t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders");
                 }
-            })) //
+            }))
             // .saveLogsTo("/tmp/test.log")// This is mostly for debugging
             .build();
     */
@@ -78,7 +78,7 @@ public abstract class AbstractEmptyDBSystemTest {
     // This was automatically generate by Katalon
     private StringBuffer verificationErrors = new StringBuffer();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ChromeOptions options = new ChromeOptions();
         /*
@@ -97,20 +97,20 @@ public abstract class AbstractEmptyDBSystemTest {
          * This is important: docker-compose randomly assign ports and names to
          * those logical entities so we get them from the rule
          */
-//        DockerPort frontend = docker.containers().container("frontend").port(8080);
+        // DockerPort frontend = docker.containers().container("frontend").port(8080);
         /*
          * For some reason, I cannot link selenium with codedefender frontend
          * using docker compose. Since we cannot connect to "localhost" from
          * within the selenium-chrome, we rely on the host.docker.internal
          * (internal Docker DNS) to find out where codedefenders runs
          */
-//        String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
+        // String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
         codeDefendersHome = "http://frontend:8080/codedefenders";
-        //
+
         driver.get(codeDefendersHome);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         driver.quit();
         String verificationErrorString = verificationErrors.toString();

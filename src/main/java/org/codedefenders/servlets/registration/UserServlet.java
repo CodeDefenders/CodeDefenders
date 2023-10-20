@@ -43,7 +43,7 @@ public class UserServlet extends HttpServlet {
             } else {
 
                 Optional<String> result = userService.registerUser(username, password, email);
-                if (!result.isPresent()) {
+                if (result.isEmpty()) {
                     messages.add("Your user has been created. You can login now.");
                 } else {
                     messages.add(result.get());

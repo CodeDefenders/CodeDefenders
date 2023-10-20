@@ -23,41 +23,38 @@ import java.util.List;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.DatabaseTest;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
+import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
+import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * @author Jose Rojas
  */
-@Category(DatabaseTest.class)
-@RunWith(org.junit.runners.JUnit4.class)
+@DatabaseTest
+@ExtendWith(DatabaseExtension.class)
 public class EmptyDatabaseIT {
-
-    @Rule
-    public DatabaseRule db = new DatabaseRule();
 
     /**
      * Checks whether the {@code empty.db} script creates an empty database.
      */
     @Test
-    public void testCleanDB() throws Exception {
-        try (Connection conn = db.getConnection()) {
+    public void testCleanDB(Connection conn) throws Exception {
+        try (conn) {
             QueryRunner qr = new QueryRunner();
 
             List<String> results = qr.query(conn, "SELECT * FROM classes;", new ColumnListHandler<>());
             assertEquals(0, results.size());
 
-            final String query2 = String.join("\n",
-                    "SELECT *",
-                    "FROM games",
-                    "WHERE ID > 0"
-            );
+            @Language("SQL") String query2 = """
+                    SELECT *
+                    FROM games
+                    WHERE ID > 0
+            """;
             results = qr.query(conn, query2, new ColumnListHandler<>());
             assertEquals(0, results.size());
 

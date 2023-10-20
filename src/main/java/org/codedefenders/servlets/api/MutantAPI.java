@@ -64,7 +64,7 @@ public class MutantAPI extends HttpServlet {
         final Optional<MutantDTO> mutant = ServletUtils.getIntParameter(request, "mutantId")
                 .map(id -> gameService.getMutant(login.getUserId(), id));
 
-        if (!mutant.isPresent()) {
+        if (mutant.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }

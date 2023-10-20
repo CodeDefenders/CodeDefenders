@@ -10,6 +10,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
+import org.intellij.lang.annotations.Language;
 
 @ApplicationScoped
 @ManagedBean
@@ -21,20 +22,20 @@ public class GameChatDAO {
      * @return A list of all chat messages for the game. Ordered from oldest to newest.
      */
     public List<ServerGameChatEvent> getChatMessages(int gameId, int limit) {
-        String query = String.join("\n",
-                "SELECT chat.User_ID AS Sender_ID,",
-                "       users.Username AS Sender_Name,",
-                "       chat.Message AS Message,",
-                "       chat.Role AS Role,",
-                "       chat.IsAllChat AS IsAllChat,",
-                "       chat.Game_ID AS Game_ID",
-                "FROM game_chat_messages AS chat,",
-                "     users",
-                "WHERE chat.User_ID = users.User_ID",
-                "  AND chat.Game_ID = ?",
-                "ORDER BY chat.Message_ID DESC",
-                "LIMIT ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT chat.User_ID AS Sender_ID,
+                       users.Username AS Sender_Name,
+                       chat.Message AS Message,
+                       chat.Role AS Role,
+                       chat.IsAllChat AS IsAllChat,
+                       chat.Game_ID AS Game_ID
+                FROM game_chat_messages AS chat,
+                     users
+                WHERE chat.User_ID = users.User_ID
+                  AND chat.Game_ID = ?
+                ORDER BY chat.Message_ID DESC
+                LIMIT ?;
+        """;
 
         List<ServerGameChatEvent> messages = DB.executeQueryReturnList(query, GameChatDAO::chatMessageFromRS,
                 DatabaseValue.of(gameId),
@@ -57,21 +58,21 @@ public class GameChatDAO {
             throw new IllegalArgumentException("Cannot get chat messages for role " + role + ".");
         }
 
-        String query = String.join("\n",
-                "SELECT chat.User_ID AS Sender_ID,",
-                "       users.Username AS Sender_Name,",
-                "       chat.Message AS Message,",
-                "       chat.Role AS Role,",
-                "       chat.IsAllChat AS IsAllChat,",
-                "       chat.Game_ID AS Game_ID",
-                "FROM game_chat_messages AS chat,",
-                "     users",
-                "WHERE chat.User_ID = users.User_ID",
-                "  AND chat.Game_ID = ?",
-                "  AND (chat.Role = 'OBSERVER' OR chat.Role = ? OR chat.IsAllChat = 1)",
-                "ORDER BY chat.Message_ID DESC",
-                "LIMIT ?;"
-        );
+        @Language("SQL") String query = """
+                SELECT chat.User_ID AS Sender_ID,
+                       users.Username AS Sender_Name,
+                       chat.Message AS Message,
+                       chat.Role AS Role,
+                       chat.IsAllChat AS IsAllChat,
+                       chat.Game_ID AS Game_ID
+                FROM game_chat_messages AS chat,
+                     users
+                WHERE chat.User_ID = users.User_ID
+                  AND chat.Game_ID = ?
+                  AND (chat.Role = 'OBSERVER' OR chat.Role = ? OR chat.IsAllChat = 1)
+                ORDER BY chat.Message_ID DESC
+                LIMIT ?;
+        """;
 
         List<ServerGameChatEvent> messages = DB.executeQueryReturnList(query, GameChatDAO::chatMessageFromRS,
                 DatabaseValue.of(gameId),
@@ -82,11 +83,11 @@ public class GameChatDAO {
     }
 
     public int insertMessage(ServerGameChatEvent message) {
-        String query = String.join("\n",
-                "INSERT INTO game_chat_messages",
-                "(User_ID, IsAllChat, Message, Role, Game_ID)",
-                "VALUES (?, ?, ?, ?, ?);"
-        );
+        @Language("SQL") String query = """
+                INSERT INTO game_chat_messages
+                (User_ID, IsAllChat, Message, Role, Game_ID)
+                VALUES (?, ?, ?, ?, ?);
+        """;
 
         DatabaseValue<?>[] values = new DatabaseValue[] {
                 DatabaseValue.of(message.getSenderId()),

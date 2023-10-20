@@ -35,7 +35,6 @@ import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.CreateGamesService;
-import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -63,7 +62,7 @@ public class ClassroomCreateGames extends CreateGamesServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;
@@ -94,7 +93,7 @@ public class ClassroomCreateGames extends CreateGamesServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (!classroom.isPresent()) {
+        if (classroom.isEmpty()) {
             messages.add("Classroom not found.");
             response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
             return;

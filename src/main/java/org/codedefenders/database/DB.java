@@ -28,6 +28,8 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import org.codedefenders.util.CDIUtil;
+import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +50,7 @@ public class DB {
 
     public static synchronized Connection getConnection() {
         try {
-            return DatabaseConnection.getConnection();
+            return CDIUtil.getBeanFromCDI(ConnectionFactory.class).getConnection();
         } catch (SQLException e) {
             logger.error("Unable to acquire SQL connection", e);
             return null;
@@ -71,7 +73,8 @@ public class DB {
         }
     }
 
-    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue<?>... values) {
+    public static PreparedStatement createPreparedStatement(Connection conn,@Language("SQL") String query,
+                                                            DatabaseValue<?>... values) {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -122,7 +125,7 @@ public class DB {
         return false;
     }
 
-    static boolean executeUpdateQuery(String query, DatabaseValue<?>... params) {
+    static boolean executeUpdateQuery(@Language("SQL") String query, DatabaseValue<?>... params) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
@@ -145,7 +148,7 @@ public class DB {
         return -1;
     }
 
-    static int executeUpdateQueryGetKeys(String query, DatabaseValue<?>... params) {
+    static int executeUpdateQueryGetKeys(@Language("SQL") String query, DatabaseValue<?>... params) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
@@ -181,7 +184,7 @@ public class DB {
      *                               not properly be extracted from it.
      * @see RSMapper
      */
-    static <T> T executeQueryReturnValue(String query, RSMapper<T> mapper, DatabaseValue<?>... params)
+    static <T> T executeQueryReturnValue(@Language("SQL") String query, RSMapper<T> mapper, DatabaseValue<?>... params)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
@@ -246,7 +249,8 @@ public class DB {
      *                               not properly be extracted from it.
      * @see RSMapper
      */
-    static <T> List<T> executeQueryReturnList(String query, RSMapper<T> mapper, DatabaseValue<?>... params)
+    static <T> List<T> executeQueryReturnList(@Language("SQL") String query, RSMapper<T> mapper,
+                                              DatabaseValue<?>... params)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
@@ -272,7 +276,7 @@ public class DB {
      * @see RSMapper
      * @see Statement#setFetchSize(int)
      */
-    static <T> List<T> executeQueryReturnListWithFetchSize(String query,
+    static <T> List<T> executeQueryReturnListWithFetchSize(@Language("SQL") String query,
                                                            int fetchSize,
                                                            RSMapper<T> mapper,
                                                            DatabaseValue<?>... params)
@@ -362,7 +366,8 @@ public class DB {
      * @param <T> the type of the elements used for the query.
      * @return a list of generated keys in the same order as the given list of elements.
      */
-    static <T> List<Integer> executeBatchQueryReturnKeys(String query, List<T> elements, DBVExtractor<T> valueExtractor)
+    static <T> List<Integer> executeBatchQueryReturnKeys(@Language("SQL") String query, List<T> elements,
+                                                         DBVExtractor<T> valueExtractor)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();

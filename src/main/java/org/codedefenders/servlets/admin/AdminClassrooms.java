@@ -61,7 +61,7 @@ public class AdminClassrooms extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Optional<String> action = ServletUtils.getStringParameter(request, "action");
-        if (!action.isPresent()) {
+        if (action.isEmpty()) {
             messages.add("Missing required parameter: action.");
             Redirect.redirectBack(request, response);
             return;

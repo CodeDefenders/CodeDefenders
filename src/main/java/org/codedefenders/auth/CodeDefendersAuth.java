@@ -21,7 +21,6 @@ package org.codedefenders.auth;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
-import org.codedefenders.model.UserEntity;
 
 public interface CodeDefendersAuth {
 
@@ -34,8 +33,4 @@ public interface CodeDefendersAuth {
     SimpleUser getSimpleUser();
 
     User getUser();
-
-    // TODO(Alex): Do not expose UserEntity!
-    @Deprecated
-    UserEntity getUserEntity();
 }

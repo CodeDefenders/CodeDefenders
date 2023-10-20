@@ -38,7 +38,7 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
+        if (gameIdOpt.isEmpty()) {
             logger.warn("No gameId parameter. Aborting request.");
             Redirect.redirectBack(request, response);
             return;

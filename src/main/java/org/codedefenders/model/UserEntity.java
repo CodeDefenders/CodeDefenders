@@ -20,14 +20,9 @@ package org.codedefenders.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.Optional;
 
-import javax.enterprise.inject.spi.CDI;
-
-import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
  * Represents a user object in the database.
@@ -46,10 +41,6 @@ public class UserEntity implements Serializable {
     private boolean active;
     private boolean allowContact;
     private KeyMap keyMap;
-
-    public UserEntity(String username) {
-        this(username, UserEntity.encodePassword(""));
-    }
 
     public UserEntity(String username, String encodedPassword) {
         this(username, encodedPassword, "");
@@ -73,30 +64,6 @@ public class UserEntity implements Serializable {
         this.active = active;
         this.allowContact = allowContact;
         this.keyMap = keyMap;
-    }
-
-    /**
-     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#insert(UserEntity)} instead.
-     */
-    @Deprecated
-    public boolean insert() {
-        // TODO: Remove workaround
-        Optional<Integer> result = CDI.current().select(UserRepository.class).get().insert(this);
-        if (!result.isPresent()) {
-            return false;
-        } else {
-            id = result.get();
-            return true;
-        }
-    }
-
-    /**
-     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#update(UserEntity)} instead.
-     */
-    @Deprecated
-    public boolean update() {
-        // TODO: Remove workaround
-        return CDI.current().select(UserRepository.class).get().update(this);
     }
 
     public boolean isValidated() {
@@ -158,11 +125,6 @@ public class UserEntity implements Serializable {
 
     public void setKeyMap(KeyMap keyMap) {
         this.keyMap = keyMap;
-    }
-
-    @Deprecated // TODO(Alex): Where to put this method?
-    public static String encodePassword(String password) {
-        return new BCryptPasswordEncoder().encode(password);
     }
 
     @Override

@@ -59,8 +59,8 @@ public class MutantEditorBean {
     }
 
     /**
-     * Sets the className. This method is called upon the information of a {@link GameClass}. Since the
-     * {@link GameClass#name} contains the fully qualified name, the package information must be removed.
+     * Sets the className. This method is called upon the information of a {@link GameClass}. Since
+     * {@link GameClass#getName()} contains the fully qualified name, the package information must be removed.
      * @param className The fully qualified name of the class
      */
     public void setClassName(String className) {

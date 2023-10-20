@@ -25,7 +25,6 @@ import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.validation.code.CodeValidator;
 
 public interface IGameManagingUtils {
 
@@ -66,10 +65,6 @@ public interface IGameManagingUtils {
     Mutant createMutant(int gameId, int classId, String mutatedCode, int ownerUserId, String subDirectory)
             throws IOException;
 
-    /**
-     * Calls {@link #createTest(int, int, String, int, String, int)},but with the default number
-     * of assertions specified in {@link CodeValidator#DEFAULT_NB_ASSERTIONS}.
-     */
     Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory) throws IOException;
 
 }

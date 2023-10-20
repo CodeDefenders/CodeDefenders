@@ -23,10 +23,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 
 import org.codedefenders.model.Dependency;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 /**
  * Tests the {@link DatabaseValue} implementation for {@code null} values
@@ -92,25 +94,26 @@ public class DatabaseValueTest {
         assertEquals(value, dbv.getValue());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testWrongDatabaseValueType() {
-        final Dependency value = new Dependency(1, 1, "", "");
-        try {
-            // Disable inspection because the type parameter information of 'DatabaseValue' is not retained at runtime,
-            // and so can't be used with reflection
-            //noinspection rawtypes
-            final Constructor<DatabaseValue> constructor = DatabaseValue.class.getDeclaredConstructor(Object.class);
-            constructor.setAccessible(true);
-            final DatabaseValue<?> dbv = constructor.newInstance(value);
-            fail("Should not successfully instantiate DatabaseValue for unsupported type: " + value.getClass().getName());
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            final Throwable cause = e.getCause();
-            if (cause instanceof IllegalArgumentException) {
-                // cause is the IllegalArgumentException thrown by DatabaseValue.Type#get(Object)
-                throw ((IllegalArgumentException) cause);
+        assertThrows(IllegalArgumentException.class, () -> {
+            final Dependency value = new Dependency(1, 1, "", "");
+            try {
+                // Disable inspection because the type parameter information of 'DatabaseValue' is not retained at runtime,
+                // and so can't be used with reflection
+                //noinspection rawtypes
+                final Constructor<DatabaseValue> constructor = DatabaseValue.class.getDeclaredConstructor(Object.class);
+                constructor.setAccessible(true);
+                final DatabaseValue<?> dbv = constructor.newInstance(value);
+                fail("Should not successfully instantiate DatabaseValue for unsupported type: " + value.getClass().getName());
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                final Throwable cause = e.getCause();
+                if (cause instanceof IllegalArgumentException) {
+                    // cause is the IllegalArgumentException thrown by DatabaseValue.Type#get(Object)
+                    throw cause;
+                }
+                fail("No exception but the expected should be thrown:" + cause.getMessage());
             }
-            fail("No exception but the expected should be thrown:" + cause.getMessage());
-        }
-
+        });
     }
 }

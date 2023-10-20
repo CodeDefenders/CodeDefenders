@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Player;
+import org.intellij.lang.annotations.Language;
 
 /**
  * This class handles the common database logic between games types.
@@ -97,11 +97,11 @@ public class GameDAO {
      * @return {@code true} if the player was successfully added, {@code false} otherwise.
      */
     public static boolean addPlayerToGame(int gameId, int userId, Role role) {
-        String query = String.join("\n",
-                "INSERT INTO players (Game_ID,User_ID, Points, Role)",
-                "VALUES (?, ?, 0, ?)",
-                "ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;"
-        );
+        @Language("SQL") String query = """
+                INSERT INTO players (Game_ID,User_ID, Points, Role)
+                VALUES (?, ?, 0, ?)
+                ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
+        """;
 
         DatabaseValue<?>[] values = {
                 DatabaseValue.of(gameId),
@@ -121,12 +121,13 @@ public class GameDAO {
      * @return a list of player identifiers as {@link Integer Integers}, can be empty but never {@code null}.
      */
     public static List<Player> getPlayersForGame(int gameId, Role role) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM view_players_with_userdata",
-                "WHERE Game_ID = ?",
-                "  AND Role = ?",
-                "  AND Active=TRUE;");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM view_players_with_userdata
+                WHERE Game_ID = ?
+                  AND Role = ?
+                  AND Active=TRUE;
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(role.toString())
@@ -142,11 +143,12 @@ public class GameDAO {
      * @return A list of {@link Player Players}, that belong to valid users. Can be empty but never {@code null}.
      */
     public static List<Player> getValidPlayersForGame(int gameId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM view_players_with_userdata",
-                "WHERE Game_ID = ?",
-                "  AND Active = TRUE;");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM view_players_with_userdata
+                WHERE Game_ID = ?
+                  AND Active = TRUE;
+        """;
 
         return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId));
     }
@@ -159,11 +161,12 @@ public class GameDAO {
      * @return whether removing was successful or not.
      */
     public static boolean removeUserFromGame(int gameId, int userId) {
-        String query = String.join("\n",
-                "UPDATE players",
-                "SET Active = FALSE",
-                "WHERE Game_ID = ?",
-                "  AND User_ID = ?;");
+        @Language("SQL") String query = """
+                UPDATE players
+                SET Active = FALSE
+                WHERE Game_ID = ?
+                  AND User_ID = ?;
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId)
@@ -173,10 +176,11 @@ public class GameDAO {
     }
 
     public static Integer getCurrentRound(int gameId) {
-        String query = String.join("\n",
-                "SELECT CurrentRound",
-                "FROM games",
-                "WHERE games.ID = ?;");
+        @Language("SQL") String query = """
+                SELECT CurrentRound
+                FROM games
+                WHERE games.ID = ?;
+        """;
         return DB.executeQueryReturnValue(query, rs -> rs.getInt("CurrentRound"), DatabaseValue.of(gameId));
     }
 
@@ -191,7 +195,7 @@ public class GameDAO {
             return new ArrayList<>();
         }
         String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-        String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
+        @Language("SQL") String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
 
@@ -203,7 +207,7 @@ public class GameDAO {
      * @return the game mode of the queried game.
      */
     public static GameMode getGameMode(int gameId) {
-        String query = "SELECT Mode FROM games WHERE ID = ?";
+        @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
         return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
                 DatabaseValue.of(gameId));
     }
@@ -227,12 +231,12 @@ public class GameDAO {
      * @return {@code true} if the game is active but expired.
      */
     public static boolean isGameExpired(int gameId) {
-        final String sql = String.join("\n",
-                // do not use TIMESTAMPADD here to avoid errors with daylight saving
-                "SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired",
-                "FROM games",
-                "WHERE ID = ?;"
-        );
+        // do not use TIMESTAMPADD here to avoid errors with daylight saving
+        @Language("SQL") final String sql = """
+                SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired
+                FROM games
+                WHERE ID = ?;
+        """;
         return DB.executeQueryReturnValue(sql,
                 l -> l.getBoolean("isExpired"),
                 DatabaseValue.of(gameId)
@@ -240,15 +244,16 @@ public class GameDAO {
     }
 
     public static Role getRole(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM games AS m ",
-                "LEFT JOIN players AS p",
-                "  ON p.Game_ID = m.ID",
-                "  AND p.Active=TRUE ",
-                "WHERE m.ID = ?",
-                "  AND (p.User_ID=?",
-                "      AND p.Game_ID=?)");
+        @Language("SQL") String query = """
+                SELECT *
+                FROM games AS m
+                LEFT JOIN players AS p
+                  ON p.Game_ID = m.ID
+                  AND p.Active=TRUE
+                WHERE m.ID = ?
+                  AND (p.User_ID=?
+                      AND p.Game_ID=?)
+        """;
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
@@ -269,11 +274,11 @@ public class GameDAO {
     }
 
     public static boolean storeStartTime(int gameId) {
-        String query = String.join("\n",
-                "UPDATE games",
-                "SET Start_Time = NOW()",
-                "WHERE ID = ?"
-        );
+        @Language("SQL") String query = """
+                UPDATE games
+                SET Start_Time = NOW()
+                WHERE ID = ?
+        """;
         DatabaseValue<?>[] values = {DatabaseValue.of(gameId)};
         return DB.executeUpdateQuery(query, values);
     }
