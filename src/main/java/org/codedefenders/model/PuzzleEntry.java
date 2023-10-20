@@ -110,6 +110,13 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
         return null;
     }
 
+    public void lock() {
+        if (this.type != Type.PUZZLE) {
+            throw new IllegalStateException();
+        }
+        this.locked = true;
+    }
+
     public boolean isLocked() {
         if (this.type != Type.PUZZLE) {
             throw new IllegalStateException();

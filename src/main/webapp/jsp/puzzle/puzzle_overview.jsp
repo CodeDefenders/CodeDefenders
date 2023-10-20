@@ -109,6 +109,8 @@
                                 </c:when>
                                 <c:otherwise>
                                     disabled="disabled"
+                                    data-bs-toggle="tooltip"
+                                    title="This puzzle is locked."
                                 </c:otherwise>
                             </c:choose>
                     >

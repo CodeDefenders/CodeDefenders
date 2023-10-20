@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -85,10 +86,17 @@ public class PuzzleOverview extends HttpServlet {
                 .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        final Optional<PuzzleEntry> nextPuzzle = puzzles.stream()
+        final List<PuzzleEntry> unsolvedPuzzles = puzzles.stream()
                 .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
                 .filter(Predicate.not(PuzzleEntry::isSolved))
-                .findFirst();
+                .toList();
+        final Optional<PuzzleEntry> nextPuzzle = unsolvedPuzzles.stream().findFirst();
+
+        // lock puzzles if the user has not solved the previous puzzle
+        unsolvedPuzzles.stream()
+                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
+                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
+                .forEach(PuzzleEntry::lock);
 
         request.setAttribute("puzzleChapterEntries", puzzles);
         request.setAttribute("nextPuzzle", nextPuzzle);

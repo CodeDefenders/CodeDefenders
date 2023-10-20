@@ -139,6 +139,14 @@
     outline-color: #00658d;
 }
 
+.chapter__level[disabled] {
+    cursor: not-allowed;
+}
+
+.chapter__level[disabled]:hover, .chapter__level[disabled]:focus, .chapter__level[disabled]:focus-within {
+    outline-color: var(--bg-attacker-dark);
+}
+
 .chapter__level p {
     margin: 0;
 }
