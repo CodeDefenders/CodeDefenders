@@ -70,6 +70,7 @@
 
 .next-puzzle__title {
     padding: .5rem 1.5rem 1.5rem;
+    position: relative;
 }
 
 .next-puzzle__title__chapter,
@@ -84,6 +85,19 @@
 
 .next-puzzle__title p {
     margin: 0;
+}
+
+.next-puzzle__watermark {
+    position: absolute;
+    top: 5%;
+    right: -1rem;
+    width: auto;
+    object-fit: contain;
+    opacity: .15;
+    user-select: none;
+    pointer-events: none;
+    filter: saturate(0) brightness(0) invert(1);
+    height: 120%;
 }
 
 @media (min-width: 992px) {

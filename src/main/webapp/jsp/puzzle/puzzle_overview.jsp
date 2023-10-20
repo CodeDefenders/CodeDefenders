@@ -76,6 +76,8 @@
                 </div>
             </div>
             <div class="next-puzzle__title">
+                <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.activeRole}"
+                     src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
                 <h2>
                     <span class="next-puzzle__title__next-puzzle">Next puzzle:</span><br>
                     <span class="next-puzzle__title__chapter">${nextPuzzleObj.puzzle.chapter.title},</span>
