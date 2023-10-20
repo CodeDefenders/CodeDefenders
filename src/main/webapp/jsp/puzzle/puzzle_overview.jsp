@@ -110,6 +110,8 @@
                                 </c:otherwise>
                             </c:choose>
                     >
+                        <img class="chapter__level__watermark" alt="${puzzle.activeRole}"
+                             src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
                         <div class="chapter__level__image">
                             <c:if test="${status == 'next'}">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">

@@ -108,6 +108,7 @@
 }
 
 .chapter__level {
+    position: relative;
     text-decoration: none;
     color: white;
     padding: 1.5rem;
@@ -151,6 +152,19 @@
 
 .chapter__level__image svg path {
     fill: white;
+}
+
+.chapter__level__watermark {
+    position: absolute;
+    top: 30%;
+    right: -0.75rem;
+    width: auto;
+    object-fit: contain;
+    opacity: .15;
+    user-select: none;
+    pointer-events: none;
+    filter: saturate(0) brightness(0) invert(1);
+    height: 80%;
 }
 
 @media (min-width: 470px) {
