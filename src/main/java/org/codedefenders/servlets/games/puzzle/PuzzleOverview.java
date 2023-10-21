@@ -165,21 +165,9 @@ public class PuzzleOverview extends HttpServlet {
                     return new PuzzleEntry(activePuzzle, solved);
                 }
             }
-            boolean locked = isPuzzleLockedForUser(entry, userId);
             boolean solved = isPuzzleSolvedForUser(entry, userId);
-            return new PuzzleEntry(entry, locked, solved);
+            return new PuzzleEntry(entry, false, solved);
         };
-    }
-
-    /**
-     * Returns whether a given puzzle is locked for a given user.
-     *
-     * @param puzzle the checked puzzle.
-     * @param userId the user which the puzzle may be locked for.
-     * @return {@code true} if the user can access the puzzle, {@code false} otherwise.
-     */
-    private static boolean isPuzzleLockedForUser(Puzzle puzzle, int userId) {
-        return false; // TODO currently all puzzle are unlocked
     }
 
     /**
