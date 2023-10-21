@@ -35,6 +35,7 @@ import javax.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -78,7 +79,8 @@ public class GameManagingUtilsTest {
                         NotificationService.class,
                         ExecutorServiceProvider.class,
                         MetricsRegistry.class,
-                        Configuration.class)
+                        Configuration.class,
+                        TestRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)

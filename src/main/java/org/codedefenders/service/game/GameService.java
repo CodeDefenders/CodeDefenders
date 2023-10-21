@@ -26,7 +26,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
@@ -48,13 +48,15 @@ public class GameService implements IGameService {
     private final MultiplayerGameService multiplayerGameService;
     private final MeleeGameService meleeGameService;
     private final PuzzleGameService puzzleGameService;
+    protected TestRepository testRepo;
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-                       PuzzleGameService puzzleGameService) {
+                       PuzzleGameService puzzleGameService, TestRepository testRepo) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
+        this.testRepo = testRepo;
     }
 
     @Override
@@ -101,7 +103,7 @@ public class GameService implements IGameService {
     @Override
     public TestDTO getTest(int userId, int testId) {
         // I can't delegate this to the other services, as the game type is still unknown.
-        Test test = TestDAO.getTestById(testId);
+        Test test = testRepo.getTestById(testId);
         if (test != null) {
             return getTest(userId, test);
         } else {

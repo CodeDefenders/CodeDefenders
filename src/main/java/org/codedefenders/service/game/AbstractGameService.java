@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
@@ -59,11 +59,13 @@ public abstract class AbstractGameService implements IGameService {
 
     protected UserRepository userRepository;
     protected UserService userService;
+    protected TestRepository testRepo;
 
     @Inject
-    public AbstractGameService(UserService userService, UserRepository userRepository) {
+    public AbstractGameService(UserService userService, UserRepository userRepository, TestRepository testRepo) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.testRepo = testRepo;
     }
 
     @Inject
@@ -160,7 +162,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public TestDTO getTest(int userId, int testId) {
-        return getTest(userId, TestDAO.getTestById(testId));
+        return getTest(userId, testRepo.getTestById(testId));
     }
 
     @Override

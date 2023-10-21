@@ -47,7 +47,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
@@ -193,6 +193,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private KillMapService killMapService;
 
+    @Inject
+    private TestRepository testRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -308,7 +311,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             boolean considerOnlydefenders = false;
             Set<Integer> testSubmittedAfterMutant =
-                    TestDAO.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant)
+                    testRepo.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant)
                             .stream()
                             .map(Test::getId)
                             .collect(Collectors.toSet());
@@ -1089,7 +1092,7 @@ public class MultiplayerGameManager extends HttpServlet {
         try (Histogram.Timer ignored = isEquivalentMutantKillableValidation.startTimer()) {
             // Get all the covering tests of this mutant which do not belong to this game
             int classId = mutantToValidate.getClassId();
-            List<Test> tests = TestDAO.getValidTestsForClass(classId);
+            List<Test> tests = testRepo.getValidTestsForClass(classId);
 
             // Remove tests which belong to the same game as the mutant
             tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());

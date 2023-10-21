@@ -20,7 +20,7 @@
 --%>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
-<%@ tag import="org.codedefenders.database.TestDAO" %>
+<%@ tag import="org.codedefenders.database.TestRepository" %>
 <%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.model.Player" %>
 <%@ tag import="org.codedefenders.database.MutantDAO" %>
@@ -34,6 +34,7 @@
 <%@ attribute name="gameFinished" required="false" type="java.lang.Boolean" %>
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<jsp:useBean id="testRepo" class="org.codedefenders.database.TestRepository" scope="application"/>
 <%
     Map<Integer, PlayerScore> mutantScores = scoreboard.getMutantsScores();
     Map<Integer, PlayerScore> testScores = scoreboard.getTestScores();
@@ -149,7 +150,7 @@
             UserEntity defenderUser = defender.getUser();
 
             if (defenderUser.getId() == Constants.DUMMY_DEFENDER_USER_ID
-                    && TestDAO.getTestsForGameAndUser(scoreboard.getGameId(), defenderUser.getId()).isEmpty()) {
+                    && testRepo.getTestsForGameAndUser(scoreboard.getGameId(), defenderUser.getId()).isEmpty()) {
                 continue;
             }
 

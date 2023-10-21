@@ -48,7 +48,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
@@ -87,16 +87,19 @@ public class Installer {
     private final CoverageGenerator coverageGenerator;
     private final KillMapService killMapService;
     private final Configuration config;
+    private final TestRepository testRepo;
 
     @Inject
     public Installer(BackendExecutorService backend,
                      CoverageGenerator coverageGenerator,
                      KillMapService killMapService,
-            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+                     TestRepository testRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
         this.config = config;
+        this.testRepo = testRepo;
     }
 
     /**
@@ -324,8 +327,8 @@ public class Installer {
         LineCoverage lineCoverage = coverageGenerator.generate(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
 
-        int testId = TestDAO.storeTest(test);
-        TestDAO.mapTestToClass(testId, cut.getId());
+        int testId = testRepo.storeTest(test);
+        testRepo.mapTestToClass(testId, cut.getId());
 
         logger.info("installTest() Stored test " + test.getId() + " in position " + targetPosition);
 
@@ -455,7 +458,7 @@ public class Installer {
         for (Test t : originalTests) {
             Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
             puzzleTest.insert();
-            TestDAO.mapTestToClass(puzzleTest.getId(), puzzleClassId);
+            testRepo.mapTestToClass(puzzleTest.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Test " + puzzleTest.getId());
             puzzleTests.add(puzzleTest);
         }

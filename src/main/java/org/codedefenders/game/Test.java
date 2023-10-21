@@ -30,8 +30,9 @@ import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -160,9 +161,11 @@ public class Test {
         return coveredMutants;
     }
 
+    @Deprecated
     public Set<Mutant> getKilledMutants() {
         // TODO This does not recover the points of the mutant... why not?
-        return TestDAO.getKilledMutantsForTestId(id);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        return testRepo.getKilledMutantsForTestId(id);
     }
 
     public String getAsString() {
@@ -173,9 +176,11 @@ public class Test {
         return StringEscapeUtils.escapeHtml4(getAsString());
     }
 
+    @Deprecated
     public boolean insert() {
         try {
-            this.id = TestDAO.storeTest(this);
+            TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+            this.id = testRepo.storeTest(this);
             return true;
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store test to database.", e);
@@ -183,9 +188,11 @@ public class Test {
         }
     }
 
+    @Deprecated
     public boolean update() {
         try {
-            return TestDAO.updateTest(this);
+            TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+            return testRepo.updateTest(this);
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store test to database.", e);
             return false;

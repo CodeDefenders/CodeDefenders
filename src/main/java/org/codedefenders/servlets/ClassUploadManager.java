@@ -55,7 +55,7 @@ import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
@@ -115,6 +115,9 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private TestRepository testRepo;
 
 
     private static List<String> reservedClassNames = Arrays.asList(
@@ -831,8 +834,8 @@ public class ClassUploadManager extends HttpServlet {
 
             int testId;
             try {
-                testId = TestDAO.storeTest(test);
-                TestDAO.mapTestToClass(testId, cutId);
+                testId = testRepo.storeTest(test);
+                testRepo.mapTestToClass(testId, cutId);
             } catch (UncheckedSQLException e) {
                 logger.error("Class upload with test failed. Could not store test to database.", e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -861,7 +864,7 @@ public class ClassUploadManager extends HttpServlet {
      * @param files           Optional additional files, which need to be removed.
      * @throws IOException When an error during redirecting occurs.
      */
-    private static void abortRequestAndCleanUp(HttpServletRequest request,
+    private void abortRequestAndCleanUp(HttpServletRequest request,
                                                HttpServletResponse response,
                                                Path cutDir,
                                                List<CompiledClass> compiledClasses,
@@ -915,7 +918,7 @@ public class ClassUploadManager extends HttpServlet {
             }
 
             MutantDAO.removeMutantsForIds(mutants);
-            TestDAO.removeTestsForIds(tests);
+            testRepo.removeTestsForIds(tests);
             DependencyDAO.removeDependenciesForIds(dependencies);
             GameClassDAO.removeClassesForIds(cuts);
         }

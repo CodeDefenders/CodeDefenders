@@ -24,12 +24,13 @@ import java.util.stream.Collectors;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,23 +156,27 @@ public abstract class AbstractGame {
         return getTests(false);
     }
 
+    @Deprecated// Get tests through service instead and cache them
     public List<Test> getTests(boolean defendersOnly) {
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
         if (defendersOnly) {
             if (testsDefendersOnly == null) {
-                testsDefendersOnly = TestDAO.getValidTestsForGame(this.id, true);
+                testsDefendersOnly = testRepo.getValidTestsForGame(this.id, true);
             }
             return testsDefendersOnly;
         } else {
             if (tests == null) {
-                tests = TestDAO.getValidTestsForGame(this.id, false);
+                tests = testRepo.getValidTestsForGame(this.id, false);
             }
             return tests;
         }
     }
 
     // NOTE: I do not want to break compatibility so I define yet another method...
+    @Deprecated // Get tests through service instead and cache them
     public List<Test> getAllTests() {
-        return TestDAO.getValidTestsForGame(this.id, false);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        return testRepo.getValidTestsForGame(this.id, false);
     }
 
 

@@ -265,7 +265,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Test_ID = tests.Test_ID
         """;
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(classId));
     }
 
     /**

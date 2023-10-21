@@ -83,7 +83,8 @@ public class KillmapDAO {
                 WHERE killmap.Game_ID = ?
         """;
 
-        List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = testRepo.getValidTestsForGame(gameId, false);
         List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
 
         return getKillMapEntries(tests, mutants, query, DatabaseValue.of(gameId));
@@ -111,7 +112,8 @@ public class KillmapDAO {
                   AND killmap.Mutant_ID = mutants.Mutant_ID;
         """;
 
-        List<Test> tests = TestDAO.getValidTestsForClass(classId);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = testRepo.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
 
         return getKillMapEntries(tests, mutants, query, DatabaseValue.of(classId));
@@ -171,7 +173,8 @@ public class KillmapDAO {
                   AND killmap.Mutant_ID = mutants.Mutant_ID
         """;
 
-        List<Test> tests = new ArrayList<>(TestDAO.getValidTestsForClassroom(classroomId).values());
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = new ArrayList<>(testRepo.getValidTestsForClassroom(classroomId).values());
         List<Mutant> mutants = new ArrayList<>(MutantDAO.getValidMutantsForClassroom(classroomId).values());
 
         return getKillMapEntries(tests, mutants, query,
@@ -233,7 +236,8 @@ public class KillmapDAO {
     }
 
     public static boolean removeClassKillmap(int classId) {
-        List<Test> testsForClass = TestDAO.getValidTestsForClass(classId);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> testsForClass = testRepo.getValidTestsForClass(classId);
         List<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClass(classId);
 
         String testIds = testsForClass.stream()
@@ -257,7 +261,8 @@ public class KillmapDAO {
     }
 
     public static boolean removeClassroomKillmap(int classroomId) {
-        Collection<Test> testsForClass = TestDAO.getValidTestsForClassroom(classroomId).values();
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        Collection<Test> testsForClass = testRepo.getValidTestsForClassroom(classroomId).values();
         Collection<Mutant> mutantsForClass = MutantDAO.getValidMutantsForClassroom(classroomId).values();
 
         String testIds = testsForClass.stream()
@@ -737,7 +742,8 @@ public class KillmapDAO {
         """;
 
 
-        Multimap<Integer, Test> tests = TestDAO.getValidTestsForClassroom(classroomId);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        Multimap<Integer, Test> tests = testRepo.getValidTestsForClassroom(classroomId);
         Multimap<Integer, Mutant> mutants = MutantDAO.getValidMutantsForClassroom(classroomId);
 
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1),

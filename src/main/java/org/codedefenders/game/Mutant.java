@@ -34,8 +34,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
@@ -281,7 +282,8 @@ public class Mutant implements Serializable {
 
     public boolean isCovered() {
         // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
-        List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = testRepo.getValidTestsForGame(gameId, true);
         return isCovered(tests);
     }
 
@@ -293,8 +295,10 @@ public class Mutant implements Serializable {
     }
 
     // This might return several instances of the same test since Test does not implement hash and equalsTo
+    @Deprecated // Get tests through service instead and cache them
     public Set<Test> getCoveringTests() {
-        List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = testRepo.getValidTestsForGame(gameId, false);
         return getCoveringTests(tests);
     }
 
@@ -374,8 +378,10 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml4(getPatchString());
     }
 
+    @Deprecated // Get tests through service instead and cache them
     public Test getKillingTest() {
-        return TestDAO.getKillingTestForMutantId(id);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        return testRepo.getKillingTestForMutantId(id);
     }
 
     public String getKillMessage() {

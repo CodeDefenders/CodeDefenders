@@ -36,11 +36,12 @@ import javax.inject.Inject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ public class KillMapService {
 
     private final BackendExecutorService backendExecutorService;
     private final Configuration config;
+    private final TestRepository testRepo;
 
     /**
      * @implNote executor is shutdown by {@link ExecutorServiceProvider#shutdown()}
@@ -67,9 +69,10 @@ public class KillMapService {
 
     @Inject
     public KillMapService(BackendExecutorService backendExecutorService, ExecutorServiceProvider executorServiceProvider,
-            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config, TestRepository testRepo) {
         this.backendExecutorService = backendExecutorService;
         this.config = config;
+        this.testRepo = testRepo;
 
         // TODO(Alex): It might be better to allow the threads of this executor to time-out, so we do not keep all the
         //  threads around forever.
@@ -116,7 +119,8 @@ public class KillMapService {
      * @throws ExecutionException   If an error occurred during an execution.
      */
     public KillMap forClass(int classId) throws InterruptedException, ExecutionException {
-        List<Test> tests = TestDAO.getValidTestsForClass(classId);
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        List<Test> tests = testRepo.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
         List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForClass(classId);
         KillMap killmap = new KillMap(tests, mutants, classId, entries);
@@ -145,7 +149,7 @@ public class KillMapService {
      * @throws ExecutionException   If an error occurred during an execution.
      */
     public void forClassroom(int classroomId) throws InterruptedException, ExecutionException {
-        Multimap<Integer, Test> testsByClass = TestDAO.getValidTestsForClassroom(classroomId);
+        Multimap<Integer, Test> testsByClass = testRepo.getValidTestsForClassroom(classroomId);
         Multimap<Integer, Mutant> mutantsByClass = MutantDAO.getValidMutantsForClassroom(classroomId);
         Multimap<Integer, KillMapEntry> entriesByClass = ArrayListMultimap.create();
         for (KillMapEntry entry : KillmapDAO.getKillMapEntriesForClassroom(classroomId)) {

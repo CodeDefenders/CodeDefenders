@@ -33,7 +33,7 @@ import java.util.concurrent.FutureTask;
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -65,8 +65,8 @@ public class ParallelMutationTester extends MutationTester {
 
     // TODO Move the Executor service before useMutantCoverage
     public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
-        super(backend, userRepo, eventDAO, useMutantCoverage);
+            TestRepository testRepo, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
+        super(backend, userRepo, eventDAO, testRepo, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -158,7 +158,7 @@ public class ParallelMutationTester extends MutationTester {
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
         int score = Scorer.score(game, test, killedMutants);
-        TestDAO.incrementTestScore(test, score);
+        testRepo.incrementTestScore(test, score);
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -242,7 +242,7 @@ public class ParallelMutationTester extends MutationTester {
                                 mutant.isAlive());
 
                         int score = Scorer.score((MultiplayerGame) game, test, mlist);
-                        TestDAO.incrementTestScore(test, score);
+                        testRepo.incrementTestScore(test, score);
                     }
 
                     Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
