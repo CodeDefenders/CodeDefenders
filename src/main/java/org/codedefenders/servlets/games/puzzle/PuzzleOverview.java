@@ -20,10 +20,13 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -36,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -82,7 +86,20 @@ public class PuzzleOverview extends HttpServlet {
                 .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
 
+        final List<PuzzleEntry> unsolvedPuzzles = puzzles.stream()
+                .flatMap(puzzleChapterEntry -> puzzleChapterEntry.getPuzzleEntries().stream())
+                .filter(Predicate.not(PuzzleEntry::isSolved))
+                .toList();
+        final Optional<PuzzleEntry> nextPuzzle = unsolvedPuzzles.stream().findFirst();
+
+        // lock puzzles if the user has not solved the previous puzzle
+        unsolvedPuzzles.stream()
+                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
+                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
+                .forEach(PuzzleEntry::lock);
+
         request.setAttribute("puzzleChapterEntries", puzzles);
+        request.setAttribute("nextPuzzle", nextPuzzle);
 
         request.getRequestDispatcher(Constants.PUZZLE_OVERVIEW_VIEW_JSP).forward(request, response);
     }
@@ -141,24 +158,27 @@ public class PuzzleOverview extends HttpServlet {
      */
     private Function<Puzzle, PuzzleEntry> toPuzzleEntry(int userId, Set<PuzzleGame> activePuzzles) {
         return entry -> {
+            int pid = entry.getPuzzleId();
             for (PuzzleGame activePuzzle : activePuzzles) {
-                if (activePuzzle.getPuzzleId() == entry.getPuzzleId()) {
-                    return new PuzzleEntry(activePuzzle);
+                if (activePuzzle.getPuzzleId() == pid) {
+                    boolean solved = activePuzzle.getState().equals(GameState.SOLVED);
+                    return new PuzzleEntry(activePuzzle, solved);
                 }
             }
-            boolean locked = isPuzzleLockedForUser(entry, userId);
-            return new PuzzleEntry(entry, locked);
+            boolean solved = isPuzzleSolvedForUser(entry, userId);
+            return new PuzzleEntry(entry, false, solved);
         };
     }
 
     /**
-     * Returns whether a given puzzle is locked for a given user.
+     * Returns whether a given puzzle is solved for a given user.
      *
-     * @param puzzle the checked puzzle.
-     * @param userId the user which the puzzle may be locked for.
-     * @return {@link true} if the user can access the puzzle, {@link false} otherwise.
+     * @param entry  the checked puzzle.
+     * @param userId the user which the puzzle may be solved for.
+     * @return {@code true} if the user has solved the puzzle, {@code false} otherwise.
      */
-    private static boolean isPuzzleLockedForUser(Puzzle puzzle, int userId) {
-        return false; // TODO currently all puzzle are unlocked
+    private boolean isPuzzleSolvedForUser(Puzzle entry, int userId) {
+        PuzzleGame puzzleGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
+        return puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
     }
 }

@@ -77,6 +77,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
@@ -133,7 +134,7 @@ public class PuzzleGameManager extends HttpServlet {
     private PreviousSubmissionBean previousSubmission;
 
     @Inject
-    private EventDAO  eventDAO;
+    private EventDAO eventDAO;
 
     @Inject
     private GameProducer gameProducer;
@@ -224,7 +225,8 @@ public class PuzzleGameManager extends HttpServlet {
      * @return {@code true} when users can play puzzles, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() &&
+                !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**
@@ -251,6 +253,15 @@ public class PuzzleGameManager extends HttpServlet {
         if (puzzle == null) {
             logger.error("Failed to retrieve puzzle from database for puzzleId: {}.", puzzleId);
             response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        // check if puzzle is locked
+        Optional<Puzzle> nextPuzzle = getNextPuzzleForUser(userId);
+        if (nextPuzzle.isPresent() && nextPuzzle.get().getPuzzleId() != puzzle.getPuzzleId()) {
+            logger.error("Cannot create puzzle game for puzzleId: {}. Puzzle is locked.", puzzleId);
+            response.setStatus(SC_FORBIDDEN);
             Redirect.redirectBack(request, response);
             return;
         }
@@ -721,22 +732,51 @@ public class PuzzleGameManager extends HttpServlet {
         Redirect.redirectBack(request, response);
     }
 
+    /**
+     * Retrieves the first puzzle that has not been solved yet by the given user.
+     *
+     * @param userId The user to retrieve the next puzzle for.
+     * @return The next puzzle for the given user, or an empty Optional if no puzzle is available / all puzzles were
+     * solved.
+     */
+    private Optional<Puzzle> getNextPuzzleForUser(int userId) {
+        for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
+            /*
+             * This returns the puzzles ordered by position and (hopefully)
+             * an empty, not-null list if there's no puzzles
+             */
+            for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+                // TODO Should he make PuzzleDAO inject dependencies instead
+                PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(
+                        puzzle.getPuzzleId(),
+                        login.getUserId()
+                );
+
+                if (playedGame == null // Not yet played this puzzle
+                        || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
+                ) {
+                    // first not solved puzzle
+                    return Optional.of(puzzle);
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
     private String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
         StringBuilder message = new StringBuilder();
         message.append("Congratulations, your ")
                 .append(isAnAttackGame ? "mutant" : "test")
                 .append(" solved the puzzle!");
 
-        /*
-         * TODO: this code does not yet consider already solved and locked
-         * puzzles.
-         */
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
         /*
-         * Find the next puzzle in the same chapter or the first puzzle in the
-         * next not empty chapters
+         * Find the next puzzle in the same chapter or the first puzzle in the next not empty chapters.
+         *
+         * {@link PuzzleGameManager#getNextPuzzleForUser(int)} cannot be used here, because the puzzle is marked as
+         * solved only after this message is generated.
          */
         for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
             // Skip chapters before this one
@@ -746,7 +786,7 @@ public class PuzzleGameManager extends HttpServlet {
                 // Check in current and next chapters
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
-                 * and empty, not-null list if there's not puzzles
+                 * empty, not-null list if there are no puzzles
                  */
                 for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
                     if (puzzleChapter.getChapterId() == currentChapter
@@ -759,8 +799,7 @@ public class PuzzleGameManager extends HttpServlet {
                     PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
                             login.getUserId());
 
-                    // Not yet played this puzzle
-                    if (playedGame == null
+                    if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
                         message.append(" ")

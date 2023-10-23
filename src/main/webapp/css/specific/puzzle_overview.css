@@ -1,0 +1,214 @@
+.next-puzzle, .no-puzzles, .chapter {
+    margin-block-end: 3.5rem;
+}
+
+.next-puzzle {
+    display: block;
+    text-decoration: none;
+    color: white;
+    background-color: var(--bg-codedefenders);
+    border-radius: 4px;
+    overflow: hidden;
+    outline: 2px solid transparent;
+    transition: outline-color .2s;
+
+    --play-btn-fill: white;
+    --play-btn-size: 5rem;
+    --img-blur: 0px;
+    --img-scale: 1;
+}
+
+.next-puzzle__image {
+    position: relative;
+    overflow: hidden;
+}
+
+.next-puzzle__image img {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    transform: scale(var(--img-scale)); /* to hide edges of blur */
+    filter: blur(var(--img-blur));
+    transition: transform .2s;
+}
+
+.next-puzzle__image::after {
+    position: absolute;
+    content: '';
+    inset: 0;
+    background-color: #003149;
+    opacity: .25;
+}
+
+.next-puzzle__play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%);
+}
+
+.next-puzzle__play-btn svg {
+    width: var(--play-btn-size);
+    height: var(--play-btn-size);
+    transition: width .2s, height .2s;
+}
+
+.next-puzzle__play-btn svg path {
+    fill: var(--play-btn-fill);
+    transition: fill .2s;
+    backdrop-filter: blur(16px);
+    opacity: .75;
+}
+
+.next-puzzle:hover, .next-puzzle:focus, .next-puzzle:focus-within {
+    color: white;
+    outline-color: #00658d;
+    --play-btn-size: 5.5rem;
+    --play-btn-fill: #fafbff;
+}
+
+.next-puzzle__title {
+    padding: .5rem 1.5rem 1.5rem;
+    position: relative;
+}
+
+.next-puzzle__title__chapter,
+.next-puzzle__title__title {
+    font-weight: bold;
+}
+
+.next-puzzle__title__next-puzzle {
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.next-puzzle__title p {
+    margin: 0;
+}
+
+.next-puzzle__watermark {
+    position: absolute;
+    top: 5%;
+    right: -1rem;
+    width: auto;
+    object-fit: contain;
+    opacity: .15;
+    user-select: none;
+    pointer-events: none;
+    filter: saturate(0) brightness(0) invert(1);
+    height: 120%;
+}
+
+@media (min-width: 992px) {
+    .next-puzzle {
+        width: 50%;
+    }
+
+    .next-puzzle, .no-puzzles, .chapter {
+        margin-block-end: 5.5rem;
+    }
+}
+
+.chapter {
+    display: block;
+}
+
+.chapter__levels {
+    --cols: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 1.5rem;
+}
+
+.chapter__level {
+    position: relative;
+    text-decoration: none;
+    color: white;
+    padding: 1.5rem;
+    outline: 2px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    transition: outline-color .2s;
+}
+
+.chapter__level:hover, .chapter__level:focus, .chapter__level:focus-within {
+    color: white;
+    outline-color: #00658d;
+}
+
+.chapter__level[disabled] {
+    cursor: not-allowed;
+}
+
+.chapter__level[disabled]:hover, .chapter__level[disabled]:focus, .chapter__level[disabled]:focus-within {
+    outline-color: var(--bg-attacker-dark);
+}
+
+.chapter__level p {
+    margin: 0;
+}
+
+.chapter__level.puzzle-next {
+    background-color: var(--bg-codedefenders);
+}
+
+.chapter__level.puzzle-solved {
+    background-color: #198754;
+}
+
+.chapter__level.puzzle-locked {
+    background-color: var(--bs-gray);
+}
+
+.chapter__level__image {
+    transform: translateY(-.5rem);
+}
+
+.chapter__level__image svg {
+    width: 3rem;
+    height: 3rem;
+}
+
+.chapter__level__image svg path {
+    fill: white;
+}
+
+.chapter__level__watermark {
+    position: absolute;
+    top: 30%;
+    right: -0.75rem;
+    width: auto;
+    object-fit: contain;
+    opacity: .15;
+    user-select: none;
+    pointer-events: none;
+    filter: saturate(0) brightness(0) invert(1);
+    height: 80%;
+}
+
+@media (min-width: 470px) {
+    .chapter__levels {
+        --cols: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .chapter__levels {
+        --cols: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .chapter__levels {
+        --cols: 4;
+    }
+}
+
+@media (min-width: 1200px) {
+    .chapter__levels {
+        --cols: 5;
+    }
+}
