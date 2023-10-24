@@ -722,7 +722,8 @@
                 /* Sort users with more recent logins first, users who never logged in last. */
                 return lastLogin === null ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - lastLogin;
             case 'filter':
-                return lastLogin === null ? 'never' : dateFormat.format(lastLogin);
+                // lastLogin is an Epoch (seconds since 1970), dateFormat needs a Date (or milliseconds)
+                return lastLogin === null ? 'never' : dateFormat.format(lastLogin * 1000);
             case 'display':
                 const span = document.createElement('span');
                 if (lastLogin === null) {
@@ -730,7 +731,8 @@
                     span.textContent = 'never';
                 } else {
                     span.title = 'Dates are converted to you local timezone: ' + timezone;
-                    span.textContent = dateFormat.format(lastLogin);
+                    // lastLogin is an Epoch (seconds since 1970), dateFormat needs a Date (or milliseconds)
+                    span.textContent = dateFormat.format(lastLogin * 1000);
                 }
                 return span.outerHTML;
         }
