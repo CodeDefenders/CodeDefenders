@@ -21,6 +21,8 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="previousTest" type="org.codedefenders.game.Test"--%>
+<%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MultiplayerGame"--%>
 
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
@@ -30,6 +32,8 @@
 <%--
     @param MutliplayerGame game
         The game to be displayed.
+    @param Test previousTest
+        The test code of the previous submission.
 --%>
 
 <%
@@ -121,6 +125,35 @@
         <div class="game-component-header">
             <h3>Write a new JUnit test here</h3>
             <div>
+
+                <button class="btn btn-warning" id="loadPreviousTest"
+                ${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
+                    Clone previous test
+                </button>
+
+                <script type="module">
+                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                    import {TestEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
+
+                    /** @type {TestEditor} */
+                    const testEditor = await objects.await('testEditor');
+                    const loadPreviousTestButton = document.getElementById('loadPreviousTest');
+                    const previousTestCode = `${previousTest != null ? previousTest.asString : ''}`;
+
+                    const setEditableLines = (a, b) => {
+                        testEditor.editableLinesStart = a;
+                        testEditor.editableLinesEnd = b;
+                    };
+
+                    if (loadPreviousTestButton && previousTestCode.length > 0) {
+                        loadPreviousTestButton.addEventListener('click', function (event) {
+                            const {editableLinesStart, editableLinesEnd} = testEditor;
+                            setEditableLines(0, testEditor.initialNumLines);
+                            testEditor.editor.setValue(previousTestCode);
+                            setEditableLines(editableLinesStart, editableLinesEnd);
+                        });
+                    }
+                </script>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
                     <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
