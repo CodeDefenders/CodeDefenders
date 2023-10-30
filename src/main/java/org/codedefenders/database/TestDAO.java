@@ -138,7 +138,7 @@ public class TestDAO {
                         LEFT JOIN users ON players.User_ID = users.User_ID
                         WHERE tests.Game_ID = ?
                           AND players.User_ID = ?
-                        ORDER BY tests.Test_ID DESC
+                        ORDER BY tests.Timestamp DESC
                         LIMIT 1;
                 """;
         return DB.executeQueryReturnValue(query,
