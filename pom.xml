@@ -6,7 +6,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<powermock.version>2.0.9</powermock.version>
-		<tomcat.version>9.0.35</tomcat.version>
+		<tomcat.version>9.0.72</tomcat.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<junit5.version>5.10.0</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
