@@ -186,7 +186,7 @@ public class TestDAO {
         @Language("SQL") String query = """
                 SELECT t.*
                 FROM view_valid_game_tests t
-                %s,
+                %s
                 WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? )
                   AND t.Game_ID=?
                 %s
