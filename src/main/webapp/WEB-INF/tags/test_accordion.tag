@@ -64,11 +64,11 @@
     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {TestAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
-
     const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
     const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
+    const testEditor = document.getElementById('test-code') ? await objects.await('testEditor') : false;
 
-    const testAccordion = new TestAccordion(categories, tests);
+    const testAccordion = new TestAccordion(categories, tests, testEditor);
 
 
     objects.register('testAccordion', testAccordion);
