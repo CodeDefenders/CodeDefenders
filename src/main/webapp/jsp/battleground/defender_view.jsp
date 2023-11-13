@@ -125,60 +125,7 @@
         <div class="game-component-header">
             <h3>Write a new JUnit test here</h3>
             <div>
-
-                <button class="btn btn-warning" id="load-previous-test"
-                ${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
-                    Clone previous test
-                </button>
-
-                <t:modal title="Clone previous test" id="clone-previous-test-modal" closeButtonText="Cancel">
-                    <jsp:attribute name="content">
-                        Are you sure you want to copy the previous test?
-                        This will overwrite your current code and replace it with your last submission.
-                    </jsp:attribute>
-                    <jsp:attribute name="footer">
-                        <button class="btn btn-primary" id="confirm-clone-previous-test-btn">Confirm Clone</button>
-                    </jsp:attribute>
-                </t:modal>
-
-                <script type="module">
-                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-                    import {TestEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
-
-                    /** @type {TestEditor} */
-                    const testEditor = await objects.await('testEditor');
-                    const loadPreviousTestButton = document.getElementById('load-previous-test');
-                    const previousTestCode = `${previousTest != null ? previousTest.asString : ''}`;
-                    const templateCode = `${game.CUT.testTemplate}`;
-
-                    const setEditableLines = (a, b) => {
-                        testEditor.editableLinesStart = a;
-                        testEditor.editableLinesEnd = b;
-                    };
-
-                    const loadPreviousTest = () => {
-                        const {editableLinesStart, editableLinesEnd} = testEditor;
-                        setEditableLines(0, testEditor.initialNumLines);
-                        testEditor.editor.setValue(previousTestCode);
-                        setEditableLines(editableLinesStart, editableLinesEnd);
-                    };
-
-                    const modal = new bootstrap.Modal(document.getElementById('clone-previous-test-modal'));
-                    document.getElementById('confirm-clone-previous-test-btn').addEventListener('click', event => {
-                        loadPreviousTest();
-                        modal.hide();
-                    });
-
-                    if (loadPreviousTestButton && previousTestCode.length > 0) {
-                        loadPreviousTestButton.addEventListener('click', event => {
-                            if (testEditor.editor.getValue() === templateCode) {
-                                loadPreviousTest();
-                            } else {
-                                modal.show();
-                            }
-                        });
-                    }
-                </script>
+                <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
                     <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
