@@ -99,7 +99,7 @@ public class UserSettingsManager extends HttpServlet {
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
-            case "updateKeyMap": {
+            case "updateKeyMap" -> {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
                 if (updateUserKeyMap(user, editorKeyMap)) {
@@ -109,10 +109,8 @@ public class UserSettingsManager extends HttpServlet {
                     messages.add("Failed to update editor preference.");
                 }
                 Redirect.redirectBack(request, response);
-                return;
             }
-
-            case "updateKeepPreviousTest": {
+            case "updateKeepPreviousTest" -> {
                 final boolean keepPreviousTest = ServletUtils.getStringParameter(request, "keepPreviousTest")
                         .map(Boolean::parseBoolean)
                         .orElse(false);
@@ -124,10 +122,8 @@ public class UserSettingsManager extends HttpServlet {
                     messages.add("Failed to update keep previous test preference.");
                 }
                 Redirect.redirectBack(request, response);
-                return;
             }
-
-            case "updateProfile": {
+            case "updateProfile" -> {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
                 final boolean success = updateUserInformation(user, email, allowContact);
@@ -138,10 +134,8 @@ public class UserSettingsManager extends HttpServlet {
                     messages.add("Failed to update profile information. Please contact the page administrator.");
                 }
                 response.sendRedirect(responsePath);
-                return;
             }
-
-            case "changePassword": {
+            case "changePassword" -> {
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
 
                 if (isPasswordValid(password)) {
@@ -157,10 +151,8 @@ public class UserSettingsManager extends HttpServlet {
                     messages.add("No or invalid password provided.");
                 }
                 response.sendRedirect(responsePath);
-                return;
             }
-
-            case "deleteAccount": {
+            case "deleteAccount" -> {
                 // Does not actually delete the account but pseudomizes it
                 final boolean success = removeUserInformation(user);
                 if (success) {
@@ -178,12 +170,11 @@ public class UserSettingsManager extends HttpServlet {
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");
                     response.sendRedirect(responsePath);
                 }
-                return;
             }
-
-            default:
+            default -> {
                 logger.error("Action {" + formType + "} not recognised.");
                 response.sendRedirect(responsePath);
+            }
         }
     }
 
