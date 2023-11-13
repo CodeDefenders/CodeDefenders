@@ -18,6 +18,7 @@
   --%>
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fn" uri="https://codedefenders.org/functions" %>
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 
@@ -63,8 +64,8 @@
     /** @type {TestEditor} */
     const testEditor = await objects.await('testEditor');
     const loadPreviousTestButton = document.getElementById('load-previous-test');
-    const previousTestCode = `${previousTest != null ? previousTest.asString : ''}`;
-    const templateCode = `${game.CUT.testTemplate}`;
+    const previousTestCode = "${previousTest != null ? fn:escapeJS(previousTest.asString) : ''}";
+    const templateCode = "${fn:escapeJS(game.CUT.testTemplate)}";
 
     const setEditableLines = (a, b) => {
         testEditor.editableLinesStart = a;
