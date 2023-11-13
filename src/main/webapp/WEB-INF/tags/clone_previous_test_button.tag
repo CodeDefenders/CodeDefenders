@@ -107,7 +107,7 @@
     });
     updateCheckmark();
 
-    if (keepPrevTest) {
+    if (keepPrevTest && previousTestCode.length > 0) {
         loadPreviousTest();
     }
 </script>
