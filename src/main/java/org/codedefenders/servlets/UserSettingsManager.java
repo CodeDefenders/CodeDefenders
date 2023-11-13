@@ -113,8 +113,9 @@ public class UserSettingsManager extends HttpServlet {
             }
 
             case "updateKeepPreviousTest": {
-                final boolean keepPreviousTest = ServletUtils.parameterThenOrOther(request, "keepPreviousTest",
-                        true, false);
+                final boolean keepPreviousTest = ServletUtils.getStringParameter(request, "keepPreviousTest")
+                        .map(Boolean::parseBoolean)
+                        .orElse(false);
                 user.setKeepPreviousTest(keepPreviousTest);
                 if (userRepo.update(user)) {
                     messages.add("Successfully updated keep previous test preference.");
