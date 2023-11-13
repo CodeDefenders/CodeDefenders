@@ -19,15 +19,32 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%@ tag import="org.codedefenders.util.Paths" %>
+
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%@ attribute name="game" required="true" type="org.codedefenders.game.AbstractGame" %>
 <%@ attribute name="previousTest" required="false" type="org.codedefenders.game.Test" %>
 
-<button class="btn btn-warning" id="load-previous-test"
-${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
-    Clone previous test
-</button>
+<div class="btn-group" style="gap: 2px">
+    <button class="btn btn-warning" id="load-previous-test"
+    ${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
+        Clone previous test
+    </button>
+    <button class="btn btn-warning dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
+            data-bs-target="#keep-prev-test-dropdown" aria-expanded="false" ${game.state != 'ACTIVE' ? 'disabled' : ''}>
+        <span class="visually-hidden">Toggle Dropdown</span>
+    </button>
+    <form class="dropdown-menu" id="keep-prev-test-dropdown" action="${url.forPath(Paths.USER_SETTINGS)}" method="post">
+        <input type="hidden" class="form-control" name="formType" value="updateKeepPreviousTest">
+        <input type="hidden" class="form-control" name="keepPreviousTest" value="">
+        <div class="dropdown-item cursor-pointer">
+            <i class="fa fa-check me-1"></i>
+            <span>Keep previous test in editor</span>
+        </div>
+    </form>
+</div>
 
 <t:modal title="Clone previous test" id="clone-previous-test-modal" closeButtonText="Cancel">
     <jsp:attribute name="content">
@@ -75,5 +92,22 @@ ${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
                 modal.show();
             }
         });
+    }
+
+    let keepPrevTest = ${login.user.keepPreviousTest};
+    const dropdown = document.getElementById('keep-prev-test-dropdown');
+    const updateCheckmark = () => {
+        dropdown.querySelector('.fa-check').classList.toggle('invisible', !keepPrevTest);
+        dropdown.querySelector('input[name="keepPreviousTest"]').value = keepPrevTest;
+    };
+    dropdown.querySelector('.dropdown-item').addEventListener('click', event => {
+        keepPrevTest = !keepPrevTest;
+        updateCheckmark();
+        dropdown.submit();
+    });
+    updateCheckmark();
+
+    if (keepPrevTest) {
+        loadPreviousTest();
     }
 </script>

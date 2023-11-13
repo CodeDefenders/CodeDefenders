@@ -98,8 +98,10 @@ public class UserRepository {
         boolean active = rs.getBoolean("Active");
         boolean allowContact = rs.getBoolean("AllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
+        boolean keepPreviousTest = rs.getBoolean("KeepPreviousTest");
 
-        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
+        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap,
+                keepPreviousTest);
     }
 
     /**
@@ -120,8 +122,8 @@ public class UserRepository {
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
         @Language("SQL") String query = """
-                INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap)
-                VALUES (?, ?, ?, ?, ?, ?, ?);
+                        INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap, KeepPreviousTest)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         try {
@@ -133,7 +135,8 @@ public class UserRepository {
                             userEntity.isValidated(),
                             userEntity.isActive(),
                             userEntity.getAllowContact(),
-                            userEntity.getKeyMap().name());
+                            userEntity.getKeyMap().name(),
+                            userEntity.getKeepPreviousTest());
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -155,7 +158,8 @@ public class UserRepository {
                   Validated = ?,
                   Active = ?,
                   AllowContact = ?,
-                  KeyMap = ?
+                          KeyMap = ?,
+                          KeepPreviousTest = ?
                 WHERE User_ID = ?;
         """;
         try {
@@ -167,6 +171,7 @@ public class UserRepository {
                     userEntity.isActive(),
                     userEntity.getAllowContact(),
                     userEntity.getKeyMap().name(),
+                    userEntity.getKeepPreviousTest(),
                     userEntity.getId()) == 1;
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);

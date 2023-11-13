@@ -112,6 +112,20 @@ public class UserSettingsManager extends HttpServlet {
                 return;
             }
 
+            case "updateKeepPreviousTest": {
+                final boolean keepPreviousTest = ServletUtils.parameterThenOrOther(request, "keepPreviousTest",
+                        true, false);
+                user.setKeepPreviousTest(keepPreviousTest);
+                if (userRepo.update(user)) {
+                    messages.add("Successfully updated keep previous test preference.");
+                } else {
+                    logger.info("Failed to update keep previous test preference for user {}.", login.getUserId());
+                    messages.add("Failed to update keep previous test preference.");
+                }
+                Redirect.redirectBack(request, response);
+                return;
+            }
+
             case "updateProfile": {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);

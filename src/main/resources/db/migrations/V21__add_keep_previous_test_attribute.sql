@@ -1,0 +1,2 @@
+ALTER TABLE `users`
+    ADD COLUMN `KeepPreviousTest` BOOLEAN NOT NULL DEFAULT FALSE;

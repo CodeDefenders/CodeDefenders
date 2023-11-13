@@ -147,7 +147,7 @@ public class UserService {
     @Nonnull
     private User userFromUserEntity(@Nonnull UserEntity user) {
         return new User(user.getId(), user.getUsername(), user.isActive(), user.getEmail(), user.isValidated(),
-                user.getAllowContact(), user.getKeyMap());
+                user.getAllowContact(), user.getKeyMap(), user.getKeepPreviousTest());
     }
 
     @Nonnull
