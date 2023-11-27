@@ -23,6 +23,7 @@ import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
@@ -174,6 +175,19 @@ public class AchievementService {
         }
     }
 
+    private void checkCoverage(int userId, Integer testId) {
+        Test test = TestDAO.getTestById(testId);
+        if (test != null) {
+            LineCoverage coverage = test.getLineCoverage();
+            int linesCovered = coverage.getLinesCovered().size();
+            int affected = repo.updateAchievementForUser(userId, Achievement.Id.TOTAL_COVERAGE, linesCovered);
+            if (affected > 0) {
+                logger.info("Updated achievement TOTAL_COVERAGE for user with id {}", userId);
+                enqueueAchievementNotification(userId, Achievement.Id.TOTAL_COVERAGE);
+            }
+        }
+    }
+
     private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
         Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
         synchronized (notificationQueue) {
@@ -294,6 +308,7 @@ public class AchievementService {
             addTestWritten(event.getUserId());
             checkTestSmells(event.getUserId(), event.getTestId());
             checkOldMutantsKilledByTest(event.getUserId(), event.getTestId());
+            checkCoverage(event.getUserId(), event.getTestId());
         }
 
         /**

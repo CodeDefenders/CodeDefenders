@@ -133,6 +133,8 @@ public class Achievement implements Serializable {
         WRITE_CLEAN_TESTS(10),
         @SerializedName("11")
         KILL_MUTANTS(11),
+        @SerializedName("12")
+        TOTAL_COVERAGE(12),
         ; // format for better git diffs
 
         private final int id;

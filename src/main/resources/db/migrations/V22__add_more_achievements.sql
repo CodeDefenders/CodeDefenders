@@ -17,4 +17,15 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
         '{0} of {1} mutants killed to reach the next level', 10),
        (11, 3, 11, 'Silver Mutant Killer', 'Kill {0} mutants with tests',
         '{0} of {1} mutants killed to reach the next level', 50),
-       (11, 4, 11, 'Mutant Executioner', 'Kill {0} mutants with tests', '{0} mutants killed, max level reached', 200);
+       (11, 4, 11, 'Mutant Executioner', 'Kill {0} mutants with tests', '{0} mutants killed, max level reached', 200),
+
+       (12, 0, 12, 'No lines covered', 'Write a test that covers at least one line of code to unlock this achievement',
+        '{0} of {1} lines covered', 0),
+       (12, 1, 12, 'Cover the first line', 'Cover the first line of code with a test',
+        '{0} of {1} lines covered to reach the next level', 1),
+       (12, 2, 12, 'Bronze Coverer', 'Cover {0} lines of code with tests',
+        '{0} of {1} lines covered to reach the next level', 100),
+       (12, 3, 12, 'Silver Coverer', 'Cover {0} lines of code with tests',
+        '{0} of {1} lines covered to reach the next level', 500),
+       (12, 4, 12, 'Line Coverage Expert', 'Cover {0} lines of code with tests', '{0} lines covered, max level reached',
+        1000);
