@@ -173,11 +173,9 @@ public class MeleeGameService extends AbstractGameService {
             return false;
         }
 
-        // Add selected role to game if the creator participates as non-observer (i.e., player)
-        if (creatorRole == Role.PLAYER) {
-            if (!game.addPlayer(login.getUserId(), Role.PLAYER)) {
-                return false;
-            }
+        // Add the creator as player with their selected role to game (creator can participate as player or just observe).
+        if (!game.addPlayer(login.getUserId(), creatorRole)) {
+            return false;
         }
 
         if (!gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests)) {

@@ -19,7 +19,6 @@
 
 package org.codedefenders.service.game;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -172,11 +171,9 @@ public class MultiplayerGameService extends AbstractGameService {
             return false;
         }
 
-        // Add selected role to game if the creator participates as attacker/defender
-        if (creatorRole.equals(Role.ATTACKER) || creatorRole.equals(Role.DEFENDER)) {
-            if (!game.addPlayer(login.getUserId(), creatorRole)) {
-                return false;
-            }
+        // Add selected role to game (creator can participate as attacker/defender or just observe)
+        if (!game.addPlayer(login.getUserId(), creatorRole)) {
+            return false;
         }
 
         if (!gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests)) {
