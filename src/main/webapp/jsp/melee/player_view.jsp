@@ -21,6 +21,8 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="previousTest" type="org.codedefenders.game.Test"--%>
+<%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MeleeGame"--%>
 
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -350,6 +352,8 @@
         <div class="game-component-header">
             <h3>Write a new JUnit test here</h3>
             <div>
+                <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
+
                 <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>

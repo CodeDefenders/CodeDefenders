@@ -41,6 +41,7 @@ public class UserEntity implements Serializable {
     private boolean active;
     private boolean allowContact;
     private KeyMap keyMap;
+    private boolean keepPreviousTest;
 
     public UserEntity(String username, String encodedPassword) {
         this(username, encodedPassword, "");
@@ -51,11 +52,11 @@ public class UserEntity implements Serializable {
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
+        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, false);
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
-            boolean active, boolean allowContact, KeyMap keyMap) {
+                      boolean active, boolean allowContact, KeyMap keyMap, boolean keepPreviousTest) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -64,6 +65,7 @@ public class UserEntity implements Serializable {
         this.active = active;
         this.allowContact = allowContact;
         this.keyMap = keyMap;
+        this.keepPreviousTest = keepPreviousTest;
     }
 
     public boolean isValidated() {
@@ -125,6 +127,14 @@ public class UserEntity implements Serializable {
 
     public void setKeyMap(KeyMap keyMap) {
         this.keyMap = keyMap;
+    }
+
+    public boolean getKeepPreviousTest() {
+        return keepPreviousTest;
+    }
+
+    public void setKeepPreviousTest(boolean keepPreviousTest) {
+        this.keepPreviousTest = keepPreviousTest;
     }
 
     @Override

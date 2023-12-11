@@ -10,26 +10,34 @@ class TestAccordion {
      *      Given by [JSON.parse('${testAccordion.categoriesAsJSON}')].
      * @param {Map<number, object>} tests
      *      Given by [new Map(JSON.parse('${testAccordion.testsAsJSON}'))].
+     * @param {TestEditor | false} cloneTo
+     *      The test editor to clone tests to, or false if no clone button should be shown.
      */
-    constructor (categories, tests) {
+    constructor(categories, tests, cloneTo = false) {
         /**
          * The categories of tests to display, i.e. one category per method + all.
          * @type {TestAccordionCategory[]}
          */
         this._categories = categories;
+
         /**
          * Maps test ids to their test DTO.
          * @type {Map<number, TestDTO>}
          */
-        this._tests = tests
+        this._tests = tests;
 
+        /**
+         * The test editor to clone tests to, or false if no clone button should be shown.
+         * @type {TestEditor | false}
+         * @private
+         */
+        this._cloneTo = cloneTo;
 
         /**
          * Maps test ids to the modal that show the test's code.
          * @type {Map<number, Modal>}
          */
         this._testModals = new Map();
-
 
         this._init();
     }
@@ -95,6 +103,18 @@ class TestAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
+
+        /* Add clone button */
+        if (this._cloneTo) {
+            const cloneButton = document.createElement('button');
+            cloneButton.classList.add('btn', 'btn-outline-primary');
+            cloneButton.innerText = 'Clone to editor';
+            cloneButton.addEventListener('click', () => {
+                this._cloneTest(editor.getValue());
+                modal.controls.hide(); // it feels weird (as if nothing happened) if the modals stays open after clicking the button
+            });
+            modal.footer.insertBefore(cloneButton, modal.footer.firstChild);
+        }
 
         modal.controls.show();
 
@@ -261,6 +281,18 @@ class TestAccordion {
         return data.smells.length > 0
                 ? data.smells.join('<br>')
                 : 'This test does not have any smells.'
+    }
+
+    /** @private */
+    _cloneTest(testcode) {
+        const setEditableLines = (a, b) => {
+            this._cloneTo.editableLinesStart = a;
+            this._cloneTo.editableLinesEnd = b;
+        };
+        const {editableLinesStart, editableLinesEnd} = this._cloneTo;
+        setEditableLines(0, this._cloneTo.initialNumLines);
+        this._cloneTo.editor.setValue(testcode);
+        setEditableLines(editableLinesStart, editableLinesEnd);
     }
 }
 

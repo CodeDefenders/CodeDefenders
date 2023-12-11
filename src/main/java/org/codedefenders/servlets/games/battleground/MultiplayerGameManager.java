@@ -237,6 +237,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;
 
+        if (!isGameClosed && game.getRole(login.getUserId()) == Role.DEFENDER) {
+            Test prevTest = TestDAO.getLatestTestForGameAndUser(gameId, login.getUserId());
+            request.setAttribute("previousTest", prevTest);
+        }
+
         request.getRequestDispatcher(jspPath).forward(request, response);
     }
 

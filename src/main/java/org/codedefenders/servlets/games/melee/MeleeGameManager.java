@@ -47,12 +47,14 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.AttackerIntention;
@@ -238,6 +240,12 @@ public class MeleeGameManager extends HttpServlet {
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED || GameDAO.isGameExpired(gameId);
         final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
+
+        if (!isGameClosed && game.getRole(login.getUserId()) == Role.PLAYER) {
+            Test prevTest = TestDAO.getLatestTestForGameAndUser(gameId, login.getUserId());
+            request.setAttribute("previousTest", prevTest);
+        }
+
         request.getRequestDispatcher(jspPath).forward(request, response);
     }
 
