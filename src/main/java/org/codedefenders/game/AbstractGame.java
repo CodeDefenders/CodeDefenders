@@ -23,12 +23,14 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
+import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
@@ -54,6 +56,8 @@ public abstract class AbstractGame {
     protected GameMode mode;
 
     protected boolean capturePlayersIntention = false;
+
+    protected List<Player> observers;
 
     protected List<Event> events;
     protected List<Mutant> mutants;
@@ -229,5 +233,12 @@ public abstract class AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
+    }
+
+    public List<Player> getObserverPlayers() {
+        if (observers == null) {
+            observers = GameDAO.getPlayersForGame(getId(), Role.OBSERVER);
+        }
+        return observers;
     }
 }
