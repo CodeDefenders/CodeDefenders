@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 public class TestPuzzle {
 
-    @Test
+    @Test(timeout = 4000)
     public void test() {
         Puzzle b = new Puzzle();
         assertEquals(0, b.run(3, 4, 3));
