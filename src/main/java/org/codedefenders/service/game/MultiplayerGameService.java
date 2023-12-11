@@ -217,6 +217,7 @@ public class MultiplayerGameService extends AbstractGameService {
         boolean withTests = gameManagingUtils.hasPredefinedTests(game);
         Role creatorRole = game.getRole(game.getCreatorId());
 
+        // TODO: shouldn't the creator switch sides as well?
         if (!createGame(newGame, withMutants, withTests, creatorRole)) {
             return Optional.empty();
         }
@@ -233,6 +234,12 @@ public class MultiplayerGameService extends AbstractGameService {
                 if (!newGame.addPlayer(player.getUser().getId(), Role.ATTACKER)) {
                     return Optional.empty();
                 }
+            }
+        }
+        for (Player observer : game.getObserverPlayers()) {
+            // creator is already added by MultiplayerGameService#createGame
+            if (observer.getUser().getId() != game.getCreatorId()) {
+                newGame.addPlayer(observer.getUser().getId(), observer.getRole());
             }
         }
 

@@ -230,6 +230,12 @@ public class MeleeGameService extends AbstractGameService {
                 }
             }
         }
+        for (Player observer : game.getObserverPlayers()) {
+            // creator is already added by MeleeGameService#createGame
+            if (observer.getUser().getId() != game.getCreatorId()) {
+                newGame.addPlayer(observer.getUser().getId(), observer.getRole());
+            }
+        }
 
         return Optional.of(newGame);
     }
