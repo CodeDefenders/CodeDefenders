@@ -57,6 +57,15 @@
     </jsp:attribute>
 </t:modal>
 
+<t:modal title='Change "Keep previous test in editor" setting' id="keep-previous-test-modal" closeButtonText="Cancel">
+    <jsp:attribute name="content">
+        Changing this setting will reload the page and therefore overwrite your current code.
+    </jsp:attribute>
+    <jsp:attribute name="footer">
+        <button class="btn btn-primary" id="confirm-keep-previous-test-btn">Confirm</button>
+    </jsp:attribute>
+</t:modal>
+
 <script type="module">
     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {TestEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
@@ -97,16 +106,28 @@
 
     let keepPrevTest = ${login.user.keepPreviousTest};
     const dropdown = document.getElementById('keep-prev-test-dropdown');
-    const updateCheckmark = () => {
+    const modalForDropdown = new bootstrap.Modal(document.getElementById('keep-previous-test-modal'));
+    const updateDomCheckmark = () => {
         dropdown.querySelector('.fa-check').classList.toggle('invisible', !keepPrevTest);
         dropdown.querySelector('input[name="keepPreviousTest"]').value = keepPrevTest;
     };
-    dropdown.querySelector('.dropdown-item').addEventListener('click', event => {
+    const toggleCheckmark = () => {
         keepPrevTest = !keepPrevTest;
-        updateCheckmark();
+        updateDomCheckmark();
         dropdown.submit();
+    };
+    document.getElementById('confirm-keep-previous-test-btn').addEventListener('click', event => {
+        toggleCheckmark();
+        modalForDropdown.hide();
     });
-    updateCheckmark();
+    dropdown.querySelector('.dropdown-item').addEventListener('click', event => {
+        if (testEditor.editor.getValue() === templateCode) {
+            toggleCheckmark();
+        } else {
+            modalForDropdown.show();
+        }
+    });
+    updateDomCheckmark();
 
     if (keepPrevTest && previousTestCode.length > 0) {
         loadPreviousTest();
