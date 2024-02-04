@@ -195,11 +195,20 @@ public class AchievementService {
                     .mapToInt(l -> 1).sum();
 
             updateAchievement(userId, Achievement.Id.TOTAL_COVERAGE, newLinesCovered);
+            setAchievementMax(userId, Achievement.Id.MAX_COVERAGE, totalLinesCovered);
         }
     }
 
     private void updateAchievement(int userId, Achievement.Id achievementId, int metricChange) {
         int affected = repo.updateAchievementForUser(userId, achievementId, metricChange);
+        if (affected > 0) {
+            logger.info("Updated achievement {} for user with id {}", achievementId.name(), userId);
+            enqueueAchievementNotification(userId, achievementId);
+        }
+    }
+
+    private void setAchievementMax(int userId, Achievement.Id achievementId, int newMetricAbsolute) {
+        int affected = repo.setAchievementForUser(userId, achievementId, newMetricAbsolute);
         if (affected > 0) {
             logger.info("Updated achievement {} for user with id {}", achievementId.name(), userId);
             enqueueAchievementNotification(userId, achievementId);

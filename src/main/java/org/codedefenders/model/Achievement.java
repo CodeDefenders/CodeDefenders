@@ -135,6 +135,8 @@ public class Achievement implements Serializable {
         KILL_MUTANTS(11),
         @SerializedName("12")
         TOTAL_COVERAGE(12),
+        @SerializedName("13")
+        MAX_COVERAGE(13),
         ; // format for better git diffs
 
         private final int id;

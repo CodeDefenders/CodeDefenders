@@ -130,6 +130,40 @@ public class AchievementRepository {
         }
     }
 
+
+    /**
+     * Sets the achievements metric for a user to the given amount if it's greater than the current amount.
+     * It sets the metric first and then updates the level if necessary.
+     * The return value indicates whether the level was updated or not.
+     *
+     * @param userId         The user to update the achievement for.
+     * @param achievementId  The achievement type to update.
+     * @param metricAbsolute The amount to set the metric to if it's greater than the current value.
+     * @return The number of rows for which the achievement level was updated (should be either 0 or 1).
+     */
+    public int setAchievementForUser(int userId, Achievement.Id achievementId, int metricAbsolute) {
+        int updated = setAchievementMetricForUser(userId, achievementId, metricAbsolute);
+        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
+    }
+
+    private int setAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricAbsolute) {
+        @Language("SQL")
+        String query = """
+                        INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)
+                        VALUES (?, ?, ?)
+                        ON DUPLICATE KEY UPDATE
+                        Metric = GREATEST(Metric, ?);
+                """;
+
+        try {
+            return queryRunner.update(query, achievementId.getAsInt(), userId, metricAbsolute, metricAbsolute);
+        } catch (SQLException e) {
+            logger.error("Failed to update achievement metric for user {} and achievement {}", userId, achievementId,
+                    e);
+            throw new UncheckedSQLException(e);
+        }
+    }
+
     private int updateAchievementLevelForUser(int userId, Achievement.Id achievementId) {
         @Language("SQL")
         String query = """
