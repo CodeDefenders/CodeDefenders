@@ -295,7 +295,7 @@ public class MultiplayerGame extends AbstractGame {
             return Role.DEFENDER;
         } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.ATTACKER;
-        } else if (userId == getCreatorId()) { // TODO: check for role, not creator.
+        } else if (getObserverPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.OBSERVER;
         } else {
             return Role.NONE;

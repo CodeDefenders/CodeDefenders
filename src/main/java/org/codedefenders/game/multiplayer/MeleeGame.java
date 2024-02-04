@@ -304,7 +304,7 @@ public class MeleeGame extends AbstractGame {
     public Role getRole(int userId) {
         if (getPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.PLAYER;
-        } else if (userId == getCreatorId()) {
+        } else if (getObserverPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.OBSERVER;
         } else {
             return Role.NONE;
