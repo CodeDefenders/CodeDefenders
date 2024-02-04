@@ -180,9 +180,21 @@ public class AchievementService {
     private void checkCoverage(int userId, Integer testId) {
         Test test = TestDAO.getTestById(testId);
         if (test != null) {
-            LineCoverage coverage = test.getLineCoverage();
-            int linesCovered = coverage.getLinesCovered().size();
-            updateAchievement(userId, Achievement.Id.TOTAL_COVERAGE, linesCovered);
+            Set<Integer> prevCoveredLines = TestDAO.getTestsForGameAndUser(test.getGameId(), userId)
+                    .stream()
+                    .filter(t -> t.getId() != testId) // exclude the new test
+                    .map(Test::getLineCoverage)
+                    .map(LineCoverage::getLinesCovered)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
+
+            List<Integer> coveredLines = test.getLineCoverage().getLinesCovered();
+            int totalLinesCovered = coveredLines.size();
+            int newLinesCovered = coveredLines.stream()
+                    .filter(line -> !prevCoveredLines.contains(line))
+                    .mapToInt(l -> 1).sum();
+
+            updateAchievement(userId, Achievement.Id.TOTAL_COVERAGE, newLinesCovered);
         }
     }
 
