@@ -45,6 +45,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * Service for achievements. Handles updating the achievements for users.
+ */
 @Named
 @ApplicationScoped
 public class AchievementService {
@@ -57,6 +60,13 @@ public class AchievementService {
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
+    /**
+     * Constructor for the AchievementService.
+     *
+     * @param achievementRepository the repository for achievements
+     * @param testSmellsDAO         the DAO for test smells
+     * @param notificationService   the notification service
+     */
     @Inject
     public AchievementService(AchievementRepository achievementRepository, TestSmellsDAO testSmellsDAO,
                               INotificationService notificationService) {
@@ -67,8 +77,32 @@ public class AchievementService {
         notificationQueue = new HashMap<>();
     }
 
+    /**
+     * Returns all achievements for a user.
+     *
+     * @param userId the id of the user
+     * @return a collection of achievements
+     */
     public Collection<Achievement> getAchievementsForUser(int userId) {
         return repo.getAchievementsForUser(userId);
+    }
+
+    /**
+     * Sends all queued achievement notifications as events via the notification service.
+     */
+    public void sendAchievementNotifications() {
+        synchronized (notificationQueue) {
+            notificationQueue.forEach((userId, achievements) -> {
+                achievements.forEach(achievement -> {
+                    logger.debug("Sending achievement notification for user with id {} and achievement {}",
+                            userId, achievement.getId());
+                    AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
+                    newEvent.setAchievement(achievement);
+                    newEvent.setUserId(userId);
+                    notificationService.post(newEvent);
+                });
+            });
+        }
     }
 
     private Achievement.Id getGamePlayedAchievementIdForRole(Role role) {
@@ -86,15 +120,8 @@ public class AchievementService {
                 .map(Player::getUser)
                 .mapToInt(UserEntity::getId)
                 .forEach(userId -> {
-                    if (repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1) > 0) {
-                        logger.info("Updated achievement PLAY_GAMES for user with id {}", userId);
-                        enqueueAchievementNotification(userId, Achievement.Id.PLAY_GAMES);
-                    }
-
-                    if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
-                        logger.info("Updated achievement {} for user with id {}", achievementId, userId);
-                        enqueueAchievementNotification(userId, achievementId);
-                    }
+                    updateAchievement(userId, Achievement.Id.PLAY_GAMES, 1);
+                    updateAchievement(userId, achievementId, 1);
                 });
     }
 
@@ -114,39 +141,22 @@ public class AchievementService {
     }
 
     private void addMultiplayerGameResult(int userId, ScoreboardBean.PlayerStatus status) {
-        getMultiplayerGameResultAchievementIdForStatus(status).forEach(achievementId -> {
-                    if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
-                        logger.info("Updated achievement {} for user with id {}", achievementId, userId);
-                        enqueueAchievementNotification(userId, achievementId);
-                    }
-                }
-        );
+        getMultiplayerGameResultAchievementIdForStatus(status)
+                .forEach(achievementId -> updateAchievement(userId, achievementId, 1));
     }
 
     private void addTestWritten(int userId) {
-        int affected = repo.updateAchievementForUser(userId, Achievement.Id.WRITE_TESTS, 1);
-        if (affected > 0) {
-            logger.info("Updated achievement WRITE_TESTS for user with id {}", userId);
-            enqueueAchievementNotification(userId, Achievement.Id.WRITE_TESTS);
-        }
+        updateAchievement(userId, Achievement.Id.WRITE_TESTS, 1);
     }
 
     private void addMutantCreated(int userId) {
-        int affected = repo.updateAchievementForUser(userId, Achievement.Id.CREATE_MUTANTS, 1);
-        if (affected > 0) {
-            logger.info("Updated achievement CREATE_MUTANTS for user with id {}", userId);
-            enqueueAchievementNotification(userId, Achievement.Id.CREATE_MUTANTS);
-        }
+        updateAchievement(userId, Achievement.Id.CREATE_MUTANTS, 1);
     }
 
     private void checkTestSmells(int userId, int testId) {
         List<String> smells = testSmellsDAO.getDetectedTestSmellsForTest(testId);
         if (smells.isEmpty()) {
-            int affected = repo.updateAchievementForUser(userId, Achievement.Id.WRITE_CLEAN_TESTS, 1);
-            if (affected > 0) {
-                logger.info("Updated achievement WRITE_CLEAN_TESTS for user with id {}", userId);
-                enqueueAchievementNotification(userId, Achievement.Id.WRITE_CLEAN_TESTS);
-            }
+            updateAchievement(userId, Achievement.Id.WRITE_CLEAN_TESTS, 1);
         }
     }
 
@@ -154,11 +164,7 @@ public class AchievementService {
         Set<Mutant> killedMutants = TestDAO.getKilledMutantsForTestId(testId);
         int killCount = killedMutants.size();
         if (killCount > 0) {
-            int affected = repo.updateAchievementForUser(userId, Achievement.Id.KILL_MUTANTS, killCount);
-            if (affected > 0) {
-                logger.info("Updated achievement KILL_MUTANTS for user with id {}", userId);
-                enqueueAchievementNotification(userId, Achievement.Id.KILL_MUTANTS);
-            }
+            updateAchievement(userId, Achievement.Id.KILL_MUTANTS, killCount);
         }
     }
 
@@ -167,11 +173,7 @@ public class AchievementService {
         if (test != null) {
             int playerId = test.getPlayerId();
             int userId = PlayerDAO.getPlayer(playerId).getUser().getId();
-            int affected = repo.updateAchievementForUser(userId, Achievement.Id.KILL_MUTANTS, 1);
-            if (affected > 0) {
-                logger.info("Updated achievement KILL_MUTANTS for user with id {}", userId);
-                enqueueAchievementNotification(userId, Achievement.Id.KILL_MUTANTS);
-            }
+            updateAchievement(userId, Achievement.Id.KILL_MUTANTS, 1);
         }
     }
 
@@ -180,11 +182,15 @@ public class AchievementService {
         if (test != null) {
             LineCoverage coverage = test.getLineCoverage();
             int linesCovered = coverage.getLinesCovered().size();
-            int affected = repo.updateAchievementForUser(userId, Achievement.Id.TOTAL_COVERAGE, linesCovered);
-            if (affected > 0) {
-                logger.info("Updated achievement TOTAL_COVERAGE for user with id {}", userId);
-                enqueueAchievementNotification(userId, Achievement.Id.TOTAL_COVERAGE);
-            }
+            updateAchievement(userId, Achievement.Id.TOTAL_COVERAGE, linesCovered);
+        }
+    }
+
+    private void updateAchievement(int userId, Achievement.Id achievementId, int metricChange) {
+        int affected = repo.updateAchievementForUser(userId, achievementId, metricChange);
+        if (affected > 0) {
+            logger.info("Updated achievement {} for user with id {}", achievementId.name(), userId);
+            enqueueAchievementNotification(userId, achievementId);
         }
     }
 
@@ -195,21 +201,6 @@ public class AchievementService {
         }
         logger.debug("Achievement unlocked & added to queue: {} (Level {})", achievement.getName(),
                 achievement.getLevel());
-    }
-
-    public void sendAchievementNotifications() {
-        synchronized (notificationQueue) {
-            notificationQueue.forEach((userId, achievements) -> {
-                achievements.forEach(achievement -> {
-                    logger.debug("Sending achievement notification for user with id {} and achievement {}",
-                            userId, achievement.getId());
-                    AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
-                    newEvent.setAchievement(achievement);
-                    newEvent.setUserId(userId);
-                    notificationService.post(newEvent);
-                });
-            });
-        }
     }
 
     private void achievementNotificationSent(int userId, int achievementId) {
@@ -226,6 +217,9 @@ public class AchievementService {
         }
     }
 
+    /**
+     * Registers the {@link AchievementEventHandler} to listen for events on the notification service.
+     */
     public void registerEventHandler() {
         if (isEventHandlerRegistered) {
             logger.warn("AchievementEventHandler is already registered");
@@ -236,6 +230,9 @@ public class AchievementService {
         isEventHandlerRegistered = true;
     }
 
+    /**
+     * Unregisters the {@link AchievementEventHandler} from the notification service.
+     */
     @PreDestroy
     public void unregisterEventHandler() {
         if (!isEventHandlerRegistered) {
@@ -247,6 +244,10 @@ public class AchievementService {
         isEventHandlerRegistered = false;
     }
 
+    /**
+     * The event handler is used to listen for events and then check & (if necessary) update
+     * the achievements for the users.
+     */
     public class AchievementEventHandler {
 
         /**
@@ -285,7 +286,7 @@ public class AchievementService {
 
         /**
          * The {@link GameSolvedEvent} is fired when a puzzle is solved.
-         * It is used to count the amount of solved puzzles.
+         * It is used to count the number of solved puzzles.
          */
         @Subscribe
         @SuppressWarnings("unused")
