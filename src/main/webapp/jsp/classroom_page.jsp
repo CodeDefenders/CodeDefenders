@@ -606,6 +606,8 @@
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
         const BATTLEGROUND_URL = '${url.forPath(Paths.BATTLEGROUND_GAME)}';
         const MELEE_URL = '${url.forPath(Paths.MELEE_GAME)}';
+        const BATTLEGROUND_MANAGER_URL = '${url.forPath(Paths.BATTLEGROUND_SELECTION)}';
+        const PARTY_MANAGER_URL = '${url.forPath(Paths.MELEE_SELECTION)}';
 
         const classroomId = ${classroom.id};
         const ownUserId = ${login.userId};
@@ -966,33 +968,54 @@
         };
 
         const renderGameActions = function(data, type, row, meta) {
-            if (data.role === Role.NONE) {
-                return '';
+            if (type !== 'display') {
+                return null;
             }
 
             let url;
+            let managerUrl;
             if (data.mode === GameMode.PARTY) {
                 url = BATTLEGROUND_URL;
+                managerUrl = BATTLEGROUND_MANAGER_URL;
             } else if (data.mode === GameMode.MELEE) {
                 url = MELEE_URL;
+                managerUrl = PARTY_MANAGER_URL;
             } else {
                 return '';
             }
 
-            switch (type) {
-                case 'type':
-                case 'sort':
-                case 'filter':
-                    return null;
-                case 'display':
-                    const params = new URLSearchParams({
-                        gameId: data.gameId
-                    });
+            const params = new URLSearchParams({
+                gameId: data.gameId
+            });
+
+            if (data.role === Role.NONE) {
+                if (${login.admin}) {
                     return `
-                        <a href="\${url}?\${params}" class="cursor-pointer float-end px-2">
-                            <i class="fa fa-external-link text-primary"></i>
-                        </a>
+                    <form id="joinGameForm_observer_\${data.gameId}"
+                          action="\${managerUrl}"
+                          method="post">
+                        <input type="hidden" name="formType" value="joinGame">
+                        <input type="hidden" name="gameId" value=\${data.gameId}>
+                        <input type="hidden" name="observer" value=1>
+
+                        <span class="text-nowrap">
+                            <button type="submit" id="join-observer-\${data.gameId}"
+                                    class="btn btn-sm btn-info ms-1"
+                                    title="Join as Observer">
+                                <i class="fa fa-external-link text-primary"></i> Spectate
+                            </button>
+                        </span>
+                    </form>
                     `;
+                } else {
+                    return '';
+                }
+            } else {
+                return `
+                <a href="\${url}?\${params}" class="cursor-pointer float-end px-2">
+                    <i class="fa fa-external-link text-primary"></i>
+                </a>
+                `;
             }
         };
 
