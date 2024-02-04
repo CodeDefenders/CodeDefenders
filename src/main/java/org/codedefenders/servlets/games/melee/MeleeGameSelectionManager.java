@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games.melee;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,8 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.ClassroomMember;
+import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -48,6 +51,7 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.MeleeGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -107,6 +111,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private ClassroomService classroomService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -237,7 +244,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         gje.setUserName(login.getSimpleUser().getName());
 
         if (observerParamExists) {
-            if (login.isAdmin()) {
+            if (login.isAdmin() || isClassroomModeratorForGame(game)) {
                 if (game.addPlayer(login.getUserId(), Role.OBSERVER)) {
                     logger.info("User {} joined game {} as observer.", login.getUserId(), gameId);
                     notificationService.post(gje);
@@ -261,6 +268,22 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
         }
+    }
+
+    /**
+     * Checks if the user is a moderator or owner of the classroom the game is associated with.
+     *
+     * @param game The game to check for.
+     * @return True if the user is a moderator or higher, false otherwise.
+     */
+    private boolean isClassroomModeratorForGame(MeleeGame game) {
+        return game.getClassroomId()
+                .map(classroomService::getMembersForClassroom)
+                .orElse(List.of())
+                .stream()
+                .filter(member -> member.getUserId() == login.getUserId())
+                .map(ClassroomMember::getRole)
+                .anyMatch(role -> role == ClassroomRole.MODERATOR || role == ClassroomRole.OWNER);
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {

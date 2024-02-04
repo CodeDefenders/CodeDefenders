@@ -989,7 +989,7 @@
             });
 
             if (data.role === Role.NONE) {
-                if (${login.admin}) {
+                if (${login.admin || member.role == ClassroomRole.OWNER || member.role == ClassroomRole.MODERATOR}) {
                     return `
                     <form id="joinGameForm_observer_\${data.gameId}"
                           action="\${managerUrl}"
