@@ -362,6 +362,8 @@ public class MeleeGame extends AbstractGame {
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
+
+        // TODO: move notifications outside of data objects.
         Optional<UserEntity> u = userRepository.getUserById(userId);
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,

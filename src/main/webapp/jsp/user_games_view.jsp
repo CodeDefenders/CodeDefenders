@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
@@ -442,6 +443,9 @@
                     <th>Class</th>
                     <th>Attackers</th>
                     <th>Defenders</th>
+                    <c:if test="${auth.admin}">
+                        <th>Observers</th>
+                    </c:if>
                     <th>Level</th>
                 </tr>
             </thead>
@@ -513,6 +517,25 @@
                                         </span>
                                     </form>
                                 </td>
+                                <c:if test="${auth.admin}">
+                                    <td>
+                                        <form id="joinGameForm_observer_<%=gameId%>"
+                                              action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
+                                              method="post">
+                                            <input type="hidden" name="formType" value="joinGame">
+                                            <input type="hidden" name="gameId" value=<%=gameId%>>
+                                            <input type="hidden" name="observer" value=1>
+
+                                            <span class="text-nowrap">
+                                            <button type="submit" id="<%="join-observer-"+gameId%>"
+                                                    class="btn btn-sm btn-info ms-1"
+                                                    value="Join as Observer">
+                                                Spectate
+                                            </button>
+                                        </span>
+                                        </form>
+                                    </td>
+                                </c:if>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
@@ -602,6 +625,9 @@
                     <th>Creator</th>
                     <th>Class</th>
                     <th>Players</th>
+                    <c:if test="${auth.admin}">
+                        <th>Observers</th>
+                    </c:if>
                     <th>Level</th>
                 </tr>
             </thead>
@@ -652,6 +678,24 @@
                                         </span>
                                     </form>
                                 </td>
+                                <c:if test="${auth.admin}">
+                                    <td>
+                                        <form id="joinGameForm_observer_<%=info.gameId()%>"
+                                              action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
+                                            <input type="hidden" name="formType" value="joinGame">
+                                            <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                                            <input type="hidden" name="observer" value=1>
+
+                                            <span class="text-nowrap">
+                                                <button type="submit" id="<%="join-observer-"+info.gameId()%>"
+                                                        class="btn btn-info btn-sm ms-1"
+                                                        value="Join">
+                                                    Spectate
+                                                </button>
+                                            </span>
+                                        </form>
+                                    </td>
+                                </c:if>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">

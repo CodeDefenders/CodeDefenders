@@ -43,7 +43,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -233,20 +232,18 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
         boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
+        boolean observerParamExists = ServletUtils.parameterThenOrOther(request, "observer", true, false);
+
+        // Create the event, publish if successfully joined
+        GameJoinedEvent gje = new GameJoinedEvent();
+        gje.setGameId(game.getId());
+        gje.setUserId(login.getUserId());
+        gje.setUserName(login.getSimpleUser().getName());
 
         if (defenderParamExists) {
             if (game.addPlayer(login.getUserId(), Role.DEFENDER)) {
                 logger.info("User {} joined game {} as a defender.", login.getUserId(), gameId);
-
-                /*
-                 * Publish the event about the user
-                 */
-                GameJoinedEvent gje = new GameJoinedEvent();
-                gje.setGameId(game.getId());
-                gje.setUserId(login.getUserId());
-                gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
-
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as a defender.", login.getUserId(), gameId);
@@ -255,23 +252,29 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         } else if (attackerParamExists) {
             if (game.addPlayer(login.getUserId(), Role.ATTACKER)) {
                 logger.info("User {} joined game {} as an attacker.", login.getUserId(), gameId);
-
-                /*
-                 * Publish the event about the user
-                 */
-                GameJoinedEvent gje = new GameJoinedEvent();
-                gje.setGameId(game.getId());
-                gje.setUserId(login.getUserId());
-                gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
-
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as an attacker.", login.getUserId(), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
+        } else if (observerParamExists) {
+            if (login.isAdmin()) {
+                if (game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    logger.info("User {} joined game {} as an observer.", login.getUserId(), gameId);
+                    notificationService.post(gje);
+                    response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+                } else {
+                    logger.info("User {} failed to join game {} as an observer.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                }
+            } else {
+                logger.info("User {} tried to join game {} as an observer, but is not an admin.", login.getUserId(),
+                        gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
         } else {
-            logger.debug("No 'defender' or 'attacker' request parameter found. Abort request.");
+            logger.debug("No 'defender', 'attacker' or 'observer' request parameter found. Abort request.");
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         }
     }
