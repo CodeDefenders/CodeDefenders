@@ -137,6 +137,8 @@ public class Achievement implements Serializable {
         TOTAL_COVERAGE(12),
         @SerializedName("13")
         MAX_COVERAGE(13),
+        @SerializedName("14")
+        WIN_EQUIVALENCE_DUELS(14),
         ; // format for better git diffs
 
         private final int id;

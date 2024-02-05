@@ -35,6 +35,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
 import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
 import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
@@ -199,6 +200,10 @@ public class AchievementService {
         }
     }
 
+    private void equivalenceDuelWon(int userId) {
+        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS, 1);
+    }
+
     private void updateAchievement(int userId, Achievement.Id achievementId, int metricChange) {
         int affected = repo.updateAchievementForUser(userId, achievementId, metricChange);
         if (affected > 0) {
@@ -342,6 +347,18 @@ public class AchievementService {
         public void handleMutantTestedEvent(MutantTestedEvent event) {
             addMutantCreated(event.getUserId());
             checkNewMutantKilledByTest(event.getMutantId());
+        }
+
+        /**
+         * The {@link EquivalenceDuelWonEvent} is fired when a user has won an equivalence duel.
+         * It is used to count the number of won equivalence duels.
+         *
+         * @param event the event
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleEquivalenceDuelWonEvent(EquivalenceDuelWonEvent event) {
+            equivalenceDuelWon(event.getUserId());
         }
 
         /**

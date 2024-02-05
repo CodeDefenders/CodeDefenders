@@ -40,4 +40,15 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
        (13, 3, 13, 'Large-Scale Tester', 'Cover {0} lines of code using a single test',
         '{0} of {1} lines covered to reach the next level', 25),
        (13, 4, 13, 'All-Encompassing Tester', 'Cover {0} lines of code using a single test',
-        'You wrote a test that covered {0} lines, this is crazy, please stop :o', 100);
+        'You wrote a test that covered {0} lines, this is crazy, please stop :o', 100),
+
+       (14, 0, 14, 'No Duels won', 'Win your first equivalence duel to unlock this achievement',
+        '{0} of {1} equivalence duels won', 0),
+       (14, 1, 14, 'Beginner Duelist', 'Win your first equivalence duel',
+        '{0} of {1} equivalence duels won to reach the next level', 1),
+       (14, 2, 14, 'Bronze Duelist', 'Win {0} equivalence duels',
+        '{0} of {1} equivalence duels won to reach the next level', 5),
+       (14, 3, 14, 'Silver Duelist', 'Win {0} equivalence duels',
+        '{0} of {1} equivalence duels won to reach the next level', 10),
+       (14, 4, 14, 'The Best Duelist', 'Win {0} equivalence duels', '{0} equivalence duels won, max level reached',
+        50);
