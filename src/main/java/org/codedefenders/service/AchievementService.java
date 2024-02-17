@@ -35,6 +35,8 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
 import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
 import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
@@ -204,6 +206,14 @@ public class AchievementService {
         updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS, 1);
     }
 
+    private void equivalenceDuelAttackerWon(int userId) {
+        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS_AS_ATTACKER, 1);
+    }
+
+    private void equivalenceDuelDefenderWon(int userId) {
+        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS_AS_DEFENDER, 1);
+    }
+
     private void updateAchievement(int userId, Achievement.Id achievementId, int metricChange) {
         int affected = repo.updateAchievementForUser(userId, achievementId, metricChange);
         if (affected > 0) {
@@ -350,7 +360,8 @@ public class AchievementService {
         }
 
         /**
-         * The {@link EquivalenceDuelWonEvent} is fired when a user has won an equivalence duel.
+         * The {@link EquivalenceDuelWonEvent} is fired when a user (either attacker or defender)
+         * has won an equivalence duel.
          * It is used to count the number of won equivalence duels.
          *
          * @param event the event
@@ -359,6 +370,30 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleEquivalenceDuelWonEvent(EquivalenceDuelWonEvent event) {
             equivalenceDuelWon(event.getUserId());
+        }
+
+        /**
+         * The {@link EquivalenceDuelAttackerWonEvent} is fired when an attacker has won an equivalence duel.
+         * It is used to count the number of won equivalence duels as attacker.
+         *
+         * @param event the event
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleEquivalenceDuelAttackerWonEvent(EquivalenceDuelAttackerWonEvent event) {
+            equivalenceDuelAttackerWon(event.getUserId());
+        }
+
+        /**
+         * The {@link EquivalenceDuelDefenderWonEvent} is fired when a defender has won an equivalence duel.
+         * It is used to count the number of won equivalence duels as defender.
+         *
+         * @param event the event
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleEquivalenceDuelDefenderWonEvent(EquivalenceDuelDefenderWonEvent event) {
+            equivalenceDuelDefenderWon(event.getUserId());
         }
 
         /**

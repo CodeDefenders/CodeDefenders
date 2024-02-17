@@ -50,5 +50,26 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
         '{0} of {1} equivalence duels won to reach the next level', 5),
        (14, 3, 14, 'Silver Duelist', 'Win {0} equivalence duels',
         '{0} of {1} equivalence duels won to reach the next level', 10),
-       (14, 4, 14, 'The Best Duelist', 'Win {0} equivalence duels', '{0} equivalence duels won, max level reached',
-        50);
+       (14, 4, 14, 'The Best Duelist', 'Win {0} equivalence duels', '{0} equivalence duels won, max level reached', 50),
+
+       (15, 0, 15, 'No Duels won as attacker', 'Win your first equivalence duel as attacker to unlock this achievement',
+        '{0} of {1} equivalence duels won as attacker', 0),
+       (15, 1, 15, 'Prove them wrong!', 'Win your first equivalence duel as attacker',
+        '{0} of {1} equivalence duels won as attacker to reach the next level', 1),
+       (15, 2, 15, 'Bronze Mutant Defender', 'Win {0} equivalence duels as attacker',
+        '{0} of {1} equivalence duels won as attacker to reach the next level', 5),
+       (15, 3, 15, 'Silver Mutant Defender', 'Win {0} equivalence duels as attacker',
+        '{0} of {1} equivalence duels won as attacker to reach the next level', 10),
+       (15, 4, 15, 'The Best Mutant Defender', 'Win {0} equivalence duels as attacker',
+        '{0} equivalence duels won as attacker, max level reached', 30),
+
+       (16, 0, 16, 'No Duels won as defender', 'Win your first equivalence duel as defender to unlock this achievement',
+        '{0} of {1} equivalence duels won as defender', 0),
+       (16, 1, 16, 'Beginner Equivalence Detective', 'Win your first equivalence duel as defender',
+        '{0} of {1} equivalence duels won as defender to reach the next level', 1),
+       (16, 2, 16, 'Bronze Equivalence Detective', 'Win {0} equivalence duels as defender',
+        '{0} of {1} equivalence duels won as defender to reach the next level', 5),
+       (16, 3, 16, 'Silver Equivalence Detective', 'Win {0} equivalence duels as defender',
+        '{0} of {1} equivalence duels won as defender to reach the next level', 10),
+       (16, 4, 16, 'The Best Equivalence Detective', 'Win {0} equivalence duels as defender',
+        '{0} equivalence duels won as defender, max level reached', 30);
