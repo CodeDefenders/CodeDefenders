@@ -1,5 +1,6 @@
 package org.codedefenders.service;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.PuzzleDAO;
@@ -30,6 +32,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
@@ -48,6 +51,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 
+import static java.time.temporal.ChronoUnit.MINUTES;
+
 /**
  * Service for achievements. Handles updating the achievements for users.
  */
@@ -58,6 +63,7 @@ public class AchievementService {
     private static final Logger logger = LoggerFactory.getLogger(AchievementService.class);
     private final AchievementRepository repo;
     private final TestSmellsDAO testSmellsDAO;
+    private final EventDAO eventDAO;
     private final INotificationService notificationService;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
@@ -68,13 +74,16 @@ public class AchievementService {
      *
      * @param achievementRepository the repository for achievements
      * @param testSmellsDAO         the DAO for test smells
+     * @param eventDAO              the DAO for events, only used for getting the number of tests written in the last
+     *                              2 minutes, not for event handling.
      * @param notificationService   the notification service
      */
     @Inject
     public AchievementService(AchievementRepository achievementRepository, TestSmellsDAO testSmellsDAO,
-                              INotificationService notificationService) {
+                              EventDAO eventDAO, INotificationService notificationService) {
         repo = achievementRepository;
         this.testSmellsDAO = testSmellsDAO;
+        this.eventDAO = eventDAO;
         this.notificationService = notificationService;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
@@ -150,6 +159,16 @@ public class AchievementService {
 
     private void addTestWritten(int userId) {
         updateAchievement(userId, Achievement.Id.WRITE_TESTS, 1);
+    }
+
+    private void checkAmountOfRecentTests(int userId, int gameId) {
+        final long twoMinAgo = Instant.now().minus(2, MINUTES).toEpochMilli();
+        final long testCount = eventDAO.getEventsForGame(gameId).stream()
+                .filter(event -> event.getUserId() == userId)
+                .filter(event -> event.getEventType() == EventType.DEFENDER_TEST_CREATED)
+                .filter(event -> event.getTimestamp() > twoMinAgo)
+                .count();
+        setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, (int) testCount);
     }
 
     private void addMutantCreated(int userId) {
@@ -346,6 +365,7 @@ public class AchievementService {
             checkTestSmells(event.getUserId(), event.getTestId());
             checkOldMutantsKilledByTest(event.getUserId(), event.getTestId());
             checkCoverage(event.getUserId(), event.getTestId());
+            checkAmountOfRecentTests(event.getUserId(), event.getGameId());
         }
 
         /**

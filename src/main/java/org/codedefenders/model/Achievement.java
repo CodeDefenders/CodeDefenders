@@ -143,6 +143,8 @@ public class Achievement implements Serializable {
         WIN_EQUIVALENCE_DUELS_AS_ATTACKER(15),
         @SerializedName("16")
         WIN_EQUIVALENCE_DUELS_AS_DEFENDER(16),
+        @SerializedName("17")
+        MAX_TESTS_IN_SHORT_TIME(17),
         ; // format for better git diffs
 
         private final int id;

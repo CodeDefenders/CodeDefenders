@@ -72,4 +72,15 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
        (16, 3, 16, 'Silver Equivalence Detective', 'Win {0} equivalence duels as defender',
         '{0} of {1} equivalence duels won as defender to reach the next level', 10),
        (16, 4, 16, 'The Best Equivalence Detective', 'Win {0} equivalence duels as defender',
-        '{0} equivalence duels won as defender, max level reached', 30);
+        '{0} equivalence duels won as defender, max level reached', 30),
+
+       (17, 0, 17, 'Not enough tests written in 2 minutes', 'Write two tests in 2 minutes to unlock this achievement',
+        '{0} of {1} tests written in 2 minutes', 0),
+       (17, 1, 17, 'Speedy Tester', 'Write {0} tests in 2 minutes',
+        '{0} of {1} tests written in 2 minutes to reach the next level', 2),
+       (17, 2, 17, 'Bronze Speedy Tester', 'Write {0} tests in 2 minutes',
+        '{0} of {1} tests written in 2 minutes to reach the next level', 5),
+       (17, 3, 17, 'Silver Speedy Tester', 'Write {0} tests in 2 minutes',
+        '{0} of {1} tests written in 2 minutes to reach the next level', 10),
+       (17, 4, 17, 'The Fastest Tester', 'Write {0} tests in 2 minutes',
+        '{0} tests written in 2 minutes, max level reached', 25);
