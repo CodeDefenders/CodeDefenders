@@ -163,10 +163,8 @@ public class AchievementService {
 
     private void checkAmountOfRecentTests(int userId, int gameId) {
         final long twoMinAgo = Instant.now().minus(2, MINUTES).toEpochMilli();
-        final long testCount = eventDAO.getEventsForGame(gameId).stream()
-                .filter(event -> event.getUserId() == userId)
+        final long testCount = eventDAO.getNewEventsForGameAndUser(gameId, twoMinAgo, userId).stream()
                 .filter(event -> event.getEventType() == EventType.DEFENDER_TEST_CREATED)
-                .filter(event -> event.getTimestamp() > twoMinAgo)
                 .count();
         setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, (int) testCount);
     }

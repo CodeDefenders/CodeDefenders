@@ -162,4 +162,22 @@ public class EventDAO {
 
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
     }
+
+    public List<Event> getNewEventsForGameAndUser(int gameId, long timestamp, int userId) {
+        @Language("SQL") String query = """
+                        SELECT *
+                        FROM events
+                        LEFT JOIN event_messages AS em
+                          ON events.Event_Type = em.Event_Type
+                        WHERE Game_ID=?
+                          AND Event_Status=?
+                          AND Timestamp >= FROM_UNIXTIME(?)
+                          AND Player_ID = ?
+                """;
+
+        DatabaseValue<?>[] values = new DatabaseValue[] {DatabaseValue.of(gameId),
+                DatabaseValue.of(EventStatus.GAME.toString()), DatabaseValue.of(timestamp), DatabaseValue.of(userId)};
+
+        return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
+    }
 }
