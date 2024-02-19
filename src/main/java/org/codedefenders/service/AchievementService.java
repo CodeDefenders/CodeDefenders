@@ -32,7 +32,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Achievement;
-import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
@@ -52,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.eventbus.Subscribe;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.codedefenders.model.EventType.DEFENDER_TEST_CREATED;
+import static org.codedefenders.model.EventType.PLAYER_TEST_CREATED;
 
 /**
  * Service for achievements. Handles updating the achievements for users.
@@ -164,7 +165,7 @@ public class AchievementService {
     private void checkAmountOfRecentTests(int userId, int gameId) {
         final long twoMinAgo = Instant.now().minus(2, MINUTES).toEpochMilli();
         final long testCount = eventDAO.getNewEventsForGameAndUser(gameId, twoMinAgo, userId).stream()
-                .filter(event -> event.getEventType() == EventType.DEFENDER_TEST_CREATED)
+                .filter(event -> List.of(DEFENDER_TEST_CREATED, PLAYER_TEST_CREATED).contains(event.getEventType()))
                 .count();
         setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, (int) testCount);
     }
