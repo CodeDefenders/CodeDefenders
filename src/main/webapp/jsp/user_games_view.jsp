@@ -530,7 +530,7 @@
                                             <button type="submit" id="<%="join-observer-"+gameId%>"
                                                     class="btn btn-sm btn-info ms-1"
                                                     value="Join as Observer">
-                                                Spectate
+                                                Observe
                                             </button>
                                         </span>
                                         </form>
@@ -690,7 +690,7 @@
                                                 <button type="submit" id="<%="join-observer-"+info.gameId()%>"
                                                         class="btn btn-info btn-sm ms-1"
                                                         value="Join">
-                                                    Spectate
+                                                    Observe
                                                 </button>
                                             </span>
                                         </form>

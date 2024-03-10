@@ -1002,7 +1002,7 @@
                             <button type="submit" id="join-observer-\${data.gameId}"
                                     class="btn btn-sm btn-info ms-1"
                                     title="Join as Observer">
-                                <i class="fa fa-external-link text-primary"></i> Spectate
+                                <i class="fa fa-external-link text-primary"></i> Observe
                             </button>
                         </span>
                     </form>
