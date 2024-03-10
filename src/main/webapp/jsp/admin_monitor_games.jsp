@@ -127,6 +127,14 @@
                                    href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gid%>">
                                     Observe
                                 </a>
+                            <% } else { %>
+                            <span class="text-nowrap">
+                                    <button type="submit" form="joinGameForm_observer_<%=gid%>"
+                                            class="btn btn-sm btn-info"
+                                            value="Join as Observer">
+                                        Join as Observer
+                                    </button>
+                                </span>
                             <% } %>
                         </td>
                         <td>
@@ -357,6 +365,14 @@
                                    href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gid%>">
                                     Observe
                                 </a>
+                            <% } else { %>
+                            <span class="text-nowrap">
+                                    <button type="submit" form="joinGameForm_observer_<%=g.getId()%>"
+                                            class="btn btn-info btn-sm"
+                                            value="Join">
+                                        Join as Observer
+                                    </button>
+                                </span>
                             <% } %>
                         </td>
                         <td>
@@ -516,6 +532,36 @@
             </div>
         <% } %>
     </form>
+
+
+    <%--
+    Forms to join games as observer.
+    They have to be placed outside of the table, because the table itself is wrapped in a form.
+    --%>
+
+    <% for (MultiplayerGame g : multiplayerGames) { %>
+    <% if (g.getRole(login.getUserId()) == Role.NONE) { %>
+    <form id="joinGameForm_observer_<%=g.getId()%>"
+          action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
+          method="post">
+        <input type="hidden" name="formType" value="joinGame">
+        <input type="hidden" name="gameId" value=<%=g.getId()%>>
+        <input type="hidden" name="observer" value=1>
+    </form>
+    <% } %>
+    <% } %>
+
+    <% for (MeleeGame g : meleeGames) { %>
+    <% if (g.getRole(login.getUserId()) == Role.NONE) { %>
+    <form id="joinGameForm_observer_<%=g.getId()%>"
+          action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
+        <input type="hidden" name="formType" value="joinGame">
+        <input type="hidden" name="gameId" value=<%=g.getId()%>>
+        <input type="hidden" name="observer" value=1>
+    </form>
+    <% } %>
+    <% } %>
+
 
     <script type="module">
         import $ from '${url.forPath("/js/jquery.mjs")}';
