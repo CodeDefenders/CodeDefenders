@@ -34,6 +34,7 @@
 <%@ page import="java.util.Comparator" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.game.Role" %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
 <% pageInfo.setPageTitle("My Games"); %>
@@ -130,7 +131,9 @@
                             <td><%=info.gameLevel().getFormattedString()%></td>
                             <td>
                                 <%
-                                    if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+                                    if (info.gameState() == GameState.CREATED
+                                            &&
+                                            (info.userRole() == Role.OBSERVER || info.creatorId() == info.userId())) {
                                 %>
                                     <form id="adminStartBtn-<%=gameId%>"
                                           action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
@@ -210,14 +213,12 @@
                                             }
                                             break;
                                         case OBSERVER:
-                                            if (info.creatorId() == info.userId()) {
                                 %>
                                     <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
                                        href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%= gameId %>">
                                         Observe battleground
                                     </a>
                                 <%
-                                            }
                                             break;
                                         default:
                                             break;
@@ -323,7 +324,9 @@
                                 <td><%=info.gameLevel().getFormattedString()%></td>
                                 <td>
                                     <%
-                                        if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+                                        if (info.gameState() == GameState.CREATED
+                                                && (info.userRole() == Role.OBSERVER ||
+                                                info.creatorId() == info.userId())) {
                                     %>
                                         <form id="adminStartBtn-<%=gameId%>"
                                               action="${url.forPath(Paths.MELEE_SELECTION)}"
