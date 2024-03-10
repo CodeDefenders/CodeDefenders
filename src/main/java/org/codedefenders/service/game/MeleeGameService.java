@@ -115,7 +115,7 @@ public class MeleeGameService extends AbstractGameService {
 
     @Override
     protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user, Role playerRole) {
-        return playerRole != Role.NONE
+        return playerRole == Role.PLAYER
                 && game.getState() == GameState.ACTIVE
                 && mutant.getState() == State.ALIVE
                 && mutant.getEquivalent() == Equivalence.ASSUMED_NO

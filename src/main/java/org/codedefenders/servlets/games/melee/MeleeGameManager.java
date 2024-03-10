@@ -54,6 +54,7 @@ import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.AttackerIntention;
@@ -252,6 +253,12 @@ public class MeleeGameManager extends HttpServlet {
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED || gameRepo.isGameExpired(gameId);
         final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
+
+        if (!isGameClosed && game.getRole(login.getUserId()) == Role.PLAYER) {
+            Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());
+            request.setAttribute("previousTest", prevTest);
+        }
+
         request.getRequestDispatcher(jspPath).forward(request, response);
     }
 

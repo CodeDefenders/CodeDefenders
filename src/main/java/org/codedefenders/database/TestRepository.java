@@ -145,6 +145,23 @@ public class TestRepository {
         }
     }
 
+    public Test getLatestTestForGameAndUser(int gameId, int userId)
+            throws UncheckedSQLException, SQLMappingException {
+        @Language("SQL") String query = """
+                        SELECT * FROM tests
+                        LEFT JOIN players ON players.ID = tests.Player_ID
+                        LEFT JOIN users ON players.User_ID = users.User_ID
+                        WHERE tests.Game_ID = ?
+                          AND players.User_ID = ?
+                        ORDER BY tests.Timestamp DESC
+                        LIMIT 1;
+                """;
+        return DB.executeQueryReturnValue(query,
+                TestRepository::testFromRS,
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId));
+    }
+
 
     /**
      * Returns the {@link Test Tests} from the given game for the given player.

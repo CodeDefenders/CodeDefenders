@@ -87,8 +87,10 @@ public class PlayerRepository {
         boolean userActive = rs.getBoolean("usersActive");
         boolean allowContact = rs.getBoolean("usersAllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("usersKeyMap"));
+        boolean keepPreviousTest = rs.getBoolean("usersKeepPreviousTest");
 
-        final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact, keyMap);
+        final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact,
+                keyMap, keepPreviousTest);
 
         return new Player(id, user, gameId, points, role, active);
     }

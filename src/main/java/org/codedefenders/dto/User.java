@@ -35,15 +35,17 @@ public class User extends SimpleUser {
     private final boolean contactingAllowed;
 
     private final KeyMap keyMap;
+    private final boolean keepPreviousTest;
 
     public User(int id, String name, boolean active, String email, boolean emailValidated,
-            boolean contactingAllowed, KeyMap keyMap) {
+                boolean contactingAllowed, KeyMap keyMap, boolean keepPreviousTest) {
         super(id, name);
         this.active = active;
         this.email = email;
         this.emailValidated = emailValidated;
         this.contactingAllowed = contactingAllowed;
         this.keyMap = keyMap;
+        this.keepPreviousTest = keepPreviousTest;
     }
 
     public boolean isActive() {
@@ -64,6 +66,10 @@ public class User extends SimpleUser {
 
     public KeyMap getKeyMap() {
         return keyMap;
+    }
+
+    public boolean getKeepPreviousTest() {
+        return keepPreviousTest;
     }
 
     @Override

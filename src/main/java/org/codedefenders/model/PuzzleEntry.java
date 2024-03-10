@@ -44,21 +44,25 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
         GAME
     }
 
-    private Type type;
+    private final Type type;
 
-    private Puzzle puzzle;
+    private final Puzzle puzzle;
+    private final PuzzleGame game;
+
     private boolean locked;
-    private PuzzleGame game;
+    private boolean solved;
 
     /**
      * Constructs a new puzzle entry for a given puzzle and locked status.
      *
      * @param puzzle the puzzle of this entry.
      * @param locked the locked status of this puzzle.
+     * @param solved whether the puzzle is solved or not.
      */
-    public PuzzleEntry(Puzzle puzzle, boolean locked) {
+    public PuzzleEntry(Puzzle puzzle, boolean locked, boolean solved) {
         this.puzzle = puzzle;
         this.locked = locked;
+        this.solved = solved;
 
         this.type = Type.PUZZLE;
         this.game = null;
@@ -68,9 +72,11 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
      * Constructs a new puzzle entry for a given puzzle game.
      *
      * @param game the puzzle game of this entry.
+     * @param solved whether the puzzle is solved or not.
      */
-    public PuzzleEntry(PuzzleGame game) {
+    public PuzzleEntry(PuzzleGame game, boolean solved) {
         this.game = game;
+        this.solved = solved;
 
         this.type = Type.GAME;
         this.puzzle = null;
@@ -104,11 +110,22 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
         return null;
     }
 
+    public void lock() {
+        if (this.type != Type.PUZZLE) {
+            throw new IllegalStateException();
+        }
+        this.locked = true;
+    }
+
     public boolean isLocked() {
         if (this.type != Type.PUZZLE) {
             throw new IllegalStateException();
         }
         return locked;
+    }
+
+    public boolean isSolved() {
+        return solved;
     }
 
     public PuzzleGame getGame() {
