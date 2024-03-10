@@ -325,8 +325,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can start the game.");
+        if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the game's creator or an observer can start the game.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -344,8 +344,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can end the game.");
+        if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the game's creator or an observer can end the game.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -365,7 +365,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame oldGame = gameProducer.getMeleeGame();
 
-        if (login.getUser().getId() != oldGame.getCreatorId()) {
+        if (login.getUser().getId() != oldGame.getCreatorId() && oldGame.getRole(login.getUserId()) != Role.OBSERVER) {
             messages.add("Only the creator of this game can call a rematch.");
             Redirect.redirectBack(request, response);
             return;
@@ -383,8 +383,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MeleeGame game = gameProducer.getMeleeGame();
 
-        if (login.getUser().getId() != game.getCreatorId()) {
-            messages.add("Only the creator of this game can change its duration.");
+        if (login.getUser().getId() != game.getCreatorId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the creator or an observer of this game can change its duration.");
             Redirect.redirectBack(request, response);
             return;
         }
