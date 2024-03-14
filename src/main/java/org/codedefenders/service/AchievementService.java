@@ -166,7 +166,7 @@ public class AchievementService {
     }
 
     private int getAmountOfRecentEvents(int userId, int gameId, List<EventType> events) {
-        final long fiveMinAgo = Instant.now().minus(5, MINUTES).toEpochMilli();
+        final long fiveMinAgo = Instant.now().minus(5, MINUTES).toEpochMilli() / 1_000;
         final long amount = eventDAO.getNewEventsForGameAndUser(gameId, fiveMinAgo, userId).stream()
                 .filter(event -> events.contains(event.getEventType()))
                 .count();
