@@ -32,6 +32,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
@@ -162,12 +163,18 @@ public class AchievementService {
         updateAchievement(userId, Achievement.Id.WRITE_TESTS, 1);
     }
 
-    private void checkAmountOfRecentTests(int userId, int gameId) {
-        final long twoMinAgo = Instant.now().minus(2, MINUTES).toEpochMilli();
-        final long testCount = eventDAO.getNewEventsForGameAndUser(gameId, twoMinAgo, userId).stream()
-                .filter(event -> List.of(DEFENDER_TEST_CREATED, PLAYER_TEST_CREATED).contains(event.getEventType()))
+    private int getAmountOfRecentEvents(int userId, int gameId, List<EventType> events) {
+        final long fiveMinAgo = Instant.now().minus(5, MINUTES).toEpochMilli();
+        final long amount = eventDAO.getNewEventsForGameAndUser(gameId, fiveMinAgo, userId).stream()
+                .filter(event -> events.contains(event.getEventType()))
                 .count();
-        setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, (int) testCount);
+        return (int) amount;
+    }
+
+    private void checkAmountOfRecentTests(int userId, int gameId) {
+        final int testCount =
+                getAmountOfRecentEvents(userId, gameId, List.of(DEFENDER_TEST_CREATED, PLAYER_TEST_CREATED));
+        setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, testCount);
     }
 
     private void addMutantCreated(int userId) {
