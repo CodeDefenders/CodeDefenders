@@ -52,7 +52,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.eventbus.Subscribe;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static org.codedefenders.model.EventType.ATTACKER_MUTANT_CREATED;
 import static org.codedefenders.model.EventType.DEFENDER_TEST_CREATED;
+import static org.codedefenders.model.EventType.PLAYER_MUTANT_CREATED;
 import static org.codedefenders.model.EventType.PLAYER_TEST_CREATED;
 
 /**
@@ -175,6 +177,12 @@ public class AchievementService {
         final int testCount =
                 getAmountOfRecentEvents(userId, gameId, List.of(DEFENDER_TEST_CREATED, PLAYER_TEST_CREATED));
         setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, testCount);
+    }
+
+    private void checkAmountOfRecentMutants(int userId, int gameId) {
+        final int mutantCount =
+                getAmountOfRecentEvents(userId, gameId, List.of(ATTACKER_MUTANT_CREATED, PLAYER_MUTANT_CREATED));
+        setAchievementMax(userId, Achievement.Id.MAX_MUTANTS_IN_SHORT_TIME, mutantCount);
     }
 
     private void addMutantCreated(int userId) {
@@ -383,6 +391,7 @@ public class AchievementService {
         public void handleMutantTestedEvent(MutantTestedEvent event) {
             addMutantCreated(event.getUserId());
             checkNewMutantKilledByTest(event.getMutantId());
+            checkAmountOfRecentMutants(event.getUserId(), event.getGameId());
         }
 
         /**

@@ -84,3 +84,15 @@ VALUES (10, 0, 10, 'No smell free tests written', 'Write a test without test sme
         '{0} of {1} tests written in 5 minutes to reach the next level', 10),
        (17, 4, 17, 'The Fastest Tester', 'Write {0} tests in 5 minutes',
         '{0} tests written in 5 minutes, max level reached', 25),
+
+       (18, 0, 18, 'Not enough mutants created in 5 minutes',
+        'Create five mutants in 5 minutes to unlock this achievement',
+        '{0} of {1} mutants created in 5 minutes', 0),
+       (18, 1, 18, 'Speedy Mutant Creator', 'Create {0} mutants in 5 minutes',
+        '{0} of {1} mutants created in 5 minutes to reach the next level', 5),
+       (18, 2, 18, 'Bronze Speedy Mutator', 'Create {0} mutants in 5 minutes',
+        '{0} of {1} mutants created in 5 minutes to reach the next level', 10),
+       (18, 3, 18, 'Silver Speedy Mutator', 'Create {0} mutants in 5 minutes',
+        '{0} of {1} mutants created in 5 minutes to reach the next level', 20),
+       (18, 4, 18, 'The Fastest Mutator', 'Create {0} mutants in 5 minutes',
+        '{0} mutants created in 5 minutes, max level reached', 50);
