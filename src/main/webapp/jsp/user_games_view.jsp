@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
@@ -33,6 +34,7 @@
 <%@ page import="java.util.Comparator" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.game.Role" %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
 <% pageInfo.setPageTitle("My Games"); %>
@@ -129,7 +131,9 @@
                             <td><%=info.gameLevel().getFormattedString()%></td>
                             <td>
                                 <%
-                                    if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+                                    if (info.gameState() == GameState.CREATED
+                                            &&
+                                            (info.userRole() == Role.OBSERVER || info.creatorId() == info.userId())) {
                                 %>
                                     <form id="adminStartBtn-<%=gameId%>"
                                           action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
@@ -209,14 +213,12 @@
                                             }
                                             break;
                                         case OBSERVER:
-                                            if (info.creatorId() == info.userId()) {
                                 %>
                                     <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
                                        href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%= gameId %>">
                                         Observe battleground
                                     </a>
                                 <%
-                                            }
                                             break;
                                         default:
                                             break;
@@ -322,7 +324,9 @@
                                 <td><%=info.gameLevel().getFormattedString()%></td>
                                 <td>
                                     <%
-                                        if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+                                        if (info.gameState() == GameState.CREATED
+                                                && (info.userRole() == Role.OBSERVER ||
+                                                info.creatorId() == info.userId())) {
                                     %>
                                         <form id="adminStartBtn-<%=gameId%>"
                                               action="${url.forPath(Paths.MELEE_SELECTION)}"
@@ -442,6 +446,9 @@
                     <th>Class</th>
                     <th>Attackers</th>
                     <th>Defenders</th>
+                    <c:if test="${auth.admin}">
+                        <th>Observers</th>
+                    </c:if>
                     <th>Level</th>
                 </tr>
             </thead>
@@ -513,6 +520,25 @@
                                         </span>
                                     </form>
                                 </td>
+                                <c:if test="${auth.admin}">
+                                    <td>
+                                        <form id="joinGameForm_observer_<%=gameId%>"
+                                              action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
+                                              method="post">
+                                            <input type="hidden" name="formType" value="joinGame">
+                                            <input type="hidden" name="gameId" value=<%=gameId%>>
+                                            <input type="hidden" name="observer" value=1>
+
+                                            <span class="text-nowrap">
+                                            <button type="submit" id="<%="join-observer-"+gameId%>"
+                                                    class="btn btn-sm btn-info ms-1"
+                                                    value="Join as Observer">
+                                                Observe
+                                            </button>
+                                        </span>
+                                        </form>
+                                    </td>
+                                </c:if>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
@@ -602,6 +628,9 @@
                     <th>Creator</th>
                     <th>Class</th>
                     <th>Players</th>
+                    <c:if test="${auth.admin}">
+                        <th>Observers</th>
+                    </c:if>
                     <th>Level</th>
                 </tr>
             </thead>
@@ -652,6 +681,24 @@
                                         </span>
                                     </form>
                                 </td>
+                                <c:if test="${auth.admin}">
+                                    <td>
+                                        <form id="joinGameForm_observer_<%=info.gameId()%>"
+                                              action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
+                                            <input type="hidden" name="formType" value="joinGame">
+                                            <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                                            <input type="hidden" name="observer" value=1>
+
+                                            <span class="text-nowrap">
+                                                <button type="submit" id="<%="join-observer-"+info.gameId()%>"
+                                                        class="btn btn-info btn-sm ms-1"
+                                                        value="Join">
+                                                    Observe
+                                                </button>
+                                            </span>
+                                        </form>
+                                    </td>
+                                </c:if>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">

@@ -19,7 +19,6 @@
 
 package org.codedefenders.service.game;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
@@ -172,11 +171,9 @@ public class MultiplayerGameService extends AbstractGameService {
             return false;
         }
 
-        // Add selected role to game if the creator participates as attacker/defender
-        if (creatorRole.equals(Role.ATTACKER) || creatorRole.equals(Role.DEFENDER)) {
-            if (!game.addPlayer(login.getUserId(), creatorRole)) {
-                return false;
-            }
+        // Add selected role to game (creator can participate as attacker/defender or just observe)
+        if (!game.addPlayer(login.getUserId(), creatorRole)) {
+            return false;
         }
 
         if (!gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests)) {
@@ -220,6 +217,7 @@ public class MultiplayerGameService extends AbstractGameService {
         boolean withTests = gameManagingUtils.hasPredefinedTests(game);
         Role creatorRole = game.getRole(game.getCreatorId());
 
+        // TODO: shouldn't the creator switch sides as well?
         if (!createGame(newGame, withMutants, withTests, creatorRole)) {
             return Optional.empty();
         }
@@ -236,6 +234,12 @@ public class MultiplayerGameService extends AbstractGameService {
                 if (!newGame.addPlayer(player.getUser().getId(), Role.ATTACKER)) {
                     return Optional.empty();
                 }
+            }
+        }
+        for (Player observer : game.getObserverPlayers()) {
+            // creator is already added by MultiplayerGameService#createGame
+            if (observer.getUser().getId() != game.getCreatorId()) {
+                newGame.addPlayer(observer.getUser().getId(), observer.getRole());
             }
         }
 

@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games.melee;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -36,41 +37,38 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.ClassroomMember;
+import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.MeleeGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * This {@link HttpServlet} handles selection of {@link MeleeGame games}.
@@ -113,6 +111,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private ClassroomService classroomService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -233,34 +234,56 @@ public class MeleeGameSelectionManager extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
             return;
         }
-        if (game.addPlayer(login.getUserId(), Role.PLAYER)) {
-            logger.info("User {} joined game {}.", login.getUserId(), gameId);
 
-            /*
-             * Publish the event about the user
-             */
-            GameJoinedEvent gje = new GameJoinedEvent();
-            gje.setGameId(game.getId());
-            gje.setUserId(login.getUserId());
-            gje.setUserName(login.getSimpleUser().getName());
-            notificationService.post(gje);
+        boolean observerParamExists = ServletUtils.parameterThenOrOther(request, "observer", true, false);
 
-            // TODO The following notification is duplicated as MeleeGame.addPlayer also trigger that.
-            // I leave it here because I believe the problem is having notifications inside DataObjects like MeleeGame.
-            // Note that MeleeGame has more than one notification.
+        // Create the event, publish if successfully joined
+        GameJoinedEvent gje = new GameJoinedEvent();
+        gje.setGameId(game.getId());
+        gje.setUserId(login.getUserId());
+        gje.setUserName(login.getSimpleUser().getName());
 
-            // final EventType notifType = EventType.PLAYER_JOINED;
-            // final String message = "You successfully joined the game.";
-            // final EventStatus eventStatus = EventStatus.NEW;
-            // final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            // Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-            // eventDAO.insert(notif);
-
-            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+        if (observerParamExists) {
+            if (login.isAdmin() || isClassroomModeratorForGame(game)) {
+                if (game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    logger.info("User {} joined game {} as observer.", login.getUserId(), gameId);
+                    notificationService.post(gje);
+                    response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+                } else {
+                    logger.info("User {} failed to join game {} as observer.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                }
+            } else {
+                logger.info("User {} tried to join game {} as an observer, but is not an admin.", login.getUserId(),
+                        gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
         } else {
-            logger.info("User {} failed to join game {}.", login.getUserId(), gameId);
-            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            if (game.addPlayer(login.getUserId(), Role.PLAYER)) {
+                logger.info("User {} joined game {} as player.", login.getUserId(), gameId);
+                notificationService.post(gje);
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+            } else {
+                logger.info("User {} failed to join game {}.", login.getUserId(), gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
         }
+    }
+
+    /**
+     * Checks if the user is a moderator or owner of the classroom the game is associated with.
+     *
+     * @param game The game to check for.
+     * @return True if the user is a moderator or higher, false otherwise.
+     */
+    private boolean isClassroomModeratorForGame(MeleeGame game) {
+        return game.getClassroomId()
+                .map(classroomService::getMembersForClassroom)
+                .orElse(List.of())
+                .stream()
+                .filter(member -> member.getUserId() == login.getUserId())
+                .map(ClassroomMember::getRole)
+                .anyMatch(role -> role == ClassroomRole.MODERATOR || role == ClassroomRole.OWNER);
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -302,8 +325,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can start the game.");
+        if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the game's creator or an observer can start the game.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -321,8 +344,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can end the game.");
+        if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the game's creator or an observer can end the game.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -342,7 +365,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame oldGame = gameProducer.getMeleeGame();
 
-        if (login.getUser().getId() != oldGame.getCreatorId()) {
+        if (login.getUser().getId() != oldGame.getCreatorId() && oldGame.getRole(login.getUserId()) != Role.OBSERVER) {
             messages.add("Only the creator of this game can call a rematch.");
             Redirect.redirectBack(request, response);
             return;
@@ -360,8 +383,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MeleeGame game = gameProducer.getMeleeGame();
 
-        if (login.getUser().getId() != game.getCreatorId()) {
-            messages.add("Only the creator of this game can change its duration.");
+        if (login.getUser().getId() != game.getCreatorId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
+            messages.add("Only the creator or an observer of this game can change its duration.");
             Redirect.redirectBack(request, response);
             return;
         }
