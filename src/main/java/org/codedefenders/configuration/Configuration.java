@@ -204,7 +204,7 @@ public class Configuration {
             if (dbHost == null || dbHost.equals("")) {
                 validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
                 dbvalid = false;
-            } else { //noinspection UnstableApiUsage
+            } else {
                 if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
                     validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
                             + " is neither a valid ip nor a valid hostname");

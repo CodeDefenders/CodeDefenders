@@ -178,7 +178,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     }
 
     private boolean invalidIP(String ip) {
-        //noinspection UnstableApiUsage
         return (ip == null)
                 || (ip.length() == 0)
                 || ("unknown".equalsIgnoreCase(ip))

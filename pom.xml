@@ -6,7 +6,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<powermock.version>2.0.9</powermock.version>
-		<tomcat.version>9.0.35</tomcat.version>
+		<tomcat.version>9.0.43</tomcat.version>
 		<slf4j.version>1.7.36</slf4j.version>
 		<junit5.version>5.10.0</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
@@ -785,14 +785,18 @@
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-servlet-plugin</artifactId>
-			<version>1.8.0</version>
+			<version>1.13.0</version>
+			<!-- When migrating from the javax to the jakarta namespace we need to add the classifier here -->
+			<!--
+			<classifier>jakarta</classifier>
+			-->
 		</dependency>
 
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
 			<artifactId>weld-servlet-core</artifactId>
-			<version>3.1.8.Final</version>
+			<version>3.1.9.Final</version>
 		</dependency>
 
 		<!-- Logging -->
@@ -833,22 +837,22 @@
 		<dependency>
 			<groupId>net.bull.javamelody</groupId>
 			<artifactId>javamelody-core</artifactId>
-			<version>1.91.0</version>
+			<version>1.98.0</version>
 		</dependency>
 
 		<!-- Annotations -->
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>13.0</version>
+			<version>24.1.0</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<!-- Begin Misc Dependencies -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.29</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>8.3.0</version>
 		</dependency>
 
 		<!-- Server side validation -->
@@ -860,22 +864,24 @@
 
 		<dependency>
 			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-			<version>7.15.0</version>
+			<artifactId>flyway-mysql</artifactId>
+			<!-- NOTE: Before updating: Check that this is compatible with our supported MySQL/MariaDB Versions -->
+			<version>9.15.1</version>
 		</dependency>
+
 
 		<!-- BCrypt password hashing -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
-			<version>5.7.1</version>
+			<version>5.7.7</version>
 		</dependency>
 
 		<!-- ReflectionUtils -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>5.3.20</version>
+			<version>5.3.25</version>
 		</dependency>
 
 		<dependency>
@@ -888,14 +894,14 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>31.0.1-jre</version>
+			<version>31.1-jre</version>
 		</dependency>
 
 		<!-- JSON serialization -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.8.9</version>
+			<version>2.10.1</version>
 		</dependency>
 
 		<!-- Test Smell Detector. Local dependency -->
@@ -910,7 +916,7 @@
 		<dependency>
 			<groupId>io.github.java-diff-utils</groupId>
 			<artifactId>java-diff-utils</artifactId>
-			<version>4.11</version>
+			<version>4.12</version>
 		</dependency>
 
 		<dependency>
@@ -922,13 +928,13 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.27.0-GA</version>
+			<version>3.29.2-GA</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-core</artifactId>
-			<version>3.24.10</version>
+			<version>3.25.1</version>
 		</dependency>
 
 		<dependency>
@@ -952,7 +958,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-			<version>1.9.0</version>
+			<version>1.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbutils</groupId>
@@ -962,7 +968,7 @@
 		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.4</version>
+			<version>1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -977,12 +983,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.9</version>
+			<version>1.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.15</version>
+			<version>4.4.16</version>
 		</dependency>
 		<!-- End Commons Libraries -->
 
@@ -1000,21 +1006,21 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.webjars</groupId>
+			<groupId>org.webjars.npm</groupId>
 			<artifactId>codemirror</artifactId>
-			<version>5.22.0</version>
+			<version>5.65.2</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables</artifactId>
-			<version>1.10.24</version>
+			<version>1.11.4</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables-select</artifactId>
-			<version>1.3.3</version>
+			<version>1.3.4</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- End Client Side Dependencies -->
@@ -1123,19 +1129,19 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>2.13.1</version>
+			<version>2.14.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-guava</artifactId>
-			<version>2.13.1</version>
+			<version>2.14.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
-			<version>2.13.1</version>
+			<version>2.14.2</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- End Integration/System Test Dependencies -->
