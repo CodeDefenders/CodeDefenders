@@ -121,7 +121,7 @@
         <div class="d-flex flex-wrap align-items-center gap-2">
 
             <%
-                if (game.getCreatorId() == login.getUserId()) {
+                if (game.getCreatorId() == login.getUserId() || role == Role.OBSERVER) {
                     if (game.getState() == GameState.ACTIVE) {
             %>
                     <div>
@@ -186,10 +186,11 @@
             %>
 
             <%
-                final boolean isCreator = game.getCreatorId() == login.getUserId();
-                if (game.getState() == GameState.ACTIVE || (game.getState() == GameState.CREATED && isCreator)) {
+                final boolean isCreatorOrObserver = game.getCreatorId() == login.getUserId() || role == Role.OBSERVER;
+                if (game.getState() == GameState.ACTIVE ||
+                        (game.getState() == GameState.CREATED && isCreatorOrObserver)) {
                     request.setAttribute("selectionManagerUrl", selectionManagerUrl);
-                    request.setAttribute("canSetDuration", isCreator);
+                    request.setAttribute("canSetDuration", isCreatorOrObserver);
                     request.setAttribute("duration", duration);
                     request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
                             AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());

@@ -176,9 +176,7 @@ public class CreateGamesService {
 
         /* Add users to the game. */
         if (gameSettings.getGameType() == MULTIPLAYER) {
-            if (gameSettings.getCreatorRole() == Role.ATTACKER || gameSettings.getCreatorRole() == Role.DEFENDER) {
-                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
-            }
+            game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
             for (int userId : stagedGame.getAttackers()) {
                 game.addPlayer(userId, Role.ATTACKER);
             }
@@ -186,9 +184,7 @@ public class CreateGamesService {
                 game.addPlayer(userId, Role.DEFENDER);
             }
         } else if (gameSettings.getGameType() == MELEE) {
-            if (gameSettings.getCreatorRole() == Role.PLAYER) {
-                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
-            }
+            game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
             for (int userId : stagedGame.getPlayers()) {
                 game.addPlayer(userId, Role.PLAYER);
             }
