@@ -319,7 +319,7 @@ public class MultiplayerGameManager extends HttpServlet {
              * If the mutant is covered by enough tests trigger the automatic
              * equivalence duel. Consider ONLY the coveringTests submitted after the mutant was created
              */
-            Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
+            Set<Integer> allCoveringTests = testRepo.getCoveringTestsForMutant(aliveMutant).stream()
                     .map(Test::getId)
                     .collect(Collectors.toSet());
 
@@ -342,7 +342,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 Optional<Integer> mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
                 Event event = new Event(-1, game.getId(), mutantOwnerId.orElse(0),
                         "One of your mutants survived "
-                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + (threshold == numberOfCoveringTestsSubmittedAfterMutant ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
                         // TODO it might make sense to specify a new event type?
                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,

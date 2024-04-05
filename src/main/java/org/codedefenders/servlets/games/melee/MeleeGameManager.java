@@ -342,7 +342,7 @@ public class MeleeGameManager extends HttpServlet {
              * If the mutant is covered by enough tests trigger the automatic equivalence
              * duel
              */
-            int coveringTests = aliveMutant.getCoveringTests().size();
+            int coveringTests = testRepo.getCoveringTestsForMutant(aliveMutant).size();
             if (coveringTests >= threshold) {
                 automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
@@ -352,7 +352,7 @@ public class MeleeGameManager extends HttpServlet {
                 int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
-                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + (threshold == coveringTests ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
                         EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
                         new Timestamp(System.currentTimeMillis()));

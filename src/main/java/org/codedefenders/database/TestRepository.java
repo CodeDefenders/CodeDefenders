@@ -637,4 +637,10 @@ public class TestRepository {
             throw new RuntimeException(e);
         }
     }
+
+    // TODO: Move this into a service
+    public Set<Test> getCoveringTestsForMutant(Mutant mutant) {
+        List<Test> tests = getValidTestsForGame(mutant.getGameId());
+        return mutant.getCoveringTests(tests);
+    }
 }

@@ -282,13 +282,6 @@ public class Mutant implements Serializable {
                 .anyMatch(t -> t.isMutantCovered(this));
     }
 
-    @Deprecated // Get tests through service instead and cache them
-    public Set<Test> getCoveringTests() {
-        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        List<Test> tests = testRepo.getValidTestsForGame(gameId);
-        return getCoveringTests(tests);
-    }
-
     public Set<Test> getCoveringTests(List<Test> tests) {
         return tests.stream()
                 .filter(t -> t.isMutantCovered(this))
