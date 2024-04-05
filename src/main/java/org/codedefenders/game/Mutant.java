@@ -358,12 +358,6 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml4(getPatchString());
     }
 
-    @Deprecated // Get tests through service instead and cache them
-    public Test getKillingTest() {
-        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        return testRepo.getKillingTestForMutantId(id);
-    }
-
     public String getKillMessage() {
         return Objects.requireNonNullElse(killMessage, Constants.DEFAULT_KILL_MESSAGE);
     }

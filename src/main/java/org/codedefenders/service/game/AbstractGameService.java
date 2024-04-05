@@ -124,7 +124,7 @@ public abstract class AbstractGameService implements IGameService {
         SimpleUser killedBy;
         int killedByTestId;
         String killMessage;
-        Test killingTest = mutant.getKillingTest();
+        Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
         if (killingTest != null) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
