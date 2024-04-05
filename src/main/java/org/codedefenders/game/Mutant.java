@@ -282,7 +282,6 @@ public class Mutant implements Serializable {
                 .anyMatch(t -> t.isMutantCovered(this));
     }
 
-    // This might return several instances of the same test since Test does not implement hash and equalsTo
     @Deprecated // Get tests through service instead and cache them
     public Set<Test> getCoveringTests() {
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);

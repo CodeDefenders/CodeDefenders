@@ -24,10 +24,13 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.TestRepository;
@@ -243,5 +246,38 @@ public class Test {
     @Override
     public String toString() {
         return "[testId=" + id + ",classId=" + classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
+    }
+
+    // equals similar to Mutant::equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Test test = (Test) o;
+
+        return new EqualsBuilder()
+                .append(id, test.id)
+                .append(gameId, test.gameId)
+                .append(playerId, test.playerId)
+                .append(javaFile, test.javaFile)
+                .append(classFile, test.classFile)
+                .isEquals();
+    }
+
+    // hashCode similar to Mutant::hashCode
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(gameId)
+                .append(playerId)
+                .append(javaFile)
+                .append(classFile)
+                .toHashCode();
     }
 }
