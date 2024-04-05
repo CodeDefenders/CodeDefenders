@@ -718,10 +718,6 @@ public class PuzzleGameManager extends HttpServlet {
      */
     private Optional<Puzzle> getNextPuzzleForUser(int userId) {
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            /*
-             * This returns the puzzles ordered by position and (hopefully)
-             * an empty, not-null list if there's no puzzles
-             */
             for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
