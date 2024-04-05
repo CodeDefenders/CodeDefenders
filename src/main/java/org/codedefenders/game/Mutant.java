@@ -35,7 +35,6 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -274,18 +273,6 @@ public class Mutant implements Serializable {
 
     public void setScore(int score) {
         this.score = score;
-    }
-
-    public boolean kill() {
-        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        return mutantRepo.killMutant(this, equivalent);
-    }
-
-    public boolean isCovered() {
-        // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
-        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        List<Test> tests = testRepo.getValidDefenderTestsForGame(gameId);
-        return isCovered(tests);
     }
 
     public boolean isCovered(List<Test> tests) {

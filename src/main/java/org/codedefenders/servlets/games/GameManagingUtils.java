@@ -311,7 +311,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
                 if (targetExecution.status == TargetExecution.Status.FAIL) {
                     testRepo.incrementMutantsKilled(test);
-                    mutant.kill();
+                    mutantRepo.killMutant(mutant, mutant.getEquivalent());
                     mutant.setKillMessage(targetExecution.message);
                     mutantRepo.updateMutantKillMessageForMutant(mutant);
                 }
