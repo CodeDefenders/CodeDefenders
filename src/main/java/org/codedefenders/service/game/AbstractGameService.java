@@ -212,9 +212,13 @@ public abstract class AbstractGameService implements IGameService {
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
 
+        List<Integer> killedMutantIds = testRepo.getKilledMutantsForTestId(test.getId()).stream()
+            .map(Mutant::getId)
+            .toList();
+
         return new TestDTO(test.getId(), creator, test.getScore(), viewable,
                 test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
-                test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
+                killedMutantIds,
                 (new TestSmellsDAO()).getDetectedTestSmellsForTest(test),
                 test.getGameId(),
                 test.getPlayerId(),

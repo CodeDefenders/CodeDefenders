@@ -169,13 +169,6 @@ public class Test {
         return coveredMutants;
     }
 
-    @Deprecated
-    public Set<Mutant> getKilledMutants() {
-        // TODO This does not recover the points of the mutant... why not?
-        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
-        return testRepo.getKilledMutantsForTestId(id);
-    }
-
     public String getAsString() {
         return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
     }
