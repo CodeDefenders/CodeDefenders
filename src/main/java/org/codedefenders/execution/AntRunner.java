@@ -264,7 +264,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             assert (!matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
             String classFile = matchingFiles.get(0).getAbsolutePath();
             logger.info("Compiled test {}", compiledClassName);
-            Test newTest = new Test(cut.getId(), gameId, javaFile, classFile, playerId);
+
+            int currentRound = gameRepo.getCurrentRound(gameId);
+            Test newTest = new Test(cut.getId(), gameId, currentRound, javaFile, classFile, playerId);
 
             int testId = testRepo.storeTest(newTest);
             newTest.setId(testId);
@@ -278,7 +280,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
             logger.error("Failed to compile test {}: {}", javaFile, message);
-            Test newTest = new Test(cut.getId(), gameId, javaFile, null, playerId);
+
+            int currentRound = gameRepo.getCurrentRound(gameId);
+            Test newTest = new Test(cut.getId(), gameId, currentRound, javaFile, null, playerId);
 
             int testId = testRepo.storeTest(newTest);
             newTest.setId(testId);

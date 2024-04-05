@@ -86,12 +86,10 @@ public class Test {
         this.lineCoverage = lineCoverage;
     }
 
-    public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
-        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
-
+    public Test(int classId, int gameId, int roundCreated, String javaFile, String classFile, int playerId) {
         this.classId = classId;
         this.gameId = gameId;
-        this.roundCreated = gameRepo.getCurrentRound(gameId);
+        this.roundCreated = roundCreated;
         this.javaFile = javaFile;
         this.classFile = classFile;
         this.playerId = playerId;
