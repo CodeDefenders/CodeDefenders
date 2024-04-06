@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -32,10 +31,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.TestRepository;
-import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -144,11 +139,6 @@ public class Test {
     public void setMutantsKilled(int mutantsKilled) {
         this.mutantsKilled = mutantsKilled;
     }
-
-    // Increment the number of mutant killed directly on the DB
-    // And update the local object. But it requires several queries/connections
-    //
-    // TODO Check that this method is never called for tests that kill a mutant that was already dead...
 
     public boolean isMutantCovered(Mutant mutant) {
         return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
