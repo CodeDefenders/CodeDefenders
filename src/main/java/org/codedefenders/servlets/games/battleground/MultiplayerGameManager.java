@@ -67,6 +67,9 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -526,6 +529,7 @@ public class MultiplayerGameManager extends HttpServlet {
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(gameId);
         ttme.setUserId(login.getUserId());
+        ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
         // Clean up the session
@@ -755,7 +759,8 @@ public class MultiplayerGameManager extends HttpServlet {
                     // tests on the same class from different games
                     MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
 
-                    PlayerDAO.increasePlayerPoints(1, MutantDAO.getEquivalentDefenderId(m));
+                    int playerIdDefender = MutantDAO.getEquivalentDefenderId(m);
+                    PlayerDAO.increasePlayerPoints(1, playerIdDefender);
                     messages.add(message);
 
                     // Notify the attacker
@@ -765,6 +770,13 @@ public class MultiplayerGameManager extends HttpServlet {
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notifEquiv);
+
+                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
+                    edwe.setGameId(gameId);
+                    userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
+                            .ifPresent(edwe::setUserId);
+                    edwe.setMutantId(m.getId());
+                    notificationService.post(edwe);
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
@@ -905,6 +917,13 @@ public class MultiplayerGameManager extends HttpServlet {
                             new Timestamp(System.currentTimeMillis())
                     );
                     eventDAO.insert(notif);
+
+                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
+                    edwe.setGameId(gameId);
+                    edwe.setUserId(login.getUserId());
+                    edwe.setMutantId(mutPending.getId());
+                    notificationService.post(edwe);
+
                     if (mutPending.getId() == mutantId) {
                         killedClaimed = true;
                     } else {
@@ -1067,7 +1086,7 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
+        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest.getId());
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

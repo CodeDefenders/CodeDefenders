@@ -205,7 +205,7 @@ public abstract class AbstractGameService implements IGameService {
         return new TestDTO(test.getId(), creator, test.getScore(), viewable,
                 test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
                 test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
-                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test),
+                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test.getId()),
                 test.getGameId(),
                 test.getPlayerId(),
                 test.getLineCoverage().getLinesCovered(),
