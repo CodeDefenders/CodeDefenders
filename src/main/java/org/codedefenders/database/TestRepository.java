@@ -156,12 +156,13 @@ public class TestRepository {
                         ORDER BY tests.Timestamp DESC
                         LIMIT 1;
                 """;
-        return DB.executeQueryReturnValue(query,
-                TestRepository::testFromRS,
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId));
+        try {
+            return queryRunner.query(query, nextFromRS(TestRepository::testFromRS), gameId, userId).orElse(null);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
-
 
     /**
      * Returns the {@link Test Tests} from the given game for the given player.

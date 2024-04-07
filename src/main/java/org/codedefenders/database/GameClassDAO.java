@@ -59,7 +59,7 @@ public class GameClassDAO {
      * @return The constructed game class.
      * @see RSMapper
      */
-    static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
+    public static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
         int classId = rs.getInt("Class_ID");
         String name = rs.getString("Name");
         String alias = rs.getString("Alias");
