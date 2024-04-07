@@ -166,7 +166,7 @@ public class AchievementService {
     }
 
     private int getAmountOfRecentEvents(int userId, int gameId, List<EventType> events) {
-        final long fiveMinAgo = Instant.now().minus(5, MINUTES).toEpochMilli() / 1_000;
+        final long fiveMinAgo = Instant.now().minus(5, MINUTES).getEpochSecond();
         final long amount = eventDAO.getNewEventsForGameAndUser(gameId, fiveMinAgo, userId).stream()
                 .filter(event -> events.contains(event.getEventType()))
                 .count();
@@ -196,7 +196,7 @@ public class AchievementService {
         }
     }
 
-    private void checkOldMutantsKilledByTest(int userId, int testId) {
+    private void checkTestKills(int userId, int testId) {
         Set<Mutant> killedMutants = TestDAO.getKilledMutantsForTestId(testId);
         int killCount = killedMutants.size();
         if (killCount > 0) {
@@ -204,7 +204,7 @@ public class AchievementService {
         }
     }
 
-    private void checkNewMutantKilledByTest(int mutantId) {
+    private void checkMutantKilled(int mutantId) {
         Test test = TestDAO.getKillingTestForMutantId(mutantId);
         if (test != null) {
             int playerId = test.getPlayerId();
@@ -377,7 +377,7 @@ public class AchievementService {
         public void handleTestTestedMutantsEvent(TestTestedMutantsEvent event) {
             addTestWritten(event.getUserId());
             checkTestSmells(event.getUserId(), event.getTestId());
-            checkOldMutantsKilledByTest(event.getUserId(), event.getTestId());
+            checkTestKills(event.getUserId(), event.getTestId());
             checkCoverage(event.getUserId(), event.getTestId());
             checkAmountOfRecentTests(event.getUserId(), event.getGameId());
         }
@@ -390,7 +390,7 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleMutantTestedEvent(MutantTestedEvent event) {
             addMutantCreated(event.getUserId());
-            checkNewMutantKilledByTest(event.getMutantId());
+            checkMutantKilled(event.getMutantId());
             checkAmountOfRecentMutants(event.getUserId(), event.getGameId());
         }
 
