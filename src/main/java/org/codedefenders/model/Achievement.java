@@ -129,6 +129,24 @@ public class Achievement implements Serializable {
         WIN_GAMES_AS_DEFENDER(8),
         @SerializedName("9")
         SOLVE_PUZZLES(9),
+        @SerializedName("10")
+        WRITE_CLEAN_TESTS(10),
+        @SerializedName("11")
+        KILL_MUTANTS(11),
+        @SerializedName("12")
+        TOTAL_COVERAGE(12),
+        @SerializedName("13")
+        MAX_COVERAGE(13),
+        @SerializedName("14")
+        WIN_EQUIVALENCE_DUELS(14),
+        @SerializedName("15")
+        WIN_EQUIVALENCE_DUELS_AS_ATTACKER(15),
+        @SerializedName("16")
+        WIN_EQUIVALENCE_DUELS_AS_DEFENDER(16),
+        @SerializedName("17")
+        MAX_TESTS_IN_SHORT_TIME(17),
+        @SerializedName("18")
+        MAX_MUTANTS_IN_SHORT_TIME(18),
         ; // format for better git diffs
 
         private final int id;

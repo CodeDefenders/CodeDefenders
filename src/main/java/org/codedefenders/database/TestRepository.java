@@ -171,12 +171,29 @@ public class TestRepository {
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_valid_game_tests tests
-                LEFT JOIN players ON players.ID = tests.Player_ID
                 WHERE tests.Game_ID = ?
                   AND tests.Player_ID = ?;
         """;
         try {
             return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId, playerId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    /**
+     * Returns the {@link Test Tests} from the given game for the given user.
+     */
+    public List<Test> getTestsForGameAndUser(int gameId, int userId)
+            throws UncheckedSQLException, SQLMappingException {
+        @Language("SQL") String query = """
+                SELECT * FROM view_valid_game_tests tests
+                WHERE tests.Game_ID = ?
+                  AND tests.User_ID = ?;
+        """;
+        try {
+            return queryRunner.query(query, listFromRS(TestRepository::testFromRS), gameId, userId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

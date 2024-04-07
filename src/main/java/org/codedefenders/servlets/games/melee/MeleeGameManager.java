@@ -64,6 +64,9 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
@@ -526,6 +529,7 @@ public class MeleeGameManager extends HttpServlet {
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(game.getId());
         ttme.setUserId(login.getUserId());
+        ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
         // Clean up the session
@@ -737,6 +741,14 @@ public class MeleeGameManager extends HttpServlet {
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notifEquiv);
 
+                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
+                    edwe.setGameId(gameId);
+                    int playerIdDefender = MutantDAO.getEquivalentDefenderId(m);
+                    userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
+                            .ifPresent(edwe::setUserId);
+                    edwe.setMutantId(m.getId());
+                    notificationService.post(edwe);
+
                     // We need this to pass the mutation information along
                     Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
                             // Here we care only about the mutantID.
@@ -882,6 +894,12 @@ public class MeleeGameManager extends HttpServlet {
                             EventType.PLAYER_WON_EQUIVALENT_DUEL, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
+
+                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
+                    edwe.setGameId(gameId);
+                    edwe.setUserId(login.getUserId());
+                    edwe.setMutantId(mPending.getId());
+                    notificationService.post(edwe);
 
                     // TODO We need a score event to hackishly include data about mutants and tests
                     Event scoreEvent = new Event(-1, gameId, Constants.DUMMY_CREATOR_USER_ID,
@@ -1052,7 +1070,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
+        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest.getId());
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

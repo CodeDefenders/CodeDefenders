@@ -73,12 +73,12 @@ public class TestSmellsDAO {
     /**
      * Retrieves and returns a {@link List} of test smells for a given test.
      *
-     * @param test the given test the smells are retrieved for.
+     * @param testId the id of the test the smells are retrieved for.
      * @return A list of all tests smells for a given test.
      */
-    public List<String> getDetectedTestSmellsForTest(Test test) {
+    public List<String> getDetectedTestSmellsForTest(int testId) {
         return DB.executeQueryReturnList(GET_SMELL_QUERY,
                 rs -> rs.getString("smell_name"),
-                DatabaseValue.of(test.getId()));
+                DatabaseValue.of(testId));
     }
 }

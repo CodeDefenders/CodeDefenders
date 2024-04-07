@@ -479,6 +479,7 @@ public class PuzzleGameManager extends HttpServlet {
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(gameId);
         ttme.setUserId(login.getUserId());
+        ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
         // may be // final TestSolvingStrategy solving = Testgame.getTestSolver();
