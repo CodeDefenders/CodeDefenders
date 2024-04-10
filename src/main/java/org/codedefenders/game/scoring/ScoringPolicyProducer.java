@@ -4,9 +4,9 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerRepository;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 
 public class ScoringPolicyProducer {
 

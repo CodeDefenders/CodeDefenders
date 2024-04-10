@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MeleeGameRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -40,6 +38,8 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;

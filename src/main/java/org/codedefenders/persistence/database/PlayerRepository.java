@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;

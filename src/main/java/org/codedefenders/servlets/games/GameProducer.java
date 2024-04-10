@@ -8,11 +8,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -22,9 +22,6 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -32,6 +29,9 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 

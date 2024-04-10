@@ -35,6 +35,8 @@ import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Classroom;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.util.CDIUtil;
 import org.intellij.lang.annotations.Language;

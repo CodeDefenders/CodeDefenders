@@ -5,8 +5,6 @@ import java.util.regex.Pattern;
 
 import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.GameChatDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
@@ -22,6 +20,8 @@ import org.codedefenders.notification.events.server.achievement.ServerAchievemen
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
 import org.codedefenders.notification.web.PushSocket;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

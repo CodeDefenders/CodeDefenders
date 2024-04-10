@@ -32,8 +32,6 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
@@ -42,6 +40,8 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;

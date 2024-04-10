@@ -28,11 +28,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

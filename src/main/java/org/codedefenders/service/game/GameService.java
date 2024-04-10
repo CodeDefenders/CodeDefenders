@@ -24,8 +24,6 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
@@ -37,6 +35,8 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

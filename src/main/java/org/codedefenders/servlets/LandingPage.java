@@ -35,10 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;

@@ -19,9 +19,6 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerRepository;
-import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
@@ -46,6 +43,9 @@ import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.persistence.database.AchievementRepository;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

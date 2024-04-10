@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;

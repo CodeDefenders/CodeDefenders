@@ -21,8 +21,6 @@ package org.codedefenders.game.puzzle;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -31,6 +29,8 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;

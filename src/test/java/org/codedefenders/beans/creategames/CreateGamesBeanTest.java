@@ -12,8 +12,6 @@ import java.util.stream.Stream;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
@@ -22,6 +20,8 @@ import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.validation.code.CodeValidatorLevel;

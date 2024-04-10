@@ -3,8 +3,6 @@ package org.codedefenders.notification.handling;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
@@ -22,6 +20,7 @@ import org.codedefenders.notification.handling.server.ServerEventHandler;
 import org.codedefenders.notification.handling.server.TestProgressBarEventHandler;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.notification.web.PushSocket;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -34,11 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.model.PuzzleInfo;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;

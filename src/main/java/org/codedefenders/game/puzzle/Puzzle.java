@@ -18,9 +18,9 @@
  */
 package org.codedefenders.game.puzzle;
 
-import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 

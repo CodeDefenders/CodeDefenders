@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +28,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codedefenders.database.SQLMappingException;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
@@ -60,7 +62,7 @@ public class MutantRepository {
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
      */
-    static Mutant mutantFromRS(ResultSet rs) throws SQLException {
+    public static Mutant mutantFromRS(ResultSet rs) throws SQLException {
         int mutantId = rs.getInt("Mutant_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");

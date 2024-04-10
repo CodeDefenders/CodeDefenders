@@ -6,15 +6,14 @@ import java.util.Map;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
-import org.codedefenders.database.GameRepository;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
 

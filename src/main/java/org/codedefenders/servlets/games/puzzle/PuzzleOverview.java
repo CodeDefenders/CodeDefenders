@@ -19,10 +19,8 @@
 package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -39,15 +37,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.PuzzleRepository;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;

@@ -35,6 +35,7 @@ import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;

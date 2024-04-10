@@ -24,7 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-<%--@elvariable id="puzzleRepo" type="org.codedefenders.database.PuzzleRepository"--%>
+<%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 

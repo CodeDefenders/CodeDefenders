@@ -11,10 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.util.Constants;
 
 /**

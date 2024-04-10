@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameRepository;
-import org.codedefenders.database.MultiplayerGameRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 

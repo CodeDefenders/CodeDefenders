@@ -43,9 +43,6 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameRepository;
-import org.codedefenders.database.MutantRepository;
-import org.codedefenders.database.PlayerRepository;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
@@ -74,7 +71,10 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -743,7 +743,7 @@ public class MeleeGameManager extends HttpServlet {
 
                     EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
                     edwe.setGameId(gameId);
-                    int playerIdDefender = MutantDAO.getEquivalentDefenderId(m);
+                    int playerIdDefender = mutantRepo.getEquivalentDefenderId(m);
                     userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
                             .ifPresent(edwe::setUserId);
                     edwe.setMutantId(m.getId());

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.codedefenders.database.GameRepository;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMap.KillMapEntry.Status;

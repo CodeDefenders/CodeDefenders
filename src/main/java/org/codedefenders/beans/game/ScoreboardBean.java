@@ -9,10 +9,10 @@ import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.MutantRepository;
 import org.codedefenders.database.TestRepository;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.util.CDIUtil;
 
 /**
