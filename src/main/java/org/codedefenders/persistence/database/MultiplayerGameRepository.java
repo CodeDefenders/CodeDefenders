@@ -69,8 +69,7 @@ public class MultiplayerGameRepository {
     static MultiplayerGame multiplayerGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.PARTY) {
-            // TODO: This should probably throw an IllegalArgumentException instead of returning null.
-            return null;
+            throw new IllegalArgumentException("Game is not a battleground game.");
         }
 
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
@@ -308,11 +307,10 @@ public class MultiplayerGameRepository {
         """;
 
         try {
-            var game = queryRunner.query(query,
+            return queryRunner.query(query,
                     oneFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
                     gameId
-            );
-            return game.orElse(null);
+            ).orElse(null);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
