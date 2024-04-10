@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
@@ -36,12 +35,15 @@ import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.database.DB.RSMapper;
+import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
 
 /**
  * This class handles the database logic for Java classes.
@@ -444,24 +446,20 @@ public class GameClassDAO {
      * Removes multiple classes for a given list of identifiers.
      *
      * @param classes the identifiers of the classes to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeClassesForIds(List<Integer> classes) {
+    public static void removeClassesForIds(List<Integer> classes) {
         if (classes.isEmpty()) {
-            return false;
+            return;
         }
 
-        String placeholders = Stream.generate(() -> "(?, ?, ?, ?)")
-                .limit(classes.size())
-                .collect(Collectors.joining(","));
-        @Language("SQL") String query =
-                "DELETE FROM classes WHERE Class_ID in (%s);".formatted(placeholders);
+        @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
-        DatabaseValue<?>[] values = classes.stream()
-                .map(DatabaseValue::of)
-                .toArray(DatabaseValue[]::new);
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.batch(query, batchParamsFromList(classes));
+        } catch (SQLException e) {
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**

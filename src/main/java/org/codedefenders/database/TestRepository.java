@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -49,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
+import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -506,18 +506,14 @@ public class TestRepository {
             return;
         }
 
-        String range = Stream.generate(() -> "?")
-                .limit(tests.size())
-                .collect(Collectors.joining(","));
+        @Language("SQL") String query1 = "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM tests WHERE Test_ID = ?;";
 
-        @Language("SQL") String query1 = "DELETE FROM tests WHERE Test_ID in (%s);"
-                .formatted(range);
-        @Language("SQL") String query2 = "DELETE FROM test_uploaded_with_class WHERE Test_ID in (%s);"
-                .formatted(range);
+        var params = batchParamsFromList(tests);
 
         try {
-            queryRunner.update(query1, tests.toArray());
-            queryRunner.update(query2, tests.toArray());
+            queryRunner.batch(query1, params);
+            queryRunner.batch(query2, params);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

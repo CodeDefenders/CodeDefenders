@@ -21,13 +21,15 @@ package org.codedefenders.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
+
+import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
 
 /**
  * This class handles the database logic for dependencies.
@@ -98,21 +100,19 @@ public class DependencyDAO {
      * Removes multiple dependencies for a given list of identifiers.
      *
      * @param dependencies the identifiers of the dependencies to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeDependenciesForIds(List<Integer> dependencies) {
+    public static void removeDependenciesForIds(List<Integer> dependencies) {
         if (dependencies.isEmpty()) {
-            return false;
+            return;
         }
 
-        String range = Stream.generate(() -> "?")
-                .limit(dependencies.size())
-                .collect(Collectors.joining(","));
+        @Language("SQL") String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
-        @Language("SQL") String query = "DELETE FROM dependencies WHERE Dependency_ID in (%s);".formatted(range);
-
-        DatabaseValue<?>[] values = dependencies.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.batch(query, batchParamsFromList(dependencies));
+        } catch (SQLException e) {
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 }

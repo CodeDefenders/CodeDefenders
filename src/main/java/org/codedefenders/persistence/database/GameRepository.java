@@ -22,8 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -40,6 +38,7 @@ import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.persistence.database.util.QueryUtils.makePlaceholders;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -222,12 +221,8 @@ public class GameRepository {
             return new ArrayList<>();
         }
 
-        String range = Stream.generate(() -> "?")
-                .limit(ids.size())
-                .collect(Collectors.joining(","));
-
-        @Language("SQL") String query = "SELECT ID FROM games WHERE ID in (%s)"
-                .formatted(range);
+        @Language("SQL") String query = "SELECT ID FROM games WHERE ID IN (%s);"
+                .formatted(makePlaceholders(ids.size()));
 
         try {
             return queryRunner.query(query,
