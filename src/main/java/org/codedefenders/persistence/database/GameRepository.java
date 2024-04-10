@@ -113,7 +113,6 @@ public class GameRepository {
                     role.toString(),
                     role.toString()
             );
-            key.ifPresent(System.out::println);
             // TODO: This will return false if a player with the same values already exists
             return key.isPresent();
         } catch (SQLException e) {
