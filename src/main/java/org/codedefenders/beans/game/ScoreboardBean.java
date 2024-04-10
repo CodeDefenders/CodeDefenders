@@ -30,7 +30,6 @@ public class ScoreboardBean {
     private List<Player> attackers;
     private List<Player> defenders;
 
-    @Inject
     public ScoreboardBean() {
         gameId = null;
         mutantsScores = null;
