@@ -66,9 +66,9 @@ public class MeleeGameRepository {
     static MeleeGame meleeGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.MELEE) {
-            // TODO: This should probably throw an IllegalArgumentException instead of returning null.
-            return null;
+            throw new IllegalArgumentException("Game is not a melee game.");
         }
+
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
         int id = rs.getInt("ID");
         int classId = rs.getInt("Class_ID");
@@ -312,8 +312,8 @@ public class MeleeGameRepository {
         """;
 
         try {
-            var game = queryRunner.query(query, oneFromRS(MeleeGameRepository::meleeGameFromRS), gameId);
-            return game.orElse(null);
+            return queryRunner.query(query, oneFromRS(MeleeGameRepository::meleeGameFromRS), gameId)
+                    .orElse(null);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
