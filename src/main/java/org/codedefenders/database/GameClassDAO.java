@@ -35,6 +35,7 @@ import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;

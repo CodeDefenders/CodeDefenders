@@ -24,7 +24,7 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;

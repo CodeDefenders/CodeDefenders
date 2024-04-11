@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,13 +31,15 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.database.SQLMappingException;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.transaction.Transactional;
 import org.codedefenders.util.FileUtils;

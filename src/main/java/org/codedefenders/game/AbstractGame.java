@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;

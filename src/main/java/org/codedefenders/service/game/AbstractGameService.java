@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;

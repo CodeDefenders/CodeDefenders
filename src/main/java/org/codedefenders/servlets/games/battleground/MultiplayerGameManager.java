@@ -44,7 +44,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;

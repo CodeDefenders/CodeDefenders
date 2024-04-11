@@ -46,7 +46,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;

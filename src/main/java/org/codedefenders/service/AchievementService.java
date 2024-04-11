@@ -19,7 +19,7 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.LineCoverage;

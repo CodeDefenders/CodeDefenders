@@ -37,7 +37,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;

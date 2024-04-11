@@ -54,7 +54,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;

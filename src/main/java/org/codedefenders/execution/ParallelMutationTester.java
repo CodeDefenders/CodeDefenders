@@ -32,7 +32,7 @@ import java.util.concurrent.FutureTask;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;

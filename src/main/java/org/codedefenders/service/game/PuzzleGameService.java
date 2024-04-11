@@ -22,7 +22,7 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;

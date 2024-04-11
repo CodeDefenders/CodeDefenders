@@ -23,7 +23,7 @@ import javax.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;

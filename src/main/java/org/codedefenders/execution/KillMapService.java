@@ -35,7 +35,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;

@@ -29,7 +29,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TestRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
