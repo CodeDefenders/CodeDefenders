@@ -19,7 +19,6 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.LineCoverage;
@@ -46,6 +45,7 @@ import org.codedefenders.persistence.database.AchievementRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

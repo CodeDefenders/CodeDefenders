@@ -35,12 +35,12 @@ import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;

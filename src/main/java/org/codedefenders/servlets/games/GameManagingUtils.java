@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -53,6 +52,7 @@ import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
