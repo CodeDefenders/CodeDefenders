@@ -48,7 +48,7 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
  * @see MeleeGame
  */
 public class MeleeGameRepository {
-    private static final Logger logger = LoggerFactory.getLogger(GameRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(MeleeGameRepository.class);
 
     private final QueryRunner queryRunner;
 
