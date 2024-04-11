@@ -217,7 +217,6 @@ public class PlayerRepository {
 
     public Role getRole(int userId, int gameId) {
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
-        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
 
         @Language("SQL") String query = """
                 SELECT *
@@ -227,26 +226,15 @@ public class PlayerRepository {
                   AND players.Game_ID = ?
         """;
 
-        Optional<Role> role;
         try {
-            role = queryRunner.query(query,
+            return queryRunner.query(query,
                     oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
                     userId,
                     gameId
-            );
+            ).orElse(Role.NONE);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
-
-        // TODO: The game for the creator role should be queried in a service, not here
-        if (role.isEmpty()) {
-            AbstractGame game = gameRepo.getGame(gameId);
-            if (game != null && game.getCreatorId() == userId) {
-                return Role.OBSERVER;
-            }
-        }
-
-        return role.orElse(Role.NONE);
     }
 }
