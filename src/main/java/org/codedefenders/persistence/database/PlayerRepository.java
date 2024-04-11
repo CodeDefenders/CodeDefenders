@@ -179,7 +179,8 @@ public class PlayerRepository {
                 throw new UncheckedSQLException("Couldn't update player.");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -194,7 +195,8 @@ public class PlayerRepository {
                 throw new UncheckedSQLException("Couldn't update player.");
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
