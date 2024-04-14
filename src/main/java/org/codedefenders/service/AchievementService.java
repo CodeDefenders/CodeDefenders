@@ -19,10 +19,6 @@ import javax.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.LineCoverage;
@@ -46,6 +42,10 @@ import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.persistence.database.AchievementRepository;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +69,10 @@ public class AchievementService {
     private final TestSmellsDAO testSmellsDAO;
     private final EventDAO eventDAO;
     private final INotificationService notificationService;
+    private final GameRepository gameRepo;
+    private final PuzzleRepository puzzleRepo;
+    private final TestRepository testRepo;
+    private final PlayerRepository playerRepo;
     private final AchievementEventHandler handler;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
@@ -83,12 +87,18 @@ public class AchievementService {
      * @param notificationService   the notification service
      */
     @Inject
-    public AchievementService(AchievementRepository achievementRepository, TestSmellsDAO testSmellsDAO,
-                              EventDAO eventDAO, INotificationService notificationService) {
+       public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
+                                 TestSmellsDAO testSmellsDAO, EventDAO eventDAO,
+                                 GameRepository gameRepo, PuzzleRepository puzzleRepo,
+                                 TestRepository testRepo, PlayerRepository playerRepo) {
         repo = achievementRepository;
         this.testSmellsDAO = testSmellsDAO;
         this.eventDAO = eventDAO;
         this.notificationService = notificationService;
+        this.gameRepo = gameRepo;
+        this.puzzleRepo = puzzleRepo;
+        this.testRepo = testRepo;
+        this.playerRepo = playerRepo;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
     }
@@ -197,7 +207,7 @@ public class AchievementService {
     }
 
     private void checkTestKills(int userId, int testId) {
-        Set<Mutant> killedMutants = TestDAO.getKilledMutantsForTestId(testId);
+        Set<Mutant> killedMutants = testRepo.getKilledMutantsForTestId(testId);
         int killCount = killedMutants.size();
         if (killCount > 0) {
             updateAchievement(userId, Achievement.Id.KILL_MUTANTS, killCount);
@@ -205,18 +215,18 @@ public class AchievementService {
     }
 
     private void checkMutantKilled(int mutantId) {
-        Test test = TestDAO.getKillingTestForMutantId(mutantId);
+        Test test = testRepo.getKillingTestForMutantId(mutantId);
         if (test != null) {
             int playerId = test.getPlayerId();
-            int userId = PlayerDAO.getPlayer(playerId).getUser().getId();
+            int userId = playerRepo.getPlayer(playerId).getUser().getId();
             updateAchievement(userId, Achievement.Id.KILL_MUTANTS, 1);
         }
     }
 
     private void checkCoverage(int userId, Integer testId) {
-        Test test = TestDAO.getTestById(testId);
+        Test test = testRepo.getTestById(testId);
         if (test != null) {
-            Set<Integer> prevCoveredLines = TestDAO.getTestsForGameAndUser(test.getGameId(), userId)
+            Set<Integer> prevCoveredLines = testRepo.getTestsForGameAndUser(test.getGameId(), userId)
                     .stream()
                     .filter(t -> t.getId() != testId) // exclude the new test
                     .map(Test::getLineCoverage)
@@ -328,13 +338,13 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleGameStopped(GameStoppedEvent event) {
             Function<Role, List<Player>> getPlayersWithRole =
-                    role -> GameDAO.getPlayersForGame(event.getGameId(), role);
+                    role -> gameRepo.getPlayersForGame(event.getGameId(), role);
 
             List.of(Role.DEFENDER, Role.ATTACKER, Role.PLAYER).forEach(role -> {
                 addGamePlayed(getPlayersWithRole.apply(role), role);
             });
 
-            AbstractGame abstractGame = GameDAO.getGame(event.getGameId());
+            AbstractGame abstractGame = gameRepo.getGame(event.getGameId());
             if (abstractGame instanceof MultiplayerGame game) {
                 ScoreboardBean scoreboard = new ScoreboardBean();
                 scoreboard.setGameId(event.getGameId());
@@ -360,7 +370,7 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handlePuzzleGameSolvedEvent(GameSolvedEvent event) {
-            int userId = PuzzleDAO.getPuzzleGameForId(event.getGameId()).getCreatorId();
+            int userId = puzzleRepo.getPuzzleGameForId(event.getGameId()).getCreatorId();
             Achievement.Id achievementId = Achievement.Id.SOLVE_PUZZLES;
             if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
                 logger.info("Updated achievement {} for user with id {}", achievementId, userId);

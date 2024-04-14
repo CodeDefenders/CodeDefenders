@@ -10,6 +10,9 @@ import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.util.CDIUtil;
 
 /**
  * <p>Provides data for the scoreboard game component.</p>
@@ -99,6 +102,16 @@ public class ScoreboardBean {
             return isDefender ? PlayerStatus.WINNING_DEFENDER : PlayerStatus.LOSING_ATTACKER;
         }
         return isDefender ? PlayerStatus.TIE_DEFENDER : PlayerStatus.TIE_ATTACKER;
+    }
+
+    public boolean gameHasPredefinedTests() {
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
+        return testRepo.gameHasPredefinedTests(gameId);
+    }
+
+    public boolean gameHasPredefinedMutants() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+        return mutantRepo.gameHasPredefinedMutants(gameId);
     }
 
     public enum PlayerStatus {

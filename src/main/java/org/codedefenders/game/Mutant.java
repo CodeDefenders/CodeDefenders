@@ -33,9 +33,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
@@ -275,27 +272,11 @@ public class Mutant implements Serializable {
         this.score = score;
     }
 
-    public boolean kill() {
-        return MutantDAO.killMutant(this, equivalent);
-    }
-
-    public boolean isCovered() {
-        // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
-        List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
-        return isCovered(tests);
-    }
-
     public boolean isCovered(List<Test> tests) {
         return tests.stream()
                 // Filter the tests that were created by the same user that created the mutant
                 .filter(t -> t.getPlayerId() != this.getPlayerId())
                 .anyMatch(t -> t.isMutantCovered(this));
-    }
-
-    // This might return several instances of the same test since Test does not implement hash and equalsTo
-    public Set<Test> getCoveringTests() {
-        List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
-        return getCoveringTests(tests);
     }
 
     public Set<Test> getCoveringTests(List<Test> tests) {
@@ -374,10 +355,6 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml4(getPatchString());
     }
 
-    public Test getKillingTest() {
-        return TestDAO.getKillingTestForMutantId(id);
-    }
-
     public String getKillMessage() {
         return Objects.requireNonNullElse(killMessage, Constants.DEFAULT_KILL_MESSAGE);
     }
@@ -386,24 +363,8 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml4(getKillMessage());
     }
 
-
-    public boolean insert() {
-        try {
-            this.id = MutantDAO.storeMutant(this);
-            return true;
-        } catch (Exception e) {
-            logger.error("Inserting mutants resulted in error.", e);
-            return false;
-        }
-    }
-
-    public boolean update() {
-        try {
-            return MutantDAO.updateMutant(this);
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store mutant to database.", e);
-            return false;
-        }
+    public void setId(int id) {
+        this.id = id;
     }
 
     // Does this every get called if mutant is not stored to DB ?

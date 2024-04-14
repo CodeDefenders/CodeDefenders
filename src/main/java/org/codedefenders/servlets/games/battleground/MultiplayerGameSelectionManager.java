@@ -49,6 +49,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.MultiplayerGameService;
@@ -105,6 +106,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private UserRepository userRepo;
+
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
 
     @Inject
     private URLUtils url;

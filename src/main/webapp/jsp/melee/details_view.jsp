@@ -21,11 +21,10 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.database.PlayerDAO" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -54,18 +53,18 @@
 	history.setLogin(login);
 	history.setGameId(game.getId());
 
-	Player player = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), game.getId());
-	List<Player> otherPlayers = game.getPlayers().stream()
-			.filter(p -> {
-				if (player != null) {
-					return p.getId() != player.getId();
-				} else {
-					return true;
-				}
-			})
-			.collect(Collectors.toList());
+    Player userPlayer = null;
+	List<Player> otherPlayers = new ArrayList<>();
+    for (Player player : game.getPlayers()) {
+        if (player.getUser().getId() == login.getUserId()) {
+            userPlayer = player;
+        } else {
+            otherPlayers.add(player);
+        }
+    }
+
 	// We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
-	history.setPlayers(Collections.singletonList(player), otherPlayers);
+	history.setPlayers(Collections.singletonList(userPlayer), otherPlayers);
 %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>

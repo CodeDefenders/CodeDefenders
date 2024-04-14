@@ -16,23 +16,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.apache.commons.lang3.StringUtils;
-import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.database.SQLMappingException;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -41,23 +42,28 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-/**
- * This class handles the database logic for mutants.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see Mutant
- */
-public class MutantDAO {
-    private static final Logger logger = LoggerFactory.getLogger(MutantDAO.class);
+import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
+
+@ApplicationScoped
+public class MutantRepository {
+    private static final Logger logger = LoggerFactory.getLogger(MutantRepository.class);
+
+    private final QueryRunner queryRunner;
+    private final GameRepository gameRepo;
+
+    @Inject
+    public MutantRepository(QueryRunner queryRunner, GameRepository gameRepo) {
+        this.queryRunner = queryRunner;
+        this.gameRepo = gameRepo;
+    }
 
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
-     *
-     * @param rs The {@link ResultSet}.
-     * @return The constructed mutant.
-     * @see RSMapper
      */
-    static Mutant mutantFromRS(ResultSet rs) throws SQLException {
+    public static Mutant mutantFromRS(ResultSet rs) throws SQLException {
         int mutantId = rs.getInt("Mutant_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");
@@ -104,53 +110,66 @@ public class MutantDAO {
     /**
      * Returns the {@link Mutant} for the given mutant id.
      */
-    public static Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
+    public Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Mutant_ID = ?;
         """;
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(mutantId));
+        try {
+            return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), mutantId).orElse(null);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Returns the {@link Mutant} with the given md5 sum from the given game.
      */
-    public static Mutant getMutantByGameAndMd5(int gameId, String md5)
+    public Mutant getMutantByGameAndMd5(int gameId, String md5)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Game_ID = ? AND m.MD5 = ?;
         """;
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of(md5));
+        try {
+            return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), gameId, md5).orElse(null);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Returns the {@link Mutant Mutants} from the given game for the given player.
      */
-    public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
+    public List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT * FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?
                   AND m.Player_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of(playerId));
+        try {
+            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId, playerId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    /**
-     * Returns the {@link Mutant Mutants} from the given game for the given user.
-     */
-    public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
-            throws UncheckedSQLException, SQLMappingException {
+    public boolean gameHasPredefinedMutants(int gameId) {
         @Language("SQL") String query = """
-                SELECT * FROM view_valid_game_mutants m
-                WHERE m.Game_ID = ?
-                  AND m.User_ID = ?;
+                SELECT * FROM view_system_mutant_instances mutants
+                WHERE mutants.Game_ID = ?
+                LIMIT 1;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of(userId));
+        try {
+            return queryRunner.query(query, nextFromRS(rs -> true), gameId).orElse(false);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -158,13 +177,18 @@ public class MutantDAO {
      *
      * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
      */
-    public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+    public List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
                 FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
+        try {
+            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -173,7 +197,7 @@ public class MutantDAO {
      * <p>This includes valid user-submitted mutants as well as templates of predefined mutants
      * (not the instances that are copied into games).
      */
-    public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
+    public List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 WITH mutants_for_class AS
                    (SELECT * FROM view_valid_user_mutants UNION ALL SELECT * FROM view_system_mutant_templates)
@@ -182,17 +206,23 @@ public class MutantDAO {
                 FROM mutants_for_class mutants
                 WHERE mutants.Class_ID = ?
         """;
-
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+        try {
+            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
-     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     * Returns the compilable {@link Mutant Mutants} from the games played in the given classroom.
      *
      * <p>This includes valid user-submitted mutants from classroom games as well as templates of predefined mutants
      * for classes used in the classroom.
+     *
+     * @return The mutants, partitioned by Class ID.
      */
-    public static Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
+    public Multimap<Integer, Mutant> getValidMutantsForClassroom(int classroomId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 WITH relevant_classes AS (
@@ -217,8 +247,13 @@ public class MutantDAO {
                 SELECT * FROM classroom_user_mutants;
         """;
 
-        List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(classroomId), DatabaseValue.of(classroomId));
+        List<Mutant> mutants;
+        try {
+            mutants = queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classroomId, classroomId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
 
         Multimap<Integer, Mutant> mutantsMap = ArrayListMultimap.create();
         for (Mutant mutant : mutants) {
@@ -228,29 +263,30 @@ public class MutantDAO {
     }
 
     /**
-     * Returns the compilable {@link Mutant Mutants} submitted by the given player.
+     * Returns the valid {@link Mutant Mutants} submitted by the given player.
      */
-    public static List<Mutant> getValidMutantsForPlayer(int playerId)
+    public List<Mutant> getValidMutantsForPlayer(int playerId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT *
-                FROM view_valid_mutants m
-                WHERE Player_ID = ?
+                FROM view_valid_game_mutants m
+                WHERE Player_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(playerId));
+        try {
+            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), playerId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Stores a given {@link Mutant} in the database.
      *
-     * <p>This method does not update the given mutant object.
-     * Use {@link Mutant#insert()} instead.
-     *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @return the generated identifier of the mutant as an {@code int}.
-     * @throws Exception If storing the mutant was not successful.
+     * @param mutant The mutant to store.
+     * @return The generated mutant ID.
      */
-    public static int storeMutant(Mutant mutant) throws Exception {
+    public int storeMutant(Mutant mutant) {
         String relativeJavaFile = FileUtils.getRelativeDataPath(mutant.getJavaFile()).toString();
         String relativeClassFile = mutant.getClassFile()
                 == null ? null : FileUtils.getRelativeDataPath(mutant.getClassFile()).toString();
@@ -269,37 +305,34 @@ public class MutantDAO {
                         Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(relativeJavaFile),
-                DatabaseValue.of(relativeClassFile),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(roundCreated),
-                DatabaseValue.of(equivalent.name()),
-                DatabaseValue.of(alive),
-                DatabaseValue.of(playerId),
-                DatabaseValue.of(score),
-                DatabaseValue.of(md5),
-                DatabaseValue.of(classId),
-                DatabaseValue.of(mutatedLinesString)
-        };
 
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
-            return result;
-        } else {
-            throw new Exception("Could not store mutant to database.");
+        try {
+            return queryRunner.insert(query,
+                    oneFromRS(rs -> rs.getInt(1)),
+                    relativeJavaFile,
+                    relativeClassFile,
+                    gameId,
+                    roundCreated,
+                    equivalent.name(),
+                    alive,
+                    playerId,
+                    score,
+                    md5,
+                    classId,
+                    mutatedLinesString
+            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store mutant."));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
     /**
-     * Updates a given {@link Mutant} in the database and returns whether
-     * updating was successful or not.
+     * Updates a given {@link Mutant} in the database.
      *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @return whether updating was successful or not
-     * @throws UncheckedSQLException If storing the mutant was not successful.
+     * @param mutant The mutant to update.
      */
-    public static boolean updateMutant(Mutant mutant) throws UncheckedSQLException {
+    public void updateMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
 
         Equivalence equivalent = mutant.getEquivalent() == null ? Equivalence.ASSUMED_NO : mutant.getEquivalent();
@@ -315,20 +348,31 @@ public class MutantDAO {
                     Points = ?
                 WHERE Mutant_ID = ? AND Alive = 1;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-            DatabaseValue.of(equivalent.name()),
-            DatabaseValue.of(alive),
-            DatabaseValue.of(roundKilled),
-            DatabaseValue.of(score),
-            DatabaseValue.of(mutantId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query,
+                    equivalent.name(),
+                    alive,
+                    roundKilled,
+                    score,
+                    mutantId
+            );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update test.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    public static boolean updateMutantScore(Mutant mutant) throws UncheckedSQLException {
+    /**
+     * Update the score for a given {@link Mutant} in the database.
+     *
+     * @param mutant The mutant to update.
+     */
+    public void updateMutantScore(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
-
         int score = mutant.getScore();
 
         @Language("SQL") String query = """
@@ -336,25 +380,28 @@ public class MutantDAO {
                 SET Points = ?
                 WHERE Mutant_ID = ?;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(score),
-                DatabaseValue.of(mutantId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query,
+                    score,
+                    mutantId
+            );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update mutant.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
-     * Updates a given {@link Mutant} in the database and returns whether
-     * updating was successful or not.
+     * Update the kill message for a given {@link Mutant} in the database.
      *
-     * @param mutant the given mutant as a {@link Mutant}.
-     * @return whether updating was successful or not
-     * @throws UncheckedSQLException If storing the mutant was not successful.
+     * @param mutant The mutant to update.
      */
-    public static boolean updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
+    public void updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
         int mutantId = mutant.getId();
-
         String killMessage = mutant.getKillMessage();
 
         @Language("SQL") String query = """
@@ -362,12 +409,19 @@ public class MutantDAO {
                 SET KillMessage = ?
                 WHERE Mutant_ID = ?;
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-            DatabaseValue.of(killMessage),
-            DatabaseValue.of(mutantId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        try {
+            int updatedRows = queryRunner.update(query,
+                    killMessage,
+                    mutantId
+            );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update mutant.");
+            }
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
@@ -375,127 +429,102 @@ public class MutantDAO {
      *
      * @param mutantId the identifier of the mutant.
      * @param classId  the identifier of the class.
-     * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
-    public static boolean mapMutantToClass(int mutantId, int classId) {
+    public void mapMutantToClass(int mutantId, int classId) {
         @Language("SQL") String query = """
                 INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)
                 VALUES (?, ?);
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(mutantId),
-                DatabaseValue.of(classId)
-        };
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.insert(query, rs -> null,
+                    mutantId,
+                    classId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
 
     /**
-     * Removes a mutant for a given identifier.
-     *
-     * @param id the identifier of the mutant to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
+     * Removes a mutant for a given ID.
      */
-    public static boolean removeMutantForId(Integer id) {
-        @Language("SQL") String query = """
-                DELETE FROM mutants WHERE Mutant_ID = ?;
-                DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?
-        """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(id),
-                DatabaseValue.of(id)
-        };
-        return DB.executeUpdateQuery(query, values);
+    public void removeMutantForId(int mutantId) {
+        @Language("SQL") String query1 = "DELETE FROM mutants WHERE Mutant_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?;";
+        try {
+            queryRunner.update(query1, mutantId);
+            queryRunner.update(query2, mutantId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**
      * Removes multiple mutants for a given list of identifiers.
      *
      * @param mutants the identifiers of the mutants to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeMutantsForIds(List<Integer> mutants) {
+    public void removeMutantsForIds(List<Integer> mutants) {
         if (mutants.isEmpty()) {
-            return false;
+            return;
         }
 
-        String range = Stream.generate(() -> "?")
-                .limit(mutants.size())
-                .collect(Collectors.joining(","));
+        @Language("SQL") String query1 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?;";
+        @Language("SQL") String query2 = "DELETE FROM mutants WHERE Mutant_ID = ?;";
 
-        @Language("SQL") String query = """
-                DELETE FROM mutants
-                WHERE Mutant_ID in (%s);
-                DELETE FROM mutant_uploaded_with_class
-                WHERE Mutant_ID in (%s);
-        """.formatted(
-                range,
-                range
-        );
+        var params = batchParamsFromList(mutants);
 
-        // Hack to make sure all values are listed in both 'ranges'.
-        mutants.addAll(new LinkedList<>(mutants));
-        DatabaseValue<?>[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.batch(query1, params);
+            queryRunner.batch(query2, params);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    /**
-     * Returns the class ID for the given mutant.
-     *
-     * @param mutantId The mutant ID of the mutant.
-     * @return The class ID for the given mutant.
-     */
-    public static Integer getClassIdForMutant(int mutantId) {
-        @Language("SQL") String query = """
-                SELECT games.Class_ID
-                FROM mutants, games
-                WHERE mutants.Mutant_ID = ?
-                  AND mutants.Game_ID = games.ID;
-        """;
+    public int getEquivalentDefenderId(Mutant m) {
+        @Language("SQL") String query = "SELECT * FROM equivalences WHERE Mutant_ID = ?;";
 
-        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DatabaseValue.of(mutantId));
+        try {
+            var defenderId = queryRunner.query(query,
+                            oneFromRS(rs -> rs.getInt("Defender_ID")),
+                            m.getId());
+            return defenderId.orElse(-1);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    /**
-     * Returns the number of killed AI tests for a given mutant.
-     *
-     * @param mutantId the identifier of the mutant.
-     * @return number of killed AI tests, or {@code 0} if none found.
-     */
-    public static int getNumTestsKillMutant(int mutantId) {
-        @Language("SQL") String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"),
-                DatabaseValue.of(mutantId));
-        return Optional.ofNullable(kills).orElse(0);
-    }
-
-    public static int getEquivalentDefenderId(Mutant m) {
-        @Language("SQL") String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
-        final Integer id = DB.executeQueryReturnValue(query,
-                rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
-        return Optional.ofNullable(id).orElse(-1);
-    }
-
-    public static boolean insertEquivalence(Mutant mutant, int defender) {
+    public void insertEquivalence(Mutant mutant, int defender) {
         @Language("SQL") String query = """
                 INSERT INTO equivalences (Mutant_ID, Defender_ID, Mutant_Points)
                 VALUES (?, ?, ?)
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(mutant.getId()),
-                DatabaseValue.of(defender),
-                DatabaseValue.of(mutant.getScore())
-        };
-        return DB.executeUpdateQuery(query, values);
+
+        try {
+            queryRunner.insert(query, rs -> null,
+                    mutant.getId(),
+                    defender,
+                    mutant.getScore()
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
-    public static void incrementMutantScore(Mutant mutant, int score) {
+    public void incrementMutantScore(Mutant mutant, int score) {
         if (score == 0) {
             logger.debug("Do not update mutant {} score by 0", mutant.getId());
             return;
         }
 
+        // Do we really need to check Alive = 1 here?
         @Language("SQL") String query = """
                 UPDATE mutants
                 SET Points = Points + ?
@@ -503,16 +532,16 @@ public class MutantDAO {
         """;
 
         try {
-            CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
+            queryRunner.update(query,
                     score, mutant.getId());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static boolean killMutant(Mutant mutant, Equivalence equivalence) {
+    public boolean killMutant(Mutant mutant, Equivalence equivalence) {
         mutant.setAlive(false);
-        int roundKilled = GameDAO.getCurrentRound(mutant.getGameId());
+        int roundKilled = gameRepo.getCurrentRound(mutant.getGameId());
         mutant.setRoundKilled(roundKilled);
         mutant.setEquivalent(equivalence);
 
@@ -541,7 +570,7 @@ public class MutantDAO {
         }
 
         try {
-            return CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
+            return queryRunner.update(query,
                     equivalence.name(), false, roundKilled, mutant.getId()) > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -54,8 +54,6 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
@@ -69,6 +67,8 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -115,6 +115,12 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
 
 
     private static List<String> reservedClassNames = Arrays.asList(
@@ -696,8 +702,8 @@ public class ClassUploadManager extends HttpServlet {
             final String md5 = CodeValidator.getMD5FromText(fileContent);
             final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
             try {
-                mutantId = MutantDAO.storeMutant(mutant);
-                MutantDAO.mapMutantToClass(mutantId, cutId);
+                mutantId = mutantRepo.storeMutant(mutant);
+                mutantRepo.mapMutantToClass(mutantId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store mutant to database.");
                 messages.add("Class upload failed. Seems like you uploaded two identical mutants.");
@@ -831,8 +837,8 @@ public class ClassUploadManager extends HttpServlet {
 
             int testId;
             try {
-                testId = TestDAO.storeTest(test);
-                TestDAO.mapTestToClass(testId, cutId);
+                testId = testRepo.storeTest(test);
+                testRepo.mapTestToClass(testId, cutId);
             } catch (UncheckedSQLException e) {
                 logger.error("Class upload with test failed. Could not store test to database.", e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -861,7 +867,7 @@ public class ClassUploadManager extends HttpServlet {
      * @param files           Optional additional files, which need to be removed.
      * @throws IOException When an error during redirecting occurs.
      */
-    private static void abortRequestAndCleanUp(HttpServletRequest request,
+    private void abortRequestAndCleanUp(HttpServletRequest request,
                                                HttpServletResponse response,
                                                Path cutDir,
                                                List<CompiledClass> compiledClasses,
@@ -914,8 +920,8 @@ public class ClassUploadManager extends HttpServlet {
                 }
             }
 
-            MutantDAO.removeMutantsForIds(mutants);
-            TestDAO.removeTestsForIds(tests);
+            mutantRepo.removeMutantsForIds(mutants);
+            testRepo.removeTestsForIds(tests);
             DependencyDAO.removeDependenciesForIds(dependencies);
             GameClassDAO.removeClassesForIds(cuts);
         }

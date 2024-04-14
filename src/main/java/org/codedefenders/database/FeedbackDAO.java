@@ -18,14 +18,14 @@
  */
 package org.codedefenders.database;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codedefenders.model.Feedback;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import static org.codedefenders.model.Feedback.MAX_RATING;
 import static org.codedefenders.model.Feedback.MIN_RATING;
 import static org.codedefenders.model.Feedback.Type;
+import static org.codedefenders.persistence.database.util.QueryUtils.extractBatchParams;
 
 public class FeedbackDAO {
 
@@ -43,27 +44,26 @@ public class FeedbackDAO {
             return true;
         }
 
-        List<DatabaseValue<?>> values = new ArrayList<>();
-
-        for (Map.Entry<Feedback.Type, Integer> entry : ratings.entrySet()) {
-            int clampedRating = Math.min(Math.max(MIN_RATING, entry.getValue()), MAX_RATING);
-            values.add(DatabaseValue.of(userId));
-            values.add(DatabaseValue.of(gameId));
-            values.add(DatabaseValue.of(entry.getKey().name()));
-            values.add(DatabaseValue.of(clampedRating));
-        }
-
-        String placeholders = Stream.generate(() -> "(?, ?, ?, ?)")
-                .limit(ratings.size())
-                .collect(Collectors.joining(","));
+        var params = extractBatchParams(ratings.entrySet(),
+                entry -> userId,
+                entry -> gameId,
+                entry -> entry.getKey().name(),
+                entry -> Math.min(Math.max(MIN_RATING, entry.getValue()), MAX_RATING));
 
         @Language("SQL") String query = """
                 INSERT INTO ratings (User_ID, Game_ID, type, value)
-                VALUES %s
+                VALUES (?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE value = VALUES(value);
-        """.formatted(placeholders);
+        """;
 
-        return DB.executeUpdateQuery(query, values.toArray(new DatabaseValue[0]));
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
+        try {
+            var updatedRows = queryRunner.batch(query, params);
+            return Arrays.stream(updatedRows)
+                    .allMatch(numRows -> numRows > 0);
+        } catch (SQLException e) {
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     public static Map<Feedback.Type, Integer> getFeedbackValues(int gameId, int userId) {

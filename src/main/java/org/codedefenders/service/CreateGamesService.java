@@ -20,6 +20,8 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -53,6 +55,12 @@ public class CreateGamesService {
     @Inject
     private GameService gameService;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
     /**
      * Maps user ID to their admin staged games list.
      */
@@ -80,13 +88,14 @@ public class CreateGamesService {
 
     public AdminCreateGamesBean getContextForAdmin(int userId) {
         StagedGameList stagedGames = getStagedGamesForAdmin(userId);
-        return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, this);
+        return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, meleeGameRepo,
+                multiplayerGameRepo, this);
     }
 
     public ClassroomCreateGamesBean getContextForClassroom(int userId, int classroomId) {
         StagedGameList stagedGames = getStagedGamesForClassroom(userId, classroomId);
-        return new ClassroomCreateGamesBean(classroomId, stagedGames, messages, eventDAO, userRepo, this,
-                classroomService);
+        return new ClassroomCreateGamesBean(classroomId, stagedGames, messages, eventDAO, userRepo,
+                classroomService, meleeGameRepo, multiplayerGameRepo, this);
     }
 
     /**
@@ -137,8 +146,6 @@ public class CreateGamesService {
         }
 
         /* Insert the game. */
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
         if (!game.insert()) {
             messages.add(format("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));

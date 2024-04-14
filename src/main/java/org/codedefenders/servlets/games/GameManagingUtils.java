@@ -37,11 +37,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -53,6 +49,10 @@ import org.codedefenders.game.Test;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
@@ -114,13 +114,25 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private Configuration config;
 
+    @Inject
+    private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
+    private GameRepository gameRepo;
+
+    @Inject
+    private PlayerRepository playerRepo;
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Mutant existingMutant(int gameId, String mutatedCode) {
         String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
-        return MutantDAO.getMutantByGameAndMd5(gameId, md5Mutant);
+        return mutantRepo.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
     /**
@@ -128,7 +140,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      */
     @Override
     public boolean hasAttackerPendingMutantsInGame(int gameId, int attackerId) {
-        for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant m : mutantRepo.getValidMutantsForGame(gameId)) {
             if (m.getPlayerId() == attackerId && m.getEquivalent() == Mutant.Equivalence.PENDING_TEST) {
                 return true;
             }
@@ -238,9 +250,9 @@ public class GameManagingUtils implements IGameManagingUtils {
     public boolean addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
         List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(game.getClassId());
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
-        int currentRound = GameDAO.getCurrentRound(game.getId());
+        int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        int dummyDefenderPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        int currentRound = gameRepo.getCurrentRound(game.getId());
 
         if (dummyAttackerPlayerId == -1) {
             logger.error("System attacker was not added to the game " + game.getId() + ".");
@@ -265,7 +277,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                         true, // Alive be default
                         dummyAttackerPlayerId,
                         currentRound);
-                newMutant.insert();
+
+                int mutantId = mutantRepo.storeMutant(newMutant);
+                newMutant.setId(mutantId);
+
                 mutantMap.put(mutant.getId(), newMutant);
             }
         }
@@ -276,7 +291,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                 Test newTest = new Test(-1, game.getClassId(), game.getId(), test.getJavaFile(),
                         test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
-                newTest.insert();
+
+                int testId = testRepo.storeTest(newTest);
+                newTest.setId(testId);
+
                 testMap.put(test.getId(), newTest);
             }
         }
@@ -292,10 +310,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                 targetExecution.mutantId = mutant.getId();
 
                 if (targetExecution.status == TargetExecution.Status.FAIL) {
-                    TestDAO.killMutant(test);
-                    mutant.kill();
+                    testRepo.incrementMutantsKilled(test);
+                    mutantRepo.killMutant(mutant, mutant.getEquivalent());
                     mutant.setKillMessage(targetExecution.message);
-                    MutantDAO.updateMutantKillMessageForMutant(mutant);
+                    mutantRepo.updateMutantKillMessageForMutant(mutant);
                 }
 
                 targetExecution.insert();
@@ -338,13 +356,13 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public boolean hasPredefinedMutants(AbstractGame game) {
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         return game.getMutants().stream()
                 .anyMatch(mutant -> mutant.getPlayerId() == dummyAttackerPlayerId);
     }
 
     public boolean hasPredefinedTests(AbstractGame game) {
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        int dummyDefenderPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         return game.getMutants().stream()
                 .anyMatch(mutant -> mutant.getPlayerId() == dummyDefenderPlayerId);
     }

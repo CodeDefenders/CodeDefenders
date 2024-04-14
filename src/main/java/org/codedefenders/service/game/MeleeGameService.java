@@ -29,7 +29,6 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -40,6 +39,7 @@ import org.codedefenders.game.Mutant.State;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.scoring.IScoringPolicy;
 import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Event;
@@ -48,6 +48,11 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -68,17 +73,21 @@ public class MeleeGameService extends AbstractGameService {
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
+    private final MeleeGameRepository meleeGameRepo;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,
-                                  GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
-                                  CodeDefendersAuth login, NotificationService notificationService) {
-        super(userService, userRepository);
-        this.gameManagingUtils = gameManagingUtils;
+                            GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
+                            CodeDefendersAuth login, NotificationService notificationService,
+                            TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+                            MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
+        this.gameManagingUtils = gameManagingUtils;
+        this.meleeGameRepo = meleeGameRepo;
     }
 
     @Override
@@ -141,7 +150,8 @@ public class MeleeGameService extends AbstractGameService {
 
     private ScoreCalculator createScoreCalculator() {
         ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
-        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
+        IScoringPolicy policy = scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo, gameRepo, playerRepo);
+        return new ScoreCalculator(policy, testRepo, mutantRepo, gameRepo, playerRepo);
     }
 
     public boolean createGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {
@@ -153,10 +163,7 @@ public class MeleeGameService extends AbstractGameService {
             return false;
         }
 
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepository);
-
-        int newGameId = MeleeGameDAO.storeMeleeGame(game);
+        int newGameId = meleeGameRepo.storeMeleeGame(game);
         game.setId(newGameId);
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,

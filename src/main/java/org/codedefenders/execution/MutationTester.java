@@ -28,9 +28,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -41,6 +39,8 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -73,14 +73,18 @@ public class MutationTester implements IMutationTester {
     protected BackendExecutorService backend;
     protected EventDAO eventDAO;
     protected UserRepository userRepo;
+    protected TestRepository testRepo;
+    protected MutantRepository mutantRepo;
 
     protected boolean useMutantCoverage;
 
     public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            boolean useMutantCoverage) {
+            TestRepository testRepo, MutantRepository mutantRepo, boolean useMutantCoverage) {
         this.backend = backend;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
         this.useMutantCoverage = useMutantCoverage;
     }
 
@@ -143,13 +147,13 @@ public class MutationTester implements IMutationTester {
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
                 int score = Scorer.score(game, mutant, missedTests);
-                MutantDAO.incrementMutantScore(mutant, score);
+                mutantRepo.incrementMutantScore(mutant, score);
             }
         }
 
         // test.setScore(Scorer.score(game, test, killedMutants));
         // test.update();
-        TestDAO.incrementTestScore(test, Scorer.score(game, test, killedMutants));
+        testRepo.incrementTestScore(test.getId(), Scorer.score(game, test, killedMutants));
 
         if (killed > 0) {
             insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
@@ -286,7 +290,7 @@ public class MutationTester implements IMutationTester {
                     // mlist));
                     // test.update();
                     int score = Scorer.score((MultiplayerGame) game, test, mlist);
-                    TestDAO.incrementTestScore(test, score);
+                    testRepo.incrementTestScore(test.getId(), score);
                 }
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
@@ -313,7 +317,7 @@ public class MutationTester implements IMutationTester {
             // missedTests));
             // mutant.update();
             int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
-            MutantDAO.incrementMutantScore(mutant, score);
+            mutantRepo.incrementMutantScore(mutant, score);
         }
 
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
@@ -357,16 +361,16 @@ public class MutationTester implements IMutationTester {
             // Mutant survived
             return false;
         }
-        if (!MutantDAO.killMutant(mutant, ASSUMED_NO)) {
+        if (!mutantRepo.killMutant(mutant, ASSUMED_NO)) {
             logger.info("Test {} would have killed Mutant {}, but Mutant {} was already dead!", test.getId(),
                     mutant.getId(), mutant.getId());
             return false;
         }
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
-        TestDAO.killMutant(test);
+        testRepo.incrementMutantsKilled(test);
         mutant.setKillMessage(executedTarget.message);
-        MutantDAO.updateMutantKillMessageForMutant(mutant);
+        mutantRepo.updateMutantKillMessageForMutant(mutant);
 
         return true;
     }
@@ -392,11 +396,11 @@ public class MutationTester implements IMutationTester {
         if (executedTarget.status.equals(ERROR) || executedTarget.status.equals(FAIL)) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
-            if (MutantDAO.killMutant(mutant, PROVEN_NO)) {
+            if (mutantRepo.killMutant(mutant, PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
-                TestDAO.killMutant(test);
+                testRepo.incrementMutantsKilled(test);
                 mutant.setKillMessage(executedTarget.message);
-                MutantDAO.updateMutantKillMessageForMutant(mutant);
+                mutantRepo.updateMutantKillMessageForMutant(mutant);
             } else {
                 logger.info(
                         "Test {} would have killed Mutant {} and resolve equivalence,"
@@ -427,7 +431,8 @@ public class MutationTester implements IMutationTester {
 
         // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
         // Note we need to return the test for all the roles to include PLAYER
-        List<Test> testsToExecute = game.getAllTests().stream().filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
+        List<Test> testsToExecute = testRepo.getValidTestsForGame(game.getId()).stream()
+                .filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
                 .collect(Collectors.toList());
         List<Test> tests = scheduler.scheduleTests(testsToExecute);
 

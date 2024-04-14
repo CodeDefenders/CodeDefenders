@@ -18,9 +18,10 @@
  */
 package org.codedefenders.game.puzzle;
 
-import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
+import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 /**
@@ -254,8 +255,9 @@ public class Puzzle {
      * @return The {@link PuzzleChapter} this puzzle belongs to.
      */
     public PuzzleChapter getChapter() {
+        var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
         if (chapterId != null && chapter == null) {
-            chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
+            chapter = puzzleRepo.getPuzzleChapterForId(chapterId);
         }
         return chapter;
     }

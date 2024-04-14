@@ -21,8 +21,6 @@ package org.codedefenders.game.puzzle;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -31,6 +29,9 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
@@ -232,7 +233,8 @@ public class PuzzleGame extends AbstractGame {
      */
     public Puzzle getPuzzle() {
         if (puzzle == null) {
-            puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+            var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+            puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         }
         return puzzle;
     }
@@ -265,6 +267,8 @@ public class PuzzleGame extends AbstractGame {
      */
     @Override
     public boolean addPlayer(int userId, Role role) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         switch (userId) {
             case DUMMY_ATTACKER_USER_ID:
                 if (role != Role.ATTACKER) {
@@ -285,18 +289,20 @@ public class PuzzleGame extends AbstractGame {
                 }
         }
 
-        return GameDAO.addPlayerToGame(id, userId, role);
+        return gameRepo.addPlayerToGame(id, userId, role);
     }
 
     @Override
     public boolean insert() {
-        id = PuzzleDAO.storePuzzleGame(this);
+        var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+        id = puzzleRepo.storePuzzleGame(this);
         return id != -1;
     }
 
     @Override
     public boolean update() {
-        return PuzzleDAO.updatePuzzleGame(this);
+        var puzzleRepo = CDIUtil.getBeanFromCDI(PuzzleRepository.class);
+        return puzzleRepo.updatePuzzleGame(this);
     }
 
     @Override

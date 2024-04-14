@@ -24,9 +24,9 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserStatsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +38,13 @@ import org.slf4j.LoggerFactory;
 public class UserStatsService {
     private static final Logger logger = LoggerFactory.getLogger(UserStatsService.class);
 
-    private final UserStatsDAO dao;
+    private final UserStatsDAO userStatsDAO;
+    private final PuzzleRepository puzzleRepo;
 
     @Inject
-    private UserStatsService(UserStatsDAO userStatsDAO) {
-        dao = userStatsDAO;
+    private UserStatsService(UserStatsDAO userStatsDAO, PuzzleRepository puzzleRepo) {
+        this.userStatsDAO = userStatsDAO;
+        this.puzzleRepo = puzzleRepo;
     }
 
     /**
@@ -61,31 +63,31 @@ public class UserStatsService {
 
     private UserStats getStatsByUserId(int userId, GameType gameType) {
         UserStats us = new UserStats(userId,
-                dao.getNumKilledMutantsByUser(userId, gameType),
-                dao.getNumAliveMutantsByUser(userId, gameType),
-                dao.getNumKillingTestsByUser(userId, gameType),
-                dao.getNumNonKillingTestsByUser(userId, gameType),
-                dao.getAveragePointsTestByUser(userId, gameType),
-                dao.getTotalPointsTestsByUser(userId, gameType),
-                dao.getAveragePointsMutantByUser(userId, gameType),
-                dao.getTotalPointsMutantByUser(userId, gameType)
+                userStatsDAO.getNumKilledMutantsByUser(userId, gameType),
+                userStatsDAO.getNumAliveMutantsByUser(userId, gameType),
+                userStatsDAO.getNumKillingTestsByUser(userId, gameType),
+                userStatsDAO.getNumNonKillingTestsByUser(userId, gameType),
+                userStatsDAO.getAveragePointsTestByUser(userId, gameType),
+                userStatsDAO.getTotalPointsTestsByUser(userId, gameType),
+                userStatsDAO.getAveragePointsMutantByUser(userId, gameType),
+                userStatsDAO.getTotalPointsMutantByUser(userId, gameType)
         );
 
         if (gameType == GameType.MULTIPLAYER) {
             us.setAttackerDefenderGames(
-                    dao.getAttackerGamesByUser(userId, gameType),
-                    dao.getDefenderGamesByUser(userId, gameType)
+                    userStatsDAO.getAttackerGamesByUser(userId, gameType),
+                    userStatsDAO.getDefenderGamesByUser(userId, gameType)
             );
         } else {
-            us.setTotalGames(dao.getTotalGamesByUser(userId, gameType));
+            us.setTotalGames(userStatsDAO.getTotalGamesByUser(userId, gameType));
         }
 
         return us;
     }
 
     public UserStats.PuzzleStats getPuzzleStatsByUserId(int userId) {
-        final UserStats.PuzzleStats puzzleStats = dao.getPuzzleStatsByUser(userId);
-        puzzleStats.setChapters(PuzzleDAO.getPuzzleChapters());
+        final UserStats.PuzzleStats puzzleStats = userStatsDAO.getPuzzleStatsByUser(userId);
+        puzzleStats.setChapters(puzzleRepo.getPuzzleChapters());
         return puzzleStats;
     }
 }

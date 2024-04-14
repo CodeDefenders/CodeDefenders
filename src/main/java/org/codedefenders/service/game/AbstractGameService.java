@@ -27,10 +27,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
@@ -44,6 +40,10 @@ import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 
@@ -59,11 +59,21 @@ public abstract class AbstractGameService implements IGameService {
 
     protected UserRepository userRepository;
     protected UserService userService;
+    protected TestRepository testRepo;
+    protected MutantRepository mutantRepo;
+    protected GameRepository gameRepo;
+    protected PlayerRepository playerRepo;
 
     @Inject
-    public AbstractGameService(UserService userService, UserRepository userRepository) {
+    public AbstractGameService(UserService userService, UserRepository userRepository,
+                               TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+                               PlayerRepository playerRepo) {
         this.userService = userService;
         this.userRepository = userRepository;
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
     }
 
     @Inject
@@ -71,13 +81,13 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
-        return getMutant(userId, MutantDAO.getMutantById(mutantId));
+        return getMutant(userId, mutantRepo.getMutantById(mutantId));
     }
 
     @Override
     public MutantDTO getMutant(int userId, Mutant mutant) {
-        AbstractGame game = GameDAO.getGame(mutant.getGameId());
-        Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
+        AbstractGame game = gameRepo.getGame(mutant.getGameId());
+        Player player = playerRepo.getPlayerForUserAndGame(userId, mutant.getGameId());
         Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         if (game != null && user.isPresent()) {
             return convertMutant(mutant, user.get(), player, game);
@@ -89,7 +99,7 @@ public abstract class AbstractGameService implements IGameService {
     @Override
     public List<MutantDTO> getMutants(int userId, int gameId) {
         Optional<SimpleUser> user = userService.getSimpleUserById(userId);
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         if (game != null && user.isPresent()) {
             return getMutants(user.get(), game);
         } else {
@@ -99,7 +109,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<MutantDTO> getMutants(SimpleUser user, AbstractGame game) {
-        Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
+        Player player = playerRepo.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getMutants().stream()
                 .map(mutant -> convertMutant(mutant, user, player, game))
                 .filter(Objects::nonNull)
@@ -114,7 +124,7 @@ public abstract class AbstractGameService implements IGameService {
         SimpleUser killedBy;
         int killedByTestId;
         String killMessage;
-        Test killingTest = mutant.getKillingTest();
+        Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
         if (killingTest != null) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
@@ -160,13 +170,13 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public TestDTO getTest(int userId, int testId) {
-        return getTest(userId, TestDAO.getTestById(testId));
+        return getTest(userId, testRepo.getTestById(testId));
     }
 
     @Override
     public TestDTO getTest(int userId, Test test) {
-        AbstractGame game = GameDAO.getGame(test.getGameId());
-        Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
+        AbstractGame game = gameRepo.getGame(test.getGameId());
+        Player player = playerRepo.getPlayerForUserAndGame(userId, test.getGameId());
         Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         if (game != null && user.isPresent()) {
             return convertTest(test, user.get(), player, game);
@@ -178,7 +188,7 @@ public abstract class AbstractGameService implements IGameService {
     @Override
     public List<TestDTO> getTests(int userId, int gameId) {
         Optional<SimpleUser> user = userService.getSimpleUserById(userId);
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         if (game != null && user.isPresent()) {
             return getTests(user.get(), game);
         } else {
@@ -188,7 +198,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<TestDTO> getTests(SimpleUser user, AbstractGame game) {
-        Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
+        Player player = playerRepo.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getTests().stream()
                 .map(test -> convertTest(test, user, player, game))
                 .filter(Objects::nonNull)
@@ -202,9 +212,13 @@ public abstract class AbstractGameService implements IGameService {
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
 
+        List<Integer> killedMutantIds = testRepo.getKilledMutantsForTestId(test.getId()).stream()
+            .map(Mutant::getId)
+            .toList();
+
         return new TestDTO(test.getId(), creator, test.getScore(), viewable,
                 test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
-                test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
+                killedMutantIds,
                 (new TestSmellsDAO()).getDetectedTestSmellsForTest(test.getId()),
                 test.getGameId(),
                 test.getPlayerId(),
@@ -256,7 +270,7 @@ public abstract class AbstractGameService implements IGameService {
             boolean updated = game.update();
 
             if (updated) {
-                GameDAO.storeStartTime(game.getId());
+                gameRepo.storeStartTime(game.getId());
 
                 GameStartedEvent gse = new GameStartedEvent();
                 gse.setGameId(game.getId());

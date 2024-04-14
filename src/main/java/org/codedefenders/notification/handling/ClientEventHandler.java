@@ -5,7 +5,6 @@ import java.util.regex.Pattern;
 
 import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.GameChatDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
@@ -21,6 +20,8 @@ import org.codedefenders.notification.events.server.achievement.ServerAchievemen
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
 import org.codedefenders.notification.web.PushSocket;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +36,24 @@ public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
     private static final Pattern CHAT_COMMAND_PATTERN = Pattern.compile("^/([a-zA-Z]+)");
 
-    private INotificationService notificationService;
-    private ServerEventHandlerContainer serverEventHandlerContainer;
-    private SimpleUser user;
-    private String ticket;
+    private final INotificationService notificationService;
+    private final ServerEventHandlerContainer serverEventHandlerContainer;
+    private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
+    private final SimpleUser user;
+    private final String ticket;
 
     public ClientEventHandler(
             INotificationService notificationService,
             ServerEventHandlerContainer serverEventHandlerContainer,
+            GameRepository gameRepo,
+            PlayerRepository playerRepo,
             SimpleUser user,
             String ticket) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
+        this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
         this.user = user;
         this.ticket = ticket;
     }
@@ -64,9 +71,9 @@ public class ClientEventHandler {
 
     public void visit(ClientGameChatEvent event) {
         GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
-        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        Role role = playerRepo.getRole(user.getId(), event.getGameId());
 
-        AbstractGame game = GameDAO.getGame(event.getGameId());
+        AbstractGame game = gameRepo.getGame(event.getGameId());
         if (game == null) {
             logger.warn("User {} tried to send chat message to game {}, which does not exist.",
                     user.getId(), event.getGameId());

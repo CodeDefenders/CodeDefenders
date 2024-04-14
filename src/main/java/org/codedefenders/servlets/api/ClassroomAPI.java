@@ -15,9 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
@@ -29,6 +26,9 @@ import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -47,6 +47,12 @@ public class ClassroomAPI extends HttpServlet {
     private UserService userService;
     @Inject
     private CodeDefendersAuth login;
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+    @Inject
+    private PlayerRepository playerRepo;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -176,12 +182,12 @@ public class ClassroomAPI extends HttpServlet {
 
     private List<ClassroomGameDTO> getGamesData(Classroom classroom) {
         List<AbstractGame> games = new ArrayList<>();
-        games.addAll(MultiplayerGameDAO.getClassroomGames(classroom.getId()));
-        games.addAll(MeleeGameDAO.getClassroomGames(classroom.getId()));
+        games.addAll(multiplayerGameRepo.getClassroomGames(classroom.getId()));
+        games.addAll(meleeGameRepo.getClassroomGames(classroom.getId()));
 
         return games.stream()
                 .map(game -> {
-                    Player player = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), game.getId());
+                    Player player = playerRepo.getPlayerForUserAndGame(login.getUserId(), game.getId());
                     Role role;
                     if (player != null) {
                         role = player.getRole();

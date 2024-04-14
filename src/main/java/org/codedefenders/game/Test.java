@@ -28,10 +28,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -82,10 +81,10 @@ public class Test {
         this.lineCoverage = lineCoverage;
     }
 
-    public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
+    public Test(int classId, int gameId, int roundCreated, String javaFile, String classFile, int playerId) {
         this.classId = classId;
         this.gameId = gameId;
-        this.roundCreated = GameDAO.getCurrentRound(gameId); // TODO: this is overwritten by other constructors
+        this.roundCreated = roundCreated;
         this.javaFile = javaFile;
         this.classFile = classFile;
         this.playerId = playerId;
@@ -95,13 +94,16 @@ public class Test {
 
     public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated,
                 int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
-        this(classId, gameId, javaFile, classFile, playerId);
-
+        this.classId = classId;
+        this.gameId = gameId;
+        this.javaFile = javaFile;
+        this.classFile = classFile;
+        this.playerId = playerId;
         this.id = testId;
         this.roundCreated = roundCreated;
         this.mutantsKilled = mutantsKilled;
         this.score = score;
-        lineCoverage = new LineCoverage(linesCovered, linesUncovered);
+        this.lineCoverage = new LineCoverage(linesCovered, linesUncovered);
     }
 
     @Deprecated
@@ -138,11 +140,6 @@ public class Test {
         this.mutantsKilled = mutantsKilled;
     }
 
-    // Increment the number of mutant killed directly on the DB
-    // And update the local object. But it requires several queries/connections
-    //
-    // TODO Check that this method is never called for tests that kill a mutant that was already dead...
-
     public boolean isMutantCovered(Mutant mutant) {
         return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
     }
@@ -160,11 +157,6 @@ public class Test {
         return coveredMutants;
     }
 
-    public Set<Mutant> getKilledMutants() {
-        // TODO This does not recover the points of the mutant... why not?
-        return TestDAO.getKilledMutantsForTestId(id);
-    }
-
     public String getAsString() {
         return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
     }
@@ -173,23 +165,8 @@ public class Test {
         return StringEscapeUtils.escapeHtml4(getAsString());
     }
 
-    public boolean insert() {
-        try {
-            this.id = TestDAO.storeTest(this);
-            return true;
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store test to database.", e);
-            return false;
-        }
-    }
-
-    public boolean update() {
-        try {
-            return TestDAO.updateTest(this);
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store test to database.", e);
-            return false;
-        }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getFullyQualifiedClassName() {
@@ -250,5 +227,38 @@ public class Test {
     @Override
     public String toString() {
         return "[testId=" + id + ",classId=" + classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
+    }
+
+    // equals similar to Mutant::equals
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Test test = (Test) o;
+
+        return new EqualsBuilder()
+                .append(id, test.id)
+                .append(gameId, test.gameId)
+                .append(playerId, test.playerId)
+                .append(javaFile, test.javaFile)
+                .append(classFile, test.classFile)
+                .isEquals();
+    }
+
+    // hashCode similar to Mutant::hashCode
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(id)
+                .append(gameId)
+                .append(playerId)
+                .append(javaFile)
+                .append(classFile)
+                .toHashCode();
     }
 }

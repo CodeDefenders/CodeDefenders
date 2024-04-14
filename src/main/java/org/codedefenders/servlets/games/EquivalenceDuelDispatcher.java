@@ -3,6 +3,7 @@ package org.codedefenders.servlets.games;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -11,8 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.GameMode;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -33,6 +34,9 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
     // decouple request dispatching and game-state-logic
 
     private static final Logger logger = LoggerFactory.getLogger(EquivalenceDuelDispatcher.class);
+
+    @Inject
+    private GameRepository gameRepo;
 
 
     @Override
@@ -65,7 +69,7 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
 
     private void forwardEquivalenceAction(HttpServletRequest request, HttpServletResponse response, int gameId)
             throws IOException, ServletException {
-        final GameMode gameType = GameDAO.getGameMode(gameId);
+        final GameMode gameType = gameRepo.getGameMode(gameId);
 
         ServletContext context = this.getServletContext();
 

@@ -23,15 +23,15 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.Player;
-import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,25 +71,12 @@ public abstract class AbstractGame {
      * Maximum number of allowed assertions per submitted test.
      */
     protected int maxAssertionsPerTest;
-    // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
-    // Consider to move this into a setEvents method instead !
-    // This tells us that AbstractGame is not the right place for any logic!!!
-    protected EventDAO eventDAO;
-    protected UserRepository userRepository;
 
     public abstract boolean addPlayer(int userId, Role role);
 
     public abstract boolean insert();
 
     public abstract boolean update();
-
-    public void setEventDAO(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-    }
-
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     public int getId() {
         return id;
@@ -101,6 +88,7 @@ public abstract class AbstractGame {
 
     public List<Event> getEvents() {
         if (events == null) {
+            EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
             events = eventDAO.getEventsForGame(getId());
         }
         return events;
@@ -159,29 +147,26 @@ public abstract class AbstractGame {
         return getTests(false);
     }
 
+    @Deprecated// Get tests through service instead and cache them
     public List<Test> getTests(boolean defendersOnly) {
+        TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
         if (defendersOnly) {
             if (testsDefendersOnly == null) {
-                testsDefendersOnly = TestDAO.getValidTestsForGame(this.id, true);
+                testsDefendersOnly = testRepo.getValidDefenderTestsForGame(this.id);
             }
             return testsDefendersOnly;
         } else {
             if (tests == null) {
-                tests = TestDAO.getValidTestsForGame(this.id, false);
+                tests = testRepo.getValidTestsForGame(this.id);
             }
             return tests;
         }
     }
 
-    // NOTE: I do not want to break compatibility so I define yet another method...
-    public List<Test> getAllTests() {
-        return TestDAO.getValidTestsForGame(this.id, false);
-    }
-
-
     public List<Mutant> getMutants() {
         if (mutants == null) {
-            mutants = MutantDAO.getValidMutantsForGame(id);
+            MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+            mutants = mutantRepo.getValidMutantsForGame(id);
         }
         return mutants;
     }
@@ -237,7 +222,8 @@ public abstract class AbstractGame {
 
     public List<Player> getObserverPlayers() {
         if (observers == null) {
-            observers = GameDAO.getPlayersForGame(getId(), Role.OBSERVER);
+            GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+            observers = gameRepo.getPlayersForGame(getId(), Role.OBSERVER);
         }
         return observers;
     }

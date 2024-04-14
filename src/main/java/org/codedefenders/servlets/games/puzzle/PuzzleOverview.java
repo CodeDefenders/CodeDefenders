@@ -37,15 +37,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
@@ -71,17 +69,20 @@ public class PuzzleOverview extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PuzzleRepository puzzleRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        if (!checkEnabled()) {
+        if (!puzzleRepo.checkPuzzlesEnabled() || !puzzleRepo.checkActivePuzzlesExist()) {
             // Send users to the home page
             response.sendRedirect(url.forPath("/"));
             return;
         }
-        final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
+        final Set<PuzzleGame> activePuzzles = new HashSet<>(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
 
-        final SortedSet<PuzzleChapterEntry> puzzles = PuzzleDAO.getPuzzleChapters()
+        final SortedSet<PuzzleChapterEntry> puzzles = puzzleRepo.getPuzzleChapters()
                 .stream()
                 .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
@@ -112,15 +113,6 @@ public class PuzzleOverview extends HttpServlet {
     }
 
     /**
-     * Checks whether users can play puzzles.
-     *
-     * @return {@code true} when users can play puzzles, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
-    }
-
-    /**
      * Helper function which converts a {@link PuzzleChapter} to a {@link PuzzleChapterEntry} for a
      * given userId and a set of active {@link PuzzleGame}s.
      *
@@ -136,7 +128,7 @@ public class PuzzleOverview extends HttpServlet {
     private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId,
                                                                              Set<PuzzleGame> activePuzzles) {
         return puzzleChapter -> {
-            final Set<PuzzleEntry> puzzleEntries = PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())
+            final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())
                     .stream()
                     .map(toPuzzleEntry(userId, activePuzzles))
                     .collect(Collectors.toSet());
@@ -178,7 +170,7 @@ public class PuzzleOverview extends HttpServlet {
      * @return {@code true} if the user has solved the puzzle, {@code false} otherwise.
      */
     private boolean isPuzzleSolvedForUser(Puzzle entry, int userId) {
-        PuzzleGame puzzleGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
+        PuzzleGame puzzleGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
         return puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
     }
 }

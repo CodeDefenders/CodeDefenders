@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
@@ -35,12 +34,17 @@ import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.database.DB.RSMapper;
+import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
 
 /**
  * This class handles the database logic for Java classes.
@@ -59,7 +63,7 @@ public class GameClassDAO {
      * @return The constructed game class.
      * @see RSMapper
      */
-    static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
+    public static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
         int classId = rs.getInt("Class_ID");
         String name = rs.getString("Name");
         String alias = rs.getString("Alias");
@@ -230,7 +234,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Mutant_ID = mutants.Mutant_ID
         """;
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(classId));
     }
 
     /**
@@ -265,7 +269,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Test_ID = tests.Test_ID
         """;
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(classId));
     }
 
     /**
@@ -443,24 +447,20 @@ public class GameClassDAO {
      * Removes multiple classes for a given list of identifiers.
      *
      * @param classes the identifiers of the classes to be removed.
-     * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeClassesForIds(List<Integer> classes) {
+    public static void removeClassesForIds(List<Integer> classes) {
         if (classes.isEmpty()) {
-            return false;
+            return;
         }
 
-        String placeholders = Stream.generate(() -> "(?, ?, ?, ?)")
-                .limit(classes.size())
-                .collect(Collectors.joining(","));
-        @Language("SQL") String query =
-                "DELETE FROM classes WHERE Class_ID in (%s);".formatted(placeholders);
+        @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
+        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
-        DatabaseValue<?>[] values = classes.stream()
-                .map(DatabaseValue::of)
-                .toArray(DatabaseValue[]::new);
-
-        return DB.executeUpdateQuery(query, values);
+        try {
+            queryRunner.batch(query, batchParamsFromList(classes));
+        } catch (SQLException e) {
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
     }
 
     /**

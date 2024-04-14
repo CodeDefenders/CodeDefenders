@@ -24,9 +24,6 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
@@ -37,6 +34,9 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,19 +48,26 @@ public class GameService implements IGameService {
     private final MultiplayerGameService multiplayerGameService;
     private final MeleeGameService meleeGameService;
     private final PuzzleGameService puzzleGameService;
+    protected TestRepository testRepo;
+    protected MutantRepository mutantRepo;
+    protected GameRepository gameRepo;
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-                       PuzzleGameService puzzleGameService) {
+                       PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo,
+                       GameRepository gameRepo) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
     }
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
         // I can't delegate this to the other services, as the game type is still unknown.
-        Mutant mutant = MutantDAO.getMutantById(mutantId);
+        Mutant mutant = mutantRepo.getMutantById(mutantId);
         if (mutant != null) {
             return getMutant(userId, mutant);
         } else {
@@ -101,7 +108,7 @@ public class GameService implements IGameService {
     @Override
     public TestDTO getTest(int userId, int testId) {
         // I can't delegate this to the other services, as the game type is still unknown.
-        Test test = TestDAO.getTestById(testId);
+        Test test = testRepo.getTestById(testId);
         if (test != null) {
             return getTest(userId, test);
         } else {
@@ -170,7 +177,7 @@ public class GameService implements IGameService {
      * @return the amount of games closed.
      */
     public int closeExpiredGames() {
-        final List<AbstractGame> expiredGames = GameDAO.getExpiredGames();
+        final List<AbstractGame> expiredGames = gameRepo.getExpiredGames();
         int closedGames = 0;
 
         for (AbstractGame game : expiredGames) {
@@ -181,7 +188,7 @@ public class GameService implements IGameService {
     }
 
     private IGameService getGameServiceForGameId(int gameId) {
-        GameMode mode = GameDAO.getGameMode(gameId);
+        GameMode mode = gameRepo.getGameMode(gameId);
         switch (mode) {
             case PARTY:
                 return multiplayerGameService;

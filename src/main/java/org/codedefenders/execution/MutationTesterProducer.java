@@ -23,6 +23,8 @@ import javax.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 
@@ -31,13 +33,14 @@ public class MutationTesterProducer {
     @Produces
     @ApplicationScoped
     public IMutationTester getMutationTester(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
-            BackendExecutorService backend, EventDAO eventDAO, UserRepository userRepo,
-                                             ExecutorServiceProvider executorServiceProvider) {
+                                             BackendExecutorService backend, EventDAO eventDAO, UserRepository userRepo,
+                                             ExecutorServiceProvider executorServiceProvider,
+                                             TestRepository testRepo, MutantRepository mutantRepo) {
         if (config.isParallelize()) {
-            return new ParallelMutationTester(backend, userRepo, eventDAO, config.isMutantCoverage(),
+            return new ParallelMutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo, config.isMutantCoverage(),
                     executorServiceProvider.createExecutorService("test-executor-parallel", config.getNumberOfParallelAntExecutions()));
         } else {
-            return new MutationTester(backend, userRepo, eventDAO, config.isMutantCoverage());
+            return new MutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo, config.isMutantCoverage());
         }
     }
 }

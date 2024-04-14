@@ -8,14 +8,14 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants
@@ -30,10 +30,20 @@ import org.codedefenders.model.Player;
 public class ScoreCalculator {
 
     private final IScoringPolicy scoringPolicy;
+    private final TestRepository testRepo;
+    private final MutantRepository mutantRepo;
+    private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
 
     @Inject
-    public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy) {
+    public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy,
+                           TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+                           PlayerRepository playerRepo) {
         this.scoringPolicy = scoringPolicy;
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
     }
 
     /**
@@ -44,11 +54,11 @@ public class ScoreCalculator {
         Map<Integer, PlayerScore> mutantScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             mutantScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
-        for (Mutant mutant : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
             // Compute the score for the mutant and store it inside the mutant object
             scoringPolicy.scoreMutant(mutant);
             // Update the Map
@@ -74,11 +84,11 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> testScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             testScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
-        for (Test test : TestDAO.getTestsForGame(gameId)) {
+        for (Test test : testRepo.getValidTestsForGame(gameId)) {
             // Compute the score for the test and store it inside the test object
             scoringPolicy.scoreTest(test);
             // Update the map
@@ -104,7 +114,7 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> duelScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
             duelScores.put(player.getId(), playerScore);
@@ -114,20 +124,20 @@ public class ScoreCalculator {
     }
 
     public void storeScoresToDB(int gameId) {
-        for (Mutant mutant : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
             // Compute the score for the mutant and store it inside the mutant object
             scoringPolicy.scoreMutant(mutant);
-            MutantDAO.updateMutantScore(mutant);
+            mutantRepo.updateMutantScore(mutant);
         }
-        for (Test test : TestDAO.getTestsForGame(gameId)) {
+        for (Test test : testRepo.getValidTestsForGame(gameId)) {
             // Compute the score for the test and store it inside the test object
             scoringPolicy.scoreTest(test);
-            TestDAO.updateTest(test);
+            testRepo.updateTest(test);
         }
-        for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
+        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
-            PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());
+            playerRepo.setPlayerPoints(playerScore.getTotalScore(), player.getId());
         }
     }
 }

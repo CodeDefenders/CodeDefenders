@@ -23,10 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -41,6 +38,12 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -303,15 +306,19 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public List<Player> getDefenderPlayers() {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (defenders == null) {
-            defenders = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
+            defenders = gameRepo.getPlayersForGame(getId(), Role.DEFENDER);
         }
         return defenders;
     }
 
     public List<Player> getAttackerPlayers() {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (attackers == null) {
-            attackers = GameDAO.getPlayersForGame(getId(), Role.ATTACKER);
+            attackers = gameRepo.getPlayersForGame(getId(), Role.ATTACKER);
         }
         return attackers;
     }
@@ -322,13 +329,17 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public boolean addPlayerForce(int userId, Role role) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+
         if (state == GameState.FINISHED) {
             return false;
         }
-        if (!GameDAO.addPlayerToGame(id, userId, role)) {
+        if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
-        Optional<UserEntity> u = userRepository.getUserById(userId);
+        Optional<UserEntity> u = userRepo.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
@@ -343,20 +354,24 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public boolean removePlayer(int userId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.CREATED) {
-            return GameDAO.removeUserFromGame(id, userId);
+            return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
     }
 
     private boolean canJoinGame(int userId) {
-        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override
     public boolean insert() {
+        var multiplayerGameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
         try {
-            this.id = MultiplayerGameDAO.storeMultiplayerGame(this);
+            this.id = multiplayerGameRepo.storeMultiplayerGame(this);
             return true;
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store multiplayer game to database.", e);
@@ -366,7 +381,8 @@ public class MultiplayerGame extends AbstractGame {
 
     @Override
     public boolean update() {
-        return MultiplayerGameDAO.updateMultiplayerGame(this);
+        var multiplayerGameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
+        return multiplayerGameRepo.updateMultiplayerGame(this);
     }
 
     /**
@@ -463,6 +479,9 @@ public class MultiplayerGame extends AbstractGame {
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
+        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
+        PlayerRepository playerRepo = CDIUtil.getBeanFromCDI(PlayerRepository.class);
+
         final HashMap<Integer, PlayerScore> testScores = new HashMap<>();
         final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
 
@@ -516,7 +535,7 @@ public class MultiplayerGame extends AbstractGame {
             int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
-            int playerScore = PlayerDAO.getPlayerPoints(playerId);
+            int playerScore = playerRepo.getPlayerPoints(playerId);
             ps.increaseTotalScore(playerScore);
 
             PlayerScore ts = testScores.get(teamKey);
@@ -528,21 +547,21 @@ public class MultiplayerGame extends AbstractGame {
                 continue;
             }
 
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
-            int defenderId = MutantDAO.getEquivalentDefenderId(m);
+            int defenderId = mutantRepo.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
@@ -627,6 +646,7 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private void notifyAttackers(String message, EventType et) {
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         for (Player player : getAttackerPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
@@ -635,6 +655,7 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private void notifyDefenders(String message, EventType et) {
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         for (Player player : getDefenderPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
@@ -644,6 +665,7 @@ public class MultiplayerGame extends AbstractGame {
 
     private void notifyCreator(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
@@ -651,6 +673,7 @@ public class MultiplayerGame extends AbstractGame {
 
     private void notifyGame(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);

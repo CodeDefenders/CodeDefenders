@@ -41,6 +41,14 @@ import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
 import org.codedefenders.util.WeldExtension;
@@ -78,7 +86,14 @@ public class GameManagingUtilsTest {
                         NotificationService.class,
                         ExecutorServiceProvider.class,
                         MetricsRegistry.class,
-                        Configuration.class)
+                        Configuration.class,
+                        TestRepository.class,
+                        MutantRepository.class,
+                        GameRepository.class,
+                        MeleeGameRepository.class,
+                        MultiplayerGameRepository.class,
+                        PuzzleRepository.class,
+                        PlayerRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)
@@ -129,6 +144,11 @@ public class GameManagingUtilsTest {
     @Produces
     TransactionManager produceTransactionManager() {
         return mock(TransactionManager.class);
+    }
+
+    @Produces
+    QueryRunner produceQueryRunner() {
+        return mock(QueryRunner.class);
     }
 
 

@@ -30,7 +30,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
@@ -48,6 +47,11 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -68,17 +72,23 @@ public class MultiplayerGameService extends AbstractGameService {
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
+    private final MultiplayerGameRepository multiplayerGameRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
                                   GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
-                                  CodeDefendersAuth login, NotificationService notificationService) {
-        super(userService, userRepository);
+                                  CodeDefendersAuth login, NotificationService notificationService,
+                                  TestRepository testRepo, MutantRepository mutantRepo,
+                                  GameRepository gameRepo,
+                                  MultiplayerGameRepository multiplayerGameRepo,
+                                  PlayerRepository playerRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
+        this.multiplayerGameRepo = multiplayerGameRepo;
     }
 
     @Override
@@ -153,10 +163,7 @@ public class MultiplayerGameService extends AbstractGameService {
             return false;
         }
 
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepository);
-
-        int newGameId = MultiplayerGameDAO.storeMultiplayerGame(game);
+        int newGameId = multiplayerGameRepo.storeMultiplayerGame(game);
         game.setId(newGameId);
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",

@@ -45,7 +45,7 @@ public class TargetExecutionDAO {
      * @return The constructed test.
      * @see RSMapper
      */
-    static TargetExecution targetExecutionFromRS(ResultSet rs) throws SQLException {
+    public static TargetExecution targetExecutionFromRS(ResultSet rs) throws SQLException {
         int targetExecutionId = rs.getInt("TargetExecution_ID");
         int testId = rs.getInt("Test_ID");
         int mutantId = rs.getInt("Mutant_ID");

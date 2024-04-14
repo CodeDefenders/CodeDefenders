@@ -40,6 +40,8 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
@@ -88,6 +90,8 @@ public class PushSocket {
     private final ITicketingService ticketingServices;
 
     private final UserService userService;
+    private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
 
     // Authorization
     private SimpleUser user;
@@ -107,6 +111,8 @@ public class PushSocket {
         ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
         userService = CDIUtil.getBeanFromCDI(UserService.class);
+        gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+        playerRepo = CDIUtil.getBeanFromCDI(PlayerRepository.class);
 
         open = false;
     }
@@ -132,8 +138,10 @@ public class PushSocket {
 
         this.user = user.get();
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user.get(), ticket);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user.get(), ticket);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(
+                notificationService, playerRepo, this, user.get(), ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer,
+                gameRepo, playerRepo, user.get(), ticket);
         this.session = session;
 
         open = true;

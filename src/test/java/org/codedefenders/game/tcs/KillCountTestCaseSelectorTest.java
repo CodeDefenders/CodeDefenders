@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMap.KillMapEntry.Status;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.tcs.impl.KillCountTestCaseSelector;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,29 +32,24 @@ public class KillCountTestCaseSelectorTest {
     List<Integer> linesUncovered = Arrays.asList(1);
     int score = 0;
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testSorting() throws Exception {
         List<org.codedefenders.game.Test> allTests;
         org.codedefenders.game.Test t1, t2, t3, t31;
 
-        try (var mockedGameDAO = mockStatic(GameDAO.class)) {
-            mockedGameDAO.when(() -> GameDAO.getCurrentRound(gameId))
-                    .thenReturn(0);
+        // Test calss is UNTESTABLE ! it requires the Database !
+        t1 = new Test(1, classId, gameId, javaFile, classFile,
+                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+        t2 = new Test(2, classId, gameId, javaFile, classFile,
+                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+        t3 = new Test(3, classId, gameId, javaFile, classFile,
+                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
 
-            // Test calss is UNTESTABLE ! it requires the Database !
-            t1 = new org.codedefenders.game.Test(1, classId, gameId, javaFile, classFile,
-                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-            t2 = new org.codedefenders.game.Test(2, classId, gameId, javaFile, classFile,
-                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-            t3 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
-                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+        // What happens if we get different instances of the same test?
+        t31 = new Test(3, classId, gameId, javaFile, classFile,
+                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
 
-            // What happens if we get different instances of the same test?
-            t31 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
-                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-
-            allTests = Arrays.asList(t1, t2, t3);
-        }
+        allTests = Arrays.asList(t1, t2, t3);
 
         List<KillMapEntry> killMapEntriesForClass = new ArrayList<>();
         // t1 covers 3 killed one mutant

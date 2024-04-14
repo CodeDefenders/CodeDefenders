@@ -50,6 +50,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
+import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.MeleeGameService;
@@ -288,6 +289,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
+
+        if (game.getCreatorId() != login.getUserId()) {
+            messages.add("Only the game's creator can start the game.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -337,6 +345,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
             logger.info("Starting melee game {} (Setting state to ACTIVE)", gameId);
             gameService.startGame(game);
         }
+
+        /*
+         * Publish the event about the user
+         */
+        GameStartedEvent gse = new GameStartedEvent();
+        gse.setGameId(game.getId());
+        notificationService.post(gse);
 
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
     }

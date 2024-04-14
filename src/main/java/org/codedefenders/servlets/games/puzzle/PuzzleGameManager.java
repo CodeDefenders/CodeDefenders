@@ -35,9 +35,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -61,9 +59,9 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -148,10 +146,13 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private PuzzleRepository puzzleRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        if (!checkEnabled()) {
+        if (!puzzleRepo.checkPuzzlesEnabled() || !puzzleRepo.checkActivePuzzlesExist()) {
             // Send users to the home page
             response.sendRedirect(url.forPath("/"));
             return;
@@ -163,18 +164,15 @@ public class PuzzleGameManager extends HttpServlet {
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
             gameProducer.setGameId(gameId);
-            game = PuzzleDAO.getPuzzleGameForId(gameId);
+            game = puzzleRepo.getPuzzleGameForId(gameId);
 
             if (game == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database"
                         + "for gameId: {}.", gameId);
                 response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
                 return;
-            } else {
-                // TODO Should he make PuzzleDAO inject dependencies instead
-                game.setEventDAO(eventDAO);
-                game.setUserRepository(userRepo);
             }
+
             if (game.getCreatorId() != login.getUserId()) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
                         login.getUserId(), gameId);
@@ -189,7 +187,7 @@ public class PuzzleGameManager extends HttpServlet {
                 return;
             }
             final int puzzleId = puzzleIdOpt.get();
-            game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
+            game = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
                         puzzleId, login.getUserId());
@@ -197,9 +195,6 @@ public class PuzzleGameManager extends HttpServlet {
                 return;
             } else {
                 gameProducer.setGameId(game.getId());
-                // TODO Should he make PuzzleDAO inject dependencies instead
-                game.setEventDAO(eventDAO);
-                game.setUserRepository(userRepo);
             }
         }
 
@@ -217,16 +212,6 @@ public class PuzzleGameManager extends HttpServlet {
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
                 response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
         }
-    }
-
-    /**
-     * Checks whether users can play puzzles.
-     *
-     * @return {@code true} when users can play puzzles, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() &&
-                !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**
@@ -249,7 +234,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId.get());
+        final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId.get());
         if (puzzle == null) {
             logger.error("Failed to retrieve puzzle from database for puzzleId: {}.", puzzleId);
             response.setStatus(SC_BAD_REQUEST);
@@ -273,10 +258,6 @@ public class PuzzleGameManager extends HttpServlet {
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            // TODO How we should handle dependency injection here?
-            game.setEventDAO(eventDAO);
-            game.setUserRepository(userRepo);
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
@@ -382,17 +363,14 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+        final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
 
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            // TODO Should he make PuzzleDAO inject dependencies instead
-            game.setEventDAO(eventDAO);
-            game.setUserRepository(userRepo);
         }
+
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit test to non-puzzle game {}.", gameId);
             response.setStatus(SC_BAD_REQUEST);
@@ -524,7 +502,7 @@ public class PuzzleGameManager extends HttpServlet {
             gse.setAttackPuzzle(isAnAttackGame);
             notificationService.post(gse);
         }
-        PuzzleDAO.updatePuzzleGame(game);
+        puzzleRepo.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
 
@@ -556,17 +534,14 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+        final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
 
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}. Aborting.", gameId);
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            // TODO Should he make PuzzleDAO inject dependencies instead
-            game.setEventDAO(eventDAO);
-            game.setUserRepository(userRepo);
         }
+
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit mutant to non-puzzle game {}. Aborting.", gameId);
             response.setStatus(SC_BAD_REQUEST);
@@ -729,7 +704,7 @@ public class PuzzleGameManager extends HttpServlet {
             gse.setAttackPuzzle(isAnAttackGame);
             notificationService.post(gse);
         }
-        PuzzleDAO.updatePuzzleGame(game);
+        puzzleRepo.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
 
@@ -741,14 +716,10 @@ public class PuzzleGameManager extends HttpServlet {
      * solved.
      */
     private Optional<Puzzle> getNextPuzzleForUser(int userId) {
-        for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
-            /*
-             * This returns the puzzles ordered by position and (hopefully)
-             * an empty, not-null list if there's no puzzles
-             */
-            for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+        for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
+            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
                 // TODO Should he make PuzzleDAO inject dependencies instead
-                PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(
+                PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
                         puzzle.getPuzzleId(),
                         login.getUserId()
                 );
@@ -779,7 +750,7 @@ public class PuzzleGameManager extends HttpServlet {
          * {@link PuzzleGameManager#getNextPuzzleForUser(int)} cannot be used here, because the puzzle is marked as
          * solved only after this message is generated.
          */
-        for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
+        for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
             // Skip chapters before this one
             if (puzzleChapter.getChapterId() < currentChapter) {
                 continue;
@@ -787,9 +758,9 @@ public class PuzzleGameManager extends HttpServlet {
                 // Check in current and next chapters
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
-                 * empty, not-null list if there are no puzzles
+                 * and empty, not-null list if there's not puzzles
                  */
-                for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
                     if (puzzleChapter.getChapterId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
@@ -797,7 +768,7 @@ public class PuzzleGameManager extends HttpServlet {
                     }
                     // Skip already solved puzzles
                     // TODO Should he make PuzzleDAO inject dependencies instead
-                    PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
+                    PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
                             login.getUserId());
 
                     if (playedGame == null // Not yet played this puzzle
@@ -813,8 +784,6 @@ public class PuzzleGameManager extends HttpServlet {
                                 .append(">Puzzle Overview</a>.");
                         return message.toString();
                     }
-                    playedGame.setEventDAO(eventDAO);
-                    playedGame.setUserRepository(userRepo);
                 }
             }
         }

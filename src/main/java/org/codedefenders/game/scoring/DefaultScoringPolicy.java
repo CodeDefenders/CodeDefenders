@@ -24,14 +24,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventType;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,10 @@ import org.slf4j.LoggerFactory;
 public class DefaultScoringPolicy implements IScoringPolicy {
     private static final Logger logger = LoggerFactory.getLogger(DefaultScoringPolicy.class);
 
-    private EventDAO eventDAO;
+    private final EventDAO eventDAO;
+    private final MutantRepository mutantRepo;
+    private final GameRepository gameRepo;
+    private final PlayerRepository playerRepo;
 
     // TODO Convert this to PlayerScore so we can keep track of won/lost equivalence
     // duels !
@@ -59,8 +63,12 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     // MutantID, PlayerClaimingEquivalence
     private Map<Integer, Integer> flaggedMutants = new HashMap<>();
 
-    public DefaultScoringPolicy(EventDAO eventDAO) {
+    public DefaultScoringPolicy(EventDAO eventDAO, MutantRepository mutantRepo, GameRepository gameRepo,
+                                PlayerRepository playerRepo) {
         this.eventDAO = eventDAO;
+        this.mutantRepo = mutantRepo;
+        this.gameRepo = gameRepo;
+        this.playerRepo = playerRepo;
     }
 
     // TODO This can be easily cached!
@@ -114,7 +122,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         // Remove the mutant from the flagged mutants
                         flaggedMutants.remove(mutantId);
                         // Mutant is killed: we keep the mutant's points and we get an extra point as duels point
-                        int mutantOwnerPlayerId = MutantDAO.getMutantById(mutantId).getPlayerId();
+                        int mutantOwnerPlayerId = mutantRepo.getMutantById(mutantId).getPlayerId();
                         // Give one point to the player claiming the equivalence
                         int duelScoreWin = duelsScore.getOrDefault(mutantOwnerPlayerId, 0);
                         duelScoreWin = duelScoreWin + 1;
@@ -179,7 +187,8 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     @Override
     public void scoreDuels(PlayerScore duelScore) {
         if (duelsScore.isEmpty()) { // Refresh Game Scoring
-            AbstractGame game = GameDAO.getGameWherePlayerPlays(duelScore.getPlayerId());
+            int gameId = playerRepo.getPlayer(duelScore.getPlayerId()).getGameId();
+            AbstractGame game = gameRepo.getGame(gameId);
             if (game != null) {
                 computeScoreForGame(game.getId());
             } else {

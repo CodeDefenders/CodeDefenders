@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -39,6 +38,10 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 public class MeleeGame extends AbstractGame {
@@ -68,13 +71,6 @@ public class MeleeGame extends AbstractGame {
     //public void setEventDAO(EventDAO eventDAO) {
     //    this.eventDAO = eventDAO;
     //}
-
-    //@Inject
-    private MeleeGameDAO meleeGameDAO;
-
-    public void setMeleeGameDAO(MeleeGameDAO meleeGameDAO) {
-        this.meleeGameDAO = meleeGameDAO;
-    }
 
     @Deprecated
     private int defenderValue;
@@ -341,12 +337,15 @@ public class MeleeGame extends AbstractGame {
      * Every user has two players, one as defender and one as attacker
      */
     public List<Player> getPlayers() {
-        List<Player> players = GameDAO.getPlayersForGame(getId(), Role.PLAYER);
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
+        List<Player> players = gameRepo.getPlayersForGame(getId(), Role.PLAYER);
         return players;
     }
 
     protected boolean canJoinGame(int userId) {
-        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override
@@ -355,16 +354,20 @@ public class MeleeGame extends AbstractGame {
     }
 
     public boolean addPlayerForce(int userId, Role role) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
+
         if (state == GameState.FINISHED) {
             return false;
         }
 
-        if (!GameDAO.addPlayerToGame(id, userId, role)) {
+        if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
 
         // TODO: move notifications outside of data objects.
-        Optional<UserEntity> u = userRepository.getUserById(userId);
+        Optional<UserEntity> u = userRepo.getUserById(userId);
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
                 EventStatus.GAME, timestamp);
@@ -377,15 +380,19 @@ public class MeleeGame extends AbstractGame {
     }
 
     public boolean removePlayer(int userId) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
         if (state == GameState.CREATED) {
-            return GameDAO.removeUserFromGame(id, userId);
+            return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
     }
 
     // We do not check that the user is in both roles !!
     public boolean hasUserJoined(int userId) {
-        for (Player p : GameDAO.getValidPlayersForGame(this.getId())) {
+        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+
+        for (Player p : gameRepo.getValidPlayersForGame(this.getId())) {
             if (p.getUser().getId() == userId) {
                 return true;
             }
@@ -436,6 +443,7 @@ public class MeleeGame extends AbstractGame {
     }
 
     private void notifyPlayers(String message, EventType et) {
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         for (Player player : getPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
@@ -445,6 +453,7 @@ public class MeleeGame extends AbstractGame {
 
     private void notifyCreator(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
@@ -452,6 +461,7 @@ public class MeleeGame extends AbstractGame {
 
     private void notifyGame(String message, EventType et) {
         // Event for game log: started
+        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
@@ -460,7 +470,8 @@ public class MeleeGame extends AbstractGame {
     @Override
     public boolean insert() {
         try {
-            this.id = meleeGameDAO.storeMeleeGame(this);
+            MeleeGameRepository meleeGameRepo = CDIUtil.getBeanFromCDI(MeleeGameRepository.class);
+            this.id = meleeGameRepo.storeMeleeGame(this);
             return true;
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store multiplayer game to database.", e);
@@ -470,7 +481,8 @@ public class MeleeGame extends AbstractGame {
 
     @Override
     public boolean update() {
-        return meleeGameDAO.updateMeleeGame(this);
+        MeleeGameRepository meleeGameRepo = CDIUtil.getBeanFromCDI(MeleeGameRepository.class);
+        return meleeGameRepo.updateMeleeGame(this);
     }
 
     public boolean isLineCovered(int lineNumber) {

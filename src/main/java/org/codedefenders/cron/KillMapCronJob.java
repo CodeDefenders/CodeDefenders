@@ -28,11 +28,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,12 +47,14 @@ public class KillMapCronJob extends FixedDelayCronJob {
 
     private boolean isEnabled;
     private KillMapJob currentJob;
+    private GameRepository gameRepo;
 
 
     @Inject
-    public KillMapCronJob(KillMapService killMapService) {
+    public KillMapCronJob(KillMapService killMapService, GameRepository gameRepo) {
         super(20, 10, TimeUnit.SECONDS);
         this.killMapService = killMapService;
+        this.gameRepo = gameRepo;
 
         AdminSystemSettings.SettingsDTO setting = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
         if (setting.getType() != AdminSystemSettings.SETTING_TYPE.BOOL_VALUE) {
@@ -110,7 +112,7 @@ public class KillMapCronJob extends FixedDelayCronJob {
                     break;
                 case GAME:
                     try {
-                        AbstractGame game = GameDAO.getGame(theJob.getId());
+                        AbstractGame game = gameRepo.getGame(theJob.getId());
 
                         assert game.getId() == theJob.getId();
 

@@ -31,12 +31,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
 import org.codedefenders.util.Constants;
 
@@ -60,23 +60,29 @@ public class GamesOverview extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         List<UserMultiplayerGameInfo> activeGames =
-                MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
+                multiplayerGameRepo.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeGames", activeGames);
 
         List<UserMeleeGameInfo> activeMeleeGames =
-                MeleeGameDAO.getActiveMeleeGamesWithInfoForUser(login.getUserId());
+                meleeGameRepo.getActiveMeleeGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeMeleeGames", activeMeleeGames);
 
         List<UserMultiplayerGameInfo> openGames =
-                MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
+                multiplayerGameRepo.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openGames", openGames);
 
         List<UserMeleeGameInfo> openMeleeGames =
-                MeleeGameDAO.getOpenMeleeGamesWithInfoForUser(login.getUserId());
+                meleeGameRepo.getOpenMeleeGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openMeleeGames", openMeleeGames);
 
         boolean gamesJoinable = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();

@@ -20,10 +20,8 @@
 --%>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
-<%@ tag import="org.codedefenders.database.TestDAO" %>
 <%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.model.Player" %>
-<%@ tag import="org.codedefenders.database.MutantDAO" %>
 <%@ tag import="java.util.Map" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
@@ -89,19 +87,18 @@
     </tr>
     <%
         for (Player attacker : attackers) {
-            int playerId = attacker.getId();
             UserEntity attackerUser = attacker.getUser();
+
             // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
             // Does system attacker submitted any mutant?
             // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
             // For system generated mutants,  mutant.playerID == userID, which is wrong...
-            if (attackerUser.getId() == Constants.DUMMY_ATTACKER_USER_ID &&
-                    MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty()) {
+            if (attackerUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && !scoreboard.gameHasPredefinedMutants()) {
                 continue;
             }
 
-            PlayerScore mutantsScore = mutantScores.getOrDefault(playerId, zeroDummyScore);
-            PlayerScore testsScore = testScores.getOrDefault(playerId, zeroDummyScore);
+            PlayerScore mutantsScore = mutantScores.getOrDefault(attacker.getId(), zeroDummyScore);
+            PlayerScore testsScore = testScores.getOrDefault(attacker.getId(), zeroDummyScore);
     %>
     <tr class="attacker">
         <td><%=attackerUser.getUsername()%>
@@ -145,15 +142,13 @@
     </tr>
     <%
         for (Player defender : defenders) {
-            int playerId = defender.getId();
             UserEntity defenderUser = defender.getUser();
 
-            if (defenderUser.getId() == Constants.DUMMY_DEFENDER_USER_ID
-                    && TestDAO.getTestsForGameAndUser(scoreboard.getGameId(), defenderUser.getId()).isEmpty()) {
+            if (defenderUser.getId() == Constants.DUMMY_DEFENDER_USER_ID && !scoreboard.gameHasPredefinedTests()) {
                 continue;
             }
 
-            PlayerScore testsScore = testScores.getOrDefault(playerId, zeroDummyScore);
+            PlayerScore testsScore = testScores.getOrDefault(defender.getId(), zeroDummyScore);
     %>
     <tr class="defender">
         <td><%=defenderUser.getUsername()%>

@@ -43,11 +43,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
@@ -78,7 +74,11 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -196,6 +196,18 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private KillMapService killMapService;
 
+    @Inject
+    private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
+    private GameRepository gameRepo;
+
+    @Inject
+    private PlayerRepository playerRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -208,7 +220,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         int gameId = game.getId();
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
@@ -222,7 +234,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
-                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
+                    int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
 
                     // TODO
@@ -235,13 +247,13 @@ public class MultiplayerGameManager extends HttpServlet {
         request.setAttribute("playerId", playerId);
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || (game.getState() == GameState.ACTIVE && GameDAO.isGameExpired(gameId));
+                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
         final String jspPath = isGameClosed
                 ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.DEFENDER) {
-            Test prevTest = TestDAO.getLatestTestForGameAndUser(gameId, login.getUserId());
+            Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());
             request.setAttribute("previousTest", prevTest);
         }
 
@@ -310,13 +322,12 @@ public class MultiplayerGameManager extends HttpServlet {
              * If the mutant is covered by enough tests trigger the automatic
              * equivalence duel. Consider ONLY the coveringTests submitted after the mutant was created
              */
-            Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
+            Set<Integer> allCoveringTests = testRepo.getCoveringTestsForMutant(aliveMutant).stream()
                     .map(Test::getId)
                     .collect(Collectors.toSet());
 
-            boolean considerOnlydefenders = false;
             Set<Integer> testSubmittedAfterMutant =
-                    TestDAO.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant)
+                    testRepo.getValidTestsForGameSubmittedAfterMutant(game.getId(), aliveMutant)
                             .stream()
                             .map(Test::getId)
                             .collect(Collectors.toSet());
@@ -329,12 +340,12 @@ public class MultiplayerGameManager extends HttpServlet {
                 automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                aliveMutant.update();
+                mutantRepo.updateMutant(aliveMutant);
                 // Send the notification about the flagged mutant to attacker
                 Optional<Integer> mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
                 Event event = new Event(-1, game.getId(), mutantOwnerId.orElse(0),
                         "One of your mutants survived "
-                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + (threshold == numberOfCoveringTestsSubmittedAfterMutant ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
                         // TODO it might make sense to specify a new event type?
                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
@@ -343,7 +354,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                mutantRepo.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -562,7 +573,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String mutantText = mutant.get();
 
-        int attackerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int attackerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
@@ -738,7 +749,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             int mutantId = equivMutantId.get();
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+            int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
             for (Mutant m : mutantsPending) {
@@ -757,10 +768,10 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // At this point we where not able to kill the mutant will all the covering
                     // tests on the same class from different games
-                    MutantDAO.killMutant(m, Mutant.Equivalence.DECLARED_YES);
+                    mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
 
-                    int playerIdDefender = MutantDAO.getEquivalentDefenderId(m);
-                    PlayerDAO.increasePlayerPoints(1, playerIdDefender);
+                    int playerIdDefender = mutantRepo.getEquivalentDefenderId(m);
+                    playerRepo.increasePlayerPoints(1, playerIdDefender);
                     messages.add(message);
 
                     // Notify the attacker
@@ -780,7 +791,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
-                        int defenderId = MutantDAO.getEquivalentDefenderId(m);
+                        int defenderId = mutantRepo.getEquivalentDefenderId(m);
                         Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getSimpleUser().getName() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
@@ -943,7 +954,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         }
 
                         // only kill the one mutant that was claimed
-                        MutantDAO.killMutant(mutPending, ASSUMED_YES);
+                        mutantRepo.killMutant(mutPending, ASSUMED_YES);
 
                         Event notif = new Event(-1, gameId, login.getUserId(), notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
@@ -979,7 +990,7 @@ public class MultiplayerGameManager extends HttpServlet {
             ttme.setTestId(newTest.getId());
             notificationService.post(ttme);
 
-            newTest.update();
+            testRepo.updateTest(newTest);
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
@@ -1018,7 +1029,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+        int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
         AtomicInteger claimedMutants = new AtomicInteger();
         AtomicBoolean noneCovered = new AtomicBoolean(true);
         List<Mutant> mutantsAlive = game.getAliveMutants();
@@ -1033,7 +1044,7 @@ public class MultiplayerGameManager extends HttpServlet {
                             .filter(m -> m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
                             .forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                                m.update();
+                                mutantRepo.updateMutant(m);
 
                                 Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 
@@ -1043,7 +1054,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
 
-                                MutantDAO.insertEquivalence(m, playerId);
+                                mutantRepo.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });
@@ -1113,7 +1124,7 @@ public class MultiplayerGameManager extends HttpServlet {
         try (Histogram.Timer ignored = isEquivalentMutantKillableValidation.startTimer()) {
             // Get all the covering tests of this mutant which do not belong to this game
             int classId = mutantToValidate.getClassId();
-            List<Test> tests = TestDAO.getValidTestsForClass(classId);
+            List<Test> tests = testRepo.getValidTestsForClass(classId);
 
             // Remove tests which belong to the same game as the mutant
             tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());

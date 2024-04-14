@@ -46,9 +46,6 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
@@ -63,6 +60,9 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
@@ -87,16 +87,25 @@ public class Installer {
     private final CoverageGenerator coverageGenerator;
     private final KillMapService killMapService;
     private final Configuration config;
+    private final TestRepository testRepo;
+    private final MutantRepository mutantRepo;
+    private final PuzzleRepository puzzleRepo;
 
     @Inject
     public Installer(BackendExecutorService backend,
                      CoverageGenerator coverageGenerator,
                      KillMapService killMapService,
-            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+                     TestRepository testRepo,
+                     MutantRepository mutantRepo,
+                     PuzzleRepository puzzleRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
         this.config = config;
+        this.testRepo = testRepo;
+        this.mutantRepo = mutantRepo;
+        this.puzzleRepo = puzzleRepo;
     }
 
     /**
@@ -275,8 +284,8 @@ public class Installer {
         String md5 = CodeValidator.getMD5FromText(mutantFileContent);
         Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cut.getId());
 
-        int mutantId = MutantDAO.storeMutant(mutant);
-        MutantDAO.mapMutantToClass(mutantId, cut.getId());
+        int mutantId = mutantRepo.storeMutant(mutant);
+        mutantRepo.mapMutantToClass(mutantId, cut.getId());
 
         logger.info("installMutant(): Stored mutant " + mutant.getId() + " in position " + targetPosition);
 
@@ -324,8 +333,8 @@ public class Installer {
         LineCoverage lineCoverage = coverageGenerator.generate(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
 
-        int testId = TestDAO.storeTest(test);
-        TestDAO.mapTestToClass(testId, cut.getId());
+        int testId = testRepo.storeTest(test);
+        testRepo.mapTestToClass(testId, cut.getId());
 
         logger.info("installTest() Stored test " + test.getId() + " in position " + targetPosition);
 
@@ -354,7 +363,7 @@ public class Installer {
         String description = cfg.getProperty("description");
 
         PuzzleChapter chapter = new PuzzleChapter(chapterId, position, title, description);
-        PuzzleDAO.storePuzzleChapter(chapter);
+        puzzleRepo.storePuzzleChapter(chapter);
 
         logger.info("installPuzzleChapter() Stored puzzle chapter with id " + chapterId);
 
@@ -440,13 +449,16 @@ public class Installer {
 
         Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest,
                 mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
-        int puzzleId = PuzzleDAO.storePuzzle(puzzle);
+        int puzzleId = puzzleRepo.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
         for (Mutant m : originalMutants) {
             Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
-            puzzleMutant.insert();
-            MutantDAO.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
+
+            int mutantId = mutantRepo.storeMutant(puzzleMutant);
+            puzzleMutant.setId(mutantId);
+
+            mutantRepo.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Mutant " + puzzleMutant.getId());
             puzzleMutants.add(puzzleMutant);
         }
@@ -454,8 +466,11 @@ public class Installer {
         List<Test> puzzleTests = new ArrayList<>();
         for (Test t : originalTests) {
             Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
-            puzzleTest.insert();
-            TestDAO.mapTestToClass(puzzleTest.getId(), puzzleClassId);
+
+            int testId = testRepo.storeTest(puzzleTest);
+            puzzleTest.setId(testId);
+
+            testRepo.mapTestToClass(puzzleTest.getId(), puzzleClassId);
             logger.info("installPuzzle(); Created Puzzle Test " + puzzleTest.getId());
             puzzleTests.add(puzzleTest);
         }

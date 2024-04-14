@@ -37,11 +37,6 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
@@ -51,6 +46,11 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
@@ -91,9 +91,25 @@ public class AdminMonitorGames extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private TestRepository testRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
+    private GameRepository gameRepo;
+
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
+    @Inject
+    private MultiplayerGameRepository multiplayerGameRepo;
+
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+        List<MultiplayerGame> multiplayerGames = multiplayerGameRepo.getAvailableMultiplayerGames();
 
         Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
@@ -117,7 +133,7 @@ public class AdminMonitorGames extends HttpServlet {
         request.setAttribute("multiplayerPlayersInfoForGame", multiplayerPlayersInfoForGame);
         request.setAttribute("multiplayerUserIdForPlayerIds", multiplayerUserIdForPlayerIds);
 
-        List<MeleeGame> meleeGames = MeleeGameDAO.getAvailableMeleeGames();
+        List<MeleeGame> meleeGames = meleeGameRepo.getAvailableMeleeGames();
         Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
                         game -> userService.getSimpleUserById(game.getCreatorId())
@@ -171,10 +187,8 @@ public class AdminMonitorGames extends HttpServlet {
             } else if (switchUser && userId.isPresent()) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
-                game = GameDAO.getGame(gameToRemoveFromId);
+                game = gameRepo.getGame(gameToRemoveFromId);
                 if (game != null) {
-                    game.setEventDAO(eventDAO);
-                    game.setUserRepository(userRepo);
                     if (!game.addPlayer(userId.get(), newRole)) {
                         messages.add("Changing role of user " + userId.get() + " failed! \n Please check the logs!");
                     } else {
@@ -229,7 +243,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     private void startStopGame(int gameId, GameState pNewState) {
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         boolean updated = false;
 
         if (game != null) {
@@ -257,7 +271,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     private void rematchGame(int gameId) {
-        AbstractGame game = GameDAO.getGame(gameId);
+        AbstractGame game = gameRepo.getGame(gameId);
         if (game instanceof MultiplayerGame) {
             multiplayerGameService.rematch((MultiplayerGame) game);
         } else if (game instanceof MeleeGame) {
@@ -268,12 +282,12 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     private boolean deletePlayer(int playerId, int gameId, int userId) {
-        for (Test t : TestDAO.getTestsForGame(gameId)) {
+        for (Test t : testRepo.getTestsForGame(gameId)) {
             if (t.getPlayerId() == playerId) {
                 AdminDAO.deleteTestTargetExecutions(t.getId());
             }
         }
-        for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
+        for (Mutant m : mutantRepo.getValidMutantsForGame(gameId)) {
             if (m.getPlayerId() == playerId) {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
             }

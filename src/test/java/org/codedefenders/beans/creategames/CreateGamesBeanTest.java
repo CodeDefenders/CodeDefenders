@@ -20,6 +20,8 @@ import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
+import org.codedefenders.persistence.database.MeleeGameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -51,6 +53,8 @@ public class CreateGamesBeanTest {
     private HashMap<Integer, CreateGamesBean.UserInfo> userInfos;
 
     private UserRepository userRepo;
+    private MeleeGameRepository meleeGameRepo;
+    private MultiplayerGameRepository multiplayerGameRepo;
     private CreateGamesService createGamesService;
 
 
@@ -71,6 +75,8 @@ public class CreateGamesBeanTest {
         MessagesBean messagesBean = Mockito.mock(MessagesBean.class);
         EventDAO eventDAO = Mockito.mock(EventDAO.class);
         userRepo = Mockito.mock(UserRepository.class);
+        meleeGameRepo = Mockito.mock(MeleeGameRepository.class);
+        multiplayerGameRepo = Mockito.mock(MultiplayerGameRepository.class);
         createGamesService = Mockito.mock(CreateGamesService.class);
 
         /* Initialize bean. */
@@ -80,6 +86,8 @@ public class CreateGamesBeanTest {
                 messagesBean,
                 eventDAO,
                 userRepo,
+                meleeGameRepo,
+                multiplayerGameRepo,
                 createGamesService
         ) {
             @Override

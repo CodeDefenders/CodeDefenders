@@ -8,11 +8,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,17 +23,18 @@ public class GameProducer implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(GameProducer.class);
 
     private final EventDAO eventDAO;
-
-    @Inject
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
+    private final GameRepository gameRepo;
 
     private Integer gameId = null;
     private AbstractGame game = null;
     private boolean gameQueried = false;
 
     @Inject
-    public GameProducer(EventDAO eventDAO) {
+    public GameProducer(EventDAO eventDAO, UserRepository userRepo, GameRepository gameRepo) {
         this.eventDAO = eventDAO;
+        this.userRepo = userRepo;
+        this.gameRepo = gameRepo;
     }
 
     /**
@@ -50,12 +51,9 @@ public class GameProducer implements Serializable {
             return null;
         }
         if (game == null && !gameQueried) {
-            game = GameDAO.getGame(gameId);
+            game = gameRepo.getGame(gameId);
             gameQueried = true;
-            if (game != null) {
-                game.setEventDAO(eventDAO);
-                game.setUserRepository(userRepo);
-            } else {
+            if (game == null) {
                 logger.debug("Could not retrieve game with id {} from database", gameId);
             }
         }
