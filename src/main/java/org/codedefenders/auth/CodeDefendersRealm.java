@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,12 +47,16 @@ import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.PermissionResolver;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.codedefenders.auth.permissions.AdminPermission;
+import org.codedefenders.auth.permissions.CreateClassroomPermission;
 import org.codedefenders.auth.roles.AdminRole;
 import org.codedefenders.auth.roles.Role;
 import org.codedefenders.auth.roles.TeacherRole;
@@ -123,6 +128,20 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         }
     }
 
+    public class CodeDefendersPermissionResolver implements PermissionResolver {
+        @Override
+        public Permission resolvePermission(String name) {
+            return CodeDefendersRealm.this.resolvePermission(name);
+        }
+    }
+
+    public class CodeDefendersRolePermissionResolver implements RolePermissionResolver {
+        @Override
+        public Collection<Permission> resolvePermissionsInRole(String name) {
+            return resolveRole(name).getPermissions();
+        }
+    }
+
     @Inject
     public CodeDefendersRealm(CodeDefendersCacheManager codeDefendersCacheManager,
             CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
@@ -134,30 +153,27 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         this.setCachingEnabled(true);
         this.setAuthenticationCachingEnabled(true);
+
+        this.setPermissionResolver(new CodeDefendersPermissionResolver());
+        this.setRolePermissionResolver(new CodeDefendersRolePermissionResolver());
     }
 
     protected Account getAccount(UserEntity userEntity) {
 
-        Collection<Object> principals = new ArrayList<>();
-        principals.add(new LocalUserId(userEntity.getId()));
-
         Set<String> roleNames = new HashSet<>();
-        Set<Permission> permissions = new HashSet<>();
 
         // imply user role for all users
         Role userRole = new UserRole();
         roleNames.add(userRole.getName());
-        permissions.addAll(userRole.getPermissions());
 
         // get other roles from db
         for (String roleName : roleRepo.getRoleNamesForUser(userEntity.getId())) {
             Role role = resolveRole(roleName);
             roleNames.add(role.getName());
-            permissions.addAll(role.getPermissions());
         }
 
-        return new SimpleAccount(principals, userEntity.getEncodedPassword(), getName(),
-                roleNames, permissions);
+        Collection<Object> principals = List.of(new LocalUserId(userEntity.getId()));
+        return new SimpleAccount(principals, userEntity.getEncodedPassword(), getName(), roleNames, Set.of());
     }
 
     @Override
@@ -260,6 +276,14 @@ public class CodeDefendersRealm extends AuthorizingRealm {
             case TeacherRole.name -> new TeacherRole();
             case AdminRole.name -> new AdminRole();
             default -> throw new AuthorizationException("Unknown role: '" + name + "'.");
+        };
+    }
+
+    public Permission resolvePermission(String name) {
+        return switch (name) {
+            case AdminPermission.name -> new AdminPermission();
+            case CreateClassroomPermission.name -> new CreateClassroomPermission();
+            default -> throw new AuthorizationException("Unknown permission: '" + name + "'.");
         };
     }
 
