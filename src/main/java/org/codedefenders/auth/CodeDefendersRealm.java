@@ -43,16 +43,23 @@ import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.codedefenders.auth.roles.AdminRole;
+import org.codedefenders.auth.roles.Role;
+import org.codedefenders.auth.roles.TeacherRole;
+import org.codedefenders.auth.roles.UserRole;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
@@ -73,12 +80,9 @@ import com.google.common.cache.CacheBuilder;
 public class CodeDefendersRealm extends AuthorizingRealm {
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersRealm.class);
 
-    private final String adminRole;
-
     private final SettingsRepository settingsRepo;
     private final UserRepository userRepo;
-
-    private final UserDatabase userDatabase;
+    private final RoleRepository roleRepo;
 
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
         private final MetricsRegistry metricsRegistry;
@@ -122,22 +126,11 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     @Inject
     public CodeDefendersRealm(CodeDefendersCacheManager codeDefendersCacheManager,
             CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
-            UserRepository userRepo, @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+            UserRepository userRepo, RoleRepository roleRepo) {
         super(codeDefendersCacheManager, codeDefendersCredentialsMatcher);
         this.settingsRepo = settingsRepo;
         this.userRepo = userRepo;
-
-        UserDatabase userDatabase;
-        try {
-            userDatabase = (UserDatabase) new InitialContext().lookup("java:comp/env/auth/UserDatabase");
-        } catch (NamingException e) {
-            logger.error("Exception looking up user database", e);
-            userDatabase = null;
-            // TODO(Alex): Should we really continue here?!
-        }
-        this.userDatabase = userDatabase;
-
-        this.adminRole = config.getAuthAdminRole();
+        this.roleRepo = roleRepo;
 
         this.setCachingEnabled(true);
         this.setAuthenticationCachingEnabled(true);
@@ -148,15 +141,23 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         Collection<Object> principals = new ArrayList<>();
         principals.add(new LocalUserId(userEntity.getId()));
 
-        Set<String> roles = new java.util.HashSet<>();
-        roles.add("user");
+        Set<String> roleNames = new HashSet<>();
+        Set<Permission> permissions = new HashSet<>();
 
-        User tomcatUser = userDatabase.findUser(userEntity.getUsername());
-        if (tomcatUser != null && tomcatUser.isInRole(userDatabase.findRole(adminRole))) {
-            roles.add("admin");
+        // imply user role for all users
+        Role userRole = new UserRole();
+        roleNames.add(userRole.getName());
+        permissions.addAll(userRole.getPermissions());
+
+        // get other roles from db
+        for (String roleName : roleRepo.getRoleNamesForUser(userEntity.getId())) {
+            Role role = resolveRole(roleName);
+            roleNames.add(role.getName());
+            permissions.addAll(role.getPermissions());
         }
 
-        return new SimpleAccount(principals, userEntity.getEncodedPassword(), getName(), roles, new HashSet<>());
+        return new SimpleAccount(principals, userEntity.getEncodedPassword(), getName(),
+                roleNames, permissions);
     }
 
     @Override
@@ -251,6 +252,15 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         public int getUserId() {
             return userId;
         }
+    }
+
+    public Role resolveRole(String name) {
+        return switch (name) {
+            case UserRole.name -> new UserRole();
+            case TeacherRole.name -> new TeacherRole();
+            case AdminRole.name -> new AdminRole();
+            default -> throw new AuthorizationException("Unknown role: '" + name + "'.");
+        };
     }
 
     /**
