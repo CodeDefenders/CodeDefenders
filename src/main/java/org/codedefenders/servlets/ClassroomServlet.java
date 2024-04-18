@@ -79,13 +79,6 @@ public class ClassroomServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Optional<Classroom> classroom = getClassroomFromRequest(request);
-        if (classroom.isEmpty()) {
-            messages.add("Classroom not found.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         Optional<String> action = ServletUtils.getStringParameter(request, "action");
         if (action.isEmpty()) {
             messages.add("Missing required parameter: action.");
@@ -93,11 +86,21 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                classroom.get().getId(), login.getUserId());
+        Optional<Classroom> classroom = getClassroomFromRequest(request);
+        if (!action.get().equals("create-classroom") && classroom.isEmpty()) {
+            messages.add("Classroom not found.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        Optional<ClassroomMember> member = classroom.flatMap(c ->
+                classroomService.getMemberForClassroomAndUser(c.getId(), login.getUserId()));
 
         try {
             switch (action.get()) {
+                case "create-classroom":
+                    createClassroom(request, response);
+                    break;
                 case "enable-joining":
                     setOpen(request, response, classroom.get(), member.orElse(null), true);
                     break;
@@ -175,6 +178,12 @@ public class ClassroomServlet extends HttpServlet {
 
         return ServletUtils.getUUIDParameter(request, "classroomUid")
                 .flatMap(classroomService::getClassroomByUUID);
+    }
+
+    private void createClassroom(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String name = ServletUtils.getStringParameter(request, "name").get();
+        classroomService.addClassroom(name);
+        Redirect.redirectBack(request, response);
     }
 
     private void setOpen(HttpServletRequest request, HttpServletResponse response, Classroom classroom,

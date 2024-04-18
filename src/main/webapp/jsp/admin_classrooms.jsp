@@ -35,16 +35,21 @@
 
     <div class="loading loading-height-200 loading-border-card mb-4">
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-            <h3 class="mb-3">Classrooms</h3>
+            <div class="mb-3 d-flex gap-3">
+                <h2 class="mb-0">Classrooms</h2>
+
+                <button id="create-classroom" type="button" class="btn btn-primary rounded-pill"
+                        data-bs-toggle="modal" data-bs-target="#create-classroom-modal">
+                    New Classroom
+                    <i class="fa fa-plus ms-1" aria-hidden="true"></i>
+                </button>
+            </div>
+
             <input type="search" id="search-classrooms" placeholder="Search"
                    class="form-control form-control-sm" style="width: 15em;">
         </div>
         <table id="classrooms-table" class="table"></table>
     </div>
-    <button id="create-classroom" type="button" class="btn btn-primary"
-            data-bs-toggle="modal" data-bs-target="#create-classroom-modal">
-        Create Classroom
-    </button>
 
     <form action="${url.forPath(Paths.ADMIN_CLASSROOMS)}" method="post" class="needs-validation">
         <input type="hidden" name="action" value="create-classroom"/>
