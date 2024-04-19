@@ -99,7 +99,9 @@ public class Constants {
     public static final String INDEX_JSP = "/jsp/index.jsp";
     public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
-    public static final String ERROR_PAGE_JSP = Paths.get("jsp", "error_page_404.jsp").toString();
+    public static final String ERROR_403_JSP = Paths.get("jsp", "error_page_403.jsp").toString();
+    public static final String ERROR_404_JSP = Paths.get("jsp", "error_page_404.jsp").toString();
+    public static final String ERROR_500_JSP = Paths.get("jsp", "error_page_500.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
     public static final String USER_SETTINGS_JSP = Paths.get("jsp", "user_settings.jsp").toString();
