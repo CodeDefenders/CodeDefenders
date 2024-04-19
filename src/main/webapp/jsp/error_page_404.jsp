@@ -18,46 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
-    <title>The page you're looking for could not be found (404)</title>
-    <link rel="icon" href="${url.forPath("/favicon.ico")}" type="image/x-icon">
-    <link href="${url.forPath("/css/specific/error_page.css")}" rel="stylesheet">
-</head>
-
-<body>
-    <div class="content">
-        <a href="${url.forPath("/")}" class="branding">
-            <img src="${url.forPath("/images/logo.png")}"
-                 alt="Code Defenders Logo"
-                 width="58">
-            <h1>Code Defenders</h1>
-        </a>
-        <h2>404</h2>
-        <h3>The page could not be found or you don't have permission to view it.</h3>
-        <hr/>
+<t:error_page
+        title="The page you're looking for could not be found (404)"
+        statusCode="404"
+        shortDescription="The page could not be found, or you don't have permission to view it.">
+    <jsp:attribute name="message">
         <p>
-            The resource that you are attempting to access does not exist or you don't have the necessary permissions to
-            view it.
+            The resource that you are attempting to access does not exist,
+            or you don't have the necessary permissions to view it.
         </p>
         <p>Make sure the address is correct and that the page hasn't moved.</p>
         <p>Please contact your administrator if you think this is a mistake.</p>
-        <div class="go-back" hidden>
-            <a href="javascript:history.back()">Go back</a>
-        </div>
-        <script>
-            if (history.length > 1) {
-                document.querySelector('.go-back').removeAttribute('hidden');
-            }
-        </script>
-    </div>
-</body>
-
-</html>
+    </jsp:attribute>
+</t:error_page>
