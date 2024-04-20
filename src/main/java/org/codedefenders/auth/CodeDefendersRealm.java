@@ -67,6 +67,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.RoleService;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +88,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     private final SettingsRepository settingsRepo;
     private final UserRepository userRepo;
-    private final RoleRepository roleRepo;
+    private final RoleService roleService;
 
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
         private final MetricsRegistry metricsRegistry;
@@ -145,11 +146,11 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     @Inject
     public CodeDefendersRealm(CodeDefendersCacheManager codeDefendersCacheManager,
             CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
-            UserRepository userRepo, RoleRepository roleRepo) {
+            UserRepository userRepo, RoleService roleService) {
         super(codeDefendersCacheManager, codeDefendersCredentialsMatcher);
         this.settingsRepo = settingsRepo;
         this.userRepo = userRepo;
-        this.roleRepo = roleRepo;
+        this.roleService = roleService;
 
         this.setCachingEnabled(true);
         this.setAuthenticationCachingEnabled(true);
@@ -167,8 +168,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         roleNames.add(userRole.getName());
 
         // get other roles from db
-        for (String roleName : roleRepo.getRoleNamesForUser(userEntity.getId())) {
-            Role role = resolveRole(roleName);
+        for (Role role : roleService.getRolesForUser(userEntity.getId())) {
             roleNames.add(role.getName());
         }
 

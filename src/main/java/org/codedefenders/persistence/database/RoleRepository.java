@@ -8,15 +8,17 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.auth.CodeDefendersRealm;
-import org.codedefenders.auth.roles.Role;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * Handles system-wide roles for authorization.
@@ -37,6 +39,10 @@ public class RoleRepository {
         return rs.getString("Role");
     }
 
+    private int userIdFromRS(ResultSet rs) throws SQLException {
+        return rs.getInt("User_ID");
+    }
+
     public List<String> getRoleNamesForUser(int userId) {
         @Language("SQL") String query = """
                 SELECT *
@@ -53,5 +59,56 @@ public class RoleRepository {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
+    }
+
+    public void addRoleNameForUser(int userId, String roleName) {
+        @Language("SQL") String query = """
+                INSERT INTO roles (User_ID, Role)
+                VALUES (?, ?);
+        """;
+
+        try {
+            queryRunner.insert(query,
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    userId,
+                    roleName);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public void deleteRoleNameForUser(int userId, String roleName) {
+        @Language("SQL") String query = """
+                DELETE FROM roles
+                WHERE User_ID = ?
+                  AND Role = ?;
+        """;
+
+        try {
+            queryRunner.update(query,
+                    userId,
+                    roleName);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public Multimap<Integer, String> getAllUserRoleNames() {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM roles;
+        """;
+
+        Multimap<Integer, String> roleNames = ArrayListMultimap.create();
+        try {
+            queryRunner.query(query,
+                listFromRS(rs ->  roleNames.put(userIdFromRS(rs), roleNameFromRS(rs))));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+        return roleNames;
     }
 }
