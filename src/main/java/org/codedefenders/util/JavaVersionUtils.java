@@ -14,20 +14,35 @@ import org.slf4j.LoggerFactory;
 public class JavaVersionUtils {
     private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
 
+    /**
+     * Extracts the major version from a Java version string.
+     *
+     * <p>Allows these formats:
+     * <ul>
+     * <li>1.8.0_72-ea</li>
+     * <li>9-ea</li>
+     * <li>9</li>
+     * <li>9.0.1</li>
+     * </ul>
+     */
     public static int getJavaMajorVersion(String version) {
         if (version.startsWith("1.")) {
             version = version.substring(2);
         }
-        /* Allow these formats:
-         * 1.8.0_72-ea
-         * 9-ea
-         * 9
-         * 9.0.1
-         */
+
         int dotPos = version.indexOf('.');
         int dashPos = version.indexOf('-');
-        return Integer.parseInt(version.substring(0,
-                dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
+
+        int end;
+        if (dotPos > -1) {
+            end = dotPos;
+        } else if (dashPos > -1) {
+            end = dashPos;
+        } else {
+            end = version.length();
+        }
+
+        return Integer.parseInt(version.substring(0, end));
     }
 
     public static int getJavaMajorVersion() {
