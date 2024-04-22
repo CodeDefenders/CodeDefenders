@@ -1,14 +1,6 @@
-import jquery from './jquery';
-import dataTables from 'datatables.net';
-import dataTablesSelect from 'datatables.net-select';
-import dataTablesBs5 from 'datatables.net-bs5';
-
-
-const DataTable = dataTables(window, jquery);
-dataTablesSelect(window, jquery);
-dataTablesBs5(window, jquery);
+import DataTable from 'datatables.net';
+import 'datatables.net-select';
+import 'datatables.net-bs5';
 
 window.DataTable = DataTable;
-
-
 export default DataTable;
