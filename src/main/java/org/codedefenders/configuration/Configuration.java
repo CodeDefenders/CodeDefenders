@@ -35,6 +35,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,7 +111,7 @@ public class Configuration {
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
-    protected String authAdminRole;
+    protected String authAdminUsers;
 
     protected Boolean metrics;
 
@@ -453,12 +454,14 @@ public class Configuration {
         return javamelody != null ? javamelody : false;
     }
 
-    @Nullable
-    public String getAuthAdminRole() {
-        if (authAdminRole == null || authAdminRole.trim().isEmpty()) {
+    public List<String> getAuthAdminUsers() {
+        if (authAdminUsers == null || authAdminUsers.trim().isEmpty()) {
             return null;
         } else {
-            return authAdminRole;
+            return Arrays.stream(authAdminUsers.split(","))
+                    .map(String::trim)
+                    .filter(name -> !name.isEmpty())
+                    .toList();
         }
     }
 

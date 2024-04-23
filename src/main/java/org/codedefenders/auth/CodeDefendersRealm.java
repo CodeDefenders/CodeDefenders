@@ -90,6 +90,8 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     private final UserRepository userRepo;
     private final RoleService roleService;
 
+    public static final String name = "CodeDefendersRealm";
+
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
         private final MetricsRegistry metricsRegistry;
 
