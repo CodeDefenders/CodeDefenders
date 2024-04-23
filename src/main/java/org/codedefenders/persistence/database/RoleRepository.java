@@ -64,7 +64,8 @@ public class RoleRepository {
     public void addRoleNameForUser(int userId, String roleName) {
         @Language("SQL") String query = """
                 INSERT INTO roles (User_ID, Role)
-                VALUES (?, ?);
+                VALUES (?, ?)
+                ON DUPLICATE KEY UPDATE roles.Role = Role;
         """;
 
         try {
@@ -78,7 +79,7 @@ public class RoleRepository {
         }
     }
 
-    public void deleteRoleNameForUser(int userId, String roleName) {
+    public void removeRoleNameForUser(int userId, String roleName) {
         @Language("SQL") String query = """
                 DELETE FROM roles
                 WHERE User_ID = ?
