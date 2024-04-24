@@ -62,6 +62,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private RoleService roleService;
 
+    @Inject
+    private SystemSubject systemSubject;
+
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -85,7 +88,7 @@ public class SystemStartStop implements ServletContextListener {
             sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
 
-        SystemSubject.get().execute(
+        systemSubject.execute(
                 () -> roleService.doInitialAdminSetup(config.getAuthAdminUsers()));
 
         sce.getServletContext().setRequestCharacterEncoding("UTF-8");

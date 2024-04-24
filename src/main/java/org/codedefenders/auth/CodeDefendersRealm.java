@@ -47,18 +47,23 @@ import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.authz.permission.PermissionResolver;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
+import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.auth.permissions.CreateClassroomPermission;
 import org.codedefenders.auth.roles.AdminRole;
 import org.codedefenders.auth.roles.Role;
+import org.codedefenders.auth.roles.SystemRole;
 import org.codedefenders.auth.roles.TeacherRole;
 import org.codedefenders.auth.roles.UserRole;
 import org.codedefenders.configuration.Configuration;
@@ -89,8 +94,6 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     private final SettingsRepository settingsRepo;
     private final UserRepository userRepo;
     private final RoleService roleService;
-
-    public static final String name = "CodeDefendersRealm";
 
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
         private final MetricsRegistry metricsRegistry;
@@ -147,8 +150,8 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     @Inject
     public CodeDefendersRealm(CodeDefendersCacheManager codeDefendersCacheManager,
-            CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
-            UserRepository userRepo, RoleService roleService) {
+                              CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
+                              UserRepository userRepo, RoleService roleService) {
         super(codeDefendersCacheManager, codeDefendersCredentialsMatcher);
         this.settingsRepo = settingsRepo;
         this.userRepo = userRepo;
@@ -195,7 +198,17 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     @Override
     protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
-        return principals.oneByType(LocalUserId.class).getUserId();
+        var localUserId = principals.oneByType(LocalUserId.class);
+        if (localUserId != null) {
+            return localUserId.getUserId();
+        }
+
+        var systemPrincipal = principals.oneByType(SystemPrincipal.class);
+        if (systemPrincipal != null) {
+            return systemPrincipal;
+        }
+
+        throw new AuthorizationException("No known principals.");
     }
 
     @Override
@@ -249,10 +262,17 @@ public class CodeDefendersRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        Optional<UserEntity> user = userRepo.getUserById(principalCollection.oneByType(LocalUserId.class).getUserId());
+        LocalUserId localUserId =  principalCollection.oneByType(LocalUserId.class);
+        SystemPrincipal systemPrincipal = principalCollection.oneByType(SystemPrincipal.class);
+
+        var user = Optional.ofNullable(localUserId)
+                        .map(LocalUserId::getUserId)
+                        .flatMap(userRepo::getUserById);
 
         if (user.isPresent()) {
             return getAccount(user.get());
+        } else if (systemPrincipal != null) {
+            return new SimpleAuthorizationInfo(Set.of(SystemRole.name));
         } else {
             // Something weird happened
             // TODO(Alex): Better Error handling
@@ -272,11 +292,15 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         }
     }
 
+    public static class SystemPrincipal implements Serializable {
+    }
+
     public Role resolveRole(String name) {
         return switch (name) {
             case UserRole.name -> new UserRole();
             case TeacherRole.name -> new TeacherRole();
             case AdminRole.name -> new AdminRole();
+            case SystemRole.name -> new SystemRole();
             default -> throw new AuthorizationException("Unknown role: '" + name + "'.");
         };
     }
