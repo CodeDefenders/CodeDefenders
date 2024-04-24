@@ -39,6 +39,7 @@ import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
@@ -214,7 +215,7 @@ public class MeleeGameRepository {
 
         try {
             return queryRunner.insert(query,
-                    oneFromRS(rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     classId,
                     level.name(),
                     prize,

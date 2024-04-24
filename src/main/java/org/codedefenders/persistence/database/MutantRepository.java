@@ -43,6 +43,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
 import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -308,7 +309,7 @@ public class MutantRepository {
 
         try {
             return queryRunner.insert(query,
-                    oneFromRS(rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     relativeJavaFile,
                     relativeClassFile,
                     gameId,
