@@ -10,6 +10,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 
+import org.codedefenders.auth.annotation.RequiresPermission;
+import org.codedefenders.auth.permissions.CreateClassroomPermission;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
@@ -45,6 +47,7 @@ public class ClassroomService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    @RequiresPermission(CreateClassroomPermission.name)
     public int addClassroom(String name) throws ValidationException {
         validateName(name);
 
