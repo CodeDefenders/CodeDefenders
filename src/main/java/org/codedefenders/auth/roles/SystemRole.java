@@ -7,7 +7,7 @@ import org.apache.shiro.authz.permission.AllPermission;
 /**
  * A role for system tasks. E.g. cron jobs or startup tasks.
  */
-public class SystemRole extends Role {
+public class SystemRole extends AuthRole {
     public static final String name = "system";
 
     public SystemRole() {

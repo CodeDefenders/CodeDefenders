@@ -4,7 +4,7 @@ import java.util.Set;
 
 import org.codedefenders.auth.permissions.CreateClassroomPermission;
 
-public class TeacherRole extends Role {
+public class TeacherRole extends AuthRole {
     public static final String name = "teacher";
 
     public TeacherRole() {

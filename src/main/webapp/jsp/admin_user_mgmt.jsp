@@ -24,7 +24,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.dto.User" %>
 <%@ page import="org.codedefenders.util.LinkUtils" %>
-<%@ page import="org.codedefenders.auth.roles.Role" %>
+<%@ page import="org.codedefenders.auth.roles.AuthRole" %>
 <%@ page import="com.google.common.collect.Multimap" %>
 <%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.codedefenders.auth.roles.TeacherRole" %>
@@ -53,7 +53,7 @@
             int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 
             @SuppressWarnings("unchecked")
-            List<Role> roles = (List<Role>) request.getAttribute("editedUserRoles");
+            List<AuthRole> roles = (List<AuthRole>) request.getAttribute("editedUserRoles");
             boolean isTeacher = roles.contains(new TeacherRole());
             boolean isAdmin = roles.contains(new AdminRole());
     %>
@@ -181,7 +181,7 @@
             <tbody>
                 <%
                     List<UserInfo> unassignedUsersInfo = (List<UserInfo>) request.getAttribute("userInfos");
-                    Multimap<Integer, Role> userRoles = (Multimap<Integer, Role>) request.getAttribute("userRoles");
+                    Multimap<Integer, AuthRole> userRoles = (Multimap<Integer, AuthRole>) request.getAttribute("userRoles");
                     for (UserInfo userInfo : unassignedUsersInfo) {
                         int userId = userInfo.getUser().getId();
                         String username = userInfo.getUser().getUsername();
@@ -190,7 +190,7 @@
                         String lastLogin = userInfo.getLastLoginString();
                         int totalScore = userInfo.getTotalScore();
                         String rolesStr = userRoles.get(userId).stream()
-                                .map(Role::getName)
+                                .map(AuthRole::getName)
                                 .collect(Collectors.joining(", "));
                 %>
                     <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"text-muted\""%>>

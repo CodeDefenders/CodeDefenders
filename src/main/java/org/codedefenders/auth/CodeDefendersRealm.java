@@ -20,7 +20,6 @@
 package org.codedefenders.auth;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -30,11 +29,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
-import org.apache.catalina.User;
-import org.apache.catalina.UserDatabase;
 import org.apache.shiro.authc.Account;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -53,23 +48,18 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.cache.AbstractCacheManager;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.auth.permissions.CreateClassroomPermission;
 import org.codedefenders.auth.roles.AdminRole;
-import org.codedefenders.auth.roles.Role;
+import org.codedefenders.auth.roles.AuthRole;
 import org.codedefenders.auth.roles.SystemRole;
 import org.codedefenders.auth.roles.TeacherRole;
 import org.codedefenders.auth.roles.UserRole;
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.RoleService;
@@ -169,11 +159,11 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         Set<String> roleNames = new HashSet<>();
 
         // imply user role for all users
-        Role userRole = new UserRole();
+        AuthRole userRole = new UserRole();
         roleNames.add(userRole.getName());
 
         // get other roles from db
-        for (Role role : roleService.getRolesForUser(userEntity.getId())) {
+        for (AuthRole role : roleService.getRolesForUser(userEntity.getId())) {
             roleNames.add(role.getName());
         }
 
@@ -293,7 +283,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     public static class SystemPrincipal implements Serializable {
     }
 
-    public Role resolveRole(String name) {
+    public AuthRole resolveRole(String name) {
         return switch (name) {
             case UserRole.name -> new UserRole();
             case TeacherRole.name -> new TeacherRole();

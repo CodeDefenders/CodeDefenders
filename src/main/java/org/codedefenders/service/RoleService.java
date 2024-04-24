@@ -11,7 +11,7 @@ import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.auth.annotation.RequiresPermission;
 import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.auth.roles.AdminRole;
-import org.codedefenders.auth.roles.Role;
+import org.codedefenders.auth.roles.AuthRole;
 import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
@@ -35,16 +35,16 @@ public class RoleService {
         this.userRepo = userRepo;
     }
 
-    public List<Role> getRolesForUser(int userId) {
+    public List<AuthRole> getRolesForUser(int userId) {
         return roleRepo.getRoleNamesForUser(userId).stream()
                 .map(realm::resolveRole)
                 .toList();
 
     }
 
-    public Multimap<Integer, Role> getAllUserRoles() {
+    public Multimap<Integer, AuthRole> getAllUserRoles() {
         Multimap<Integer, String> roleNames = roleRepo.getAllUserRoleNames();
-        Multimap<Integer, Role> roles = ArrayListMultimap.create();
+        Multimap<Integer, AuthRole> roles = ArrayListMultimap.create();
         for (var entry : roleNames.entries()) {
             roles.put(entry.getKey(), realm.resolveRole(entry.getValue()));
         }
@@ -52,28 +52,28 @@ public class RoleService {
     }
 
     @RequiresPermission(AdminPermission.name)
-    public void addRoleForUser(int userId, Role role) {
+    public void addRoleForUser(int userId, AuthRole role) {
         roleRepo.addRoleNameForUser(userId, role.getName());
         realm.invalidate(userId);
     }
 
     @RequiresPermission(AdminPermission.name)
-    public void removeRoleForUser(int userId, Role role) {
+    public void removeRoleForUser(int userId, AuthRole role) {
         roleRepo.removeRoleNameForUser(userId, role.getName());
         realm.invalidate(userId);
     }
 
     @RequiresPermission(AdminPermission.name)
-    public void setRolesForUser(int userId, Collection<Role> newRoles) {
-        Collection<Role> existingRoles = getRolesForUser(userId);
+    public void setRolesForUser(int userId, Collection<AuthRole> newRoles) {
+        Collection<AuthRole> existingRoles = getRolesForUser(userId);
 
-        for (Role role : existingRoles) {
+        for (AuthRole role : existingRoles) {
             if (!newRoles.contains(role)) {
                 roleRepo.removeRoleNameForUser(userId, role.getName());
             }
         }
 
-        for (Role role : newRoles) {
+        for (AuthRole role : newRoles) {
             if (!existingRoles.contains(role)) {
                 roleRepo.addRoleNameForUser(userId, role.getName());
             }
