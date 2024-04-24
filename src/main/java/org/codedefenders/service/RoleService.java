@@ -35,6 +35,12 @@ public class RoleService {
         this.userRepo = userRepo;
     }
 
+    /**
+     * Retrieves the roles for a user. This includes only roles that are saved in the database.
+     * Implicit roles are not included.
+     * @param userId The user to fetch the roles for.
+     * @return A list of roles that are stored in the database for the given user.
+     */
     public List<AuthRole> getRolesForUser(int userId) {
         return roleRepo.getRoleNamesForUser(userId).stream()
                 .map(realm::resolveRole)
@@ -42,6 +48,11 @@ public class RoleService {
 
     }
 
+    /**
+     * Retrieves the roles for all users. This includes only roles that are saved in the database.
+     * Implicit roles are not included.
+     * @return A map from user ids to lists of roles. The lists only contain roles that are stored in the database.
+     */
     public Multimap<Integer, AuthRole> getAllUserRoles() {
         Multimap<Integer, String> roleNames = roleRepo.getAllUserRoleNames();
         Multimap<Integer, AuthRole> roles = ArrayListMultimap.create();
@@ -51,18 +62,34 @@ public class RoleService {
         return roles;
     }
 
+    /**
+     * Adds a role for a given user.
+     * @param userId The user id to add the role for.
+     * @param role The role to add. Must be a role that is stored in the database. Implicit roles are not allowed.
+     */
     @RequiresPermission(AdminPermission.name)
     public void addRoleForUser(int userId, AuthRole role) {
         roleRepo.addRoleNameForUser(userId, role.getName());
         realm.invalidate(userId);
     }
 
+    /**
+     * Removes a role for a given user.
+     * @param userId The user id to remove the role for.
+     * @param role The role to remove. Must be a role that is stored in the database. Implicit roles are not allowed.
+     */
     @RequiresPermission(AdminPermission.name)
     public void removeRoleForUser(int userId, AuthRole role) {
         roleRepo.removeRoleNameForUser(userId, role.getName());
         realm.invalidate(userId);
     }
 
+    /**
+     * Sets the roles for a given user.
+     * @param userId The user id to set the roles for.
+     * @param newRoles The roles to set. Must a collection of roles that are stored in the database.
+     *                 Implicit roles are not allowed.
+     */
     @RequiresPermission(AdminPermission.name)
     public void setRolesForUser(int userId, Collection<AuthRole> newRoles) {
         Collection<AuthRole> existingRoles = getRolesForUser(userId);
