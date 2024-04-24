@@ -254,8 +254,6 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     /**
      * {@inheritDoc}
      *
-     * <p>TODO(Alex): Implement Cache invalidation (If roles are tracked in the Database);
-     *
      * See: {@link #getAuthorizationInfo(PrincipalCollection)}
      * See: {@link #clearCachedAuthorizationInfo(PrincipalCollection)}
      * See: {@link #clearCache(PrincipalCollection)}

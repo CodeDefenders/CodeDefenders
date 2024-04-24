@@ -3,7 +3,6 @@ package org.codedefenders.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -55,11 +54,13 @@ public class RoleService {
     @RequiresPermission(AdminPermission.name)
     public void addRoleForUser(int userId, Role role) {
         roleRepo.addRoleNameForUser(userId, role.getName());
+        realm.invalidate(userId);
     }
 
     @RequiresPermission(AdminPermission.name)
     public void removeRoleForUser(int userId, Role role) {
         roleRepo.removeRoleNameForUser(userId, role.getName());
+        realm.invalidate(userId);
     }
 
     @RequiresPermission(AdminPermission.name)
@@ -68,15 +69,17 @@ public class RoleService {
 
         for (Role role : existingRoles) {
             if (!newRoles.contains(role)) {
-                removeRoleForUser(userId, role);
+                roleRepo.removeRoleNameForUser(userId, role.getName());
             }
         }
 
         for (Role role : newRoles) {
             if (!existingRoles.contains(role)) {
-                addRoleForUser(userId, role);
+                roleRepo.addRoleNameForUser(userId, role.getName());
             }
         }
+
+        realm.invalidate(userId);
     }
 
     /**
