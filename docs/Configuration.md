@@ -19,6 +19,15 @@ Properties are loaded from:
 8. The `codedefenders.properties` file in the classpath.  
 (More precisely the `src/main/resources/codedefenders.properties` file which provides default values)
 
+## Admin permission setup
+
+Here is how to acquire admin permissions on a fresh Code Defenders instance:
+- Create the admin accounts as regular user accounts, if you haven't already.
+- Add the usernames of the accounts to the `auth.admin.users` config value.
+Accounts named in this config value will be promoted to admin on application startup.
+- (Re)start the application. The accounts should have admin permissions now.
+If not, please check the logs for errors.
+- Remove the usernames from `auth.admin.users` again.
 
 ## Renaming/Deprecation of configuration properties
 
