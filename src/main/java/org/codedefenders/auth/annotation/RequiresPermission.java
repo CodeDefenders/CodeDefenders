@@ -14,5 +14,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({METHOD, TYPE})
 @Retention(RUNTIME)
 public @interface RequiresPermission {
-    @Nonbinding String value() default "";
+    @Nonbinding String value();
 }

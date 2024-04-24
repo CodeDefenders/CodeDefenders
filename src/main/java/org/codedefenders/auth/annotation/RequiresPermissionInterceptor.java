@@ -29,7 +29,7 @@ import javax.interceptor.InvocationContext;
 import org.apache.shiro.SecurityUtils;
 import org.jboss.weld.interceptor.WeldInvocationContext;
 
-@RequiresPermission
+@RequiresPermission("")
 @Interceptor
 public class RequiresPermissionInterceptor implements Serializable {
 
