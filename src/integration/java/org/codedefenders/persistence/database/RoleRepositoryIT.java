@@ -7,6 +7,7 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.tags.DatabaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,8 +18,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
+@DatabaseTest
 @ExtendWith({MockitoExtension.class, DatabaseExtension.class})
-public class RoleRepositoryTest {
+public class RoleRepositoryIT {
 
     private UserRepository userRepo;
     private RoleRepository roleRepo;
