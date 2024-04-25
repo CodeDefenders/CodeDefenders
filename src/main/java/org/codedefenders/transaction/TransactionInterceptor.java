@@ -22,8 +22,6 @@ package org.codedefenders.transaction;
 import java.io.Serializable;
 import java.util.Optional;
 
-import org.jboss.weld.interceptor.WeldInvocationContext;
-
 import jakarta.inject.Inject;
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
@@ -43,9 +41,7 @@ public class TransactionInterceptor implements Serializable { // TODO(Alex): Che
     @SuppressWarnings("unused")
     @AroundInvoke
     public Object manageTransaction(InvocationContext ctx) throws Exception {
-        WeldInvocationContext weldContext = (WeldInvocationContext) ctx;
-
-        Optional<Transactional> annotation = weldContext.getInterceptorBindingsByType(Transactional.class).stream().findFirst();
+        Optional<Transactional> annotation = ctx.getInterceptorBindings(Transactional.class).stream().findFirst();
         Integer transactionIsolation = null;
         if (annotation.isPresent()) {
             int value = annotation.get().value();
