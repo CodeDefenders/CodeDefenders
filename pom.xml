@@ -776,13 +776,6 @@
 			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- Web Socket API -->
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-websocket-api</artifactId>
-			<version>${tomcat.version}</version>
-			<scope>provided</scope>
-		</dependency>
 		<!-- Provides Database Connection Pool -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
