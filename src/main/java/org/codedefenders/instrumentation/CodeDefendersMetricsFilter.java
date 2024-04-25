@@ -26,7 +26,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.Paths;
 
 import io.prometheus.client.Counter;
-import io.prometheus.client.filter.MetricsFilter;
+import io.prometheus.client.servlet.jakarta.filter.MetricsFilter;
 import jakarta.inject.Inject;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

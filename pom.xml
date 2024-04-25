@@ -851,9 +851,15 @@
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_servlet</artifactId>
+			<artifactId>simpleclient_guava</artifactId>
 			<version>${prometheus-client.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_servlet_jakarta</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>jakarta.interceptor</groupId>
 			<artifactId>jakarta.interceptor-api</artifactId>
@@ -888,11 +894,6 @@
 			<groupId>jakarta.enterprise</groupId>
 			<artifactId>jakarta.enterprise.cdi-api</artifactId>
 			<version>4.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.prometheus</groupId>
-			<artifactId>simpleclient_guava</artifactId>
-			<version>${prometheus-client.version}</version>
 		</dependency>
 		<!-- javamelody-core -->
 		<dependency>
