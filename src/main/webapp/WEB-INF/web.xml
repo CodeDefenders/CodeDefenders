@@ -55,11 +55,6 @@
 		<auth-constraint/>
 	</security-constraint>
 
-	<!-- Shiro -->
-	<listener>
-		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
-	</listener>
-
 	<context-param>
 		<param-name>shiroEnvironmentClass</param-name>
 		<param-value>org.codedefenders.auth.CodeDefendersWebEnvironment</param-value>
