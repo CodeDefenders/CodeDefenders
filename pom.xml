@@ -1112,8 +1112,8 @@
 		<!-- Enable usage of CDI for tests -->
 		<dependency>
 			<groupId>org.jboss.weld</groupId>
-			<artifactId>weld-junit4</artifactId>
-			<version>2.0.2.Final</version>
+			<artifactId>weld-junit5</artifactId>
+			<version>4.0.3.Final</version>
 			<scope>test</scope>
 		</dependency>
 

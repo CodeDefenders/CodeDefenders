@@ -45,10 +45,10 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
-import org.codedefenders.util.WeldExtension;
-import org.codedefenders.util.WeldSetup;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
-import org.jboss.weld.junit4.WeldInitiator;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(WeldExtension.class)
+@ExtendWith(WeldJunit5Extension.class)
 public class GameManagingUtilsTest {
 
     private static TestSmellsDAO mockedTestSmellDAO;
