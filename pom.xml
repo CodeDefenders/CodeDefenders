@@ -750,6 +750,18 @@
 		</profile>
 	</profiles>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.apache.shiro</groupId>
+				<artifactId>shiro-bom</artifactId>
+				<version>2.0.0</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 
 		<!-- Tomcat dependencies - Provides Servlet API -->
@@ -783,12 +795,27 @@
 		<!-- Shiro Security - This includes shiro-web and shiro-core -->
 		<dependency>
 			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-servlet-plugin</artifactId>
-			<version>1.13.0</version>
-			<!-- When migrating from the javax to the jakarta namespace we need to add the classifier here -->
-			<!--
+			<artifactId>shiro-jakarta-ee</artifactId>
 			<classifier>jakarta</classifier>
-			-->
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-cdi</artifactId>
+			<classifier>jakarta</classifier>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<classifier>jakarta</classifier>
+			<version>2.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<classifier>jakarta</classifier>
+			<version>2.0.0</version>
 		</dependency>
 
 		<!-- Context and Dependency Injection (CDI) -->
