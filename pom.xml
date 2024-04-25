@@ -894,6 +894,12 @@
 			<artifactId>jakarta.enterprise.cdi-api</artifactId>
 			<version>4.0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>jakarta.faces</groupId>
+			<artifactId>jakarta.faces-api</artifactId>
+			<version>4.1.0-M1</version>
+		</dependency>
+
 		<!-- javamelody-core -->
 		<dependency>
 			<groupId>net.bull.javamelody</groupId>
