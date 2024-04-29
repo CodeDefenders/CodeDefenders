@@ -15,7 +15,7 @@ admin_user = (settings['admin']['username'] rescue puts("INFO: Could not load 'a
 Vagrant.configure("2") do |config|
 
   config.vm.define "dev" do |dev|
-    dev.vm.box = "debian/buster64"
+    dev.vm.box = "debian/bookworm64"
 
     # Booting can take a bit longer
     dev.vm.boot_timeout = 600
@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
     dev.vm.provision :shell do |s|
       install_pom_xml = File.read("#{vagrant_file_dir}/installation/installation-pom.xml")
       sed_expression = 's|</tomcat-users>|  <role rolename="manager-script"/>\n  <role rolename="manager-gui"/>\n  <role rolename="codedefenders-admin"/>\n  <user username="'+admin_user+'" roles="codedefenders-admin"/>\n  <user username="manager" password="manager" roles="manager-gui,manager-script"/>\n</tomcat-users>|'
-      tomcat9_overwrite = '[Service]\nEnvironment="CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000"\nReadWritePaths="/srv/codedefenders"\n'
+      tomcat10_overwrite = '[Service]\nEnvironment="CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000"\nReadWritePaths="/srv/codedefenders"\n'
       codedefenders_properties = <<-CONFIG
       data.dir=/srv/codedefenders
       db.password=codedefenders
@@ -52,10 +52,10 @@ Vagrant.configure("2") do |config|
       apt upgrade -y
 
       # Install required packages
-      apt install -y tomcat9 tomcat9-admin mariadb-server maven ant
+      apt install -y tomcat10 tomcat10-admin mariadb-server maven ant
 
       # Change owner, so tomcat itself can replace it (e.g. with a (re)deploy via maven)
-      chown -R tomcat:tomcat /var/lib/tomcat9/webapps/
+      chown -R tomcat:tomcat /var/lib/tomcat10/webapps/
 
       # Bind mariadb-server to all addresses
       sed -i -E 's|bind-address.*|bind-address = 0.0.0.0|' /etc/mysql/mariadb.conf.d/50-server.cnf
@@ -69,23 +69,23 @@ Vagrant.configure("2") do |config|
       chown -R tomcat:tomcat /srv/codedefenders
 
       # Create tomcat users
-      sed -i -E '#{sed_expression}' /etc/tomcat9/tomcat-users.xml
+      sed -i -E '#{sed_expression}' /etc/tomcat10/tomcat-users.xml
 
       # Configure tomcat systemd service to allow writing to data directory and enable remote debugging
-      mkdir -p /etc/systemd/system/tomcat9.service.d/
-      printf '#{tomcat9_overwrite}' > /etc/systemd/system/tomcat9.service.d/override.conf
+      mkdir -p /etc/systemd/system/tomcat10.service.d/
+      printf '#{tomcat10_overwrite}' > /etc/systemd/system/tomcat10.service.d/override.conf
 
       # Create codedefenders configuration
-      printf '#{codedefenders_properties}' > /etc/tomcat9/codedefenders.properties
+      printf '#{codedefenders_properties}' > /etc/tomcat10/codedefenders.properties
 
       systemctl daemon-reload
-      systemctl restart tomcat9
+      systemctl restart tomcat10
 
       # Install execution dependencies
       mkdir -p /tmp/cdsetup
       printf '#{install_pom_xml}' > /tmp/cdsetup/pom.xml
       cd /tmp/cdsetup
-      mvn --batch-mode --quiet clean package -Dconfig.properties="/etc/tomcat9/codedefenders.properties"
+      mvn --batch-mode --quiet clean package -Dconfig.properties="/etc/tomcat10/codedefenders.properties"
       chown -R tomcat:tomcat /srv/codedefenders
       rm -rf /tmp/cdsetup
       SHELL
