@@ -26,8 +26,8 @@ There's a `docker-compose-debug.yml` file under `src/test/resources/systemtests`
 Assuming that you have `docker` and `docker-compose` installed.
 
 ```bash
-cd src/test/resources/systemtests/tomcat9-jdk8
-docker build -t codedefenders/tomcat:9 .
+cd src/test/resources/systemtests/backend
+docker build -t codedefenders/tomcat:10 .
 cd ../frontend
 ./setup-filesystem.sh ./config.properties
 docker build -t codedefenders/frontend .
