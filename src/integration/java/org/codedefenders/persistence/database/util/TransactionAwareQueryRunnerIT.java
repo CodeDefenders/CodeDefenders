@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -227,7 +228,7 @@ public class TransactionAwareQueryRunnerIT {
         transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             queryRunner.insert("INSERT INTO test (name) VALUES ('test0')",
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)));
+                    generatedKeyFromRS());
             return true;
         });
         assertTrue(connection.isClosed());
@@ -245,7 +246,7 @@ public class TransactionAwareQueryRunnerIT {
         transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     "test1", 1);
             tx.commit();
             return true;
@@ -267,7 +268,7 @@ public class TransactionAwareQueryRunnerIT {
         transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     "test1", 1);
             tx.commit();
             return true;
@@ -282,7 +283,7 @@ public class TransactionAwareQueryRunnerIT {
         assertThrows(SQLException.class, () -> transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     "test2", 1);
             tx.commit();
             return true;
@@ -302,7 +303,7 @@ public class TransactionAwareQueryRunnerIT {
         int id = transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             int result = queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     "test1", 1).get();
             tx.commit();
             return result;

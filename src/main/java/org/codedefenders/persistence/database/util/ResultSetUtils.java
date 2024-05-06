@@ -101,4 +101,12 @@ public class ResultSetUtils {
     public static <T> ResultSetHandler<Optional<T>> oneFromRS(ResultSetHandler<T> handler) {
         return resultSet -> oneFromRS(resultSet, handler);
     }
+
+    /**
+     * Extracts exactly one generated key from an insert query {@link ResultSet}.
+     * @see ResultSetUtils#oneFromRS(ResultSetHandler)
+     */
+    public static ResultSetHandler<Optional<Integer>> generatedKeyFromRS() {
+        return oneFromRS(rs ->  rs.getInt(1));
+    }
 }

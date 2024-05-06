@@ -45,6 +45,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -128,7 +129,7 @@ public class UserRepository {
 
         try {
             return queryRunner
-                    .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
+                    .insert(query, generatedKeyFromRS(),
                             userEntity.getUsername(),
                             userEntity.getEncodedPassword(),
                             userEntity.getEmail(),

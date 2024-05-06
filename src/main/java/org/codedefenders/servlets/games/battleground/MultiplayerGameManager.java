@@ -752,63 +752,64 @@ public class MultiplayerGameManager extends HttpServlet {
             int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
-            for (Mutant m : mutantsPending) {
-                if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    // Here we check if the accepted equivalence is "possibly" equivalent
-                    boolean isMutantKillable = isMutantKillableByOtherTests(m);
+            var optMutant = mutantsPending.stream()
+                    .filter(m -> m.getId() == mutantId && m.getPlayerId() == playerId)
+                    .findFirst();
+            if (optMutant.isEmpty()) {
+                logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
+                        login.getUserId(), mutantId);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            var mutant = optMutant.get();
 
-                    String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
-                    String notification = String.format("%s accepts that their mutant %d is equivalent",
-                            login.getSimpleUser().getName(), m.getId());
-                    if (isMutantKillable) {
-                        logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
-                        message = message + " " + " However, the mutant was killable!";
-                        notification = notification + " " + " However, the mutant was killable!";
-                    }
+            // Here we check if the accepted equivalence is "possibly" equivalent
+            boolean isMutantKillable = isMutantKillableByOtherTests(mutant);
 
-                    // At this point we where not able to kill the mutant will all the covering
-                    // tests on the same class from different games
-                    mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
-
-                    int playerIdDefender = mutantRepo.getEquivalentDefenderId(m);
-                    playerRepo.increasePlayerPoints(1, playerIdDefender);
-                    messages.add(message);
-
-                    // Notify the attacker
-                    Event notifEquiv = new Event(-1, game.getId(),
-                            login.getUserId(),
-                            notification,
-                            EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-                            new Timestamp(System.currentTimeMillis()));
-                    eventDAO.insert(notifEquiv);
-
-                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
-                    edwe.setGameId(gameId);
-                    userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
-                            .ifPresent(edwe::setUserId);
-                    edwe.setMutantId(m.getId());
-                    notificationService.post(edwe);
-
-                    // Notify the defender which triggered the duel about it !
-                    if (isMutantKillable) {
-                        int defenderId = mutantRepo.getEquivalentDefenderId(m);
-                        Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
-                        notification = login.getSimpleUser().getName() + " accepts that the mutant " + m.getId()
-                                + "that you claimed equivalent is equivalent, but that mutant was killable.";
-                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId.orElse(0), notification,
-                                EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
-                                new Timestamp(System.currentTimeMillis()));
-                        eventDAO.insert(notifDefenderEquiv);
-                    }
-
-
-                    response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-                    return;
-                }
+            String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
+            String notification = String.format("%s accepts that their mutant %d is equivalent",
+                    login.getSimpleUser().getName(), mutant.getId());
+            if (isMutantKillable) {
+                logger.warn("Mutant {} was accepted as equivalence but it is killable", mutant);
+                message = message + " " + " However, the mutant was killable!";
+                notification = notification + " " + " However, the mutant was killable!";
             }
 
-            logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
-                    login.getUserId(), mutantId);
+            // At this point we where not able to kill the mutant will all the covering
+            // tests on the same class from different games
+            mutantRepo.killMutant(mutant, Mutant.Equivalence.DECLARED_YES);
+
+            int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
+            playerRepo.increasePlayerPoints(1, playerIdDefender);
+            messages.add(message);
+
+            // Notify the attacker
+            Event notifEquiv = new Event(-1, game.getId(),
+                    login.getUserId(),
+                    notification,
+                    EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
+            eventDAO.insert(notifEquiv);
+
+            EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
+            edwe.setGameId(gameId);
+            userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
+                    .ifPresent(edwe::setUserId);
+            edwe.setMutantId(mutant.getId());
+            notificationService.post(edwe);
+
+            // Notify the defender which triggered the duel about it !
+            if (isMutantKillable) {
+                int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
+                Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
+                notification = login.getSimpleUser().getName() + " accepts that the mutant " + mutant.getId()
+                        + "that you claimed equivalent is equivalent, but that mutant was killable.";
+                Event notifDefenderEquiv = new Event(-1, game.getId(), userId.orElse(0), notification,
+                        EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(notifDefenderEquiv);
+            }
+
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
 
         } else if ("reject".equals(resolveAction)) {

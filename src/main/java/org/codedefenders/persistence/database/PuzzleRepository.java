@@ -45,6 +45,7 @@ import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -328,7 +329,7 @@ public class PuzzleRepository {
 
         try {
             return queryRunner.insert(query,
-                    oneFromRS(rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     puzzle.getClassId(),
                     puzzle.getActiveRole().toString(),
                     puzzle.getLevel().toString(),
@@ -367,7 +368,7 @@ public class PuzzleRepository {
 
         try {
             return queryRunner.insert(query,
-                    oneFromRS(rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     chapter.getChapterId(),
                     chapter.getPosition(),
                     chapter.getTitle(),
@@ -405,7 +406,7 @@ public class PuzzleRepository {
 
         try {
             return queryRunner.insert(query,
-                    oneFromRS(rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     game.getClassId(),
                     game.getLevel().toString(),
                     game.getCreatorId(),

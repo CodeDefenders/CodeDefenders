@@ -727,43 +727,45 @@ public class MeleeGameManager extends HttpServlet {
             int mutantId = equivMutantId.get();
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
-            for (Mutant m : mutantsPending) {
-                // This might be replaced by m.getCreatorId() == userId
-                if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    mutantRepo.killMutant(m, Mutant.Equivalence.DECLARED_YES);
-                    messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
-
-                    Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
-
-                    Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
-                            eventUser.map(SimpleUser::getName).orElse("") + " accepts that their mutant " + m.getId() + " is equivalent.",
-                            EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
-                            new Timestamp(System.currentTimeMillis()));
-                    eventDAO.insert(notifEquiv);
-
-                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
-                    edwe.setGameId(gameId);
-                    int playerIdDefender = mutantRepo.getEquivalentDefenderId(m);
-                    userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
-                            .ifPresent(edwe::setUserId);
-                    edwe.setMutantId(m.getId());
-                    notificationService.post(edwe);
-
-                    // We need this to pass the mutation information along
-                    Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
-                            // Here we care only about the mutantID.
-                            "-1" + ":" + m.getId(),
-                            EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
-                            new Timestamp(System.currentTimeMillis()));
-                    eventDAO.insert(scoreEvent);
-
-                    response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-                    return;
-                }
+            var optMutant = mutantsPending.stream()
+                    // This might be replaced by m.getCreatorId() == userId
+                    .filter(m -> m.getId() == mutantId && m.getPlayerId() == playerId)
+                    .findFirst();
+            if (optMutant.isEmpty()) {
+                logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
+                        login.getUserId(), mutantId);
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+                return;
             }
+            var mutant = optMutant.get();
 
-            logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
-                    login.getUserId(), mutantId);
+            mutantRepo.killMutant(mutant, Mutant.Equivalence.DECLARED_YES);
+            messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
+
+            Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
+
+            Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
+                    eventUser.map(SimpleUser::getName).orElse("") + " accepts that their mutant " + mutant.getId() + " is equivalent.",
+                    EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
+            eventDAO.insert(notifEquiv);
+
+            EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
+            edwe.setGameId(gameId);
+            int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
+            userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
+                    .ifPresent(edwe::setUserId);
+            edwe.setMutantId(mutant.getId());
+            notificationService.post(edwe);
+
+            // We need this to pass the mutation information along
+            Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
+                    // Here we care only about the mutantID.
+                    "-1" + ":" + mutant.getId(),
+                    EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
+            eventDAO.insert(scoreEvent);
+
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
 
         } else if ("reject".equals(resolveAction)) {

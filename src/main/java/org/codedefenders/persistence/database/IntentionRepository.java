@@ -33,6 +33,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 
 /**
@@ -74,8 +75,7 @@ public class IntentionRepository {
         """;
 
         try {
-            return queryRunner.insert(query,
-                    resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
+            return queryRunner.insert(query, generatedKeyFromRS(),
                     testId, gameId, targetLines);
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
@@ -101,7 +101,7 @@ public class IntentionRepository {
 
         try {
             return queryRunner.insert(query,
-                    resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
+                    generatedKeyFromRS(),
                     mutant.getId(), mutant.getGameId(), intention.toString());
         } catch (SQLException e) {
             throw new UncheckedSQLException(e);
