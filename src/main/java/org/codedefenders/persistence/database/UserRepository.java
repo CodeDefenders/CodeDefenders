@@ -31,7 +31,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
@@ -47,7 +46,6 @@ import com.google.common.cache.LoadingCache;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
-import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**

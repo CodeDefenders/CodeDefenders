@@ -19,13 +19,10 @@
 package org.codedefenders.persistence.database;
 
 
-import java.sql.SQLException;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;

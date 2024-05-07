@@ -18,7 +18,6 @@
  */
 package org.codedefenders.database;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;

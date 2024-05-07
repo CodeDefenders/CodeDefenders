@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Achievement;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
