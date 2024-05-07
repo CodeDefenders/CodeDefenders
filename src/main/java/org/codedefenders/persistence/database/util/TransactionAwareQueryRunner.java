@@ -170,15 +170,20 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
         }
     }
 
-
-    // Can't add the @FunctionalInterface annotation to an inner interface.
-    private interface Executor<T> {
+    @FunctionalInterface
+    private interface SQLAction<T> {
         @Nullable
         T execute(@Nonnull Connection connection) throws SQLException;
     }
 
+    @FunctionalInterface
+    private interface SQLActionWithConnection<T> {
+        @Nullable
+        T execute() throws SQLException;
+    }
+
     @Nullable
-    private <T> T withConnection(@Nonnull Executor<T> function) throws SQLException {
+    private <T> T withConnection(@Nonnull SQLAction<T> function) throws SQLException {
         T result;
 
         ManagedTransaction currentTransaction = transaction.get();
@@ -199,12 +204,22 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
         return result;
     }
 
+    @Nullable
+    private <T> T handleException(@Nonnull SQLActionWithConnection<T> function) throws UncheckedSQLException {
+        try {
+            return function.execute();
+        } catch (SQLException e) {
+            logger.error("Rethrowing SQLException", e);
+            throw new UncheckedSQLException(e);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T query(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws SQLException {
-        return withConnection(conn -> queryRunner.query(conn, sql, mapper));
+    public <T> T query(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.query(conn, sql, mapper)));
     }
 
     /**
@@ -212,16 +227,16 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
      */
     @Override
     public <T> T query(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
-            @Nonnull Object... params) throws SQLException {
-        return withConnection(conn -> queryRunner.query(conn, sql, mapper, params));
+            @Nonnull Object... params) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.query(conn, sql, mapper, params)));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public <T> T insert(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws SQLException {
-        return withConnection(conn -> queryRunner.insert(conn, sql, mapper));
+    public <T> T insert(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.insert(conn, sql, mapper)));
     }
 
     /**
@@ -229,22 +244,22 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
      */
     @Override
     public <T> T insert(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
-            @Nonnull Object... params) throws SQLException {
-        return withConnection(conn -> queryRunner.insert(conn, sql, mapper, params));
+            @Nonnull Object... params) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.insert(conn, sql, mapper, params)));
     }
 
     @Override
     public <T> T insertBatch(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
-            @Nonnull Object[][] params) throws SQLException {
-        return withConnection(conn -> queryRunner.insertBatch(conn, sql, mapper, params));
+            @Nonnull Object[][] params) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.insertBatch(conn, sql, mapper, params)));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int update(@Nonnull String sql) throws SQLException {
-        Integer result = withConnection(conn -> queryRunner.update(conn, sql));
+    public int update(@Nonnull String sql) throws UncheckedSQLException {
+        Integer result = handleException(() -> withConnection(conn -> queryRunner.update(conn, sql)));
         return result != null ? result : 0;
     }
 
@@ -252,8 +267,8 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
      * {@inheritDoc}
      */
     @Override
-    public int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
-        Integer result = withConnection(conn -> queryRunner.update(conn, sql, params));
+    public int update(@Nonnull String sql, @Nonnull Object... params) throws UncheckedSQLException {
+        Integer result = handleException(() -> withConnection(conn -> queryRunner.update(conn, sql, params)));
         return result != null ? result : 0;
     }
 
@@ -261,8 +276,8 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
      * {@inheritDoc}
      */
     @Override
-    public int execute(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
-        Integer result = withConnection(conn -> queryRunner.execute(conn, sql, params));
+    public int execute(@Nonnull String sql, @Nonnull Object... params) throws UncheckedSQLException {
+        Integer result = handleException(() -> withConnection(conn -> queryRunner.execute(conn, sql, params)));
         return result != null ? result : 0;
     }
 
@@ -271,13 +286,13 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
      */
     @Override
     public <T> List<T> execute(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
-            @Nonnull Object... params) throws SQLException {
-        return withConnection(conn -> queryRunner.execute(conn, sql, mapper, params));
+            @Nonnull Object... params) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.execute(conn, sql, mapper, params)));
     }
 
     @Override
-    public int[] batch(@Nonnull String sql, @Nonnull Object[][] params) throws SQLException {
-        return withConnection(conn -> queryRunner.batch(conn, sql, params));
+    public int[] batch(@Nonnull String sql, @Nonnull Object[][] params) throws UncheckedSQLException {
+        return handleException(() -> withConnection(conn -> queryRunner.batch(conn, sql, params)));
     }
 
 
