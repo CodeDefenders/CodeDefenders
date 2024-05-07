@@ -107,18 +107,13 @@ public class PlayerRepository {
                   AND Game_ID = ?
         """;
 
-        try {
-            // TODO: Return optional here
-            var playerId = queryRunner.query(query,
-                    oneFromRS(rs -> rs.getInt("ID")),
-                    userId,
-                    gameId
-            );
-            return playerId.orElse(-1);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        // TODO: Return optional here
+        var playerId = queryRunner.query(query,
+                oneFromRS(rs -> rs.getInt("ID")),
+                userId,
+                gameId
+        );
+        return playerId.orElse(-1);
     }
 
     /**
@@ -131,16 +126,11 @@ public class PlayerRepository {
                 WHERE ID = ?;
         """;
 
-        try {
-            var player = queryRunner.query(query,
-                    oneFromRS(PlayerRepository::playerWithUserFromRS),
-                    playerId
-            );
-            return player.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var player = queryRunner.query(query,
+                oneFromRS(PlayerRepository::playerWithUserFromRS),
+                playerId
+        );
+        return player.orElse(null);
     }
 
     /**
@@ -155,64 +145,44 @@ public class PlayerRepository {
                   AND Active = TRUE;
         """;
 
-        try {
-            var player = queryRunner.query(query,
-                    oneFromRS(PlayerRepository::playerWithUserFromRS),
-                    gameId,
-                    userId
-            );
-            return player.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var player = queryRunner.query(query,
+                oneFromRS(PlayerRepository::playerWithUserFromRS),
+                gameId,
+                userId
+        );
+        return player.orElse(null);
     }
 
     public void setPlayerPoints(int points, int player) {
         @Language("SQL") String query = "UPDATE players SET Points = ? WHERE ID = ?";
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    points,
-                    player);
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update player.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+        int updatedRows = queryRunner.update(query,
+                points,
+                player);
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update player.");
         }
     }
 
     public void increasePlayerPoints(int points, int player) {
         @Language("SQL") String query = "UPDATE players SET Points = Points + ? WHERE ID = ?";
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    points,
-                    player);
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update player.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+        int updatedRows = queryRunner.update(query,
+                points,
+                player);
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update player.");
         }
     }
 
     public int getPlayerPoints(int playerId) {
         @Language("SQL") String query = "SELECT Points FROM players WHERE ID = ?;";
 
-        try {
-            var points = queryRunner.query(query,
-                    oneFromRS(rs -> rs.getInt("Points")),
-                    playerId
-            );
-            return points.orElse(0);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var points = queryRunner.query(query,
+                oneFromRS(rs -> rs.getInt("Points")),
+                playerId
+        );
+        return points.orElse(0);
     }
 
     public Role getRole(int userId, int gameId) {
@@ -226,15 +196,10 @@ public class PlayerRepository {
                   AND players.Game_ID = ?
         """;
 
-        try {
-            return queryRunner.query(query,
-                    oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
-                    userId,
-                    gameId
-            ).orElse(Role.NONE);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),
+                userId,
+                gameId
+        ).orElse(Role.NONE);
     }
 }

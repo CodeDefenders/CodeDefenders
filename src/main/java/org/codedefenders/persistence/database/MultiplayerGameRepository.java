@@ -212,31 +212,26 @@ public class MultiplayerGameRepository {
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    classId,
-                    level.name(),
-                    prize,
-                    defenderValue,
-                    attackerValue,
-                    lineCoverage,
-                    mutantCoverage,
-                    creatorId,
-                    state.name(),
-                    mode.name(),
-                    maxAssertionsPerTest,
-                    chatEnabled,
-                    mutantValidatorLevel.name(),
-                    capturePlayersIntention,
-                    automaticMutantEquivalenceThreshold,
-                    gameDurationMinutes,
-                    classroomId
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                classId,
+                level.name(),
+                prize,
+                defenderValue,
+                attackerValue,
+                lineCoverage,
+                mutantCoverage,
+                creatorId,
+                state.name(),
+                mode.name(),
+                maxAssertionsPerTest,
+                chatEnabled,
+                mutantValidatorLevel.name(),
+                capturePlayersIntention,
+                automaticMutantEquivalenceThreshold,
+                gameDurationMinutes,
+                classroomId
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
     }
 
     /**
@@ -273,24 +268,19 @@ public class MultiplayerGameRepository {
                 WHERE ID = ?
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    classId,
-                    level.name(),
-                    prize,
-                    defenderValue,
-                    attackerValue,
-                    lineCoverage,
-                    mutantCoverage,
-                    state.name(),
-                    duration,
-                    id
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                classId,
+                level.name(),
+                prize,
+                defenderValue,
+                attackerValue,
+                lineCoverage,
+                mutantCoverage,
+                state.name(),
+                duration,
+                id
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -307,15 +297,10 @@ public class MultiplayerGameRepository {
                 WHERE ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    oneFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    gameId
-            ).orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                oneFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                gameId
+        ).orElse(null);
     }
 
     /**
@@ -330,15 +315,10 @@ public class MultiplayerGameRepository {
                 WHERE State != ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    GameState.FINISHED.name()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                GameState.FINISHED.name()
+        );
     }
 
     /**
@@ -367,15 +347,10 @@ public class MultiplayerGameRepository {
                     AND p.Active = TRUE);
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::openGameInfoFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::openGameInfoFromRS),
+                userId
+        );
     }
 
     /**
@@ -405,15 +380,10 @@ public class MultiplayerGameRepository {
                 GROUP BY g.ID;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::activeGameInfoFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::activeGameInfoFromRS),
+                userId
+        );
     }
 
     /**
@@ -432,15 +402,10 @@ public class MultiplayerGameRepository {
                 WHERE (p.User_ID = ?);
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                userId
+        );
     }
 
     /**
@@ -470,15 +435,10 @@ public class MultiplayerGameRepository {
                 GROUP BY g.ID;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::finishedGameInfoFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::finishedGameInfoFromRS),
+                userId
+        );
     }
 
     /**
@@ -497,17 +457,12 @@ public class MultiplayerGameRepository {
                   AND Creator_ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    GameState.ACTIVE.name(),
-                    GameState.CREATED.name(),
-                    creatorId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                GameState.ACTIVE.name(),
+                GameState.CREATED.name(),
+                creatorId
+        );
     }
 
 
@@ -525,15 +480,10 @@ public class MultiplayerGameRepository {
                   AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    GameState.ACTIVE.toString()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                GameState.ACTIVE.toString()
+        );
     }
 
     public List<MultiplayerGame> getClassroomGames(int classroomId) {
@@ -542,15 +492,10 @@ public class MultiplayerGameRepository {
                 WHERE games.Classroom_ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    classroomId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                classroomId
+        );
     }
 
     public List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
@@ -560,15 +505,10 @@ public class MultiplayerGameRepository {
                 AND games.State != ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
-                    classroomId,
-                    GameState.FINISHED.name()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
+                classroomId,
+                GameState.FINISHED.name()
+        );
     }
 }

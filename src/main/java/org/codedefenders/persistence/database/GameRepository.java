@@ -106,19 +106,14 @@ public class GameRepository {
                 ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
         """;
 
-        try {
-            var key = queryRunner.insert(query, generatedKeyFromRS(),
-                    gameId,
-                    userId,
-                    role.toString(),
-                    role.toString()
-            );
-            // TODO: This will return false if a player with the same values already exists
-            return key.isPresent();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var key = queryRunner.insert(query, generatedKeyFromRS(),
+                gameId,
+                userId,
+                role.toString(),
+                role.toString()
+        );
+        // TODO: This will return false if a player with the same values already exists
+        return key.isPresent();
     }
 
     /**
@@ -137,14 +132,9 @@ public class GameRepository {
                   AND Active = TRUE;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS),
-                    gameId,
-                    role.toString());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS),
+                gameId,
+                role.toString());
     }
 
     /**
@@ -161,12 +151,7 @@ public class GameRepository {
                   AND Active = TRUE;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS), gameId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS), gameId);
     }
 
     /**
@@ -184,13 +169,8 @@ public class GameRepository {
                   AND User_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query, gameId, userId);
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query, gameId, userId);
+        return updatedRows > 0;
     }
 
     public int getCurrentRound(int gameId) {
@@ -200,15 +180,10 @@ public class GameRepository {
                 WHERE games.ID = ?;
         """;
 
-        try {
-            var currentRound = queryRunner.query(query,
-                    oneFromRS(rs -> rs.getInt("CurrentRound")),
-                    gameId);
-            return currentRound.orElseThrow();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var currentRound = queryRunner.query(query,
+                oneFromRS(rs -> rs.getInt("CurrentRound")),
+                gameId);
+        return currentRound.orElseThrow();
     }
 
     /**
@@ -225,14 +200,9 @@ public class GameRepository {
         @Language("SQL") String query = "SELECT ID FROM games WHERE ID IN (%s);"
                 .formatted(makePlaceholders(ids.size()));
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(rs -> rs.getInt("ID")),
-                    ids.toArray());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(rs -> rs.getInt("ID")),
+                ids.toArray());
     }
 
 
@@ -245,15 +215,10 @@ public class GameRepository {
     public GameMode getGameMode(int gameId) {
         @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
 
-        try {
-            var gameMode = queryRunner.query(query,
-                    oneFromRS(rs -> GameMode.valueOf(rs.getString("Mode"))),
-                    gameId);
-            return gameMode.orElseThrow();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var gameMode = queryRunner.query(query,
+                oneFromRS(rs -> GameMode.valueOf(rs.getString("Mode"))),
+                gameId);
+        return gameMode.orElseThrow();
     }
 
     /**
@@ -281,16 +246,12 @@ public class GameRepository {
                 FROM games
                 WHERE ID = ?;
         """;
-        try {
-            var isExpired = queryRunner.query(query,
-                    oneFromRS(l -> l.getBoolean("isExpired")),
-                    gameId
-            );
-            return isExpired.orElseThrow();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        var isExpired = queryRunner.query(query,
+                oneFromRS(l -> l.getBoolean("isExpired")),
+                gameId
+        );
+        return isExpired.orElseThrow();
     }
 
     public boolean storeStartTime(int gameId) {
@@ -300,11 +261,7 @@ public class GameRepository {
                 WHERE ID = ?
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query, gameId);
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        int updatedRows = queryRunner.update(query, gameId);
+        return updatedRows > 0;
     }
 }

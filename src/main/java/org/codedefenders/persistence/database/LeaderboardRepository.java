@@ -81,15 +81,7 @@ public class LeaderboardRepository {
     @Nonnull
     public List<LeaderboardEntryEntity> getLeaderboard() {
         @Language("SQL") String query = baseQuery + ";";
-
-        try {
-            return queryRunner
-                    .query(query, rs -> listFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS));
-        } catch (SQLException e) {
-            logger.error("Exception while querying leaderboard", e);
-        }
-
-        return new ArrayList<>();
+        return queryRunner.query(query, listFromRS(LeaderboardRepository::leaderboardEntryFromRS));
     }
 
     @Nonnull
@@ -97,13 +89,7 @@ public class LeaderboardRepository {
         @Language("SQL") String query = baseQuery
                 + " WHERE U.user_id = ?;";
 
-        try {
-            return queryRunner
-                    .query(query, rs -> oneFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS), userId);
-        } catch (SQLException e) {
-            logger.error("Exception while querying score for userId {}", userId, e);
-        }
-        return Optional.empty();
+        return queryRunner.query(query, oneFromRS(LeaderboardRepository::leaderboardEntryFromRS), userId);
     }
 
     private static LeaderboardEntryEntity leaderboardEntryFromRS(ResultSet rs) throws SQLException {

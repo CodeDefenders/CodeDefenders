@@ -45,21 +45,16 @@ public class ClassroomRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    classroom.getUUID().toString(),
-                    classroom.getCreatorId().orElse(null),
-                    classroom.getName(),
-                    classroom.getPassword().orElse(null),
-                    classroom.isOpen(),
-                    classroom.isVisible(),
-                    classroom.isArchived()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                classroom.getUUID().toString(),
+                classroom.getCreatorId().orElse(null),
+                classroom.getName(),
+                classroom.getPassword().orElse(null),
+                classroom.isOpen(),
+                classroom.isVisible(),
+                classroom.isArchived()
+        );
     }
 
     public void updateClassroom(Classroom classroom) {
@@ -74,23 +69,19 @@ public class ClassroomRepository {
                   Archived = ?
                 WHERE classrooms.ID = ?
         """;
-        try {
-             int updatedRows = queryRunner.update(query,
-                     classroom.getUUID().toString(),
-                     classroom.getCreatorId().orElse(null),
-                     classroom.getName(),
-                     classroom.getPassword().orElse(null),
-                     classroom.isOpen(),
-                     classroom.isVisible(),
-                     classroom.isArchived(),
-                     classroom.getId()
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update classroom.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+
+         int updatedRows = queryRunner.update(query,
+                 classroom.getUUID().toString(),
+                 classroom.getCreatorId().orElse(null),
+                 classroom.getName(),
+                 classroom.getPassword().orElse(null),
+                 classroom.isOpen(),
+                 classroom.isVisible(),
+                 classroom.isArchived(),
+                 classroom.getId()
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update classroom.");
         }
     }
 
@@ -99,15 +90,11 @@ public class ClassroomRepository {
                 SELECT * FROM classrooms
                 WHERE ID = ?;
         """;
-        try {
-            return queryRunner.query(query,
-                    oneFromRS(this::classroomFromRS),
-                    id
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                oneFromRS(this::classroomFromRS),
+                id
+        );
     }
 
     public Optional<Classroom> getClassroomByUUID(UUID uuid) {
@@ -115,25 +102,16 @@ public class ClassroomRepository {
                 SELECT * FROM classrooms
                 WHERE UUID = ?;
         """;
-        try {
-            return queryRunner.query(query,
-                    oneFromRS(this::classroomFromRS),
-                    uuid.toString()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                oneFromRS(this::classroomFromRS),
+                uuid.toString()
+        );
     }
 
     public List<Classroom> getAllClassrooms() {
         @Language("SQL") String query = "SELECT * FROM classrooms;";
-        try {
-            return queryRunner.query(query, listFromRS(this::classroomFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(this::classroomFromRS));
     }
 
     public List<Classroom> getAllClassroomsByMember(int userId) {
@@ -142,25 +120,16 @@ public class ClassroomRepository {
                 WHERE classrooms.ID = classroom_members.Classroom_ID
                 AND classroom_members.User_ID = ?;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomFromRS),
+                userId
+        );
     }
 
     public List<Classroom> getActiveClassrooms() {
         @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0;";
-        try {
-            return queryRunner.query(query, listFromRS(this::classroomFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(this::classroomFromRS));
     }
 
     public List<Classroom> getActiveClassroomsByMember(int userId) {
@@ -170,15 +139,11 @@ public class ClassroomRepository {
                 AND classroom_members.User_ID = ?
                 AND classrooms.Archived = 0;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomFromRS),
+                userId
+        );
     }
 
     public List<Classroom> getActiveClassroomsByMemberAndRole(int userId, ClassroomRole role) {
@@ -189,36 +154,22 @@ public class ClassroomRepository {
                 AND classroom_members.Role = ?
                 AND classrooms.Archived = 0;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomFromRS),
-                    userId,
-                    role.name()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomFromRS),
+                userId,
+                role.name()
+        );
     }
 
     public List<Classroom> getVisibleClassrooms() {
         @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0 AND Visible = 1;";
-        try {
-            return queryRunner.query(query, listFromRS(this::classroomFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(this::classroomFromRS));
     }
 
     public List<Classroom> getArchivedClassrooms() {
         @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 1;";
-        try {
-            return queryRunner.query(query, listFromRS(this::classroomFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(this::classroomFromRS));
     }
 
     public List<Classroom> getArchivedClassroomsByMember(int userId) {
@@ -228,15 +179,11 @@ public class ClassroomRepository {
                 AND classroom_members.User_ID = ?
                 AND classrooms.Archived = 1;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomFromRS),
+                userId
+        );
     }
 
     public List<Classroom> getArchivedClassroomsByMemberAndRole(int userId, ClassroomRole role) {
@@ -247,16 +194,12 @@ public class ClassroomRepository {
                 AND classroom_members.Role = ?
                 AND classrooms.Archived = 1;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomFromRS),
-                    userId,
-                    role.name()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomFromRS),
+                userId,
+                role.name()
+        );
     }
 
     private Classroom classroomFromRS(ResultSet rs) throws SQLException {

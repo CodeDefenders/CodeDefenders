@@ -82,16 +82,11 @@ public class PuzzleRepository {
                 WHERE Chapter_ID = ?;
         """;
 
-        try {
-            var chapter = queryRunner.query(query,
-                    oneFromRS(PuzzleRepository::puzzleChapterFromRS),
-                    chapterId
-            );
-            return chapter.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var chapter = queryRunner.query(query,
+                oneFromRS(PuzzleRepository::puzzleChapterFromRS),
+                chapterId
+        );
+        return chapter.orElse(null);
     }
 
     /**
@@ -106,14 +101,9 @@ public class PuzzleRepository {
                 ORDER BY Position;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(PuzzleRepository::puzzleChapterFromRS)
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleChapterFromRS)
+        );
     }
 
     /**
@@ -129,16 +119,11 @@ public class PuzzleRepository {
                 WHERE Puzzle_ID = ?;
         """;
 
-        try {
-            var puzzle = queryRunner.query(query,
-                    oneFromRS(PuzzleRepository::puzzleFromRS),
-                    puzzleId
-            );
-            return puzzle.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var puzzle = queryRunner.query(query,
+                oneFromRS(PuzzleRepository::puzzleFromRS),
+                puzzleId
+        );
+        return puzzle.orElse(null);
     }
 
     /**
@@ -153,14 +138,9 @@ public class PuzzleRepository {
                 ORDER BY Chapter_ID, Position;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(PuzzleRepository::puzzleFromRS)
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS)
+        );
     }
 
     /**
@@ -179,15 +159,10 @@ public class PuzzleRepository {
                 ORDER BY Position;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(PuzzleRepository::puzzleFromRS),
-                    chapterId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS),
+                chapterId
+        );
     }
 
     /**
@@ -203,16 +178,11 @@ public class PuzzleRepository {
                 WHERE ID = ?;
         """;
 
-        try {
-            var game = queryRunner.query(query,
-                    oneFromRS(PuzzleRepository::puzzleGameFromRS),
-                    gameId
-            );
-            return game.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var game = queryRunner.query(query,
+                oneFromRS(PuzzleRepository::puzzleGameFromRS),
+                gameId
+        );
+        return game.orElse(null);
     }
 
     /**
@@ -231,17 +201,12 @@ public class PuzzleRepository {
                 ORDER BY Timestamp DESC;
         """;
 
-        try {
-            var game = queryRunner.query(query,
-                    nextFromRS(PuzzleRepository::puzzleGameFromRS),
-                    puzzleId,
-                    userId
-            );
-            return game.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var game = queryRunner.query(query,
+                nextFromRS(PuzzleRepository::puzzleGameFromRS),
+                puzzleId,
+                userId
+        );
+        return game.orElse(null);
     }
 
     /**
@@ -262,16 +227,11 @@ public class PuzzleRepository {
                 ORDER BY Timestamp DESC;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(PuzzleRepository::puzzleGameFromRS),
-                    puzzleId,
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleGameFromRS),
+                puzzleId,
+                userId
+        );
     }
 
     /**
@@ -291,15 +251,10 @@ public class PuzzleRepository {
                 ORDER BY Timestamp DESC;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(PuzzleRepository::puzzleGameFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleGameFromRS),
+                userId
+        );
     }
 
     /**
@@ -327,25 +282,20 @@ public class PuzzleRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    puzzle.getClassId(),
-                    puzzle.getActiveRole().toString(),
-                    puzzle.getLevel().toString(),
-                    puzzle.getMaxAssertionsPerTest(),
-                    puzzle.getMutantValidatorLevel().toString(),
-                    puzzle.getEditableLinesStart(),
-                    puzzle.getEditableLinesEnd(),
-                    puzzle.getChapterId(),
-                    puzzle.getPosition(),
-                    puzzle.getTitle(),
-                    puzzle.getDescription()
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                puzzle.getClassId(),
+                puzzle.getActiveRole().toString(),
+                puzzle.getLevel().toString(),
+                puzzle.getMaxAssertionsPerTest(),
+                puzzle.getMutantValidatorLevel().toString(),
+                puzzle.getEditableLinesStart(),
+                puzzle.getEditableLinesEnd(),
+                puzzle.getChapterId(),
+                puzzle.getPosition(),
+                puzzle.getTitle(),
+                puzzle.getDescription()
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
 
     /**
@@ -366,18 +316,13 @@ public class PuzzleRepository {
                 VALUES (?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    chapter.getChapterId(),
-                    chapter.getPosition(),
-                    chapter.getTitle(),
-                    chapter.getDescription()
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                chapter.getChapterId(),
+                chapter.getPosition(),
+                chapter.getTitle(),
+                chapter.getDescription()
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
     }
 
     /**
@@ -404,24 +349,19 @@ public class PuzzleRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    game.getClassId(),
-                    game.getLevel().toString(),
-                    game.getCreatorId(),
-                    game.getMaxAssertionsPerTest(),
-                    game.getMutantValidatorLevel().toString(),
-                    game.getState().toString(),
-                    game.getCurrentRound(),
-                    game.getActiveRole().toString(),
-                    game.getMode().toString(),
-                    game.getPuzzleId()
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle game."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                game.getClassId(),
+                game.getLevel().toString(),
+                game.getCreatorId(),
+                game.getMaxAssertionsPerTest(),
+                game.getMutantValidatorLevel().toString(),
+                game.getState().toString(),
+                game.getCurrentRound(),
+                game.getActiveRole().toString(),
+                game.getMode().toString(),
+                game.getPuzzleId()
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle game."));
     }
 
 
@@ -444,22 +384,17 @@ public class PuzzleRepository {
                 WHERE Puzzle_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    puzzle.getChapterId(),
-                    puzzle.getPosition(),
-                    puzzle.getTitle(),
-                    puzzle.getDescription(),
-                    puzzle.getMaxAssertionsPerTest(),
-                    puzzle.getEditableLinesStart(),
-                    puzzle.getEditableLinesEnd(),
-                    puzzle.getPuzzleId()
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                puzzle.getChapterId(),
+                puzzle.getPosition(),
+                puzzle.getTitle(),
+                puzzle.getDescription(),
+                puzzle.getMaxAssertionsPerTest(),
+                puzzle.getEditableLinesStart(),
+                puzzle.getEditableLinesEnd(),
+                puzzle.getPuzzleId()
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -477,19 +412,14 @@ public class PuzzleRepository {
                 WHERE Chapter_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    chapter.getPosition(),
-                    chapter.getTitle(),
-                    chapter.getDescription(),
+        int updatedRows = queryRunner.update(query,
+                chapter.getPosition(),
+                chapter.getTitle(),
+                chapter.getDescription(),
 
-                    chapter.getChapterId()
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+                chapter.getChapterId()
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -515,24 +445,19 @@ public class PuzzleRepository {
                 WHERE ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    game.getClassId(),
-                    game.getLevel().toString(),
-                    game.getCreatorId(),
-                    game.getMaxAssertionsPerTest(),
-                    game.getMutantValidatorLevel().toString(),
-                    game.getState().toString(),
-                    game.getCurrentRound(),
-                    game.getActiveRole().toString(),
-                    game.getPuzzleId(),
-                    game.getId()
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                game.getClassId(),
+                game.getLevel().toString(),
+                game.getCreatorId(),
+                game.getMaxAssertionsPerTest(),
+                game.getMutantValidatorLevel().toString(),
+                game.getState().toString(),
+                game.getCurrentRound(),
+                game.getActiveRole().toString(),
+                game.getPuzzleId(),
+                game.getId()
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -550,16 +475,11 @@ public class PuzzleRepository {
                     AND games.Class_ID = puzzles.Class_ID
         """;
 
-        try {
-            var exists = queryRunner.query(query,
-                    oneFromRS(rs -> rs.getBoolean("games_exist")),
-                    puzzle.getPuzzleId()
-            );
-            return exists.orElseThrow();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var exists = queryRunner.query(query,
+                oneFromRS(rs -> rs.getBoolean("games_exist")),
+                puzzle.getPuzzleId()
+        );
+        return exists.orElseThrow();
     }
 
     /**
@@ -576,16 +496,11 @@ public class PuzzleRepository {
                     WHERE Puzzle_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    active,
-                    puzzle.getPuzzleId()
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                active,
+                puzzle.getPuzzleId()
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -598,15 +513,10 @@ public class PuzzleRepository {
      */
     public boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
         @Language("SQL") String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
-        try {
-            int updatedRows = queryRunner.update(query,
-                    chapter.getChapterId()
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                chapter.getChapterId()
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -626,16 +536,11 @@ public class PuzzleRepository {
                   AND classes.Class_ID = puzzle_classes.Parent_Class;
         """;
 
-        try {
-            var clazz = queryRunner.query(query,
-                    oneFromRS(GameClassDAO::gameClassFromRS),
-                    puzzleClassId
-            );
-            return clazz.orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var clazz = queryRunner.query(query,
+                oneFromRS(GameClassDAO::gameClassFromRS),
+                puzzleClassId
+        );
+        return clazz.orElse(null);
     }
 
     /**
@@ -653,16 +558,11 @@ public class PuzzleRepository {
                       AND c1.JavaFile = c2.JavaFile
         """;
 
-        try {
-            var used = queryRunner.query(query,
-                    oneFromRS(rs -> rs.getBoolean("class_used")),
-                    classId
-            );
-            return used.orElseThrow();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var used = queryRunner.query(query,
+                oneFromRS(rs -> rs.getBoolean("class_used")),
+                classId
+        );
+        return used.orElseThrow();
     }
 
     public boolean checkPuzzlesEnabled() {
@@ -676,13 +576,8 @@ public class PuzzleRepository {
                 LIMIT 1;
         """;
 
-        try {
-            var puzzle = queryRunner.query(query, nextFromRS(rs -> rs.getInt("Puzzle_ID")));
-            return puzzle.isPresent();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var puzzle = queryRunner.query(query, nextFromRS(rs -> rs.getInt("Puzzle_ID")));
+        return puzzle.isPresent();
     }
 
     /**

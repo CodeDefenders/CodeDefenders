@@ -109,10 +109,6 @@ public class DependencyDAO {
         @Language("SQL") String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
-        try {
-            queryRunner.batch(query, batchParamsFromList(dependencies));
-        } catch (SQLException e) {
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.batch(query, batchParamsFromList(dependencies));
     }
 }

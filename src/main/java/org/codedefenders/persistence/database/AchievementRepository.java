@@ -85,16 +85,11 @@ public class AchievementRepository {
 
         """.formatted(achievementId != null ? "AND achievements.ID = ?" : "");
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> listFromRS(resultSet, this::achievementFromRS),
-                    achievementId == null ? new Object[] {userId} : new Object[] {userId, achievementId.getAsInt()}
-            );
-        } catch (SQLException e) {
-            logger.error("Failed to get achievements for user {}", userId, e);
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.query(
+                query,
+                listFromRS(this::achievementFromRS),
+                achievementId == null ? new Object[] {userId} : new Object[] {userId, achievementId.getAsInt()}
+        );
     }
 
     /**
@@ -121,13 +116,7 @@ public class AchievementRepository {
                 Metric = Metric + ?;
         """;
 
-        try {
-            return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
-        } catch (SQLException e) {
-            logger.error("Failed to update achievement metric for user {} and achievement {}", userId, achievementId,
-                    e);
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
     }
 
 
@@ -155,13 +144,7 @@ public class AchievementRepository {
                         Metric = GREATEST(Metric, ?);
                 """;
 
-        try {
-            return queryRunner.update(query, achievementId.getAsInt(), userId, metricAbsolute, metricAbsolute);
-        } catch (SQLException e) {
-            logger.error("Failed to update achievement metric for user {} and achievement {}", userId, achievementId,
-                    e);
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.update(query, achievementId.getAsInt(), userId, metricAbsolute, metricAbsolute);
     }
 
     private int updateAchievementLevelForUser(int userId, Achievement.Id achievementId) {
@@ -179,11 +162,6 @@ public class AchievementRepository {
                 );
         """;
 
-        try {
-            return queryRunner.update(query, userId, achievementId.getAsInt(), achievementId.getAsInt());
-        } catch (SQLException e) {
-            logger.error("Failed to update achievement level for user {} and achievement {}", userId, achievementId, e);
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.update(query, userId, achievementId.getAsInt(), achievementId.getAsInt());
     }
 }

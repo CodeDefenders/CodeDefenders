@@ -39,17 +39,12 @@ public class ClassroomMemberRepository {
                 VALUES (?, ?, ?);
         """;
 
-        try {
-            queryRunner.insert(query,
-                    rs -> null,
-                    member.getUserId(),
-                    member.getClassroomId(),
-                    member.getRole().name()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.insert(query,
+                rs -> null,
+                member.getUserId(),
+                member.getClassroomId(),
+                member.getRole().name()
+        );
     }
 
     public void updateMember(ClassroomMember member) {
@@ -59,18 +54,14 @@ public class ClassroomMemberRepository {
                 WHERE User_ID = ?
                   AND Classroom_ID = ?;
         """;
-        try {
-            int updatedRows = queryRunner.update(query,
-                    member.getRole().name(),
-                    member.getUserId(),
-                    member.getClassroomId()
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update classroom.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+
+        int updatedRows = queryRunner.update(query,
+                member.getRole().name(),
+                member.getUserId(),
+                member.getClassroomId()
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update classroom.");
         }
     }
 
@@ -80,17 +71,13 @@ public class ClassroomMemberRepository {
                 WHERE User_ID = ?
                   AND Classroom_ID = ?;
         """;
-        try {
-            int updatedRows = queryRunner.update(query,
-                    userId,
-                    classroomId
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update classroom member.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+
+        int updatedRows = queryRunner.update(query,
+                userId,
+                classroomId
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update classroom member.");
         }
     }
 
@@ -99,15 +86,11 @@ public class ClassroomMemberRepository {
                 SELECT * FROM classroom_members
                 WHERE Classroom_ID = ?;
         """;
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomMemberFromRS),
-                    id
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                listFromRS(this::classroomMemberFromRS),
+                id
+        );
     }
 
     public Optional<ClassroomMember> getMemberForClassroomAndUser(int classroomId, int userId) {
@@ -116,16 +99,12 @@ public class ClassroomMemberRepository {
                 WHERE Classroom_ID = ?
                 AND User_ID = ?;
         """;
-        try {
-            return queryRunner.query(query,
-                    nextFromRS(this::classroomMemberFromRS),
-                    classroomId,
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query,
+                nextFromRS(this::classroomMemberFromRS),
+                classroomId,
+                userId
+        );
     }
 
     private ClassroomMember classroomMemberFromRS(ResultSet rs) throws SQLException {

@@ -213,31 +213,26 @@ public class MeleeGameRepository {
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    classId,
-                    level.name(),
-                    prize,
-                    defenderValue,
-                    attackerValue,
-                    lineCoverage,
-                    mutantCoverage,
-                    creatorId,
-                    state.name(),
-                    mode.name(),
-                    maxAssertionsPerTest,
-                    chatEnabled,
-                    mutantValidatorLevel.name(),
-                    capturePlayersIntention,
-                    automaticMutantEquivalenceThreshold,
-                    gameDurationMinutes,
-                    classroomId
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                classId,
+                level.name(),
+                prize,
+                defenderValue,
+                attackerValue,
+                lineCoverage,
+                mutantCoverage,
+                creatorId,
+                state.name(),
+                mode.name(),
+                maxAssertionsPerTest,
+                chatEnabled,
+                mutantValidatorLevel.name(),
+                capturePlayersIntention,
+                automaticMutantEquivalenceThreshold,
+                gameDurationMinutes,
+                classroomId
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
     }
 
     /**
@@ -278,24 +273,19 @@ public class MeleeGameRepository {
                 WHERE ID = ?
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    classId,
-                    level.name(),
-                    prize,
-                    defenderValue,
-                    attackerValue,
-                    lineCoverage,
-                    mutantCoverage,
-                    state.name(),
-                    duration,
-                    id
-            );
-            return updatedRows > 0;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        int updatedRows = queryRunner.update(query,
+                classId,
+                level.name(),
+                prize,
+                defenderValue,
+                attackerValue,
+                lineCoverage,
+                mutantCoverage,
+                state.name(),
+                duration,
+                id
+        );
+        return updatedRows > 0;
     }
 
     /**
@@ -312,13 +302,8 @@ public class MeleeGameRepository {
                 WHERE ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query, oneFromRS(MeleeGameRepository::meleeGameFromRS), gameId)
-                    .orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, oneFromRS(MeleeGameRepository::meleeGameFromRS), gameId)
+                .orElse(null);
     }
 
     /**
@@ -334,13 +319,8 @@ public class MeleeGameRepository {
                 WHERE State != ?;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    GameState.FINISHED.name());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                GameState.FINISHED.name());
     }
 
     /**
@@ -371,13 +351,8 @@ public class MeleeGameRepository {
                 ;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::openMeleeGameInfoFromRS),
-                    userId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::openMeleeGameInfoFromRS),
+                userId);
     }
 
     /**
@@ -409,13 +384,8 @@ public class MeleeGameRepository {
                 GROUP BY g.ID
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::activeMeleeGameInfoFromRS),
-                    userId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::activeMeleeGameInfoFromRS),
+                userId);
     }
 
     /**
@@ -436,13 +406,8 @@ public class MeleeGameRepository {
                 WHERE (p.User_ID = ?);
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    userId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                userId);
     }
 
     /**
@@ -472,13 +437,8 @@ public class MeleeGameRepository {
                 GROUP BY g.ID;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::finishedGameInfoFromRS),
-                    userId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::finishedGameInfoFromRS),
+                userId);
     }
 
     /**
@@ -496,15 +456,10 @@ public class MeleeGameRepository {
                   AND Creator_ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    GameState.ACTIVE.name(),
-                    GameState.CREATED.name(),
-                    creatorId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                GameState.ACTIVE.name(),
+                GameState.CREATED.name(),
+                creatorId);
     }
 
 
@@ -522,13 +477,8 @@ public class MeleeGameRepository {
                 AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    GameState.ACTIVE.toString());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                GameState.ACTIVE.toString());
     }
 
     public List<MeleeGame> getClassroomGames(int classroomId) {
@@ -537,13 +487,8 @@ public class MeleeGameRepository {
                 WHERE games.Classroom_ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    classroomId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                classroomId);
     }
 
     public List<MeleeGame> getAvailableClassroomGames(int classroomId) {
@@ -552,12 +497,8 @@ public class MeleeGameRepository {
                 WHERE games.Classroom_ID = ?
                 AND games.State != ?;
         """;
-        try {
-            return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
-                    classroomId, GameState.FINISHED.name());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(MeleeGameRepository::meleeGameFromRS),
+                classroomId, GameState.FINISHED.name());
     }
 }
