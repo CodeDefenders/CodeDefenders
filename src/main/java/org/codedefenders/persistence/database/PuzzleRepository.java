@@ -586,23 +586,18 @@ public class PuzzleRepository {
      * @param rs The {@link ResultSet}.
      * @return The created {@link PuzzleChapter}.
      */
-    private static PuzzleChapter puzzleChapterFromRS(ResultSet rs) {
-        try {
-            int chapterId = rs.getInt("puzzle_chapters.Chapter_ID");
+    private static PuzzleChapter puzzleChapterFromRS(ResultSet rs) throws SQLException {
+        int chapterId = rs.getInt("puzzle_chapters.Chapter_ID");
 
-            Integer position = rs.getInt("puzzle_chapters.Position");
-            if (rs.wasNull()) {
-                position = null;
-            }
-
-            String title = rs.getString("puzzle_chapters.Title");
-            String description = rs.getString("puzzle_chapters.Description");
-
-            return new PuzzleChapter(chapterId, position, title, description);
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while checking ResultSet.", e);
-            return null;
+        Integer position = rs.getInt("puzzle_chapters.Position");
+        if (rs.wasNull()) {
+            position = null;
         }
+
+        String title = rs.getString("puzzle_chapters.Title");
+        String description = rs.getString("puzzle_chapters.Description");
+
+        return new PuzzleChapter(chapterId, position, title, description);
     }
 
     /**
@@ -611,49 +606,44 @@ public class PuzzleRepository {
      * @param rs The {@link ResultSet}.
      * @return The created {@link Puzzle}.
      */
-    private static Puzzle puzzleFromRS(ResultSet rs) {
-        try {
-            final int puzzleId = rs.getInt("puzzles.Puzzle_ID");
-            final int classId = rs.getInt("puzzles.Class_ID");
-            final Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
+    private static Puzzle puzzleFromRS(ResultSet rs) throws SQLException {
+        final int puzzleId = rs.getInt("puzzles.Puzzle_ID");
+        final int classId = rs.getInt("puzzles.Class_ID");
+        final Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
 
-            Integer chapterId = rs.getInt("puzzles.Chapter_ID");
-            if (rs.wasNull()) {
-                chapterId = null;
-            }
-
-            Integer position = rs.getInt("puzzles.Position");
-            if (rs.wasNull()) {
-                position = null;
-            }
-
-            String title = rs.getString("puzzles.Title");
-            String description = rs.getString("puzzles.Description");
-
-            GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
-
-            int maxAssertions = rs.getInt("puzzles.Max_Assertions");
-            // TODO Pay attention that the name of the column here follows a different format
-
-            CodeValidatorLevel mutantValidatorLevel =
-                    CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
-
-            Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
-            if (rs.wasNull()) {
-                editableLinesStart = null;
-            }
-
-            Integer editableLinesEnd = rs.getInt("puzzles.Editable_Lines_End");
-            if (rs.wasNull()) {
-                editableLinesEnd = null;
-            }
-
-            return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
-                    editableLinesStart, editableLinesEnd, chapterId, position, title, description);
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while checking ResultSet.", e);
-            return null;
+        Integer chapterId = rs.getInt("puzzles.Chapter_ID");
+        if (rs.wasNull()) {
+            chapterId = null;
         }
+
+        Integer position = rs.getInt("puzzles.Position");
+        if (rs.wasNull()) {
+            position = null;
+        }
+
+        String title = rs.getString("puzzles.Title");
+        String description = rs.getString("puzzles.Description");
+
+        GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
+
+        int maxAssertions = rs.getInt("puzzles.Max_Assertions");
+        // TODO Pay attention that the name of the column here follows a different format
+
+        CodeValidatorLevel mutantValidatorLevel =
+                CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
+
+        Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
+        if (rs.wasNull()) {
+            editableLinesStart = null;
+        }
+
+        Integer editableLinesEnd = rs.getInt("puzzles.Editable_Lines_End");
+        if (rs.wasNull()) {
+            editableLinesEnd = null;
+        }
+
+        return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
+                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
     /**
@@ -662,25 +652,20 @@ public class PuzzleRepository {
      * @param rs The {@link ResultSet}.
      * @return The created {@link PuzzleGame}.
      */
-    private static PuzzleGame puzzleGameFromRS(ResultSet rs) {
-        try {
-            GameClass cut = GameClassDAO.gameClassFromRS(rs);
-            int gameId = rs.getInt("games.ID");
-            int classId = rs.getInt("games.Class_ID");
-            GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));
-            int creatorId = rs.getInt("games.Creator_ID");
-            int maxAssertionsPerTest = rs.getInt("games.MaxAssertionsPerTest");
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
-            GameState state = GameState.valueOf(rs.getString("games.State"));
-            int currentRound = rs.getInt("games.CurrentRound");
-            Role activeRole = Role.valueOf(rs.getString("games.ActiveRole"));
-            int puzzleId = rs.getInt("games.Puzzle_ID");
+    private static PuzzleGame puzzleGameFromRS(ResultSet rs) throws SQLException {
+        GameClass cut = GameClassDAO.gameClassFromRS(rs);
+        int gameId = rs.getInt("games.ID");
+        int classId = rs.getInt("games.Class_ID");
+        GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));
+        int creatorId = rs.getInt("games.Creator_ID");
+        int maxAssertionsPerTest = rs.getInt("games.MaxAssertionsPerTest");
+        CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
+        GameState state = GameState.valueOf(rs.getString("games.State"));
+        int currentRound = rs.getInt("games.CurrentRound");
+        Role activeRole = Role.valueOf(rs.getString("games.ActiveRole"));
+        int puzzleId = rs.getInt("games.Puzzle_ID");
 
-            return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
-                maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while checking ResultSet.", e);
-            return null;
-        }
+        return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
+            maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
     }
 }
