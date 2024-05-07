@@ -219,6 +219,10 @@ public class UserSettingsManager extends HttpServlet {
         user.setUsername(DELETED_USER_NAME);
         user.setEmail(String.format(DELETED_USER_EMAIL, UUID.randomUUID()));
         user.setEncodedPassword(DELETED_USER_PASSWORD);
-        return userRepo.update(user) && userService.deleteRecordedSessions(user.getId());
+        if (!userRepo.update(user)) {
+            return false;
+        }
+        userService.deleteRecordedSessions(user.getId());
+        return true;
     }
 }

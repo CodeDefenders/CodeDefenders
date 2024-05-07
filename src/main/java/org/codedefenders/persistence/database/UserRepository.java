@@ -284,21 +284,17 @@ public class UserRepository {
         return queryRunner.query(query, listFromRS(UserRepository::userFromRS), classroomId);
     }
 
-    public boolean insertSession(int userId, String ipAddress) {
+    public void insertSession(int userId, String ipAddress) {
         @Language("SQL") String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
-
         queryRunner.update(query, userId, ipAddress);
-        return true;
     }
 
-    public boolean deleteSessions(int userId) {
+    public void deleteSessions(int userId) {
         @Language("SQL") String query = "DELETE FROM sessions WHERE User_ID = ?;";
-
         queryRunner.update(query, userId);
-        return true;
     }
 
-    public boolean setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
+    public void setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
         @Language("SQL") String query = """
                 UPDATE users
                 SET pw_reset_secret = ?,
@@ -307,7 +303,6 @@ public class UserRepository {
         """;
 
         queryRunner.update(query, passwordResetSecret, userId);
-        return true;
     }
 
     @Nonnull
