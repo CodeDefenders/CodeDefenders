@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.transaction.Transaction;
 import org.codedefenders.transaction.TransactionManager;
 import org.codedefenders.util.DatabaseExtension;
@@ -280,7 +281,7 @@ public class TransactionAwareQueryRunnerIT {
         assertTrue(actual.isPresent());
         assertEquals(1, actual.get());
 
-        assertThrows(SQLException.class, () -> transactionManager.executeInTransaction(tx -> {
+        assertThrows(UncheckedSQLException.class, () -> transactionManager.executeInTransaction(tx -> {
             //noinspection SqlResolve
             queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
                     generatedKeyFromRS(),
@@ -316,7 +317,7 @@ public class TransactionAwareQueryRunnerIT {
         assertTrue(actualInt.isPresent());
         assertEquals(1, actualInt.get());
 
-        assertThrows(SQLException.class, () -> transactionManager.executeInTransaction(tx1 -> {
+        assertThrows(UncheckedSQLException.class, () -> transactionManager.executeInTransaction(tx1 -> {
             transactionManager.executeInTransaction(tx -> {
                 //noinspection SqlResolve
                 queryRunner.execute("UPDATE test SET name = ? WHERE id = ?;", "test2", id);
