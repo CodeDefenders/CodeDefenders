@@ -61,7 +61,8 @@
 </div>
 
 <script type="module">
-    import {objects, TestAccordion} from '';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {TestAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
     const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
     const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));

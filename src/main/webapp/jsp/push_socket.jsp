@@ -32,7 +32,7 @@
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <script type="module">
-    import {objects, PushSocket} from '';
+    import {objects, PushSocket} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const baseWsUri = '${url.getAbsoluteURLForPath("/")}'

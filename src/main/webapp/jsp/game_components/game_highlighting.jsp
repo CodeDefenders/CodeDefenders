@@ -36,7 +36,8 @@
 --%>
 
 <script type="module">
-    import {GameHighlighting, objects} from '';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {GameHighlighting} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const data = JSON.parse('${gameHighlighting.JSON}');

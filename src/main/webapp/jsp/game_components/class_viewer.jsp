@@ -110,7 +110,8 @@
 </div>
 
 <script type="module">
-    import {ClassViewer, objects} from '';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {ClassViewer} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};

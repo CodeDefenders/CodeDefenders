@@ -130,7 +130,7 @@
 </form>
 
 <script type="module">
-    import {GameTimeManager} from '';
+    import {GameTimeManager} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
     const gameTimeManager = new GameTimeManager(".time-left", 10);
 </script>

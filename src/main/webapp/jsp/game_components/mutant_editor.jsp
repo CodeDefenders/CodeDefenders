@@ -115,7 +115,8 @@
 </div>
 
 <script type="module">
-    import {MutantEditor, objects} from '';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {MutantEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};

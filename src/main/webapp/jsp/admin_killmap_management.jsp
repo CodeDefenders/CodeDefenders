@@ -353,7 +353,8 @@
 </div>
 
 <script type="module">
-    import DataTable, {DataTablesUtils, postForm} from '';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import {postForm, DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     <% if (currentPage == KillmapPage.MANUAL) { %>

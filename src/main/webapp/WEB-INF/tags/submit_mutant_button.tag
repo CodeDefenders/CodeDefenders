@@ -17,7 +17,7 @@
         </button>
 
         <script type="module">
-            import {objects} from '';
+            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const mutantProgressBar = await objects.await('mutantProgressBar');
 
