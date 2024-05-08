@@ -121,6 +121,12 @@ public class AdminSystemSettings extends HttpServlet {
                 return "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance.";
             }
         },
+        CONTACT_NOTICE {
+            @Override
+            public String toString() {
+                return "HTML formatted text shown on the \"Contact Us\" page just below the contact form.";
+            }
+        },
         EMAIL_SMTP_HOST {
             @Override
             public String toString() {

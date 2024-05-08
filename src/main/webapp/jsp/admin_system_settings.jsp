@@ -65,7 +65,8 @@
                 switch (setting.getType()) {
                     case STRING_VALUE:
                         if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
-                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE) ||
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.CONTACT_NOTICE)) {
         %>
                 <div class="col-8">
                     <textarea class="form-control" rows="3"
