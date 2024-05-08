@@ -18,49 +18,49 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%
     List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
+    pageContext.setAttribute("openGames", openGames);
+    pageContext.setAttribute("gameCreatorNames", gameCreatorNames);
 %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Welcome to Code Defenders"); %>
+<p:main_page title="Welcome to Code Defenders">
+    <%-- Vertically align content if enough space is available. --%>
+    <div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
 
-<jsp:include page="/jsp/header_logout.jsp"/>
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
+                <%-- Make the header break nicely on smaller screens. --%>
+            <h1 class="d-lg-block d-flex flex-column">
+                <span>Code Defenders: </span>
+                <span>A Mutation Testing Game</span>
+            </h1>
+        </div>
 
-<%-- Vertically align content if enough space is available. --%>
-<div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
+        <a href="${url.forPath(Paths.LOGIN)}"
+           class="btn btn-lg btn-primary btn-highlight"
+           style="margin-bottom: 5rem;">
+            Log in or Sign up
+        </a>
 
-    <div class="d-flex align-items-center gap-3 mb-3">
-        <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
-        <%-- Make the header break nicely on smaller screens. --%>
-        <h1 class="d-lg-block d-flex flex-column">
-            <span>Code Defenders: </span>
-            <span>A Mutation Testing Game</span>
-        </h1>
-    </div>
-
-    <a href="${url.forPath(Paths.LOGIN)}"
-       class="btn btn-lg btn-primary btn-highlight"
-       style="margin-bottom: 5rem;">
-        Log in or Sign up
-    </a>
-
-    <div class="row g-4">
-        <div class="col-xxl-6 col-12">
-            <div class="p-5 bg-light rounded-3">
-                <h2 class="mb-3">Active Multiplayer Games</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
+        <div class="row g-4">
+            <div class="col-xxl-6 col-12">
+                <div class="p-5 bg-light rounded-3">
+                    <h2 class="mb-3">Active Multiplayer Games</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
                             <tr>
                                 <th>Creator</th>
                                 <th>Class</th>
@@ -68,69 +68,40 @@
                                 <th>Defenders</th>
                                 <th>Level</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <%
-                                if (openGames.isEmpty()) {
-                            %>
-                                <tr>
-                                    <td colspan="100" class="text-center">
-                                        There are currently no open games.
-                                    </td>
-                                </tr>
-                            <%
-                                } else {
-                                    for (MultiplayerGame game : openGames) {
-                                    final GameClass cut = game.getCUT();
-                                    int attackers = game.getAttackerPlayers().size();
-                                    int defenders = game.getDefenderPlayers().size();
-                            %>
-                                <tr id="<%="game-"+game.getId()%>">
-                                    <td><%=gameCreatorNames.get(game.getId())%></td>
-                                    <td><span><%=cut.getAlias()%></span></td>
-                                    <td><%=attackers%></td>
-                                    <td><%=defenders%></td>
-                                    <td><%=game.getLevel().getFormattedString()%></td>
-                                </tr>
-                            <%
-                                    }
-                                }
-                            %>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <c:choose>
+                                    <c:when test="${empty openGames}">
+                                        <tr>
+                                            <td colspan="100" class="text-center">
+                                                There are currently no open games.
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach items="${openGames}" var="game">
+                                            <tr id="game-${game.id}">
+                                                <td>${gameCreatorNames[game.id]}</td>
+                                                <td><span>${game.CUT.alias}</span></td>
+                                                <td>${game.attackerPlayers.size()}</td>
+                                                <td>${game.defenderPlayers.size()}</td>
+                                                <td>${game.level.formattedString}</td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-6 col-12">
+                <div class="p-5 bg-light rounded-3">
+                    <h2 class="mb-3">Research</h2>
+                    <%@ include file="/jsp/research.jsp" %>
                 </div>
             </div>
         </div>
-
-        <div class="col-xxl-6 col-12">
-            <div class="p-5 bg-light rounded-3">
-                <h2 class="mb-3">Research</h2>
-                <%@ include file="/jsp/research.jsp" %>
-            </div>
-        </div>
     </div>
-
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
-
-<%--            <!-- Puzzle--> may be used in the future once puzzles are more sophisticated--%>
-<%--            <h3 class="text-primary"--%>
-<%--                style="border-top: 1px solid; border-bottom: 1px solid; padding: 10px; /*background: #d9edf7">--%>
-<%--                Puzzles--%>
-<%--            </h3>--%>
-<%--            <p style="font-size: medium">Play one of our predefined puzzles to improve your testing skills in the--%>
-<%--                following lectures:</p>--%>
-<%--            <%--%>
-<%--                final List<PuzzleChapter> puzzleChapters = PuzzleDAO.getPuzzleChapters();--%>
-<%--            %>--%>
-
-<%--            <table class="table table-hover table-responsive table-paragraphs games-table">--%>
-<%--                <%for (PuzzleChapter chapter : puzzleChapters) {%>--%>
-<%--                <tr>--%>
-<%--                    <td>--%>
-<%--                        <%=chapter.getTitle()%>: <%=chapter.getDescription()%>--%>
-<%--                    </td>--%>
-<%--                </tr>--%>
-<%--                <%}%>--%>
-<%--            </table>--%>
+</p:main_page>
