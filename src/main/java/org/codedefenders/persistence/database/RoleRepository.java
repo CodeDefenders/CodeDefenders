@@ -70,7 +70,7 @@ public class RoleRepository {
 
         try {
             queryRunner.insert(query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    rs -> null,
                     userId,
                     roleName);
         } catch (SQLException e) {
