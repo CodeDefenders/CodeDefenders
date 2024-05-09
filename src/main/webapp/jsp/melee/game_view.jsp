@@ -27,12 +27,16 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     Role role = game.getRole(login.getUserId());
+
+    pageContext.setAttribute("game", game);
+    pageContext.setAttribute("role", role);
 %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
@@ -65,36 +69,24 @@
 
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
-<jsp:include page="/jsp/header_game.jsp"/>
+<p:game_page>
+    <jsp:include page="/jsp/player_feedback.jsp"/>
+    <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
+    <jsp:include page="/jsp/battleground/game_history.jsp"/>
 
-<jsp:include page="/jsp/player_feedback.jsp"/>
-<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
-
-<jsp:include page="/jsp/battleground/game_history.jsp"/>
-
-<%
-    if (role.equals(Role.OBSERVER)) {
-%>
-        <jsp:include page="/jsp/melee/creator_view.jsp" />
-<%
-    } else {
-%>
-        <jsp:include page="/jsp/melee/player_view.jsp" />
-<%
-    }
-%>
-
-<%
-    if (game.isCapturePlayersIntention()) {
-%>
-    <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
-    <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
-<%
-    }
-%>
-
-<!-- This corresponds to dispatcher.Dispatch -->
-<%@ include file="/jsp/footer_game.jsp" %>
+    <c:choose>
+        <c:when test="${role == Role.OBSERVER}">
+            <jsp:include page="/jsp/melee/creator_view.jsp" />
+        </c:when>
+        <c:otherwise>
+            <jsp:include page="/jsp/melee/player_view.jsp" />
+        </c:otherwise>
+    </c:choose>
+    <c:if test="${game.capturePlayersIntention}">
+        <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
+        <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
+    </c:if>
+</p:game_page>
 
 
 <% previousSubmission.clear(); %>
