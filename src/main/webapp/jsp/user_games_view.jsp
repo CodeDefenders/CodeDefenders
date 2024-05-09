@@ -35,11 +35,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.game.Role" %>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
-<% pageInfo.setPageTitle("My Games"); %>
-
-<jsp:include page="/jsp/header.jsp"/>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%
     // Games active for this user (Created or joined)
@@ -78,7 +74,7 @@
 
 <div class="container">
 
-    <h2 class="mb-3">${pageInfo.pageTitle}</h2>
+    <h2 class="mb-3">My Games</h2>
     <table id="my-games" class="table table-striped table-v-align-middle">
         <thead>
             <tr>
@@ -773,4 +769,3 @@
     </script>
 
 </div>
-<%@ include file="/jsp/footer.jsp" %>
