@@ -1,4 +1,4 @@
-<%@ page import="org.codedefenders.util.Paths" %><%--
+<%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -18,52 +18,24 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page pageEncoding="UTF-8" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<%@ page pageEncoding="UTF-8" %>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
-    <title>User not found (404)</title>
-    <link rel="icon" href="${url.forPath("/favicon.ico")}" type="image/x-icon">
-    <link href="${url.forPath("/css/specific/error_page.css")}" rel="stylesheet">
-</head>
-
-<body>
-    <div class="content">
-        <a href="${url.forPath("/")}" class="branding">
-            <img src="${url.forPath("/images/logo.png")}"
-                 alt="Code Defenders Logo"
-                 width="58">
-            <h1>Code Defenders</h1>
-        </a>
-        <h2>404</h2>
-        <%--
-        Escaping is necessary here, because the displayed value is taken from the URL directly.
-        This prevents XSS attacks (e.g. /profile?user=<script>alert(1)</script>).
-        --%>
-        <h3>The user with the name "${fn:escapeXml(param.user)}" does not exist.</h3>
-        <hr/>
+<t:error_page
+        title="User not found (404)"
+        statusCode="404"
+        shortDescription="The user with the name \"${fn:escapeXml(param.user)}\" does not exist.">
+    <jsp:attribute name="message">
         <p>Make sure the address and the username are correct and that the page hasn't moved.</p>
         <p>Please contact your administrator if you think this is a mistake.</p>
         <p>
             Looking for your own profile?
             <a href="${url.forPath(Paths.USER_PROFILE)}" title="your profile">Click here.</a>
         </p>
-        <div class="go-back" hidden>
-            <a href="javascript:history.back()">Go back</a>
-        </div>
-        <script>
-            if (history.length > 1) {
-                document.querySelector('.go-back').removeAttribute('hidden');
-            }
-        </script>
-    </div>
-</body>
-
-</html>
+    </jsp:attribute>
+</t:error_page>
