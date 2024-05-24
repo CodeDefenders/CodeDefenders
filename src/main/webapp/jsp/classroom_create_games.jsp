@@ -20,27 +20,25 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <c:set var="classroom" value="${requestScope.classroom}"/>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Create Games"); %>
+<p:main_page title="Create Games">
+    <div class="container">
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <h2 class="m-0"><c:out value="${classroom.name}"/></h2>
+            <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}"
+               class="btn btn-sm rounded-pill btn-outline-secondary flex-shrink-0">
+                Back to Classroom
+                <i class="fa fa-external-link ms-1"></i>
+            </a>
+        </div>
 
-<jsp:include page="/jsp/header.jsp"/>
-
-<div class="container">
-    <div class="d-flex align-items-center mb-4 gap-3">
-        <h2 class="m-0"><c:out value="${classroom.name}"/></h2>
-        <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}"
-           class="btn btn-sm rounded-pill btn-outline-secondary flex-shrink-0">
-            Back to Classroom
-            <i class="fa fa-external-link ms-1"></i>
-        </a>
+        <t:create_games/>
     </div>
-
-    <t:create_games/>
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+</p:main_page>
