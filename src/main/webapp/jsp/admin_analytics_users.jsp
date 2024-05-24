@@ -20,163 +20,162 @@
 --%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("User Analytics"); %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<jsp:include page="/jsp/header.jsp"/>
+<%@ page import="org.codedefenders.util.Paths" %>
 
-<div class="container">
-    <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
-    <jsp:include page="/jsp/admin_navigation.jsp"/>
+<p:main_page title="User Analytics">
+    <div class="container">
+        <t:admin_navigation activePage="adminAnalytics"/>
 
-    <h3>User Analytics</h3>
+        <h3>User Analytics</h3>
 
-    <table id="tableUsers" class="table table-striped">
-        <thead>
-            <tr>
-                <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
-                <th>ID</th>
-                <th>Username</th>
-                <th>Games Played</th>
-                <th>Attacker Score</th>
-                <th>Defender Score</th>
-                <th>Total Score</th>
-            </tr>
-        </thead>
-    </table>
+        <table id="tableUsers" class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Games Played</th>
+                    <th>Attacker Score</th>
+                    <th>Defender Score</th>
+                    <th>Total Score</th>
+                </tr>
+            </thead>
+        </table>
 
-    <div class="row mt-4">
-        <div class="col-auto">
-            <div class="btn-group">
-                <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download">
-                    <i class="fa fa-download me-1"></i>
-                    Download table
-                </a>
-                <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                    as CSV
-                </a>
-                <a download="user-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
-                    as JSON
-                </a>
+        <div class="row mt-4">
+            <div class="col-auto">
+                <div class="btn-group">
+                    <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
+                       type="button" class="btn btn-sm btn-outline-secondary" id="download">
+                        <i class="fa fa-download me-1"></i>
+                        Download table
+                    </a>
+                    <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
+                       type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                        as CSV
+                    </a>
+                    <a download="user-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json"
+                       type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
+                        as JSON
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script type="module">
-    import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import $ from '${url.forPath("/js/jquery.mjs")}';
+    <script type="module">
+        import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
-    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
+        import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
-    const div = DataTablesUtils.formatDivision;
-    const valPercent = DataTablesUtils.formatValueAndPercent;
+        const div = DataTablesUtils.formatDivision;
+        const valPercent = DataTablesUtils.formatValueAndPercent;
 
-    function format(data) {
-        return '' +
-            `<div class="child-row-wrapper">
-                <table class="child-row-details">
-                    <thead>
-                        <tr>
-                            <th>Games Played</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Games as Attacker:</td>
-                            <td>\${valPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
-                            <td>Games as Defender:</td>
-                            <td>\${valPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
-                        </tr>
-                    </tbody>
-                    <thead>
-                        <tr>
-                            <th>Mutants</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Mutants Submitted:</td>
-                            <td>\${data.mutantsSubmitted}</td>
-                            <td>Per Game (as Attacker):</td>
-                            <td>\${div(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
-                        </tr>
-                        <tr>
-                            <td>Alive Mutants:</td>
-                            <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
-                            <td>Per Game (as Attacker):</td>
-                            <td>\${div(data.mutantsAlive, data.attackerGamesPlayed)}</td>
-                        </tr>
-                        <tr>
-                            <td>Equivalent Mutants:</td>
-                            <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
-                            <td>Per Game (as Attacker):</td>
-                            <td>\${div(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
-                        </tr>
-                    </tbody>
-                    <thead>
-                        <tr>
-                            <th>Tests</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Tests Submitted:</td>
-                            <td>\${data.testsSubmitted}</td>
-                            <td>Per Game (as Defender):</td>
-                            <td>\${div(data.testsSubmitted, data.defenderGamesPlayed)}</td>
-                        </tr>
-                        <tr>
-                            <td>Mutants Killed:</td>
-                            <td>\${data.mutantsKilled}</td>
-                            <td>Per Game (as Defender):</td>
-                            <td>\${div(data.mutantsKilled, data.defenderGamesPlayed)}</td>
-                            <td>Per Test:</td>
-                            <td>\${div(data.mutantsKilled, data.testsSubmitted)}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>`;
-    }
+        function format(data) {
+            return '' +
+                `<div class="child-row-wrapper">
+                    <table class="child-row-details">
+                        <thead>
+                            <tr>
+                                <th>Games Played</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Games as Attacker:</td>
+                                <td>\${valPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
+                                <td>Games as Defender:</td>
+                                <td>\${valPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <th>Mutants</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mutants Submitted:</td>
+                                <td>\${data.mutantsSubmitted}</td>
+                                <td>Per Game (as Attacker):</td>
+                                <td>\${div(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
+                            </tr>
+                            <tr>
+                                <td>Alive Mutants:</td>
+                                <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                                <td>Per Game (as Attacker):</td>
+                                <td>\${div(data.mutantsAlive, data.attackerGamesPlayed)}</td>
+                            </tr>
+                            <tr>
+                                <td>Equivalent Mutants:</td>
+                                <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                                <td>Per Game (as Attacker):</td>
+                                <td>\${div(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <th>Tests</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tests Submitted:</td>
+                                <td>\${data.testsSubmitted}</td>
+                                <td>Per Game (as Defender):</td>
+                                <td>\${div(data.testsSubmitted, data.defenderGamesPlayed)}</td>
+                            </tr>
+                            <tr>
+                                <td>Mutants Killed:</td>
+                                <td>\${data.mutantsKilled}</td>
+                                <td>Per Game (as Defender):</td>
+                                <td>\${div(data.mutantsKilled, data.defenderGamesPlayed)}</td>
+                                <td>Per Test:</td>
+                                <td>\${div(data.mutantsKilled, data.testsSubmitted)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>`;
+        }
 
-    $(document).ready(function() {
-        const table = new DataTable('#tableUsers', {
-            "ajax": {
-                "url": "${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json",
-                "dataSrc": "data"
-            },
-            "columns": [
-                {
-                    "className":      'toggle-details',
-                    "orderable":      false,
-                    "data":           null,
-                    "defaultContent": '<i class="toggle-details-icon fa fa-chevron-right"></i>'
+        $(document).ready(function() {
+            const table = new DataTable('#tableUsers', {
+                "ajax": {
+                    "url": "${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json",
+                    "dataSrc": "data"
                 },
-                { "data": "id" },
-                { "data": "username" },
-                { "data": "gamesPlayed" },
-                { "data": "attackerScore" },
-                { "data": "defenderScore" },
-                { "data":
-                    function (row, type, val, meta) {
-                        return row.attackerScore + row.defenderScore;
+                "columns": [
+                    {
+                        "className":      'toggle-details',
+                        "orderable":      false,
+                        "data":           null,
+                        "defaultContent": '<i class="toggle-details-icon fa fa-chevron-right"></i>'
+                    },
+                    { "data": "id" },
+                    { "data": "username" },
+                    { "data": "gamesPlayed" },
+                    { "data": "attackerScore" },
+                    { "data": "defenderScore" },
+                    { "data":
+                        function (row, type, val, meta) {
+                            return row.attackerScore + row.defenderScore;
+                        }
                     }
-                }
-            ],
-            "pageLength": 50,
-            "order": [[ 1, "asc" ]],
-            "scrollY": '600px',
-            "scrollCollapse": true,
-            "paging": false,
-            "language": {"info": "Showing _TOTAL_ entries"}
+                ],
+                "pageLength": 50,
+                "order": [[ 1, "asc" ]],
+                "scrollY": '600px',
+                "scrollCollapse": true,
+                "paging": false,
+                "language": {"info": "Showing _TOTAL_ entries"}
+            });
+
+            DataTablesUtils.setupChildRows(table, format);
         });
-
-        DataTablesUtils.setupChildRows(table, format);
-    });
-</script>
-
-<%@ include file="/jsp/footer.jsp" %>
+    </script>
+</p:main_page>
