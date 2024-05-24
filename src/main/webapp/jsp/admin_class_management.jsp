@@ -20,127 +20,115 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Class Management"); %>
-
-<jsp:include page="/jsp/header.jsp"/>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%
+    @SuppressWarnings("unchecked")
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");
+    pageContext.setAttribute("allClasses", allClasses);
 %>
 
-<div class="container">
-    <% request.setAttribute("adminActivePage", "adminClasses"); %>
-    <jsp:include page="/jsp/admin_navigation.jsp"/>
+<p:main_page title="Class Management">
+    <div class="container">
+        <t:admin_navigation activePage="adminClasses"/>
 
-    <table id="tableClasses" class="table table-v-align-middle table-striped">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Alias</th>
-                <th>#Games</th>
-                <th>Manage Class</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            <% if (allClasses.isEmpty()) { %>
+        <table id="tableClasses" class="table table-v-align-middle table-striped">
+            <thead>
                 <tr>
-                    <td colspan="100" class="text-center">
-                        There are no classes yet.
-                        <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
-                        to upload a new class.
-                    </td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Alias</th>
+                    <th>#Games</th>
+                    <th>Manage Class</th>
                 </tr>
-            <% } %>
+            </thead>
+            <tbody>
 
-            <%
-                for (GameClassInfo classInfo : allClasses) {
-                    int classId = classInfo.getGameClass().getId();
-                    String name = classInfo.getGameClass().getName();
-                    String alias = classInfo.getGameClass().getAlias();
-                    boolean active = classInfo.getGameClass().isActive();
-                    int gamesWithClass = classInfo.getGamesWithClass();
-                    boolean deletable = classInfo.isDeletable();
-            %>
+                <c:if test="${empty allClasses}">
+                    <tr>
+                        <td colspan="100" class="text-center">
+                            There are no classes yet.
+                            <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">Click here</a>
+                            to upload a new class.
+                        </td>
+                    </tr>
+                </c:if>
 
-                <tr id="<%="class_row_" + classId%>" <%=active ? "" : "class=\"text-muted\""%>>
-                    <td><%=classId%></td>
-                    <td><%=name%></td>
-                    <td>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-<%=classId%>">
-                            <%=alias%>
-                        </a>
-                        <% pageContext.setAttribute("classId", classId); %>
-                        <% pageContext.setAttribute("classAlias", alias); %>
-                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-${classId}"/>
-                    </td>
-                    <td><%=gamesWithClass%></td>
-                    <td>
-                        <div class="d-flex flex-row gap-1">
-                            <%
-                                if (active) {
-                            %>
-                                <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
-                                    <input type="hidden" name="formType" value="setClassInactive">
-                                    <button class="btn btn-sm btn-danger" id="<%="active_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                            title="Set class as inactive. This class won't be available for games afterwards."
-                                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to inactive?');">
-                                        <i class="fa fa-power-off"></i>
+                <c:forEach var="classInfo" items="${allClasses}">
+                    <c:set var="gameClass" value="${classInfo.gameClass}"/>
+                    <c:set var="classId" value="${gameClass.id}"/>
+
+                    <tr id="class_row_${classId}" ${gameClass.active ? '' : 'class="text-muted"'}>
+                        <td>${classId}</td>
+                        <td>${gameClass.name}</td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-${classId}">
+                                ${gameClass.alias}
+                            </a>
+                            <t:class_modal classId="${classId}" classAlias="${gameClass.alias}" htmlId="class-modal-${classId}"/>
+                        </td>
+                        <td>${classInfo.gamesWithClass}</td>
+                        <td>
+                            <div class="d-flex flex-row gap-1">
+                                <c:choose>
+                                    <c:when test="${gameClass.active}">
+                                        <form id="manageClass_${classId}" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
+                                            <input type="hidden" name="formType" value="setClassInactive">
+                                            <button class="btn btn-sm btn-danger" id="active_class_${classId}" type="submit" value="${classId}" name="classId"
+                                                    title="Set class as inactive. This class won't be available for games afterwards."
+                                                    onclick="return confirm('Are you sure you want to set class \'${gameClass.name}\' to inactive?');">
+                                                <i class="fa fa-power-off"></i>
+                                            </button>
+                                        </form>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <form id="manageClass_${classId}" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
+                                            <input type="hidden" name="formType" value="setClassActive">
+                                            <button class="btn btn-sm btn-success" id="inactive_class_${classId}" type="submit" value="${classId}" name="classId"
+                                                    title="Set class as active. This class will be available for games afterwards again."
+                                                    onclick="return confirm('Are you sure you want to set class \'${gameClass.name}\' to active?');">
+                                                <i class="fa fa-power-off"></i>
+                                            </button>
+                                        </form>
+                                    </c:otherwise>
+                                </c:choose>
+                                <form id="manageClass_${classId}" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
+                                    <input type="hidden" name="formType" value="classRemoval">
+                                    <button class="btn btn-sm btn-danger" id="delete_class_${classId}" type="submit" value="${classId}" name="classId"
+                                            <c:choose>
+                                                <c:when test="${classInfo.deletable}">
+                                                    title="Delete class from the system. This class won't be available for games afterwards."
+                                                    onclick="return confirm('Are you sure you want to delete class \'${gameClass.name}\' forever? This cannot be undone.');"
+                                                </c:when>
+                                                <c:otherwise>
+                                                    disabled
+                                                    title="Class can't be deleted, since games were already played on it."
+                                                </c:otherwise>
+                                            </c:choose>
+                                        >
+                                        <i class="fa fa-trash"></i>
                                     </button>
                                 </form>
-                            <%
-                                } else {
-                            %>
-                                <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
-                                    <input type="hidden" name="formType" value="setClassActive">
-                                    <button class="btn btn-sm btn-success" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                            title="Set class as active. This class will be available for games afterwards again."
-                                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to active?');">
-                                        <i class="fa fa-power-off"></i>
-                                    </button>
-                                </form>
-                            <%
-                                }
-                            %>
-                            <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
-                                <input type="hidden" name="formType" value="classRemoval">
-                                <button class="btn btn-sm btn-danger" id="<%="delete_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                        <% if (deletable) { %>
-                                            title="Delete class from the system. This class won't be available for games afterwards."
-                                            onclick="return confirm('Are you sure you want to delete class \'<%=name%>\' forever? This cannot be undone.');"
-                                        <% } else { %>
-                                            disabled
-                                            title="Class can't be deleted, since games were already played on it."
-                                        <% } %>
-                                    >
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            <%
-                }
-            %>
+                            </div>
+                        </td>
+                    </tr>
+                </c:forEach>
 
-        </tbody>
-    </table>
+            </tbody>
+        </table>
 
-    <% if (!allClasses.isEmpty()) { %>
-        <p>
-            <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
-            to upload a new class.
-        </p>
-    <% } %>
+        <c:if test="${!empty allClasses}">
+            <p>
+                <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">Click here</a>
+                to upload a new class.
+            </p>
+        </c:if>
 
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+    </div>
+</p:main_page>
