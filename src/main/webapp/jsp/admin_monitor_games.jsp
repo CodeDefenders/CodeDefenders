@@ -34,13 +34,9 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminMonitorGames" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Monitor Games"); %>
-
-<jsp:include page="/jsp/header.jsp"/>
 
 <%
     List<MultiplayerGame> multiplayerGames = (List<MultiplayerGame>) request.getAttribute("multiplayerGames");
@@ -62,8 +58,7 @@
 %>
 
 <div class="container">
-    <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
-    <jsp:include page="/jsp/admin_navigation.jsp"/>
+    <t:admin_navigation activePage="adminMonitorGames"/>
 
     <form id="games" action="${url.forPath(Paths.ADMIN_MONITOR)}" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
@@ -668,5 +663,3 @@
     </script>
 
 </div>
-
-<%@ include file="/jsp/footer.jsp" %>
