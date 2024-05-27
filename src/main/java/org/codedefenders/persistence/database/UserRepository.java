@@ -31,7 +31,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
@@ -47,7 +46,6 @@ import com.google.common.cache.LoadingCache;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
-import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
@@ -127,21 +125,16 @@ public class UserRepository {
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner
-                    .insert(query, generatedKeyFromRS(),
-                            userEntity.getUsername(),
-                            userEntity.getEncodedPassword(),
-                            userEntity.getEmail(),
-                            userEntity.isValidated(),
-                            userEntity.isActive(),
-                            userEntity.getAllowContact(),
-                            userEntity.getKeyMap().name(),
-                            userEntity.getKeepPreviousTest());
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner
+                .insert(query, generatedKeyFromRS(),
+                        userEntity.getUsername(),
+                        userEntity.getEncodedPassword(),
+                        userEntity.getEmail(),
+                        userEntity.isValidated(),
+                        userEntity.isActive(),
+                        userEntity.getAllowContact(),
+                        userEntity.getKeyMap().name(),
+                        userEntity.getKeepPreviousTest());
     }
 
     /**
@@ -163,21 +156,17 @@ public class UserRepository {
                           KeepPreviousTest = ?
                 WHERE User_ID = ?;
         """;
-        try {
-            return queryRunner.update(query,
-                    userEntity.getUsername(),
-                    userEntity.getEmail(),
-                    userEntity.getEncodedPassword(),
-                    userEntity.isValidated(),
-                    userEntity.isActive(),
-                    userEntity.getAllowContact(),
-                    userEntity.getKeyMap().name(),
-                    userEntity.getKeepPreviousTest(),
-                    userEntity.getId()) == 1;
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.update(query,
+                userEntity.getUsername(),
+                userEntity.getEmail(),
+                userEntity.getEncodedPassword(),
+                userEntity.isValidated(),
+                userEntity.isActive(),
+                userEntity.getAllowContact(),
+                userEntity.getKeyMap().name(),
+                userEntity.getKeepPreviousTest(),
+                userEntity.getId()) == 1;
     }
 
     /**
@@ -190,13 +179,8 @@ public class UserRepository {
                 FROM  users
                 WHERE User_ID = ?;
         """;
-        try {
-            return queryRunner
-                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), userId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(UserRepository::userFromRS), userId);
     }
 
     /**
@@ -209,13 +193,8 @@ public class UserRepository {
                 FROM  users
                 WHERE Username = ?;
         """;
-        try {
-            return queryRunner
-                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), username);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(UserRepository::userFromRS), username);
     }
 
     /**
@@ -228,13 +207,8 @@ public class UserRepository {
                 FROM  users
                 WHERE Email = ?;
         """;
-        try {
-            return queryRunner
-                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(UserRepository::userFromRS), email);
     }
 
     // TODO: Relocate into sth like `PlayerRepository`
@@ -258,13 +232,8 @@ public class UserRepository {
                 WHERE players.User_ID = users.User_ID
                   AND players.ID = ?;
         """;
-        try {
-            return Optional.ofNullable(queryRunner
-                    .query(query, new ScalarHandler<>(), playerId));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(new ScalarHandler<>()), playerId);
     }
 
     /**
@@ -275,13 +244,7 @@ public class UserRepository {
     @Nonnull
     public List<UserEntity> getUsers() {
         @Language("SQL") String query = "SELECT * FROM  users;";
-        try {
-            return queryRunner
-                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query, listFromRS(UserRepository::userFromRS));
     }
 
     @Nonnull
@@ -297,12 +260,8 @@ public class UserRepository {
                   AND users.Active = TRUE
                 ORDER BY User_ID;
         """;
-        try {
-            return queryRunner.query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(UserRepository::userFromRS));
     }
 
     @Nonnull
@@ -319,40 +278,21 @@ public class UserRepository {
                   AND games.Classroom_ID = ?
                 ORDER BY User_ID;
         """;
-        try {
-            return queryRunner
-                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS), classroomId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(UserRepository::userFromRS), classroomId);
     }
 
-    public boolean insertSession(int userId, String ipAddress) {
+    public void insertSession(int userId, String ipAddress) {
         @Language("SQL") String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
-
-        try {
-            queryRunner.update(query, userId, ipAddress);
-            return true;
-        } catch (SQLException e) {
-            logger.warn("SQLException while logging session", e);
-            return false;
-        }
+        queryRunner.update(query, userId, ipAddress);
     }
 
-    public boolean deleteSessions(int userId) {
+    public void deleteSessions(int userId) {
         @Language("SQL") String query = "DELETE FROM sessions WHERE User_ID = ?;";
-
-        try {
-            queryRunner.update(query, userId);
-            return true;
-        } catch (SQLException e) {
-            logger.warn("SQLException while executing query", e);
-            return false;
-        }
+        queryRunner.update(query, userId);
     }
 
-    public boolean setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
+    public void setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
         @Language("SQL") String query = """
                 UPDATE users
                 SET pw_reset_secret = ?,
@@ -360,13 +300,7 @@ public class UserRepository {
                 WHERE User_ID = ?;
         """;
 
-        try {
-            queryRunner.update(query, passwordResetSecret, userId);
-            return true;
-        } catch (SQLException e) {
-            logger.warn("SQLException while executing query", e);
-            return false;
-        }
+        queryRunner.update(query, passwordResetSecret, userId);
     }
 
     @Nonnull
@@ -381,12 +315,6 @@ public class UserRepository {
                 ) AND pw_reset_secret = ?;
         """;
 
-        try {
-            return Optional.ofNullable(queryRunner
-                    .query(query, new ScalarHandler<>(), passwordResetSecret));
-        } catch (SQLException e) {
-            logger.warn("SQLException while executing query", e);
-            return Optional.empty();
-        }
+        return queryRunner.query(query, oneFromRS(new ScalarHandler<>()), passwordResetSecret);
     }
 }

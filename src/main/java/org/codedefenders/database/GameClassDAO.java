@@ -456,11 +456,7 @@ public class GameClassDAO {
         @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
-        try {
-            queryRunner.batch(query, batchParamsFromList(classes));
-        } catch (SQLException e) {
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.batch(query, batchParamsFromList(classes));
     }
 
     /**

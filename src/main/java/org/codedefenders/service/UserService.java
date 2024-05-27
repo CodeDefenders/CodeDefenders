@@ -305,11 +305,12 @@ public class UserService {
     // Session Recording
     //
 
-    public boolean recordSession(int userId, String ipAddress) {
-        return deleteRecordedSessions(userId) && userRepo.insertSession(userId, ipAddress);
+    public void recordSession(int userId, String ipAddress) {
+        deleteRecordedSessions(userId);
+        userRepo.insertSession(userId, ipAddress);
     }
 
-    public boolean deleteRecordedSessions(int userId) {
-        return userRepo.deleteSessions(userId);
+    public void deleteRecordedSessions(int userId) {
+        userRepo.deleteSessions(userId);
     }
 }

@@ -19,13 +19,10 @@
 package org.codedefenders.persistence.database;
 
 
-import java.sql.SQLException;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -97,17 +94,12 @@ public class UserStatsDAO {
                 getViewForGameType(gameType)
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("mutants")),
-                    userId,
-                    alive ? 1 : 0
-            ).orElse(0);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getInt("mutants")),
+                userId,
+                alive ? 1 : 0
+        ).orElse(0);
     }
 
     /**
@@ -145,16 +137,11 @@ public class UserStatsDAO {
                 killingTest ? ">" : "="
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("tests")),
-                    userId
-            ).orElse(0);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getInt("tests")),
+                userId
+        ).orElse(0);
     }
 
     /**
@@ -191,16 +178,11 @@ public class UserStatsDAO {
                 getViewForGameType(gameType)
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
-                    userId
-            ).orElse(0d);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
+                userId
+        ).orElse(0d);
     }
 
     /**
@@ -237,16 +219,11 @@ public class UserStatsDAO {
                 getViewForGameType(gameType)
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
-                    userId
-            ).orElse(0d);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
+                userId
+        ).orElse(0d);
     }
 
     /**
@@ -288,17 +265,12 @@ public class UserStatsDAO {
                 getViewForGameType(gameType)
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
-                    userId,
-                    role.toString()
-            ).orElse(0);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
+                userId,
+                role.toString()
+        ).orElse(0);
     }
 
     public UserStats.PuzzleStats getPuzzleStatsByUser(int userId) {
@@ -313,25 +285,20 @@ public class UserStatsDAO {
                 GROUP BY puzzle_chapters.Position
         """;
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> {
-                        final UserStats.PuzzleStats stats = new UserStats.PuzzleStats();
-                        while (resultSet.next()) {
-                            stats.addPuzzle(
-                                    resultSet.getInt("chapter"),
-                                    resultSet.getInt("puzzle")
-                            );
-                        }
-                        return stats;
-                    },
-                    GameMode.PUZZLE.toString(), GameState.SOLVED.toString(), userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> {
+                    final UserStats.PuzzleStats stats = new UserStats.PuzzleStats();
+                    while (resultSet.next()) {
+                        stats.addPuzzle(
+                                resultSet.getInt("chapter"),
+                                resultSet.getInt("puzzle")
+                        );
+                    }
+                    return stats;
+                },
+                GameMode.PUZZLE.toString(), GameState.SOLVED.toString(), userId
+        );
     }
 
     public int getTotalGamesByUser(int userId, GameType gameType) {
@@ -345,15 +312,10 @@ public class UserStatsDAO {
             getViewForGameType(gameType)
         );
 
-        try {
-            return queryRunner.query(
-                    query,
-                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
-                    userId
-            ).orElse(0);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(
+                query,
+                resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
+                userId
+        ).orElse(0);
     }
 }

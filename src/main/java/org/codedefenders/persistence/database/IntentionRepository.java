@@ -18,7 +18,6 @@
  */
 package org.codedefenders.persistence.database;
 
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,6 @@ import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
-import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 
 /**
  * This class handles the database logic for player intentions.
@@ -74,12 +72,8 @@ public class IntentionRepository {
             VALUES (?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query, generatedKeyFromRS(),
-                    testId, gameId, targetLines);
-        } catch (SQLException e) {
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.insert(query, generatedKeyFromRS(),
+                testId, gameId, targetLines);
     }
 
     /**
@@ -99,12 +93,8 @@ public class IntentionRepository {
             VALUES (?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    mutant.getId(), mutant.getGameId(), intention.toString());
-        } catch (SQLException e) {
-            throw new UncheckedSQLException(e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                mutant.getId(), mutant.getGameId(), intention.toString());
     }
 }

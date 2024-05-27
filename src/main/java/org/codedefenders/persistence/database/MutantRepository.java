@@ -116,12 +116,8 @@ public class MutantRepository {
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Mutant_ID = ?;
         """;
-        try {
-            return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), mutantId).orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), mutantId).orElse(null);
     }
 
     /**
@@ -133,12 +129,8 @@ public class MutantRepository {
                 SELECT * FROM view_mutants_with_user m
                 WHERE m.Game_ID = ? AND m.MD5 = ?;
         """;
-        try {
-            return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), gameId, md5).orElse(null);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, oneFromRS(MutantRepository::mutantFromRS), gameId, md5).orElse(null);
     }
 
     /**
@@ -151,12 +143,8 @@ public class MutantRepository {
                 WHERE m.Game_ID = ?
                   AND m.Player_ID = ?;
         """;
-        try {
-            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId, playerId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId, playerId);
     }
 
     public boolean gameHasPredefinedMutants(int gameId) {
@@ -165,12 +153,8 @@ public class MutantRepository {
                 WHERE mutants.Game_ID = ?
                 LIMIT 1;
         """;
-        try {
-            return queryRunner.query(query, nextFromRS(rs -> true), gameId).orElse(false);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, nextFromRS(rs -> true), gameId).orElse(false);
     }
 
     /**
@@ -184,12 +168,8 @@ public class MutantRepository {
                 FROM view_valid_game_mutants m
                 WHERE m.Game_ID = ?;
         """;
-        try {
-            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), gameId);
     }
 
     /**
@@ -207,12 +187,8 @@ public class MutantRepository {
                 FROM mutants_for_class mutants
                 WHERE mutants.Class_ID = ?
         """;
-        try {
-            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classId);
     }
 
     /**
@@ -248,13 +224,10 @@ public class MutantRepository {
                 SELECT * FROM classroom_user_mutants;
         """;
 
-        List<Mutant> mutants;
-        try {
-            mutants = queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classroomId, classroomId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var mutants = queryRunner.query(query,
+                listFromRS(MutantRepository::mutantFromRS),
+                classroomId,
+                classroomId);
 
         Multimap<Integer, Mutant> mutantsMap = ArrayListMultimap.create();
         for (Mutant mutant : mutants) {
@@ -273,12 +246,8 @@ public class MutantRepository {
                 FROM view_valid_game_mutants m
                 WHERE Player_ID = ?;
         """;
-        try {
-            return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), playerId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), playerId);
     }
 
     /**
@@ -307,25 +276,20 @@ public class MutantRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
-        try {
-            return queryRunner.insert(query,
-                    generatedKeyFromRS(),
-                    relativeJavaFile,
-                    relativeClassFile,
-                    gameId,
-                    roundCreated,
-                    equivalent.name(),
-                    alive,
-                    playerId,
-                    score,
-                    md5,
-                    classId,
-                    mutatedLinesString
-            ).orElseThrow(() -> new UncheckedSQLException("Couldn't store mutant."));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.insert(query,
+                generatedKeyFromRS(),
+                relativeJavaFile,
+                relativeClassFile,
+                gameId,
+                roundCreated,
+                equivalent.name(),
+                alive,
+                playerId,
+                score,
+                md5,
+                classId,
+                mutatedLinesString
+        ).orElseThrow(() -> new UncheckedSQLException("Couldn't store mutant."));
     }
 
     /**
@@ -350,20 +314,15 @@ public class MutantRepository {
                 WHERE Mutant_ID = ? AND Alive = 1;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    equivalent.name(),
-                    alive,
-                    roundKilled,
-                    score,
-                    mutantId
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update test.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+        int updatedRows = queryRunner.update(query,
+                equivalent.name(),
+                alive,
+                roundKilled,
+                score,
+                mutantId
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update test.");
         }
     }
 
@@ -382,17 +341,12 @@ public class MutantRepository {
                 WHERE Mutant_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    score,
-                    mutantId
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update mutant.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+        int updatedRows = queryRunner.update(query,
+                score,
+                mutantId
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update mutant.");
         }
     }
 
@@ -411,17 +365,12 @@ public class MutantRepository {
                 WHERE Mutant_ID = ?;
         """;
 
-        try {
-            int updatedRows = queryRunner.update(query,
-                    killMessage,
-                    mutantId
-            );
-            if (updatedRows != 1) {
-                throw new UncheckedSQLException("Couldn't update mutant.");
-            }
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
+        int updatedRows = queryRunner.update(query,
+                killMessage,
+                mutantId
+        );
+        if (updatedRows != 1) {
+            throw new UncheckedSQLException("Couldn't update mutant.");
         }
     }
 
@@ -436,15 +385,11 @@ public class MutantRepository {
                 INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)
                 VALUES (?, ?);
         """;
-        try {
-            queryRunner.insert(query, rs -> null,
-                    mutantId,
-                    classId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        queryRunner.insert(query, rs -> null,
+                mutantId,
+                classId
+        );
     }
 
 
@@ -454,13 +399,9 @@ public class MutantRepository {
     public void removeMutantForId(int mutantId) {
         @Language("SQL") String query1 = "DELETE FROM mutants WHERE Mutant_ID = ?;";
         @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?;";
-        try {
-            queryRunner.update(query1, mutantId);
-            queryRunner.update(query2, mutantId);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+
+        queryRunner.update(query1, mutantId);
+        queryRunner.update(query2, mutantId);
     }
 
     /**
@@ -478,27 +419,17 @@ public class MutantRepository {
 
         var params = batchParamsFromList(mutants);
 
-        try {
-            queryRunner.batch(query1, params);
-            queryRunner.batch(query2, params);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.batch(query1, params);
+        queryRunner.batch(query2, params);
     }
 
     public int getEquivalentDefenderId(Mutant m) {
         @Language("SQL") String query = "SELECT * FROM equivalences WHERE Mutant_ID = ?;";
 
-        try {
-            var defenderId = queryRunner.query(query,
-                            oneFromRS(rs -> rs.getInt("Defender_ID")),
-                            m.getId());
-            return defenderId.orElse(-1);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var defenderId = queryRunner.query(query,
+                        oneFromRS(rs -> rs.getInt("Defender_ID")),
+                        m.getId());
+        return defenderId.orElse(-1);
     }
 
     public void insertEquivalence(Mutant mutant, int defender) {
@@ -507,16 +438,11 @@ public class MutantRepository {
                 VALUES (?, ?, ?)
         """;
 
-        try {
-            queryRunner.insert(query, rs -> null,
-                    mutant.getId(),
-                    defender,
-                    mutant.getScore()
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.insert(query, rs -> null,
+                mutant.getId(),
+                defender,
+                mutant.getScore()
+        );
     }
 
     public void incrementMutantScore(Mutant mutant, int score) {
@@ -532,12 +458,8 @@ public class MutantRepository {
                 WHERE Mutant_ID = ? AND Alive = 1;
         """;
 
-        try {
-            queryRunner.update(query,
-                    score, mutant.getId());
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        queryRunner.update(query,
+                score, mutant.getId());
     }
 
     public boolean killMutant(Mutant mutant, Equivalence equivalence) {
@@ -570,11 +492,7 @@ public class MutantRepository {
             """;
         }
 
-        try {
-            return queryRunner.update(query,
-                    equivalence.name(), false, roundKilled, mutant.getId()) > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return queryRunner.update(query,
+                equivalence.name(), false, roundKilled, mutant.getId()) > 0;
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.codedefenders.database;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,13 +56,9 @@ public class FeedbackDAO {
         """;
 
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
-        try {
-            var updatedRows = queryRunner.batch(query, params);
-            return Arrays.stream(updatedRows)
-                    .allMatch(numRows -> numRows > 0);
-        } catch (SQLException e) {
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        var updatedRows = queryRunner.batch(query, params);
+        return Arrays.stream(updatedRows)
+                .allMatch(numRows -> numRows > 0);
     }
 
     public static Map<Feedback.Type, Integer> getFeedbackValues(int gameId, int userId) {
