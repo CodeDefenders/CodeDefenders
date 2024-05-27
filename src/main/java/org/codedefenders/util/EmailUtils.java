@@ -40,6 +40,7 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_USERNAME;
 
 /**
  * Utility class for sending emails. Email credentials are stored in
@@ -100,7 +101,10 @@ public class EmailUtils {
         final String emailPassword = AdminDAO.getSystemSetting(EMAIL_PASSWORD).getStringValue();
         final boolean debug = AdminDAO.getSystemSetting(DEBUG_MODE).getBoolValue();
 
-        try    {
+        String username = AdminDAO.getSystemSetting(EMAIL_USERNAME).getStringValue();
+        String emailUsername = username.isEmpty() ? emailAddress : username;
+
+        try {
             Properties props = System.getProperties();
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.auth", "true");
@@ -109,7 +113,7 @@ public class EmailUtils {
 
             Session session = Session.getInstance(props, new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(emailAddress, emailPassword);
+                    return new PasswordAuthentication(emailUsername, emailPassword);
                 }
             });
 
@@ -124,7 +128,7 @@ public class EmailUtils {
             msg.setSentDate(new Date());
 
             Transport transport = session.getTransport("smtp");
-            transport.connect(smtpHost, smtpPort, emailAddress, emailPassword);
+            transport.connect(smtpHost, smtpPort, emailUsername, emailPassword);
             Transport.send(msg);
             transport.close();
 

@@ -145,6 +145,13 @@ public class AdminSystemSettings extends HttpServlet {
                 return "Password for the system mail account";
             }
         },
+        EMAIL_USERNAME {
+            @Override
+            public String toString() {
+                return "Username for the system mail account. Should usually be the same as the address. "
+                        + "If left blank, will default to the address.";
+            }
+        },
         EMAILS_ENABLED {
             @Override
             public String toString() {
