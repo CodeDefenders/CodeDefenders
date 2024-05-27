@@ -214,8 +214,11 @@ class GameHighlighting {
             });
 
             mutantIcon.addEventListener('mouseleave', setPopoverTimeout.bind(null, popover));
-            popover.getTipElement().addEventListener('mouseenter', clearPopoverTimeout);
-            popover.getTipElement().addEventListener('mouseleave', setPopoverTimeout.bind(null, popover));
+
+            mutantIcon.addEventListener('inserted.bs.popover', function (event) {
+                popover.tip.addEventListener('mouseenter', clearPopoverTimeout);
+                popover.tip.addEventListener('mouseleave', setPopoverTimeout.bind(null, popover));
+            });
         }
     }
 
