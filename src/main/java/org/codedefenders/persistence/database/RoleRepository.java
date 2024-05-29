@@ -65,6 +65,8 @@ public class RoleRepository {
         @Language("SQL") String query = """
                 INSERT INTO roles (User_ID, Role)
                 VALUES (?, ?)
+
+                -- To avoid duplicate role entries. The key of the roles is (User_ID, Role).
                 ON DUPLICATE KEY UPDATE roles.Role = Role;
         """;
 
