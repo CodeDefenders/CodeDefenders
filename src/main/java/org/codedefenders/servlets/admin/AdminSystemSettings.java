@@ -124,7 +124,7 @@ public class AdminSystemSettings extends HttpServlet {
         CONTACT_NOTICE {
             @Override
             public String toString() {
-                return "HTML formatted text shown on the \"Contact Us\" page just below the contact form.";
+                return "HTML formatted text shown on the 'Contact Us' page just below heading.";
             }
         },
         EMAIL_SMTP_HOST {
@@ -211,6 +211,19 @@ public class AdminSystemSettings extends HttpServlet {
             @Override
             public String toString() {
                 return "The default duration a multiplayer/melee game is open (in minutes).";
+            }
+        },
+        TEACHER_APPLICATIONS_ENABLED {
+            @Override
+            public String toString() {
+                return "Enable teacher account applications using email on the 'Contact Us' page. "
+                        + "Configuring a valid email address is required.";
+            }
+        },
+        TEACHER_APPLICATIONS_EMAIL {
+            @Override
+            public String toString() {
+                return "The email address to use for teacher account applications.";
             }
         },
     }
