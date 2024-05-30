@@ -1,12 +1,18 @@
 package org.codedefenders.service;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringJoiner;
+import java.util.function.Consumer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
+import org.apache.catalina.Role;
+import org.apache.catalina.UserDatabase;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.auth.annotation.RequiresPermission;
 import org.codedefenders.auth.permissions.AdminPermission;
@@ -122,22 +128,11 @@ public class RoleService {
 
         StringJoiner messages = new StringJoiner("\n");
         messages.add("""
-                     You are seeing this message because you configured auth.admin.users to promote the following \
-                     users to admin: '%s'. Please remember to disable this setting in the config after you finish \
-                     setting up Code Defenders."""
+                     You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to \
+                     disable this setting in the config after you finish setting up Code Defenders."""
                 .stripIndent().formatted(String.join(", ", userNames)));
 
-        boolean missingUser = false;
-        for (String userName : userNames) {
-            var user = userRepo.getUserByName(userName);
-            if (user.isPresent()) {
-                roleRepo.addRoleNameForUser(user.get().getId(), AdminRole.name);
-                messages.add("Promoted user to admin: '%s'".formatted(userName));
-            } else {
-                missingUser = true;
-                messages.add("Could not promote user to admin: '%s'. User not found.".formatted(userName));
-            }
-        }
+        boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
 
         if (missingUser) {
         messages.add("""
@@ -146,5 +141,97 @@ public class RoleService {
         }
 
         logger.warn(messages.toString());
+    }
+
+    /**
+     * Promotes all users in the Tomcat UserDatabase with the given role to admin. Unknown users are ignored.
+     * This should only be used to migrate admin users from the Tomcat user database.
+     * @param roleName The name of the admin role in the Tomcat user database.
+     */
+    @RequiresPermission(AdminPermission.name)
+    public void migrateAdminUsers(String roleName) {
+        if (roleName == null) {
+            return;
+        }
+
+        List<String> userNames = getUsersWithRoleFromUserDatabase(roleName);
+        if (userNames == null) {
+            return;
+        }
+
+        if (userNames.isEmpty()) {
+            logger.warn("""
+                        Your configuration still contains the deprecated auth.admin.role setting, but no users \
+                        matching the role were found in your Tomcat user database. You can safely remove \
+                        auth.admin.role from your config.""");
+            return;
+        }
+
+        StringJoiner messages = new StringJoiner("\n");
+        messages.add("""
+                     Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now \
+                     migrate your existing admin users from the Tomcat user database to our new system. You can safely \
+                     remove auth.admin.role after this is done."""
+                .stripIndent());
+
+        boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
+
+        if (missingUser) {
+            messages.add("""
+                    Some users were not found. If you want to add these users as administrators, please create the \
+                    accounts and restart the application.""".stripIndent());
+        }
+
+        logger.warn(messages.toString());
+    }
+
+    /**
+     * Promotes the given users to admin.
+     * @param userNames User names to promote.
+     * @param logMessage A callback for log messages.
+     * @return {@code true} if any of the given users wasn't found.
+     */
+    private boolean promoteUsersToAdmin(List<String> userNames, Consumer<String> logMessage) {
+        boolean missingUser = false;
+        for (String userName : userNames) {
+            var user = userRepo.getUserByName(userName);
+            if (user.isPresent()) {
+                roleRepo.addRoleNameForUser(user.get().getId(), AdminRole.name);
+                logMessage.accept("Promoted user to admin: '%s'".formatted(userName));
+            } else {
+                missingUser = true;
+                logMessage.accept("Could not promote user to admin: '%s'. User not found.".formatted(userName));
+            }
+        }
+        return missingUser;
+    }
+
+    /**
+     * Retrieves users with the given role from the Tomcat UserDatabase.
+     * @param roleName The role to look up users for.
+     * @return A list of found usernames with the role, or {@code null} if there was a problem with the lookup.
+     */
+    private List<String> getUsersWithRoleFromUserDatabase(String roleName) {
+        UserDatabase userDatabase;
+        try {
+            userDatabase = (UserDatabase) new InitialContext().lookup("java:comp/env/auth/UserDatabase");
+        } catch (NamingException e) {
+            logger.error("Exception while looking up Tomcat UserDatabase.", e);
+            return null;
+        }
+
+        Role adminRole = userDatabase.findRole(roleName);
+        if (adminRole == null) {
+            logger.error("Couldn't role '{}' in Tomcat UserDatabase.", roleName);
+            return null;
+        }
+
+        List<String> adminUserNames = new ArrayList<>();
+        userDatabase.getUsers().forEachRemaining(user -> {
+            if (user.isInRole(adminRole)) {
+                adminUserNames.add(user.getUsername());
+            }
+        });
+        return adminUserNames;
     }
 }

@@ -111,6 +111,8 @@ public class Configuration {
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
+    @Deprecated
+    protected String authAdminRole;
     protected String authAdminUsers;
 
     protected Boolean metrics;
@@ -452,6 +454,11 @@ public class Configuration {
 
     public boolean isJavaMelodyEnabled() {
         return javamelody != null ? javamelody : false;
+    }
+
+    @Deprecated
+    public String getAuthAdminRole() {
+        return authAdminRole;
     }
 
     public List<String> getAuthAdminUsers() {

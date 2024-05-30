@@ -89,6 +89,8 @@ public class SystemStartStop implements ServletContextListener {
         }
 
         systemSubject.execute(
+                () -> roleService.migrateAdminUsers(config.getAuthAdminRole()));
+        systemSubject.execute(
                 () -> roleService.doInitialAdminSetup(config.getAuthAdminUsers()));
 
         sce.getServletContext().setRequestCharacterEncoding("UTF-8");
