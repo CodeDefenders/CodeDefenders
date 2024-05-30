@@ -196,7 +196,7 @@ public class RoleService {
         for (String userName : userNames) {
             var user = userRepo.getUserByName(userName);
             if (user.isPresent()) {
-                roleRepo.addRoleNameForUser(user.get().getId(), AdminRole.name);
+                addRoleForUser(user.get().getId(), new AdminRole());
                 logMessage.accept("Promoted user to admin: '%s'".formatted(userName));
             } else {
                 missingUser = true;
