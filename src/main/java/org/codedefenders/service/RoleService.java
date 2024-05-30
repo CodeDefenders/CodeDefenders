@@ -122,9 +122,10 @@ public class RoleService {
 
         StringJoiner messages = new StringJoiner("\n");
         messages.add("""
-You are seeing the following message because you configured auth.admin.users to promote the following users to admin: \
-'%s'. Please remember to disable this setting after the setup is done."""
-                .formatted(String.join(", ", userNames)));
+                     You are seeing this message because you configured auth.admin.users to promote the following \
+                     users to admin: '%s'. Please remember to disable this setting in the config after you finish \
+                     setting up Code Defenders."""
+                .stripIndent().formatted(String.join(", ", userNames)));
 
         boolean missingUser = false;
         for (String userName : userNames) {
@@ -140,8 +141,8 @@ You are seeing the following message because you configured auth.admin.users to 
 
         if (missingUser) {
         messages.add("""
-Some users were not found. If you want to add these users as administrators, please create the accounts and restart \
-the application.""");
+                    Some users were not found. If you want to add these users as administrators, please create the \
+                    accounts and restart the application.""".stripIndent());
         }
 
         logger.warn(messages.toString());
