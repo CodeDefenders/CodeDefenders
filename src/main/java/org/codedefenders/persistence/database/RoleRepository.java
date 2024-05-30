@@ -50,15 +50,10 @@ public class RoleRepository {
                 WHERE User_ID = ?;
         """;
 
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::roleNameFromRS),
-                    userId
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        return queryRunner.query(query,
+                listFromRS(this::roleNameFromRS),
+                userId
+        );
     }
 
     public void addRoleNameForUser(int userId, String roleName) {
@@ -70,15 +65,10 @@ public class RoleRepository {
                 ON DUPLICATE KEY UPDATE roles.Role = Role;
         """;
 
-        try {
-            queryRunner.insert(query,
-                    rs -> null,
-                    userId,
-                    roleName);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.insert(query,
+                rs -> null,
+                userId,
+                roleName);
     }
 
     public void removeRoleNameForUser(int userId, String roleName) {
@@ -88,14 +78,9 @@ public class RoleRepository {
                   AND Role = ?;
         """;
 
-        try {
-            queryRunner.update(query,
-                    userId,
-                    roleName);
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.update(query,
+                userId,
+                roleName);
     }
 
     public Multimap<Integer, String> getAllUserRoleNames() {
@@ -105,13 +90,8 @@ public class RoleRepository {
         """;
 
         Multimap<Integer, String> roleNames = ArrayListMultimap.create();
-        try {
-            queryRunner.query(query,
-                listFromRS(rs ->  roleNames.put(userIdFromRS(rs), roleNameFromRS(rs))));
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
+        queryRunner.query(query,
+            listFromRS(rs ->  roleNames.put(userIdFromRS(rs), roleNameFromRS(rs))));
         return roleNames;
     }
 }
