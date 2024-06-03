@@ -2,10 +2,10 @@ package org.codedefenders.auth;
 
 import java.util.concurrent.Callable;
 
-import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -15,10 +15,10 @@ public class SystemSubject {
     private static Subject instance;
 
     private final CodeDefendersRealm realm;
-    private final SecurityManager securityManager;
+    private final WebSecurityManager securityManager;
 
     @Inject
-    public SystemSubject(CodeDefendersRealm realm, SecurityManager securityManager) {
+    public SystemSubject(CodeDefendersRealm realm, WebSecurityManager securityManager) {
         this.realm = realm;
         this.securityManager = securityManager;
     }
