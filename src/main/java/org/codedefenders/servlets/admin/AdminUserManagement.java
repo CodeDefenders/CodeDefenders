@@ -29,11 +29,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.codedefenders.auth.roles.AdminRole;
+import org.codedefenders.auth.roles.TeacherRole;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.RoleService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -73,6 +75,9 @@ public class AdminUserManagement extends HttpServlet {
     @Inject
     private PasswordEncoder passwordEncoder;
 
+    @Inject
+    private RoleService roleService;
+
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
@@ -92,14 +97,16 @@ public class AdminUserManagement extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        User user = null;
         String editUser = request.getParameter("editUser");
-        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            user = userService.getUserById(Integer.parseInt(editUser)).orElse(null);
+        if (editUser != null && !editUser.isEmpty() && StringUtils.isNumeric(editUser)) {
+            var editedUser = userService.getUserById(Integer.parseInt(editUser));
+            var roles = editedUser.map(user -> roleService.getRolesForUser(user.getId()));
+            request.setAttribute("editedUser", editedUser.orElse(null));
+            request.setAttribute("editedUserRoles", roles.orElse(null));
         }
 
-        request.setAttribute("editedUser", user);
+        request.setAttribute("userInfos", AdminDAO.getAllUsersInfo());
+        request.setAttribute("userRoles", roleService.getAllUserRoles());
 
         request.getRequestDispatcher(Constants.ADMIN_USER_JSP).forward(request, response);
     }
@@ -158,6 +165,8 @@ public class AdminUserManagement extends HttpServlet {
                     String newEmail = request.getParameter("email");
                     String password = request.getParameter("password");
                     String confirmPassword = request.getParameter("confirm_password");
+                    boolean isTeacher = request.getParameter("role-teacher") != null;
+                    boolean isAdmin = request.getParameter("role-admin") != null;
 
                     String msg;
 
@@ -170,12 +179,22 @@ public class AdminUserManagement extends HttpServlet {
                         }
 
                         Optional<String> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
-
                         if (result.isPresent()) { // There was an error
                             responsePath = url.forPath(Paths.ADMIN_USERS)
                                     + "?editUser=" + userId.get();
                             msg = result.get();
                         } else {
+                            if (isTeacher) {
+                                roleService.addRoleForUser(userId.get(), new TeacherRole());
+                            } else {
+                                roleService.removeRoleForUser(userId.get(), new TeacherRole());
+                            }
+                            if (isAdmin) {
+                                roleService.addRoleForUser(userId.get(), new AdminRole());
+                            } else {
+                                roleService.removeRoleForUser(userId.get(), new AdminRole());
+                            }
+
                             msg = "Successfully updated info for User " + userId.get();
                         }
                     }

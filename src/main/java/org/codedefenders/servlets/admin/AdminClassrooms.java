@@ -41,53 +41,8 @@ import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.ADMIN_CLASSROOMS)
 public class AdminClassrooms extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminClassrooms.class);
-
-    @Inject
-    private ClassroomService classroomService;
-
-    @Inject
-    private CodeDefendersAuth login;
-
-    @Inject
-    private MessagesBean messages;
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher("/jsp/admin_classrooms.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Optional<String> action = ServletUtils.getStringParameter(request, "action");
-        if (action.isEmpty()) {
-            messages.add("Missing required parameter: action.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        try {
-            switch (action.get()) {
-                case "create-classroom":
-                    createClassroom(request, response);
-                    break;
-                default:
-                    messages.add("Invalid action: " + action);
-                    Redirect.redirectBack(request, response);
-            }
-        } catch (ValidationException e) {
-            messages.add("Validation failed: " + e.getMessage());
-            Redirect.redirectBack(request, response);
-        } catch (NoSuchElementException e) {
-            messages.add("Missing or invalid parameter.");
-            Redirect.redirectBack(request, response);
-        }
-    }
-
-    private void createClassroom(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String name = ServletUtils.getStringParameter(request, "name").get();
-        classroomService.addClassroom(name);
-        Redirect.redirectBack(request, response);
     }
 }

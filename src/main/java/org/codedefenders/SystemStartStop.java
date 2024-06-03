@@ -28,11 +28,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.codedefenders.auth.SystemSubject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.CronJobManager;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.AchievementService;
+import org.codedefenders.service.RoleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,12 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private MetricsRegistry metricsRegistry;
 
+    @Inject
+    private RoleService roleService;
+
+    @Inject
+    private SystemSubject systemSubject;
+
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -79,6 +87,11 @@ public class SystemStartStop implements ServletContextListener {
         if (config.isJavaMelodyEnabled()) {
             sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
+
+        systemSubject.execute(
+                () -> roleService.migrateAdminUsers(config.getAuthAdminRole()));
+        systemSubject.execute(
+                () -> roleService.doInitialAdminSetup(config.getAuthAdminUsers()));
 
         sce.getServletContext().setRequestCharacterEncoding("UTF-8");
         sce.getServletContext().setResponseCharacterEncoding("UTF-8");

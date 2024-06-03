@@ -19,7 +19,10 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%@ page import="org.codedefenders.auth.permissions.CreateClassroomPermission" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -28,7 +31,19 @@
 <div class="container">
 
     <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-        <h2 class="mb-3">My Classrooms</h2>
+
+        <div class="mb-3 d-flex gap-3">
+            <h2 class="mb-0">My Classrooms</h2>
+
+            <shiro:hasPermission name="${CreateClassroomPermission.name}">
+                <button id="create-classroom" type="button" class="btn btn-primary rounded-pill"
+                        data-bs-toggle="modal" data-bs-target="#create-classroom-modal">
+                    New Classroom
+                    <i class="fa fa-plus ms-1" aria-hidden="true"></i>
+                </button>
+            </shiro:hasPermission>
+        </div>
+
         <div class="d-flex gap-3">
             <div>
                 <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
@@ -53,6 +68,27 @@
     <div class="loading loading-border-card loading-height-200">
         <table id="public-classrooms" class="table"></table>
     </div>
+
+    <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
+        <input type="hidden" name="action" value="create-classroom"/>
+
+        <t:modal title="Create classroom" id="create-classroom-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                <label for="name-input" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name-input" name="name"
+                       required maxlength="100" placeholder="Name">
+                <div class="invalid-feedback">
+                    Please enter a valid name.
+                </div>
+                <div class="form-text">
+                    Maximum length: 100 characters.
+                </div>
+            </jsp:attribute>
+            <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-primary">Create Classroom</button>
+            </jsp:attribute>
+        </t:modal>
+    </form>
 
     <script type="module">
         import DataTable from '${url.forPath("/js/datatables.mjs")}';

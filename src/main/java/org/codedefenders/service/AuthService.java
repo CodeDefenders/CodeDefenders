@@ -26,6 +26,7 @@ import javax.inject.Named;
 import org.apache.shiro.SecurityUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.auth.CodeDefendersRealm;
+import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 
@@ -50,7 +51,7 @@ public class AuthService implements CodeDefendersAuth {
 
     @Override
     public boolean isAdmin() {
-        return SecurityUtils.getSubject().hasRole("admin");
+        return SecurityUtils.getSubject().isPermitted(AdminPermission.name);
     }
 
     @Override

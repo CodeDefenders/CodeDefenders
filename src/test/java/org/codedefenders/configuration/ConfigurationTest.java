@@ -23,6 +23,7 @@ package org.codedefenders.configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -61,5 +62,20 @@ public class ConfigurationTest {
         } catch (ConfigurationValidationException e) {
             assertTrue(e.getMessage().contains("dbPort"));
         }
+    }
+
+    @Test
+    public void testGetAuthAdminUsers() {
+        config.authAdminUsers = "userA,userB,userC";
+        assertThat(config.getAuthAdminUsers())
+                .containsExactly("userA", "userB", "userC");
+    }
+
+    @Test
+    public void testGetAuthAdminUsersBadFormatting() {
+        String someSymbols = ".;/\\@!?#";
+        config.authAdminUsers = "userA   ,  userB,  , userC," + someSymbols;
+        assertThat(config.getAuthAdminUsers())
+                .containsExactly("userA", "userB", "userC", someSymbols);
     }
 }

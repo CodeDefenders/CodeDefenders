@@ -24,6 +24,11 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.dto.User" %>
 <%@ page import="org.codedefenders.util.LinkUtils" %>
+<%@ page import="org.codedefenders.auth.roles.AuthRole" %>
+<%@ page import="com.google.common.collect.Multimap" %>
+<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.auth.roles.TeacherRole" %>
+<%@ page import="org.codedefenders.auth.roles.AdminRole" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -46,6 +51,11 @@
         User u = (User) request.getAttribute("editedUser");
         if (u != null) {
             int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
+
+            @SuppressWarnings("unchecked")
+            List<AuthRole> roles = (List<AuthRole>) request.getAttribute("editedUserRoles");
+            boolean isTeacher = roles.contains(new TeacherRole());
+            boolean isAdmin = roles.contains(new AdminRole());
     %>
         <h3>Editing User <%=u.getId()%></h3>
 
@@ -74,6 +84,20 @@
                            required>
                     <div class="invalid-feedback">
                         Please enter a valid email address.
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <label for="email" class="form-label">Roles</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="role-teacher" name="role-teacher"
+                               autocomplete="off" <%=isTeacher ? "checked" : ""%>>
+                        <label class="form-check-label" for="role-teacher">Teacher</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="role-admin" name="role-admin"
+                                autocomplete="off" <%=isAdmin ? "checked" : ""%>>
+                        <label class="form-check-label" for="role-admin">Admin</label>
                     </div>
                 </div>
 
@@ -147,6 +171,7 @@
                     <th>ID</th>
                     <th>User</th>
                     <th>Email</th>
+                    <th>Roles</th>
                     <th>Total Score</th>
                     <th>Last Login</th>
                     <th></th>
@@ -155,7 +180,8 @@
             </thead>
             <tbody>
                 <%
-                    List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
+                    List<UserInfo> unassignedUsersInfo = (List<UserInfo>) request.getAttribute("userInfos");
+                    Multimap<Integer, AuthRole> userRoles = (Multimap<Integer, AuthRole>) request.getAttribute("userRoles");
                     for (UserInfo userInfo : unassignedUsersInfo) {
                         int userId = userInfo.getUser().getId();
                         String username = userInfo.getUser().getUsername();
@@ -163,6 +189,9 @@
                         boolean active = userInfo.getUser().isActive();
                         String lastLogin = userInfo.getLastLoginString();
                         int totalScore = userInfo.getTotalScore();
+                        String rolesStr = userRoles.get(userId).stream()
+                                .map(AuthRole::getName)
+                                .collect(Collectors.joining(", "));
                 %>
                     <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"text-muted\""%>>
                         <td>
@@ -171,6 +200,7 @@
                         </td>
                         <td><%=LinkUtils.getUserProfileAnchorOrText(username)%></td>
                         <td><%=email%></td>
+                        <td><%=rolesStr%></td>
                         <td><%=totalScore%></td>
                         <td><%=lastLogin%></td>
                         <td>

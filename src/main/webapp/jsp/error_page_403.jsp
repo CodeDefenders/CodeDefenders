@@ -19,15 +19,16 @@
 
 --%>
 
-<%@ page isErrorPage="true" pageEncoding="UTF-8" %>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <t:error_page
-        title="Internal Server Error (500)"
-        statusCode="500"
-        shortDescription="Internal Server Error">
+        title="You don't have permission to perform this request (403)"
+        statusCode="403"
+        shortDescription="You don't have permission to perform this request.">
     <jsp:attribute name="message">
-        <p>There has been a problem on our side. Sorry about that.</p>
-        <p>Please try again and contact your administrator if this keeps happening.</p>
+        <p>Your accounts permissions do not include the accessed page or performed action.</p>
+        <%-- TODO: Info about appyling for teacher roles here? --%>
+        <p>Please contact your administrator if you think this is a mistake.</p>
     </jsp:attribute>
 </t:error_page>

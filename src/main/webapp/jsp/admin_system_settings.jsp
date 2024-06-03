@@ -65,7 +65,8 @@
                 switch (setting.getType()) {
                     case STRING_VALUE:
                         if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
-                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE) ||
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.CONTACT_NOTICE)) {
         %>
                 <div class="col-8">
                     <textarea class="form-control" rows="3"
@@ -144,7 +145,7 @@
     <script type="module">
         import $ from '${url.forPath("/js/jquery.mjs")}';
 
-
+        // Validate regular contact email settings.
         $(document).ready(() => {
             const emailSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>');
             const otherEmailInputs = [
@@ -165,6 +166,22 @@
             for (const emailInput of otherEmailInputs) {
                 emailInput.addEventListener('input', validateEmailSettings);
             }
+
+            validateEmailSettings();
+        });
+
+        // Validate email settings for teacher account applications.
+        $(document).ready(() => {
+            const teacherApplicationsSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_ENABLED.name()%>');
+            const teacherApplicationsEmail = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_EMAIL.name()%>');
+
+            const validateEmailSettings = function () {
+                const valid = !teacherApplicationsSwitch.checked || teacherApplicationsEmail.value.trim().length > 0;
+                teacherApplicationsEmail.setCustomValidity(valid ? '' : 'value-missing');
+            };
+
+            teacherApplicationsSwitch.addEventListener('change', validateEmailSettings);
+            teacherApplicationsEmail.addEventListener('input', validateEmailSettings);
 
             validateEmailSettings();
         });
