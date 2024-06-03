@@ -45,7 +45,7 @@ public class DependencyDAO {
      * @return The constructed dependency.
      * @see RSMapper
      */
-    static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
+    public static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
         final int id = rs.getInt("Dependency_ID");
         final String javaFile = rs.getString("JavaFile");
         final String classFile = rs.getString("ClassFile");
