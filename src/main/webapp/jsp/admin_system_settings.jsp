@@ -25,10 +25,28 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+
+<%
+    // Get the enum constants here, since EL doesn't seem to work with inner-class enums.
+    pageContext.setAttribute("BOOL_VALUE", SETTING_TYPE.BOOL_VALUE);
+    pageContext.setAttribute("INT_VALUE", SETTING_TYPE.INT_VALUE);
+    pageContext.setAttribute("STRING_VALUE", SETTING_TYPE.STRING_VALUE);
+
+    pageContext.setAttribute("AUTOMATIC_KILLMAP_COMPUTATION", SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
+    pageContext.setAttribute("SITE_NOTICE", SETTING_NAME.SITE_NOTICE);
+    pageContext.setAttribute("PRIVACY_NOTICE", SETTING_NAME.PRIVACY_NOTICE);
+    pageContext.setAttribute("CONTACT_NOTICE", SETTING_NAME.CONTACT_NOTICE);
+    pageContext.setAttribute("EMAILS_ENABLED", SETTING_NAME.EMAILS_ENABLED);
+    pageContext.setAttribute("EMAIL_ADDRESS", SETTING_NAME.EMAIL_ADDRESS);
+    pageContext.setAttribute("EMAIL_PASSWORD", SETTING_NAME.EMAIL_PASSWORD);
+    pageContext.setAttribute("EMAIL_SMTP_HOST", SETTING_NAME.EMAIL_SMTP_HOST);
+    pageContext.setAttribute("EMAIL_SMTP_PORT", SETTING_NAME.EMAIL_SMTP_PORT);
+    pageContext.setAttribute("TEACHER_APPLICATIONS_ENABLED", SETTING_NAME.TEACHER_APPLICATIONS_ENABLED);
+    pageContext.setAttribute("TEACHER_APPLICATIONS_EMAIL", SETTING_NAME.TEACHER_APPLICATIONS_EMAIL);
+%>
 
 <p:main_page title="System Settings">
     <div class="container">
@@ -40,13 +58,14 @@
               autocomplete="off">
             <input type="hidden" name="formType" value="saveSettings">
 
-            <c:forEach var="setting" items="${AdminDAO.systemSettings}">
+            <c:forEach var="setting" items="${AdminDAO.getSystemSettings()}">
+                <%--@elvariable id="setting" type="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"--%>
                 <c:set var="readableName" value="${setting.name.readableName}"/>
                 <c:set var="explanation" value="${setting.name.toString()}"/>
                 <c:set var="settingId" value="${setting.name.name()}"/>
 
                 <%-- Do not show Killmap Setting here. --%>
-                <c:if test="${setting.name != SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION}">
+                <c:if test="${setting.name != AUTOMATIC_KILLMAP_COMPUTATION}">
                     <div class="row mb-3">
                         <label class="col-4 col-form-label" id="class-label"
                                for="${settingId}"
@@ -54,11 +73,9 @@
                             ${readableName}
                         </label>
                         <c:choose>
-                            <c:when test="${setting.type == SETTING_TYPE.STRING_VALUE}">
+                            <c:when test="${setting.type == STRING_VALUE}">
                                 <c:choose>
-                                    <c:when test="${setting.name == SETTING_NAME.SITE_NOTICE
-                                                        || setting.name == SETTING_NAME.PRIVACY_NOTICE
-                                                        || setting.name == SETTING_NAME.CONTACT_NOTICE}">
+                                    <c:when test="${setting.name == SITE_NOTICE || setting.name == PRIVACY_NOTICE || setting.name == CONTACT_NOTICE}">
                                         <div class="col-8">
                                             <textarea class="form-control" rows="3"
                                                       name="${settingId}"
@@ -82,7 +99,7 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:when>
-                            <c:when test="${setting.type == SETTING_TYPE.BOOL_VALUE}">
+                            <c:when test="${setting.type == BOOL_VALUE}">
                                 <div class="col-8 d-flex align-items-center">
                                     <div class="form-check form-switch">
                                         <input type="checkbox"
@@ -96,7 +113,7 @@
                                     </div>
                                 </div>
                             </c:when>
-                            <c:when test="${setting.type == SETTING_TYPE.INT_VALUE}">
+                            <c:when test="${setting.type == INT_VALUE}">
                                 <div class="col-8">
                                     <input type="number"
                                            class="form-control"
@@ -131,12 +148,12 @@
 
             // Validate regular contact email settings.
             $(document).ready(() => {
-                const emailSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>');
+                const emailSwitch = document.getElementById('${EMAILS_ENABLED.name()}');
                 const otherEmailInputs = [
-                    document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS.name()%>'),
-                    document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD.name()%>'),
-                    document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST.name()%>'),
-                    document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT.name()%>')
+                    document.getElementById('${EMAIL_ADDRESS.name()}'),
+                    document.getElementById('${EMAIL_PASSWORD.name()}'),
+                    document.getElementById('${EMAIL_SMTP_HOST.name()}'),
+                    document.getElementById('${EMAIL_SMTP_PORT.name()}')
                 ];
 
                 const validateEmailSettings = function () {
@@ -156,8 +173,8 @@
 
             // Validate email settings for teacher account applications.
             $(document).ready(() => {
-                const teacherApplicationsSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_ENABLED.name()%>');
-                const teacherApplicationsEmail = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_EMAIL.name()%>');
+                const teacherApplicationsSwitch = document.getElementById('${TEACHER_APPLICATIONS_ENABLED.name()}');
+                const teacherApplicationsEmail = document.getElementById('${TEACHER_APPLICATIONS_EMAIL.name()}');
 
                 const validateEmailSettings = function () {
                     const valid = !teacherApplicationsSwitch.checked || teacherApplicationsEmail.value.trim().length > 0;
