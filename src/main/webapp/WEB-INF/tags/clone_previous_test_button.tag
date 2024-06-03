@@ -18,7 +18,7 @@
   --%>
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-<%@ taglib prefix="fn" uri="https://codedefenders.org/functions" %>
+<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 

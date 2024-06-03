@@ -17,15 +17,15 @@
   ~ You should have received a copy of the GNU General Public License
   ~ along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
   -->
-<taglib xmlns="http://java.sun.com/xml/ns/javaee"
+<taglib xmlns="https://jakarta.ee/xml/ns/jakartaee"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
-        version="2.1">
+        xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-jsptaglibrary_3_0.xsd"
+        version="3.0">
 
     <display-name>Custom Functions</display-name>
     <tlib-version>1.0</tlib-version>
     <short-name>functions</short-name>
-    <uri>https://codedefenders.org/functions</uri>
+    <uri>org.codedefenders.functions</uri>
 
     <function>
         <name>escapeJS</name>
