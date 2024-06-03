@@ -25,11 +25,7 @@ import java.sql.Savepoint;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.ConnectionFactory;
@@ -41,6 +37,11 @@ import org.codedefenders.transaction.TransactionalSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 
 /**

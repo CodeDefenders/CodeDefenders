@@ -26,12 +26,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
@@ -63,6 +57,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
 

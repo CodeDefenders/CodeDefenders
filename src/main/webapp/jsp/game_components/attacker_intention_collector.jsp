@@ -21,8 +21,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {AttackerIntentionCollection} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {AttackerIntentionCollection, objects} from '';
 
 
     const attackerIntentionCollection = new AttackerIntentionCollection();

@@ -67,10 +67,8 @@
 </div>
 
 <script type="module">
-    import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import $ from '${url.forPath("/js/jquery.mjs")}';
-
-    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import DataTable from '';
+    import $, {DataTablesUtils} from '';
 
 
     const div = DataTablesUtils.formatDivision;

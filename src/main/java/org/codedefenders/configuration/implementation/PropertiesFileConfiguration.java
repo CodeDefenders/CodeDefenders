@@ -23,16 +23,15 @@ import java.io.Reader;
 import java.util.List;
 import java.util.Properties;
 
-import javax.annotation.Priority;
-import javax.enterprise.inject.Alternative;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.codedefenders.configuration.configfileresolver.ConfigFileResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.CaseFormat;
+import jakarta.annotation.Priority;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Loads the properties files found by the {@link ConfigFileResolver}s, merges them and then resolves the attributes by

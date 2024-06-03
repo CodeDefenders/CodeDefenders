@@ -73,8 +73,7 @@
 </button>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {GameChat} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {GameChat, objects} from '';
 
 
     const gameId = ${gameChat.gameId};

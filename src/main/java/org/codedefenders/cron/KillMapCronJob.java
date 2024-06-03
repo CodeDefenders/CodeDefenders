@@ -22,11 +22,6 @@ package org.codedefenders.cron;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
@@ -36,6 +31,11 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @Named("killMapCronJob")
 @ApplicationScoped

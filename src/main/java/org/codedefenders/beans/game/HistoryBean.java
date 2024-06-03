@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.dto.SimpleUser;
@@ -20,11 +17,12 @@ import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 
+import jakarta.enterprise.context.RequestScoped;
+
 /**
  * <p>Provides data for the history game component.</p>
  * <p>Bean Name: {@code history}</p>
  */
-@ManagedBean
 @RequestScoped
 public class HistoryBean {
 

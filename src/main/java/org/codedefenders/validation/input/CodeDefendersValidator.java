@@ -1,10 +1,10 @@
 package org.codedefenders.validation.input;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 
 // TODO Create an interface if needed and inject this whether needed
 public class CodeDefendersValidator {

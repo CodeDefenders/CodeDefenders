@@ -67,8 +67,7 @@
 </t:modal>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {TestEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {objects, TestEditor} from '';
 
     /** @type {TestEditor} */
     const testEditor = await objects.await('testEditor');

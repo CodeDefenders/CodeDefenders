@@ -244,8 +244,8 @@
 </div>
 
 <script type="module">
-    import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import $ from '${url.forPath("/js/jquery.mjs")}';
+    import DataTable from '';
+    import $ from '';
 
 
     $(document).ready(function () {

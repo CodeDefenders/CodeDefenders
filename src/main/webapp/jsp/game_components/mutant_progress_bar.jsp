@@ -23,8 +23,7 @@
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {MutantProgressBar} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {MutantProgressBar, objects} from '';
 
 
     const progressElement = document.getElementById('progress');

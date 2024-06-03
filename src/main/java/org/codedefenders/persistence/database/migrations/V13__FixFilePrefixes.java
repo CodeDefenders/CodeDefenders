@@ -23,14 +23,14 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.apache.commons.dbutils.QueryRunner;
 import org.codedefenders.configuration.Configuration;
 import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.Context;
 import org.intellij.lang.annotations.Language;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 // Using @Singleton should lead to only the name of this class showing up in the flyway_schema_history_table script
 // column instead of also including some WeldClientProxy foo.

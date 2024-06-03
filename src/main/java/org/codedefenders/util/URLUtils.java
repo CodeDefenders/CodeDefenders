@@ -24,12 +24,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.configuration.Configuration;
+
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 /**
  * A helper class for constructing relative and absolute URLs for paths in our application

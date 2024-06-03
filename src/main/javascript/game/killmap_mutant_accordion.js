@@ -1,7 +1,6 @@
 import {Collapse} from '../thirdparty/bootstrap';
 import DataTable from '../thirdparty/datatables';
-import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
-import {Popover} from "../thirdparty/bootstrap";
+import {LoadingAnimation} from '../main';
 import KillMapAccordion from "./killmap_accordion";
 
 class KillMapMutantAccordion extends KillMapAccordion {

@@ -29,9 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
 import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
@@ -53,6 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class CoverageGenerator {

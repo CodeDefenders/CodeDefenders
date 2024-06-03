@@ -27,13 +27,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -43,6 +36,13 @@ import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} handles to the landing page under "/".

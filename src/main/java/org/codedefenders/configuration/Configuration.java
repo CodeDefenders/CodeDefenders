@@ -43,15 +43,15 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import javax.enterprise.inject.Alternative;
-import javax.inject.Singleton;
-
 import org.codedefenders.util.JavaVersionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Singleton;
 
 /**
  * This class is the central place for accessing and defining the configuration for this application.<br><br>

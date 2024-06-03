@@ -18,9 +18,6 @@
  */
 package org.codedefenders.coverage;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.game.AssertionLibrary;
@@ -33,6 +30,9 @@ import org.codedefenders.util.WeldSetup;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;

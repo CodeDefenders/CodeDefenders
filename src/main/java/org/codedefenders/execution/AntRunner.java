@@ -27,9 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -49,6 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
@@ -59,7 +58,7 @@ import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
  * @author Jose Rojas
  * @author Alessio Gambi (last edit)
  */
-@ManagedBean
+@ApplicationScoped
 public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 

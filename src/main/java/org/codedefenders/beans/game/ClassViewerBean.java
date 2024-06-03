@@ -5,20 +5,18 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 
+import jakarta.enterprise.context.RequestScoped;
+
 /**
  * <p>Provides data for the class viewer game component.</p>
  * <p>Bean Name: {@code classViewer}</p>
  */
-@ManagedBean
 @RequestScoped
 public class ClassViewerBean {
     /**

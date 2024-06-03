@@ -23,10 +23,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Singleton;
-
 import org.codedefenders.notification.ITicketingService;
+
+import jakarta.inject.Singleton;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 
@@ -34,7 +33,6 @@ import static java.time.temporal.ChronoUnit.HOURS;
  * Authenticates users' WebSocket connections generating a ticket for users and validating it when opening the
  * connection.
  */
-@ManagedBean
 @Singleton
 public class TicketingService implements ITicketingService {
     /**

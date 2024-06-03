@@ -3,19 +3,19 @@ package org.codedefenders.servlets;
 import java.io.IOException;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.util.Constants;
+
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} redirects to the games history page.

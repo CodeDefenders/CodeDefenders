@@ -215,7 +215,7 @@
 </div>
 
 <script type="module">
-    import $ from '${url.forPath("/js/jquery.mjs")}';
+    import $ from '';
 
 
     $(document).ready(() => {

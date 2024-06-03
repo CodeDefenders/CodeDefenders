@@ -40,8 +40,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
-
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
@@ -70,6 +68,8 @@ import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
 
 
 /**

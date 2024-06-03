@@ -5,15 +5,13 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.ApplicationScoped;
-
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.intellij.lang.annotations.Language;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 @ApplicationScoped
-@ManagedBean
 public class GameChatDAO {
     /**
      * Gets all chat messages for a game.

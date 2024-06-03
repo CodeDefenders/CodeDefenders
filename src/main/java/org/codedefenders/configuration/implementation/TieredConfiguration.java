@@ -22,14 +22,14 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
-import javax.annotation.Priority;
-import javax.enterprise.inject.Alternative;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Priority;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 /**
  * Merges other {@link BaseConfiguration}s in the order they are specified and then resolves attributes on the result.

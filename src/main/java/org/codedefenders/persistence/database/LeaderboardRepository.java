@@ -24,15 +24,15 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;

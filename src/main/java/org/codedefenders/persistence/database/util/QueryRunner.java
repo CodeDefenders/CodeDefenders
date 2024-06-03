@@ -21,11 +21,11 @@ package org.codedefenders.persistence.database.util;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.UncheckedSQLException;
 import org.intellij.lang.annotations.Language;
+
+import jakarta.annotation.Nonnull;
 
 /**
  * Interface for classes which implement common logic for database operations without exposing a connection.

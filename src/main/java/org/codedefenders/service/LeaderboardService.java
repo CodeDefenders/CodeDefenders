@@ -20,13 +20,13 @@ package org.codedefenders.service;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.persistence.database.LeaderboardRepository;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
+
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @SuppressWarnings("unused") // Used in leaderboards.jsp
 @Named

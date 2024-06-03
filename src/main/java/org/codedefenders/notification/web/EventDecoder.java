@@ -5,10 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
-import javax.websocket.DecodeException;
-import javax.websocket.Decoder;
-import javax.websocket.EndpointConfig;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.client.ClientEvent;
@@ -23,6 +19,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
+import jakarta.websocket.DecodeException;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.EndpointConfig;
 
 /**
  * Decodes JSON strings with a "{type: string, data: {}}" format to client events.

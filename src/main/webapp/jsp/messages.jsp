@@ -15,8 +15,7 @@
     </div>
 
     <script type="module">
-        import {Alert} from '${url.forPath("/js/bootstrap.mjs")}';
-        import $ from '${url.forPath("/js/jquery.mjs")}';
+        import $, {Alert} from '';
 
 
         $(document).ready(() => {

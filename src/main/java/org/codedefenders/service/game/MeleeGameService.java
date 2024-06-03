@@ -22,9 +22,6 @@ package org.codedefenders.service.game;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
@@ -59,6 +56,9 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;

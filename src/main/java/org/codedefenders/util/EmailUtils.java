@@ -21,18 +21,18 @@ package org.codedefenders.util;
 import java.util.Date;
 import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.DEBUG_MODE;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
@@ -111,7 +111,7 @@ public class EmailUtils {
             props.put("mail.smtp.host", smtpHost);
             props.put("mail.smtp.port", smtpPort);
 
-            Session session = Session.getInstance(props, new javax.mail.Authenticator() {
+            Session session = Session.getInstance(props, new jakarta.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(emailUsername, emailPassword);
                 }

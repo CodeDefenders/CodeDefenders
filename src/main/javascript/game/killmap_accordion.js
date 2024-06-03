@@ -1,4 +1,4 @@
-import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
+import {InfoApi, LoadingAnimation, Modal} from '../main';
 import {Popover} from "../thirdparty/bootstrap";
 
 /**

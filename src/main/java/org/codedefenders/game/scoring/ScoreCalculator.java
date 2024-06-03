@@ -3,11 +3,6 @@ package org.codedefenders.game.scoring;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
@@ -17,6 +12,10 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants
  * and defending/tests score.
@@ -25,7 +24,6 @@ import org.codedefenders.persistence.database.TestRepository;
  *
  * @author gambi
  */
-@ManagedBean
 @RequestScoped
 public class ScoreCalculator {
 

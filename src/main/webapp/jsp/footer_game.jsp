@@ -30,7 +30,7 @@
 
 <%-- Recieve events from the server --%>
 <script type="module">
-    import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {AchievementNotifications, objects} from '';
 
     (async function () {
         /** @type {PushSocket} */

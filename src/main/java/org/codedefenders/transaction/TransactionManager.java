@@ -21,8 +21,8 @@ package org.codedefenders.transaction;
 
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 /**
  * A {@link TransactionManager} is a class which provides a standard way to run multiple database query executed in a

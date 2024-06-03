@@ -21,7 +21,7 @@ package org.codedefenders.cron;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 public abstract class FixedDelayCronJob implements Runnable {
 

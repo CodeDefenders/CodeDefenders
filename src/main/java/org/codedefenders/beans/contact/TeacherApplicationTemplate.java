@@ -1,18 +1,16 @@
 package org.codedefenders.beans.contact;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.LinkUtils;
 import org.codedefenders.util.URLUtils;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 @RequestScoped
-@ManagedBean
 @Named("teacherApplicationTemplate")
 public class TeacherApplicationTemplate {
     private final CodeDefendersAuth login;

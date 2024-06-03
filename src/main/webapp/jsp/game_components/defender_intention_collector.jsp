@@ -23,8 +23,7 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {DefenderIntentionCollection} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {DefenderIntentionCollection, objects} from '';
 
 
     const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};

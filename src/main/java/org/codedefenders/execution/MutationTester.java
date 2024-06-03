@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -45,6 +43,8 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.annotation.Nonnull;
 
 import static org.codedefenders.execution.TargetExecution.Status.ERROR;
 import static org.codedefenders.execution.TargetExecution.Status.FAIL;

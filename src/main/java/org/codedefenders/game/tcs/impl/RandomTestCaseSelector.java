@@ -5,10 +5,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.inject.Alternative;
-
 import org.codedefenders.game.Test;
 import org.codedefenders.game.tcs.ITestCaseSelector;
+
+import jakarta.enterprise.inject.Alternative;
 
 /**
  * Return a number of tests selected randomly.

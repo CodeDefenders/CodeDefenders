@@ -353,11 +353,10 @@
 </div>
 
 <script type="module">
-    import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import {parseHTML, postForm, DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import DataTable, {DataTablesUtils, postForm} from '';
 
 
-<% if (currentPage == KillmapPage.MANUAL) { %>
+    <% if (currentPage == KillmapPage.MANUAL) { %>
 
     document.getElementById('queue-ids-classes').addEventListener('click', event => {
         const idsField = document.getElementById('class-ids');

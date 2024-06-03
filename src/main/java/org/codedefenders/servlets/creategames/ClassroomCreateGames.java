@@ -21,12 +21,6 @@ package org.codedefenders.servlets.creategames;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.creategames.ClassroomCreateGamesBean;
 import org.codedefenders.beans.creategames.CreateGamesBean;
@@ -38,6 +32,12 @@ import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 @WebServlet(Paths.CLASSROOM_CREATE_GAMES)

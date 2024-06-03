@@ -531,10 +531,7 @@
 </t:modal>
 
 <script type="module">
-    import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
-    import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
-    import {parseHTML} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import DataTable, {GameTime, parseHTML, Popover} from '';
 
     const loggedInUserId = ${login.userId};
 

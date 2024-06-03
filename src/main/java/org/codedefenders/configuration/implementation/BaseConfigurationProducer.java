@@ -22,7 +22,7 @@ package org.codedefenders.configuration.implementation;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Produces;
 
 public class BaseConfigurationProducer {
 

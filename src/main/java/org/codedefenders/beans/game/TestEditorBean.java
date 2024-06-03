@@ -1,19 +1,15 @@
 package org.codedefenders.beans.game;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.TestingFramework;
-import org.codedefenders.game.puzzle.Puzzle;
+
+import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the test editor game component.</p>
  * <p>Bean Name: {@code testEditor}</p>
  */
-@ManagedBean
 @RequestScoped
 public class TestEditorBean {
     /**

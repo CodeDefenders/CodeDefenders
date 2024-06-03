@@ -21,9 +21,8 @@ package org.codedefenders.api.analytics;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Produces;
-
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.Produces;
 import testsmell.SmellFactory;
 import testsmell.TestSmellDetector;
 import testsmell.smell.AssertionRoulette;

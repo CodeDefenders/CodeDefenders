@@ -30,8 +30,7 @@
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
 <script type="module">
-    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-    import {ErrorHighlighting} from '${url.forPath("/js/codedefenders_game.mjs")}';
+    import {ErrorHighlighting, objects} from '';
 
 
     const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');

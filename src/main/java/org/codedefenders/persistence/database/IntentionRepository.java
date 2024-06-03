@@ -21,9 +21,6 @@ package org.codedefenders.persistence.database;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -31,6 +28,9 @@ import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 

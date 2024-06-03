@@ -3,8 +3,6 @@ package org.codedefenders.notification.handling.server;
 import java.io.IOException;
 import java.util.Objects;
 
-import javax.websocket.EncodeException;
-
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
@@ -13,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
+import jakarta.websocket.EncodeException;
 
 public class GameChatEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(GameChatEventHandler.class);

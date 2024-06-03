@@ -27,9 +27,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.database.SQLMappingException;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -48,6 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;

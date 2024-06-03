@@ -20,14 +20,14 @@ package org.codedefenders.servlets.util;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class Redirect {
     private static final Logger logger = LoggerFactory.getLogger(Redirect.class);

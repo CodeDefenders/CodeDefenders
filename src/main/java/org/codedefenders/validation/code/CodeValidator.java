@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.AssertionLibrary;
-import org.codedefenders.game.Mutant;
 import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +65,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.NoCommentEqualsVisitor;
-import com.github.javaparser.ast.visitor.NoCommentHashCodeVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
 /**

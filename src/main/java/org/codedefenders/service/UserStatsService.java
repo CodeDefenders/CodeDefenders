@@ -21,15 +21,15 @@ package org.codedefenders.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserStatsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 /**
  * Provides an API for fetching statistics of users.

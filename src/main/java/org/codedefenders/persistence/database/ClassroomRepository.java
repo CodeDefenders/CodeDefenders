@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomRole;
@@ -17,6 +14,9 @@ import org.codedefenders.transaction.Transactional;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
