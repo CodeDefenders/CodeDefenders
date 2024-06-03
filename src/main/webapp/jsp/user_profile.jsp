@@ -20,7 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.game.GameType" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>

@@ -20,7 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.util.LinkUtils" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>

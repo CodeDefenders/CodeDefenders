@@ -25,7 +25,7 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.ArrayList" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
