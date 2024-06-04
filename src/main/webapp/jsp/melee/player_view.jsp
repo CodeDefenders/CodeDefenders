@@ -95,9 +95,6 @@
     // We should show game highlighting only inside the mutant editor
     if (!openEquivalenceDuel) {
         gameHighlighting.setAlternativeTests(enemyTests);
-        gameHighlighting.setCodeDivSelector("#newmut-div");
-    } else {
-        gameHighlighting.setCodeDivSelector("#cut-div");
     }
 %>
 
@@ -105,11 +102,6 @@
              class="org.codedefenders.beans.game.ErrorHighlightingBean"
              scope="request"/>
 <%
-    if (!openEquivalenceDuel) {
-        testErrorHighlighting.setCodeDivSelector("#utest-div");
-    } else {
-        testErrorHighlighting.setCodeDivSelector("#equivmut-div");
-    }
     if (previousSubmission.hasTest() && previousSubmission.hasErrorLines()) {
         testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
@@ -119,7 +111,6 @@
              class="org.codedefenders.beans.game.ErrorHighlightingBean"
              scope="request"/>
 <%
-    mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasMutant() && previousSubmission.hasErrorLines()) {
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }

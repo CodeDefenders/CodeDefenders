@@ -70,7 +70,6 @@
 	gameHighlighting.setGameData(game.getMutants(), game.getTests());
 	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
 	gameHighlighting.setEnableFlagging(false);
-	gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>

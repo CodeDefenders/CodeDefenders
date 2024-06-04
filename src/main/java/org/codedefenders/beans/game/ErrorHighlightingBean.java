@@ -13,22 +13,12 @@ import com.google.gson.Gson;
 @RequestScoped
 public class ErrorHighlightingBean {
     /**
-     * Selector for the div the CodeMirror container is in. Should only contain one CodeMirror instance.
-     */
-    private String codeDivSelector;
-
-    /**
      * The line numbers of the errors reported by the compiler.
      */
     private List<Integer> errorLines;
 
     public ErrorHighlightingBean() {
-        codeDivSelector = null;
         errorLines = null;
-    }
-
-    public void setCodeDivSelector(String codeDivSelector) {
-        this.codeDivSelector = codeDivSelector;
     }
 
     public void setErrorLines(List<Integer> errorLines) {
@@ -39,10 +29,6 @@ public class ErrorHighlightingBean {
 
     public boolean hasErrorLines() {
         return errorLines != null;
-    }
-
-    public String getCodeDivSelector() {
-        return codeDivSelector;
     }
 
     public String getErrorLinesJSON() {

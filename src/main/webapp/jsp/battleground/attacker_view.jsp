@@ -66,13 +66,11 @@
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(false);
-    gameHighlighting.setCodeDivSelector("#newmut-div");
 %>
 
 
 <jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasErrorLines()) {
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
