@@ -26,6 +26,9 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.auth.CodeDefendersAuth" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -69,6 +72,38 @@
 	// We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
 	history.setPlayers(Collections.singletonList(userPlayer), otherPlayers);
 %>
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    final CodeDefendersAuth finalLogin = login;
+    int playerId = game.getPlayers().stream()
+            .filter(p -> p.getUser().getId() == finalLogin.getUserId())
+            .map(Player::getId)
+            .findFirst()
+            .orElseThrow();
+    List<Test> enemyTests = game.getTests()
+            .stream()
+            .filter(t -> t.getPlayerId() != playerId)
+            .collect(Collectors.toList());
+    List<Test> playerTests = game.getTests()
+            .stream()
+            .filter(t -> t.getPlayerId() == playerId)
+            .collect(Collectors.toList());
+
+    gameHighlighting.setGameData(game.getMutants(), playerTests, login.getUserId());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setAlternativeTests(enemyTests);
+%>
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 <c:set var="title" value="${'Details of Game ' += game.id += ' (' += role.formattedString += ')'}"/>
 
@@ -186,29 +221,35 @@
                 </div>
 
                 <div class="details-content__item">
-                    <h3>Class under test</h3>
-                    <div class="p-0 codemirror-expand loading loading-bg-gray loading-height-200">
-                        <pre class="m-0"><textarea aria-label="Class under test" id="class-under-test"></textarea></pre>
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h3 class="mb-0">Class under test</h3>
+                        <div data-bs-toggle="tooltip" data-bs-html="true"
+                             title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
+                            <input class="btn-check" type="checkbox" id="highlighting-switch" autocomplete="off">
+                            <label class="btn btn-outline-secondary" for="highlighting-switch">
+                                Enemy Coverage
+                                <i class="fa fa-check ms-1 btn-check-active"></i>
+                            </label>
+                        </div>
                     </div>
-                    <script>
-                        (async function () {
-                            const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
-                            const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
+                    <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+                    <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+                    <script type="module">
+                        import $ from '${url.forPath("/js/jquery.mjs")}';
 
-                            const textarea = document.getElementById('class-under-test');
+                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-                            const editor = CodeMirror.fromTextArea(textarea, {
-                                lineNumbers: true,
-                                readOnly: true,
-                                mode: 'text/x-java',
-                                autoRefresh: true,
-                                viewportMargin: Infinity,
-                            });
-                            editor.getWrapperElement().classList.add('codemirror-readonly');
 
-                            await InfoApi.setClassEditorValue(editor, ${game.classId});
-                            LoadingAnimation.hideAnimation(textarea);
-                        })();
+                        const gameHighlighting = await objects.await('gameHighlighting');
+
+                        $('#highlighting-switch').change(function () {
+                            gameHighlighting.clearCoverage();
+                            if (this.checked) {
+                                gameHighlighting.highlightAlternativeCoverage();
+                            } else {
+                                gameHighlighting.highlightCoverage();
+                            }
+                        })
                     </script>
                 </div>
 
