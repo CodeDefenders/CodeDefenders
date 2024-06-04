@@ -4,6 +4,10 @@
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 
+<%--
+    Provides the footer with links to static pages.
+--%>
+
 <nav class="navbar navbar-expand-md navbar-cd py-0" id="footer">
     <div class="container-fluid justify-content-center">
         <div id="footer-navbar-controls">

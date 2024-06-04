@@ -4,8 +4,14 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
-<%@ attribute name="title" required="true" type="java.lang.String" %>
-<%@ attribute name="additionalImports" required="false" fragment="true" %>
+<%@ attribute name="title" required="true" type="java.lang.String"
+              description="Title of the page" %>
+<%@ attribute name="additionalImports" required="false" fragment="true"
+              description="Additional CSS or JavaScript tags to include in the head." %>
+
+<%--
+    Contains the html tag with the complete head and empty body.
+--%>
 
 <!DOCTYPE html>
 <html>

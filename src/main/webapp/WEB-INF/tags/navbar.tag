@@ -9,6 +9,10 @@
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
 
+<%--
+    Provides the navigation bar.
+    Different menu entries are available depending on if the user is logged in or not.
+--%>
 
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">

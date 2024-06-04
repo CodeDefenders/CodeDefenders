@@ -11,9 +11,12 @@
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
+<%@ attribute name="additionalImports" required="false" fragment="true"
+              description="Additional CSS or JavaScript tags to include in the head." %>
 
-<%@ attribute name="additionalImports" required="false" fragment="true" %>
-
+<%--
+    Adds game header, game container and game-specific JS/CSS to the main page layout.
+--%>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 

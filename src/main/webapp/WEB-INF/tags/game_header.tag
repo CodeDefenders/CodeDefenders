@@ -17,6 +17,11 @@
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
+<%--
+    The game header displayed for game pages (except puzzle games).
+    Contains the title and common game controls.
+--%>
+
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 

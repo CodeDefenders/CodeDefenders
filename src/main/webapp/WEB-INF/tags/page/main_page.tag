@@ -6,8 +6,14 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
-<%@ attribute name="title" required="true" type="java.lang.String" %>
-<%@ attribute name="additionalImports" required="false" fragment="true" %>
+<%@ attribute name="title" required="true" type="java.lang.String"
+              description="Title of the page" %>
+<%@ attribute name="additionalImports" required="false" fragment="true"
+              description="Additional CSS or JavaScript tags to include in the head." %>
+
+<%--
+    Adds the header and footer along with other common elements to the base page.
+--%>
 
 <p:base_page title="${title}">
     <jsp:attribute name="additionalImports">

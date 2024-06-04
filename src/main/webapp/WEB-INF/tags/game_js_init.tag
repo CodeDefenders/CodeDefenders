@@ -6,6 +6,10 @@
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
+<%--
+    Provides common JS initialization for game pages.
+--%>
+
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_socket.jsp"/>

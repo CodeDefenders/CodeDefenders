@@ -5,6 +5,10 @@
 
 <%@ attribute name="additionalImports" required="false" fragment="true" %>
 
+<%--
+    Provides common imports for all pages.
+--%>
+
 
 <!-- Variables -->
 <link href="${url.forPath("/css/global/variables.css")}" rel="stylesheet">

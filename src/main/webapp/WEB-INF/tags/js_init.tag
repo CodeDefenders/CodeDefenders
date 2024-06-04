@@ -2,6 +2,11 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
+
+<%--
+    Provides common JS initialization for all pages.
+--%>
+
 <!-- Context path of server, so plain JS code (without JSP templating) can construct a correct url. -->
 <script>
     const contextPath = "${url.forPath("/")}";
