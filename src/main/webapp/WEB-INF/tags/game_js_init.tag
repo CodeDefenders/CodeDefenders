@@ -8,6 +8,7 @@
 
 <%--
     Provides common JS initialization for game pages.
+    Currently the WebSocket and achievement notifications.
 --%>
 
 

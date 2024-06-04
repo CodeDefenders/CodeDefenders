@@ -81,6 +81,8 @@
     </jsp:attribute>
 
     <jsp:body>
+        <t:game_js_init/>
+
         <div id="game-container" class="container-fluid">
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h2 class="m-0 text-center">${title}</h2>

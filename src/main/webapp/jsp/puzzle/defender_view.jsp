@@ -121,6 +121,8 @@
     </jsp:attribute>
 
     <jsp:body>
+        <t:game_js_init/>
+
         <div id="game-container" class="container-fluid">
 
             <h4><b>${title}</b></h4>

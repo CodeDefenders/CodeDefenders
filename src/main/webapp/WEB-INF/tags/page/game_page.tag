@@ -45,10 +45,11 @@
     </jsp:attribute>
 
     <jsp:body>
+        <t:game_js_init/>
+
         <div id="game-container" class="container-fluid">
             <t:game_header/>
             <jsp:doBody/>
         </div>
-        <t:game_js_init/> <%-- TODO: move this before the container? --%>
     </jsp:body>
 </p:main_page>

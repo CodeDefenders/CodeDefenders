@@ -87,7 +87,6 @@
     </jsp:attribute>
 
     <jsp:body>
-        <%-- Not sure if this is needed, but it was included in the footer before refactoring the headers. --%>
         <t:game_js_init/>
 
         <div id="game-container" class="container-fluid">
