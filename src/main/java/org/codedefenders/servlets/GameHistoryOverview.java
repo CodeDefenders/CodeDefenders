@@ -16,6 +16,7 @@ import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.JspWorkaround;
 
 /**
  * This {@link HttpServlet} redirects to the games history page.
@@ -41,6 +42,6 @@ public class GameHistoryOverview extends HttpServlet {
         List<UserMeleeGameInfo> meleeGames = meleeGameRepo.getFinishedMeleeGamesForUser(login.getUserId());
         request.setAttribute("finishedMeleeGames", meleeGames);
 
-        request.getRequestDispatcher(Constants.GAMES_HISTORY_JSP).forward(request, response);
+        JspWorkaround.forwardInWrapper(request, response, "Game History", Constants.GAMES_HISTORY_JSP);
     }
 }
