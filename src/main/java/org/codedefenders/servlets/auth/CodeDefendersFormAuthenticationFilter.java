@@ -28,6 +28,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -183,5 +184,18 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
                 || ("unknown".equalsIgnoreCase(ip))
                 || ("0:0:0:0:0:0:0:1".equals(ip))
                 || !InetAddresses.isInetAddress(ip);
+    }
+
+    @Override
+    protected boolean preHandle(ServletRequest request, ServletResponse response) throws Exception {
+        if (request instanceof HttpServletRequest httpRequest && response instanceof HttpServletResponse httpResponse) {
+            if (isLoginRequest(request, response)
+                    && httpRequest.getMethod().equals("POST")
+                    && SecurityUtils.getSubject().isAuthenticated()) {
+                httpResponse.sendRedirect(url.forPath(getSuccessUrl()));
+                return false;
+            }
+        }
+        return super.preHandle(request, response);
     }
 }
