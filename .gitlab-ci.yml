@@ -345,7 +345,7 @@ container-images:
     - scp target/codedefenders.war "deploy@codedefenders.fim.uni-passau.de:/tmp/$DEPLOY_ENV.war"
     - ssh deploy@codedefenders.fim.uni-passau.de "chown deploy:tomcat /tmp/$DEPLOY_ENV.war"
     - ssh deploy@codedefenders.fim.uni-passau.de "chmod 640 /tmp/$DEPLOY_ENV.war"
-    - ssh deploy@codedefenders.fim.uni-passau.de "mv /tmp/$DEPLOY_ENV.war /var/lib/tomcat9/webapps/$DEPLOY_ENV.war"
+    - ssh deploy@codedefenders.fim.uni-passau.de "mv /tmp/$DEPLOY_ENV.war /var/lib/tomcat10/webapps/$DEPLOY_ENV.war"
   tags:
     - deploy
 
