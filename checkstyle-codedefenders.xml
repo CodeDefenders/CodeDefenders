@@ -206,7 +206,7 @@
 			<property name="customImportOrderRules"
 					  value="STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###SAME_PACKAGE(1)###THIRD_PARTY_PACKAGE###STATIC"/>
 			<property name="standardPackageRegExp" value="^java\."/>
-			<property name="specialImportsRegExp" value="^javax\."/>
+			<property name="specialImportsRegExp" value="^(javax|jakarta)\."/>
 			<property name="sortImportsInGroupAlphabetically" value="true"/>
 			<property name="separateLineBetweenGroups" value="true"/>
 			<property name="severity" value="error"/>
