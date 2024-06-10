@@ -21,6 +21,8 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import jakarta.inject.Inject;
+
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
@@ -31,8 +33,6 @@ import org.codedefenders.util.CDIUtil;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 

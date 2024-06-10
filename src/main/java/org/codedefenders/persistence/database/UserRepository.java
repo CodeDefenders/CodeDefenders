@@ -25,6 +25,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.KeyMap;
@@ -38,10 +43,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;

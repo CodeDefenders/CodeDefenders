@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.dbutils.ResultSetHandler;
-
 import jakarta.annotation.Nonnull;
+
+import org.apache.commons.dbutils.ResultSetHandler;
 
 public class ResultSetUtils {
 

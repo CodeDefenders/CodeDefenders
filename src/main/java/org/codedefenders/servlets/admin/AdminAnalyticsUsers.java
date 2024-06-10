@@ -20,16 +20,16 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.ADMIN_ANALYTICS_USERS)
 public class AdminAnalyticsUsers extends HttpServlet {

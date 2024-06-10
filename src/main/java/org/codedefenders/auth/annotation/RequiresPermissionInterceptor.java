@@ -22,11 +22,11 @@ package org.codedefenders.auth.annotation;
 import java.io.Serializable;
 import java.util.Optional;
 
-import org.apache.shiro.SecurityUtils;
-
 import jakarta.interceptor.AroundInvoke;
 import jakarta.interceptor.Interceptor;
 import jakarta.interceptor.InvocationContext;
+
+import org.apache.shiro.SecurityUtils;
 
 @RequiresPermission("")
 @Interceptor

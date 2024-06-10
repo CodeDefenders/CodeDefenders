@@ -26,6 +26,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
@@ -36,12 +41,6 @@ import org.flywaydb.core.api.migration.BaseJavaMigration;
 import org.flywaydb.core.api.migration.JavaMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.inject.spi.CDI;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 
 @ThreadSafe // Probably

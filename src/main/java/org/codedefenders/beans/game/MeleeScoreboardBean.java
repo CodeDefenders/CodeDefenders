@@ -6,6 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
@@ -13,11 +18,6 @@ import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameProducer;
-
-import jakarta.annotation.Nonnull;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 /**
  * <p>

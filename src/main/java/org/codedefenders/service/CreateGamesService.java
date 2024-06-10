@@ -3,6 +3,9 @@ package org.codedefenders.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.creategames.AdminCreateGamesBean;
 import org.codedefenders.beans.creategames.ClassroomCreateGamesBean;
@@ -22,9 +25,6 @@ import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;

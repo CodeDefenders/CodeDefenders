@@ -5,6 +5,14 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ValidationException;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.page.PageInfoBean;
@@ -17,14 +25,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.ValidationException;
 
 @WebServlet(Paths.CLASSROOM)
 public class ClassroomServlet extends HttpServlet {

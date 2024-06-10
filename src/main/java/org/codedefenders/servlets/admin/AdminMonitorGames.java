@@ -26,6 +26,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
@@ -53,13 +60,6 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {

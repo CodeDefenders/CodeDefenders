@@ -30,6 +30,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -45,8 +48,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.ERROR;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;

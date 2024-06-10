@@ -1,13 +1,14 @@
 package org.codedefenders.notification.web;
 
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
+
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.server.ServerEvent;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import jakarta.websocket.Encoder;
-import jakarta.websocket.EndpointConfig;
 
 /**
  * Encodes server events to a JSON string with a "{type: string, data: {}}" format.

@@ -25,6 +25,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import jakarta.enterprise.inject.Produces;
+
 import org.codedefenders.configuration.Configuration;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -33,8 +35,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import jakarta.enterprise.inject.Produces;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

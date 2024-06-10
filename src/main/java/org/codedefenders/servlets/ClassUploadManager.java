@@ -32,6 +32,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.core.FileItem;
@@ -71,14 +79,6 @@ import org.codedefenders.util.ZipFileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;

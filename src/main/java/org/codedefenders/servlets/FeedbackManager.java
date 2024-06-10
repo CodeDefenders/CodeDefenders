@@ -23,6 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.FeedbackDAO;
@@ -34,13 +41,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(Paths.API_FEEDBACK)
 public class FeedbackManager extends HttpServlet {

@@ -22,8 +22,6 @@ package org.codedefenders.servlets.util;
 import java.io.IOException;
 import java.net.URL;
 
-import org.codedefenders.util.URLUtils;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -32,6 +30,8 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.codedefenders.util.URLUtils;
 
 @WebFilter(urlPatterns = "/*")
 public class AppURLFilter implements Filter {

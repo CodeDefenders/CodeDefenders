@@ -19,16 +19,16 @@
 
 package org.codedefenders.service;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.apache.shiro.SecurityUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 @Named("auth")
 @ApplicationScoped

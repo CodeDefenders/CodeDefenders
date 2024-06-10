@@ -19,10 +19,11 @@
 
 package org.codedefenders.analysis.coverage.line;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 
 import com.github.javaparser.ast.CompilationUnit;
-import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class CoverageTokenGenerator {

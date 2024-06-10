@@ -12,6 +12,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -45,10 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static org.codedefenders.model.EventType.ATTACKER_MUTANT_CREATED;

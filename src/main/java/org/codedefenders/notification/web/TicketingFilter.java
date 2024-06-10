@@ -21,12 +21,6 @@ package org.codedefenders.notification.web;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -36,6 +30,12 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.notification.ITicketingService;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebFilter(filterName = "TicketingFilter")
 public class TicketingFilter implements Filter {

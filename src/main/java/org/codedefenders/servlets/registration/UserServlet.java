@@ -3,17 +3,17 @@ package org.codedefenders.servlets.registration;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.service.UserService;
-import org.codedefenders.util.Paths;
-import org.codedefenders.util.URLUtils;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.service.UserService;
+import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 
 @WebServlet(Paths.USER)

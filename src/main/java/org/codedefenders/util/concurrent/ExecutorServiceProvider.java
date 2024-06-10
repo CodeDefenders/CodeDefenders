@@ -28,6 +28,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import javax.annotation.concurrent.GuardedBy;
 
 import org.codedefenders.instrumentation.MetricsRegistry;
@@ -36,10 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.PreDestroy;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class ExecutorServiceProvider {

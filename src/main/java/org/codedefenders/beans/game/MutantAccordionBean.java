@@ -9,6 +9,10 @@ import java.util.SortedSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
@@ -25,9 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 /**
  * <p>Provides data for the mutant accordion game component.</p>

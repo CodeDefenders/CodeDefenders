@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Role;
@@ -32,9 +35,6 @@ import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.QueryUtils.makePlaceholders;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;

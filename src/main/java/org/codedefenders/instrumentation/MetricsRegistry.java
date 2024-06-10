@@ -21,10 +21,11 @@ package org.codedefenders.instrumentation;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import com.google.common.cache.Cache;
 import io.prometheus.client.guava.cache.CacheMetricsCollector;
 import io.prometheus.client.hotspot.DefaultExports;
-import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * Provides additional functionality for Metrics collection.

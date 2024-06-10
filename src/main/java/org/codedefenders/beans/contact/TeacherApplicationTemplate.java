@@ -1,14 +1,14 @@
 package org.codedefenders.beans.contact;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.LinkUtils;
 import org.codedefenders.util.URLUtils;
-
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 @RequestScoped
 @Named("teacherApplicationTemplate")

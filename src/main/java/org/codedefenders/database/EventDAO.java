@@ -7,13 +7,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.intellij.lang.annotations.Language;
-
-import jakarta.enterprise.context.ApplicationScoped;
 
 // TODO Probably this should expose some specific functions, like handleChatEvent, handle gameEvent, and the like
 @ApplicationScoped

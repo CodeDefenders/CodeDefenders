@@ -22,11 +22,6 @@ package org.codedefenders.instrumentation;
 import java.io.IOException;
 import java.util.stream.Stream;
 
-import org.codedefenders.configuration.Configuration;
-import org.codedefenders.util.Paths;
-
-import io.prometheus.client.Counter;
-import io.prometheus.client.servlet.jakarta.filter.MetricsFilter;
 import jakarta.inject.Inject;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,6 +30,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.codedefenders.configuration.Configuration;
+import org.codedefenders.util.Paths;
+
+import io.prometheus.client.Counter;
+import io.prometheus.client.servlet.jakarta.filter.MetricsFilter;
 
 @WebFilter(filterName = "metricsFilter")
 public class CodeDefendersMetricsFilter extends MetricsFilter {

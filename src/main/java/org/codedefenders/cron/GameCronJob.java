@@ -2,12 +2,12 @@ package org.codedefenders.cron;
 
 import java.util.concurrent.TimeUnit;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.service.game.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 /**
  * This processor is executed regular to handle tasks asynchronous.

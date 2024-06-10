@@ -23,9 +23,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.codedefenders.notification.ITicketingService;
-
 import jakarta.inject.Singleton;
+
+import org.codedefenders.notification.ITicketingService;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 

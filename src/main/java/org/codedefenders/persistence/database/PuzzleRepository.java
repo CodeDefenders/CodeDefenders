@@ -22,6 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -39,11 +44,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;

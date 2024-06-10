@@ -2,6 +2,11 @@ package org.codedefenders.servlets.games;
 
 import java.io.Serializable;
 
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -11,11 +16,6 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nullable;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 @RequestScoped
 @Named("gameProducer")

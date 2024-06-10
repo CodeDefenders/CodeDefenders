@@ -28,6 +28,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.beans.creategames.CreateGamesBean.UserInfo;
 import org.codedefenders.beans.message.MessagesBean;
@@ -47,12 +53,6 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;

@@ -23,6 +23,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
+
 import org.codedefenders.auth.SystemSubject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
@@ -35,10 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import io.prometheus.client.servlet.jakarta.exporter.MetricsServlet;
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
 import net.bull.javamelody.ReportServlet;
 
 @WebListener

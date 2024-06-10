@@ -32,6 +32,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -60,8 +63,6 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 

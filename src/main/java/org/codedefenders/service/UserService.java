@@ -23,6 +23,13 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
@@ -38,12 +45,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Provides an API for user retrieval and management.

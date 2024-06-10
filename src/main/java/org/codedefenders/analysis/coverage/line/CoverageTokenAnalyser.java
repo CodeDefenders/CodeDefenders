@@ -18,9 +18,9 @@
  */
 package org.codedefenders.analysis.coverage.line;
 
-import org.codedefenders.analysis.coverage.line.CoverageTokens.Token;
-
 import jakarta.enterprise.context.ApplicationScoped;
+
+import org.codedefenders.analysis.coverage.line.CoverageTokens.Token;
 
 @ApplicationScoped
 public class CoverageTokenAnalyser {

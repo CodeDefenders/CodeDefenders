@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.ast.CompilationUnit;
@@ -36,7 +38,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import jakarta.enterprise.context.ApplicationScoped;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;

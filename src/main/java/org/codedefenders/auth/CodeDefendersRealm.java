@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import org.apache.shiro.authc.Account;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -65,9 +69,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.google.common.cache.CacheBuilder;
-import jakarta.annotation.Nonnull;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 /**
  * Implements a Realm that uses the {@link UserRepository} for authenticating users. The logic

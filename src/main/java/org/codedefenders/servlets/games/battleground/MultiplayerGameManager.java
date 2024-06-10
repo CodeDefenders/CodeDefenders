@@ -29,6 +29,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
@@ -89,12 +96,6 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;

@@ -29,6 +29,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -41,13 +48,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} handles to the overview page of {@link PuzzleGame}s.

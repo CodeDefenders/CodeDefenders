@@ -1,13 +1,13 @@
 package org.codedefenders.beans.notification;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Named;
 
 @ApplicationScoped
 @Named("eventNames")

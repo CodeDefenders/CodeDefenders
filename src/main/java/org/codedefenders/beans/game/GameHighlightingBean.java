@@ -2,6 +2,8 @@ package org.codedefenders.beans.game;
 
 import java.util.List;
 
+import jakarta.enterprise.context.RequestScoped;
+
 import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
@@ -10,7 +12,6 @@ import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the game highlighting game component.</p>

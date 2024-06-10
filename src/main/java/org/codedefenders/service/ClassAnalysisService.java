@@ -22,6 +22,10 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
 import org.codedefenders.database.GameClassDAO;
@@ -31,9 +35,6 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import jakarta.annotation.Nonnull;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class ClassAnalysisService {

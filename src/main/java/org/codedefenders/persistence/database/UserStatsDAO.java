@@ -18,6 +18,10 @@
  */
 package org.codedefenders.persistence.database;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -27,10 +31,6 @@ import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 

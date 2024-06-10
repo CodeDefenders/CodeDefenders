@@ -3,14 +3,6 @@ package org.codedefenders.servlets.auth;
 import java.io.IOException;
 import java.util.Objects;
 
-import org.apache.shiro.authz.UnauthorizedException;
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.prometheus.client.Counter;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
@@ -20,6 +12,15 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.UnauthorizedException;
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.prometheus.client.Counter;
 
 /**
  * Handles unauthorized requests after they have been denied.

@@ -24,6 +24,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Date;
 
+import jakarta.inject.Inject;
+
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -31,8 +33,6 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
-
-import jakarta.inject.Inject;
 
 /**
  * This class supports the testing of mutationTester

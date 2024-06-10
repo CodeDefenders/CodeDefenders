@@ -23,6 +23,7 @@ import java.util.List;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Produces;
+
 import testsmell.SmellFactory;
 import testsmell.TestSmellDetector;
 import testsmell.smell.AssertionRoulette;

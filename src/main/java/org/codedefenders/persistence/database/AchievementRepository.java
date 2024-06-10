@@ -5,13 +5,13 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
+import jakarta.inject.Inject;
+
 import org.codedefenders.model.Achievement;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 

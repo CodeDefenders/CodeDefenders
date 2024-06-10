@@ -21,6 +21,9 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 
+import jakarta.enterprise.inject.Produces;
+import jakarta.servlet.ServletException;
+
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.FileUtils;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -28,9 +31,6 @@ import org.jboss.weld.junit5.WeldJunit5Extension;
 import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import jakarta.enterprise.inject.Produces;
-import jakarta.servlet.ServletException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -27,6 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -46,8 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;

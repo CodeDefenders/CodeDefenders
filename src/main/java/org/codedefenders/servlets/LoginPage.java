@@ -21,17 +21,17 @@ package org.codedefenders.servlets;
 
 import java.io.IOException;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.util.Paths;
-import org.codedefenders.util.URLUtils;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.page.PageInfoBean;
+import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet("/login")
 public class LoginPage extends HttpServlet {

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import jakarta.enterprise.context.RequestScoped;
+
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.CDIUtil;
-
-import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the scoreboard game component.</p>

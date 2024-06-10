@@ -3,14 +3,6 @@ package org.codedefenders.beans;
 import java.io.IOException;
 import java.util.Optional;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.servlets.games.GameProducer;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -20,6 +12,14 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.page.PageInfoBean;
+import org.codedefenders.servlets.games.GameProducer;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adds various beans to the request, so they can be shared between the

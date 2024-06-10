@@ -22,6 +22,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
@@ -65,14 +73,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;

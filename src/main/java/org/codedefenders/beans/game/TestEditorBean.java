@@ -1,10 +1,10 @@
 package org.codedefenders.beans.game;
 
+import jakarta.enterprise.context.RequestScoped;
+
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
-
-import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the test editor game component.</p>

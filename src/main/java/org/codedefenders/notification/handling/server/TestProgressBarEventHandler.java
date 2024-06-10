@@ -3,13 +3,14 @@ package org.codedefenders.notification.handling.server;
 import java.io.IOException;
 import java.util.Objects;
 
+import jakarta.websocket.EncodeException;
+
 import org.codedefenders.notification.events.server.test.TestLifecycleEvent;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
-import jakarta.websocket.EncodeException;
 
 public class TestProgressBarEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(TestProgressBarEventHandler.class);

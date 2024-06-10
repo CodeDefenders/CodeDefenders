@@ -21,14 +21,14 @@ package org.codedefenders.servlets;
 
 import java.io.IOException;
 
-import org.codedefenders.beans.page.PageInfoBean;
-
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.page.PageInfoBean;
 
 @WebServlet("/leaderboard")
 public class LeaderboardPage extends HttpServlet {

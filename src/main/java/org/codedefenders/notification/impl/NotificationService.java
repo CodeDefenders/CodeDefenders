@@ -18,6 +18,9 @@
  */
 package org.codedefenders.notification.impl;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
@@ -26,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 /**
  * Notification Service implementation.

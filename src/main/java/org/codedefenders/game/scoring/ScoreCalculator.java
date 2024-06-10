@@ -3,6 +3,10 @@ package org.codedefenders.game.scoring;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
@@ -11,10 +15,6 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
-
-import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants

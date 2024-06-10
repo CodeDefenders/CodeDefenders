@@ -19,11 +19,11 @@
 
 package org.codedefenders.persistence.database;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
+
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 @Named
 @ApplicationScoped

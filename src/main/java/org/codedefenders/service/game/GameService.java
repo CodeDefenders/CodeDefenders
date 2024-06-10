@@ -21,6 +21,9 @@ package org.codedefenders.service.game;
 
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
@@ -36,9 +39,6 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class GameService implements IGameService {

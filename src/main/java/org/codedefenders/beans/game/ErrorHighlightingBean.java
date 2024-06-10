@@ -2,8 +2,9 @@ package org.codedefenders.beans.game;
 
 import java.util.List;
 
-import com.google.gson.Gson;
 import jakarta.enterprise.context.RequestScoped;
+
+import com.google.gson.Gson;
 
 /**
  * <p>Provides data for the error highlighting game component.</p>

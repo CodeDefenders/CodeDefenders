@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.enterprise.context.RequestScoped;
+
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.game.Role;
@@ -13,8 +15,6 @@ import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
-
-import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the player feedback game component.</p>

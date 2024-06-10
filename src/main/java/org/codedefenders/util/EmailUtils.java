@@ -21,11 +21,6 @@ package org.codedefenders.util;
 import java.util.Date;
 import java.util.Properties;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.PasswordAuthentication;
@@ -33,6 +28,11 @@ import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.DEBUG_MODE;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;

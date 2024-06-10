@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.inject.Inject;
+
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -42,7 +44,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.Expose;
-import jakarta.inject.Inject;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
