@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
@@ -233,7 +232,7 @@ public class UserRepository {
                   AND players.ID = ?;
         """;
 
-        return queryRunner.query(query, oneFromRS(new ScalarHandler<>()), playerId);
+        return queryRunner.query(query, oneFromRS(rs -> rs.getInt("User_ID")), playerId);
     }
 
     /**
@@ -315,6 +314,6 @@ public class UserRepository {
                 ) AND pw_reset_secret = ?;
         """;
 
-        return queryRunner.query(query, oneFromRS(new ScalarHandler<>()), passwordResetSecret);
+        return queryRunner.query(query, oneFromRS(rs -> rs.getInt("User_ID")), passwordResetSecret);
     }
 }
