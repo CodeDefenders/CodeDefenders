@@ -91,6 +91,7 @@ import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_EQUIVALENCE_VIEW_JSP;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
@@ -200,6 +201,12 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
+        if (game.getPuzzle().isEquivalencePuzzle()) {
+            // claim all mutants as equivalent
+            game.getPuzzleMutants().forEach(m -> m.setEquivalent(Mutant.Equivalence.PENDING_TEST));
+            request.getRequestDispatcher(PUZZLE_GAME_EQUIVALENCE_VIEW_JSP).forward(request, response);
+            return;
+        }
         final Role role = game.getActiveRole();
         switch (role) {
             case ATTACKER:

@@ -114,19 +114,19 @@ public class Installer {
     /**
      * Mapping from CUT alias to the {@link GameClass} instance.
      */
-    private Map<String, GameClass> installedCuts = new HashMap<>();
+    private final Map<String, GameClass> installedCuts = new HashMap<>();
     /**
      * Mapping from a CUT alias to a mapping of positions to mutants.
      */
-    private Map<String, Map<Integer, Mutant>> installedMutants = new HashMap<>();
+    private final Map<String, Map<Integer, Mutant>> installedMutants = new HashMap<>();
     /**
      * Mapping from a CUT alias to a mapping of positions to test cases.
      */
-    private Map<String, Map<Integer, Test>> installedTests = new HashMap<>();
+    private final Map<String, Map<Integer, Test>> installedTests = new HashMap<>();
     /**
      * Set of identifiers of puzzle chapters.
      */
-    private Set<Integer> puzzleChapters = new HashSet<>();
+    private final Set<Integer> puzzleChapters = new HashSet<>();
 
 
     /**
@@ -405,7 +405,7 @@ public class Installer {
                 .map(Integer::parseInt)
                 .map(positionToMutantMap::get)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         String[] testPositions = cfg.getProperty("tests", "").split(",");
         Map<Integer, Test> positionToTestMap = installedTests.get(cutAlias);
@@ -413,7 +413,7 @@ public class Installer {
                 .map(Integer::parseInt)
                 .map(positionToTestMap::get)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         String puzzleAliasExt = puzzleSpecFile.getName().replace(".properties", "");
         String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
@@ -426,6 +426,8 @@ public class Installer {
 
         // Read values from specification file
         Role activeRole = Role.valueOf(cfg.getProperty("activeRole"));
+        boolean isEquivalent = Boolean.parseBoolean(cfg.getProperty("isEquivalent", "false"));
+        boolean isEquivalencePuzzle = cfg.containsKey("isEquivalent");
         GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
         String title = cfg.getProperty("title");
         String description = cfg.getProperty("description");
@@ -450,8 +452,9 @@ public class Installer {
 
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest,
-                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, isEquivalent, isEquivalencePuzzle, level,
+                maxAssertionsPerTest, mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position,
+                title, description);
         int puzzleId = puzzleRepo.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();

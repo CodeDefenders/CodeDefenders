@@ -115,6 +115,7 @@ public class Constants {
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
     public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
+    public static final String PUZZLE_GAME_EQUIVALENCE_VIEW_JSP = "/jsp/puzzle/equivalence_view.jsp";
 
     public static final String USER_GAMES_OVERVIEW_JSP = "/jsp/user_games_view.jsp";
     public static final String GAMES_HISTORY_JSP = "/jsp/games_history.jsp";

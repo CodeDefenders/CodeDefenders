@@ -502,6 +502,18 @@ public class PuzzleRepository {
         return updatedRows > 0;
     }
 
+    public void setAllActive(boolean active) {
+        //noinspection SqlWithoutWhere
+        @Language("SQL") String query = "UPDATE puzzles SET Active = ?;";
+        queryRunner.update(query, active);
+    }
+
+    public void removeAllPuzzleChapters() {
+        //noinspection SqlWithoutWhere
+        @Language("SQL") String query = "DELETE FROM puzzle_chapters;";
+        queryRunner.update(query);
+    }
+
     /**
      * Removes a given puzzle chapter from the database.
      * All puzzles, which reference this puzzle chapter, have their
@@ -641,7 +653,11 @@ public class PuzzleRepository {
             editableLinesEnd = null;
         }
 
-        return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
+        boolean isEquivalent = rs.getBoolean("puzzles.IsEquivalent");
+        boolean isEquivalencePuzzle = rs.getBoolean("puzzles.IsEquivalencePuzzle");
+
+        return new Puzzle(puzzleId, classId, activeRole, isEquivalent, isEquivalencePuzzle, level, maxAssertions,
+                mutantValidatorLevel,
                 editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 

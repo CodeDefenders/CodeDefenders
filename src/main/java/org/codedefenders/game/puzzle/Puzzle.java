@@ -48,6 +48,17 @@ public class Puzzle {
     private Role activeRole;
 
     /**
+     * Whether the mutant is an equivalent mutant.
+     */
+    private boolean isEquivalent;
+
+    /**
+     * Whether the puzzle is an equivalence puzzle.
+     * TODO: use subclass instead of flag
+     */
+    private boolean isEquivalencePuzzle;
+
+    /**
      * The {@link GameLevel} the puzzle is played on.
      */
     private GameLevel level;
@@ -100,24 +111,26 @@ public class Puzzle {
     /**
      * Constructs a new Puzzle instance.
      *
-     * @param puzzleId ID of the chapter.
-     * @param classId Class ID of the class the puzzle uses.
-     *                The mutants and test for the puzzle come together with the class.
-     * @param activeRole The {@link Role} the player takes in the puzzle.
-     * @param level The {@link GameLevel} the puzzle is played on.
-     * @param mutantValidatorLevel Validation level used to check submitted mutants.
+     * @param puzzleId             ID of the chapter.
+     * @param classId              Class ID of the class the puzzle uses.
+     *                             The mutants and test for the puzzle come together with the class.
+     * @param activeRole           The {@link Role} the player takes in the puzzle.
+     * @param isEquivalent         Whether the mutant is an equivalent mutant.
+     * @param isEquivalencePuzzle  Whether the puzzle is an equivalence puzzle.
+     * @param level                The {@link GameLevel} the puzzle is played on.
      * @param maxAssertionsPerTest Maximum number of allowed assertions per submitted test.
-     * @param editableLinesStart First editable line of the class or test. Can be null.
-     * @param editableLinesEnd Last editable line of the class or test. Can be null.
-     * @param chapterId ID of the chapter the puzzle belongs to. Can be null.
-     * @param position Position of the puzzle inside the chapter. Can be null.
-     * @param title Title of the puzzle. Can be null.
-     * @param description Description of the puzzle. Can be null.
+     * @param mutantValidatorLevel Validation level used to check submitted mutants.
+     * @param editableLinesStart   First editable line of the class or test. Can be null.
+     * @param editableLinesEnd     Last editable line of the class or test. Can be null.
+     * @param chapterId            ID of the chapter the puzzle belongs to. Can be null.
+     * @param position             Position of the puzzle inside the chapter. Can be null.
+     * @param title                Title of the puzzle. Can be null.
+     * @param description          Description of the puzzle. Can be null.
      */
     public Puzzle(int puzzleId,
                   int classId,
                   Role activeRole,
-                  GameLevel level,
+                  boolean isEquivalent, boolean isEquivalencePuzzle, GameLevel level,
                   int maxAssertionsPerTest,
                   CodeValidatorLevel mutantValidatorLevel,
                   Integer editableLinesStart,
@@ -129,6 +142,8 @@ public class Puzzle {
         this.puzzleId = puzzleId;
         this.classId = classId;
         this.activeRole = activeRole;
+        this.isEquivalent = isEquivalent;
+        this.isEquivalencePuzzle = isEquivalencePuzzle;
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.mutantValidatorLevel = mutantValidatorLevel;
@@ -149,7 +164,7 @@ public class Puzzle {
                                        int maxAssertionsPerTest,
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
-        return new Puzzle(puzzleId, -1, null, null, maxAssertionsPerTest,
+        return new Puzzle(puzzleId, -1, null, false, false, null, maxAssertionsPerTest,
             null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
@@ -264,5 +279,13 @@ public class Puzzle {
 
     public void setChapter(PuzzleChapter chapter) {
         this.chapter = chapter;
+    }
+
+    public boolean isEquivalent() {
+        return isEquivalent;
+    }
+
+    public boolean isEquivalencePuzzle() {
+        return isEquivalencePuzzle;
     }
 }
