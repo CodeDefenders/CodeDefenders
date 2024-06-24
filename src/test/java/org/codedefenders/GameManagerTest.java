@@ -21,14 +21,14 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 
-import javax.enterprise.inject.Produces;
-import javax.servlet.ServletException;
+import jakarta.enterprise.inject.Produces;
+import jakarta.servlet.ServletException;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.FileUtils;
-import org.codedefenders.util.WeldExtension;
-import org.codedefenders.util.WeldSetup;
-import org.jboss.weld.junit4.WeldInitiator;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Jose Rojas
  */
-@ExtendWith(WeldExtension.class)
+@ExtendWith(WeldJunit5Extension.class)
 public class GameManagerTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils.

@@ -22,7 +22,7 @@ Codedefenders can be deployed to the VM e.g. via the [maven deployment steps](#a
 ### Software Requirements
 
 - Java (Version 1.8 or later)
-- Tomcat Server (Version 9)
+- Tomcat Server (Version 10)
 - Apache Maven
 - Apache Ant
 - MySQL (e.g. [MariaDB](https://mariadb.org/))
@@ -30,18 +30,18 @@ Codedefenders can be deployed to the VM e.g. via the [maven deployment steps](#a
 ### Setup
 
 This guide assumes:
- - you are running Debian 10 as OS
+ - you are running Debian 12 as OS
  - you installed all the required software
 
 #### Modify the configuration
 
-Copy the `example.codedefenders.properties` file to `/var/lib/tomcat9/conf/codedefenders.properties` and set the values to match your environment.  
+Copy the `example.codedefenders.properties` file to `/var/lib/tomcat10/conf/codedefenders.properties` and set the values to match your environment.  
 The only required value is `data.dir`, all other properties have sensible default values.
 
 #### Adapt the systemd service
 
-On Debian 10 tomcat9 by default has only very limited write permissions.  
-To allow the `data.dir` to be located outside of the `/var/lib/tomcat9/webapps/` folder hierarchy you have to `systemctl edit tomcat9` and add the following code:  
+On Debian 10 tomcat10 by default has only very limited write permissions.  
+To allow the `data.dir` to be located outside of the `/var/lib/tomcat10/webapps/` folder hierarchy you have to `systemctl edit tomcat10` and add the following code:  
 ```ini
 [Service]
 ReadWritePaths="<data.dir path>"
@@ -60,7 +60,7 @@ To install Code Defenders automatically, execute the `setup.sh` script under the
 
 ```bash
 cd installation
-./setup.sh /var/lib/tomcat9/conf/codedefenders.properties
+./setup.sh /var/lib/tomcat10/conf/codedefenders.properties
 ```
 
 The script performs a basic availability check of required software. The data directory folder structures created. All the required dependencies and files are automatically downloaded.
@@ -107,7 +107,7 @@ For additional information on the system- and integration-tests see the [Testing
 #### Manual
 
 To deploy you simply need to copy the `codedefenders.war` file to the tomcat `webapps` directory, with the context path as name.  
-E.g to deploy codedefenders at the tomcat root path (`http://localhost:8080/`) you can simply `cp target/codedefenders.war /var/lib/tomcat9/webapps/ROOT.war`
+E.g to deploy codedefenders at the tomcat root path (`http://localhost:8080/`) you can simply `cp target/codedefenders.war /var/lib/tomcat10/webapps/ROOT.war`
 
 You can either download the `codedefenders.war` file from the latest [release](https://github.com/CodeDefenders/CodeDefenders/releases/) or build it yourself with `mvn clean package -DskipTests`.
 
@@ -122,7 +122,7 @@ The maven deployment is configured via a `config.properties` file. Simply copy t
 <user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
 ```
 
-**Note:** This requires the tomcat manager application to be installed, which on Debian is provided by the `tomcat9-admin` package.
+**Note:** This requires the tomcat manager application to be installed, which on Debian is provided by the `tomcat10-admin` package.
 
 Code Defenders is built and deployed with Maven using the following commands.
 

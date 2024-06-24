@@ -22,7 +22,7 @@
 <%--@elvariable id="puzzleChapterEntries" type="java.util.SortedSet"--%>
 <%--@elvariable id="nextPuzzle" type="java.util.Optional"--%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="org.codedefenders.game.GameState" %>

@@ -18,8 +18,8 @@
  */
 package org.codedefenders.validation.input;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 // https://stackoverflow.com/questions/19537664/how-to-validate-number-string-as-digit-with-hibernate
 public class EnsureFloatValidator implements ConstraintValidator<EnsureFloat, Object> {

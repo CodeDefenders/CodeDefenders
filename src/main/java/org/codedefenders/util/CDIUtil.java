@@ -19,7 +19,7 @@
 
 package org.codedefenders.util;
 
-import javax.enterprise.inject.spi.CDI;
+import jakarta.enterprise.inject.spi.CDI;
 
 public class CDIUtil {
     /**

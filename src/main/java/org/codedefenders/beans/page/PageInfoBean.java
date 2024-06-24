@@ -1,13 +1,11 @@
 package org.codedefenders.beans.page;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides various page info, like the page title (and maybe other things later).</p>
  * <p>Bean Name: {@code pageInfo}</p>
  */
-@ManagedBean
 @RequestScoped
 public class PageInfoBean {
     private String pageTitle;

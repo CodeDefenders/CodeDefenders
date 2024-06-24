@@ -1,13 +1,11 @@
 package org.codedefenders.beans.game;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 /**
  * <p>Provides data for the mutant progress bar game component.</p>
  * <p>Bean Name: {@code mutantProgressBar}</p>
  */
-@ManagedBean
 @RequestScoped
 public class MutantProgressBarBean {
     /**

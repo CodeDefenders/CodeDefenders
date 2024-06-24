@@ -57,7 +57,7 @@ This enables the following migration schema:
 To have different configuration files for each instance you have to configure the file location via the `java:comp/env/codedefenders/config` JNDI attribute.  
 This can (in tomcat) be set on a per instance basis through a `.xml` file located at `$CATALINA_BASE/conf/[enginename]/[hostname]/[context path].xml`.
 
-For running two instances of codedefenders on a Debian 10 host with the context paths `/` and `test` you would deploy the following files:
+For running two instances of codedefenders on a Debian 12 host with the context paths `/` and `test` you would deploy the following files:
 
 `/var/lib/conf/catalina/localhost/ROOT.xml`  
 ```xml

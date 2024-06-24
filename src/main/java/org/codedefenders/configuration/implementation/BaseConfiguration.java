@@ -21,7 +21,7 @@ package org.codedefenders.configuration.implementation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;

@@ -18,8 +18,8 @@
  */
 package org.codedefenders;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.configuration.Configuration;
@@ -28,9 +28,9 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.ClassAnalysisService;
-import org.codedefenders.util.WeldExtension;
-import org.codedefenders.util.WeldSetup;
-import org.jboss.weld.junit4.WeldInitiator;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -41,7 +41,7 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-@ExtendWith(WeldExtension.class)
+@ExtendWith(WeldJunit5Extension.class)
 public class AutomaticImportTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.

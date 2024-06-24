@@ -21,7 +21,7 @@ package org.codedefenders.instrumentation;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import com.google.common.cache.Cache;
 import io.prometheus.client.guava.cache.CacheMetricsCollector;

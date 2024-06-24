@@ -6,9 +6,9 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.validation.ValidationException;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.validation.ValidationException;
 
 import org.codedefenders.auth.annotation.RequiresPermission;
 import org.codedefenders.auth.permissions.CreateClassroomPermission;

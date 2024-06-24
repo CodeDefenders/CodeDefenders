@@ -18,10 +18,9 @@
  */
 package org.codedefenders.persistence.database;
 
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameMode;

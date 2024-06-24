@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.SessionScoped;
-import javax.inject.Named;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Named;
 
 /**
  * <p>Implements a container for messages that are displayed to the user on page load.</p>
@@ -17,7 +16,6 @@ import javax.inject.Named;
  * </p>
  */
 // TODO: Find a way to make this request scoped, so messages are not mixed when multiple tabs are used.
-@ManagedBean
 @SessionScoped
 @Named("messages")
 public class MessagesBean implements Serializable {

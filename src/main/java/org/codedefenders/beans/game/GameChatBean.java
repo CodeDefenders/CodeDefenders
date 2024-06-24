@@ -1,9 +1,8 @@
 package org.codedefenders.beans.game;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.AbstractGame;
@@ -11,7 +10,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.games.GameProducer;
 
-@ManagedBean
 @RequestScoped
 @Named("gameChat")
 public class GameChatBean {

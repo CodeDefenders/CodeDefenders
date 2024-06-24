@@ -21,7 +21,7 @@ package org.codedefenders.persistence.database.util;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.UncheckedSQLException;

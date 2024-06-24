@@ -25,17 +25,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.beans.message.MessagesBean;
@@ -78,24 +79,25 @@ public class AdminPuzzleUpload extends HttpServlet {
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
 
-        List<FileItem> items;
+        List<DiskFileItem> items;
         try {
-            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            var fileUpload = new JakartaServletFileUpload<>(DiskFileItemFactory.builder().get());
+            items = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to upload puzzles. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
             return;
         }
 
-        final Map<Boolean, List<FileItem>> parameters = items
+        final Map<Boolean, List<DiskFileItem>> parameters = items
                 .stream()
                 .collect(Collectors.partitioningBy(FileItem::isFormField));
-        final List<FileItem> uploadParameters = parameters.get(true);
-        final List<FileItem> fileParameters = parameters.get(false);
+        final List<DiskFileItem> uploadParameters = parameters.get(true);
+        final List<DiskFileItem> fileParameters = parameters.get(false);
 
         String action = null;
 
-        for (FileItem uploadParameter : uploadParameters) {
+        for (DiskFileItem uploadParameter : uploadParameters) {
             final String fieldName = uploadParameter.getFieldName();
             final String fieldValue = uploadParameter.getString();
             logger.debug("Upload parameter {" + fieldName + ":" + fieldValue + "}");
@@ -132,8 +134,8 @@ public class AdminPuzzleUpload extends HttpServlet {
         }
     }
 
-    private void createPuzzles(HttpServletRequest request, List<FileItem> fileParameters) throws IOException {
-        for (FileItem fileParameter : fileParameters) {
+    private void createPuzzles(HttpServletRequest request, List<? extends FileItem<?>> fileParameters) throws IOException {
+        for (FileItem<?> fileParameter : fileParameters) {
             final String fieldName = fileParameter.getFieldName();
             final String fileName = FilenameUtils.getName(fileParameter.getName());
             logger.debug("Upload file parameter {" + fieldName + ":" + fileName + "}");

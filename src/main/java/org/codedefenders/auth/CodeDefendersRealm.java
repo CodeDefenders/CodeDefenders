@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.apache.shiro.authc.Account;
 import org.apache.shiro.authc.AuthenticationException;

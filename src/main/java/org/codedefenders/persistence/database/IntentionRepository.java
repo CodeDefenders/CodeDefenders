@@ -21,8 +21,8 @@ package org.codedefenders.persistence.database;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Mutant;

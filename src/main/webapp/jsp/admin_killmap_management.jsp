@@ -27,7 +27,7 @@
 
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
@@ -354,10 +354,10 @@
 
 <script type="module">
     import DataTable from '${url.forPath("/js/datatables.mjs")}';
-    import {parseHTML, postForm, DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {postForm, DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
-<% if (currentPage == KillmapPage.MANUAL) { %>
+    <% if (currentPage == KillmapPage.MANUAL) { %>
 
     document.getElementById('queue-ids-classes').addEventListener('click', event => {
         const idsField = document.getElementById('class-ids');

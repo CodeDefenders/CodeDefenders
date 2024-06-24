@@ -23,8 +23,8 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.codedefenders.configuration.Configuration;

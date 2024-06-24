@@ -18,9 +18,8 @@
  */
 package org.codedefenders.notification.impl;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
@@ -37,7 +36,6 @@ import com.google.gson.Gson;
  *
  * @author gambi
  */
-@ManagedBean
 @Singleton
 public class NotificationService implements INotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);

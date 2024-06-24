@@ -21,8 +21,8 @@ package org.codedefenders.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;

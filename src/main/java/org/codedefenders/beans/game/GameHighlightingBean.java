@@ -2,8 +2,7 @@ package org.codedefenders.beans.game;
 
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
@@ -18,7 +17,6 @@ import com.google.gson.GsonBuilder;
  * <p>Provides data for the game highlighting game component.</p>
  * <p>Bean Name: {@code gameHighlighting}</p>
  */
-@ManagedBean
 @RequestScoped
 public class GameHighlightingBean {
     /**

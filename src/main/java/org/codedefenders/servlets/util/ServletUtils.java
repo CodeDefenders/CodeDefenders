@@ -21,8 +21,8 @@ package org.codedefenders.servlets.util;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.

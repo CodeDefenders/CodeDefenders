@@ -22,8 +22,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
@@ -34,7 +33,6 @@ import org.codedefenders.model.UserEntity;
  * Holds information for the user profile page.
  */
 @RequestScoped
-@ManagedBean
 public class UserProfileBean {
     private UserEntity user;
     private Map<GameType, UserStats> stats;

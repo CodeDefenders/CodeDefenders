@@ -19,9 +19,9 @@
 
 package org.codedefenders.service;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.shiro.SecurityUtils;
 import org.codedefenders.auth.CodeDefendersAuth;

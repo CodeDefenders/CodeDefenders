@@ -3,7 +3,7 @@ package org.codedefenders.notification.handling.server;
 import java.io.IOException;
 import java.util.Objects;
 
-import javax.websocket.EncodeException;
+import jakarta.websocket.EncodeException;
 
 import org.codedefenders.notification.events.server.test.TestLifecycleEvent;
 import org.codedefenders.notification.web.PushSocket;

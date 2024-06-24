@@ -1,7 +1,6 @@
 package org.codedefenders.beans.game;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
@@ -9,7 +8,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
  * <p>Provides data for the mutant explanation game component.</p>
  * <p>Bean Name: {@code mutantExplanation}</p>
  */
-@ManagedBean
 @RequestScoped
 public class MutantExplanationBean {
     /**

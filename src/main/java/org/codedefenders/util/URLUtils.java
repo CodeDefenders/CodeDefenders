@@ -24,10 +24,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.codedefenders.configuration.Configuration;
 

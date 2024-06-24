@@ -25,10 +25,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
-import org.jboss.weld.junit4.WeldInitiator;
+import org.jboss.weld.junit5.WeldInitiator;
+import org.jboss.weld.junit5.WeldJunit5Extension;
+import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -46,7 +48,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 /**
  * Testing {@link FileUtils}.
  */
-@ExtendWith(WeldExtension.class)
+@ExtendWith(WeldJunit5Extension.class)
 public class FileUtilsTest {
 
     // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.

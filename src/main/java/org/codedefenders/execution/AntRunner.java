@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -59,7 +59,7 @@ import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
  * @author Jose Rojas
  * @author Alessio Gambi (last edit)
  */
-@ManagedBean
+@ApplicationScoped
 public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 

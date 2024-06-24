@@ -1,8 +1,7 @@
 package org.codedefenders.beans.notification;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
@@ -11,7 +10,6 @@ import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
 
 @ApplicationScoped
-@ManagedBean
 @Named("eventNames")
 public class EventNamesBean {
     public String getGameChatRegistrationEventName() {

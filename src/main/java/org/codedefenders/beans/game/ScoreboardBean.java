@@ -5,8 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
@@ -18,7 +17,6 @@ import org.codedefenders.util.CDIUtil;
  * <p>Provides data for the scoreboard game component.</p>
  * <p>Bean Name: {@code scoreboard}</p>
  */
-@ManagedBean
 @RequestScoped
 public class ScoreboardBean {
     private Integer gameId;

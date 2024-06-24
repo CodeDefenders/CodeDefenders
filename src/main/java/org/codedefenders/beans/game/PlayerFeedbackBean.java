@@ -4,8 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
@@ -21,7 +20,6 @@ import org.codedefenders.util.CDIUtil;
  * <p>Provides data for the player feedback game component.</p>
  * <p>Bean Name: {@code playerFeedback}</p>
  */
-@ManagedBean
 @RequestScoped
 public class PlayerFeedbackBean {
     private Integer gameId;

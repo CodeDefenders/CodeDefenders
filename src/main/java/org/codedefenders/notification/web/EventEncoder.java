@@ -1,7 +1,7 @@
 package org.codedefenders.notification.web;
 
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
 
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.server.ServerEvent;

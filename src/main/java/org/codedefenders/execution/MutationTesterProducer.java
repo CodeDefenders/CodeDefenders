@@ -18,8 +18,8 @@
  */
 package org.codedefenders.execution;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;

@@ -5,8 +5,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.RequestScoped;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
@@ -19,7 +18,6 @@ import org.codedefenders.util.FileUtils;
  * <p>Provides data for the mutant editor game component.</p>
  * <p>Bean Name: {@code mutantEditor}</p>
  */
-@ManagedBean
 @RequestScoped
 public class MutantEditorBean {
     /**

@@ -24,9 +24,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.annotation.Nonnull;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;

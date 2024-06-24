@@ -32,18 +32,19 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.inject.Inject;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
@@ -176,9 +177,10 @@ public class ClassUploadManager extends HttpServlet {
 
         // Get actual parameters, because of the upload component, I can't do
         // request.getParameter before fetching the file
-        List<FileItem> items;
+        List<DiskFileItem> items;
         try {
-            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            var fileUpload = new JakartaServletFileUpload<>(DiskFileItemFactory.builder().get());
+            items = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to upload class. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
@@ -188,13 +190,13 @@ public class ClassUploadManager extends HttpServlet {
         // Splits request parameters by FileItem#isFormField into
         // upload and file parameters to ensure that all upload parameters
         // set before storing files.
-        final Map<Boolean, List<FileItem>> parameters = items
+        final Map<Boolean, List<DiskFileItem>> parameters = items
                 .stream()
                 .collect(Collectors.partitioningBy(FileItem::isFormField));
-        final List<FileItem> uploadParameters = parameters.get(true);
-        final List<FileItem> fileParameters = parameters.get(false);
+        final List<DiskFileItem> uploadParameters = parameters.get(true);
+        final List<DiskFileItem> fileParameters = parameters.get(false);
 
-        for (FileItem uploadParameter : uploadParameters) {
+        for (DiskFileItem uploadParameter : uploadParameters) {
             final String fieldName = uploadParameter.getFieldName();
             final String fieldValue = uploadParameter.getString();
             logger.debug("Upload parameter {" + fieldName + ":" + fieldValue + "}");

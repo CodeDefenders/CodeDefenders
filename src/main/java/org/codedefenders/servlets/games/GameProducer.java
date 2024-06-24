@@ -2,10 +2,10 @@ package org.codedefenders.servlets.games;
 
 import java.io.Serializable;
 
-import javax.annotation.Nullable;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.annotation.Nullable;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;

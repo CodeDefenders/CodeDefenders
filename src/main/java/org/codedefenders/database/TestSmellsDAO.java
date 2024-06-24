@@ -21,7 +21,7 @@ package org.codedefenders.database;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.ManagedBean;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.game.Test;
 import org.intellij.lang.annotations.Language;
@@ -36,7 +36,7 @@ import testsmell.TestFile;
  *
  * @author gambi
  */
-@ManagedBean
+@ApplicationScoped
 public class TestSmellsDAO {
     private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
 

@@ -20,8 +20,8 @@ package org.codedefenders.validation.input;
 
 import java.time.format.DateTimeFormatter;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class CheckDateValidator implements ConstraintValidator<CheckDateFormat, Object> {
 

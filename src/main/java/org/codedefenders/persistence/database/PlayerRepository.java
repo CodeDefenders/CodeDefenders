@@ -21,7 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Role;

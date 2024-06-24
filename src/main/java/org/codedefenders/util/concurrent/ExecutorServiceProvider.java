@@ -28,11 +28,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import javax.annotation.concurrent.GuardedBy;
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.transaction.TransactionManager;

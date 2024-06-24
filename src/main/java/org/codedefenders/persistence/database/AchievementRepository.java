@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.codedefenders.model.Achievement;
 import org.codedefenders.persistence.database.util.QueryRunner;

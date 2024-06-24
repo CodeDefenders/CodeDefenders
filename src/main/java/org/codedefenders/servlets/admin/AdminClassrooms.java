@@ -19,25 +19,14 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ValidationException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.service.ClassroomService;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.ADMIN_CLASSROOMS)
 public class AdminClassrooms extends HttpServlet {

@@ -40,7 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;

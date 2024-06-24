@@ -9,10 +9,9 @@ import java.util.SortedSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
@@ -34,7 +33,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
 @Named(value = "killMapAccordion")
-@ManagedBean
 @RequestScoped
 public class KillMapAccordionBean {
     private final AbstractGame game;

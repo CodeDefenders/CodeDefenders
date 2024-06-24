@@ -26,7 +26,7 @@
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%@ attribute name="playerId" required="false" type="java.lang.Integer" %>
 <%@ attribute name="gameFinished" required="false" type="java.lang.Boolean" %>

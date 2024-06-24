@@ -10,7 +10,7 @@
 <%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <c:set var="createGamesBean" value="${requestScope.createGamesBean}"/>

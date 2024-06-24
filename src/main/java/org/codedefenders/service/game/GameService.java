@@ -21,8 +21,8 @@ package org.codedefenders.service.game;
 
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
