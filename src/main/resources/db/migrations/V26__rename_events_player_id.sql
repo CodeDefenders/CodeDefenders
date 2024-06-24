@@ -1,0 +1,3 @@
+ALTER TABLE `events`
+    ALGORITHM = INPLACE,
+    CHANGE COLUMN `Player_ID` `User_ID` INT(11) NOT NULL;
