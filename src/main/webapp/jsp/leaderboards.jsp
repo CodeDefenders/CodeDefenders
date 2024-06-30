@@ -21,63 +21,55 @@
 <%@ page import="org.codedefenders.util.LinkUtils" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
-<c:choose>
-    <c:when test="${login.loggedIn}">
-        <jsp:include page="/jsp/header.jsp"/>
-    </c:when>
-    <c:otherwise>
-        <jsp:include page="/jsp/header_logout.jsp"/>
-    </c:otherwise>
-</c:choose>
+<c:set var="title" value="Battlegrounds Leaderboard"/>
 
-<div class="container">
-    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
+<p:main_page title="${title}">
+    <div class="container">
+        <h2 class="mb-4">${title}</h2>
 
-    <table id="tableMPLeaderboard" class="table table-striped">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Mutants</th>
-                <th>Attacker Score</th>
-                <th>Tests</th>
-                <th>Defender Score</th>
-                <th>Mutants Killed</th>
-                <th>Total Score</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="entry" items="${leaderboardService.all}">
+        <table id="tableMPLeaderboard" class="table table-striped">
+            <thead>
                 <tr>
-                    <td>${LinkUtils.getUserProfileAnchorOrText(entry.username)}</td>
-                    <td>${entry.mutantsSubmitted}</td>
-                    <td>${entry.attackerScore}</td>
-                    <td>${entry.testsSubmitted}</td>
-                    <td>${entry.defenderScore}</td>
-                    <td>${entry.mutantsKilled}</td>
-                    <td>${entry.totalPoints}</td>
+                    <th>User</th>
+                    <th>Mutants</th>
+                    <th>Attacker Score</th>
+                    <th>Tests</th>
+                    <th>Defender Score</th>
+                    <th>Mutants Killed</th>
+                    <th>Total Score</th>
                 </tr>
-            </c:forEach>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <c:forEach var="entry" items="${leaderboardService.all}">
+                    <tr>
+                        <td>${LinkUtils.getUserProfileAnchorOrText(entry.username)}</td>
+                        <td>${entry.mutantsSubmitted}</td>
+                        <td>${entry.attackerScore}</td>
+                        <td>${entry.testsSubmitted}</td>
+                        <td>${entry.defenderScore}</td>
+                        <td>${entry.mutantsKilled}</td>
+                        <td>${entry.totalPoints}</td>
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
 
-    <script type="module">
-        import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        <script type="module">
+            import DataTable from '${url.forPath("/js/datatables.mjs")}';
 
 
-        new DataTable('#tableMPLeaderboard', {
-            "order": [[6, "desc"]],
-            "columnDefs": [
-                {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
-            ],
-            "pageLength": 50
-        });
-    </script>
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+            new DataTable('#tableMPLeaderboard', {
+                "order": [[6, "desc"]],
+                "columnDefs": [
+                    {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
+                ],
+                "pageLength": 50
+            });
+        </script>
+    </div>
+</p:main_page>

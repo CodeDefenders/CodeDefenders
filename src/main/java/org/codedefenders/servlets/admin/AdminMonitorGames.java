@@ -58,6 +58,7 @@ import org.codedefenders.service.game.MeleeGameService;
 import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.JspWorkaround;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 
@@ -156,7 +157,7 @@ public class AdminMonitorGames extends HttpServlet {
         request.setAttribute("meleePlayersInfoForGame", meleePlayersInfoForGame);
         request.setAttribute("meleeUserIdForPlayerIds", meleeUserIdForPlayerIds);
 
-        request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
+        JspWorkaround.forwardInWrapper(request, response, "Monitor Games", Constants.ADMIN_MONITOR_JSP);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

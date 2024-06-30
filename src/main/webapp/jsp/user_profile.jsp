@@ -22,188 +22,190 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="profile" type="org.codedefenders.beans.user.UserProfileBean"--%>
 
-<jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
-<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<c:set var="title" value="${profile.self ? 'My Profile' : 'Profile of ' += profile.user.username}"/>
 
-<% pageInfo.setPageTitle(profile.isSelf() ? "My Profile" : "Profile of " + profile.getUser().getUsername()); %>
+<p:main_page title="${title}">
+    <jsp:attribute name="additionalImports">
+        <link rel="stylesheet" href="${url.forPath("/css/specific/user_profile.css")}">
+    </jsp:attribute>
+    <jsp:body>
+        <div class="container">
+            <h1>${title}</h1>
 
-<% if (login.isLoggedIn()) { %>
-<jsp:include page="/jsp/header.jsp"/>
-<% } else { %>
-<jsp:include page="/jsp/header_logout.jsp"/>
-<% } %>
+            <section>
+                <h2>Achievements</h2>
+                <div class="achievements">
+                    <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
+                    <c:if test="${profile.unlockedAchievements.size() == 0}">
+                        <div class="no-achievements">No achievement unlocked yet.</div>
+                    </c:if>
+                    <c:forEach items="${profile.unlockedAchievements}" var="achievement">
+                        <t:achievement_badge achievement="${achievement}"/>
+                    </c:forEach>
+                </div>
+                <c:if test="${profile.lockedAchievements.size() > 0}">
+                    <button class="btn btn-outline-primary btn-sm mt-3">
+                        Show all achievements
+                    </button>
+                    <script>
+                        const button = document.currentScript.previousElementSibling;
+                        button.addEventListener("click", function(event) {
+                            document.querySelector('.locked-achievements').classList.toggle('hidden');
+                            button.innerText = button.innerText === 'Show all achievements'
+                                    ? 'Hide locked achievements'
+                                    : 'Show all achievements';
+                        });
+                    </script>
+                    <div class="achievements locked-achievements hidden">
+                        <c:forEach items="${profile.lockedAchievements}" var="achievement">
+                            <t:achievement_badge achievement="${achievement}"/>
+                        </c:forEach>
+                    </div>
+                </c:if>
+            </section>
 
-<link rel="stylesheet" href="${url.forPath("/css/specific/user_profile.css")}">
+            <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
+                <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
 
-<div class="container">
-    <h1>${pageInfo.pageTitle}</h1>
+                <div class="dashboards">
+                        <%--@elvariable id="stats" type="org.codedefenders.dto.UserStats"--%>
+                    <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
 
-    <section>
-        <h2>Achievements</h2>
-        <div class="achievements">
-            <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
-            <c:if test="${profile.unlockedAchievements.size() == 0}">
-                <div class="no-achievements">No achievement unlocked yet.</div>
+                    <t:dashboard_pie
+                            type="mutants" title="Mutants created"
+                            total="${stats.totalMutants}"
+                            percentage="${stats.aliveMutantsPercentage}"
+                            label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                            label2="Killed mutants:" value2="${stats.killedMutants}"
+                    />
+
+                    <t:dashboard_pie
+                            type="tests" title="Tests written"
+                            total="${stats.totalTests}"
+                            percentage="${stats.killingTestsPercentage}"
+                            label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                            label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+                    />
+
+                    <t:dashboard_pie
+                            type="points" title="Points earned"
+                            total="${stats.totalPoints}"
+                            percentage="${stats.testPointsPercentage}"
+                            label1="By writing tests:" value1="${stats.totalPointsTests}"
+                            label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+                    />
+
+                    <t:dashboard_pie
+                            type="games" title="Games played"
+                            total="${stats.totalGames}"
+                            percentage="${stats.defenderGamesPercentage}"
+                            label1="As defender:" value1="${stats.defenderGames}"
+                            label2="As attacker:" value2="${stats.attackerGames}"
+                    />
+                </div>
+
+                <dl class="other-stats mt-3">
+                    <dt>Average points per tests:</dt>
+                    <dd>${stats.avgPointsTests}</dd>
+
+                    <dt>Average points per mutant:</dt>
+                    <dd>${stats.avgPointsMutants}</dd>
+                </dl>
+            </section>
+
+            <section class="mt-5 statistics" aria-labelledby="stats-melee">
+                <h2 class="mb-3" id="stats-melee">Statistics for Melee Games</h2>
+
+                <div class="dashboards">
+                    <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
+
+                    <t:dashboard_pie
+                            type="mutants" title="Mutants created"
+                            total="${stats.totalMutants}"
+                            percentage="${stats.aliveMutantsPercentage}"
+                            label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                            label2="Killed mutants:" value2="${stats.killedMutants}"
+                    />
+
+                    <t:dashboard_pie
+                            type="tests" title="Tests written"
+                            total="${stats.totalTests}"
+                            percentage="${stats.killingTestsPercentage}"
+                            label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                            label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+                    />
+
+                    <t:dashboard_pie
+                            type="points" title="Points earned"
+                            total="${stats.totalPoints}"
+                            percentage="${stats.testPointsPercentage}"
+                            label1="By writing tests:" value1="${stats.totalPointsTests}"
+                            label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+                    />
+                </div>
+
+                <dl class="other-stats mt-3">
+                    <dt>Total melee games played:</dt>
+                    <dd>${stats.totalGames}</dd>
+
+                    <dt>Average points per tests:</dt>
+                    <dd>${stats.avgPointsTests}</dd>
+
+                    <dt>Average points per mutant:</dt>
+                    <dd>${stats.avgPointsMutants}</dd>
+                </dl>
+            </section>
+
+            <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
+                <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
+
+                <dl class="other-stats">
+                        <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
+                        <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
+                        <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
+                    <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
+                        <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
+                        <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
+                        <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
+                        <dd ${hasPlayed}>
+                            <c:choose><c:when test="${maxPuzzle != 0}">
+                                highest puzzle solved is puzzle ${maxPuzzle}
+                            </c:when><c:otherwise>
+                                chapter not played yet
+                            </c:otherwise></c:choose>
+                        </dd>
+                    </c:forEach>
+                </dl>
+            </section>
+
+            <c:if test="${profile.self}">
+                <section class="mt-5" aria-labelledby="played-games">
+                    <h2 class="mb-3" id="played-games">Played games</h2>
+                    <p>
+                        You can find a list of your past games in the
+                        <a href="${url.forPath(Paths.GAMES_HISTORY)}">games history</a>.
+                    </p>
+                </section>
+
+                <section class="mt-5" aria-labelledby="account-information">
+                    <h2 class="mb-3" id="account-information">Account Information</h2>
+                    <p>
+                        Your current email:
+                        <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
+                    </p>
+                    <p>
+                        Change your account information, password or delete your account in the
+                        <a href="${url.forPath(Paths.USER_SETTINGS)}"
+                           title="Edit or delete your CodeDefenders account.">account settings</a>.
+                    </p>
+                </section>
             </c:if>
-            <c:forEach items="${profile.unlockedAchievements}" var="achievement">
-                <t:achievement_badge achievement="${achievement}"/>
-            </c:forEach>
+
         </div>
-        <c:if test="${profile.lockedAchievements.size() > 0}">
-            <button class="btn btn-outline-primary btn-sm mt-3" onclick="
-                document.querySelector('.locked-achievements').classList.toggle('hidden');
-                this.innerText = this.innerText === 'Show all achievements' ? 'Hide locked achievements' : 'Show all achievements';
-            ">Show all achievements
-            </button>
-            <div class="achievements locked-achievements hidden">
-                <c:forEach items="${profile.lockedAchievements}" var="achievement">
-                    <t:achievement_badge achievement="${achievement}"/>
-                </c:forEach>
-            </div>
-        </c:if>
-    </section>
-
-    <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
-        <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
-
-        <div class="dashboards">
-            <%--@elvariable id="stats" type="org.codedefenders.dto.UserStats"--%>
-            <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
-
-            <t:dashboard_pie
-                    type="mutants" title="Mutants created"
-                    total="${stats.totalMutants}"
-                    percentage="${stats.aliveMutantsPercentage}"
-                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
-                    label2="Killed mutants:" value2="${stats.killedMutants}"
-            />
-
-            <t:dashboard_pie
-                    type="tests" title="Tests written"
-                    total="${stats.totalTests}"
-                    percentage="${stats.killingTestsPercentage}"
-                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
-                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
-            />
-
-            <t:dashboard_pie
-                    type="points" title="Points earned"
-                    total="${stats.totalPoints}"
-                    percentage="${stats.testPointsPercentage}"
-                    label1="By writing tests:" value1="${stats.totalPointsTests}"
-                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
-            />
-
-            <t:dashboard_pie
-                    type="games" title="Games played"
-                    total="${stats.totalGames}"
-                    percentage="${stats.defenderGamesPercentage}"
-                    label1="As defender:" value1="${stats.defenderGames}"
-                    label2="As attacker:" value2="${stats.attackerGames}"
-            />
-        </div>
-
-        <dl class="other-stats mt-3">
-            <dt>Average points per tests:</dt>
-            <dd>${stats.avgPointsTests}</dd>
-
-            <dt>Average points per mutant:</dt>
-            <dd>${stats.avgPointsMutants}</dd>
-        </dl>
-    </section>
-
-    <section class="mt-5 statistics" aria-labelledby="stats-melee">
-        <h2 class="mb-3" id="stats-melee">Statistics for Melee Games</h2>
-
-        <div class="dashboards">
-            <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
-
-            <t:dashboard_pie
-                    type="mutants" title="Mutants created"
-                    total="${stats.totalMutants}"
-                    percentage="${stats.aliveMutantsPercentage}"
-                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
-                    label2="Killed mutants:" value2="${stats.killedMutants}"
-            />
-
-            <t:dashboard_pie
-                    type="tests" title="Tests written"
-                    total="${stats.totalTests}"
-                    percentage="${stats.killingTestsPercentage}"
-                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
-                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
-            />
-
-            <t:dashboard_pie
-                    type="points" title="Points earned"
-                    total="${stats.totalPoints}"
-                    percentage="${stats.testPointsPercentage}"
-                    label1="By writing tests:" value1="${stats.totalPointsTests}"
-                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
-            />
-        </div>
-
-        <dl class="other-stats mt-3">
-            <dt>Total melee games played:</dt>
-            <dd>${stats.totalGames}</dd>
-
-            <dt>Average points per tests:</dt>
-            <dd>${stats.avgPointsTests}</dd>
-
-            <dt>Average points per mutant:</dt>
-            <dd>${stats.avgPointsMutants}</dd>
-        </dl>
-    </section>
-
-    <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
-        <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
-
-        <dl class="other-stats">
-            <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
-            <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
-            <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
-            <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
-                <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
-                <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
-                <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
-                <dd ${hasPlayed}>
-                    <c:choose><c:when test="${maxPuzzle != 0}">
-                        highest puzzle solved is puzzle ${maxPuzzle}
-                    </c:when><c:otherwise>
-                        chapter not played yet
-                    </c:otherwise></c:choose>
-                </dd>
-            </c:forEach>
-        </dl>
-    </section>
-
-    <c:if test="${profile.self}">
-        <section class="mt-5" aria-labelledby="played-games">
-            <h2 class="mb-3" id="played-games">Played games</h2>
-            <p>
-                You can find a list of your past games in the
-                <a href="${url.forPath(Paths.GAMES_HISTORY)}">games history</a>.
-            </p>
-        </section>
-
-        <section class="mt-5" aria-labelledby="account-information">
-            <h2 class="mb-3" id="account-information">Account Information</h2>
-            <p>
-                Your current email:
-                <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
-            </p>
-            <p>
-                Change your account information, password or delete your account in the
-                <a href="${url.forPath(Paths.USER_SETTINGS)}"
-                   title="Edit or delete your CodeDefenders account.">account settings</a>.
-            </p>
-        </section>
-    </c:if>
-
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+    </jsp:body>
+</p:main_page>

@@ -20,17 +20,21 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.util.CDIUtil" %>
-<%@ page import="org.codedefenders.util.URLUtils" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-	Role role = game.getRole(login.getUserId()); // required for header_game, too
+    Role role = game.getRole(login.getUserId()); // required for header_game, too
+    boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
+
+    pageContext.setAttribute("game", game);
+    pageContext.setAttribute("role", role);
+    pageContext.setAttribute("openEquivalenceDuel", openEquivalenceDuel);
 %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
@@ -55,53 +59,40 @@
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
-<jsp:include page="/jsp/header_game.jsp"/>
 
-<jsp:include page="/jsp/player_feedback.jsp"/>
-<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
-<jsp:include page="/jsp/battleground/game_history.jsp"/>
+<p:game_page>
+    <jsp:include page="/jsp/player_feedback.jsp"/>
+    <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+    <jsp:include page="/jsp/battleground/game_history.jsp"/>
 
-<%
-    boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
+    <c:choose>
+        <c:when test="${role == Role.ATTACKER}">
+            <c:choose>
+                <c:when test="${openEquivalenceDuel}">
+                    <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>
+                </c:when>
+                <c:otherwise>
+                    <jsp:include page="/jsp/battleground/attacker_view.jsp"/>
+                </c:otherwise>
+            </c:choose>
+        </c:when>
+        <c:when test="${role == Role.DEFENDER}">
+            <jsp:include page="/jsp/battleground/defender_view.jsp"/>
+        </c:when>
+        <c:when test="${role == Role.OBSERVER}">
+            <jsp:include page="/jsp/battleground/creator_view.jsp"/>
+        </c:when>
+    </c:choose>
 
-    switch (role) {
-        case ATTACKER:
-            if (openEquivalenceDuel) { %>
-                <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>
-            <% } else { %>
-                <jsp:include page="/jsp/battleground/attacker_view.jsp"/>
-            <% }
-            break;
-        case DEFENDER:
-            %><jsp:include page="/jsp/battleground/defender_view.jsp"/>
-            <%
-            break;
-        case OBSERVER:
-            %><jsp:include page="/jsp/battleground/creator_view.jsp"/><%
-            break;
-        default:
-            // TODO(Alex): Do not redirect from JSP!!
-            response.sendRedirect(CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.GAMES_OVERVIEW));
-            return;
-    }
-%>
-
-<%
-    if (game.isCapturePlayersIntention()) {
-        if (role == Role.DEFENDER) {
-%>
-    <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
-<%
-        } else if (role == Role.ATTACKER && !openEquivalenceDuel) {
-%>
-    <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
-<%
-        }
-    }
-%>
-
-<!-- This corresponds to dispatcher.Dispatch -->
-<%@ include file="/jsp/footer_game.jsp" %>
+    <c:if test="${game.capturePlayersIntention}">
+        <c:if test="${role == Role.DEFENDER}">
+            <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
+        </c:if>
+        <c:if test="${role == Role.ATTACKER && !openEquivalenceDuel}">
+            <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
+        </c:if>
+    </c:if>
+</p:game_page>
 
 
 <% previousSubmission.clear(); %>

@@ -1,5 +1,4 @@
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %><%--
+<%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -19,45 +18,47 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Imprint & Privacy Policy"); %>
-
-<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
-
-<% if (login.isLoggedIn()) { %>
-    <jsp:include page="/jsp/header.jsp"/>
-<% } else { %>
-    <jsp:include page="/jsp/header_logout.jsp"/>
-<% } %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
 
 <%
     String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
     String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
+    pageContext.setAttribute("siteNotice", siteNotice);
+    pageContext.setAttribute("privacyNotice", privacyNotice);
 %>
 
-<div class="container">
+<p:main_page title="Imprint & Privacy Policy">
+    <div class="container">
 
-    <h3 class="mb-3">Imprint</h3>
+        <h3 class="mb-3">Imprint</h3>
 
-    <div class="bg-light rounded-3 p-3 mb-3">
-        <% if (siteNotice.isEmpty()) { %>
-            <p class="mb-0">Please add an imprint in the system settings.</p>
-        <% } else { %>
-            <p style="white-space: pre-wrap" class="mb-0"><%=siteNotice%></p>
-        <% } %>
+        <div class="bg-light rounded-3 p-3 mb-3">
+            <c:choose>
+                <c:when test="${empty siteNotice}">
+                    <p class="mb-0">Please add an imprint in the system settings.</p>
+                </c:when>
+                <c:otherwise>
+                    <p style="white-space: pre-wrap" class="mb-0"><c:out value="${siteNotice}" escapeXml="false"/></p>
+                </c:otherwise>
+            </c:choose>
+        </div>
+
+        <h3 class="mt-4 mb-3">Privacy Policy</h3>
+
+        <div class="bg-light rounded-3 p-3 mb-3">
+            <c:choose>
+                <c:when test="${empty privacyNotice}">
+                    <p class="mb-0">Please add a privacy policy in the system settings.</p>
+                </c:when>
+                <c:otherwise>
+                    <p style="white-space: pre-wrap" class="mb-0"><c:out value="${privacyNotice}" escapeXml="false"/></p>
+                </c:otherwise>
+            </c:choose>
+        </div>
+
     </div>
-
-    <h3 class="mt-4 mb-3">Privacy Policy</h3>
-
-    <div class="bg-light rounded-3 p-3 mb-3">
-        <% if (privacyNotice.isEmpty()) { %>
-            <p class="mb-0">Please add a privacy policy in the system settings.</p>
-        <% } else { %>
-            <p style="white-space: pre-wrap" class="mb-0"><%=privacyNotice%></p>
-        <% } %>
-    </div>
-
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+</p:main_page>

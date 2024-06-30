@@ -24,14 +24,12 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
-<%@ page import="org.codedefenders.model.Player" %>
-<%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
+<%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.model.UserMeleeGameInfo" %>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Game History"); %>
+<%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
@@ -54,11 +52,9 @@
     }
 %>
 
-<jsp:include page="/jsp/header.jsp"/>
-
 <div class="container">
 
-    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
+    <h2 class="mb-4">Game History</h2>
 
     <h3 class="mt-4 mb-3">Battlegrounds</h3>
     <table class="table table-striped table-v-align-middle">
@@ -324,5 +320,3 @@
     </script>
 
 </div>
-
-<%@ include file="/jsp/footer.jsp" %>

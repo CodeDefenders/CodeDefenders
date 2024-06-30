@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -43,8 +44,11 @@
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    final String title = puzzle.getTitle();
-    final String description = puzzle.getDescription();
+    String title = "Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle();
+
+    pageContext.setAttribute("game", game);
+    pageContext.setAttribute("puzzle", puzzle);
+    pageContext.setAttribute("title", title);
 %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -83,13 +87,11 @@
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(false);
-    gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
 
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    testErrorHighlighting.setCodeDivSelector("#ut-div");
     if (previousSubmission.hasErrorLines()) {
         testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
@@ -111,80 +113,85 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/header.jsp"/>
+<p:main_page title="${title}">
+    <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+    </jsp:attribute>
 
-<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+    <jsp:body>
+        <t:game_js_init/>
 
-<div id="game-container" class="container-fluid">
+        <div id="game-container" class="container-fluid">
 
-    <h4><b><%=title%></b></h4>
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-        <h4 class="m-0"><%=description%></h4>
-        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
-    </div>
-    <hr>
+            <h4><b>${title}</b></h4>
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+                <h4 class="m-0">${puzzle.description}</h4>
+                <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+            </div>
+            <hr>
 
-    <div class="row">
-        <div class="col-xl-6 col-12" id="cut-div">
-            <div class="game-component-header"><h3>Class Under Test</h3></div>
-            <%-- <t:defender_intention_collection_note/>
-                 for defender intetion collection, not needed here --%>
-            <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
-            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        </div>
+            <div class="row">
+                <div class="col-xl-6 col-12" id="cut-div">
+                    <div class="game-component-header"><h3>Class Under Test</h3></div>
+                    <%-- <t:defender_intention_collection_note/>
+                         for defender intetion collection, not needed here --%>
+                    <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+                    <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+                </div>
 
-        <div class="col-xl-6 col-12" id="ut-div">
-            <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
+                <div class="col-xl-6 col-12" id="ut-div">
+                    <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
-            <div class="game-component-header">
-                <h3>Write a new JUnit test here</h3>
-                <div>
-                    <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                        Defend
-                    </button>
+                    <div class="game-component-header">
+                        <h3>Write a new JUnit test here</h3>
+                        <div>
+                            <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
+                                    ${game.state != GameState.ACTIVE ? 'disabled' : ''}>
+                                Defend
+                            </button>
 
-                    <script type="module">
-                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-                        const testProgressBar = await objects.await('testProgressBar');
+                            <script type="module">
+                                import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                                const testProgressBar = await objects.await('testProgressBar');
 
 
-                        document.getElementById('submitTest').addEventListener('click', function (event) {
-                            this.form.submit();
-                            this.disabled = true;
-                            testProgressBar.activate();
-                        });
-                    </script>
+                                document.getElementById('submitTest').addEventListener('click', function (event) {
+                                    this.form.submit();
+                                    this.disabled = true;
+                                    testProgressBar.activate();
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <form id="def"
+                          action="${url.forPath(Paths.PUZZLE_GAME)}"
+                          method="post">
+                        <input type="hidden" name="formType" value="createTest">
+                        <input type="hidden" name="gameId" value="${game.id}">
+                        <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
+                             for defender intention collection, not needed here --%>
+
+                        <jsp:include page="/jsp/game_components/test_editor.jsp"/>
+                    </form>
+
+                    <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
                 </div>
             </div>
 
-            <form id="def"
-                  action="${url.forPath(Paths.PUZZLE_GAME)}"
-                  method="post">
-                <input type="hidden" name="formType" value="createTest">
-                <input type="hidden" name="gameId" value="<%= game.getId() %>">
-                <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
-                     for defender intention collection, not needed here --%>
+            <div class="row">
+                <div class="col-xl-6 col-12">
+                    <t:mutant_accordion/>
+                </div>
 
-                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
-            </form>
-
-            <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
+                <div class="col-xl-6 col-12">
+                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                    <t:test_accordion/>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-xl-6 col-12">
-            <t:mutant_accordion/>
-        </div>
-
-        <div class="col-xl-6 col-12">
-            <div class="game-component-header"><h3>JUnit Tests</h3></div>
-            <t:test_accordion/>
-        </div>
-    </div>
-
-<%@ include file="/jsp/footer_game.jsp"%>
+    </jsp:body>
+</p:main_page>
 
 
 <% previousSubmission.clear(); %>

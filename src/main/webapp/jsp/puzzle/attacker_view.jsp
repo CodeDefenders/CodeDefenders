@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -44,16 +45,17 @@
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    final String title = puzzle.getTitle();
-    final String description = puzzle.getDescription();
-
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
+    String title = "Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle();
+
+    pageContext.setAttribute("game", game);
+    pageContext.setAttribute("cut", cut);
+    pageContext.setAttribute("puzzle", puzzle);
+    pageContext.setAttribute("showTestAccordion", showTestAccordion);
+    pageContext.setAttribute("title", title);
 %>
 
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
@@ -79,13 +81,11 @@
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(false);
-    gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
 
 <jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    mutantErrorHighlighting.setCodeDivSelector("#cut-div");
     if (previousSubmission.hasErrorLines()) {
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
@@ -111,64 +111,68 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/header.jsp"/>
+<p:main_page title="${title}">
+    <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+    </jsp:attribute>
 
-<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
+    <jsp:body>
+        <div id="game-container" class="container-fluid">
 
-<div id="game-container" class="container-fluid">
+            <h4><b>${title}</b></h4>
+            <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+                <h4 class="m-0">${puzzle.description}</h4>
+                <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+            </div>
+            <hr>
 
-    <h4><b><%=title%></b></h4>
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-        <h4 class="m-0"><%=description%></h4>
-        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
-    </div>
-    <hr>
+            <div class="row">
+                <div class="col-xl-6 col-12">
+                    <t:mutant_accordion/>
 
-    <div class="row">
-        <div class="col-xl-6 col-12">
-            <t:mutant_accordion/>
-
-            <% if (showTestAccordion) { %>
-                <div id="tests-div">
-                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
-                    <t:test_accordion/>
+                    <c:if test="${showTestAccordion}">
+                        <div id="tests-div">
+                            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                            <t:test_accordion/>
+                        </div>
+                    </c:if>
                 </div>
-            <% } %>
-        </div>
 
-        <div class="col-xl-6 col-12" id="cut-div">
-            <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
+                <div class="col-xl-6 col-12" id="cut-div">
+                    <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
-            <div class="game-component-header">
-                <h3>Create a mutant here</h3>
-                <div>
+                    <div class="game-component-header">
+                        <h3>Create a mutant here</h3>
+                        <div>
 
-                    <form id="reset" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
-                        <input type="hidden" name="formType" value="reset">
-                        <input type="hidden" name="gameId" value="<%= game.getId() %>">
-                        <button class="btn btn-warning" id="btnReset">
-                            Reset
-                        </button>
+                            <form id="reset" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
+                                <input type="hidden" name="formType" value="reset">
+                                <input type="hidden" name="gameId" value="${game.id}">
+                                <button class="btn btn-warning" id="btnReset">
+                                    Reset
+                                </button>
+                            </form>
+
+                            <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
+                                                    intentionCollectionEnabled="false"/>
+                        </div>
+                    </div>
+
+                    <form id="atk" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
+                        <input type="hidden" name="formType" value="createMutant">
+                        <input type="hidden" name="gameId" value="${game.id}">
+                        <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
+
+                        <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+                        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+                        <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
                     </form>
-
-                    <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
-                                            intentionCollectionEnabled="false"/>
                 </div>
             </div>
-
-            <form id="atk" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
-                <input type="hidden" name="formType" value="createMutant">
-                <input type="hidden" name="gameId" value="<%= game.getId() %>">
-                <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
-
-                <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
-                <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-                <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
-            </form>
         </div>
-    </div>
 
-<%@ include file="/jsp/footer_game.jsp" %>
-
+        <t:game_js_init/>
+    </jsp:body>
+</p:main_page>
 
 <% previousSubmission.clear(); %>

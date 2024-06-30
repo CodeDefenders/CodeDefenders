@@ -20,17 +20,12 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Create Games"); %>
+<p:main_page title="Create Games">
+    <div class="container">
+        <t:admin_navigation activePage="adminCreateGames"/>
 
-<jsp:include page="/jsp/header.jsp"/>
-
-<div class="container">
-    <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
-    <jsp:include page="/jsp/admin_navigation.jsp"/>
-
-    <t:create_games/>
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>
+        <t:create_games/>
+    </div>
+</p:main_page>

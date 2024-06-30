@@ -39,6 +39,7 @@ import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.JspWorkaround;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
@@ -91,7 +92,7 @@ public class GamesOverview extends HttpServlet {
         boolean gamesCreatable = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         request.setAttribute("gamesCreatable", gamesCreatable);
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.USER_GAMES_OVERVIEW_JSP);
-        dispatcher.forward(request, response);
+
+        JspWorkaround.forwardInWrapper(request, response, "My Games", Constants.USER_GAMES_OVERVIEW_JSP);
     }
 }

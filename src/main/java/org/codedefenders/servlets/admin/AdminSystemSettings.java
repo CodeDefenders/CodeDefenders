@@ -19,7 +19,9 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -225,7 +227,13 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The email address to use for teacher account applications.";
             }
-        },
+        };
+
+        public String getReadableName() {
+            return Arrays.stream(this.name().split("_"))
+                    .map(s -> s.charAt(0) + s.substring(1).toLowerCase())
+                    .collect(Collectors.joining(" "));
+        }
     }
 
     public enum SETTING_TYPE {

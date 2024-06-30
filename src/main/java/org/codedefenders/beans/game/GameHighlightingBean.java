@@ -26,11 +26,6 @@ public class GameHighlightingBean {
     private GameHighlightingDTO gameHighlightingData;
 
     /**
-     * Selector for the div the CodeMirror container is in. Should only contain one CodeMirror instance.
-     */
-    private String codeDivSelector;
-
-    /**
      * Show a button to flag a selected mutant as equivalent.
      */
     private Boolean enableFlagging;
@@ -48,7 +43,6 @@ public class GameHighlightingBean {
     private Integer gameId;
 
     public GameHighlightingBean() {
-        codeDivSelector = null;
         enableFlagging = null;
         gameHighlightingData = null;
         gameMode = null;
@@ -67,10 +61,6 @@ public class GameHighlightingBean {
         gameHighlightingData.setAlternativeTestData(tests);
     }
 
-    public void setCodeDivSelector(String codeDivSelector) {
-        this.codeDivSelector = codeDivSelector;
-    }
-
     public void setEnableFlagging(boolean enableFlagging) {
         this.enableFlagging = enableFlagging;
     }
@@ -81,10 +71,6 @@ public class GameHighlightingBean {
     }
 
     // --------------------------------------------------------------------------------
-
-    public String getCodeDivSelector() {
-        return codeDivSelector;
-    }
 
     public GameMode getGameMode() {
         return gameMode;
