@@ -72,6 +72,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 <%-- Mutant editor in player mode is the same as class viewer in defender --%>
+<%--
 <jsp:useBean id="mutantEditor"
              class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <%
@@ -83,6 +84,7 @@
         mutantEditor.setMutantCodeForClass(cut);
     }
 %>
+--%>
 
 
 <jsp:useBean id="gameHighlighting"

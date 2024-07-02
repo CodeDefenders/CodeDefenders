@@ -2,23 +2,29 @@ package org.codedefenders.beans.game;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractCollection;
 import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.FileUtils;
 
 /**
  * <p>Provides data for the mutant editor game component.</p>
  * <p>Bean Name: {@code mutantEditor}</p>
  */
+@Named("mutantEditor")
 @RequestScoped
 public class MutantEditorBean {
 
@@ -53,13 +59,27 @@ public class MutantEditorBean {
     private Integer editableLinesEnd;
 
     @Inject
-    public MutantEditorBean(GameClassRepository gameClassRepo) {
+    public MutantEditorBean(GameClassRepository gameClassRepo, GameProducer gameProducer,
+                            PreviousSubmissionBean previousSubmission) {
+        AbstractGame game = gameProducer.getGame();
+        GameClass clazz = game.getCUT();
+
         this.gameClassRepo = gameClassRepo;
-        className = null;
         mutantCode = null;
-        dependencies = new HashMap<>();
         editableLinesStart = null;
         editableLinesEnd = null;
+
+        setClassName(clazz.getName());
+        setDependenciesForClass(clazz);
+        if (previousSubmission.hasMutant()) {
+            setPreviousMutantCode(previousSubmission.getMutantCode());
+        } else {
+            setMutantCodeForClass(clazz);
+        }
+
+        if (game instanceof PuzzleGame p) {
+            setEditableLinesForPuzzle(p.getPuzzle());
+        }
     }
 
     /**
@@ -85,6 +105,7 @@ public class MutantEditorBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
+        dependencies = new HashMap<>();
         for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);

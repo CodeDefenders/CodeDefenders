@@ -19,94 +19,77 @@
 
 --%>
 
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="mutantEditor" type="org.codedefenders.beans.game.MutantEditorBean"--%>
+
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <%--
     Displays the mutant code in a CodeMirror textarea.
 --%>
 
-<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
-<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-
 <div class="card game-component-resize">
-
-    <%-- no dependencies -> no tabs --%>
-    <%
-        if (!mutantEditor.hasDependencies()) {
-    %>
-
-        <div class="card-body p-0 codemirror-fill loading">
-            <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
-        </div>
-
-    <%-- dependencies exist -> tab system --%>
-    <%
-        } else {
-            int currentId = 0;
-    %>
-
-        <div class="card-header">
-            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-1 active" data-bs-toggle="tab"
-                            id="mutant-editor-tab-<%=currentId%>"
-                            data-bs-target="#mutant-editor-pane-<%=currentId%>"
-                            aria-controls="mutant-editor-pane-<%=currentId%>"
-                            type="button" role="tab" aria-selected="true">
-                        ${mutantEditor.className}
-                    </button>
-                </li>
-                <%
-                    for (String depName : mutantEditor.getDependencies().keySet()) {
-                        currentId++;
-                %>
+    <c:choose>
+        <c:when test="${!mutantEditor.hasDependencies()}">
+            <%-- no dependencies -> no tabs --%>
+            <div class="card-body p-0 codemirror-fill loading">
+                <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <div class="card-header">
+                <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link py-1" data-bs-toggle="tab"
-                                id="mutant-editor-tab-<%=currentId%>"
-                                data-bs-target="#mutant-editor-pane-<%=currentId%>"
-                                aria-controls="mutant-editor-pane-<%=currentId%>"
+                        <button class="nav-link py-1 active" data-bs-toggle="tab"
+                                id="mutant-editor-tab-0"
+                                data-bs-target="#mutant-editor-pane-0"
+                                aria-controls="mutant-editor-pane-0"
                                 type="button" role="tab" aria-selected="true">
-                            <%=depName%>
+                            ${mutantEditor.className}
                         </button>
                     </li>
-                <%
-                    }
-                %>
-            </ul>
-        </div>
+                    <c:forEach var="depName" items="${mutantEditor.dependencies.keySet()}" varStatus="s">
+                        <c:set var="id" value="${s.index + 1}"/>
 
-        <%
-            currentId = 0;
-        %>
-
-        <div class="card-body p-0 codemirror-fill loading">
-            <div class="tab-content">
-                <div class="tab-pane active"
-                     id="mutant-editor-pane-<%=currentId%>"
-                     aria-labelledby="mutant-editor-tab-<%=currentId%>"
-                     role="tabpanel">
-                    <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
-                </div>
-                <%
-                    for (String depCode : mutantEditor.getDependencies().values()) {
-                        currentId++;
-                %>
-                    <div class="tab-pane"
-                         id="mutant-editor-pane-<%=currentId%>"
-                         aria-labelledby="mutant-editor-tab-<%=currentId%>"
-                         role="tabpanel">
-                             <pre class="m-0"><textarea id="mutant-editor-code-<%=currentId%>"
-                                                        name="mutant-editor-code-<%=currentId%>"
-                                                        title="mutant-editor-code-<%=currentId%>"
-                                                        readonly><%=depCode%></textarea></pre>
-                    </div>
-                <%
-                    }
-                %>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link py-1" data-bs-toggle="tab"
+                                    id="mutant-editor-tab-${id}"
+                                    data-bs-target="#mutant-editor-pane-${id}"
+                                    aria-controls="mutant-editor-pane-${id}"
+                                    type="button" role="tab" aria-selected="true">
+                                ${depName}
+                            </button>
+                        </li>
+                    </c:forEach>
+                </ul>
             </div>
-        </div>
 
-    <% } %>
+            <div class="card-body p-0 codemirror-fill loading">
+                <div class="tab-content">
+                    <div class="tab-pane active"
+                         id="mutant-editor-pane-0"
+                         aria-labelledby="mutant-editor-tab-0"
+                         role="tabpanel">
+                        <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
+                    </div>
+                    <c:forEach var="depCode" items="${mutantEditor.dependencies.values()}" varStatus="s">
+                        <c:set var="id" value="${s.index + 1}"/>
+
+                        <div class="tab-pane"
+                             id="mutant-editor-pane-${id}"
+                             aria-labelledby="mutant-editor-tab-${id}"
+                             role="tabpanel">
+                                 <pre class="m-0"><textarea id="mutant-editor-code-${id}"
+                                                            name="mutant-editor-code-${id}"
+                                                            title="mutant-editor-code-${id}"
+                                                            readonly>${depCode}</textarea></pre>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+        </c:otherwise>
+    </c:choose>
 
     <div class="card-footer">
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
