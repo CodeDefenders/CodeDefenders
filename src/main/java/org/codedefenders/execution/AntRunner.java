@@ -36,11 +36,11 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
@@ -76,17 +76,19 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final PlayerRepository playerRepo;
     private final MutantRepository mutantRepo;
     private final TestRepository testRepo;
+    private final GameClassRepository gameClassRepo;
 
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
-                     MutantRepository mutantRepo, TestRepository testRepo) {
+                     MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
         this.mutantRepo = mutantRepo;
         this.testRepo = testRepo;
+        this.gameClassRepo = gameClassRepo;
     }
 
     /**
@@ -95,10 +97,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     public TargetExecution testMutant(Mutant mutant, Test test) {
         logger.info("Running test {} on mutant {}", test.getId(), mutant.getId());
 
-        GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
-        if (cut == null) {
-            cut = GameClassDAO.getClassForId(mutant.getClassId());
-        }
+        var cut = gameClassRepo.getClassForGameId(mutant.getGameId())
+                .or(() -> gameClassRepo.getClassForId(mutant.getClassId()))
+                .orElseThrow();
 
         // Check if this mutant requires a test recompilation
         String target;
@@ -157,7 +158,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
      * {@inheritDoc}
      */
     public TargetExecution testOriginal(File dir, Test t) {
-        GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
+        GameClass cut = gameClassRepo.getClassForGameId(t.getGameId())
+                .orElseThrow();
 
         AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(),
                 cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());

@@ -15,6 +15,7 @@ import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -43,8 +44,9 @@ public class ClassroomCreateGamesBean extends CreateGamesBean {
                                     ClassroomService classroomService,
                                     MeleeGameRepository meleeGameRepo,
                                     MultiplayerGameRepository multiplayerGameRepo,
-                                    CreateGamesService createGamesService) {
-        super(stagedGames, messages, eventDAO, userRepo, createGamesService);
+                                    CreateGamesService createGamesService,
+                                    GameClassRepository gameClassRepo) {
+        super(stagedGames, messages, eventDAO, userRepo, createGamesService, gameClassRepo);
         this.classroomService = classroomService;
         this.userRepo = userRepo;
         this.meleeGameRepo = meleeGameRepo;

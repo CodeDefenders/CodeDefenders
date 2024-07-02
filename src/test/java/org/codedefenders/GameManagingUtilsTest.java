@@ -41,6 +41,7 @@ import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
@@ -93,7 +94,8 @@ public class GameManagingUtilsTest {
                         MeleeGameRepository.class,
                         MultiplayerGameRepository.class,
                         PuzzleRepository.class,
-                        PlayerRepository.class)
+                        PlayerRepository.class,
+                        GameClassRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)

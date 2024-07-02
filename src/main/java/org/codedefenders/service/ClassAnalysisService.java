@@ -28,9 +28,9 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.persistence.database.GameClassRepository;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -41,10 +41,13 @@ public class ClassAnalysisService {
     private final LoadingCache<Integer, ClassAnalysisResult> cache;
 
     private final ClassCodeAnalyser classCodeAnalyser;
+    private final GameClassRepository gameClassRepo;
 
     @Inject
-    public ClassAnalysisService(ClassCodeAnalyser classCodeAnalyser, MetricsRegistry metricsRegistry) {
+    public ClassAnalysisService(ClassCodeAnalyser classCodeAnalyser, MetricsRegistry metricsRegistry,
+                                GameClassRepository gameClassRepo) {
         this.classCodeAnalyser = classCodeAnalyser;
+        this.gameClassRepo = gameClassRepo;
 
         cache = CacheBuilder.newBuilder()
                 .expireAfterWrite(30, TimeUnit.MINUTES)
@@ -55,7 +58,8 @@ public class ClassAnalysisService {
                             @Nonnull
                             @Override
                             public ClassAnalysisResult load(@Nonnull Integer classId) throws Exception {
-                                GameClass clazz = GameClassDAO.getClassForId(classId);
+                                GameClass clazz = gameClassRepo.getClassForId(classId)
+                                        .orElseThrow();
                                 return classCodeAnalyser.analyze(clazz.getSourceCode())
                                         .orElseThrow(AnalysisException::new);
                             }

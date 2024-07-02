@@ -28,7 +28,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -537,7 +536,7 @@ public class PuzzleRepository {
         """;
 
         var clazz = queryRunner.query(query,
-                oneFromRS(GameClassDAO::gameClassFromRS),
+                oneFromRS(GameClassRepository::gameClassFromRS),
                 puzzleClassId
         );
         return clazz.orElse(null);
@@ -653,7 +652,7 @@ public class PuzzleRepository {
      * @return The created {@link PuzzleGame}.
      */
     private static PuzzleGame puzzleGameFromRS(ResultSet rs) throws SQLException {
-        GameClass cut = GameClassDAO.gameClassFromRS(rs);
+        GameClass cut = GameClassRepository.gameClassFromRS(rs);
         int gameId = rs.getInt("games.ID");
         int classId = rs.getInt("games.Class_ID");
         GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));

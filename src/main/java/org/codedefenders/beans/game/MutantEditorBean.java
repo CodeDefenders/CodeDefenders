@@ -6,12 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.util.FileUtils;
 
 /**
@@ -20,6 +21,9 @@ import org.codedefenders.util.FileUtils;
  */
 @RequestScoped
 public class MutantEditorBean {
+
+    private final GameClassRepository gameClassRepo;
+
     /**
      * The class name of the mutant.
      */
@@ -48,7 +52,9 @@ public class MutantEditorBean {
      */
     private Integer editableLinesEnd;
 
-    public MutantEditorBean() {
+    @Inject
+    public MutantEditorBean(GameClassRepository gameClassRepo) {
+        this.gameClassRepo = gameClassRepo;
         className = null;
         mutantCode = null;
         dependencies = new HashMap<>();
@@ -79,7 +85,7 @@ public class MutantEditorBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
-        for (Dependency dependency : GameClassDAO.getMappedDependenciesForClassId(clazz.getId())) {
+        for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
             String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));

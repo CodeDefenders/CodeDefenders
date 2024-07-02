@@ -1,6 +1,6 @@
 <%@ tag import="org.codedefenders.game.GameType" %>
 <%@ tag import="org.codedefenders.game.GameClass" %>
-<%@ tag import="org.codedefenders.database.GameClassDAO" %>
+<%@ tag import="org.codedefenders.persistence.database.GameClassRepository" %>
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.util.Paths" %>
@@ -9,11 +9,16 @@
 <%@ tag import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy" %>
+<%@ tag import="org.codedefenders.util.CDIUtil" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <c:set var="createGamesBean" value="${requestScope.createGamesBean}"/>
+
+<%
+    GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+%>
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between flex-wrap gap-1">
@@ -129,7 +134,7 @@
                             <label for="class-select" class="form-label">Class Under Test</label>
                             <div class="input-group mb-2">
                                 <select id="class-select" name="cut" class="form-control form-select">
-                                    <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
+                                    <% for (GameClass clazz : gameClassRepo.getAllPlayableClasses()) { %>
                                     <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                                     <% } %>
                                 </select>

@@ -11,7 +11,6 @@ import org.codedefenders.beans.creategames.AdminCreateGamesBean;
 import org.codedefenders.beans.creategames.ClassroomCreateGamesBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
@@ -20,6 +19,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -61,6 +61,9 @@ public class CreateGamesService {
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
 
+    @Inject
+    private GameClassRepository gameClassRepo;
+
     /**
      * Maps user ID to their admin staged games list.
      */
@@ -89,13 +92,13 @@ public class CreateGamesService {
     public AdminCreateGamesBean getContextForAdmin(int userId) {
         StagedGameList stagedGames = getStagedGamesForAdmin(userId);
         return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, meleeGameRepo,
-                multiplayerGameRepo, this);
+                multiplayerGameRepo, this, gameClassRepo);
     }
 
     public ClassroomCreateGamesBean getContextForClassroom(int userId, int classroomId) {
         StagedGameList stagedGames = getStagedGamesForClassroom(userId, classroomId);
         return new ClassroomCreateGamesBean(classroomId, stagedGames, messages, eventDAO, userRepo,
-                classroomService, meleeGameRepo, multiplayerGameRepo, this);
+                classroomService, meleeGameRepo, multiplayerGameRepo, this, gameClassRepo);
     }
 
     /**
@@ -105,7 +108,8 @@ public class CreateGamesService {
      */
     public boolean createGame(StagedGame stagedGame) {
         GameSettings gameSettings = stagedGame.getGameSettings();
-        GameClass cut = GameClassDAO.getClassForId(gameSettings.getClassId());
+        GameClass cut = gameClassRepo.getClassForId(gameSettings.getClassId())
+                .orElseThrow();
 
         /* Create the game. */
         AbstractGame game;

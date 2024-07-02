@@ -40,11 +40,11 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.cron.KillMapCronJob;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.model.Classroom;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
@@ -108,6 +108,9 @@ public class AdminKillmapManagement extends HttpServlet {
 
     @Inject
     private GameRepository gameRepo;
+
+    @Inject
+    private GameClassRepository gameClassRepo;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -223,7 +226,7 @@ public class AdminKillmapManagement extends HttpServlet {
         List<Integer> existingIds;
         switch (killmapType) {
             case CLASS:
-                existingIds = GameClassDAO.filterExistingClassIDs(ids);
+                existingIds = gameClassRepo.filterExistingClassIDs(ids);
                 break;
             case GAME:
                 existingIds = gameRepo.filterExistingGameIDs(ids);

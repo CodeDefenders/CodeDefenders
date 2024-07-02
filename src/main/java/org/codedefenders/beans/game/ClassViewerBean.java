@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.util.FileUtils;
 
 /**
@@ -35,7 +36,11 @@ public class ClassViewerBean {
      */
     private Map<String, String> dependencies;
 
-    public ClassViewerBean() {
+    private GameClassRepository gameClassRepo;
+
+    @Inject
+    public ClassViewerBean(GameClassRepository gameClassRepo) {
+        this.gameClassRepo = gameClassRepo;
         className = null;
         classCode = null;
         dependencies = new HashMap<>();
@@ -53,7 +58,7 @@ public class ClassViewerBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
-        for (Dependency dependency : GameClassDAO.getMappedDependenciesForClassId(clazz.getId())) {
+        for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
             String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));

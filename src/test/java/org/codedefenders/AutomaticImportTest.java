@@ -27,6 +27,7 @@ import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.service.ClassAnalysisService;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -63,6 +64,11 @@ public class AutomaticImportTest {
     @Produces
     public MetricsRegistry getMockedMetricsRegistry() {
         return mock(MetricsRegistry.class);
+    }
+
+    @Produces
+    public GameClassRepository getMockedGameClassRepo() {
+        return mock(GameClassRepository.class);
     }
 
     @Test

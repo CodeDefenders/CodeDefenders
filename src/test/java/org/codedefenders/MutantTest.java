@@ -28,18 +28,15 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
@@ -48,10 +45,8 @@ import com.github.difflib.patch.PatchFailedException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 public class MutantTest {
 
     @TempDir
@@ -123,13 +118,13 @@ public class MutantTest {
         int mockedGameId = 1;
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-        try (var mockedClassDAO = mockStatic(GameClassDAO.class)) {
-            mockedClassDAO.when(() -> GameClassDAO.getClassForId(mockedClassId))
-                    .thenReturn(mockedGameClass);
-
-            Mutant mutant = new Mutant(mockedGameId, mockedClassId, mutantJavaFile.getAbsolutePath(), null, true, 1, 2);
-            assertions.accept(mutant);
-        }
+        Mutant mutant = new Mutant(mockedGameId, mockedClassId, mutantJavaFile.getAbsolutePath(), null, true, 1, 2) {
+            @Override
+            protected GameClass getCUT() {
+                return mockedGameClass;
+            }
+        };
+        assertions.accept(mutant);
     }
 
     public static class MutantTestArguments implements ArgumentsProvider {

@@ -44,7 +44,6 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
@@ -60,6 +59,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -90,6 +90,7 @@ public class Installer {
     private final TestRepository testRepo;
     private final MutantRepository mutantRepo;
     private final PuzzleRepository puzzleRepo;
+    private final GameClassRepository gameClassRepo;
 
     @Inject
     public Installer(BackendExecutorService backend,
@@ -98,7 +99,8 @@ public class Installer {
             @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
                      TestRepository testRepo,
                      MutantRepository mutantRepo,
-                     PuzzleRepository puzzleRepo) {
+                     PuzzleRepository puzzleRepo,
+                     GameClassRepository gameClassRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
@@ -106,6 +108,7 @@ public class Installer {
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
         this.puzzleRepo = puzzleRepo;
+        this.gameClassRepo = gameClassRepo;
     }
 
     /**
@@ -222,7 +225,7 @@ public class Installer {
     private void installCUT(File cutFile) throws Exception {
         String fileName = cutFile.getName();
         String classAlias = cutFile.getParentFile().getName();
-        if (GameClassDAO.classExistsForAlias(classAlias)) {
+        if (gameClassRepo.classExistsForAlias(classAlias)) {
             logger.warn("Class alias {} does already exist. Skipping installation of CUT.", classAlias);
             return;
         }
@@ -246,7 +249,7 @@ public class Installer {
                 .active(false)
                 .create();
 
-        cut.insert();
+        gameClassRepo.storeClass(cut);
         logger.info("installCut(): Stored Class " + cut.getId() + " to " + cutJavaFilePath);
 
         installedCuts.put(classAlias, cut);
@@ -418,7 +421,7 @@ public class Installer {
         // Create a puzzle cut with another alias for this puzzle
         GameClass puzzleClass = GameClass.ofPuzzle(cut, puzzleAlias);
 
-        int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
+        int puzzleClassId = gameClassRepo.storeClass(puzzleClass);
         logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);
 
         // Read values from specification file

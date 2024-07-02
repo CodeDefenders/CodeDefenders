@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -96,7 +96,9 @@ public abstract class AbstractGame {
 
     public GameClass getCUT() {
         if (cut == null) {
-            cut = GameClassDAO.getClassForId(classId);
+            GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+            cut = gameClassRepo.getClassForId(classId)
+                    .orElseThrow();
         }
         return cut;
     }
