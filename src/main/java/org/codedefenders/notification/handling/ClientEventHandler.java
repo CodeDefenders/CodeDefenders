@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codedefenders.beans.game.GameChatBean;
-import org.codedefenders.database.GameChatDAO;
+import org.codedefenders.persistence.database.GameChatRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
@@ -70,7 +70,7 @@ public class ClientEventHandler {
     }
 
     public void visit(ClientGameChatEvent event) {
-        GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
+        GameChatRepository gameChatRepo = CDIUtil.getBeanFromCDI(GameChatRepository.class);
         Role role = playerRepo.getRole(user.getId(), event.getGameId());
 
         AbstractGame game = gameRepo.getGame(event.getGameId());
@@ -133,7 +133,7 @@ public class ClientEventHandler {
         serverEvent.setGameId(event.getGameId());
         serverEvent.setRole(role);
 
-        gameChatDAO.insertMessage(serverEvent);
+        gameChatRepo.insertMessage(serverEvent);
         notificationService.post(serverEvent);
     }
 

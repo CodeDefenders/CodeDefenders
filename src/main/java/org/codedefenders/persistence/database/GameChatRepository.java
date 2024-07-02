@@ -1,18 +1,31 @@
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 
+import com.google.common.collect.Lists;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+
 @ApplicationScoped
-public class GameChatDAO {
+public class GameChatRepository {
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public GameChatRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
+
     /**
      * Gets all chat messages for a game.
      * @param gameId The ID of the game the messages are from.
@@ -31,15 +44,15 @@ public class GameChatDAO {
                      users
                 WHERE chat.User_ID = users.User_ID
                   AND chat.Game_ID = ?
+                -- ORDER descending here, so the LIMIT limits to the n newest messages.
                 ORDER BY chat.Message_ID DESC
                 LIMIT ?;
         """;
 
-        List<ServerGameChatEvent> messages = DB.executeQueryReturnList(query, GameChatDAO::chatMessageFromRS,
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(limit));
-        Collections.reverse(messages);
-        return messages;
+        var messages = queryRunner.query(query, listFromRS(GameChatRepository::chatMessageFromRS),
+                gameId, limit);
+        // Reverse the list, so the newest message is the last.
+        return Lists.reverse(messages);
     }
 
     /**
@@ -68,16 +81,18 @@ public class GameChatDAO {
                 WHERE chat.User_ID = users.User_ID
                   AND chat.Game_ID = ?
                   AND (chat.Role = 'OBSERVER' OR chat.Role = ? OR chat.IsAllChat = 1)
+                -- ORDER descending here, so the LIMIT limits to the n newest messages.
                 ORDER BY chat.Message_ID DESC
                 LIMIT ?;
         """;
 
-        List<ServerGameChatEvent> messages = DB.executeQueryReturnList(query, GameChatDAO::chatMessageFromRS,
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(role.toString()),
-                DatabaseValue.of(limit));
-        Collections.reverse(messages);
-        return messages;
+
+        var messages = queryRunner.query(query, listFromRS(GameChatRepository::chatMessageFromRS),
+                gameId,
+                role.toString(),
+                limit);
+        // Reverse the list, so the newest message is the last.
+        return Lists.reverse(messages);
     }
 
     public int insertMessage(ServerGameChatEvent message) {
@@ -87,15 +102,13 @@ public class GameChatDAO {
                 VALUES (?, ?, ?, ?, ?);
         """;
 
-        DatabaseValue<?>[] values = new DatabaseValue[] {
-                DatabaseValue.of(message.getSenderId()),
-                DatabaseValue.of(message.isAllChat()),
-                DatabaseValue.of(message.getMessage()),
-                DatabaseValue.of(message.getRole().toString()),
-                DatabaseValue.of(message.getGameId())
-        };
-
-        return DB.executeUpdateQueryGetKeys(query, values);
+        return queryRunner.insert(query, generatedKeyFromRS(),
+                message.getSenderId(),
+                message.isAllChat(),
+                message.getMessage(),
+                message.getRole().toString(),
+                message.getGameId())
+                .orElseThrow();
     }
 
     /**
