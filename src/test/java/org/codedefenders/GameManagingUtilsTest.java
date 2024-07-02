@@ -35,7 +35,7 @@ import jakarta.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
@@ -74,7 +74,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(WeldJunit5Extension.class)
 public class GameManagingUtilsTest {
 
-    private static TestSmellsDAO mockedTestSmellDAO;
+    private static TestSmellRepository mockedTestSmellDAO;
 
     @TempDir
     public Path tempFolder;
@@ -107,7 +107,7 @@ public class GameManagingUtilsTest {
      */
     @BeforeAll
     public static void setupTestSmellDao() {
-        mockedTestSmellDAO = Mockito.mock(TestSmellsDAO.class);
+        mockedTestSmellDAO = Mockito.mock(TestSmellRepository.class);
     }
 
     /*
@@ -120,7 +120,7 @@ public class GameManagingUtilsTest {
 
     @ApplicationScoped
     @Produces
-    TestSmellsDAO produceBar() {
+    TestSmellRepository produceBar() {
         return mockedTestSmellDAO;
     }
 

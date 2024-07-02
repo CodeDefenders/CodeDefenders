@@ -37,7 +37,7 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
@@ -106,7 +106,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private TestSmellDetector testSmellDetector;
 
     @Inject
-    private TestSmellsDAO testSmellsDAO;
+    private TestSmellRepository testSmellRepo;
 
     @Inject
     private INotificationService notificationService;
@@ -246,7 +246,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
             testSmellDetector.detectSmells(testFile);
             // TODO Post Process Smells. See #500
-            testSmellsDAO.storeSmell(newTest, testFile);
+            testSmellRepo.storeSmell(newTest, testFile);
         } catch (Exception e) {
             logger.error("Failed to generate or store test smell.", e);
         }

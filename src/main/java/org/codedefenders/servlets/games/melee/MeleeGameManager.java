@@ -44,7 +44,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -142,7 +142,7 @@ public class MeleeGameManager extends HttpServlet {
     private IMutationTester mutationTester;
 
     @Inject
-    private TestSmellsDAO testSmellsDAO;
+    private TestSmellRepository testSmellRepo;
 
     @Inject
     private INotificationService notificationService;
@@ -1072,7 +1072,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest.getId());
+        List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(newTest.getId());
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

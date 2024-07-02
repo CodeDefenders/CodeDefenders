@@ -53,6 +53,7 @@ import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -74,20 +75,23 @@ public class MeleeGameService extends AbstractGameService {
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MeleeGameRepository meleeGameRepo;
+    private final TestSmellRepository testSmellRepo;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,
                             GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                             CodeDefendersAuth login, NotificationService notificationService,
                             TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
-                            MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo);
+                            MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo,
+                            TestSmellRepository testSmellRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.gameManagingUtils = gameManagingUtils;
         this.meleeGameRepo = meleeGameRepo;
+        this.testSmellRepo = testSmellRepo;
     }
 
     @Override

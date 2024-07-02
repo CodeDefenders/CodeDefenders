@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 
-import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
@@ -63,17 +63,19 @@ public abstract class AbstractGameService implements IGameService {
     protected MutantRepository mutantRepo;
     protected GameRepository gameRepo;
     protected PlayerRepository playerRepo;
+    protected TestSmellRepository testSmellRepo;
 
     @Inject
     public AbstractGameService(UserService userService, UserRepository userRepository,
                                TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
-                               PlayerRepository playerRepo) {
+                               PlayerRepository playerRepo, TestSmellRepository testSmellRepo) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
+        this.testSmellRepo = testSmellRepo;
     }
 
     @Inject
@@ -219,7 +221,7 @@ public abstract class AbstractGameService implements IGameService {
         return new TestDTO(test.getId(), creator, test.getScore(), viewable,
                 test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
                 killedMutantIds,
-                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test.getId()),
+                testSmellRepo.getDetectedTestSmellsForTest(test.getId()),
                 test.getGameId(),
                 test.getPlayerId(),
                 test.getLineCoverage().getLinesCovered(),
