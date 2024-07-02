@@ -7,17 +7,20 @@ import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.FileUtils;
 
 /**
  * <p>Provides data for the class viewer game component.</p>
  * <p>Bean Name: {@code classViewer}</p>
  */
+@Named("classViewer")
 @RequestScoped
 public class ClassViewerBean {
     /**
@@ -36,14 +39,14 @@ public class ClassViewerBean {
      */
     private Map<String, String> dependencies;
 
-    private GameClassRepository gameClassRepo;
+    private final GameClassRepository gameClassRepo;
 
     @Inject
-    public ClassViewerBean(GameClassRepository gameClassRepo) {
+    public ClassViewerBean(GameClassRepository gameClassRepo, GameProducer gameProducer) {
         this.gameClassRepo = gameClassRepo;
-        className = null;
-        classCode = null;
-        dependencies = new HashMap<>();
+        GameClass clazz = gameProducer.getGame().getCUT();
+        setClassCode(clazz);
+        setDependenciesForClass(clazz);
     }
 
     /**
@@ -58,6 +61,7 @@ public class ClassViewerBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
+        dependencies = new HashMap<>();
         for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
