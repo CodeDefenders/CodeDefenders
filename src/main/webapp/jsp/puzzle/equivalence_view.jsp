@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2024 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -22,8 +22,6 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
@@ -186,7 +184,7 @@
                 <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
                 <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
-                <form id="equivalenceForm" action="${url.forPath(Paths.BATTLEGROUND_GAME)}" method="post">
+                <form id="equivalenceForm" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
                     <input type="hidden" name="formType" value="resolveEquivalence">
                     <input type="hidden" name="gameId" value="<%=game.getId()%>">
                     <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%=equivMutant.getId()%>">
@@ -206,14 +204,14 @@
                             const testProgressBar = await objects.await('testProgressBar');
 
 
-                            document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
-                                if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
+                            document.getElementById("accept-equivalent-button").addEventListener('click', function () {
+                                if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
                                     this.form['resolveAction'].value = 'accept';
                                     this.form.submit();
                                     this.disabled = true;
                                 }
                             });
-                            document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
+                            document.getElementById("reject-equivalent-button").addEventListener('click', function () {
                                 this.form['resolveAction'].value = 'reject';
                                 this.form.submit();
                                 this.disabled = true;

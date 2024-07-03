@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,12 @@ import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
 import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -59,7 +65,9 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -75,13 +83,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS;
 import static org.codedefenders.servlets.util.ServletUtils.gameId;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
@@ -149,6 +158,12 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private PuzzleRepository puzzleRepo;
+
+    @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
+    private TestRepository testRepo;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -282,7 +297,7 @@ public class PuzzleGameManager extends HttpServlet {
      * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
      * @param uid    User ID of the user who plays the puzzle.
      * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or
-     *         {@code null} if any error occurred.
+     * {@code null} if any error occurred.
      */
     public PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
         String errorMsg = String.format("Error while preparing puzzle game for puzzle %d and user %d.",
@@ -334,11 +349,195 @@ public class PuzzleGameManager extends HttpServlet {
             case "createMutant":
                 createMutant(request, response, session);
                 break;
+            case "resolveEquivalence":
+                resolveEquivalence(request, response, session);
+                break;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
                 break;
         }
+    }
+
+    private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+            throws IOException {
+        final Optional<Integer> gameIdOpt = gameId(request);
+        if (gameIdOpt.isEmpty()) {
+            logger.error("Cannot resolve equivalence for this puzzle. Failed to retrieve gameId from request.");
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        final int gameId = gameIdOpt.get();
+        final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
+
+        final var mutantId = getIntParameter(request, "equivMutantId");
+        if (mutantId.isEmpty()) {
+            logger.error("Cannot resolve equivalence for this puzzle. Failed to retrieve equivMutantId from request.");
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        final var mutant = mutantRepo.getMutantById(mutantId.get());
+
+        final var action = getStringParameter(request, "resolveAction");
+        if (action.isEmpty()) {
+            logger.error("Cannot resolve equivalence for this puzzle. Failed to retrieve resolveAction from request.");
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        final var resolveAction = action.get();
+        switch (resolveAction) {
+            case "accept":
+                if (game.getPuzzle().isEquivalent()) {
+                    mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
+
+                    game.setState(GameState.SOLVED);
+
+                    messages.clear();
+                    boolean playerWroteKillingTest = false;
+                    messages.add(generateEquivalencePuzzleWonMessage(game, playerWroteKillingTest)).escape(false)
+                            .fadeOut(false);
+
+                    GameSolvedEvent gse = new GameSolvedEvent();
+                    gse.setGameId(gameId);
+                    notificationService.post(gse);
+                } else {
+                    mutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                    messages.add("No, this mutant is not equivalent to the class under test.");
+                    game.incrementCurrentRound();
+                }
+                mutantRepo.updateMutant(mutant);
+                puzzleRepo.updatePuzzleGame(game);
+                break;
+            case "reject":
+                final var test = ServletUtils.getStringParameter(request, "test");
+                if (test.isEmpty()) {
+                    previousSubmission.clear();
+                    logger.error("Cannot resolve equivalence for this puzzle. Failed to retrieve test from request.");
+                    response.setStatus(SC_BAD_REQUEST);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+                final String testText = test.get();
+
+                TestSubmittedEvent tse = new TestSubmittedEvent();
+                tse.setGameId(gameId);
+                tse.setUserId(login.getUserId());
+                notificationService.post(tse);
+
+                final var validationMessage = CodeValidator.validateTestCodeGetMessage(
+                        testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
+                boolean validationSuccess = validationMessage.isEmpty();
+
+                TestValidatedEvent tve = new TestValidatedEvent();
+                tve.setGameId(gameId);
+                tve.setUserId(login.getUserId());
+                tve.setSuccess(validationSuccess);
+                tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+                notificationService.post(tve);
+
+                if (!validationSuccess) {
+                    messages.addAll(validationMessage);
+                    previousSubmission.setTestCode(testText);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+
+                Test newTest;
+                try {
+                    newTest = gameManagingUtils.createTest(gameId, game.getClassId(),
+                            testText, login.getUserId(), MODE_PUZZLE_DIR);
+                } catch (IOException io) {
+                    messages.add(TEST_GENERIC_ERROR_MESSAGE);
+                    previousSubmission.setTestCode(testText);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+
+                logger.debug("Executing Action resolveEquivalence for mutant {} and test {}", mutantId,
+                        newTest.getId());
+                TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
+
+                if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
+                    logger.debug("compileTestTarget: " + compileTestTarget);
+                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+
+                    if (compileTestTarget != null) {
+                        String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
+                        // Extract the line numbers of the errors
+                        List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
+                        // Store them in the session, so they can be picked up later
+                        previousSubmission.setErrorLines(errorLines);
+                        // We introduce our decoration
+                        String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
+                        messages.add(decorate).escape(false).fadeOut(false);
+                    }
+
+                    previousSubmission.setTestCode(testText);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+                TargetExecution testOriginalTarget =
+                        TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
+                if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+                    logger.debug("testOriginalTarget: " + testOriginalTarget);
+                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
+                    messages.add(testOriginalTarget.message).fadeOut(false);
+                    previousSubmission.setTestCode(testText);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+                logger.debug("Test {} passed on the CUT", newTest.getId());
+
+                mutationTester.runEquivalenceTest(newTest, mutant); // updates mutant
+
+                if (mutant.getEquivalent() == PROVEN_NO) {
+                    logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(),
+                            mutant.getId());
+                    final String message = login.getSimpleUser().getName() + " killed mutant "
+                            + mutant.getId() + " in an equivalence duel.";
+                    Event notif = new Event(-1, gameId, login.getUserId(), message,
+                            EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis())
+                    );
+                    eventDAO.insert(notif);
+
+                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
+                    edwe.setGameId(gameId);
+                    edwe.setUserId(login.getUserId());
+                    edwe.setMutantId(mutant.getId());
+                    notificationService.post(edwe);
+
+                    game.setState(GameState.SOLVED);
+                    messages.clear();
+                    messages.add(generateEquivalencePuzzleWonMessage(game, true)).escape(false).fadeOut(false);
+
+                    GameSolvedEvent gse = new GameSolvedEvent();
+                    gse.setGameId(gameId);
+                    notificationService.post(gse);
+                } else { // ASSUMED_YES
+                    messages.add("Your test did not kill the mutant. Try again.");
+                    previousSubmission.setTestCode(testText); // keep the non-killing test?
+                    game.incrementCurrentRound();
+                }
+
+                TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+                ttme.setGameId(gameId);
+                ttme.setUserId(login.getUserId());
+                ttme.setTestId(newTest.getId());
+                notificationService.post(ttme);
+
+                testRepo.updateTest(newTest);
+                game.update();
+                break;
+            default:
+                logger.error("Cannot resolve equivalence for this puzzle. Invalid resolveAction: {}", resolveAction);
+                response.setStatus(SC_BAD_REQUEST);
+                break;
+        }
+        Redirect.redirectBack(request, response);
     }
 
     /**
@@ -747,7 +946,20 @@ public class PuzzleGameManager extends HttpServlet {
         message.append("Congratulations, your ")
                 .append(isAnAttackGame ? "mutant" : "test")
                 .append(" solved the puzzle!");
+        return generateNextPuzzleMessage(game, message);
+    }
 
+    private String generateEquivalencePuzzleWonMessage(PuzzleGame game, boolean killingTest) {
+        StringBuilder message = new StringBuilder();
+        if (killingTest) {
+            message.append("Congratulations, your test killed the equivalent mutant!");
+        } else {
+            message.append("Congratulations, this mutant is equivalent to the class under test!");
+        }
+        return generateNextPuzzleMessage(game, message);
+    }
+
+    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message) {
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
