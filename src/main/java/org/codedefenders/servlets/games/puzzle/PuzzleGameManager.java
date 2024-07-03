@@ -371,6 +371,13 @@ public class PuzzleGameManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
         final PuzzleGame game = puzzleRepo.getPuzzleGameForId(gameId);
 
+        if (game.getState() != GameState.ACTIVE) {
+            logger.error("Cannot resolve equivalence for this puzzle. Game is not active.");
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         final var mutantId = getIntParameter(request, "equivMutantId");
         if (mutantId.isEmpty()) {
             logger.error("Cannot resolve equivalence for this puzzle. Failed to retrieve equivMutantId from request.");
