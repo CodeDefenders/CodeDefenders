@@ -203,7 +203,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (game.getPuzzle().isEquivalencePuzzle()) {
             // claim all mutants as equivalent
-            game.getPuzzleMutants().forEach(m -> m.setEquivalent(Mutant.Equivalence.PENDING_TEST));
+            game.getMutants().forEach(m -> m.setEquivalent(Mutant.Equivalence.PENDING_TEST));
             request.getRequestDispatcher(PUZZLE_GAME_EQUIVALENCE_VIEW_JSP).forward(request, response);
             return;
         }
