@@ -28,6 +28,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -193,9 +194,11 @@
                     <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                     <div class="d-flex justify-content-between mt-2 mb-2">
-                        <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent
+                        <button class="btn btn-danger" id="accept-equivalent-button" type="button"
+                                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>Accept As Equivalent
                         </button>
-                        <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test
+                        <button class="btn btn-primary" id="reject-equivalent-button" type="button"
+                                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>Submit Killing Test
                         </button>
 
                         <script type="module">
