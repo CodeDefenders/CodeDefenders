@@ -307,17 +307,15 @@ public class PuzzleRepository {
         @Language("SQL") String query = """
                 INSERT INTO puzzle_chapters
 
-                (Chapter_ID,
-                Position,
+                (Position,
                 Title,
                 Description)
 
-                VALUES (?, ?, ?, ?);
+                VALUES (?, ?, ?);
         """;
 
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
-                chapter.getChapterId(),
                 chapter.getPosition(),
                 chapter.getTitle(),
                 chapter.getDescription()

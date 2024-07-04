@@ -136,6 +136,10 @@ public class Installer {
      * Maps the original class aliases to their storage directory.
      */
     private final Map<String, Path> pathMapping = new HashMap<>();
+    /**
+     * Maps the chapter IDs from the uploaded puzzle files to their ID in the database.
+     */
+    private final Map<Integer, Integer> chapterIdMapping =  new HashMap<>();
 
     /**
      * Looks for puzzle related files in a given directory.
@@ -382,8 +386,10 @@ public class Installer {
         String title = cfg.getProperty("title");
         String description = cfg.getProperty("description");
 
-        PuzzleChapter chapter = new PuzzleChapter(chapterId, position, title, description);
-        puzzleRepo.storePuzzleChapter(chapter);
+        PuzzleChapter chapter = new PuzzleChapter(-1, position, title, description);
+
+        int databaseId = puzzleRepo.storePuzzleChapter(chapter);
+        chapterIdMapping.put(chapterId, databaseId);
 
         logger.info("installPuzzleChapter() Stored puzzle chapter with id " + chapterId);
 
@@ -459,6 +465,13 @@ public class Installer {
             return;
         }
         int chapterId = chapterIdOpt.get();
+
+        if (!chapterIdMapping.containsKey(chapterId)) {
+            logger.warn("Couldn't get database chapter ID for chapter {}", chapterId);
+            return;
+        }
+        int databaseChapterId = chapterIdMapping.get(chapterId);
+
         Integer position = Optional.ofNullable(cfg.getProperty("position"))
                 .map(Integer::parseInt)
                 .orElse(null);
@@ -469,7 +482,8 @@ public class Installer {
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
         Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest,
-                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, databaseChapterId, position, title,
+                description);
         int puzzleId = puzzleRepo.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
