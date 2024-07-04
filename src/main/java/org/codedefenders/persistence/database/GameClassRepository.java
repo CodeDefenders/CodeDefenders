@@ -51,6 +51,7 @@ import static org.codedefenders.persistence.database.util.QueryUtils.batchParams
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
+import static org.codedefenders.util.NamingUtils.nextFreeName;
 
 /**
  * This class handles the database logic for Java classes.
@@ -483,5 +484,30 @@ public class GameClassRepository {
         @Language("SQL") String query =
                 "SELECT Class_ID FROM classes WHERE Class_ID in (%s);".formatted(idsString);
         return queryRunner.query(query, listFromRS(rs -> rs.getInt("Class_ID")));
+    }
+
+    public String nextFreeAlias(String bareAlias) {
+        return nextFreeAlias(bareAlias, 2);
+    }
+
+    private String nextFreeAlias(String bareAlias, int retries) {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM classes
+                WHERE Alias LIKE CONCAT(?, '%');
+                """;
+        List<String> similarAliases = queryRunner.query(query, listFromRS(rs -> rs.getString("Alias")), bareAlias);
+        String freeAlias = nextFreeName(similarAliases, bareAlias);
+
+        if (classExistsForAlias(freeAlias)) {
+            logger.warn("Alias already exists: '{}'", freeAlias);
+            if (retries > 0) {
+                return nextFreeAlias(bareAlias, retries - 1);
+            } else {
+                throw new RuntimeException("Couldn't find free alias.");
+            }
+        }
+
+        return freeAlias;
     }
 }
