@@ -128,6 +128,14 @@ public class Installer {
      */
     private Set<Integer> puzzleChapters = new HashSet<>();
 
+    /**
+     * Maps the original class aliases to their numbered version used for dodging naming collisions.
+     */
+    private final Map<String, String> aliasMapping = new HashMap<>();
+    /**
+     * Maps the original class aliases to their storage directory.
+     */
+    private final Map<String, Path> pathMapping = new HashMap<>();
 
     /**
      * Looks for puzzle related files in a given directory.
@@ -224,27 +232,26 @@ public class Installer {
      */
     private void installCUT(File cutFile) throws Exception {
         String fileName = cutFile.getName();
-        String classAlias = cutFile.getParentFile().getName();
-        if (gameClassRepo.classExistsForAlias(classAlias)) {
-            logger.warn("Class alias {} does already exist. Skipping installation of CUT.", classAlias);
-            return;
-        }
+        String alias = cutFile.getParentFile().getName();
+
+        String newAlias = gameClassRepo.nextFreeAlias(alias);
+        aliasMapping.put(alias, newAlias);
+        Path storagePath = FileUtils.nextFreeClassDirectory(alias);
+        pathMapping.put(alias, storagePath);
 
         String fileContent = Files.readString(cutFile.toPath(), Charset.defaultCharset());
-
-        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
-        String cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
+        String cutJavaFilePath = FileUtils.storeFile(storagePath, fileName, fileContent).toString();
         String cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
         String classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
 
         GameClass cut = GameClass.build()
                 .name(classQualifiedName)
-                .alias(classAlias)
+                .alias(newAlias)
                 .javaFile(cutJavaFilePath)
                 .classFile(cutClassFilePath)
-                .mockingEnabled(false) // TODO: dont't use a default value
-                .testingFramework(TestingFramework.JUNIT4) // TODO: dont't use a default value
-                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST) // TODO: dont't use a default value
+                .mockingEnabled(false) // TODO: don't use a default value
+                .testingFramework(TestingFramework.JUNIT4) // TODO: don't use a default value
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST) // TODO: don't use a default value
                 .puzzleClass(true)
                 .active(false)
                 .create();
@@ -252,9 +259,9 @@ public class Installer {
         gameClassRepo.storeClass(cut);
         logger.info("installCut(): Stored Class " + cut.getId() + " to " + cutJavaFilePath);
 
-        installedCuts.put(classAlias, cut);
-        installedMutants.put(classAlias, new HashMap<>());
-        installedTests.put(classAlias, new HashMap<>());
+        installedCuts.put(alias, cut);
+        installedMutants.put(alias, new HashMap<>());
+        installedTests.put(alias, new HashMap<>());
     }
 
     /**
@@ -279,7 +286,12 @@ public class Installer {
 
         String mutantFileContent = Files.readString(mutantFile.toPath(), Charset.defaultCharset());
 
-        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
+        Path cutDir = pathMapping.get(classAlias);
+        if (cutDir == null) {
+            logger.warn("Couldn't get storage path for CUT {}", classAlias);
+            return;
+        }
+
         Path folderPath = cutDir.resolve(Constants.CUTS_MUTANTS_DIR).resolve(String.valueOf(targetPosition));
         String javaFilePath = FileUtils.storeFile(folderPath, mutantFileName, mutantFileContent).toString();
         String classFilePath = Compiler.compileJavaFileForContent(javaFilePath, mutantFileContent);
@@ -321,7 +333,12 @@ public class Installer {
 
         String testFileContent = Files.readString(testFile.toPath(), Charset.defaultCharset());
 
-        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
+        Path cutDir = pathMapping.get(classAlias);
+        if (cutDir == null) {
+            logger.warn("Couldn't get storage path for CUT {}", classAlias);
+            return;
+        }
+
         Path folderPath = cutDir.resolve(Constants.CUTS_TESTS_DIR).resolve(String.valueOf(targetPosition));
         Path javaFilePath = FileUtils.storeFile(folderPath, testFileName, testFileContent);
         String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath.toString(),
@@ -405,7 +422,7 @@ public class Installer {
                 .map(Integer::parseInt)
                 .map(positionToMutantMap::get)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         String[] testPositions = cfg.getProperty("tests", "").split(",");
         Map<Integer, Test> positionToTestMap = installedTests.get(cutAlias);
@@ -413,13 +430,14 @@ public class Installer {
                 .map(Integer::parseInt)
                 .map(positionToTestMap::get)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .toList();
 
         String puzzleAliasExt = puzzleSpecFile.getName().replace(".properties", "");
         String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
 
         // Create a puzzle cut with another alias for this puzzle
-        GameClass puzzleClass = GameClass.ofPuzzle(cut, puzzleAlias);
+        String newAlias = gameClassRepo.nextFreeAlias(puzzleAlias);
+        GameClass puzzleClass = GameClass.ofPuzzle(cut, newAlias);
 
         int puzzleClassId = gameClassRepo.storeClass(puzzleClass);
         logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);
