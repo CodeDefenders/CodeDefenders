@@ -34,7 +34,8 @@ public class PuzzleInfo {
      */
     public static PuzzleInfo of(Puzzle p) {
         return new PuzzleInfo(p.getPuzzleId(), p.getChapterId(), p.getPosition(), p.getTitle(), p.getDescription(),
-            p.getMaxAssertionsPerTest(), p.getEditableLinesStart(), p.getEditableLinesEnd());
+                p.getMaxAssertionsPerTest(), p.getEditableLinesStart(), p.getEditableLinesEnd(), p.isEquivalent(),
+                p.isEquivalencePuzzle());
     }
 
     private int puzzleId;
@@ -46,9 +47,13 @@ public class PuzzleInfo {
     private Integer editableLinesStart;
     private Integer editableLinesEnd;
 
+    private boolean isEquivalent;
+    private boolean isEquivalencePuzzle;
+
     private PuzzleInfo(int puzzleId, Integer chapterId, Integer position, String title,
                        String description, int maxAssertionsPerTest,
-                       Integer editableLinesStart, Integer editableLinesEnd) {
+                       Integer editableLinesStart, Integer editableLinesEnd,
+                       boolean isEquivalent, boolean isEquivalencePuzzle) {
         this.puzzleId = puzzleId;
         this.chapterId = chapterId;
         this.position = position;
@@ -57,6 +62,8 @@ public class PuzzleInfo {
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.editableLinesStart = editableLinesStart;
         this.editableLinesEnd = editableLinesEnd;
+        this.isEquivalent = isEquivalent;
+        this.isEquivalencePuzzle = isEquivalencePuzzle;
     }
 
     public int getPuzzleId() {
@@ -89,5 +96,13 @@ public class PuzzleInfo {
 
     public Integer getEditableLinesEnd() {
         return editableLinesEnd;
+    }
+
+    public boolean isEquivalent() {
+        return isEquivalent;
+    }
+
+    public boolean isEquivalencePuzzle() {
+        return isEquivalencePuzzle;
     }
 }

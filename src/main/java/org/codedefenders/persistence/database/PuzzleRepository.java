@@ -76,10 +76,10 @@ public class PuzzleRepository {
      */
     public PuzzleChapter getPuzzleChapterForId(int chapterId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM puzzle_chapters
-                WHERE Chapter_ID = ?;
-        """;
+                        SELECT *
+                        FROM puzzle_chapters
+                        WHERE Chapter_ID = ?;
+                """;
 
         var chapter = queryRunner.query(query,
                 oneFromRS(PuzzleRepository::puzzleChapterFromRS),
@@ -95,10 +95,10 @@ public class PuzzleRepository {
      */
     public List<PuzzleChapter> getPuzzleChapters() {
         @Language("SQL") String query = """
-                SELECT *
-                FROM puzzle_chapters
-                ORDER BY Position;
-        """;
+                        SELECT *
+                        FROM puzzle_chapters
+                        ORDER BY Position;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(PuzzleRepository::puzzleChapterFromRS)
@@ -113,10 +113,10 @@ public class PuzzleRepository {
      */
     public Puzzle getPuzzleForId(int puzzleId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM puzzles
-                WHERE Puzzle_ID = ?;
-        """;
+                        SELECT *
+                        FROM puzzles
+                        WHERE Puzzle_ID = ?;
+                """;
 
         var puzzle = queryRunner.query(query,
                 oneFromRS(PuzzleRepository::puzzleFromRS),
@@ -132,10 +132,10 @@ public class PuzzleRepository {
      */
     public List<Puzzle> getPuzzles() {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_active_puzzles as puzzles
-                ORDER BY Chapter_ID, Position;
-        """;
+                        SELECT *
+                        FROM view_active_puzzles as puzzles
+                        ORDER BY Chapter_ID, Position;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(PuzzleRepository::puzzleFromRS)
@@ -148,15 +148,15 @@ public class PuzzleRepository {
      *
      * @param chapterId The chapter ID.
      * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
-     *     in the chapter.
+     * in the chapter.
      */
     public List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_active_puzzles as puzzles
-                WHERE Chapter_ID = ?
-                ORDER BY Position;
-        """;
+                        SELECT *
+                        FROM view_active_puzzles as puzzles
+                        WHERE Chapter_ID = ?
+                        ORDER BY Position;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(PuzzleRepository::puzzleFromRS),
@@ -172,10 +172,10 @@ public class PuzzleRepository {
      */
     public PuzzleGame getPuzzleGameForId(int gameId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_puzzle_games games
-                WHERE ID = ?;
-        """;
+                        SELECT *
+                        FROM view_puzzle_games games
+                        WHERE ID = ?;
+                """;
 
         var game = queryRunner.query(query,
                 oneFromRS(PuzzleRepository::puzzleGameFromRS),
@@ -193,12 +193,12 @@ public class PuzzleRepository {
      */
     public PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_puzzle_games games
-                WHERE Puzzle_ID = ?
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
-        """;
+                        SELECT *
+                        FROM view_puzzle_games games
+                        WHERE Puzzle_ID = ?
+                          AND Creator_ID = ?
+                        ORDER BY Timestamp DESC;
+                """;
 
         var game = queryRunner.query(query,
                 nextFromRS(PuzzleRepository::puzzleGameFromRS),
@@ -215,16 +215,16 @@ public class PuzzleRepository {
      * @param puzzleId The puzzle ID.
      * @param userId   The user ID.
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     *     given user. The list is sorted by the timestamp of the games.
+     * given user. The list is sorted by the timestamp of the games.
      */
     public List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_puzzle_games games
-                WHERE Puzzle_ID = ?
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
-        """;
+                        SELECT *
+                        FROM view_puzzle_games games
+                        WHERE Puzzle_ID = ?
+                          AND Creator_ID = ?
+                        ORDER BY Timestamp DESC;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(PuzzleRepository::puzzleGameFromRS),
@@ -239,16 +239,16 @@ public class PuzzleRepository {
      *
      * @param userId The user ID.
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
-     *     The list is sorted by the timestamp of the games.
+     * The list is sorted by the timestamp of the games.
      */
     public List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_puzzle_games games
-                WHERE State = 'ACTIVE'
-                  AND Creator_ID = ?
-                ORDER BY Timestamp DESC;
-        """;
+                        SELECT *
+                        FROM view_puzzle_games games
+                        WHERE State = 'ACTIVE'
+                          AND Creator_ID = ?
+                        ORDER BY Timestamp DESC;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(PuzzleRepository::puzzleGameFromRS),
@@ -264,22 +264,24 @@ public class PuzzleRepository {
      */
     public int storePuzzle(Puzzle puzzle) {
         @Language("SQL") String query = """
-                INSERT INTO puzzles
+                        INSERT INTO puzzles
 
-                (Class_ID,
-                Active_Role,
-                Level,
-                Max_Assertions,
-                Mutant_Validator_Level,
-                Editable_Lines_Start,
-                Editable_Lines_End,
-                Chapter_ID,
-                Position,
-                Title,
-                Description)
+                        (Class_ID,
+                        Active_Role,
+                        Level,
+                        Max_Assertions,
+                        Mutant_Validator_Level,
+                        Editable_Lines_Start,
+                        Editable_Lines_End,
+                        Chapter_ID,
+                        Position,
+                        Title,
+                        Description,
+                        IsEquivalent,
+                        IsEquivalencePuzzle)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """;
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                """;
 
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
@@ -293,7 +295,9 @@ public class PuzzleRepository {
                 puzzle.getChapterId(),
                 puzzle.getPosition(),
                 puzzle.getTitle(),
-                puzzle.getDescription()
+                puzzle.getDescription(),
+                puzzle.isEquivalent(),
+                puzzle.isEquivalencePuzzle()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
 
@@ -305,15 +309,15 @@ public class PuzzleRepository {
      */
     public int storePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
-                INSERT INTO puzzle_chapters
+                        INSERT INTO puzzle_chapters
 
-                (Chapter_ID,
-                Position,
-                Title,
-                Description)
+                        (Chapter_ID,
+                        Position,
+                        Title,
+                        Description)
 
-                VALUES (?, ?, ?, ?);
-        """;
+                        VALUES (?, ?, ?, ?);
+                """;
 
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
@@ -332,21 +336,21 @@ public class PuzzleRepository {
      */
     public int storePuzzleGame(PuzzleGame game) {
         @Language("SQL") String query = """
-                INSERT INTO games
+                        INSERT INTO games
 
-                (Class_ID,
-                Level,
-                Creator_ID,
-                MaxAssertionsPerTest,
-                MutantValidator,
-                State,
-                CurrentRound,
-                ActiveRole,
-                Mode,
-                Puzzle_ID)
+                        (Class_ID,
+                        Level,
+                        Creator_ID,
+                        MaxAssertionsPerTest,
+                        MutantValidator,
+                        State,
+                        CurrentRound,
+                        ActiveRole,
+                        Mode,
+                        Puzzle_ID)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-        """;
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                """;
 
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
@@ -372,16 +376,18 @@ public class PuzzleRepository {
      */
     public boolean updatePuzzle(PuzzleInfo puzzle) {
         @Language("SQL") String query = """
-                UPDATE puzzles
-                SET Chapter_ID           = ?,
-                    Position             = ?,
-                    Title                = ?,
-                    Description          = ?,
-                    Max_Assertions       = ?,
-                    Editable_Lines_Start = ?,
-                    Editable_Lines_End   = ?
-                WHERE Puzzle_ID = ?;
-        """;
+                        UPDATE puzzles
+                        SET Chapter_ID           = ?,
+                            Position             = ?,
+                            Title                = ?,
+                            Description          = ?,
+                            Max_Assertions       = ?,
+                            Editable_Lines_Start = ?,
+                            Editable_Lines_End   = ?,
+                            IsEquivalent         = ?,
+                            IsEquivalencePuzzle  = ?
+                        WHERE Puzzle_ID = ?;
+                """;
 
         int updatedRows = queryRunner.update(query,
                 puzzle.getChapterId(),
@@ -391,7 +397,9 @@ public class PuzzleRepository {
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
-                puzzle.getPuzzleId()
+                puzzle.getPuzzleId(),
+                puzzle.isEquivalent(),
+                puzzle.isEquivalencePuzzle()
         );
         return updatedRows > 0;
     }
@@ -404,12 +412,12 @@ public class PuzzleRepository {
      */
     public boolean updatePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
-                UPDATE puzzle_chapters
-                SET Position    = ?,
-                    Title       = ?,
-                    Description = ?
-                WHERE Chapter_ID = ?;
-        """;
+                        UPDATE puzzle_chapters
+                        SET Position    = ?,
+                            Title       = ?,
+                            Description = ?
+                        WHERE Chapter_ID = ?;
+                """;
 
         int updatedRows = queryRunner.update(query,
                 chapter.getPosition(),
@@ -429,20 +437,20 @@ public class PuzzleRepository {
      */
     public boolean updatePuzzleGame(PuzzleGame game) {
         @Language("SQL") String query = """
-                UPDATE games
+                        UPDATE games
 
-                SET Class_ID = ?,
-                    Level = ?,
-                    Creator_ID = ?,
-                    MaxAssertionsPerTest = ?,
-                    MutantValidator = ?,
-                    State = ?,
-                    CurrentRound = ?,
-                    ActiveRole = ?,
-                    Puzzle_ID = ?
+                        SET Class_ID = ?,
+                            Level = ?,
+                            Creator_ID = ?,
+                            MaxAssertionsPerTest = ?,
+                            MutantValidator = ?,
+                            State = ?,
+                            CurrentRound = ?,
+                            ActiveRole = ?,
+                            Puzzle_ID = ?
 
-                WHERE ID = ?;
-        """;
+                        WHERE ID = ?;
+                """;
 
         int updatedRows = queryRunner.update(query,
                 game.getClassId(),
@@ -468,11 +476,11 @@ public class PuzzleRepository {
      */
     public boolean gamesExistsForPuzzle(@Nonnull Puzzle puzzle) {
         @Language("SQL") String query = """
-                    SELECT (COUNT(games.ID) > 0) AS games_exist
-                    FROM games, puzzles
-                    WHERE puzzles.Puzzle_ID = ?
-                    AND games.Class_ID = puzzles.Class_ID
-        """;
+                            SELECT (COUNT(games.ID) > 0) AS games_exist
+                            FROM games, puzzles
+                            WHERE puzzles.Puzzle_ID = ?
+                            AND games.Class_ID = puzzles.Class_ID
+                """;
 
         var exists = queryRunner.query(query,
                 oneFromRS(rs -> rs.getBoolean("games_exist")),
@@ -490,22 +498,16 @@ public class PuzzleRepository {
      */
     public boolean setPuzzleActive(@Nonnull Puzzle puzzle, boolean active) {
         @Language("SQL") String query = """
-                UPDATE puzzles
-                    SET ACTIVE = ?
-                    WHERE Puzzle_ID = ?;
-        """;
+                        UPDATE puzzles
+                            SET ACTIVE = ?
+                            WHERE Puzzle_ID = ?;
+                """;
 
         int updatedRows = queryRunner.update(query,
                 active,
                 puzzle.getPuzzleId()
         );
         return updatedRows > 0;
-    }
-
-    public void setAllActive(boolean active) {
-        //noinspection SqlWithoutWhere
-        @Language("SQL") String query = "UPDATE puzzles SET Active = ?;";
-        queryRunner.update(query, active);
     }
 
     public void removeAllPuzzleChapters() {
@@ -522,7 +524,7 @@ public class PuzzleRepository {
      * @param chapter the puzzle chapter to be removed.
      * @return {@code true} when the removal was successful, {@code false} otherwise.
      */
-    public boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
+    public boolean removePuzzleChapter(@Nonnull PuzzleChapter chapter) {
         @Language("SQL") String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
         int updatedRows = queryRunner.update(query,
                 chapter.getChapterId()
@@ -540,12 +542,12 @@ public class PuzzleRepository {
      */
     public GameClass getParentGameClass(int puzzleClassId) {
         @Language("SQL") String query = """
-                SELECT classes.*
-                FROM classes,
-                     view_puzzle_classes puzzle_classes
-                WHERE puzzle_classes.Class_ID = ?
-                  AND classes.Class_ID = puzzle_classes.Parent_Class;
-        """;
+                        SELECT classes.*
+                        FROM classes,
+                             view_puzzle_classes puzzle_classes
+                        WHERE puzzle_classes.Class_ID = ?
+                          AND classes.Class_ID = puzzle_classes.Parent_Class;
+                """;
 
         var clazz = queryRunner.query(query,
                 oneFromRS(GameClassRepository::gameClassFromRS),
@@ -562,12 +564,12 @@ public class PuzzleRepository {
      */
     public boolean classSourceUsedForPuzzleClasses(int classId) {
         @Language("SQL") String query = """
-                SELECT (COUNT(c1.Class_ID)) > 0 as class_used
-                FROM classes c1,
-                     view_puzzle_classes c2
-                WHERE c1.Class_ID = ?
-                      AND c1.JavaFile = c2.JavaFile
-        """;
+                        SELECT (COUNT(c1.Class_ID)) > 0 as class_used
+                        FROM classes c1,
+                             view_puzzle_classes c2
+                        WHERE c1.Class_ID = ?
+                              AND c1.JavaFile = c2.JavaFile
+                """;
 
         var used = queryRunner.query(query,
                 oneFromRS(rs -> rs.getBoolean("class_used")),
@@ -582,10 +584,10 @@ public class PuzzleRepository {
 
     public boolean checkActivePuzzlesExist() {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_active_puzzles as puzzles
-                LIMIT 1;
-        """;
+                        SELECT *
+                        FROM view_active_puzzles as puzzles
+                        LIMIT 1;
+                """;
 
         var puzzle = queryRunner.query(query, nextFromRS(rs -> rs.getInt("Puzzle_ID")));
         return puzzle.isPresent();
@@ -657,8 +659,7 @@ public class PuzzleRepository {
         boolean isEquivalencePuzzle = rs.getBoolean("puzzles.IsEquivalencePuzzle");
 
         return new Puzzle(puzzleId, classId, activeRole, isEquivalent, isEquivalencePuzzle, level, maxAssertions,
-                mutantValidatorLevel,
-                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
     /**
@@ -681,6 +682,6 @@ public class PuzzleRepository {
         int puzzleId = rs.getInt("games.Puzzle_ID");
 
         return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
-            maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
+                maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
     }
 }
