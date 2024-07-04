@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ import javassist.CtClass;
 
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TEST_PREFIX;
+import static org.codedefenders.util.NamingUtils.nextFreeName;
 
 /**
  * This class offers static methods for file functionality.
@@ -296,5 +298,53 @@ public class FileUtils {
             logger.error("Could not store file.", e);
             throw e;
         }
+    }
+
+    /**
+     * Uses nextFreeName to choose a non-existing filename within a directory.
+     *
+     * <p>In comparison to {@link FileUtils#getNextSubDir(Path)}, this method sidesteps collisions less effectively,
+     * but doesn't require adding a level of depth to the file system.
+     *
+     * @param directory The directory to find a free filename in.
+     * @param name The desired filename.
+     * @return A path pointing to the non-existent file.
+     */
+    public static Path nextFreePath(Path directory, String name) {
+        return nextFreePath(directory, name, 2);
+    }
+
+    private static Path nextFreePath(Path directory, String name, int retries) {
+        try (Stream<Path> files = Files.walk(directory, 1)) {
+            List<String> filenames = files
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .toList();
+            String numberedName = nextFreeName(filenames, name);
+            Path freePath = directory.resolve(numberedName);
+
+            if (Files.exists(freePath)) {
+                logger.warn("Path already exists: '{}'", freePath);
+                if (retries > 0) {
+                    return nextFreePath(directory, name, retries - 1);
+                } else {
+                    throw new RuntimeException("Couldn't find free path.");
+                }
+            }
+
+            return freePath;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Uses nextFreeName to choose a non-existing storage directory for a class.
+     * @param alias The alias of the class.
+     * @return A path pointing to the non-existent directory.
+     */
+    public static Path nextFreeClassDirectory(String alias) {
+        var path = Paths.get(getConfig().getSourcesDir().getAbsolutePath());
+        return nextFreePath(path, alias);
     }
 }
