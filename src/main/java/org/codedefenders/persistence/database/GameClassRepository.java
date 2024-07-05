@@ -368,6 +368,7 @@ public class GameClassRepository {
 
         if (key.isPresent()) {
             logger.debug("Successfully stored class in database[Name={}, Alias={}].", cut.getName(), cut.getAlias());
+            cut.setId(key.get());
             return key.get();
         } else {
             throw new UncheckedSQLException("Could not store class to database.");
