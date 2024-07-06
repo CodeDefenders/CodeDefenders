@@ -222,7 +222,7 @@ public class RoleService {
 
         Role adminRole = userDatabase.findRole(roleName);
         if (adminRole == null) {
-            logger.error("Couldn't role '{}' in Tomcat UserDatabase.", roleName);
+            logger.error("Couldn't find role '{}' in Tomcat UserDatabase.", roleName);
             return null;
         }
 
