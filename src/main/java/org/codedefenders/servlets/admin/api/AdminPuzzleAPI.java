@@ -176,11 +176,16 @@ public class AdminPuzzleAPI extends HttpServlet {
         switch (url) {
             case Paths.API_ADMIN_PUZZLE: {
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
-                if (puzzleId.isPresent()) {
-                    handleDeletePuzzleRequest(response, puzzleId.get());
+                final Optional<String> action = ServletUtils.getStringParameter(request, "action");
+                if (puzzleId.isPresent() && action.isPresent()) {
+                    if (action.get().equals("archive")) {
+                        handleArchivePuzzleRequest(response, puzzleId.get());
+                    } else if (action.get().equals("delete")) {
+                        handleDeletePuzzleRequest(response, puzzleId.get());
+                    }
                     return;
                 }
-                message = "Missing puzzleId parameter.";
+                message = "Missing parameter.";
                 break;
             }
             case Paths.API_ADMIN_PUZZLECHAPTER: {
@@ -202,54 +207,74 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json.toString());
     }
 
+    private void handleArchivePuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
+        final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
+        if (puzzle == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        String message;
+        if (puzzleRepo.setPuzzleActive(puzzle, false)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            message = "Archived puzzle " + puzzleId;
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            message = "Failed to archive puzzle " + puzzleId;
+        }
+
+        JsonObject json = new JsonObject();
+        json.add("message", new JsonPrimitive(message));
+        writeJSONResponse(response, json.toString());
+    }
+
     private void handleDeletePuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
         final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        String message;
+
         if (puzzleRepo.gamesExistsForPuzzle(puzzle)) {
-            if (puzzleRepo.setPuzzleActive(puzzle, false)) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                message = "Set puzzle " + puzzleId + " as inactive";
+            JsonObject json = new JsonObject();
+            json.add("message",
+                    new JsonPrimitive("Cannot delete puzzle " + puzzleId + " because games exist for that puzzle."));
+            writeJSONResponse(response, json.toString());
+            return;
+        }
+
+        GameClass parentGameClass = puzzleRepo.getParentGameClass(puzzle.getClassId());
+
+        // Uses 'cascade delete'. Deleted the puzzles, too.
+        boolean classRemoved = gameClassRepo.forceRemoveClassForId(puzzle.getClassId());
+        if (classRemoved) {
+            if (puzzleRepo.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
+                logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
+                        puzzle.getClassId(), parentGameClass.getId());
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                message = "Failed to set puzzle " + puzzleId + " as inactive";
-            }
-        } else {
-            GameClass parentGameClass = puzzleRepo.getParentGameClass(puzzle.getClassId());
+                logger.info("Puzzle class {} removed and since parent class {} is not used for other puzzles,"
+                                + "it's removed too.",
+                        puzzle.getClassId(), parentGameClass.getId());
+                gameClassRepo.forceRemoveClassForId(parentGameClass.getId());
 
-            // Uses 'cascade delete'. Deleted the puzzles, too.
-            boolean classRemoved = gameClassRepo.forceRemoveClassForId(puzzle.getClassId());
-            if (classRemoved) {
-                if (puzzleRepo.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
-                    logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
-                            puzzle.getClassId(), parentGameClass.getId());
-                } else {
-                    logger.info("Puzzle class {} removed and since parent class {} is not used for other puzzles,"
-                                    + "it's removed too.",
-                            puzzle.getClassId(), parentGameClass.getId());
-                    gameClassRepo.forceRemoveClassForId(parentGameClass.getId());
-
-                    // Remove the whole class folder
-                    final String javaFile = parentGameClass.getJavaFile();
-                    final Path parent = java.nio.file.Paths.get(javaFile).getParent();
-                    try {
-                        org.apache.commons.io.FileUtils.forceDelete(parent.toFile());
-                    } catch (IOException e) {
-                        logger.error("Failed to remove folder for deleted class " + parentGameClass.getAlias(), e);
-                    }
+                // Remove the whole class folder
+                final String javaFile = parentGameClass.getJavaFile();
+                final Path parent = java.nio.file.Paths.get(javaFile).getParent();
+                try {
+                    org.apache.commons.io.FileUtils.forceDelete(parent.toFile());
+                } catch (IOException e) {
+                    logger.error("Failed to remove folder for deleted class " + parentGameClass.getAlias(), e);
                 }
             }
+        }
 
-            if (classRemoved) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                message = "Removed puzzle " + puzzleId + " successfully";
-            } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                message = "Failed to remove puzzle " + puzzleId;
-            }
+        String message;
+        if (classRemoved) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            message = "Removed puzzle " + puzzleId + " successfully";
+        } else {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            message = "Failed to remove puzzle " + puzzleId;
         }
 
         JsonObject json = new JsonObject();
