@@ -83,6 +83,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
