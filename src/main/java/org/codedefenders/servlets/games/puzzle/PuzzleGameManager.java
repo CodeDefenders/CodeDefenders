@@ -399,6 +399,7 @@ public class PuzzleGameManager extends HttpServlet {
             case "accept":
                 if (game.getPuzzle().isEquivalent()) {
                     mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
+                    mutantRepo.updateMutant(mutant);
 
                     game.setState(GameState.SOLVED);
 
@@ -411,11 +412,9 @@ public class PuzzleGameManager extends HttpServlet {
                     gse.setGameId(gameId);
                     notificationService.post(gse);
                 } else {
-                    mutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                     messages.add("No, this mutant is not equivalent to the class under test.");
                     game.incrementCurrentRound();
                 }
-                mutantRepo.updateMutant(mutant);
                 puzzleRepo.updatePuzzleGame(game);
                 break;
             case "reject":
