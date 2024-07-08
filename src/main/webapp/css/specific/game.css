@@ -59,9 +59,12 @@
     overflow: auto;
 }
 
+#equivalenceForm .game-component-resize {
+    height: 300px;
+}
+
 /* Container for highlighting the components for resolving an equivalence duel
 ----------------------------------------------------------------------------- */
-
 .equivalence-container {
     border: 5px dashed #f00;
     border-radius: 5px;
