@@ -415,6 +415,9 @@ public class PuzzleGameManager extends HttpServlet {
                 } else {
                     messages.add("No, this mutant is not equivalent to the class under test.");
                     game.incrementCurrentRound();
+
+                    ServletUtils.getStringParameter(request, "test")
+                            .ifPresent(t -> previousSubmission.setTestCode(t));
                 }
                 puzzleRepo.updatePuzzleGame(game);
                 break;
