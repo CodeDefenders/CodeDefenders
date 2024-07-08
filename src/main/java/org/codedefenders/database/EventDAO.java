@@ -23,14 +23,14 @@ public class EventDAO {
      * @param gameId The gameId for which to remove the events.
      * @param userId The userId of the events to remove.
      *
-     * @implNote Even if the database table column is called {@code Player_ID} it stores User_IDs!
+     * @implNote Even if the database table column is called {@code User_ID} it stores User_IDs!
      */
     public void removePlayerEventsForGame(int gameId, int userId) {
         @Language("SQL") String query = """
                 UPDATE events
                 SET Event_Status = ?
                 WHERE Game_ID = ?
-                  AND Player_ID = ?
+                AND User_ID = ?
                 AND Event_Type NOT IN (
                     'GAME_CREATED',
                     'GAME_STARTED',
@@ -59,7 +59,7 @@ public class EventDAO {
                 || eventType.equals(EventType.PLAYER_MUTANT_EQUIVALENT)
                 || eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)) {
             query = """
-                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)
+                    INSERT INTO events (Game_ID, User_ID, Event_Type, Event_Status, Event_Message)
                     VALUES (?, ?, ?, ?, ?);
             """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
@@ -71,7 +71,7 @@ public class EventDAO {
                 || eventType.equals(EventType.PLAYER_MUTANT_SURVIVED)
                 || eventType.equals(EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT)) {
             query = """
-                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)
+                    INSERT INTO events (Game_ID, User_ID, Event_Type, Event_Status, Event_Message)
                     VALUES (?, ?, ?, ?, ?);
             """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
@@ -79,7 +79,7 @@ public class EventDAO {
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else {
             query = """
-                    INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)
+                    INSERT INTO events (Game_ID, User_ID, Event_Type, Event_Status)
                     VALUES (?, ?, ?, ?);
             """;
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
@@ -101,7 +101,7 @@ public class EventDAO {
         @Language("SQL") String query = """
                 UPDATE events
                 SET Game_ID = ?,
-                    Player_ID = ?,
+                    User_ID = ?,
                     Event_Type=?,
                     Event_Status = ?,
                     Timestamp = FROM_UNIXTIME(?)
@@ -118,12 +118,9 @@ public class EventDAO {
     }
 
     static Event eventFromRS(ResultSet rs) throws SQLException {
-
         int eventId = rs.getInt("Event_ID");
         int gameId = rs.getInt("Game_ID");
-        // TODO Is this correct? The columns is called Player_ID but the data is
-        // User_ID?
-        int userId = rs.getInt("Player_ID");
+        int userId = rs.getInt("User_ID");
         String message = rs.getString("Event_Message");
         EventType eventType = EventType.valueOf(rs.getString("Event_Type"));
         EventStatus eventStatus = EventStatus.valueOf(rs.getString("Event_Status"));
@@ -170,7 +167,7 @@ public class EventDAO {
                         WHERE Game_ID=?
                           AND Event_Status=?
                           AND Timestamp >= FROM_UNIXTIME(?)
-                          AND Player_ID = ?
+                          AND User_ID = ?
                 """;
 
         DatabaseValue<?>[] values = new DatabaseValue[] {DatabaseValue.of(gameId),
