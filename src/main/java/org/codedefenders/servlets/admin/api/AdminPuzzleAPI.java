@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.model.PuzzleInfo;
@@ -41,6 +44,7 @@ import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -305,23 +309,19 @@ public class AdminPuzzleAPI extends HttpServlet {
 
     private void handleGetAllPuzzlesRequest(HttpServletResponse response) throws IOException {
         final List<PuzzleChapter> puzzleChapters = puzzleRepo.getPuzzleChapters();
-        final List<Puzzle> puzzles = puzzleRepo.getPuzzles();
+        final List<AdminPuzzleInfo> puzzles = puzzleRepo.getAdminPuzzleInfos();
 
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
 
-        // Sadly I haven't found a way around the parser and creating the json array by hand.
-        // The 'normal' way (gson.toJson(puzzles)) somehow didn't work.
-
         JsonArray puzzleArray = new JsonArray();
-        for (Puzzle puzzle : puzzles) {
-            puzzleArray.add(JsonParser.parseString(gson.toJson(puzzle)));
+        for (AdminPuzzleInfo puzzleInfo : puzzles) {
+            puzzleArray.add(puzzleInfo.toJson());
         }
         JsonArray puzzleChapterArray = new JsonArray();
         for (PuzzleChapter chapter : puzzleChapters) {
-            puzzleChapterArray.add(JsonParser.parseString(gson.toJson(chapter)));
+            puzzleChapterArray.add(gson.toJsonTree(chapter));
         }
 
         JsonObject json = new JsonObject();
@@ -524,20 +524,47 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
     }
 
-    /**
+    private static class AdminPuzzleInfoTypeAdapter extends TypeAdapter<AdminPuzzleInfo> {
+        @Override
+        public void write(JsonWriter out, AdminPuzzleInfo info) throws IOException {
+            out.beginObject()
+                    .name("id").value(info.puzzle.getPuzzleId())
+                    .name("position").value(info.puzzle.getPosition())
+                    .name("title").value(info.puzzle.getTitle())
+                    .name("description").value(info.puzzle.getDescription())
+                    .name("maxAssertionsPerTest").value(info.puzzle.getMaxAssertionsPerTest())
+                    .name("editableLinesStart").value(info.puzzle.getEditableLinesStart())
+                    .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
+                    .name("chapterId").value(info.puzzle.getChapterId())
+                    .name("classId").value(info.puzzle.getClassId())
+                    .name("gameCount").value(info.gameCount)
+                    .name("active").value(info.active)
+                    .endObject();
+        }
+
+        @Override
+        public AdminPuzzleInfo read(JsonReader in) throws IOException {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+        /**
      * Custom {@link TypeAdapter} to convert {@link PuzzleChapter PuzzleChapters} to JSON.
      * Currently does not support to convert JSON to puzzle chapters.
      */
     private static class PuzzleChapterTypeAdapter extends TypeAdapter<PuzzleChapter> {
         @Override
         public void write(JsonWriter out, PuzzleChapter chapter) throws IOException {
+            if (chapter == null) {
+                out.nullValue();
+                return;
+            }
             out.beginObject()
                     .name("id").value(chapter.getChapterId())
                     .name("position").value(chapter.getPosition())
                     .name("title").value(chapter.getTitle())
                     .name("description").value(chapter.getDescription())
                     .endObject();
-            out.close();
         }
 
         @Override
@@ -551,6 +578,25 @@ public class AdminPuzzleAPI extends HttpServlet {
             String description = json.get("description").getAsString();
 
             return new PuzzleChapter(chapterId, position, title, description);
+        }
+    }
+
+    public record AdminPuzzleInfo(Puzzle puzzle, int gameCount, boolean active) {
+        public JsonObject toJson() {
+            var object = new JsonObject();
+            object.addProperty("id", this.puzzle.getPuzzleId());
+            object.addProperty("position", this.puzzle.getPosition());
+            object.addProperty("title", this.puzzle.getTitle());
+            object.addProperty("description", this.puzzle.getDescription());
+            object.addProperty("maxAssertionsPerTest", this.puzzle.getMaxAssertionsPerTest());
+            object.addProperty("editableLinesStart", this.puzzle.getEditableLinesStart());
+            object.addProperty("editableLinesEnd", this.puzzle.getEditableLinesEnd());
+            object.addProperty("chapterId", this.puzzle.getChapterId());
+            object.addProperty("classId", this.puzzle.getClassId());
+            object.addProperty("activeRole", this.puzzle.getActiveRole().name());
+            object.addProperty("gameCount", this.gameCount);
+            object.addProperty("active", this.active);
+            return object;
         }
     }
 }

@@ -184,3 +184,8 @@
     max-width: calc(100% - 20rem);
 }
 
+.chapter__title {
+    max-width: 30rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

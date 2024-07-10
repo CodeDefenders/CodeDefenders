@@ -20,7 +20,9 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.annotation.Nonnull;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -39,6 +41,8 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.AdminPuzzleInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -583,6 +587,22 @@ public class PuzzleRepository {
 
         var puzzle = queryRunner.query(query, nextFromRS(rs -> rs.getInt("Puzzle_ID")));
         return puzzle.isPresent();
+    }
+
+    public List<AdminPuzzleInfo> getAdminPuzzleInfos() {
+        @Language("SQL") String query = """
+                SELECT puzzles.*, COUNT(games.ID) AS game_count
+                FROM puzzles
+                LEFT JOIN view_puzzle_games games ON puzzles.Puzzle_ID = games.Puzzle_ID
+                GROUP BY puzzles.Puzzle_ID;
+        """;
+
+        return queryRunner.query(query, listFromRS(rs -> {
+            Puzzle puzzle = puzzleFromRS(rs);
+            int gameCount = rs.getInt("game_count");
+            boolean active = rs.getBoolean("puzzles.Active");
+            return new AdminPuzzleInfo(puzzle, gameCount, active);
+        }));
     }
 
     /**
