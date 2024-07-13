@@ -411,6 +411,31 @@
             document.getElementById('button-save').addEventListener('click', function(event) {
                 isUnsavedChanges = false;
             });
+
+            document.getElementById('button-add-chapter').addEventListener('click', function(event) {
+                const chapter = {
+                    id: -1,
+                    title: 'Unnamed Chapter',
+                    description: ''
+                };
+                const chapterElem = createChapterElement(chapter);
+                document.querySelector('.chapters').insertAdjacentElement('afterbegin', chapterElem);
+            });
+
+            document.querySelector('.chapters').addEventListener('click', function(event) {
+                const deleteButton = event.target.closest('.chapter__button__delete');
+                if (deleteButton === null) {
+                    return;
+                }
+
+                const chapter = event.target.closest('.chapter');
+                const puzzles = Array.from(chapter.querySelector('.puzzles').children);
+                for (const puzzle of puzzles) {
+                    unassignPuzzle(puzzle);
+                }
+
+                chapter.remove();
+            });
         </script>
     </jsp:body>
 </p:main_page>
