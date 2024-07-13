@@ -45,6 +45,6 @@ public class AdminPuzzleManagement extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("/jsp/admin_puzzle_management2.jsp").forward(request, response);
+        request.getRequestDispatcher(Constants.ADMIN_PUZZLE_MANAGEMENT_JSP).forward(request, response);
     }
 }

@@ -1,402 +1,441 @@
-<%--
-
-    Copyright (C) 2016-2019 Code Defenders contributors
-
-    This file is part of Code Defenders.
-
-    Code Defenders is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or (at
-    your option) any later version.
-
-    Code Defenders is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
-
---%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <p:main_page title="Puzzle Management">
-    <div class="container">
-        <t:admin_navigation activePage="adminPuzzles"/>
+    <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/puzzle_management.css")}" rel="stylesheet">
+    </jsp:attribute>
+    <jsp:body>
+        <div class="container">
+            <t:admin_navigation activePage="adminPuzzles"/>
+            <div id="puzzle-management">
+                <div id="puzzle-management-controls">
+                    <div class="d-flex gap-2">
+                        <button type="button" id="button-upload-chapters" class="btn btn-sm btn-outline-secondary">
+                            Upload chapters
+                            <i class="fa fa-upload ms-1"></i>
+                        </button>
+                        <button type="button" id="button-upload-puzzles" class="btn btn-sm btn-outline-secondary">
+                            Upload puzzles
+                            <i class="fa fa-upload ms-1"></i>
+                        </button>
+                        <button type="button" id="button-add-chapter" class="btn btn-sm btn-outline-secondary">
+                            Add empty chapter
+                            <i class="fa fa-plus ms-1"></i>
+                        </button>
+                    </div>
+                    <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight">
+                        Save
+                        <i class="fa fa-save ms-1"></i>
+                    </button>
+                </div>
 
-        <h3 class="mb-3">Puzzle Chapters</h3>
-        <table id="tableChapters" class="table table-striped table-v-align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Position</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-        </table>
+                <div class="chapter" id="chapter-unassigned">
+                    <div class="chapter__header">
+                        <span class="chapter__title">Unassigned Puzzles</span>
+                    </div>
+                    <div class="puzzles"></div>
+                </div>
 
-        <h3 class="mt-4 mb-3">Puzzles</h3>
-        <table id="tablePuzzles" class="table table-striped table-v-align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Chapter</th>
-                    <th>Position</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Class</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-        </table>
+                <div class="chapters"></div>
+
+                <div class="chapter" id="chapter-archived">
+                    <div class="chapter__header">
+                        <span class="chapter__title">Archived Puzzles</span>
+                    </div>
+                    <div class="puzzles"></div>
+                </div>
+            </div>
+        </div>
 
         <script type="module">
-            import DataTable from '${url.forPath("/js/datatables.mjs")}';
-            import $ from '${url.forPath("/js/jquery.mjs")}';
+            import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
+            import {PuzzleAPI} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-            import {PuzzleAPI, DeferredPromise} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-            let puzzleTable = null;
-            let chapterTable = null;
-            let puzzleTablePromise = new DeferredPromise();
-            let chapterTablePromise = new DeferredPromise();
+            const watermarkUrl = '${url.forPath("/images/achievements/")}';
 
-            $(document).ready(async function() {
-                const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            const puzzles = puzzleData.puzzles;
+            const chapters = puzzleData.puzzleChapters;
 
-                const chapters = puzzleData.puzzleChapters;
-                if (chapters) {
-                    chapterTable = new DataTable('#tableChapters', {
-                        "data": chapters,
-                        "columns": [
-                            { "data": "id" },
-                            {
-                                "data": "position",
-                                "defaultContent": "none"
-                            },
-                            { "data": "title" },
-                            { "data": "description" },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(chapter, type, row, meta) {
-                                    return `
-    <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal" data-bs-target="#updatePuzzleChapter-\${chapter.id}">
-        <i class="fa fa-edit"></i>
-    </button>
-    <div class="modal fade" id="updatePuzzleChapter-\${chapter.id}" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Update Puzzle Chapter \${chapter.id}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+            const puzzlesPerChapter = new Map();
+            puzzlesPerChapter.set('unassigned', []);
+            puzzlesPerChapter.set('archived', []);
+            for (const puzzle of puzzles) {
+                if (!puzzle.active) {
+                    puzzlesPerChapter.get('archived').push(puzzle);
+                } else if (puzzle.chapterId === null) {
+                    puzzlesPerChapter.get('unassigned').push(puzzle);
+                } else {
+                    if (!puzzlesPerChapter.has(puzzle.chapterId)) {
+                        puzzlesPerChapter.set(puzzle.chapterId, [puzzle])
+                    } else {
+                        puzzlesPerChapter.get(puzzle.chapterId).push(puzzle);
+                    }
+                }
+            }
 
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="form-group">
-                                <label for="positionForPuzzleChapter\${chapter.id}" class="form-label">Position</label>
-                                <input type="number" class="form-control"
-                                    id="positionForPuzzleChapter\${chapter.id}" value="\${chapter.position}"
-                                    placeholder="Number or empty.">
+            chapters.sort((a, b) => a.position - b.position);
+            for (const puzzles of puzzlesPerChapter.values()) {
+                puzzles.sort((a, b) => a.position - b.position);
+            }
+
+            let isUnsavedChanges = false;
+
+
+            function createChapterElement(chapter) {
+                const chapterDiv = document.createElement('div');
+                chapterDiv.classList.add('chapter');
+                chapterDiv.innerHTML =
+                        `<div class="chapter__header">
+                            <div class="chapter__info">
+                                <div class="d-flex align-items-stretch">
+                                    <span class="chapter__index"></span>
+                                    <span class="chapter__title"></span>
+                                </div>
+                                <div class="chapter__description"></div>
+                            </div>
+                            <div class="chapter__controls">
+                                <div class="chapter__handle me-3"></div>
+                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="Upload Puzzles">
+                                    <i class="fa fa-upload"></i>
+                                </button>
+                                <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             </div>
                         </div>
+                        <div class="puzzles"></div>`;
 
-                        <div class="row mb-3">
-                            <div class="form-group">
-                                <label for="titleForPuzzleChapter\${chapter.id}" class="form-label">Title</label>
-                                <input type="text" class="form-control"
-                                    id="titleForPuzzleChapter\${chapter.id}" value="\${chapter.title}">
+                chapterDiv.querySelector('.chapter__title').innerText = chapter.title;
+                chapterDiv.querySelector('.chapter__description').innerText = chapter.description;
+
+                chapterDiv.querySelector('.chapter__controls').firstElementChild
+                        .insertAdjacentElement('afterend', createMoveDropdown('Move to position:'));
+
+                chapterDiv.dataset.id = chapter.id;
+                return chapterDiv;
+            }
+
+            function createPuzzleElement(puzzle) {
+                const watermark = document.createElement('img');
+                watermark.classList.add('puzzle__watermark');
+                watermark.src = `\${watermarkUrl}codedefenders_achievements_\${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+
+                const puzzleDiv = document.createElement('div');
+                puzzleDiv.classList.add('puzzle', `puzzle-\${puzzle.activeRole.toLowerCase()}`)
+                puzzleDiv.innerHTML =
+                        `<div class="puzzle__container">
+                            <div class="puzzle__info">
+                                <div class="puzzle__title"></div>
+                                <div class="puzzle__description"></div>
+                            </div>
+                            <div class="puzzle__tags">
+                                <span class="badge puzzle__tag puzzle__tag__id"></span>
+                                <span class="badge puzzle__tag puzzle__tag__games"></span>
                             </div>
                         </div>
+                        <div class="puzzle__controls">
+                            <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="Edit">
+                                <i class="fa fa-edit"></i>
+                            </button>
 
-                        <div class="row mb-2">
-                            <div class="form-group">
-                                <label for="descriptionForPuzzleChapter\${chapter.id}" class="form-label">Description</label>
-                                <input type="text" class="form-control"
-                                    id="descriptionForPuzzleChapter\${chapter.id}" value="\${chapter.description}">
+                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="Unassign">
+                                <i class="fa fa-times"></i>
+                            </button>
+
+                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="Archive">
+                                <i class="fa fa-archive"></i>
+                            </button>
+
+                            <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="Delete">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>`;
+
+                puzzleDiv.appendChild(watermark);
+                puzzleDiv.querySelector('.puzzle__title').innerText = puzzle.title;
+                puzzleDiv.querySelector('.puzzle__title').setAttribute('title', puzzle.title);
+                puzzleDiv.querySelector('.puzzle__description').innerText = puzzle.description;
+                puzzleDiv.querySelector('.puzzle__tag__id').innerText = '#' + puzzle.id;
+                puzzleDiv.querySelector('.puzzle__tag__games').innerText =
+                        puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
+                if (puzzle.gameCount > 0) {
+                    const deleteButton = puzzleDiv.querySelector('.puzzle__button__delete');
+                    deleteButton.disabled = true;
+                    deleteButton.title = "Puzzles with existing games can't be deleted";
+                }
+                puzzleDiv.querySelector('.puzzle__controls').firstElementChild
+                        .insertAdjacentElement('afterend', createMoveDropdown('Move to chapter:'));
+
+                puzzleDiv.dataset.id = puzzle.id;
+                return puzzleDiv;
+            }
+
+            function createMoveDropdown(label) {
+                const dropdown = document.createElement('div');
+                dropdown.classList.add('dropdown', 'move', 'd-flex');
+                dropdown.title = 'Move';
+                dropdown.innerHTML =
+                        `<button class="btn btn-xs btn-primary btn-fixed move__show"
+                            data-bs-toggle="dropdown" data-bs-offset="0,8">
+                        <i class="fa fa-arrow-right"></i>
+                    </button>
+                    <div class="dropdown-menu move__menu">
+                        <div class="d-flex flex-column gap-1">
+                            <div class="move__label"></div>
+                            <div class="d-flex flex-row gap-2">
+                                <select class="form-select form-select-sm move__position"></select>
+                                <button type="button" class="btn btn-primary btn-xs move__confirm">
+                                    Move
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        </div
+                    </div>`;
+                dropdown.querySelector('.move__label').innerText = label;
+                return dropdown;
+            }
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary updatePuzzleChapter" data-bs-dismiss="modal"
-                                data-chapter-id="\${chapter.id}">
-                            Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-                                    `;
-                                },
-                                "orderable": false
-                            },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(data, type, row, meta) {
-                                    return `<button class="btn btn-sm btn-danger removePuzzleChapter"
-                                               data-chapter-id="\${data.id}">
-                                               <i class="fa fa-trash"></i>
-                                           </button>`;
-                                },
-                                "orderable": false
-                            }
-                        ],
-                        "scrollY": "600px",
-                        "scrollCollapse": true,
-                        "paging": false,
-                        "language": {"info": "Showing _TOTAL_ entries"},
-                        "order": [[ 1, "asc" ]]
-                    });
-                    chapterTablePromise.resolve();
+            function createChapterSelectOptions(selectedChapter = null) {
+                let options = document.createDocumentFragment();
+                let index = 1;
+                for (const chapter of document.querySelectorAll('.chapters .chapter')) {
+                    const title = chapter.querySelector('.chapter__title').innerText;
+                    const option = document.createElement('option');
+                    option.value = String(index);
+                    option.innerText = `\${index} | \${title}`;
+                    if (chapter === selectedChapter) {
+                        option.disabled = true;
+                    }
+                    options.appendChild(option);
+                    index++;
+                }
+                return options;
+            }
+
+            function addPuzzleToChapter(puzzleElement, chapterElement) {
+                chapterElement.querySelector('.puzzles').appendChild(puzzleElement);
+            }
+
+            function moveChapterToIndex(chapterElement, index) {
+                index--; // 1-indexed
+                const allChapters = document.querySelector('.chapters').children;
+                const clampedIndex = Math.max(0, Math.min(allChapters.length - 1, index));
+
+                let ownIndex = 0;
+                for (const element of allChapters) {
+                    if (element === chapterElement) {
+                        break;
+                    }
+                    ownIndex++;
                 }
 
-                const puzzles = puzzleData.puzzles;
-                if (puzzles) {
-                    puzzleTable = new DataTable('#tablePuzzles', {
-                        "data": puzzles,
-                        "columns": [
-                            { "data": "id" },
-                            {
-                                "data": "chapterId",
-                                "defaultContent": "none"
-                            },
-                            {
-                                "data": "position",
-                                "defaultContent": "none"
-                            },
-                            { "data": "title" },
-                            { "data": "description" },
-                            { "data": "classId" },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(puzzle, type, row, meta) {
-                                    return `
-    <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal" data-bs-target="#updatePuzzle-\${puzzle.id}">
-        <i class="fa fa-edit"></i>
-    </button>
-    <div class="modal fade" id="updatePuzzle-\${puzzle.id}" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Update Puzzle \${puzzle.id}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label for="chapterIdForPuzzle\${puzzle.id}" class="form-label">Chapter ID</label>
-                                <input type="number" class="form-control"
-                                    id="chapterIdForPuzzle\${puzzle.id}"
-                                    value="\${puzzle.chapterId}" placeholder="Identifier of a chapter or empty.">
-                            </div>
-                            <div class="col-6">
-                                <label for="positionForPuzzle\${puzzle.id}" class="form-label">Position in Chapter</label>
-                                <input type="number" class="form-control"
-                                    id="positionForPuzzle\${puzzle.id}" value="\${puzzle.position}"
-                                    placeholder="Number or empty.">
-                            </div>
-                        </div>
+                if (ownIndex > clampedIndex) {
+                    allChapters.item(clampedIndex).insertAdjacentElement('beforebegin', chapterElement);
+                } else if (ownIndex < clampedIndex) {
+                    allChapters.item(clampedIndex).insertAdjacentElement('afterend', chapterElement);
+                }
+            }
 
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="titleForPuzzle\${puzzle.id}" class="form-label">Title</label>
-                                <input type="text" class="form-control"
-                                    id="titleForPuzzle\${puzzle.id}" value="\${puzzle.title}">
-                            </div>
-                        </div>
+            function movePuzzleToChapterIndex(puzzleElement, index) {
+                index--; // 1-indexed
+                const allChapters = document.querySelector('.chapters').children;
+                const clampedIndex = Math.max(0, Math.min(allChapters.length - 1, index));
+                const chapter = allChapters.item(clampedIndex);
 
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="descriptionForPuzzle\${puzzle.id}" class="form-label">Description</label>
-                                <input type="text" class="form-control"
-                                    id="descriptionForPuzzle\${puzzle.id}" value="\${puzzle.description}">
-                            </div>
-                        </div>
+                if (chapter !== puzzleElement.closest('.chapter')) {
+                    addPuzzleToChapter(puzzleElement, chapter);
+                }
+            }
 
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="maxAssertionsPerTestForPuzzle\${puzzle.id}" class="form-label">Max. Assertions</label>
-                                <input type="number" class="form-control"
-                                    id="maxAssertionsPerTestForPuzzle\${puzzle.id}" value="\${puzzle.maxAssertionsPerTest}">
-                            </div>
-                        </div>
+            function archivePuzzle(puzzleElement) {
+                document.querySelector('#chapter-archived .puzzles').appendChild(puzzleElement);
+            }
 
-                        <div class="row g-3 mb-2">
-                            <div class="col-6">
-                                <label for="editableLinesStartForPuzzle\${puzzle.id}" class="form-label">First Editable Line</label>
-                                <input type="number" class="form-control"
-                                    id="editableLinesStartForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesStart}">
-                            </div>
-                            <div class="col-6">
-                                <label for="editableLinesEndForPuzzle\${puzzle.id}" class="form-label">Last Editable Line</label>
-                                <input type="number" class="form-control"
-                                    id="editableLinesEndForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesEnd}">
-                            </div>
-                        </div>
-                    </div>
+            function unassignPuzzle(puzzleElement) {
+                document.querySelector('#chapter-unassigned .puzzles').appendChild(puzzleElement);
+            }
 
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary updatePuzzle" data-bs-dismiss="modal"
-                                data-puzzle-id="\${puzzle.id}">
-                            Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-                                    `;
-                                },
-                                "orderable": false
-                            },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(data, type, row, meta) {
-                                    return `<button class="btn btn-sm btn-danger removePuzzle"
-                                               data-puzzle-id="\${data.id}">
-                                               <i class="fa fa-trash"></i>
-                                           </button>`;
-                                },
-                                "orderable": false
-                            }
-                        ],
-                        "scrollY": "600px",
-                        "scrollCollapse": true,
-                        "paging": false,
-                        "language": {"info": "Showing _TOTAL_ entries"},
-                        "order": [[ 1, "asc" ], [ 2, "asc" ]]
-                    });
-                    puzzleTablePromise.resolve();
+            function getChapterData() {
+                const data = {};
+
+                const unassignedPuzzles = document.querySelector('#chapter-unassigned .puzzles').children;
+                data.unassigned = Array.from(unassignedPuzzles).map(el => el.dataset.id);
+
+                const archivedPuzzles = document.querySelector('#chapter-archived .puzzles').children
+                data.archived = Array.from(archivedPuzzles).map(el => el.dataset.id);
+
+                data.chapters = [];
+                for (const chapter of document.querySelector('.chapters').children) {
+                    const puzzles = chapter.querySelector('.puzzles').children;
+                    data.chapters.push(Array.from(puzzles).map(el => el.dataset.id));
+                }
+
+                return data;
+            }
+
+            function init() {
+                const unassignedChapter = document.getElementById('chapter-unassigned');
+                for (const puzzle of puzzlesPerChapter.get('unassigned')) {
+                    addPuzzleToChapter(createPuzzleElement(puzzle), unassignedChapter);
+                }
+
+                const container = document.querySelector('#puzzle-management .chapters');
+                for (const chapter of chapters) {
+                    const chapterElement = createChapterElement(chapter);
+                    container.appendChild(chapterElement)
+                    const puzzles = puzzlesPerChapter.get(chapter.id) || [];
+                    for (const puzzle of puzzles) {
+                        addPuzzleToChapter(createPuzzleElement(puzzle), chapterElement);
+                    }
+                }
+
+                const archivedChapter = document.getElementById('chapter-archived');
+                for (const puzzle of puzzlesPerChapter.get('archived')) {
+                    addPuzzleToChapter(createPuzzleElement(puzzle), archivedChapter);
+                }
+
+
+                for (const list of document.getElementsByClassName('puzzles')) {
+                    Sortable.create(list, {
+                        animation: 200,
+                        group: 'puzzles',
+                        onMove: function() {
+                            isUnsavedChanges = true;
+                        }
+                    })
+                }
+
+                for (const list of document.getElementsByClassName('chapters')) {
+                    Sortable.create(list, {
+                        animation: 200,
+                        group: 'chapters',
+                        handle: '.chapter__handle',
+                        onMove: function() {
+                            isUnsavedChanges = true;
+                        }
+                    })
+                }
+
+                document.getElementById('puzzle-management').addEventListener('show.bs.dropdown', function (event) {
+                    const toggleButton = event.target.closest('.chapter__controls .move__show');
+                    if (toggleButton === null) {
+                        return;
+                    }
+
+                    const chapter = event.target.closest('.chapter');
+                    const options = createChapterSelectOptions(chapter);
+
+                    const select = chapter.querySelector('.move__position');
+                    select.innerText = '';
+                    select.appendChild(options);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const moveButton = event.target.closest('.chapter__controls .move__confirm');
+                    if (moveButton === null) {
+                        return;
+                    }
+
+                    const chapter = event.target.closest('.chapter');
+                    const select = chapter.querySelector('.move__position');
+
+                    const position = Number(select.value);
+                    moveChapterToIndex(chapter, position);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('show.bs.dropdown', function (event) {
+                    const toggleButton = event.target.closest('.puzzle__controls .move__show');
+                    if (toggleButton === null) {
+                        return;
+                    }
+
+                    const puzzle = event.target.closest('.puzzle');
+                    const chapter = puzzle.closest('.chapter');
+                    const options = createChapterSelectOptions(chapter);
+
+                    const select = puzzle.querySelector('.move__position');
+                    select.innerText = '';
+                    select.appendChild(options);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const moveButton = event.target.closest('.puzzle__controls .move__confirm');
+                    if (moveButton === null) {
+                        return;
+                    }
+
+                    const puzzle = event.target.closest('.puzzle');
+                    const select = puzzle.querySelector('.move__position');
+
+                    const position = Number(select.value);
+                    movePuzzleToChapterIndex(puzzle, position);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const archiveButton = event.target.closest('.puzzle__button__archive');
+                    if (archiveButton === null) {
+                        return;
+                    }
+
+                    const puzzle = event.target.closest('.puzzle');
+                    archivePuzzle(puzzle);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const unassignButton = event.target.closest('.puzzle__button__unassign');
+                    if (unassignButton === null) {
+                        return;
+                    }
+
+                    const puzzle = event.target.closest('.puzzle');
+                    unassignPuzzle(puzzle);
+                });
+            }
+
+            init();
+
+            window.addEventListener('beforeunload', function(event) {
+                if (isUnsavedChanges) {
+                    event.preventDefault();
                 }
             });
 
-            function parseIntOrNull(value) {
-                let newVal = parseInt(value);
-                if (isNaN(newVal)) {
-                    return null;
-                }
-                return newVal;
-            }
-
-            function updatePuzzleChapter(puzzleChapterId, row) {
-                let updateChapterData = {
-                    id: puzzleChapterId,
-                    title: String(document.getElementById(`titleForPuzzleChapter\${puzzleChapterId}`).value),
-                    description: String(document.getElementById(`descriptionForPuzzleChapter\${puzzleChapterId}`).value),
-                    position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter\${puzzleChapterId}`).value)
-                };
-
-                PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
-                    .then(responseJSON => {
-                        chapterTable.row(row).data(updateChapterData);
-
-                        // Redraw, so ordering is restored, too.
-                        chapterTable.rows().invalidate('data').draw();
-                    }).catch(error => {
-                        alert(`Puzzle chapter \${puzzleChapterId} could not be updated.`);
-                });
-            }
-
-            function removePuzzleChapter(puzzleChapterId, row) {
-                let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
-                    + ' This will not remove the puzzles of the chapter.');
-                if (confirmResult) {
-                    PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
-                        .then(responseJSON => {
-                            chapterTable.row(row).remove();
-
-                            // Forces re-rendering to update row index
-                            chapterTable.rows().invalidate('data').draw();
-                        }).catch(error => {
-                            chapterTable.row(row).node().querySelector('.removePuzzleChapter').disabled = true;
-                            alert(`Puzzle chapter \${puzzleChapterId} could not be removed.`);
-                        });
-                }
-            }
-
-            function updatePuzzle(puzzleId, row) {
-                let puzzleData = puzzleTable.row(row).data();
-
-                let updatedPuzzleData = {
-                    id: puzzleId,
-                    title: String(document.getElementById(`titleForPuzzle` + puzzleId).value),
-                    description: String(document.getElementById(`descriptionForPuzzle` + puzzleId).value),
-                    chapterId: parseIntOrNull(document.getElementById(`chapterIdForPuzzle` + puzzleId).value),
-                    position: parseIntOrNull(document.getElementById(`positionForPuzzle` + puzzleId).value),
-                    classId: puzzleData.classId,
-                    maxAssertionsPerTest: parseIntOrNull(document.getElementById(`maxAssertionsPerTestForPuzzle` + puzzleId).value),
-                    forceHamcrest: puzzleData.forceHamcrest,
-                    editableLinesStart: parseIntOrNull(document.getElementById(`editableLinesStartForPuzzle` + puzzleId).value),
-                    editableLinesEnd: parseIntOrNull(document.getElementById(`editableLinesEndForPuzzle` + puzzleId).value)
-                };
-
-                PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
-                    .then(responseJSON => {
-                        puzzleTable.row(row).data(updatedPuzzleData);
-
-                        // Redraw, so ordering is restored, too.
-                        puzzleTable.rows().invalidate('data').draw();
-                    }).catch(error => {
-                        alert(`Puzzle \${puzzleId} could not be updated.`);
-                    });
-            }
-
-            function removePuzzle(puzzleId, row) {
-                let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
-                if (confirmResult) {
-                    PuzzleAPI.deletePuzzle(puzzleId)
-                        .then(responseJSON => {
-                            puzzleTable.row(row).remove();
-
-                            // Forces re-rendering to update row index
-                            puzzleTable.rows().invalidate('data').draw();
-                        }).catch(error => {
-                            puzzleTable.row(row).node().querySelector('.removePuzzle').disabled = true;
-                            alert(`Puzzle \${puzzleId} could not be removed.`);
-                    });
-                }
-            }
-
-            puzzleTablePromise.promise.then(() => {
-                puzzleTable.table().container().addEventListener('click', function (event) {
-                    if (event.target.classList.contains('updatePuzzle')) {
-                        updatePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
-                    }
-                    if (event.target.classList.contains('removePuzzle')) {
-                        removePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
-                    }
-                });
+            document.getElementById('button-save').addEventListener('click', function(event) {
+                isUnsavedChanges = false;
             });
-            chapterTablePromise.promise.then(() => {
-                chapterTable.table().container().addEventListener('click', function (event) {
-                    if (event.target.classList.contains('updatePuzzleChapter')) {
-                        updatePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
-                    }
-                    if (event.target.classList.contains('removePuzzleChapter')) {
-                        removePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
-                    }
-                });
+
+            document.getElementById('button-add-chapter').addEventListener('click', function(event) {
+                const chapter = {
+                    id: -1,
+                    title: 'Unnamed Chapter',
+                    description: ''
+                };
+                const chapterElem = createChapterElement(chapter);
+                document.querySelector('.chapters').insertAdjacentElement('afterbegin', chapterElem);
+            });
+
+            document.querySelector('.chapters').addEventListener('click', function(event) {
+                const deleteButton = event.target.closest('.chapter__button__delete');
+                if (deleteButton === null) {
+                    return;
+                }
+
+                const chapter = event.target.closest('.chapter');
+                const puzzles = Array.from(chapter.querySelector('.puzzles').children);
+                for (const puzzle of puzzles) {
+                    unassignPuzzle(puzzle);
+                }
+
+                chapter.remove();
             });
         </script>
-
-    </div>
+    </jsp:body>
 </p:main_page>
