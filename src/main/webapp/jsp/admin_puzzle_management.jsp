@@ -118,7 +118,10 @@
                 chapterDiv.querySelector('.chapter__description').innerText = chapter.description;
 
                 chapterDiv.querySelector('.chapter__controls').firstElementChild
-                        .insertAdjacentElement('afterend', createMoveDropdown('Move to position:'));
+                        .insertAdjacentElement('afterend', createMoveDropdown({
+                            label: 'Move to position:',
+                            title: 'Move to position'
+                        }));
 
                 chapterDiv.dataset.id = chapter.id;
                 return chapterDiv;
@@ -173,33 +176,41 @@
                     deleteButton.title = "Puzzles with existing games can't be deleted";
                 }
                 puzzleDiv.querySelector('.puzzle__controls').firstElementChild
-                        .insertAdjacentElement('afterend', createMoveDropdown('Move to chapter:'));
+                        .insertAdjacentElement('afterend', createMoveDropdown({
+                            label: 'Move to chapter:',
+                            title: 'Move to chapter'
+                        }));
 
                 puzzleDiv.dataset.id = puzzle.id;
                 return puzzleDiv;
             }
 
-            function createMoveDropdown(label) {
+            function createMoveDropdown(config) {
+                const showButtonClasses = config.showButtonClasses ?? 'btn btn-xs btn-primary btn-fixed';
+                const showButtonContent = config.showButtonContent ?? '<i class="fa fa-arrow-right"></i>';
+                const label = config.label ?? 'Move to chapter:';
+                const moveButtonContent = config.moveButtonContent ?? 'Move';
+                const title = config.title ?? 'Move';
+
                 const dropdown = document.createElement('div');
                 dropdown.classList.add('dropdown', 'move', 'd-flex');
                 dropdown.title = 'Move';
                 dropdown.innerHTML =
-                        `<button class="btn btn-xs btn-primary btn-fixed move__show"
+                        `<button class="\${showButtonClasses} move__show"
                             data-bs-toggle="dropdown" data-bs-offset="0,8">
-                        <i class="fa fa-arrow-right"></i>
+                            \${showButtonContent}
                     </button>
                     <div class="dropdown-menu move__menu">
                         <div class="d-flex flex-column gap-1">
-                            <div class="move__label"></div>
+                            <div class="move__label">\${label}</div>
                             <div class="d-flex flex-row gap-2">
                                 <select class="form-select form-select-sm move__position"></select>
                                 <button type="button" class="btn btn-primary btn-xs move__confirm">
-                                    Move
+                                    \${moveButtonContent}
                                 </button>
                             </div>
                         </div
                     </div>`;
-                dropdown.querySelector('.move__label').innerText = label;
                 return dropdown;
             }
 
@@ -282,6 +293,14 @@
             }
 
             function init() {
+                document.getElementById('button-add-chapter').insertAdjacentElement('afterend', createMoveDropdown({
+                    title: 'Scroll to chapter',
+                    label: 'Scroll to chapter:',
+                    moveButtonContent: 'Go',
+                    showButtonClasses: 'btn btn-sm btn-outline-secondary',
+                    showButtonContent: 'Scroll to chapter <i class="fa fa-arrow-down ms-1"></i>',
+                }));
+
                 const unassignedChapter = document.getElementById('chapter-unassigned');
                 for (const puzzle of puzzlesPerChapter.get('unassigned')) {
                     addPuzzleToChapter(createPuzzleElement(puzzle), unassignedChapter);
@@ -435,6 +454,20 @@
                 }
 
                 chapter.remove();
+            });
+
+            document.querySelector('#puzzle-management .move__confirm').addEventListener('click', function (event) {
+                const select = event.target.closest('.move').querySelector('.move__position');
+                const index = Number(select.value) - 1;
+
+                document.querySelector('.chapters').children.item(index).scrollIntoView();
+            });
+
+            document.querySelector('#puzzle-management .move__show').addEventListener('click', function (event) {
+                const options = createChapterSelectOptions();
+                const select = event.target.closest('.move').querySelector('.move__position');
+                select.innerText = '';
+                select.appendChild(options);
             });
         </script>
     </jsp:body>
