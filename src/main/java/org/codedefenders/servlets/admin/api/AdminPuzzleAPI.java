@@ -35,8 +35,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.model.PuzzleInfo;
@@ -44,7 +42,6 @@ import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,6 +158,9 @@ public class AdminPuzzleAPI extends HttpServlet {
                 }
                 message = "Missing puzzleChapterId parameter.";
                 break;
+            }
+            case Paths.API_ADMIN_PUZZLES_ALL: {
+                handleBatchUpdatePuzzlePositions(request, response);
             }
             default: {
                 message = "Requested URL not available.";
@@ -313,11 +313,12 @@ public class AdminPuzzleAPI extends HttpServlet {
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
+                .registerTypeAdapter(AdminPuzzleInfo.class, new AdminPuzzleInfoTypeAdapter())
+                .serializeNulls()
                 .create();
-
         JsonArray puzzleArray = new JsonArray();
         for (AdminPuzzleInfo puzzleInfo : puzzles) {
-            puzzleArray.add(puzzleInfo.toJson());
+            puzzleArray.add(gson.toJsonTree(puzzleInfo));
         }
         JsonArray puzzleChapterArray = new JsonArray();
         for (PuzzleChapter chapter : puzzleChapters) {
@@ -446,6 +447,29 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json.toString());
     }
 
+    private void handleBatchUpdatePuzzlePositions(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        Optional<JsonObject> optBody = readJSONBody(request);
+        if (optBody.isEmpty()) {
+            JsonObject json = new JsonObject();
+            json.add("message", new JsonPrimitive("No valid request body provided"));
+            writeJSONResponse(response, json.toString());
+            return;
+        }
+
+        JsonObject body = optBody.get();
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
+                .create();
+
+        AdminPuzzlePositions positions = gson.fromJson(body, AdminPuzzlePositions.class);
+        puzzleRepo.batchUpdatePuzzlePositions(positions);
+
+        JsonObject json = new JsonObject();
+        json.add("message", new JsonPrimitive("Successfully updated puzzle and chapter positions."));
+        writeJSONResponse(response, json.toString());
+    }
+
     /**
      * Writes a given JSON string to a given {@link HttpServletResponse}.
      * Also sets the content type to {@code application/json}.
@@ -537,6 +561,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
                     .name("chapterId").value(info.puzzle.getChapterId())
                     .name("classId").value(info.puzzle.getClassId())
+                    .name("activeRole").value(info.puzzle.getActiveRole().name())
                     .name("gameCount").value(info.gameCount)
                     .name("active").value(info.active)
                     .endObject();
@@ -545,6 +570,21 @@ public class AdminPuzzleAPI extends HttpServlet {
         @Override
         public AdminPuzzleInfo read(JsonReader in) throws IOException {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class AdminPuzzlePositionsTypeAdapter extends TypeAdapter<AdminPuzzleInfo> {
+        @Override
+        public void write(JsonWriter out, AdminPuzzleInfo info) throws IOException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public AdminPuzzleInfo read(JsonReader in) throws IOException {
+            JsonObject json = JsonParser.parseReader(in).getAsJsonObject();
+
+
+            return null;
         }
     }
 
@@ -581,22 +621,14 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
     }
 
-    public record AdminPuzzleInfo(Puzzle puzzle, int gameCount, boolean active) {
-        public JsonObject toJson() {
-            var object = new JsonObject();
-            object.addProperty("id", this.puzzle.getPuzzleId());
-            object.addProperty("position", this.puzzle.getPosition());
-            object.addProperty("title", this.puzzle.getTitle());
-            object.addProperty("description", this.puzzle.getDescription());
-            object.addProperty("maxAssertionsPerTest", this.puzzle.getMaxAssertionsPerTest());
-            object.addProperty("editableLinesStart", this.puzzle.getEditableLinesStart());
-            object.addProperty("editableLinesEnd", this.puzzle.getEditableLinesEnd());
-            object.addProperty("chapterId", this.puzzle.getChapterId());
-            object.addProperty("classId", this.puzzle.getClassId());
-            object.addProperty("activeRole", this.puzzle.getActiveRole().name());
-            object.addProperty("gameCount", this.gameCount);
-            object.addProperty("active", this.active);
-            return object;
-        }
+    public record AdminPuzzleInfo(Puzzle puzzle, int gameCount, boolean active) {}
+
+    public record AdminPuzzlePositions(
+            List<Integer> unassignedPuzzles,
+            List<Integer> archivedPuzzles,
+            List<AdminPuzzlePositionsChapter> chapters) {
+        public record AdminPuzzlePositionsChapter(
+                int id,
+                List<Integer> puzzles) {}
     }
 }
