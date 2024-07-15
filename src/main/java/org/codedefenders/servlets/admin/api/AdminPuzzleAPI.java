@@ -151,12 +151,17 @@ public class AdminPuzzleAPI extends HttpServlet {
                 break;
             }
             case Paths.API_ADMIN_PUZZLECHAPTER: {
-                final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
-                if (puzzleChapterId.isPresent()) {
-                    handleUpdatePuzzleChapter(request, response, puzzleChapterId.get());
+                if (request.getParameter("create") != null) {
+                    handleCreatePuzzleChapter(request, response);
                     return;
+                } else {
+                    final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
+                    if (puzzleChapterId.isPresent()) {
+                        handleUpdatePuzzleChapter(request, response, puzzleChapterId.get());
+                        return;
+                    }
                 }
-                message = "Missing puzzleChapterId parameter.";
+                message = "Missing puzzleChapterId or create parameter.";
                 break;
             }
             case Paths.API_ADMIN_PUZZLES_ALL: {
@@ -407,6 +412,30 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json.toString());
     }
 
+    private void handleCreatePuzzleChapter(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        Optional<JsonObject> body = readJSONBody(request);
+        if (body.isEmpty()) {
+            JsonObject json = new JsonObject();
+            json.add("message", new JsonPrimitive("No valid request body provided"));
+            writeJSONResponse(response, json.toString());
+            return;
+        }
+
+        JsonObject json = body.get();
+        Gson gson = new GsonBuilder().create();
+        var data = gson.fromJson(json, AdminCreateChapterData.class);
+
+        int maxPosition = puzzleRepo.getPuzzleChapters().stream()
+                    .mapToInt(PuzzleChapter::getPosition)
+                    .max().orElse(0);
+
+        puzzleRepo.storePuzzleChapter(new PuzzleChapter(-1, maxPosition + 1, data.title, data.description));
+        JsonObject jsonResponse = new JsonObject();
+        jsonResponse.add("message", new JsonPrimitive("Successfully create puzzle chapter."));
+        writeJSONResponse(response, json.toString());
+    }
+
     private void handleUpdatePuzzleChapter(HttpServletRequest request,
                                            HttpServletResponse response,
                                            int puzzleChapterId) throws IOException {
@@ -631,4 +660,6 @@ public class AdminPuzzleAPI extends HttpServlet {
                 int id,
                 List<Integer> puzzles) {}
     }
+
+    public record AdminCreateChapterData(String title, String description) {}
 }

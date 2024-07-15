@@ -53,7 +53,8 @@
 
         <script type="module">
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
-            import {PuzzleAPI} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            import {Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
+            import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
             const watermarkUrl = '${url.forPath("/images/achievements/")}';
@@ -82,6 +83,11 @@
             chapters.sort((a, b) => a.position - b.position);
             for (const puzzles of puzzlesPerChapter.values()) {
                 puzzles.sort((a, b) => a.position - b.position);
+            }
+
+            const chaptersById = new Map();
+            for (const chapter of chapters) {
+                chaptersById.set(chapter.id, chapter);
             }
 
             let isUnsavedChanges = false;
@@ -122,6 +128,14 @@
                             label: 'Move to position:',
                             title: 'Move to position'
                         }));
+
+                Sortable.create(chapterDiv.querySelector('.puzzles'), {
+                    animation: 200,
+                    group: 'puzzles',
+                    onMove: function() {
+                        isUnsavedChanges = true;
+                    }
+                });
 
                 chapterDiv.dataset.id = chapter.id;
                 return chapterDiv;
@@ -274,19 +288,22 @@
                 document.querySelector('#chapter-unassigned .puzzles').appendChild(puzzleElement);
             }
 
-            function getChapterData() {
+            function getPuzzlePositions() {
                 const data = {};
 
                 const unassignedPuzzles = document.querySelector('#chapter-unassigned .puzzles').children;
-                data.unassigned = Array.from(unassignedPuzzles).map(el => el.dataset.id);
+                data.unassignedPuzzles = Array.from(unassignedPuzzles).map(el => Number(el.dataset.id));
 
                 const archivedPuzzles = document.querySelector('#chapter-archived .puzzles').children
-                data.archived = Array.from(archivedPuzzles).map(el => el.dataset.id);
+                data.archivedPuzzles = Array.from(archivedPuzzles).map(el => Number(el.dataset.id));
 
                 data.chapters = [];
                 for (const chapter of document.querySelector('.chapters').children) {
                     const puzzles = chapter.querySelector('.puzzles').children;
-                    data.chapters.push(Array.from(puzzles).map(el => el.dataset.id));
+                    data.chapters.push({
+                        id: Number(chapter.dataset.id),
+                        puzzles: Array.from(puzzles).map(el => Number(el.dataset.id))
+                    });
                 }
 
                 return data;
@@ -322,26 +339,14 @@
                 }
 
 
-                for (const list of document.getElementsByClassName('puzzles')) {
-                    Sortable.create(list, {
-                        animation: 200,
-                        group: 'puzzles',
-                        onMove: function() {
-                            isUnsavedChanges = true;
-                        }
-                    })
-                }
-
-                for (const list of document.getElementsByClassName('chapters')) {
-                    Sortable.create(list, {
-                        animation: 200,
-                        group: 'chapters',
-                        handle: '.chapter__handle',
-                        onMove: function() {
-                            isUnsavedChanges = true;
-                        }
-                    })
-                }
+                Sortable.create(document.querySelector('.chapters'), {
+                    animation: 200,
+                    group: 'chapters',
+                    handle: '.chapter__handle',
+                    onMove: function() {
+                        isUnsavedChanges = true;
+                    }
+                });
 
                 document.getElementById('puzzle-management').addEventListener('show.bs.dropdown', function (event) {
                     const toggleButton = event.target.closest('.chapter__controls .move__show');
@@ -431,16 +436,6 @@
                 isUnsavedChanges = false;
             });
 
-            document.getElementById('button-add-chapter').addEventListener('click', function(event) {
-                const chapter = {
-                    id: -1,
-                    title: 'Unnamed Chapter',
-                    description: ''
-                };
-                const chapterElem = createChapterElement(chapter);
-                document.querySelector('.chapters').insertAdjacentElement('afterbegin', chapterElem);
-            });
-
             document.querySelector('.chapters').addEventListener('click', function(event) {
                 const deleteButton = event.target.closest('.chapter__button__delete');
                 if (deleteButton === null) {
@@ -468,6 +463,180 @@
                 const select = event.target.closest('.move').querySelector('.move__position');
                 select.innerText = '';
                 select.appendChild(options);
+            });
+
+            document.getElementById('button-save').addEventListener('click', function (event) {
+                PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions());
+            });
+
+            document.querySelector('.chapters').addEventListener('click', function (event) {
+                const editButton = event.target.closest('.chapter__button__edit');
+                if (editButton === null) {
+                    return;
+                }
+
+                const chapterElem = event.target.closest('.chapter');
+                const chapter = chaptersById.get(Number(chapterElem.dataset.id));
+
+                const modal = new Modal();
+                modal.body.innerHTML =`
+                        <div class="row mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" value=""
+                                    placeholder="Title">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description" class="form-control" value=""
+                                    placeholder="Description">
+                            </div>
+                        </div>`;
+                modal.title.innerText = 'Edit Chapter';
+                modal.footerCloseButton.innerText = 'Cancel';
+                modal.modal.dataset.id = chapter.id;
+                modal.body.querySelector('input[name="title"]').value = chapter.title;
+                modal.body.querySelector('input[name="description"]').value = chapter.description;
+
+                const saveButton = document.createElement('button');
+                saveButton.classList.add('btn', 'btn-primary');
+                saveButton.role = 'button';
+                saveButton.innerText = 'Save';
+                modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                saveButton.addEventListener('click', function(event) {
+                    const title = modal.body.querySelector('input[name="title"]').value;
+                    const description = modal.body.querySelector('input[name="description"]').value;
+
+                    PuzzleAPI.updatePuzzleChapter(chapter.id, {
+                        title: title,
+                        description: description,
+                        id: chapter.id,
+                        position: chapter.position
+                    }).then(responseJSON => {
+                        chapter.title = title;
+                        chapter.description = description;
+                        chapterElem.querySelector('.chapter__title').innerText = title;
+                        chapterElem.querySelector('.chapter__description').innerText = description;
+                    }).catch(error => {
+                        alert('Puzzle chapter could not be updated.');
+                    }).finally(() => {
+                        modal.controls.hide();
+                    });
+                });
+
+                modal.controls.show();
+            });
+
+            for (const chapter of [
+                document.querySelector('#chapter-archived .puzzles'),
+                document.querySelector('#chapter-unassigned .puzzles')
+            ]) {
+                Sortable.create(chapter, {
+                    animation: 200,
+                    group: 'puzzles',
+                    onMove: function() {
+                        isUnsavedChanges = true;
+                    }
+                });
+            }
+
+            document.querySelector('.chapters').addEventListener('click', function (event) {
+                const deleteButton = event.target.closest('.chapter__button__delete');
+                if (deleteButton === null) {
+                    return;
+                }
+
+                const chapterElem = event.target.closest('.chapter');
+
+                const modal = createDeleteChapterModal();
+
+                modal.querySelector('.button__confirm').addEventListener('click', function(event) {
+                    const title = modal.querySelector('.input__title').value;
+                    const description = modal.querySelector('.input__description').value;
+
+                    PuzzleAPI.updatePuzzleChapter(chapter.id, {
+                        title: title,
+                        description: description,
+                        id: chapter.id,
+                        position: chapter.position
+                    }).then(responseJSON => {
+                        chapterElem.querySelector('.chapter__title').innerText = title;
+                        chapterElem.querySelector('.chapter__description').innerText = description;
+                    }).catch(error => {
+                        alert('Puzzle chapter could not be updated.');
+                    }).finally(() => {
+                        modal.controls.hide();
+                    });
+                });
+
+                new BootstrapModal(modal).show();
+            });
+
+            for (const chapter of [
+                document.querySelector('#chapter-archived .puzzles'),
+                document.querySelector('#chapter-unassigned .puzzles')
+            ]) {
+                Sortable.create(chapter, {
+                    animation: 200,
+                    group: 'puzzles',
+                    onMove: function() {
+                        isUnsavedChanges = true;
+                    }
+                });
+            }
+
+            document.getElementById('button-add-chapter').addEventListener('click', function (event) {
+                const modal = new Modal();
+                modal.body.innerHTML =`
+                        <div class="row mb-3">
+                            <div class="form-group">
+                                <label class="form-label">Title</label>
+                                <input type="text" name="title" class="form-control" value=""
+                                    placeholder="Title">
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <input type="text" name="description" class="form-control" value=""
+                                    placeholder="Description">
+                            </div>
+                        </div>`;
+                modal.title.innerText = 'Create New Chapter';
+                modal.footerCloseButton.innerText = 'Cancel';
+
+                const saveButton = document.createElement('button');
+                saveButton.classList.add('btn', 'btn-primary');
+                saveButton.role = 'button';
+                saveButton.innerText = 'Save';
+                modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                saveButton.addEventListener('click', function(event) {
+                    const title = modal.body.querySelector('input[name="title"]').value;
+                    const description = modal.body.querySelector('input[name="description"]').value;
+
+                    PuzzleAPI.createPuzzleChapter({
+                        title: title,
+                        description: description,
+                    }).then(responseJSON => {
+                        const chapter = {
+                            id: -1,
+                            title,
+                            description
+                        };
+                        const chapterElem = createChapterElement(chapter);
+                        document.querySelector('.chapters').insertAdjacentElement('beforeend', chapterElem);
+                    }).catch(error => {
+                        alert('Puzzle chapter could not be updated.');
+                    });
+                });
+
+                modal.controls.show();
             });
         </script>
     </jsp:body>
