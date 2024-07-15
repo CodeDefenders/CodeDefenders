@@ -20,9 +20,10 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Function;
 
 import jakarta.annotation.Nonnull;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -41,13 +42,14 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.admin.api.AdminPuzzleAPI;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.AdminPuzzleInfo;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.AdminPuzzlePositions;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.persistence.database.util.QueryUtils.extractBatchParams;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
@@ -603,6 +605,66 @@ public class PuzzleRepository {
             boolean active = rs.getBoolean("puzzles.Active");
             return new AdminPuzzleInfo(puzzle, gameCount, active);
         }));
+    }
+
+    public void batchUpdatePuzzlePositions(AdminPuzzlePositions positions) {
+        @Language("SQL") String query = """
+            UPDATE puzzles
+            SET Position = ?,
+                Chapter_ID = ?,
+                Active = ?
+            WHERE Puzzle_ID = ?;
+        """;
+
+        class Counter {
+            int pos = 1;
+            <T> Object getPos(T t) {
+                return pos++;
+            }
+        }
+
+        var batchParams = new ArrayList<>();
+
+        // unassigned puzzles
+        // -> Active = true, Chapter_ID = null, Position = <count>
+        batchParams.addAll(Arrays.asList(
+                extractBatchParams(positions.unassignedPuzzles(),
+                        new Counter()::getPos,
+                        id -> null,
+                        id -> true,
+                        id -> id)));
+
+        // archived puzzles
+        // -> Active = false, Chapter_ID = null, Position = <count>
+        batchParams.addAll(Arrays.asList(
+                extractBatchParams(positions.archivedPuzzles(),
+                        new Counter()::getPos,
+                        id -> null,
+                        id -> false,
+                        id -> id)));
+
+        // regular puzzles
+        // -> Active = true, Chapter_ID = id, Position = <count>
+        for (var chapter : positions.chapters()) {
+            batchParams.addAll(Arrays.asList(
+                    extractBatchParams(chapter.puzzles(),
+                            new Counter()::getPos,
+                            id -> chapter.id(),
+                            id -> true,
+                            id -> id)));
+        }
+
+        queryRunner.batch(query, batchParams.toArray(Object[][]::new));
+
+        // update chapter positions
+        query = """
+            UPDATE puzzle_chapters
+            SET Position = ?
+            WHERE Chapter_ID = ?;
+        """;
+        queryRunner.batch(query, extractBatchParams(positions.chapters(),
+                new Counter()::getPos,
+                chapter -> chapter.id()));
     }
 
     /**
