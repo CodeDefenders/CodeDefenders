@@ -166,6 +166,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             }
             case Paths.API_ADMIN_PUZZLES_ALL: {
                 handleBatchUpdatePuzzlePositions(request, response);
+                return;
             }
             default: {
                 message = "Requested URL not available.";

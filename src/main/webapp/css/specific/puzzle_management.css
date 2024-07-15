@@ -19,7 +19,7 @@
 
 /* ==================== Chapters / Puzzle Containers ==================== */
 
-.chapters {
+#chapters {
     counter-reset: chapter 0;
 
     display: flex;
@@ -184,7 +184,7 @@
     filter: saturate(0) brightness(0) invert(1);
 }
 
-.puzzle__container {
+.puzzle__content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -257,21 +257,21 @@
     opacity: .65;
 }
 
-/* ==================== Move Menu ==================== */
+/* ==================== Chapter Select Menu ==================== */
 
-.move__menu {
+.chapter_select__menu {
     width: max-content;
     padding: 0.4rem;
     border-radius: 0.5rem;
 }
 
-.move__position {
+.chapter_select__position {
     max-width: 12rem;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.move__label {
+.chapter_select__label {
     font-size: .85rem;
     color: var(--bs-secondary);
     margin-bottom: -1px;
