@@ -58,7 +58,7 @@
             const watermarkUrl = '${url.forPath("/images/achievements/")}';
             const puzzleData = await PuzzleAPI.fetchPuzzleData();
             const puzzles = puzzleData.puzzles;
-            const chapters = puzzleData.puzzleChapters;
+            const chapters = puzzleData.chapters;
 
             // ==== Init Data ==========================================================================================
 
@@ -501,16 +501,109 @@
 
                         PuzzleAPI.updatePuzzleChapter(chapter.id, {
                             title: title,
-                            description: description,
-                            id: chapter.id,
-                            position: chapter.position
+                            description: description
                         }).then(response => {
-                            chapter.title = title;
-                            chapter.description = description;
-                            chapterComp.title.innerText = title;
-                            chapterComp.description.innerText = description;
+                            chapter.title = response.chapter.title;
+                            chapter.description = response.chapter.description;
+                            chapterComp.title.innerText = response.chapter.title;
+                            chapterComp.description.innerText = response.chapter.description;
                         }).catch(error => {
                             alert('Puzzle chapter could not be updated.');
+                        }).finally(() => {
+                            modal.controls.hide();
+                        });
+                    });
+
+                    modal.controls.show();
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const editButton = event.target.closest('.puzzle__button__edit');
+                    if (editButton === null) {
+                        return;
+                    }
+
+                    const puzzleComp = PuzzleComponent.fromChild(event.target);
+                    const puzzle = puzzleComp.puzzle;
+
+                    const modal = new Modal();
+                    modal.body.innerHTML = `
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" value="" name="title">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <input type="text" class="form-control" value="" name="description">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Max. Assertions</label>
+                                <input type="number" class="form-control" value="" name="maxAssertionsPerTest">
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-2 editable-lines">
+                            <div class="col-6">
+                                <label class="form-label">First Editable Line</label>
+                                <input type="number" class="form-control" value="" name="editableLinesStart">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Last Editable Line</label>
+                                <input type="number" class="form-control" value="" name="editableLinesEnd">
+                            </div>
+                        </div>`;
+                    modal.title.innerText = 'Edit Puzzle';
+                    modal.footerCloseButton.innerText = 'Cancel';
+                    modal.modal.dataset.id = puzzle.id;
+                    modal.body.querySelector('input[name="title"]').value = puzzle.title;
+                    modal.body.querySelector('input[name="description"]').value = puzzle.description;
+                    modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
+                    if (puzzle.activeRole === 'DEFENDER') {
+                        modal.body.querySelector('.editable-lines').remove();
+                    } else {
+                        modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
+                        modal.body.querySelector('input[name="editableLinesEnd"]').value = puzzle.editableLinesEnd;
+                    }
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-primary');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Save';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        const title = modal.body.querySelector('input[name="title"]').value;
+                        const description = modal.body.querySelector('input[name="description"]').value;
+                        let maxAssertionsPerTest = modal.body.querySelector('input[name="maxAssertionsPerTest"]').value;
+                        maxAssertionsPerTest = Number(maxAssertionsPerTest);
+                        let editableLinesStart = modal.body.querySelector('input[name="editableLinesStart"]')?.value;
+                        editableLinesStart = editableLinesStart ? Number(editableLinesStart) : null;
+                        let editableLinesEnd = modal.body.querySelector('input[name="editableLinesEnd"]')?.value;
+                        editableLinesEnd = editableLinesEnd ? Number(editableLinesEnd) : null;
+
+                        PuzzleAPI.updatePuzzle(puzzle.id, {
+                            title,
+                            description,
+                            maxAssertionsPerTest,
+                            editableLinesStart,
+                            editableLinesEnd
+                        }).then(response => {
+                            puzzle.title = response.puzzle.title;
+                            puzzle.description = response.puzzle.description;
+                            puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
+                            puzzle.editableLinesStart = response.puzzle.editableLinesStart;
+                            puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
+                            puzzleComp.title.innerText = response.puzzle.title;
+                            puzzleComp.description.innerText = response.puzzle.description;
+                        }).catch(error => {
+                            alert('Puzzle could not be updated.');
                         }).finally(() => {
                             modal.controls.hide();
                         });
@@ -548,10 +641,10 @@
                     saveButton.addEventListener('click', function(event) {
                         PuzzleAPI.deletePuzzleChapter(chapter.id)
                                 .then(response => {
-                                    chapterComp.container.remove();
-                                    for (const puzzle of [...chapterComp.puzzles]) {
-                                        unassignedChapter.addPuzzle(puzzle);
+                                    for (const puzzleElem of [...chapterComp.puzzles]) {
+                                        unassignedChapter.addPuzzle(PuzzleComponent.fromChild(puzzleElem));
                                     }
+                                    chapterComp.container.remove();
                                 }).catch(error => {
                                     alert('Puzzle chapter could not be deleted.');
                                 }).finally(() => {
@@ -598,9 +691,9 @@
                             description: description,
                         }).then(response => {
                             const chapterComp = ChapterComponent.forChapter({
-                                id: response.id,
-                                title: response.title,
-                                description: response.description
+                                id: response.chapter.id,
+                                title: response.chapter.title,
+                                description: response.chapter.description
                             });
                             chaptersContainer.appendChild(chapterComp.container);
                         }).catch(error => {

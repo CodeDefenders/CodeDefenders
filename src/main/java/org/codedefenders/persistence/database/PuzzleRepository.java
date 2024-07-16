@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import jakarta.annotation.Nonnull;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -39,11 +38,10 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.AdminPuzzleInfo;
-import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.AdminPuzzlePositions;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.UpdatePuzzlePositionsData;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -377,12 +375,12 @@ public class PuzzleRepository {
 
 
     /**
-     * Updates the given {@link PuzzleInfo puzzle information} in the database.
+     * Updates the given {@link org.codedefenders.model.PuzzleInfo puzzle information} in the database.
      *
-     * @param puzzle The {@link PuzzleInfo}.
+     * @param puzzle The {@link org.codedefenders.model.PuzzleInfo}.
      * @return {@code true} if the update was successful, {@code false} otherwise.
      */
-    public boolean updatePuzzle(PuzzleInfo puzzle) {
+    public boolean updatePuzzle(org.codedefenders.model.PuzzleInfo puzzle) {
         @Language("SQL") String query = """
                 UPDATE puzzles
                 SET Chapter_ID           = ?,
@@ -591,7 +589,7 @@ public class PuzzleRepository {
         return puzzle.isPresent();
     }
 
-    public List<AdminPuzzleInfo> getAdminPuzzleInfos() {
+    public List<AdminPuzzleAPI.GetPuzzlesData.PuzzleData> getAdminPuzzleInfos() {
         @Language("SQL") String query = """
                 SELECT puzzles.*, COUNT(games.ID) AS game_count
                 FROM puzzles
@@ -603,11 +601,11 @@ public class PuzzleRepository {
             Puzzle puzzle = puzzleFromRS(rs);
             int gameCount = rs.getInt("game_count");
             boolean active = rs.getBoolean("puzzles.Active");
-            return new AdminPuzzleInfo(puzzle, gameCount, active);
+            return new AdminPuzzleAPI.GetPuzzlesData.PuzzleData(puzzle, gameCount, active);
         }));
     }
 
-    public void batchUpdatePuzzlePositions(AdminPuzzlePositions positions) {
+    public void batchUpdatePuzzlePositions(UpdatePuzzlePositionsData positions) {
         @Language("SQL") String query = """
             UPDATE puzzles
             SET Position = ?,

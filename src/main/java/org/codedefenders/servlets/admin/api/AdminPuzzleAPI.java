@@ -36,9 +36,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
-import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.GetPuzzlesData.PuzzleData;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -246,26 +245,14 @@ public class AdminPuzzleAPI extends HttpServlet {
 
     private void handleGetAllPuzzlesRequest(HttpServletResponse response) throws IOException {
         final List<PuzzleChapter> puzzleChapters = puzzleRepo.getPuzzleChapters();
-        final List<AdminPuzzleInfo> puzzles = puzzleRepo.getAdminPuzzleInfos();
+        final List<PuzzleData> puzzles = puzzleRepo.getAdminPuzzleInfos();
 
         Gson gson = new GsonBuilder()
+                .registerTypeAdapter(PuzzleData.class, new PuzzleDataTypeAdapter())
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
-                .registerTypeAdapter(AdminPuzzleInfo.class, new AdminPuzzleInfoTypeAdapter())
                 .serializeNulls()
                 .create();
-        JsonArray puzzleArray = new JsonArray();
-        for (AdminPuzzleInfo puzzleInfo : puzzles) {
-            puzzleArray.add(gson.toJsonTree(puzzleInfo));
-        }
-        JsonArray puzzleChapterArray = new JsonArray();
-        for (PuzzleChapter chapter : puzzleChapters) {
-            puzzleChapterArray.add(gson.toJsonTree(chapter));
-        }
-
-        JsonObject json = new JsonObject();
-        json.add("puzzles", puzzleArray);
-        json.add("puzzleChapters", puzzleChapterArray);
-
+        JsonElement json = gson.toJsonTree(new GetPuzzlesData(puzzles, puzzleChapters));
         writeJSONResponse(response, 200, json);
     }
 
@@ -312,57 +299,44 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        JsonObject json = body.get();
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
-                .create();
-        Puzzle parsedPuzzle = gson.fromJson(json, Puzzle.class);
-
-        if (puzzleId != parsedPuzzle.getPuzzleId()) {
-            writeJSONMessage(response, 400, "Identifier from URL and body do not match.");
-            return;
-        }
+        Gson gson = new GsonBuilder().create();
+        UpdatePuzzleData puzzleData = gson.fromJson(body.get(), UpdatePuzzleData.class);
 
         // TODO: This should be done in a service.
-        String title = parsedPuzzle.getTitle().strip();
+        String title = puzzleData.title.strip();
         if (title.isEmpty() || title.length() > 100) {
             writeJSONMessage(response, 400, "Invalid title.");
             return;
         }
-        String description = parsedPuzzle.getDescription().strip();
+        String description = puzzleData.description.strip();
         if (description.length() > 1000) {
             writeJSONMessage(response, 400, "Invalid description.");
             return;
         }
-        int maxAssertionsPerTest = parsedPuzzle.getMaxAssertionsPerTest();
+        int maxAssertionsPerTest = puzzleData.maxAssertionsPerTest;
         if (maxAssertionsPerTest < 0) {
             writeJSONMessage(response, 400, "Invalid maxAssertionsPerTest.");
             return;
         }
-        int position = parsedPuzzle.getPosition();
-        if (position < 0) {
-            writeJSONMessage(response, 400, "Invalid position.");
-            return;
-        }
-        Integer editableLinesStart = parsedPuzzle.getEditableLinesStart();
+        Integer editableLinesStart = puzzleData.editableLinesStart;
         if (editableLinesStart != null && editableLinesStart < 0) {
             writeJSONMessage(response, 400, "Invalid editableLinesStart.");
             return;
         }
-        Integer editableLinesEnd = parsedPuzzle.getEditableLinesEnd();
+        Integer editableLinesEnd = puzzleData.editableLinesEnd;
         if (editableLinesEnd != null && editableLinesEnd < 0) {
             writeJSONMessage(response, 400, "Invalid editableLinesEnd.");
             return;
         }
         if (editableLinesStart == null ^ editableLinesEnd == null) {
             writeJSONMessage(response, 400, "Invalid editable lines.");
+            return;
         }
 
-        boolean success = puzzleRepo.updatePuzzle(new PuzzleInfo(
-                parsedPuzzle.getPuzzleId(),
-                parsedPuzzle.getChapterId(),
-                position,
+        boolean success = puzzleRepo.updatePuzzle(new org.codedefenders.model.PuzzleInfo(
+                puzzle.getPuzzleId(),
+                puzzle.getChapterId(),
+                puzzle.getPosition(),
                 title,
                 description,
                 maxAssertionsPerTest,
@@ -374,16 +348,18 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
+        puzzle.setTitle(title);
+        puzzle.setDescription(description);
+        puzzle.setMaxAssertionsPerTest(maxAssertionsPerTest);
+        puzzle.setEditableLinesStart(editableLinesStart);
+        puzzle.setEditableLinesEnd(editableLinesEnd);
         JsonObject answer = new JsonObject();
-        answer.add("message", new JsonPrimitive("Successfully update puzzle."));
-        answer.add("id", new JsonPrimitive(parsedPuzzle.getPuzzleId()));
-        answer.add("title", new JsonPrimitive(title));
-        answer.add("description", new JsonPrimitive(description));
-        answer.add("position", new JsonPrimitive(position));
-        answer.add("maxAssertionsPerTest", new JsonPrimitive(maxAssertionsPerTest));
-        answer.add("editableLinesStart", editableLinesStart == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesStart));
-        answer.add("editableLinesEnd", editableLinesEnd == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesEnd));
-        writeJSONMessage(response, 200, answer.toString());
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
+                .create();
+        answer.add("message", new JsonPrimitive("Successfully updated puzzle."));
+        answer.add("puzzle", gson.toJsonTree(puzzle));
+        writeJSONResponse(response, 200, answer);
     }
 
     private void handleCreatePuzzleChapter(HttpServletRequest request, HttpServletResponse response)
@@ -394,9 +370,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        JsonObject json = body.get();
         Gson gson = new GsonBuilder().create();
-        var data = gson.fromJson(json, AdminCreateChapterData.class);
+        var data = gson.fromJson(body.get(), CreateChapterData.class);
 
         // TODO: This should be done in a service.
         int maxPosition = puzzleRepo.getPuzzleChapters().stream()
@@ -414,91 +389,80 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        int id = puzzleRepo.storePuzzleChapter(new PuzzleChapter(-1, position, title, description));
+        PuzzleChapter chapter = new PuzzleChapter(-1, position, title, description);
+        int id = puzzleRepo.storePuzzleChapter(chapter);
+        chapter.setChapterId(id);
 
+
+        gson = new GsonBuilder()
+                .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
+                .create();
         JsonObject answer = new JsonObject();
-        answer.add("message", new JsonPrimitive("Successfully create puzzle chapter."));
-        answer.add("id", new JsonPrimitive(id));
-        answer.add("title", new JsonPrimitive(title));
-        answer.add("description", new JsonPrimitive(description));
-        answer.add("position", new JsonPrimitive(position));
+        answer.add("message", new JsonPrimitive("Successfully created puzzle chapter."));
+        answer.add("chapter", gson.toJsonTree(chapter));
         writeJSONResponse(response, 200, answer);
     }
 
     private void handleUpdatePuzzleChapter(HttpServletRequest request,
                                            HttpServletResponse response,
                                            int puzzleChapterId) throws IOException {
-        final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
-        if (puzzleChapter == null) {
+        final PuzzleChapter chapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
+        if (chapter == null) {
             writeJSONMessage(response, 404, "Puzzle chapter not found.");
             return;
         }
-        Optional<JsonObject> body = readJSONBody(request);
 
+        Optional<JsonObject> body = readJSONBody(request);
         if (body.isEmpty()) {
             writeJSONMessage(response, 400, "No valid request body provided");
             return;
         }
 
-        JsonObject json = body.get();
-
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
-                .create();
-
-        PuzzleChapter parsedChapter = gson.fromJson(json, PuzzleChapter.class);
-        if (puzzleChapterId != parsedChapter.getChapterId()) {
-            writeJSONMessage(response, 400, "Identifier from URL and body do not match.");
-            return;
-        }
+        Gson gson = new GsonBuilder().create();
+        UpdateChapterData data = gson.fromJson(body.get(), UpdateChapterData.class);
 
         // TODO: This should be done in a service.
-        String title = parsedChapter.getTitle().strip();
+        String title = data.title.strip();
         if (title.isEmpty() || title.length() > 100) {
             writeJSONMessage(response, 400, "Invalid title.");
             return;
         }
-        String description = parsedChapter.getDescription().strip();
+        String description = data.description.strip();
         if (description.length() > 1000) {
             writeJSONMessage(response, 400, "Invalid description.");
             return;
         }
-        int position = parsedChapter.getPosition();
-        if (position < 0) {
-            writeJSONMessage(response, 400, "Invalid position.");
-            return;
-        }
 
-        boolean success = puzzleRepo.updatePuzzleChapter(new PuzzleChapter(
-                        parsedChapter.getChapterId(), position, title, description));
+        boolean success = puzzleRepo.updatePuzzleChapter(chapter);
         if (!success) {
             writeJSONMessage(response, 500, "Failed to update puzzle chapter.");
             return;
         }
 
+        chapter.setTitle(title);
+        chapter.setDescription(description);
+        gson = new GsonBuilder()
+                .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
+                .create();
         JsonObject answer = new JsonObject();
         answer.add("message", new JsonPrimitive("Successfully updated puzzle chapter."));
-        answer.add("id", new JsonPrimitive(parsedChapter.getChapterId()));
-        answer.add("title", new JsonPrimitive(title));
-        answer.add("description", new JsonPrimitive(description));
-        answer.add("position", new JsonPrimitive(position));
-        writeJSONMessage(response, 200, answer.toString());
+        answer.add("chapter", gson.toJsonTree(chapter));
+        writeJSONResponse(response, 200, answer);
     }
 
     private void handleBatchUpdatePuzzlePositions(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
-        Optional<JsonObject> optBody = readJSONBody(request);
-        if (optBody.isEmpty()) {
+        Optional<JsonObject> body = readJSONBody(request);
+        if (body.isEmpty()) {
             writeJSONMessage(response, 400, "No valid request body provided");
             return;
         }
 
-        JsonObject body = optBody.get();
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
 
-        AdminPuzzlePositions positions = gson.fromJson(body, AdminPuzzlePositions.class);
+        UpdatePuzzlePositionsData positions = gson.fromJson(body.get(), UpdatePuzzlePositionsData.class);
         puzzleRepo.batchUpdatePuzzlePositions(positions);
 
         writeJSONMessage(response, 200, "Successfully updated puzzle and chapter positions.");
@@ -550,7 +514,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     /**
-     * Custom {@link TypeAdapter} to convert {@link PuzzleInfo Puzzle information} to JSON.
+     * Custom {@link TypeAdapter} to convert {@link org.codedefenders.model.PuzzleInfo Puzzle information} to JSON.
      * Currently does not support to convert JSON to puzzles.
      */
     private static class PuzzleTypeAdapter extends TypeAdapter<Puzzle> {
@@ -567,7 +531,6 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("chapterId").value(puzzle.getChapterId())
                     .name("classId").value(puzzle.getClassId())
                     .endObject();
-            out.close();
         }
 
         @Override
@@ -591,47 +554,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
     }
 
-    private static class AdminPuzzleInfoTypeAdapter extends TypeAdapter<AdminPuzzleInfo> {
-        @Override
-        public void write(JsonWriter out, AdminPuzzleInfo info) throws IOException {
-            out.beginObject()
-                    .name("id").value(info.puzzle.getPuzzleId())
-                    .name("position").value(info.puzzle.getPosition())
-                    .name("title").value(info.puzzle.getTitle())
-                    .name("description").value(info.puzzle.getDescription())
-                    .name("maxAssertionsPerTest").value(info.puzzle.getMaxAssertionsPerTest())
-                    .name("editableLinesStart").value(info.puzzle.getEditableLinesStart())
-                    .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
-                    .name("chapterId").value(info.puzzle.getChapterId())
-                    .name("classId").value(info.puzzle.getClassId())
-                    .name("activeRole").value(info.puzzle.getActiveRole().name())
-                    .name("gameCount").value(info.gameCount)
-                    .name("active").value(info.active)
-                    .endObject();
-        }
-
-        @Override
-        public AdminPuzzleInfo read(JsonReader in) throws IOException {
-            throw new UnsupportedOperationException();
-        }
-    }
-
-    private static class AdminPuzzlePositionsTypeAdapter extends TypeAdapter<AdminPuzzleInfo> {
-        @Override
-        public void write(JsonWriter out, AdminPuzzleInfo info) throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public AdminPuzzleInfo read(JsonReader in) throws IOException {
-            JsonObject json = JsonParser.parseReader(in).getAsJsonObject();
-
-
-            return null;
-        }
-    }
-
-        /**
+    /**
      * Custom {@link TypeAdapter} to convert {@link PuzzleChapter PuzzleChapters} to JSON.
      * Currently does not support to convert JSON to puzzle chapters.
      */
@@ -664,16 +587,48 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
     }
 
-    public record AdminPuzzleInfo(Puzzle puzzle, int gameCount, boolean active) {}
+    private static class PuzzleDataTypeAdapter extends TypeAdapter<GetPuzzlesData.PuzzleData> {
+        @Override
+        public void write(JsonWriter out, PuzzleData info) throws IOException {
+            out.beginObject()
+                    .name("id").value(info.puzzle.getPuzzleId())
+                    .name("position").value(info.puzzle.getPosition())
+                    .name("title").value(info.puzzle.getTitle())
+                    .name("description").value(info.puzzle.getDescription())
+                    .name("maxAssertionsPerTest").value(info.puzzle.getMaxAssertionsPerTest())
+                    .name("editableLinesStart").value(info.puzzle.getEditableLinesStart())
+                    .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
+                    .name("chapterId").value(info.puzzle.getChapterId())
+                    .name("classId").value(info.puzzle.getClassId())
+                    .name("activeRole").value(info.puzzle.getActiveRole().name())
+                    .name("gameCount").value(info.gameCount)
+                    .name("active").value(info.active)
+                    .endObject();
+        }
 
-    public record AdminPuzzlePositions(
-            List<Integer> unassignedPuzzles,
-            List<Integer> archivedPuzzles,
-            List<AdminPuzzlePositionsChapter> chapters) {
-        public record AdminPuzzlePositionsChapter(
-                int id,
-                List<Integer> puzzles) {}
+        @Override
+        public GetPuzzlesData.PuzzleData read(JsonReader in) throws IOException {
+            throw new UnsupportedOperationException();
+        }
     }
 
-    public record AdminCreateChapterData(String title, String description) {}
+    public record GetPuzzlesData(
+            List<PuzzleData> puzzles,
+            List<PuzzleChapter> chapters) {
+        public record PuzzleData(Puzzle puzzle, int gameCount, boolean active) {}
+    }
+    public record UpdatePuzzlePositionsData(
+            List<Integer> unassignedPuzzles,
+            List<Integer> archivedPuzzles,
+            List<ChapterData> chapters) {
+        public record ChapterData(int id, List<Integer> puzzles) {}
+    }
+    public record CreateChapterData(String title, String description) {}
+    public record UpdateChapterData(String title, String description) {}
+    public record UpdatePuzzleData(
+            String title,
+            String description,
+            int maxAssertionsPerTest,
+            Integer editableLinesStart,
+            Integer editableLinesEnd) {}
 }
