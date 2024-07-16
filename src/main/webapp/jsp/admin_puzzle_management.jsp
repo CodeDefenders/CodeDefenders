@@ -511,6 +511,7 @@
                             alert('Puzzle chapter could not be updated.');
                         }).finally(() => {
                             modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
                         });
                     });
 
@@ -606,6 +607,7 @@
                             alert('Puzzle could not be updated.');
                         }).finally(() => {
                             modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
                         });
                     });
 
@@ -649,6 +651,7 @@
                                     alert('Puzzle chapter could not be deleted.');
                                 }).finally(() => {
                                     modal.controls.hide();
+                                    setTimeout(() => modal.modal.remove(), 1000);
                                 });
                     });
 
@@ -700,6 +703,7 @@
                             alert('Puzzle chapter could not be created.');
                         }).finally(() => {
                             modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
                         });
                     });
 
