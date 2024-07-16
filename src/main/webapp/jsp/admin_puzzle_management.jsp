@@ -549,6 +549,9 @@
                         PuzzleAPI.deletePuzzleChapter(chapter.id)
                                 .then(response => {
                                     chapterComp.container.remove();
+                                    for (const puzzle of [...chapterComp.puzzles]) {
+                                        unassignedChapter.addPuzzle(puzzle);
+                                    }
                                 }).catch(error => {
                                     alert('Puzzle chapter could not be deleted.');
                                 }).finally(() => {
@@ -594,7 +597,11 @@
                             title: title,
                             description: description,
                         }).then(response => {
-                            const chapterComp = ChapterComponent.forChapter({id: -1, title, description});
+                            const chapterComp = ChapterComponent.forChapter({
+                                id: response.id,
+                                title: response.title,
+                                description: response.description
+                            });
                             chaptersContainer.appendChild(chapterComp.container);
                         }).catch(error => {
                             alert('Puzzle chapter could not be created.');
@@ -647,20 +654,6 @@
 
                     const puzzle = PuzzleComponent.fromChild(event.target)
                     unassignedChapter.addPuzzle(puzzle);
-                });
-
-                chaptersContainer.addEventListener('click', function(event) {
-                    const deleteButton = event.target.closest('.chapter__button__delete');
-                    if (deleteButton === null) {
-                        return;
-                    }
-
-                    const chapter = ChapterComponent.fromChild(event.target);
-                    for (const puzzle of [...chapter.puzzles]) {
-                        unassignedChapter.addPuzzle(puzzle);
-                    }
-
-                    chapter.remove();
                 });
 
                 document.getElementById('button-save').addEventListener('click', function (event) {
