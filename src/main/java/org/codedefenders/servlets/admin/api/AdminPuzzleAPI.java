@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -48,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -109,7 +109,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
-                    writeJSONMessage(response, "Missing puzzleId parameter.");
+                    writeJSONMessage(response, 400, "Missing puzzleId parameter.");
                     return;
                 }
                 handleGetPuzzleRequest(response, puzzleId.get());
@@ -117,13 +117,13 @@ public class AdminPuzzleAPI extends HttpServlet {
             case Paths.API_ADMIN_PUZZLECHAPTER:
                 final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleChapterId.isEmpty()) {
-                    writeJSONMessage(response, "Missing puzzleChapterId parameter.");
+                    writeJSONMessage(response, 400, "Missing puzzleChapterId parameter.");
                     return;
                 }
                 handleGetPuzzleChapterRequest(response, puzzleChapterId.get());
                 return;
             default:
-                writeJSONMessage(response, "Requested URL not available.");
+                writeJSONMessage(response, 404, "Requested URL not available.");
         }
     }
 
@@ -134,7 +134,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
-                    writeJSONMessage(response, "Missing puzzleId parameter.");
+                    writeJSONMessage(response, 400, "Missing puzzleId parameter.");
                     return;
                 }
                 handleUpdatePuzzle(request, response, puzzleId.get());
@@ -147,7 +147,7 @@ public class AdminPuzzleAPI extends HttpServlet {
 
                 final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleChapterId.isEmpty()) {
-                    writeJSONMessage(response, "Missing puzzleChapterId or create parameter.");
+                    writeJSONMessage(response, 400, "Missing puzzleChapterId or create parameter.");
                     return;
                 }
                 handleUpdatePuzzleChapter(request, response, puzzleChapterId.get());
@@ -156,7 +156,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 handleBatchUpdatePuzzlePositions(request, response);
                 return;
             default:
-                writeJSONMessage(response, "Requested URL not available.");
+                writeJSONMessage(response, 404, "Requested URL not available.");
         }
     }
 
@@ -167,7 +167,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
-                    writeJSONMessage(response, "Missing parameter.");
+                    writeJSONMessage(response, 400, "Missing parameter.");
                     return;
                 }
                 handleDeletePuzzleRequest(response, puzzleId.get());
@@ -175,25 +175,25 @@ public class AdminPuzzleAPI extends HttpServlet {
             case Paths.API_ADMIN_PUZZLECHAPTER:
                 final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleChapterId.isEmpty()) {
-                    writeJSONMessage(response, "Missing puzzleChapterId parameter.");
+                    writeJSONMessage(response, 400, "Missing puzzleChapterId parameter.");
                     return;
                 }
                 handleDeletePuzzleChapterRequest(response, puzzleChapterId.get());
                 return;
             default:
-                writeJSONMessage(response, "Requested URL not available.");
+                writeJSONMessage(response, 404, "Requested URL not available.");
         }
     }
 
     private void handleDeletePuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
         final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle not found.");
             return;
         }
 
         if (puzzleRepo.gamesExistsForPuzzle(puzzle)) {
-            writeJSONMessage(response, "Cannot delete puzzle " + puzzleId + " because games exist for that puzzle.");
+            writeJSONMessage(response, 400, "Cannot delete puzzle " + puzzleId + " because games exist for that puzzle.");
             return;
         }
 
@@ -223,11 +223,9 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
 
         if (classRemoved) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            writeJSONMessage(response, "Removed puzzle " + puzzleId + " successfully");
+            writeJSONMessage(response, 200, "Removed puzzle " + puzzleId + " successfully");
         } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeJSONMessage(response, "Removed puzzle " + puzzleId + " successfully");
+            writeJSONMessage(response, 500, "Couldn't update puzzle" + puzzleId);
         }
 
     }
@@ -236,16 +234,14 @@ public class AdminPuzzleAPI extends HttpServlet {
                                                   int puzzleChapterId) throws IOException {
         final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle chapter not found.");
             return;
         }
-        if (puzzleRepo.removePuzzleChapter(puzzleChapter)) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            writeJSONMessage(response, "Removed puzzle chapter ");
-        } else {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeJSONMessage(response, "Failed to remove puzzle chapter ");
+        if (!puzzleRepo.removePuzzleChapter(puzzleChapter)) {
+            writeJSONMessage(response, 500, "Failed to remove puzzle chapter.");
+            return;
         }
+        writeJSONMessage(response, 200, "Removed puzzle chapter.");
     }
 
     private void handleGetAllPuzzlesRequest(HttpServletResponse response) throws IOException {
@@ -270,40 +266,35 @@ public class AdminPuzzleAPI extends HttpServlet {
         json.add("puzzles", puzzleArray);
         json.add("puzzleChapters", puzzleChapterArray);
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        writeJSONResponse(response, json.toString());
+        writeJSONResponse(response, 200, json);
     }
 
     private void handleGetPuzzleRequest(HttpServletResponse response, int puzzleId) throws IOException {
         final Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle not found.");
             return;
         }
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
                 .create();
-        String json = gson.toJson(puzzle);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        writeJSONResponse(response, json);
+        JsonElement json = gson.toJsonTree(puzzle);
+        writeJSONResponse(response, 200, json);
     }
 
     private void handleGetPuzzleChapterRequest(HttpServletResponse response, int puzzleChapterId) throws IOException {
         final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle chapter not found.");
             return;
         }
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
-        String json = gson.toJson(puzzleChapter);
-
-        response.setStatus(HttpServletResponse.SC_OK);
-        writeJSONResponse(response, json);
+        JsonElement json = gson.toJsonTree(puzzleChapter);
+        writeJSONResponse(response, 200, json);
     }
 
     private void handleUpdatePuzzle(HttpServletRequest request,
@@ -311,13 +302,13 @@ public class AdminPuzzleAPI extends HttpServlet {
                                     int puzzleId) throws IOException {
         Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle not found.");
             return;
         }
         Optional<JsonObject> body = readJSONBody(request);
 
         if (body.isEmpty()) {
-            writeJSONMessage(response, "No valid request body provided");
+            writeJSONMessage(response, 400, "No valid request body provided");
             return;
         }
 
@@ -329,44 +320,43 @@ public class AdminPuzzleAPI extends HttpServlet {
         Puzzle parsedPuzzle = gson.fromJson(json, Puzzle.class);
 
         if (puzzleId != parsedPuzzle.getPuzzleId()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeJSONMessage(response, "Identifier from URL and body do not match.");
+            writeJSONMessage(response, 400, "Identifier from URL and body do not match.");
             return;
         }
 
         // TODO: This should be done in a service.
         String title = parsedPuzzle.getTitle().strip();
         if (title.isEmpty() || title.length() > 100) {
-            writeJSONMessage(response, "Invalid title.");
+            writeJSONMessage(response, 400, "Invalid title.");
             return;
         }
         String description = parsedPuzzle.getDescription().strip();
         if (description.length() > 1000) {
-            writeJSONMessage(response, "Invalid description.");
+            writeJSONMessage(response, 400, "Invalid description.");
             return;
         }
         int maxAssertionsPerTest = parsedPuzzle.getMaxAssertionsPerTest();
         if (maxAssertionsPerTest < 0) {
-            writeJSONMessage(response, "Invalid maxAssertionsPerTest.");
+            writeJSONMessage(response, 400, "Invalid maxAssertionsPerTest.");
             return;
         }
         int position = parsedPuzzle.getPosition();
         if (position < 0) {
-            writeJSONMessage(response, "Invalid position.");
+            writeJSONMessage(response, 400, "Invalid position.");
             return;
         }
         Integer editableLinesStart = parsedPuzzle.getEditableLinesStart();
         if (editableLinesStart != null && editableLinesStart < 0) {
-            writeJSONMessage(response, "Invalid editableLinesStart.");
+            writeJSONMessage(response, 400, "Invalid editableLinesStart.");
             return;
         }
         Integer editableLinesEnd = parsedPuzzle.getEditableLinesEnd();
         if (editableLinesEnd != null && editableLinesEnd < 0) {
-            writeJSONMessage(response, "Invalid editableLinesEnd.");
+            writeJSONMessage(response, 400, "Invalid editableLinesEnd.");
             return;
         }
         if (editableLinesStart == null ^ editableLinesEnd == null) {
-            writeJSONMessage(response, "Invalid editable lines.");
+            writeJSONMessage(response, 400, "Invalid editable lines.");
         }
 
         boolean success = puzzleRepo.updatePuzzle(new PuzzleInfo(
@@ -380,8 +370,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 editableLinesEnd
         ));
         if (!success) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeJSONMessage(response, "Failed to update puzzle ");
+            writeJSONMessage(response, 500, "Failed to update puzzle.");
             return;
         }
 
@@ -394,14 +383,14 @@ public class AdminPuzzleAPI extends HttpServlet {
         answer.add("maxAssertionsPerTest", new JsonPrimitive(maxAssertionsPerTest));
         answer.add("editableLinesStart", editableLinesStart == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesStart));
         answer.add("editableLinesEnd", editableLinesEnd == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesEnd));
-        writeJSONMessage(response, answer.toString());
+        writeJSONMessage(response, 200, answer.toString());
     }
 
     private void handleCreatePuzzleChapter(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         Optional<JsonObject> body = readJSONBody(request);
         if (body.isEmpty()) {
-            writeJSONMessage(response, "No valid request body provided");
+            writeJSONMessage(response, 200, "No valid request body provided");
             return;
         }
 
@@ -416,12 +405,12 @@ public class AdminPuzzleAPI extends HttpServlet {
         int position = maxPosition + 1;
         String title = data.title.strip();
         if (title.isEmpty() || title.length() > 100) {
-            writeJSONMessage(response, "Invalid title.");
+            writeJSONMessage(response, 400, "Invalid title.");
             return;
         }
         String description = data.description.strip();
         if (description.length() > 1000) {
-            writeJSONMessage(response, "Invalid description.");
+            writeJSONMessage(response, 400, "Invalid description.");
             return;
         }
 
@@ -433,7 +422,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         answer.add("title", new JsonPrimitive(title));
         answer.add("description", new JsonPrimitive(description));
         answer.add("position", new JsonPrimitive(position));
-        writeJSONMessage(response, answer.toString());
+        writeJSONResponse(response, 200, answer);
     }
 
     private void handleUpdatePuzzleChapter(HttpServletRequest request,
@@ -441,13 +430,13 @@ public class AdminPuzzleAPI extends HttpServlet {
                                            int puzzleChapterId) throws IOException {
         final PuzzleChapter puzzleChapter = puzzleRepo.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            writeJSONMessage(response, 404, "Puzzle chapter not found.");
             return;
         }
         Optional<JsonObject> body = readJSONBody(request);
 
         if (body.isEmpty()) {
-            writeJSONMessage(response, "No valid request body provided");
+            writeJSONMessage(response, 400, "No valid request body provided");
             return;
         }
 
@@ -459,33 +448,31 @@ public class AdminPuzzleAPI extends HttpServlet {
 
         PuzzleChapter parsedChapter = gson.fromJson(json, PuzzleChapter.class);
         if (puzzleChapterId != parsedChapter.getChapterId()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            writeJSONMessage(response, "Identifier from URL and body do not match.");
+            writeJSONMessage(response, 400, "Identifier from URL and body do not match.");
             return;
         }
 
         // TODO: This should be done in a service.
         String title = parsedChapter.getTitle().strip();
         if (title.isEmpty() || title.length() > 100) {
-            writeJSONMessage(response, "Invalid title.");
+            writeJSONMessage(response, 400, "Invalid title.");
             return;
         }
         String description = parsedChapter.getDescription().strip();
         if (description.length() > 1000) {
-            writeJSONMessage(response, "Invalid description.");
+            writeJSONMessage(response, 400, "Invalid description.");
             return;
         }
         int position = parsedChapter.getPosition();
         if (position < 0) {
-            writeJSONMessage(response, "Invalid position.");
+            writeJSONMessage(response, 400, "Invalid position.");
             return;
         }
 
         boolean success = puzzleRepo.updatePuzzleChapter(new PuzzleChapter(
                         parsedChapter.getChapterId(), position, title, description));
         if (!success) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            writeJSONMessage(response, "Failed to update puzzle chapter ");
+            writeJSONMessage(response, 500, "Failed to update puzzle chapter.");
             return;
         }
 
@@ -495,14 +482,14 @@ public class AdminPuzzleAPI extends HttpServlet {
         answer.add("title", new JsonPrimitive(title));
         answer.add("description", new JsonPrimitive(description));
         answer.add("position", new JsonPrimitive(position));
-        writeJSONMessage(response, answer.toString());
+        writeJSONMessage(response, 200, answer.toString());
     }
 
     private void handleBatchUpdatePuzzlePositions(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
         Optional<JsonObject> optBody = readJSONBody(request);
         if (optBody.isEmpty()) {
-            writeJSONMessage(response, "No valid request body provided");
+            writeJSONMessage(response, 400, "No valid request body provided");
             return;
         }
 
@@ -514,7 +501,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         AdminPuzzlePositions positions = gson.fromJson(body, AdminPuzzlePositions.class);
         puzzleRepo.batchUpdatePuzzlePositions(positions);
 
-        writeJSONMessage(response, "Successfully updated puzzle and chapter positions.");
+        writeJSONMessage(response, 200, "Successfully updated puzzle and chapter positions.");
     }
 
     /**
@@ -522,20 +509,23 @@ public class AdminPuzzleAPI extends HttpServlet {
      * Also sets the content type to {@code application/json}.
      *
      * @param response the response the JSON is written to, never {@code null}.
-     * @param json the JSON as a {@link String}.
+     * @param json     the JSON as a {@link String}.
      * @throws IOException when writing the JSON fails.
      */
-    private static void writeJSONResponse(@Nonnull HttpServletResponse response, String json) throws IOException {
+    private static void writeJSONResponse(@Nonnull HttpServletResponse response, int statusCode, JsonElement json)
+            throws IOException {
+        response.setStatus(statusCode);
         response.setContentType("application/json");
         PrintWriter writer = response.getWriter();
-        writer.print(json);
+        writer.print(json.toString());
         writer.flush();
     }
 
-    private static void writeJSONMessage(@Nonnull HttpServletResponse response, String message) throws IOException {
+    private static void writeJSONMessage(@Nonnull HttpServletResponse response, int statusCode, String message)
+            throws IOException {
         JsonObject json = new JsonObject();
         json.add("message", new JsonPrimitive(message));
-        writeJSONResponse(response, json.toString());
+        writeJSONResponse(response, statusCode, json);
     }
 
     /**
