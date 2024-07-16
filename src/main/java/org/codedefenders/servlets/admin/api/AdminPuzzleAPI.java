@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -104,6 +105,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         switch (url) {
             case Paths.API_ADMIN_PUZZLES_ALL:
                 handleGetAllPuzzlesRequest(response);
+                return;
             case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
@@ -111,6 +113,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     return;
                 }
                 handleGetPuzzleRequest(response, puzzleId.get());
+                return;
             case Paths.API_ADMIN_PUZZLECHAPTER:
                 final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleChapterId.isEmpty()) {
@@ -118,6 +121,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     return;
                 }
                 handleGetPuzzleChapterRequest(response, puzzleChapterId.get());
+                return;
             default:
                 writeJSONMessage(response, "Requested URL not available.");
         }
@@ -127,32 +131,32 @@ public class AdminPuzzleAPI extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = request.getServletPath();
         switch (url) {
-            case Paths.API_ADMIN_PUZZLE: {
+            case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
                     writeJSONMessage(response, "Missing puzzleId parameter.");
                     return;
                 }
                 handleUpdatePuzzle(request, response, puzzleId.get());
-            }
-            case Paths.API_ADMIN_PUZZLECHAPTER: {
+                return;
+            case Paths.API_ADMIN_PUZZLECHAPTER:
                 if (request.getParameter("create") != null) {
                     handleCreatePuzzleChapter(request, response);
-                } else {
-                    final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
-                    if (puzzleChapterId.isEmpty()) {
-                        writeJSONMessage(response, "Missing puzzleChapterId or create parameter.");
-                        return;
-                    }
-                    handleUpdatePuzzleChapter(request, response, puzzleChapterId.get());
+                    return;
                 }
-            }
-            case Paths.API_ADMIN_PUZZLES_ALL: {
+
+                final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
+                if (puzzleChapterId.isEmpty()) {
+                    writeJSONMessage(response, "Missing puzzleChapterId or create parameter.");
+                    return;
+                }
+                handleUpdatePuzzleChapter(request, response, puzzleChapterId.get());
+                return;
+            case Paths.API_ADMIN_PUZZLES_ALL:
                 handleBatchUpdatePuzzlePositions(request, response);
-            }
-            default: {
+                return;
+            default:
                 writeJSONMessage(response, "Requested URL not available.");
-            }
         }
     }
 
@@ -160,25 +164,24 @@ public class AdminPuzzleAPI extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = request.getServletPath();
         switch (url) {
-            case Paths.API_ADMIN_PUZZLE: {
+            case Paths.API_ADMIN_PUZZLE:
                 final Optional<Integer> puzzleId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleId.isEmpty()) {
                     writeJSONMessage(response, "Missing parameter.");
                     return;
                 }
                 handleDeletePuzzleRequest(response, puzzleId.get());
-            }
-            case Paths.API_ADMIN_PUZZLECHAPTER: {
+                return;
+            case Paths.API_ADMIN_PUZZLECHAPTER:
                 final Optional<Integer> puzzleChapterId = ServletUtils.getIntParameter(request, "id");
                 if (puzzleChapterId.isEmpty()) {
                     writeJSONMessage(response, "Missing puzzleChapterId parameter.");
                     return;
                 }
                 handleDeletePuzzleChapterRequest(response, puzzleChapterId.get());
-            }
-            default: {
+                return;
+            default:
                 writeJSONMessage(response, "Requested URL not available.");
-            }
         }
     }
 
@@ -331,14 +334,67 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        boolean updateSuccess = puzzleRepo.updatePuzzle(PuzzleInfo.of(parsedPuzzle));
-        if (updateSuccess) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            writeJSONMessage(response, "Updated puzzle ");
-        } else {
+        // TODO: This should be done in a service.
+        String title = parsedPuzzle.getTitle().strip();
+        if (title.isEmpty() || title.length() > 100) {
+            writeJSONMessage(response, "Invalid title.");
+            return;
+        }
+        String description = parsedPuzzle.getDescription().strip();
+        if (description.length() > 1000) {
+            writeJSONMessage(response, "Invalid description.");
+            return;
+        }
+        int maxAssertionsPerTest = parsedPuzzle.getMaxAssertionsPerTest();
+        if (maxAssertionsPerTest < 0) {
+            writeJSONMessage(response, "Invalid maxAssertionsPerTest.");
+            return;
+        }
+        int position = parsedPuzzle.getPosition();
+        if (position < 0) {
+            writeJSONMessage(response, "Invalid position.");
+            return;
+        }
+        Integer editableLinesStart = parsedPuzzle.getEditableLinesStart();
+        if (editableLinesStart != null && editableLinesStart < 0) {
+            writeJSONMessage(response, "Invalid editableLinesStart.");
+            return;
+        }
+        Integer editableLinesEnd = parsedPuzzle.getEditableLinesEnd();
+        if (editableLinesEnd != null && editableLinesEnd < 0) {
+            writeJSONMessage(response, "Invalid editableLinesEnd.");
+            return;
+        }
+        if (editableLinesStart == null ^ editableLinesEnd == null) {
+            writeJSONMessage(response, "Invalid editable lines.");
+        }
+
+        boolean success = puzzleRepo.updatePuzzle(new PuzzleInfo(
+                parsedPuzzle.getPuzzleId(),
+                parsedPuzzle.getChapterId(),
+                position,
+                title,
+                description,
+                maxAssertionsPerTest,
+                editableLinesStart,
+                editableLinesEnd
+        ));
+        if (!success) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeJSONMessage(response, "Failed to update puzzle ");
+            return;
         }
+
+        JsonObject answer = new JsonObject();
+        answer.add("message", new JsonPrimitive("Successfully update puzzle."));
+        answer.add("id", new JsonPrimitive(parsedPuzzle.getPuzzleId()));
+        answer.add("title", new JsonPrimitive(title));
+        answer.add("description", new JsonPrimitive(description));
+        answer.add("position", new JsonPrimitive(position));
+        answer.add("maxAssertionsPerTest", new JsonPrimitive(maxAssertionsPerTest));
+        answer.add("editableLinesStart", editableLinesStart == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesStart));
+        answer.add("editableLinesEnd", editableLinesEnd == null ?  JsonNull.INSTANCE : new JsonPrimitive(editableLinesEnd));
+        writeJSONMessage(response, answer.toString());
     }
 
     private void handleCreatePuzzleChapter(HttpServletRequest request, HttpServletResponse response)
@@ -353,12 +409,31 @@ public class AdminPuzzleAPI extends HttpServlet {
         Gson gson = new GsonBuilder().create();
         var data = gson.fromJson(json, AdminCreateChapterData.class);
 
+        // TODO: This should be done in a service.
         int maxPosition = puzzleRepo.getPuzzleChapters().stream()
                     .mapToInt(PuzzleChapter::getPosition)
                     .max().orElse(0);
+        int position = maxPosition + 1;
+        String title = data.title.strip();
+        if (title.isEmpty() || title.length() > 100) {
+            writeJSONMessage(response, "Invalid title.");
+            return;
+        }
+        String description = data.description.strip();
+        if (description.length() > 1000) {
+            writeJSONMessage(response, "Invalid description.");
+            return;
+        }
 
-        puzzleRepo.storePuzzleChapter(new PuzzleChapter(-1, maxPosition + 1, data.title, data.description));
-        writeJSONMessage(response, "Successfully create puzzle chapter.");
+        int id = puzzleRepo.storePuzzleChapter(new PuzzleChapter(-1, position, title, description));
+
+        JsonObject answer = new JsonObject();
+        answer.add("message", new JsonPrimitive("Successfully create puzzle chapter."));
+        answer.add("id", new JsonPrimitive(id));
+        answer.add("title", new JsonPrimitive(title));
+        answer.add("description", new JsonPrimitive(description));
+        answer.add("position", new JsonPrimitive(position));
+        writeJSONMessage(response, answer.toString());
     }
 
     private void handleUpdatePuzzleChapter(HttpServletRequest request,
@@ -382,21 +457,45 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
 
-        PuzzleChapter parsedPuzzleChapter = gson.fromJson(json, PuzzleChapter.class);
-        if (puzzleChapterId != parsedPuzzleChapter.getChapterId()) {
+        PuzzleChapter parsedChapter = gson.fromJson(json, PuzzleChapter.class);
+        if (puzzleChapterId != parsedChapter.getChapterId()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             writeJSONMessage(response, "Identifier from URL and body do not match.");
             return;
         }
 
-        boolean updateSuccess = puzzleRepo.updatePuzzleChapter(parsedPuzzleChapter);
-        if (updateSuccess) {
-            response.setStatus(HttpServletResponse.SC_OK);
-            writeJSONMessage(response, "Updated puzzle chapter ");
-        } else {
+        // TODO: This should be done in a service.
+        String title = parsedChapter.getTitle().strip();
+        if (title.isEmpty() || title.length() > 100) {
+            writeJSONMessage(response, "Invalid title.");
+            return;
+        }
+        String description = parsedChapter.getDescription().strip();
+        if (description.length() > 1000) {
+            writeJSONMessage(response, "Invalid description.");
+            return;
+        }
+        int position = parsedChapter.getPosition();
+        if (position < 0) {
+            writeJSONMessage(response, "Invalid position.");
+            return;
+        }
+
+        boolean success = puzzleRepo.updatePuzzleChapter(new PuzzleChapter(
+                        parsedChapter.getChapterId(), position, title, description));
+        if (!success) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             writeJSONMessage(response, "Failed to update puzzle chapter ");
+            return;
         }
+
+        JsonObject answer = new JsonObject();
+        answer.add("message", new JsonPrimitive("Successfully updated puzzle chapter."));
+        answer.add("id", new JsonPrimitive(parsedChapter.getChapterId()));
+        answer.add("title", new JsonPrimitive(title));
+        answer.add("description", new JsonPrimitive(description));
+        answer.add("position", new JsonPrimitive(position));
+        writeJSONMessage(response, answer.toString());
     }
 
     private void handleBatchUpdatePuzzlePositions(HttpServletRequest request, HttpServletResponse response)

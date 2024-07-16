@@ -46,7 +46,7 @@ public class PuzzleInfo {
     private Integer editableLinesStart;
     private Integer editableLinesEnd;
 
-    private PuzzleInfo(int puzzleId, Integer chapterId, Integer position, String title,
+    public PuzzleInfo(int puzzleId, Integer chapterId, Integer position, String title,
                        String description, int maxAssertionsPerTest,
                        Integer editableLinesStart, Integer editableLinesEnd) {
         this.puzzleId = puzzleId;
