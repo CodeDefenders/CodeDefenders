@@ -496,11 +496,14 @@
 
                     const modal = new Modal();
                     modal.body.innerHTML =`
+                        <form class="" novalidate>
                             <div class="row mb-3">
                                 <div class="form-group">
                                     <label class="form-label">Title</label>
                                     <input type="text" name="title" class="form-control" value=""
-                                        placeholder="Title">
+                                        placeholder="Title"
+                                        required minlength="1" maxlength="100">
+                                    <div class="invalid-feedback">Please enter a title.</div>
                                 </div>
                             </div>
 
@@ -508,9 +511,11 @@
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
                                     <input type="text" name="description" class="form-control" value=""
-                                        placeholder="Description">
+                                        placeholder="Description"
+                                        maxlength="1000">
                                 </div>
-                            </div>`;
+                            </div>
+                        </form>`;
                     modal.title.innerText = 'Edit Chapter';
                     modal.footerCloseButton.innerText = 'Cancel';
                     modal.modal.dataset.id = chapter.id;
@@ -524,6 +529,12 @@
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
                         const title = modal.body.querySelector('input[name="title"]').value;
                         const description = modal.body.querySelector('input[name="description"]').value;
 
@@ -558,37 +569,47 @@
 
                     const modal = new Modal();
                     modal.body.innerHTML = `
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label">Title</label>
-                                <input type="text" class="form-control" value="" name="title">
+                        <form class="" novalidate>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" class="form-control" value="" name="title"
+                                        placeholder="title"
+                                        required minlength="1" maxlength="100">
+                                    <div class="invalid-feedback">Please enter a title.</div>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label">Description</label>
-                                <input type="text" class="form-control" value="" name="description">
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <input type="text" class="form-control" value="" name="description"
+                                        placeholder="description"
+                                        maxlength="1000">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label class="form-label">Max. Assertions</label>
-                                <input type="number" class="form-control" value="" name="maxAssertionsPerTest">
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Max. Assertions</label>
+                                    <input type="number" class="form-control" value="" name="maxAssertionsPerTest"
+                                        min="1">
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row g-3 mb-2 editable-lines">
-                            <div class="col-6">
-                                <label class="form-label">First Editable Line</label>
-                                <input type="number" class="form-control" value="" name="editableLinesStart">
+                            <div class="row g-3 mb-2 editable-lines">
+                                <div class="col-6">
+                                    <label class="form-label">First Editable Line</label>
+                                    <input type="number" class="form-control" value="" name="editableLinesStart"
+                                        min="1">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Last Editable Line</label>
+                                    <input type="number" class="form-control" value="" name="editableLinesEnd"
+                                        min="1">
+                                </div>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label">Last Editable Line</label>
-                                <input type="number" class="form-control" value="" name="editableLinesEnd">
-                            </div>
-                        </div>`;
+                        </form>`;
                     modal.title.innerText = 'Edit Puzzle';
                     modal.footerCloseButton.innerText = 'Cancel';
                     modal.modal.dataset.id = puzzle.id;
@@ -609,6 +630,12 @@
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
                         const title = modal.body.querySelector('input[name="title"]').value;
                         const description = modal.body.querySelector('input[name="description"]').value;
                         let maxAssertionsPerTest = modal.body.querySelector('input[name="maxAssertionsPerTest"]').value;
@@ -738,21 +765,26 @@
                 document.getElementById('button-add-chapter').addEventListener('click', function (event) {
                     const modal = new Modal();
                     modal.body.innerHTML =`
-                            <div class="row mb-3">
-                                <div class="form-group">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" name="title" class="form-control" value=""
-                                        placeholder="Title">
+                            <form class="" novalidate>
+                                <div class="row mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="title" class="form-control" value=""
+                                            placeholder="Title"
+                                            required minlength="1" maxlength="100">
+                                        <div class="invalid-feedback">Please enter a title.</div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="row mb-2">
-                                <div class="form-group">
-                                    <label class="form-label">Description</label>
-                                    <input type="text" name="description" class="form-control" value=""
-                                        placeholder="Description">
+                                <div class="row mb-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="description" class="form-control" value=""
+                                            placeholder="Description"
+                                            maxlength="1000">
+                                    </div>
                                 </div>
-                            </div>`;
+                            </form>`;
                     modal.title.innerText = 'Create New Chapter';
                     modal.footerCloseButton.innerText = 'Cancel';
 
@@ -763,6 +795,12 @@
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
                         const title = modal.body.querySelector('input[name="title"]').value;
                         const description = modal.body.querySelector('input[name="description"]').value;
 
