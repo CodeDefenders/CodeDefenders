@@ -375,12 +375,12 @@ public class PuzzleRepository {
 
 
     /**
-     * Updates the given {@link org.codedefenders.model.PuzzleInfo puzzle information} in the database.
+     * Updates the given {@link org.codedefenders.game.puzzle.Puzzle puzzle information} in the database.
      *
-     * @param puzzle The {@link org.codedefenders.model.PuzzleInfo}.
+     * @param puzzle The {@link org.codedefenders.game.puzzle.Puzzle}.
      * @return {@code true} if the update was successful, {@code false} otherwise.
      */
-    public boolean updatePuzzle(org.codedefenders.model.PuzzleInfo puzzle) {
+    public boolean updatePuzzle(Puzzle puzzle) {
         @Language("SQL") String query = """
                 UPDATE puzzles
                 SET Chapter_ID           = ?,

@@ -333,16 +333,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        boolean success = puzzleRepo.updatePuzzle(new org.codedefenders.model.PuzzleInfo(
-                puzzle.getPuzzleId(),
-                puzzle.getChapterId(),
-                puzzle.getPosition(),
-                title,
-                description,
-                maxAssertionsPerTest,
-                editableLinesStart,
-                editableLinesEnd
-        ));
+        boolean success = puzzleRepo.updatePuzzle(puzzle);
         if (!success) {
             writeJSONMessage(response, 500, "Failed to update puzzle.");
             return;
@@ -514,8 +505,8 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     /**
-     * Custom {@link TypeAdapter} to convert {@link org.codedefenders.model.PuzzleInfo Puzzle information} to JSON.
-     * Currently does not support to convert JSON to puzzles.
+     * Custom {@link TypeAdapter} to convert {@link org.codedefenders.game.puzzle.Puzzle puzzle information} to JSON.
+     * Currently, does not support to convert JSON to puzzles.
      */
     private static class PuzzleTypeAdapter extends TypeAdapter<Puzzle> {
         @Override
