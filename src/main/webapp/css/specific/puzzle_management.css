@@ -128,6 +128,11 @@
     cursor: pointer;
 }
 
+.chapter:only-child .chapter__controls .chapter_select__show {
+    pointer-events: none;
+    opacity: .65;
+}
+
 .puzzles {
     display: grid;
     grid-template-columns: repeat(var(--cols, 1), 1fr);
