@@ -222,7 +222,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         }
 
         if (classRemoved) {
-            writeJSONMessage(response, 200, "Removed puzzle " + puzzleId + " successfully");
+            writeJSONMessage(response, 200, "Removed puzzle " + puzzleId + ".");
         } else {
             writeJSONMessage(response, 500, "Couldn't update puzzle" + puzzleId);
         }
@@ -357,7 +357,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         gson = new GsonBuilder()
                 .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
                 .create();
-        answer.add("message", new JsonPrimitive("Successfully updated puzzle."));
+        answer.add("message", new JsonPrimitive("Updated puzzle."));
         answer.add("puzzle", gson.toJsonTree(puzzle));
         writeJSONResponse(response, 200, answer);
     }
@@ -398,7 +398,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
         JsonObject answer = new JsonObject();
-        answer.add("message", new JsonPrimitive("Successfully created puzzle chapter."));
+        answer.add("message", new JsonPrimitive("Created puzzle chapter."));
         answer.add("chapter", gson.toJsonTree(chapter));
         writeJSONResponse(response, 200, answer);
     }
@@ -445,7 +445,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
         JsonObject answer = new JsonObject();
-        answer.add("message", new JsonPrimitive("Successfully updated puzzle chapter."));
+        answer.add("message", new JsonPrimitive("Updated puzzle chapter."));
         answer.add("chapter", gson.toJsonTree(chapter));
         writeJSONResponse(response, 200, answer);
     }
@@ -465,7 +465,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         UpdatePuzzlePositionsData positions = gson.fromJson(body.get(), UpdatePuzzlePositionsData.class);
         puzzleRepo.batchUpdatePuzzlePositions(positions);
 
-        writeJSONMessage(response, 200, "Successfully updated puzzle and chapter positions.");
+        writeJSONMessage(response, 200, "Updated puzzle and chapter positions.");
     }
 
     /**

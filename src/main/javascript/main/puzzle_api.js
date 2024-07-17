@@ -19,7 +19,7 @@ class PuzzleAPI {
         }
         const response = await fetch(url, request);
         if (!response.ok) {
-            return Promise.reject();
+            throw await response.json();
         }
         return await response.json();
     }
