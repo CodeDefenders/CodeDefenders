@@ -284,13 +284,13 @@
 
             // ==== Other Functions ====================================================================================
 
-            function createChapterSelectDropdown(config) {
-                const tooltip = config.tooltip ?? 'Move';
-                const label = config.label ?? 'Move to chapter:';
-                const showButtonClasses = config.showButtonClasses ?? 'btn btn-xs btn-primary btn-fixed';
-                const showButtonContent = config.showButtonContent ?? '<i class="fa fa-arrow-right"></i>';
-                const moveButtonContent = config.moveButtonContent ?? 'Move';
-
+            function createChapterSelectDropdown({
+                     tooltip = 'Move',
+                     label = 'Move to chapter:',
+                     showButtonClasses = 'btn btn-xs btn-primary btn-fixed',
+                     showButtonContent = '<i class="fa fa-arrow-right"></i>',
+                     moveButtonContent = 'Move'
+                }) {
                 const dropdown = document.createElement('div');
                 dropdown.classList.add('dropdown', 'chapter_select', 'd-flex');
                 dropdown.title = tooltip;
