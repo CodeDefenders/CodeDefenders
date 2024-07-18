@@ -333,17 +333,17 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
+        puzzle.setTitle(title);
+        puzzle.setDescription(description);
+        puzzle.setMaxAssertionsPerTest(maxAssertionsPerTest);
+        puzzle.setEditableLinesStart(editableLinesStart);
+        puzzle.setEditableLinesEnd(editableLinesEnd);
         boolean success = puzzleRepo.updatePuzzle(puzzle);
         if (!success) {
             writeJSONMessage(response, 500, "Failed to update puzzle.");
             return;
         }
 
-        puzzle.setTitle(title);
-        puzzle.setDescription(description);
-        puzzle.setMaxAssertionsPerTest(maxAssertionsPerTest);
-        puzzle.setEditableLinesStart(editableLinesStart);
-        puzzle.setEditableLinesEnd(editableLinesEnd);
         JsonObject answer = new JsonObject();
         gson = new GsonBuilder()
                 .registerTypeAdapter(Puzzle.class, new PuzzleTypeAdapter())
