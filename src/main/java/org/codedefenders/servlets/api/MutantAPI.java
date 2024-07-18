@@ -33,6 +33,7 @@ import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
@@ -53,7 +54,7 @@ import com.google.gson.JsonObject;
 public class MutantAPI extends HttpServlet {
 
     @Inject
-    GameService gameService;
+    MutantRepository mutantRepo;
 
     @Inject
     CodeDefendersAuth login;
@@ -61,8 +62,8 @@ public class MutantAPI extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        final Optional<MutantDTO> mutant = ServletUtils.getIntParameter(request, "mutantId")
-                .map(id -> gameService.getMutant(login.getUserId(), id));
+        final Optional<Mutant> mutant = ServletUtils.getIntParameter(request, "mutantId")
+                .map(id -> mutantRepo.getMutantById(id));
 
         if (mutant.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -78,7 +79,7 @@ public class MutantAPI extends HttpServlet {
         out.flush();
     }
 
-    private String generateJsonForMutant(MutantDTO mutant) {
+    private String generateJsonForMutant(Mutant mutant) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();

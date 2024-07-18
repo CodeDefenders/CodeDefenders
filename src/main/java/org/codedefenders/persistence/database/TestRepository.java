@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -465,6 +466,27 @@ public class TestRepository {
 
         // TODO: We shouldn't give away that we don't know which test killed the mutant?
         return targ.map(t -> t.testId).orElse(-1);
+    }
+
+    public Optional<String> findKillMessageForMutant(int mutantId) {
+        @Language("SQL") String query = """
+                SELECT te.*
+                FROM targetexecutions te
+                JOIN mutants m on m.Mutant_ID = te.Mutant_ID
+                JOIN tests t on te.Test_ID = t.Test_ID
+                WHERE te.Target = ?
+                  AND te.Status != ?
+                  AND te.Mutant_ID = ?
+                ORDER BY te.TargetExecution_ID LIMIT 1;
+        """;
+
+        var targetExecution = queryRunner.query(query, nextFromRS(TargetExecutionDAO::targetExecutionFromRS),
+                TargetExecution.Target.TEST_MUTANT.name(),
+                TargetExecution.Status.SUCCESS.name(),
+                mutantId
+        );
+
+        return targetExecution.map(t -> t.message);
     }
 
     /**

@@ -3,6 +3,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <p:main_page title="Puzzle Management">
     <jsp:attribute name="additionalImports">
@@ -58,6 +59,7 @@
             import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const watermarkUrl = '${url.forPath("/images/achievements/")}';
+            const puzzlePreviewUrl = '${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}';
             const puzzleData = await PuzzleAPI.fetchPuzzleData();
             const puzzles = puzzleData.puzzles;
             const chapters = puzzleData.chapters;
@@ -574,7 +576,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Title</label>
                                     <input type="text" class="form-control" value="" name="title"
-                                        placeholder="title"
+                                        placeholder="Title"
                                         required minlength="1" maxlength="100">
                                     <div class="invalid-feedback">Please enter a title.</div>
                                 </div>
@@ -584,7 +586,7 @@
                                 <div class="col-12">
                                     <label class="form-label">Description</label>
                                     <input type="text" class="form-control" value="" name="description"
-                                        placeholder="description"
+                                        placeholder="Description"
                                         maxlength="1000">
                                 </div>
                             </div>
@@ -821,6 +823,41 @@
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
                         });
+                    });
+
+                    modal.controls.show();
+                });
+
+                chaptersContainer.addEventListener('click', function (event) {
+                    const puzzleContent = event.target.closest('.puzzle__content');
+                    if (puzzleContent === null) {
+                        return;
+                    }
+
+                    const puzzleComp = PuzzleComponent.fromChild(event.target);
+                    const puzzle = puzzleComp.puzzle;
+
+                    const modal = new Modal();
+                    modal.title.innerText = puzzle.title;
+                    modal.title.classList.add('d-flex', 'align-items-center', 'gap-2');
+                    modal.footerCloseButton.innerText = 'Close';
+                    modal.modal.dataset.id = puzzle.id;
+                    modal.dialog.classList.add('modal-dialog-responsive');
+                    modal.body.classList.add('d-flex', 'p-0');
+
+                    const tag = document.createElement('span');
+                    tag.innerText = `#\${puzzle.id}`;
+                    tag.classList.add('badge', 'bg-secondary');
+                    modal.title.appendChild(tag);
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `\${puzzlePreviewUrl}?previewPuzzleId=\${puzzle.id}`;
+                    iframe.style.width = '50rem';
+                    iframe.style.height = '700px';
+                    modal.body.appendChild(iframe);
+
+                    modal.modal.addEventListener('hidden.bs.modal', () => {
+                        setTimeout(() => modal.modal.remove(), 1000);
                     });
 
                     modal.controls.show();
