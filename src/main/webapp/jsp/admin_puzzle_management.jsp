@@ -60,11 +60,12 @@
 
             const watermarkUrl = '${url.forPath("/images/achievements/")}';
             const puzzlePreviewUrl = '${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}';
+
+            // ==== Init Data ==========================================================================================
+
             const puzzleData = await PuzzleAPI.fetchPuzzleData();
             const puzzles = puzzleData.puzzles;
             const chapters = puzzleData.chapters;
-
-            // ==== Init Data ==========================================================================================
 
             const puzzlesPerChapter = new Map();
             puzzlesPerChapter.set('unassigned', []);
@@ -88,7 +89,7 @@
                 puzzles.sort((a, b) => a.position - b.position);
             }
 
-            // ==== Other Globals =====================================================================================
+            // ==== Globals ============================================================================================
 
             let archivedChapter;
             let unassignedChapter;
@@ -284,8 +285,12 @@
                 }
             }
 
-            // ==== Other Functions ====================================================================================
+            // ==== Functions ==========================================================================================
 
+            /**
+             * Creates a button that opens a dropdown menu for selecting chapters.
+             * The menu contains a label, a select for the puzzle chapters, and a confirm button.
+             */
             function createChapterSelectDropdown({
                      tooltip = 'Move',
                      label = 'Move to chapter:',
@@ -315,7 +320,11 @@
                 return dropdown;
             }
 
-            function createChapterSelectOptions(selectedChapter = null) {
+            /**
+             * Creates the options for the chapter-select dropdown as a DocumentFragment.
+             * @param currentChapter A ChapterComponent for the current chapter. Will be greyed out in the list.
+             */
+            function createChapterSelectOptions(currentChapter = null) {
                 let options = document.createDocumentFragment();
                 let index = 1;
                 for (const chapterElem of chaptersContainer.children) {
@@ -323,7 +332,7 @@
                     const option = document.createElement('option');
                     option.value = String(index);
                     option.innerText = `\${index} | \${title}`;
-                    if (chapterElem.chapterComp === selectedChapter) {
+                    if (chapterElem.chapterComp === currentChapter) {
                         option.disabled = true;
                     }
                     options.appendChild(option);
@@ -358,6 +367,9 @@
                 });
             }
 
+            /**
+             * Gathers the positions of unassigned puzzles, archived puzzles and all puzzle chapters.
+             */
             function getPuzzlePositions() {
                 const data = {};
 
@@ -380,7 +392,7 @@
                 return data;
             }
 
-            // ==== Init =============================================================================================
+            // ==== Init Code ==========================================================================================
 
             function initChaptersAndPuzzles() {
                 unassignedChapter = new ChapterComponent(document.getElementById('chapter-unassigned'));
@@ -487,6 +499,7 @@
             }
 
             function initModals() {
+                // Edit Chapter Modal
                 chaptersContainer.addEventListener('click', function (event) {
                     const editButton = event.target.closest('.chapter__button__edit');
                     if (editButton === null) {
@@ -560,6 +573,7 @@
                     modal.controls.show();
                 });
 
+                // Edit Puzzle Modal
                 document.getElementById('puzzle-management').addEventListener('click', function (event) {
                     const editButton = event.target.closest('.puzzle__button__edit');
                     if (editButton === null) {
@@ -673,6 +687,7 @@
                     modal.controls.show();
                 });
 
+                // Delete Chapter Modal
                 chaptersContainer.addEventListener('click', function (event) {
                     const deleteButton = event.target.closest('.chapter__button__delete');
                     if (deleteButton === null) {
@@ -721,6 +736,7 @@
                     modal.controls.show();
                 });
 
+                // Delete Puzzle Modal
                 chaptersContainer.addEventListener('click', function (event) {
                     const deleteButton = event.target.closest('.puzzle__button__delete');
                     if (deleteButton === null) {
@@ -764,6 +780,7 @@
                     modal.controls.show();
                 });
 
+                // Add Chapter Modal
                 document.getElementById('button-add-chapter').addEventListener('click', function (event) {
                     const modal = new Modal();
                     modal.body.innerHTML =`
@@ -828,6 +845,7 @@
                     modal.controls.show();
                 });
 
+                // Preview Puzzle Modal
                 chaptersContainer.addEventListener('click', function (event) {
                     const puzzleContent = event.target.closest('.puzzle__content');
                     if (puzzleContent === null) {
@@ -864,7 +882,17 @@
                 });
             }
 
-            function initRemainingSortables() {
+            function init() {
+                initChaptersAndPuzzles();
+                initChapterSelects();
+                initModals();
+
+                window.addEventListener('beforeunload', function(event) {
+                    if (isUnsavedChanges) {
+                        event.preventDefault();
+                    }
+                });
+
                 Sortable.create(chaptersContainer, {
                     animation: 200,
                     group: 'chapters',
@@ -883,9 +911,7 @@
                         }
                     });
                 }
-            }
 
-            function initRemainingButtons() {
                 document.getElementById('puzzle-management').addEventListener('click', function (event) {
                     const archiveButton = event.target.closest('.puzzle__button__archive');
                     if (archiveButton === null) {
@@ -912,23 +938,9 @@
                                 isUnsavedChanges = false
                                 showToast({title: 'Success', body: response.message});
                             }).catch(async response => {
-                                showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
-                                alert('Could not save changes.');
-                            });
-                });
-            }
-
-            function init() {
-                initChaptersAndPuzzles();
-                initChapterSelects();
-                initModals();
-                initRemainingSortables();
-                initRemainingButtons();
-
-                window.addEventListener('beforeunload', function(event) {
-                    if (isUnsavedChanges) {
-                        event.preventDefault();
-                    }
+                        showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                        alert('Could not save changes.');
+                    });
                 });
             }
 

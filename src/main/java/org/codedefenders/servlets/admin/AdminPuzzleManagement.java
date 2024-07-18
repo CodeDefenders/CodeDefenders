@@ -103,6 +103,9 @@ public class AdminPuzzleManagement extends HttpServlet {
         }
     }
 
+    /**
+     * Displays a full-page puzzle preview.
+     */
     private void displayPuzzlePreview(HttpServletRequest request, HttpServletResponse response, int puzzleId)
             throws ServletException, IOException {
 
