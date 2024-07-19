@@ -466,6 +466,7 @@
                     const select = chapterComp.container.querySelector('.chapter_select__position');
                     const position = Number(select.value);
                     chapterComp.moveToIndex(position);
+                    isUnsavedChanges = true;
                 });
 
                 // --- Init 'Move puzzle' ------------------------------------------------------------------------------
@@ -495,6 +496,7 @@
                     const select = puzzle.container.querySelector('.chapter_select__position');
                     const position = Number(select.value);
                     puzzle.moveToChapterIndex(position);
+                    isUnsavedChanges = true;
                 });
             }
 
@@ -718,6 +720,7 @@
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
+                        isUnsavedChanges = true;
                         PuzzleAPI.deletePuzzleChapter(chapter.id)
                                 .then(response => {
                                     for (const puzzleElem of [...chapterComp.puzzles]) {
@@ -920,6 +923,7 @@
 
                     const puzzle = PuzzleComponent.fromChild(event.target);
                     archivedChapter.addPuzzle(puzzle);
+                    isUnsavedChanges = true;
                 });
 
                 document.getElementById('puzzle-management').addEventListener('click', function (event) {
@@ -930,6 +934,7 @@
 
                     const puzzle = PuzzleComponent.fromChild(event.target)
                     unassignedChapter.addPuzzle(puzzle);
+                    isUnsavedChanges = true;
                 });
 
                 document.getElementById('button-save').addEventListener('click', function (event) {
