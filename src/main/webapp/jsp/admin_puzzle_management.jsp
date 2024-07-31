@@ -849,7 +849,7 @@
                 });
 
                 // Preview Puzzle Modal
-                chaptersContainer.addEventListener('click', function (event) {
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
                     const puzzleContent = event.target.closest('.puzzle__content');
                     if (puzzleContent === null) {
                         return;
