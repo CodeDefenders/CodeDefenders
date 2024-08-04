@@ -44,6 +44,7 @@ import javassist.CtClass;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TEST_PREFIX;
 import static org.codedefenders.util.NamingUtils.nextFreeName;
+import static org.codedefenders.util.NamingUtils.nextFreeNumber;
 
 /**
  * This class offers static methods for file functionality.
@@ -331,5 +332,35 @@ public class FileUtils {
     public static Path nextFreeClassDirectory(String alias) {
         var path = Paths.get(getConfig().getSourcesDir().getAbsolutePath());
         return nextFreePath(path, alias);
+    }
+
+    public static Path nextFreeNumberPath(Path directory) {
+        return nextFreeNumberPath(directory, 2);
+    }
+
+    public static Path nextFreeNumberPath(Path directory, int retries) {
+        try (Stream<Path> files = Files.walk(directory, 1)) {
+            List<String> existingNames = files
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .toList();
+
+            int nextNumber = nextFreeNumber(existingNames);
+            String numberName = String.format("%02d", nextNumber);
+            Path freePath = directory.resolve(numberName);
+
+            if (Files.exists(freePath)) {
+                logger.warn("Path already exists: '{}'", freePath);
+                if (retries > 0) {
+                    return nextFreeNumberPath(directory, retries - 1);
+                } else {
+                    throw new RuntimeException("Couldn't find free path.");
+                }
+            }
+
+            return freePath;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
