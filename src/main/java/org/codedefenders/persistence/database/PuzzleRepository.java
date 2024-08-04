@@ -147,6 +147,38 @@ public class PuzzleRepository {
     }
 
     /**
+     * Returns all unassigned {@link Puzzle Puzzles}, sorted by position.
+     */
+    public List<Puzzle> getUnassignedPuzzles() {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM puzzles
+                WHERE Chapter_ID IS NULL
+                ORDER BY Position;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS)
+        );
+    }
+
+    /**
+     * Returns all archived {@link Puzzle Puzzles}, sorted by position.
+     */
+    public List<Puzzle> getArchivedPuzzles() {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM puzzles
+                WHERE Active = 0
+                ORDER BY Position;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleFromRS)
+        );
+    }
+
+    /**
      * Returns a {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
      * in the chapter.
      *
