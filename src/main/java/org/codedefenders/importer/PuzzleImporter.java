@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.installer;
+package org.codedefenders.importer;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -77,8 +77,8 @@ import static org.codedefenders.util.FileUtils.nextFreeNumberPath;
  * Imports puzzles and puzzle chapters from files.
  * See the puzzle management page for file format explanations.
  */
-public class Installer {
-    private static final Logger logger = LoggerFactory.getLogger(Installer.class);
+public class PuzzleImporter {
+    private static final Logger logger = LoggerFactory.getLogger(PuzzleImporter.class);
 
     private final BackendExecutorService backend;
     private final CoverageGenerator coverageGenerator;
@@ -89,13 +89,13 @@ public class Installer {
     private final GameClassRepository gameClassRepo;
 
     @Inject
-    public Installer(BackendExecutorService backend,
-                     CoverageGenerator coverageGenerator,
-                     KillMapService killMapService,
-                     TestRepository testRepo,
-                     MutantRepository mutantRepo,
-                     PuzzleRepository puzzleRepo,
-                     GameClassRepository gameClassRepo) {
+    public PuzzleImporter(BackendExecutorService backend,
+                          CoverageGenerator coverageGenerator,
+                          KillMapService killMapService,
+                          TestRepository testRepo,
+                          MutantRepository mutantRepo,
+                          PuzzleRepository puzzleRepo,
+                          GameClassRepository gameClassRepo) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
@@ -125,53 +125,53 @@ public class Installer {
     /**
      * Imports a single puzzle into an existing chapter.
      */
-    public void installPuzzle(Collection<SimpleFile> files, Integer chapterId) throws CompileException,
+    public void importPuzzle(Collection<SimpleFile> files, Integer chapterId) throws CompileException,
             CoverageGenerator.CoverageGeneratorException, IOException, BackendExecutorService.ExecutionException {
-        PuzzleData data = PuzzleInstaller.readPuzzleData(files);
-        installPuzzle(data, chapterId);
+        PuzzleData data = SinglePuzzleImporter.readPuzzleData(files);
+        importPuzzle(data, chapterId);
     }
 
     /**
      * Imports a single puzzle into an existing chapter.
      */
-    public void installPuzzle(PuzzleData data, Integer chapterId) throws CoverageGenerator.CoverageGeneratorException,
+    public void importPuzzle(PuzzleData data, Integer chapterId) throws CoverageGenerator.CoverageGeneratorException,
             CompileException, IOException, BackendExecutorService.ExecutionException {
-        new PuzzleInstaller(data, chapterId).install();
+        new SinglePuzzleImporter(data, chapterId).install();
     }
 
     /**
      * Imports a single puzzle without assigning a chapter. It will put into the unassigned category.
      */
-    public void installPuzzle(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
+    public void importPuzzle(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
             CompileException, IOException, BackendExecutorService.ExecutionException {
-        installPuzzle(files, null);
+        importPuzzle(files, null);
     }
 
     /**
      * Imports a single puzzle without assigning a chapter. It will be put into the unassigned category.
      */
-    public void installPuzzle(PuzzleData data) throws CoverageGenerator.CoverageGeneratorException, CompileException,
+    public void importPuzzle(PuzzleData data) throws CoverageGenerator.CoverageGeneratorException, CompileException,
             IOException, BackendExecutorService.ExecutionException {
-        installPuzzle(data, null);
+        importPuzzle(data, null);
     }
 
     /**
      * Imports a single puzzle chapter.
      */
-    public void installPuzzleChapter(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
+    public void importPuzzleChapter(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
             CompileException, IOException, BackendExecutorService.ExecutionException {
         ChapterData data = readChapterData(files);
-        installPuzzleChapter(data);
+        importPuzzleChapter(data);
     }
 
     /**
      * Imports a single puzzle chapter.
      */
-    public void installPuzzleChapter(ChapterData data) throws IOException, CoverageGenerator.CoverageGeneratorException,
+    public void importPuzzleChapter(ChapterData data) throws IOException, CoverageGenerator.CoverageGeneratorException,
             CompileException, BackendExecutorService.ExecutionException {
         PuzzleChapter chapter = storePuzzleChapterToDB(data.properties);
         for (PuzzleData puzzleData : data.puzzles) {
-            installPuzzle(puzzleData, chapter.getChapterId());
+            importPuzzle(puzzleData, chapter.getChapterId());
         }
     }
 
@@ -181,7 +181,7 @@ public class Installer {
 
         String title = cfg.getProperty("title");
         if (title == null || title.isEmpty()) {
-            throw new InstallerValidationException("Missing title for puzzle chapter.");
+            throw new ValidationException("Missing title for puzzle chapter.");
         }
 
         String description = cfg.getProperty("description");
@@ -202,11 +202,11 @@ public class Installer {
         return chapter;
     }
 
-    public static ChapterData readChapterData(Collection<SimpleFile> files) throws InstallerValidationException {
+    public static ChapterData readChapterData(Collection<SimpleFile> files) throws ValidationException {
         SimpleFile propertiesFile = files.stream()
                 .filter(file -> file.getFilename().equals("chapter.properties") && file.getPath().getNameCount() == 1)
                 .findFirst()
-                .orElseThrow(() -> new InstallerValidationException("Missing properties file for chapter."));
+                .orElseThrow(() -> new ValidationException("Missing properties file for chapter."));
 
         // Find puzzle folders by searching for "puzzle.properties" files at depth 2.
         List<SimpleFile> puzzlePropertiesFiles = files.stream()
@@ -223,14 +223,17 @@ public class Installer {
                                     otherFile.getPath().subpath(1, otherFile.getPath().getNameCount()),
                                     otherFile.getContent()))
                             .toList();
-                    return PuzzleInstaller.readPuzzleData(puzzleFiles);
+                    return SinglePuzzleImporter.readPuzzleData(puzzleFiles);
                 })
                 .toList();
 
         return new ChapterData(propertiesFile, puzzles);
     }
 
-    public class PuzzleInstaller {
+    /**
+     * This class exists only to store the intermediate results from the installation as class members.
+     */
+    public class SinglePuzzleImporter {
         // Input Data
         private final PuzzleData puzzleData;
         private final Integer chapterId;
@@ -243,7 +246,7 @@ public class Installer {
         private List<Mutant> mutants;
         private List<Test> tests;
 
-        public PuzzleInstaller(PuzzleData puzzleData, Integer chapterId) {
+        public SinglePuzzleImporter(PuzzleData puzzleData, Integer chapterId) {
             this.puzzleData = puzzleData;
             this.chapterId = chapterId;
         }
@@ -454,7 +457,7 @@ public class Installer {
             }
         }
 
-        public static PuzzleData readPuzzleData(Collection<SimpleFile> files) throws InstallerValidationException {
+        public static PuzzleData readPuzzleData(Collection<SimpleFile> files) throws ValidationException {
             if (files.isEmpty()) {
                 throw new IllegalArgumentException("No files for puzzle.");
             }
@@ -510,24 +513,24 @@ public class Installer {
             }
 
             if (properties == null) {
-                throw new InstallerValidationException("Missing properties file for puzzle.");
+                throw new ValidationException("Missing properties file for puzzle.");
             }
             if (cuts.isEmpty()) {
-                throw new InstallerValidationException("Missing CUT for puzzle.");
+                throw new ValidationException("Missing CUT for puzzle.");
             } else if (cuts.size() > 1) {
                 String cutNames = cuts.stream()
                         .map(SimpleFile::getPath)
                         .map(path -> String.format("'%s'", path))
                         .collect(Collectors.joining(", "));
-                throw new InstallerValidationException("Multiple CUT files for puzzle: " + cutNames);
+                throw new ValidationException("Multiple CUT files for puzzle: " + cutNames);
             }
 
             return new PuzzleData(properties, cuts.get(0), deps, mutants, tests);
         }
     }
 
-    public static class InstallerValidationException extends RuntimeException {
-        public InstallerValidationException(String message) {
+    public static class ValidationException extends RuntimeException {
+        public ValidationException(String message) {
             super(message);
         }
     }

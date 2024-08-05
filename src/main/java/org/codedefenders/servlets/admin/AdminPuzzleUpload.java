@@ -34,14 +34,12 @@ import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
-import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
-import org.codedefenders.installer.Installer;
+import org.codedefenders.importer.PuzzleImporter;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.SimpleFile;
@@ -64,7 +62,7 @@ public class AdminPuzzleUpload extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleUpload.class);
 
     @Inject
-    private Installer installer;
+    private PuzzleImporter puzzleImporter;
 
     @Inject
     private MessagesBean messages;
@@ -140,7 +138,7 @@ public class AdminPuzzleUpload extends HttpServlet {
         for (byte[] fileContent : files) {
             try {
                 Collection<SimpleFile> puzzleFiles = ZipFileUtils.readZipRecursive(fileContent);
-                installer.installPuzzle(puzzleFiles);
+                puzzleImporter.importPuzzle(puzzleFiles);
                 messages.add("Successfully uploaded puzzle. As of now, please check the logs for errors.");
                 logger.info("Successfully uploaded puzzle.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
@@ -163,7 +161,7 @@ public class AdminPuzzleUpload extends HttpServlet {
         for (byte[] fileContent : files) {
             try {
                 Collection<SimpleFile> chapterFiles = ZipFileUtils.readZipRecursive(fileContent);
-                installer.installPuzzleChapter(chapterFiles);
+                puzzleImporter.importPuzzleChapter(chapterFiles);
                 messages.add("Successfully uploaded chapter. As of now, please check the logs for errors.");
                 logger.info("Successfully uploaded chapter.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
