@@ -2,6 +2,11 @@ package org.codedefenders.util;
 
 import java.nio.file.Path;
 
+/**
+ * Data class to store in-memory files.
+ * Can be either in-memory representations of existing files or fully transient.
+ *
+ */
 public class SimpleFile {
     private final Path path;
     private final byte[] content;
@@ -25,6 +30,9 @@ public class SimpleFile {
         return stringContent;
     }
 
+    /**
+     * Returns the path of the file. The path may not lead to an existing file.
+     */
     public Path getPath() {
         return path;
     }

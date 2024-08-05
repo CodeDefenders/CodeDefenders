@@ -74,12 +74,8 @@ import static org.codedefenders.util.FileUtils.nextFreeNumberPath;
 
 
 /**
- * This class allows adding {@link GameClass game classes (CUTs)}, {@link Mutant mutants},
- * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
- * programmatically.
- *
- * @author gambi
- * @author <a href="https://github.com/werli">Phil Werli</a>
+ * Imports puzzles and puzzle chapters from files.
+ * See the puzzle management page for file format explanations.
  */
 public class Installer {
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
@@ -109,6 +105,9 @@ public class Installer {
         this.gameClassRepo = gameClassRepo;
     }
 
+    /**
+     * Input data for installing a single puzzle.
+     */
     public record PuzzleData(
             SimpleFile properties,
             SimpleFile cut,
@@ -116,37 +115,58 @@ public class Installer {
             List<SimpleFile> mutants,
             List<SimpleFile> tests) {}
 
+    /**
+     * Input data for installing a single puzzle chapter.
+     */
     public record ChapterData(
             SimpleFile properties,
             List<PuzzleData> puzzles) {}
 
-    public void installPuzzle(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
-            CompileException, IOException, BackendExecutorService.ExecutionException {
-        installPuzzle(files, null);
-    }
-
+    /**
+     * Imports a single puzzle into an existing chapter.
+     */
     public void installPuzzle(Collection<SimpleFile> files, Integer chapterId) throws CompileException,
             CoverageGenerator.CoverageGeneratorException, IOException, BackendExecutorService.ExecutionException {
         PuzzleData data = PuzzleInstaller.readPuzzleData(files);
         installPuzzle(data, chapterId);
     }
 
+    /**
+     * Imports a single puzzle into an existing chapter.
+     */
     public void installPuzzle(PuzzleData data, Integer chapterId) throws CoverageGenerator.CoverageGeneratorException,
             CompileException, IOException, BackendExecutorService.ExecutionException {
         new PuzzleInstaller(data, chapterId).install();
     }
 
+    /**
+     * Imports a single puzzle without assigning a chapter. It will put into the unassigned category.
+     */
+    public void installPuzzle(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
+            CompileException, IOException, BackendExecutorService.ExecutionException {
+        installPuzzle(files, null);
+    }
+
+    /**
+     * Imports a single puzzle without assigning a chapter. It will be put into the unassigned category.
+     */
     public void installPuzzle(PuzzleData data) throws CoverageGenerator.CoverageGeneratorException, CompileException,
             IOException, BackendExecutorService.ExecutionException {
         installPuzzle(data, null);
     }
 
+    /**
+     * Imports a single puzzle chapter.
+     */
     public void installPuzzleChapter(Collection<SimpleFile> files) throws CoverageGenerator.CoverageGeneratorException,
             CompileException, IOException, BackendExecutorService.ExecutionException {
         ChapterData data = readChapterData(files);
         installPuzzleChapter(data);
     }
 
+    /**
+     * Imports a single puzzle chapter.
+     */
     public void installPuzzleChapter(ChapterData data) throws IOException, CoverageGenerator.CoverageGeneratorException,
             CompileException, BackendExecutorService.ExecutionException {
         PuzzleChapter chapter = storePuzzleChapterToDB(data.properties);
@@ -182,7 +202,7 @@ public class Installer {
         return chapter;
     }
 
-    public static ChapterData readChapterData(Collection<SimpleFile> files) {
+    public static ChapterData readChapterData(Collection<SimpleFile> files) throws InstallerValidationException {
         SimpleFile propertiesFile = files.stream()
                 .filter(file -> file.getFilename().equals("chapter.properties") && file.getPath().getNameCount() == 1)
                 .findFirst()
@@ -215,7 +235,7 @@ public class Installer {
         private final PuzzleData puzzleData;
         private final Integer chapterId;
 
-        // Working and output data
+        // Working data
         private List<JavaFileObject> dependencyFiles;
         private Path cutDir;
         private GameClass cut;
@@ -379,20 +399,6 @@ public class Installer {
             }
         }
 
-        /**
-         * File convention: {@code puzzles/<cut_alias>/<puzzle_alias_ext>}.
-         * {@code <puzzle_alias_ext>} is used for the puzzle alias, which is constructed as follows:
-         * {@code <cut_alias>_puzzle_<puzzle_alias_ext>}
-         *
-         * <p>Mandatory properties: {@code activeRole} ({@link Role#DEFENDER 'DEFENDER'} or
-         * {@link Role#ATTACKER 'ATTACKER'}), {@code gameLevel} ({@link GameLevel#EASY 'EASY'}
-         * or {@link GameLevel#HARD 'HARD'},
-         * {@code chapterId} (has to be of existing chapter).
-         *
-         * <p>Optional properties: {@code mutants}, {@code tests}, {@code title}, {@code description},
-         * {@code editableLinesStart}, {@code editableLinesEnd},
-         * {@code position}.
-         */
         private void installPuzzle() throws IOException {
             // Store the properties file.
             FileUtils.storeFile(cutDir, puzzleData.properties.getFilename(),

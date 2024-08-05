@@ -190,7 +190,7 @@ public class ZipFileUtils {
 
 
     /**
-     * Reads a zip files contents into memory.
+     * Reads a zip file's contents into memory.
      */
     public static List<SimpleFile> readZip(byte[] bytes) throws IOException {
         Path zipPath = null;
@@ -216,7 +216,8 @@ public class ZipFileUtils {
 
 
     /**
-     * Reads a zip files contents into memory, recursively unpacking any nested zip files.
+     * Reads a zip file's contents into memory, recursively unpacking any nested zip files and replacing them with a
+     * directory of the same name.
      */
     public static List<SimpleFile> readZipRecursive(byte[] bytes) throws IOException {
         return readZip(bytes).stream()
