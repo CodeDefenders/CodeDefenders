@@ -40,12 +40,8 @@
     <li class="nav-item">
         <a class="nav-link ${activePage.equals("adminClasses") ? 'active' : ''}" id="adminClasses" href="${url.forPath(Paths.ADMIN_CLASSES)}">Classes</a>
     </li>
-    <li class="nav-item dropdown">
-        <a class="nav-link ${activePage.equals("adminPuzzles") ? 'active' : ''} dropdown-toggle" id="adminPuzzles" data-bs-toggle="dropdown" href="#">Puzzles</a>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" id="adminPuzzleManagement" href="${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}">Manage</a></li>
-            <li><a class="dropdown-item" id="adminPuzzleUpload" href="${url.forPath(Paths.ADMIN_PUZZLE_UPLOAD)}">Upload</a></li>
-        </ul>
+    <li class="nav-item">
+        <a class="nav-link ${activePage.equals("adminPuzzles") ? 'active' : ''}" id="adminPuzzleManagement" href="${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}">Puzzles</a>
     </li>
     <li class="nav-item">
         <a class="nav-link ${activePage.equals("adminKillMaps") ? 'active' : ''}" id="adminKillMaps" href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">Analysis</a>

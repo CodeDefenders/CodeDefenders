@@ -49,13 +49,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
- *
- * <p>{@code GET} requests redirect to the admin puzzle upload page.
- * and {@code POST} requests handle batch uploading puzzle related information.
- *
- * <p>Serves under {@code /admin/puzzles/upload}.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
+ * {@code POST} requests handle uploading puzzles and chapters.
  */
 @WebServlet(Paths.ADMIN_PUZZLE_UPLOAD)
 public class AdminPuzzleUpload extends HttpServlet {
@@ -68,12 +62,6 @@ public class AdminPuzzleUpload extends HttpServlet {
     private MessagesBean messages;
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher(Constants.ADMIN_PUZZLE_UPLOAD_JSP).forward(request, response);
-    }
-
-    @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
         // Parse request parameters.
@@ -83,6 +71,7 @@ public class AdminPuzzleUpload extends HttpServlet {
             parameters = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to get file upload parameters.", e);
+            messages.add("Failed to get file upload parameters.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -95,6 +84,23 @@ public class AdminPuzzleUpload extends HttpServlet {
                 .findAny();
         if (formType.isEmpty()) {
             logger.warn("No formType provided. Aborting request.");
+            messages.add("No formType provided.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        Optional<Integer> chapterId;
+        try {
+            chapterId = parameters.stream()
+                    .filter(DiskFileItem::isFormField)
+                    .filter(item -> item.getFieldName().equals("chapterId"))
+                    .map(DiskFileItem::getString)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::parseInt)
+                    .findAny();
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid chapterId. Aborting request.", e);
+            messages.add("Invalid chapterId.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -115,6 +121,7 @@ public class AdminPuzzleUpload extends HttpServlet {
         if (fileParametersContents.isEmpty()) {
             messages.add("No file parameters found.");
             Redirect.redirectBack(request, response);
+            return;
         }
 
         switch (formType.get()) {
@@ -123,23 +130,21 @@ public class AdminPuzzleUpload extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 break;
             case "uploadPuzzles":
-                installPuzzles(fileParametersContents);
+                installPuzzles(fileParametersContents, chapterId.orElse(null));
                 Redirect.redirectBack(request, response);
                 break;
-            default: {
+            default:
                 logger.info("Action not recognised: {}", formType);
                 Redirect.redirectBack(request, response);
                 break;
-            }
         }
     }
 
-    private void installPuzzles(List<byte[]> files) {
+    private void installPuzzles(List<byte[]> files, Integer chapterId) {
         for (byte[] fileContent : files) {
             try {
                 Collection<SimpleFile> puzzleFiles = ZipFileUtils.readZipRecursive(fileContent);
-                puzzleImporter.importPuzzle(puzzleFiles);
-                messages.add("Successfully uploaded puzzle. As of now, please check the logs for errors.");
+                puzzleImporter.importPuzzle(puzzleFiles, chapterId);
                 logger.info("Successfully uploaded puzzle.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
                 messages.add("Error while computing coverage.");
@@ -154,6 +159,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                 messages.add("Execution Error");
                 logger.info("Execution Error", e);
             }
+            messages.add("Successfully uploaded puzzle(s). As of now, please check the logs for errors.");
         }
     }
 
@@ -162,7 +168,6 @@ public class AdminPuzzleUpload extends HttpServlet {
             try {
                 Collection<SimpleFile> chapterFiles = ZipFileUtils.readZipRecursive(fileContent);
                 puzzleImporter.importPuzzleChapter(chapterFiles);
-                messages.add("Successfully uploaded chapter. As of now, please check the logs for errors.");
                 logger.info("Successfully uploaded chapter.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
                 messages.add("Error while computing coverage.");
@@ -178,5 +183,6 @@ public class AdminPuzzleUpload extends HttpServlet {
                 logger.info("Execution Error", e);
             }
         }
+        messages.add("Successfully uploaded chapter(s). As of now, please check the logs for errors.");
     }
 }
