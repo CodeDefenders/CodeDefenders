@@ -99,20 +99,34 @@
                             <div class="mt-3 p-1">
                                 <ul>
                                     <li>
-                                        Example attacker puzzle:
-                                        <a href="#">puzzle_attacker.zip</a>
-                                    </li>
-                                    <li>
-                                        Example defender puzzle:
-                                        <a href="#">puzzle_defender.zip</a>
+                                        Empty puzzle template:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
+                                            puzzle_template.zip
+                                        </a>
                                     </li>
                                     <li>
                                         Example properties file:
-                                        <a href="#">puzzle.properties</a>
+                                        <a href="${url.forPath("puzzle-importer/puzzle_properties.zip")}" download>
+                                            puzzle.properties
+                                        </a>
                                     </li>
                                     <li>
-                                        Empty puzzle template:
-                                        <a href="#">puzzle_template.zip</a>
+                                        Example attacker puzzle:
+                                        <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
+                                            puzzle_attacker.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example defender puzzle:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
+                                            puzzle_defender.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example puzzle with dependencies:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
+                                            puzzle_deps.zip
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
@@ -168,34 +182,54 @@
                                 <ul>
                                     <li>
                                         Example chapter:
-                                        <a href="#">chapter.zip</a>
+                                        <a href="${url.forPath("puzzle-importer/chapter_example.zip")}" download>
+                                            chapter_example.zip
+                                        </a>
                                     </li>
                                     <li>
                                         Example properties file:
-                                        <a href="#">chapter.properties</a>
+                                        <a href="${url.forPath("puzzle-importer/chapter.properties")}" download>
+                                            chapter.properties
+                                        </a>
                                     </li>
                                     <li>
                                         Empty chapter template:
-                                        <a href="#">chapter_template.zip</a>
+                                        <a href="${url.forPath("puzzle-importer/chapter_template.zip")}" download>
+                                            chapter_template.zip
+                                        </a>
                                     </li>
                                 </ul>
                                 <p>Puzzle Downloads:</p>
                                 <ul>
                                     <li>
-                                        Example attacker puzzle:
-                                        <a href="#">puzzle_attacker.zip</a>
-                                    </li>
-                                    <li>
-                                        Example defender puzzle:
-                                        <a href="#">puzzle_defender.zip</a>
+                                        Empty puzzle template:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
+                                            puzzle_template.zip
+                                        </a>
                                     </li>
                                     <li>
                                         Example properties file:
-                                        <a href="#">puzzle.properties</a>
+                                        <a href="${url.forPath("puzzle-importer/puzzle.properties")}" download>
+                                            puzzle.properties
+                                        </a>
                                     </li>
                                     <li>
-                                        Empty puzzle template:
-                                        <a href="#">puzzle_template.zip</a>
+                                        Example attacker puzzle:
+                                        <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
+                                            puzzle_attacker.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example defender puzzle:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
+                                            puzzle_defender.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example puzzle with dependencies:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
+                                            puzzle_deps.zip
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
