@@ -420,9 +420,11 @@ public class PuzzleImporter {
             String title = cfg.getProperty("title");
             String description = cfg.getProperty("description");
             Integer editableLinesStart = Optional.ofNullable(cfg.getProperty("editableLinesStart", null))
+                    .flatMap(s -> s.isEmpty() ? Optional.empty() : Optional.of(s))
                     .map(Integer::parseInt)
                     .orElse(null);
             Integer editableLinesEnd = Optional.ofNullable(cfg.getProperty("editableLinesEnd", null))
+                    .flatMap(s -> s.isEmpty() ? Optional.empty() : Optional.of(s))
                     .map(Integer::parseInt)
                     .orElse(null);
 
