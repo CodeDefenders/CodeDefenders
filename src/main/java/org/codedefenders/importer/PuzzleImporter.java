@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -215,8 +217,9 @@ public class PuzzleImporter {
 
         // Sort files for puzzles.
         List<PuzzleData> puzzles = puzzlePropertiesFiles.stream()
-                .map(file -> {
-                    Path parent = file.getPath().getParent();
+                .map(file -> file.getPath().getParent())
+                .sorted(Comparator.comparing(parent -> parent.getFileName().toString()))
+                .map(parent -> {
                     List<SimpleFile> puzzleFiles = files.stream()
                             .filter(otherFile -> otherFile.getPath().getName(0).equals(parent))
                             .map(otherFile -> new SimpleFile(
@@ -524,6 +527,10 @@ public class PuzzleImporter {
                         .collect(Collectors.joining(", "));
                 throw new ValidationException("Multiple CUT files for puzzle: " + cutNames);
             }
+
+            // Sort mutants and tests by their subdirectory.
+            mutants.sort(Comparator.comparing(mutantFile -> mutantFile.getPath().getName(0)));
+            tests.sort(Comparator.comparing(mutantFile -> mutantFile.getPath().getName(0)));
 
             return new PuzzleData(properties, cuts.get(0), deps, mutants, tests);
         }
