@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
@@ -591,7 +590,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
                     .name("chapterId").value(info.puzzle.getChapterId())
                     .name("classId").value(info.puzzle.getClassId())
-                    .name("activeRole").value(info.puzzle.getActiveRole().name())
+                    .name("type").value(info.puzzle.getType().name())
                     .name("gameCount").value(info.gameCount)
                     .name("active").value(info.active)
                     .endObject();

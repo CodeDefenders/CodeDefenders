@@ -457,9 +457,9 @@
                     puzzleComp.tags.id.innerText = '#' + puzzle.id;
                     puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
 
-                    puzzleComp.container.classList.add(`puzzle-\${puzzle.activeRole.toLowerCase()}`);
+                    puzzleComp.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
                     puzzleComp.container.querySelector('.puzzle__watermark').src =
-                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
 
                     if (puzzle.gameCount > 0) {
                         const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
@@ -832,7 +832,7 @@
                     modal.body.querySelector('input[name="title"]').value = puzzle.title;
                     modal.body.querySelector('input[name="description"]').value = puzzle.description;
                     modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
-                    if (puzzle.activeRole === 'DEFENDER') {
+                    if (puzzle.type === 'DEFENDER') {
                         modal.body.querySelector('.editable-lines').remove();
                     } else {
                         modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;

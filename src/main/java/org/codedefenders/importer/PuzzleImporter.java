@@ -55,6 +55,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -415,7 +416,7 @@ public class PuzzleImporter {
             cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
 
             // Read values from specification file
-            Role activeRole = Role.valueOf(cfg.getProperty("type"));
+            PuzzleType type = PuzzleType.valueOf(cfg.getProperty("type"));
             GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
             String title = cfg.getProperty("title");
             String description = cfg.getProperty("description");
@@ -445,7 +446,7 @@ public class PuzzleImporter {
                     .orElse(0) + 1;
 
             // Store puzzle to DB.
-            Puzzle puzzle = new Puzzle(-1, cut.getId(), activeRole, level, maxAssertionsPerTest,
+            Puzzle puzzle = new Puzzle(-1, cut.getId(), type, level, maxAssertionsPerTest,
                     mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title,
                     description);
             int puzzleId = puzzleRepo.storePuzzle(puzzle);

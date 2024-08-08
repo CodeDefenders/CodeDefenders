@@ -41,11 +41,23 @@ WHERE Mode = 'MELEE'
 
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
-FROM games,
-     classes
+SELECT games.*,
+       classes.Name,
+       classes.JavaFile,
+       classes.ClassFile,
+       classes.Alias,
+       classes.AiPrepared,
+       classes.RequireMocking,
+       classes.Puzzle,
+       classes.Active,
+       classes.TestingFramework,
+       classes.AssertionLibrary,
+       classes.Parent_Class,
+       puzzles.Type as Puzzle_Type
+FROM games, classes, puzzles
 WHERE Mode = 'PUZZLE'
-  AND games.Class_ID = classes.Class_ID;
+  AND games.Class_ID = classes.Class_ID
+  AND games.Puzzle_ID = puzzles.Puzzle_ID;
 
 CREATE OR REPLACE VIEW `view_players` AS
 SELECT *

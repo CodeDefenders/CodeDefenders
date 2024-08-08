@@ -38,6 +38,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI;
@@ -303,7 +304,7 @@ public class PuzzleRepository {
                 INSERT INTO puzzles
 
                 (Class_ID,
-                Active_Role,
+                Type,
                 Level,
                 Max_Assertions,
                 Mutant_Validator_Level,
@@ -320,7 +321,7 @@ public class PuzzleRepository {
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
                 puzzle.getClassId(),
-                puzzle.getActiveRole().toString(),
+                puzzle.getType().toString(),
                 puzzle.getLevel().toString(),
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getMutantValidatorLevel().toString(),
@@ -383,11 +384,10 @@ public class PuzzleRepository {
                 MutantValidator,
                 State,
                 CurrentRound,
-                ActiveRole,
                 Mode,
                 Puzzle_ID)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner.insert(query,
@@ -399,7 +399,6 @@ public class PuzzleRepository {
                 game.getMutantValidatorLevel().toString(),
                 game.getState().toString(),
                 game.getCurrentRound(),
-                game.getActiveRole().toString(),
                 game.getMode().toString(),
                 game.getPuzzleId()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle game."));
@@ -480,7 +479,6 @@ public class PuzzleRepository {
                     MutantValidator = ?,
                     State = ?,
                     CurrentRound = ?,
-                    ActiveRole = ?,
                     Puzzle_ID = ?
 
                 WHERE ID = ?;
@@ -494,7 +492,6 @@ public class PuzzleRepository {
                 game.getMutantValidatorLevel().toString(),
                 game.getState().toString(),
                 game.getCurrentRound(),
-                game.getActiveRole().toString(),
                 game.getPuzzleId(),
                 game.getId()
         );
@@ -726,7 +723,7 @@ public class PuzzleRepository {
     private static Puzzle puzzleFromRS(ResultSet rs) throws SQLException {
         final int puzzleId = rs.getInt("puzzles.Puzzle_ID");
         final int classId = rs.getInt("puzzles.Class_ID");
-        final Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
+        final PuzzleType type = PuzzleType.valueOf(rs.getString("puzzles.Type"));
 
         Integer chapterId = rs.getInt("puzzles.Chapter_ID");
         if (rs.wasNull()) {
@@ -759,7 +756,7 @@ public class PuzzleRepository {
             editableLinesEnd = null;
         }
 
-        return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
+        return new Puzzle(puzzleId, classId, type, level, maxAssertions, mutantValidatorLevel,
                 editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
@@ -779,10 +776,11 @@ public class PuzzleRepository {
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
         GameState state = GameState.valueOf(rs.getString("games.State"));
         int currentRound = rs.getInt("games.CurrentRound");
-        Role activeRole = Role.valueOf(rs.getString("games.ActiveRole"));
+
         int puzzleId = rs.getInt("games.Puzzle_ID");
+        PuzzleType type = PuzzleType.valueOf(rs.getString("Puzzle_Type"));
 
         return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
-            maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
+            maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, type);
     }
 }

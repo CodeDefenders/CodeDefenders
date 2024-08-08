@@ -66,8 +66,8 @@
                         </div>
                     </div>
                     <div class="next-puzzle__title">
-                        <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.activeRole}"
-                             src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
+                        <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.type}"
+                             src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
                         <h2>
                             <span class="next-puzzle__title__next-puzzle">Next puzzle:</span><br>
                             <span class="next-puzzle__title__chapter">${nextPuzzleObj.puzzle.chapter.title},</span>
@@ -104,8 +104,8 @@
                                         </c:otherwise>
                                     </c:choose>
                             >
-                                <img class="chapter__level__watermark" alt="${puzzle.activeRole}"
-                                     src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
+                                <img class="chapter__level__watermark" alt="${puzzle.type}"
+                                     src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
                                 <div class="chapter__level__image">
                                     <c:if test="${status == 'next'}">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">

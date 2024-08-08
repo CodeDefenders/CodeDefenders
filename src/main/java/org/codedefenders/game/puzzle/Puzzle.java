@@ -43,9 +43,9 @@ public class Puzzle {
     private int classId;
 
     /**
-     * The {@link Role} the player takes in the puzzle.
+     * The type of the puzzle.
      */
-    private Role activeRole;
+    private PuzzleType type;
 
     /**
      * The {@link GameLevel} the puzzle is played on.
@@ -103,7 +103,7 @@ public class Puzzle {
      * @param puzzleId ID of the chapter.
      * @param classId Class ID of the class the puzzle uses.
      *                The mutants and test for the puzzle come together with the class.
-     * @param activeRole The {@link Role} the player takes in the puzzle.
+     * @param type The type of the puzzle.
      * @param level The {@link GameLevel} the puzzle is played on.
      * @param mutantValidatorLevel Validation level used to check submitted mutants.
      * @param maxAssertionsPerTest Maximum number of allowed assertions per submitted test.
@@ -116,7 +116,7 @@ public class Puzzle {
      */
     public Puzzle(int puzzleId,
                   int classId,
-                  Role activeRole,
+                  PuzzleType type,
                   GameLevel level,
                   int maxAssertionsPerTest,
                   CodeValidatorLevel mutantValidatorLevel,
@@ -128,7 +128,7 @@ public class Puzzle {
                   String description) {
         this.puzzleId = puzzleId;
         this.classId = classId;
-        this.activeRole = activeRole;
+        this.type = type;
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.mutantValidatorLevel = mutantValidatorLevel;
@@ -169,12 +169,12 @@ public class Puzzle {
         this.classId = classId;
     }
 
-    public Role getActiveRole() {
-        return activeRole;
+    public PuzzleType getType() {
+        return type;
     }
 
-    public void setActiveRole(Role activeRole) {
-        this.activeRole = activeRole;
+    public void setType(PuzzleType type) {
+        this.type = type;
     }
 
     public GameLevel getLevel() {
