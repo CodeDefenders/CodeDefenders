@@ -199,7 +199,7 @@ public class AdminPuzzleAPI extends HttpServlet {
 
         // Uses 'cascade delete'. Deleted the puzzles, too.
         boolean classRemoved = gameClassRepo.forceRemoveClassForId(puzzle.getClassId());
-        if (classRemoved) {
+        if (classRemoved && parentGameClass != null) {
             if (puzzleRepo.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
                 logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
                         puzzle.getClassId(), parentGameClass.getId());
