@@ -1,9 +1,22 @@
-# Converts puzzles from the old import format to the new import format.
-
 from pathlib import Path
 from typing import Dict, List, Any
 from zipfile import ZipFile
 from dataclasses import dataclass
+import re
+import sys
+import os
+
+
+def exit_with_usage():
+    print(
+        f"""Converts a puzzle folder in the old import format to the new format.
+
+Usage: {os.path.basename(sys.argv[0])} input_path output_path
+    input_path: directory or zip file containing puzzle chapters in the old format
+    output_path: directory in which to store the converted puzzle files. should be empty""",
+        file=sys.stderr,
+    )
+    sys.exit(1)
 
 
 @dataclass
@@ -41,6 +54,16 @@ def read_properties_file(content: str) -> Dict[str, Any]:
 
         properties[name] = value
     return properties
+
+
+def format_chapter_dir(title: str, position: int) -> str:
+    dir_name = f"Chapter {position:02d} - {title}"
+    return re.sub(r"^[ .]|[/<>:\"\\|?*]+|[ .]$", "_", dir_name)
+
+
+def format_puzzle_dir(title: str, position: int) -> str:
+    dir_name = f"Puzzle {position:02d} - {title}"
+    return re.sub(r"^[ .]|[/<>:\"\\|?*]+|[ .]$", "_", dir_name)
 
 
 class PuzzleConverter:
@@ -109,7 +132,9 @@ class PuzzleConverter:
 
     def convert_chapters(self) -> None:
         for chapter in self.chapters:
-            chapter_dir = self.output_dir / f"chapter_{chapter["position"]:02d}"
+            chapter_dir = self.output_dir / format_chapter_dir(
+                chapter["title"], chapter["position"]
+            )
             print(
                 f"Converting chapter: '{chapter["file"].path}' -> "
                 f"{(chapter_dir / 'chapter.properties').relative_to(self.output_dir)}"
@@ -127,7 +152,9 @@ description={chapter["description"]}
     def convert_puzzles(self) -> None:
         for puzzle in self.puzzles:
             chapter_dir = self.chapter_dirs[puzzle["chapterId"]]
-            puzzle_dir = chapter_dir / f"puzzle_{puzzle["position"]:02d}"
+            puzzle_dir = chapter_dir / format_puzzle_dir(
+                puzzle["title"], puzzle["position"]
+            )
             print(
                 f"Converting puzzle: '{puzzle["file"].path}' -> "
                 f"{(puzzle_dir / 'puzzle.properties').relative_to(self.output_dir)}"
@@ -174,18 +201,6 @@ gameLevel={puzzle["gameLevel"]}
 
 
 def main() -> None:
-    import sys
-    import os
-
-    def exit_with_usage():
-        print(
-            f"""Usage: {os.path.basename(sys.argv[0])} input_path output_path
-    input_path: directory or zip file containing puzzle chapters in the old format
-    output_path: directory in which to store the converted puzzle files. should be empty""",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
     if len(sys.argv) != 3:
         exit_with_usage()
 
