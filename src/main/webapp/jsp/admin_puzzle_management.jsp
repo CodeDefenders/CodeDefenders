@@ -155,6 +155,10 @@
                             For details on the convention, please expand the explanation.
                         </p>
 
+                        <p>
+                            Uploading large chapters may take several minutes.
+                        </p>
+
                         <input class="form-control mb-4" type="file" id="fileUploadChapter" name="fileUploadChapter"
                                accept=".zip" multiple>
 
@@ -938,7 +942,7 @@
                 });
 
                 // Delete Puzzle Modal
-                chaptersContainer.addEventListener('click', function (event) {
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
                     const deleteButton = event.target.closest('.puzzle__button__delete');
                     if (deleteButton === null) {
                         return;
