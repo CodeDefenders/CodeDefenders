@@ -44,7 +44,6 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
@@ -79,6 +78,7 @@ import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -158,7 +158,7 @@ public class MultiplayerGameManager extends HttpServlet {
     private IMutationTester mutationTester;
 
     @Inject
-    private TestSmellsDAO testSmellsDAO;
+    private TestSmellRepository testSmellRepo;
 
     @Inject
     private ITestCaseSelector regressionTestCaseSelector;
@@ -1098,7 +1098,7 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest.getId());
+        List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(newTest.getId());
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

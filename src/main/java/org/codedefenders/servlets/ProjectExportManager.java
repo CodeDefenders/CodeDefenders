@@ -38,10 +38,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -76,6 +76,9 @@ public class ProjectExportManager extends HttpServlet {
     @Inject
     private PlayerRepository playerRepo;
 
+    @Inject
+    private GameClassRepository gameClassRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -90,9 +93,10 @@ public class ProjectExportManager extends HttpServlet {
             return;
         }
 
-        GameClass cut = GameClassDAO.getClassForGameId(gameId.get());
+        GameClass cut = gameClassRepo.getClassForGameId(gameId.get())
+                .orElseThrow();
         Path packagePath = Paths.get(cut.getPackage().replace(".", "/"));
-        List<Dependency> dependencies = GameClassDAO.getMappedDependenciesForClassId(cut.getId());
+        List<Dependency> dependencies = gameClassRepo.getMappedDependenciesForClassId(cut.getId());
 
         final Set<Path> paths = dependencies
                 .stream()

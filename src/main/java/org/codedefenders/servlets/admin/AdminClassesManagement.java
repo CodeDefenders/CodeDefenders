@@ -30,8 +30,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -54,9 +54,12 @@ public class AdminClassesManagement extends HttpServlet {
     @Inject
     private URLUtils url;
 
+    @Inject
+    private GameClassRepository gameClassRepo;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        request.setAttribute("classInfos", GameClassDAO.getAllClassInfos());
+        request.setAttribute("classInfos", gameClassRepo.getAllClassInfos());
 
         request.getRequestDispatcher(Constants.ADMIN_CLASSES_JSP).forward(request, response);
     }
@@ -95,7 +98,7 @@ public class AdminClassesManagement extends HttpServlet {
                     break;
                 }
                 logger.info("Removing class...");
-                if (GameClassDAO.gamesExistsForClass(classId.get())) {
+                if (gameClassRepo.gamesExistsForClass(classId.get())) {
                     logger.info("Failed to remove class {}! At least one game already exists.", classId.get());
                     messages.add("Failed to remove class! There are existing games with this class.");
                     break;
@@ -118,21 +121,32 @@ public class AdminClassesManagement extends HttpServlet {
     }
 
     private boolean setClassActive(int classId, boolean active) {
-        final GameClass gameClass = GameClassDAO.getClassForId(classId);
-        if (gameClass == null || gameClass.isPuzzleClass()) {
+        var optGameClass = gameClassRepo.getClassForId(classId);
+        if (optGameClass.isEmpty()) {
             return false;
         }
+
+        GameClass gameClass = optGameClass.get();
+        if (gameClass.isPuzzleClass()) {
+            return false;
+        }
+
         gameClass.setActive(active);
-        return gameClass.update();
+        return gameClassRepo.updateClass(gameClass);
     }
 
     private boolean forceRemoveClass(int classId) {
-        final GameClass gameClass = GameClassDAO.getClassForId(classId);
-        if (gameClass == null || gameClass.isPuzzleClass()) {
+        var optGameClass = gameClassRepo.getClassForId(classId);
+        if (optGameClass.isEmpty()) {
             return false;
         }
 
-        final boolean removalSuccess = GameClassDAO.forceRemoveClassForId(classId);
+        GameClass gameClass = optGameClass.get();
+        if (gameClass.isPuzzleClass()) {
+            return false;
+        }
+
+        final boolean removalSuccess = gameClassRepo.forceRemoveClassForId(classId);
         if (!removalSuccess) {
             return false;
         }

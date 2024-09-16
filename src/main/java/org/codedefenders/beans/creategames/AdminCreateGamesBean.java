@@ -10,6 +10,7 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -31,8 +32,9 @@ public class AdminCreateGamesBean extends CreateGamesBean {
                                 UserRepository userRepo,
                                 MeleeGameRepository meleeGameRepo,
                                 MultiplayerGameRepository multiplayerGameRepo,
-                                CreateGamesService createGamesService) {
-        super(stagedGames, messages, eventDAO, userRepo, createGamesService);
+                                CreateGamesService createGamesService,
+                                GameClassRepository gameClassRepo) {
+        super(stagedGames, messages, eventDAO, userRepo, createGamesService, gameClassRepo);
         this.userRepo = userRepo;
         this.meleeGameRepo = meleeGameRepo;
         this.multiplayerGameRepo = multiplayerGameRepo;

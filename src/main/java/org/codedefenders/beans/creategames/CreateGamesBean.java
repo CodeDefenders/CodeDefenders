@@ -18,7 +18,6 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
@@ -32,6 +31,7 @@ import org.codedefenders.model.creategames.roleassignment.MeleeRoleAssignmentStr
 import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.creategames.CreateGamesServlet;
@@ -64,6 +64,7 @@ public abstract class CreateGamesBean implements Serializable {
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
     private final CreateGamesService createGamesService;
+    private final GameClassRepository gameClassRepo;
 
     protected final StagedGameList stagedGames;
 
@@ -72,12 +73,14 @@ public abstract class CreateGamesBean implements Serializable {
                            MessagesBean messages,
                            EventDAO eventDAO,
                            UserRepository userRepo,
-                           CreateGamesService createGamesService) {
+                           CreateGamesService createGamesService,
+                           GameClassRepository gameClassRepo) {
         this.messages = messages;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
         this.createGamesService = createGamesService;
         this.stagedGames = stagedGames;
+        this.gameClassRepo = gameClassRepo;
     }
 
     /**
@@ -497,7 +500,8 @@ public abstract class CreateGamesBean implements Serializable {
                 .map(StagedGame::getGameSettings)
                 .map(GameSettings::getClassId)
                 .distinct()
-                .map(GameClassDAO::getClassForId)
+                .map(gameClassRepo::getClassForId)
+                .map(Optional::orElseThrow)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(
                         GameClass::getId,

@@ -49,6 +49,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<%--
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <%
     mutantEditor.setClassName(cut.getName());
@@ -59,6 +60,7 @@
         mutantEditor.setMutantCodeForClass(cut);
     }
 %>
+--%>
 
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>

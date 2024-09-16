@@ -16,15 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+
+import org.codedefenders.database.DependencyDAO;
+import org.codedefenders.database.SQLMappingException;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -34,17 +41,16 @@ import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
-import org.codedefenders.persistence.database.MutantRepository;
-import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.database.DB.RSMapper;
 import static org.codedefenders.persistence.database.util.QueryUtils.batchParamsFromList;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * This class handles the database logic for Java classes.
@@ -53,15 +59,22 @@ import static org.codedefenders.persistence.database.util.QueryUtils.batchParams
  * @see GameClass
  * @see GameClassInfo
  */
-public class GameClassDAO {
-    private static final Logger logger = LoggerFactory.getLogger(GameClassDAO.class);
+@ApplicationScoped
+public class GameClassRepository {
+    private static final Logger logger = LoggerFactory.getLogger(GameClassRepository.class);
+
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public GameClassRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
 
     /**
      * Constructs a game class from a {@link ResultSet} entry.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed game class.
-     * @see RSMapper
      */
     public static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
         int classId = rs.getInt("Class_ID");
@@ -101,7 +114,6 @@ public class GameClassDAO {
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed game class information instance.
-     * @see RSMapper
      */
     private static GameClassInfo gameClassInfoFromRS(ResultSet rs) throws SQLException {
         GameClass gc = gameClassFromRS(rs);
@@ -114,21 +126,21 @@ public class GameClassDAO {
      * Retrieves a game class for a given identifier.
      *
      * @param classId the given identifier.
-     * @return a {@link GameClass} instance, or {@code null}.
+     * @return a {@link GameClass} instance, or {@code null}. // TODO change
      */
-    public static GameClass getClassForId(int classId) {
+    public Optional<GameClass> getClassForId(int classId) {
         @Language("SQL") String query = "SELECT * FROM classes WHERE Class_ID = ?;";
 
-        return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(classId));
+        return queryRunner.query(query, oneFromRS(GameClassRepository::gameClassFromRS), classId);
     }
 
     /**
      * Retrieves a game class for a given identifier of a {@link AbstractGame Game}.
      *
      * @param gameId the given game identifier.
-     * @return a {@link GameClass} instance, or {@code null}.
+     * @return a {@link GameClass} instance, or {@code null}. // TODO change
      */
-    public static GameClass getClassForGameId(int gameId) {
+    public Optional<GameClass> getClassForGameId(int gameId) {
         @Language("SQL") String query = """
                 SELECT classes.*
                 FROM classes
@@ -136,7 +148,7 @@ public class GameClassDAO {
                   ON classes.Class_ID = games.Class_ID
                 WHERE games.ID=?;
         """;
-        return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(gameId));
+        return queryRunner.query(query, oneFromRS(GameClassRepository::gameClassFromRS), gameId);
     }
 
     /**
@@ -148,7 +160,7 @@ public class GameClassDAO {
      *
      * @return all game classes.
      */
-    public static List<GameClassInfo> getAllClassInfos() {
+    public List<GameClassInfo> getAllClassInfos() {
         @Language("SQL") String query = """
                 SELECT classes.*,
                     (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count
@@ -157,7 +169,7 @@ public class GameClassDAO {
                 GROUP BY classes.Class_ID;
         """;
 
-        return DB.executeQueryReturnList(query, GameClassDAO::gameClassInfoFromRS);
+        return queryRunner.query(query, listFromRS(GameClassRepository::gameClassInfoFromRS));
     }
 
     /**
@@ -168,10 +180,10 @@ public class GameClassDAO {
      *
      * @return all game classes.
      */
-    public static List<GameClass> getAllPlayableClasses() {
+    public List<GameClass> getAllPlayableClasses() {
         @Language("SQL") String query = "SELECT * FROM view_playable_classes;";
 
-        return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+        return queryRunner.query(query, listFromRS(GameClassRepository::gameClassFromRS));
     }
 
     /**
@@ -181,13 +193,13 @@ public class GameClassDAO {
      * @param classId the class identifier of the checked class.
      * @return {@code true} if at least one game does exist, {@code false} otherwise.
      */
-    public static boolean gamesExistsForClass(Integer classId) {
+    public boolean gamesExistsForClass(Integer classId) {
         @Language("SQL") String query = """
                 SELECT (COUNT(games.ID) > 0) AS games_exist
                 FROM games
                 WHERE games.Class_ID = ?
         """;
-        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("games_exist"), DatabaseValue.of(classId));
+        return queryRunner.query(query, rs -> rs.getBoolean("games_exist"), classId);
     }
 
     /**
@@ -196,10 +208,9 @@ public class GameClassDAO {
      * @param alias the alias that is checked.
      * @return {@code true} if alias does exist, {@code false} otherwise.
      */
-    public static boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
+    public boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = "SELECT * FROM classes WHERE Alias = ?";
-        Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(alias));
-        return rv != null;
+        return queryRunner.query(query, oneFromRS(rs -> true), alias).orElse(false);
     }
 
     /**
@@ -209,14 +220,14 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of mutants
      */
-    public static List<Integer> getMappedMutantIdsForClassId(Integer classId)
+    public List<Integer> getMappedMutantIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT Mutant_ID
                 FROM mutant_uploaded_with_class
                 WHERE Class_ID = ?
         """;
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DatabaseValue.of(classId));
+        return queryRunner.query(query, listFromRS(rs -> rs.getInt("Mutant_ID")), classId);
     }
 
     /**
@@ -226,7 +237,7 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of mutants
      */
-    public static List<Mutant> getMappedMutantsForClassId(Integer classId)
+    public List<Mutant> getMappedMutantsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT mutants.*
@@ -234,7 +245,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Mutant_ID = mutants.Mutant_ID
         """;
-        return DB.executeQueryReturnList(query, MutantRepository::mutantFromRS, DatabaseValue.of(classId));
+        return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), classId);
     }
 
     /**
@@ -244,14 +255,14 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of tests
      */
-    public static List<Integer> getMappedTestIdsForClassId(Integer classId)
+    public List<Integer> getMappedTestIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT Test_ID
                 FROM test_uploaded_with_class
                 WHERE Class_ID = ?;
         """;
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID"), DatabaseValue.of(classId));
+        return queryRunner.query(query, listFromRS(rs -> rs.getInt("Test_ID")), classId);
     }
 
     /**
@@ -261,7 +272,7 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of tests
      */
-    public static List<Test> getMappedTestsForClassId(Integer classId)
+    public List<Test> getMappedTestsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT tests.*
@@ -269,7 +280,7 @@ public class GameClassDAO {
                 WHERE up.Class_ID = ?
                    AND up.Test_ID = tests.Test_ID
         """;
-        return DB.executeQueryReturnList(query, TestRepository::testFromRS, DatabaseValue.of(classId));
+        return queryRunner.query(query, listFromRS(TestRepository::testFromRS), classId);
     }
 
     /**
@@ -279,10 +290,10 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of dependencies
      */
-    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
+    public List<Integer> getMappedDependencyIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DatabaseValue.of(classId));
+        return queryRunner.query(query, listFromRS(rs -> rs.getInt("Dependency_ID")), classId);
     }
 
     /**
@@ -292,7 +303,7 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of dependencies
      */
-    public static List<Dependency> getMappedDependenciesForClassId(Integer classId)
+    public List<Dependency> getMappedDependenciesForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         @Language("SQL") String query = """
                 SELECT
@@ -301,9 +312,9 @@ public class GameClassDAO {
                    ClassFile
                 FROM dependencies WHERE Class_ID = ?;
         """;
-        return DB.executeQueryReturnList(query,
-                rs -> DependencyDAO.dependencyFromRS(rs, classId),
-                DatabaseValue.of(classId));
+        return queryRunner.query(query,
+                listFromRS(rs -> DependencyDAO.dependencyFromRS(rs, classId)),
+                classId);
     }
 
     /**
@@ -314,7 +325,7 @@ public class GameClassDAO {
      * @return An identifier as an integer value.
      * @throws UncheckedSQLException If storing the class was not successful.
      */
-    public static int storeClass(GameClass cut) throws UncheckedSQLException {
+    public int storeClass(GameClass cut) throws UncheckedSQLException {
         String name = cut.getName();
         String alias = cut.getAlias();
         String relativeJavaFile = FileUtils.getRelativeDataPath(cut.getJavaFile()).toString();
@@ -340,23 +351,23 @@ public class GameClassDAO {
                     Active
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(name),
-                DatabaseValue.of(alias),
-                DatabaseValue.of(relativeJavaFile),
-                DatabaseValue.of(relativeClassFile),
-                DatabaseValue.of(isMockingEnabled),
-                DatabaseValue.of(testingFramework.name()),
-                DatabaseValue.of(assertionLibrary.name()),
-                DatabaseValue.of(isPuzzleClass),
-                DatabaseValue.of(parentClassId),
-                DatabaseValue.of(isActive)
-        };
 
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
+        var key = queryRunner.insert(query,
+                generatedKeyFromRS(),
+                name,
+                alias,
+                relativeJavaFile,
+                relativeClassFile,
+                isMockingEnabled,
+                testingFramework.name(),
+                assertionLibrary.name(),
+                isPuzzleClass,
+                parentClassId,
+                isActive);
+
+        if (key.isPresent()) {
             logger.debug("Successfully stored class in database[Name={}, Alias={}].", cut.getName(), cut.getAlias());
-            return result;
+            return key.get();
         } else {
             throw new UncheckedSQLException("Could not store class to database.");
         }
@@ -370,7 +381,7 @@ public class GameClassDAO {
      * @return whether updating was successful or not
      * @throws UncheckedSQLException If storing the class was not successful.
      */
-    public static boolean updateClass(GameClass cut) throws UncheckedSQLException {
+    public boolean updateClass(GameClass cut) throws UncheckedSQLException {
         int classId = cut.getId();
         String alias = cut.getAlias();
         boolean isMockingEnabled = cut.isMockingEnabled();
@@ -384,14 +395,12 @@ public class GameClassDAO {
                   Active = ?
                 WHERE class_ID = ?
         """;
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(alias),
-                DatabaseValue.of(isMockingEnabled),
-                DatabaseValue.of(isActive),
-                DatabaseValue.of(classId)
-        };
 
-        return DB.executeUpdateQuery(query, values);
+        return queryRunner.update(query,
+                alias,
+                isMockingEnabled,
+                isActive,
+                classId) > 0;
     }
 
     /**
@@ -400,10 +409,10 @@ public class GameClassDAO {
      * @param id the identifier of the class to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeClassForId(int id) {
+    public boolean removeClassForId(int id) {
         @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
 
-        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+        return queryRunner.update(query, id) > 0;
     }
 
     /**
@@ -421,7 +430,7 @@ public class GameClassDAO {
      * @param id the identifier of the class to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean forceRemoveClassForId(int id) {
+    public boolean forceRemoveClassForId(int id) {
         @Language("SQL") String query1 = "DELETE FROM dependencies WHERE Class_ID = ?;";
         @Language("SQL") String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
         @Language("SQL") String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";
@@ -433,12 +442,12 @@ public class GameClassDAO {
         @Language("SQL") String query5 = "DELETE FROM mutants WHERE Class_ID = ?;";
         @Language("SQL") String query6 = "DELETE FROM tests WHERE Class_ID = ?;";
 
-        DB.executeUpdateQuery(query1, DatabaseValue.of(id));
-        DB.executeUpdateQuery(query2, DatabaseValue.of(id));
-        DB.executeUpdateQuery(query3, DatabaseValue.of(id));
-        DB.executeUpdateQuery(query4, DatabaseValue.of(id));
-        DB.executeUpdateQuery(query5, DatabaseValue.of(id));
-        DB.executeUpdateQuery(query6, DatabaseValue.of(id));
+        queryRunner.update(query1, id);
+        queryRunner.update(query2, id);
+        queryRunner.update(query3, id);
+        queryRunner.update(query4, id);
+        queryRunner.update(query5, id);
+        queryRunner.update(query6, id);
 
         return removeClassForId(id);
     }
@@ -448,13 +457,12 @@ public class GameClassDAO {
      *
      * @param classes the identifiers of the classes to be removed.
      */
-    public static void removeClassesForIds(List<Integer> classes) {
+    public void removeClassesForIds(List<Integer> classes) {
         if (classes.isEmpty()) {
             return;
         }
 
         @Language("SQL") String query = "DELETE FROM classes WHERE Class_ID = ?;";
-        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
         queryRunner.batch(query, batchParamsFromList(classes));
     }
@@ -465,7 +473,7 @@ public class GameClassDAO {
      * @param ids The class IDs to check.
      * @return The given class IDs for which classes exist.
      */
-    public static List<Integer> filterExistingClassIDs(Collection<Integer> ids) {
+    public List<Integer> filterExistingClassIDs(Collection<Integer> ids) {
         if (ids.isEmpty()) {
             return new ArrayList<>();
         }
@@ -474,6 +482,6 @@ public class GameClassDAO {
                 .collect(Collectors.joining(","));
         @Language("SQL") String query =
                 "SELECT Class_ID FROM classes WHERE Class_ID in (%s);".formatted(idsString);
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Class_ID"));
+        return queryRunner.query(query, listFromRS(rs -> rs.getInt("Class_ID")));
     }
 }

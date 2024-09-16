@@ -35,6 +35,7 @@ import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Classroom;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -617,6 +618,8 @@ public class KillmapDAO {
      * @return The killmap progress for the class.
      */
     public static KillMapClassProgress getKillMapProgressForClass(int classId) {
+        GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+
         @Language("SQL") String nrTestsQuery = """
                 WITH tests_for_class AS
                    (SELECT * FROM view_valid_user_tests UNION ALL SELECT * FROM view_system_test_templates)
@@ -656,7 +659,8 @@ public class KillmapDAO {
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
 
         int nrExpectedEntries = nrMutants * nrTests;
-        GameClass cut = GameClassDAO.getClassForId(classId);
+        GameClass cut = gameClassRepo.getClassForId(classId)
+                .orElseThrow();
 
         return new KillMapClassProgress(
                 nrTests, nrMutants, nrEntries, nrExpectedEntries,

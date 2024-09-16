@@ -63,6 +63,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<%--
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <%
     mutantEditor.setDependenciesForClass(game.getCUT());
@@ -74,6 +75,7 @@
         mutantEditor.setMutantCodeForClass(cut);
     }
 %>
+--%>
 
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>

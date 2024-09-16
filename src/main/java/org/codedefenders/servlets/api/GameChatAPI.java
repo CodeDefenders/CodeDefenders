@@ -31,9 +31,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
+import org.codedefenders.persistence.database.GameChatRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -47,7 +47,7 @@ import com.google.gson.GsonBuilder;
  * This {@link HttpServlet} offers an API for chat messages.
  * <br/>
  * <br/>
- * Chat messages are sent in the same way they are retrieved from {@link GameChatDAO#getChatMessages(int, Role, int)}.
+ * Chat messages are sent in the same way they are retrieved from {@link GameChatRepository#getChatMessages(int, Role, int)}.
  * <br/>
  * <br/>
  * Parameters:
@@ -65,7 +65,7 @@ public class GameChatAPI extends HttpServlet {
     private CodeDefendersAuth login;
 
     @Inject
-    private GameChatDAO gameChatDAO;
+    private GameChatRepository gameChatRepo;
 
     @Inject
     private PlayerRepository playerRepo;
@@ -95,7 +95,7 @@ public class GameChatAPI extends HttpServlet {
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
 
-        List<ServerGameChatEvent> messages = gameChatDAO.getChatMessages(gameId, role, limit);
+        List<ServerGameChatEvent> messages = gameChatRepo.getChatMessages(gameId, role, limit);
 
         response.setContentType("application/json");
         gson.toJson(messages, response.getWriter());

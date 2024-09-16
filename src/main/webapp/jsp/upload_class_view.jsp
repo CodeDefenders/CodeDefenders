@@ -23,6 +23,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="gameClassRepo" type="org.codedefenders.persistence.database.GameClassRepository"--%>
 
 <%@ page import="java.lang.String" %>
 <%@ page import="java.util.List" %>
@@ -31,11 +32,14 @@
 <%@ page import="org.codedefenders.game.AssertionLibrary" %>
 <%@ page import="org.codedefenders.game.TestingFramework" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
-<%@ page import="org.codedefenders.database.GameClassDAO" %>
+<%@ page import="org.codedefenders.persistence.database.GameClassRepository" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%
-    List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
+    GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+
+    List<GameClass> gameClasses = gameClassRepo.getAllPlayableClasses();
     Map<Integer, Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
     Map<Integer, Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
     pageContext.setAttribute("gameClasses", gameClasses);
@@ -228,9 +232,9 @@
                             <c:set var="testingDiff" value="${avgTestDifficulties.get(clazz.id)}"/>
 
                             <%-- TODO: Remove the DB accesses here --%>
-                            <c:set var="numDeps" value="${GameClassDAO.getMappedDependencyIdsForClassId(clazz.id).size()}"/>
-                            <c:set var="numTests" value="${GameClassDAO.getMappedTestIdsForClassId(clazz.id).size()}"/>
-                            <c:set var="numMutants" value="${GameClassDAO.getMappedMutantIdsForClassId(clazz.id).size()}"/>
+                            <c:set var="numDeps" value="${gameClassRepo.getMappedDependencyIdsForClassId(clazz.id).size()}"/>
+                            <c:set var="numTests" value="${gameClassRepo.getMappedTestIdsForClassId(clazz.id).size()}"/>
+                            <c:set var="numMutants" value="${gameClassRepo.getMappedMutantIdsForClassId(clazz.id).size()}"/>
 
                             <tr>
                                 <td>${clazz.id}</td>

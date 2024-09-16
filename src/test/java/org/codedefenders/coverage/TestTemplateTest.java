@@ -27,6 +27,8 @@ import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.service.ClassAnalysisService;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -48,7 +50,8 @@ public class TestTemplateTest {
     public WeldInitiator weld = WeldInitiator
                 .from(TestTemplateTest.class,
                         ClassAnalysisService.class,
-                        ClassCodeAnalyser.class)
+                        ClassCodeAnalyser.class,
+                        GameClassRepository.class)
                 .inject(this)
                 .activate(ApplicationScoped.class)
                 .build();
@@ -62,6 +65,11 @@ public class TestTemplateTest {
     @Produces
     public MetricsRegistry getMockedMetricsRegistry() {
         return mock(MetricsRegistry.class);
+    }
+
+    @Produces
+    public QueryRunner getMockedQueryRunner() {
+        return mock(QueryRunner.class);
     }
 
     private void assertEditableLineCorrect(GameClass gc) {

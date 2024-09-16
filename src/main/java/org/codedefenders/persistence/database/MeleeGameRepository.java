@@ -24,7 +24,6 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -70,7 +69,7 @@ public class MeleeGameRepository {
             throw new IllegalArgumentException("Game is not a melee game.");
         }
 
-        GameClass cut = GameClassDAO.gameClassFromRS(rs);
+        GameClass cut = GameClassRepository.gameClassFromRS(rs);
         int id = rs.getInt("ID");
         int classId = rs.getInt("Class_ID");
         int creatorId = rs.getInt("Creator_ID");

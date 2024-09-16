@@ -36,9 +36,7 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
@@ -49,10 +47,12 @@ import org.codedefenders.game.Test;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
@@ -106,7 +106,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private TestSmellDetector testSmellDetector;
 
     @Inject
-    private TestSmellsDAO testSmellsDAO;
+    private TestSmellRepository testSmellRepo;
 
     @Inject
     private INotificationService notificationService;
@@ -125,6 +125,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private PlayerRepository playerRepo;
+
+    @Inject
+    private GameClassRepository gameClassRepo;
 
     /**
      * {@inheritDoc}
@@ -156,7 +159,8 @@ public class GameManagingUtils implements IGameManagingUtils {
             throws IOException {
         // Mutant is assumed valid here
 
-        GameClass classMutated = GameClassDAO.getClassForId(classId);
+        GameClass classMutated = gameClassRepo.getClassForId(classId)
+                .orElseThrow();
         String classMutatedBaseName = classMutated.getBaseName();
 
         Path path = Paths.get(config.getMutantDir().getAbsolutePath(), subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId));
@@ -188,7 +192,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Override
     public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
             throws IOException {
-        GameClass cut = GameClassDAO.getClassForId(classId);
+        GameClass cut = gameClassRepo.getClassForId(classId)
+                .orElseThrow();
 
         Path path = Paths.get(config.getTestsDir().getAbsolutePath(), subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
         File newTestDir = FileUtils.getNextSubDir(path);
@@ -241,15 +246,15 @@ public class GameManagingUtils implements IGameManagingUtils {
             TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
             testSmellDetector.detectSmells(testFile);
             // TODO Post Process Smells. See #500
-            testSmellsDAO.storeSmell(newTest, testFile);
+            testSmellRepo.storeSmell(newTest, testFile);
         } catch (Exception e) {
             logger.error("Failed to generate or store test smell.", e);
         }
     }
 
     public boolean addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
-        List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(game.getClassId());
-        List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
+        List<Mutant> uploadedMutants = gameClassRepo.getMappedMutantsForClassId(game.getClassId());
+        List<Test> uploadedTests = gameClassRepo.getMappedTestsForClassId(game.getClassId());
         int dummyAttackerPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         int dummyDefenderPlayerId = playerRepo.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         int currentRound = gameRepo.getCurrentRound(game.getId());

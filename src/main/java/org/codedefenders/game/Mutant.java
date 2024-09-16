@@ -32,7 +32,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
@@ -286,12 +287,7 @@ public class Mutant implements Serializable {
     }
 
     public boolean doesRequireRecompilation() {
-        // dummy game with id = -1 has null class, and this check cannot be implemented...
-        GameClass cut = GameClassDAO.getClassForGameId(gameId);
-        if (cut == null) {
-            cut = GameClassDAO.getClassForId(classId);
-        }
-        return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
+        return CollectionUtils.containsAny(getCUT().getCompileTimeConstants(), getLines());
     }
 
     public Patch<String> getDifferences() {
@@ -303,14 +299,7 @@ public class Mutant implements Serializable {
 
     // Not sure
     private void computeDifferences() {
-        GameClass sut = GameClassDAO.getClassForGameId(gameId);
-        if (sut == null) {
-            // in this case gameId might have been -1 (upload)
-            // so we try to reload the sut
-            sut = GameClassDAO.getClassForId(classId);
-        }
-
-        assert sut != null;
+        GameClass sut = getCUT();
 
         File sourceFile = new File(sut.getJavaFile());
         File mutantFile = new File(javaFile);
@@ -326,12 +315,7 @@ public class Mutant implements Serializable {
     }
 
     public String getPatchString() {
-        GameClass sut = GameClassDAO.getClassForGameId(gameId);
-        if (sut == null) {
-            // in this case gameId might have been -1 (upload)
-            // so we try to reload the sut
-            sut = GameClassDAO.getClassForId(classId);
-        }
+        GameClass sut = getCUT();
 
         Path sourceFile = Paths.get(sut.getJavaFile());
         Path mutantFile = Paths.get(javaFile);
@@ -502,5 +486,18 @@ public class Mutant implements Serializable {
 
     public void setKillMessage(String message) {
         this.killMessage = message;
+    }
+
+    protected GameClass getCUT() {
+        GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+
+        var cut = gameClassRepo.getClassForGameId(gameId);
+        if (cut.isEmpty()) {
+            // in this case gameId might have been -1 (upload)
+            // so we try to reload the sut
+            cut = gameClassRepo.getClassForId(classId);
+        }
+
+        return cut.orElseThrow();
     }
 }

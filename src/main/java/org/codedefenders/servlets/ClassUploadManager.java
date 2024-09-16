@@ -53,7 +53,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
@@ -68,6 +67,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.servlets.util.Redirect;
@@ -122,6 +122,9 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private MutantRepository mutantRepo;
+
+    @Inject
+    private GameClassRepository gameClassRepo;
 
 
     private static List<String> reservedClassNames = Arrays.asList(
@@ -344,7 +347,7 @@ public class ClassUploadManager extends HttpServlet {
         if (classAlias == null || classAlias.equals("")) {
             classAlias = fileName.replace(".java", "");
         }
-        if (GameClassDAO.classExistsForAlias(classAlias)) {
+        if (gameClassRepo.classExistsForAlias(classAlias)) {
             logger.error("Class upload failed. Given alias {} was already used.", classAlias);
             messages.add("Class upload failed. Given alias is already used.");
             abortRequestAndCleanUp(request, response);
@@ -494,7 +497,7 @@ public class ClassUploadManager extends HttpServlet {
                 .create();
 
         try {
-            cutId = GameClassDAO.storeClass(cut);
+            cutId = gameClassRepo.storeClass(cut);
         } catch (Exception e) {
             logger.error("Class upload failed. Could not store class to database.");
             messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -543,8 +546,8 @@ public class ClassUploadManager extends HttpServlet {
 
         // At this point if there's test and mutants we shall run them against each other.
         // Since this is not happening in the context of a game we shall do it manually.
-        List<Mutant> mutants = GameClassDAO.getMappedMutantsForClassId(cutId);
-        List<Test> tests = GameClassDAO.getMappedTestsForClassId(cutId);
+        List<Mutant> mutants = gameClassRepo.getMappedMutantsForClassId(cutId);
+        List<Test> tests = gameClassRepo.getMappedTestsForClassId(cutId);
         try {
             // Custom Killmaps are not store in the DB for whatever reason,
             // while we need that !
@@ -925,7 +928,7 @@ public class ClassUploadManager extends HttpServlet {
             mutantRepo.removeMutantsForIds(mutants);
             testRepo.removeTestsForIds(tests);
             DependencyDAO.removeDependenciesForIds(dependencies);
-            GameClassDAO.removeClassesForIds(cuts);
+            gameClassRepo.removeClassesForIds(cuts);
         }
 
         Redirect.redirectBack(request, response);

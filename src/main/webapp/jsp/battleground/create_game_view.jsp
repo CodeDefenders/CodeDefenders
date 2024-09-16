@@ -24,7 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<%@ page import="org.codedefenders.database.GameClassDAO" %>
+<%@ page import="org.codedefenders.persistence.database.GameClassRepository" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
@@ -33,11 +33,14 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
 
 <%
-    List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
+    GameClassRepository gameClassRepo = CDIUtil.getBeanFromCDI(GameClassRepository.class);
+
+    List<GameClass> gameClasses = gameClassRepo.getAllPlayableClasses();
     boolean isClassUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
     int defaultDuration = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
     int maximumDuration = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();

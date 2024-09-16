@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,8 +30,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 
 import com.google.gson.Gson;
@@ -49,11 +50,14 @@ import com.google.gson.JsonObject;
 @WebServlet(org.codedefenders.util.Paths.API_CLASS)
 public class GameClassAPI extends HttpServlet {
 
+    @Inject
+    private GameClassRepository gameClassRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         final Optional<GameClass> classId = ServletUtils.getIntParameter(request, "classId")
-                .map(GameClassDAO::getClassForId);
+                .flatMap(gameClassRepo::getClassForId);
 
         if (classId.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

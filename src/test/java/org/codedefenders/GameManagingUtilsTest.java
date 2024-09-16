@@ -35,12 +35,12 @@ import jakarta.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
@@ -48,6 +48,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
@@ -73,7 +74,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(WeldJunit5Extension.class)
 public class GameManagingUtilsTest {
 
-    private static TestSmellsDAO mockedTestSmellDAO;
+    private static TestSmellRepository mockedTestSmellDAO;
 
     @TempDir
     public Path tempFolder;
@@ -93,7 +94,8 @@ public class GameManagingUtilsTest {
                         MeleeGameRepository.class,
                         MultiplayerGameRepository.class,
                         PuzzleRepository.class,
-                        PlayerRepository.class)
+                        PlayerRepository.class,
+                        GameClassRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)
@@ -105,7 +107,7 @@ public class GameManagingUtilsTest {
      */
     @BeforeAll
     public static void setupTestSmellDao() {
-        mockedTestSmellDAO = Mockito.mock(TestSmellsDAO.class);
+        mockedTestSmellDAO = Mockito.mock(TestSmellRepository.class);
     }
 
     /*
@@ -118,7 +120,7 @@ public class GameManagingUtilsTest {
 
     @ApplicationScoped
     @Produces
-    TestSmellsDAO produceBar() {
+    TestSmellRepository produceBar() {
         return mockedTestSmellDAO;
     }
 

@@ -27,8 +27,6 @@ import java.util.Objects;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
 import org.codedefenders.analysis.gameclass.MethodDescription;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.service.ClassAnalysisService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
@@ -131,37 +129,6 @@ public class GameClass {
                 .puzzleClass(true)
                 .parentClassId(other.getId())
                 .create();
-    }
-
-    /**
-     * Calls {@link GameClassDAO} to insert this {@link GameClass} instance into the database.
-     * <p></p>
-     * Updates the identifier of the called instance.
-     *
-     * @return {@code true} if insertion was successful, {@code false} otherwise.
-     */
-    public boolean insert() {
-        try {
-            this.id = GameClassDAO.storeClass(this);
-            return true;
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store game class to database.", e);
-            return false;
-        }
-    }
-
-    /**
-     * Calls {@link GameClassDAO} to update this {@link GameClass} instance in the database.
-     *
-     * @return {@code true} if updating was successful, {@code false} otherwise.
-     */
-    public boolean update() {
-        try {
-            return GameClassDAO.updateClass(this);
-        } catch (UncheckedSQLException e) {
-            logger.error("Failed to store game class to database.", e);
-            return false;
-        }
     }
 
     public int getId() {

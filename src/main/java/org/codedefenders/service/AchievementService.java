@@ -19,7 +19,6 @@ import jakarta.inject.Named;
 
 import org.codedefenders.beans.game.ScoreboardBean;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -46,6 +45,7 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +66,7 @@ public class AchievementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AchievementService.class);
     private final AchievementRepository repo;
-    private final TestSmellsDAO testSmellsDAO;
+    private final TestSmellRepository testSmellRepo;
     private final EventDAO eventDAO;
     private final INotificationService notificationService;
     private final GameRepository gameRepo;
@@ -81,18 +81,18 @@ public class AchievementService {
      * Constructor for the AchievementService.
      *
      * @param achievementRepository the repository for achievements
-     * @param testSmellsDAO         the DAO for test smells
+     * @param testSmellRepo         the DAO for test smells
      * @param eventDAO              the DAO for events, only used for getting the number of tests written in the last
      *                              2 minutes, not for event handling.
      * @param notificationService   the notification service
      */
     @Inject
        public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
-                                 TestSmellsDAO testSmellsDAO, EventDAO eventDAO,
+                                 TestSmellRepository testSmellRepo, EventDAO eventDAO,
                                  GameRepository gameRepo, PuzzleRepository puzzleRepo,
                                  TestRepository testRepo, PlayerRepository playerRepo) {
         repo = achievementRepository;
-        this.testSmellsDAO = testSmellsDAO;
+        this.testSmellRepo = testSmellRepo;
         this.eventDAO = eventDAO;
         this.notificationService = notificationService;
         this.gameRepo = gameRepo;
@@ -200,7 +200,7 @@ public class AchievementService {
     }
 
     private void checkTestSmells(int userId, int testId) {
-        List<String> smells = testSmellsDAO.getDetectedTestSmellsForTest(testId);
+        List<String> smells = testSmellRepo.getDetectedTestSmellsForTest(testId);
         if (smells.isEmpty()) {
             updateAchievement(userId, Achievement.Id.WRITE_CLEAN_TESTS, 1);
         }

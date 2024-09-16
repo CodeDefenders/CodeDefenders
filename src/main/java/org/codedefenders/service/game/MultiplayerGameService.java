@@ -52,6 +52,7 @@ import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -73,6 +74,7 @@ public class MultiplayerGameService extends AbstractGameService {
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MultiplayerGameRepository multiplayerGameRepo;
+    private final TestSmellRepository testSmellRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -81,14 +83,16 @@ public class MultiplayerGameService extends AbstractGameService {
                                   TestRepository testRepo, MutantRepository mutantRepo,
                                   GameRepository gameRepo,
                                   MultiplayerGameRepository multiplayerGameRepo,
-                                  PlayerRepository playerRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo);
+                                  PlayerRepository playerRepo,
+                                  TestSmellRepository testSmellRepo) {
+        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.multiplayerGameRepo = multiplayerGameRepo;
+        this.testSmellRepo = testSmellRepo;
     }
 
     @Override

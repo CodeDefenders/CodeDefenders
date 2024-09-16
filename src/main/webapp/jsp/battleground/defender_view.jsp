@@ -47,11 +47,13 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<%--
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
     classViewer.setClassCode(game.getCUT());
     classViewer.setDependenciesForClass(game.getCUT());
 %>
+--%>
 
 
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>

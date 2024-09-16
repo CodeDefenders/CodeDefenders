@@ -33,11 +33,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.model.PuzzleInfo;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -92,6 +92,9 @@ public class AdminPuzzleAPI extends HttpServlet {
 
     @Inject
     private PuzzleRepository puzzleRepo;
+
+    @Inject
+    private GameClassRepository gameClassRepo;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -218,7 +221,7 @@ public class AdminPuzzleAPI extends HttpServlet {
             GameClass parentGameClass = puzzleRepo.getParentGameClass(puzzle.getClassId());
 
             // Uses 'cascade delete'. Deleted the puzzles, too.
-            boolean classRemoved = GameClassDAO.forceRemoveClassForId(puzzle.getClassId());
+            boolean classRemoved = gameClassRepo.forceRemoveClassForId(puzzle.getClassId());
             if (classRemoved) {
                 if (puzzleRepo.classSourceUsedForPuzzleClasses(parentGameClass.getId())) {
                     logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
@@ -227,7 +230,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     logger.info("Puzzle class {} removed and since parent class {} is not used for other puzzles,"
                                     + "it's removed too.",
                             puzzle.getClassId(), parentGameClass.getId());
-                    GameClassDAO.forceRemoveClassForId(parentGameClass.getId());
+                    gameClassRepo.forceRemoveClassForId(parentGameClass.getId());
 
                     // Remove the whole class folder
                     final String javaFile = parentGameClass.getJavaFile();

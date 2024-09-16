@@ -19,89 +19,76 @@
 
 --%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
 
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <div class="card game-component-resize">
 
-    <%-- no dependencies -> no tabs --%>
-    <%
-        if (!classViewer.hasDependencies()) {
-    %>
-
-        <div class="card-body p-0 codemirror-fill loading">
-            <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
-        </div>
-
-    <%-- dependencies exist -> tab system --%>
-    <%
-        } else {
-            int currentId = 0;
-    %>
-
-        <div class="card-header">
-            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-1 active" data-bs-toggle="tab"
-                            id="class-viewer-tab-<%=currentId%>"
-                            data-bs-target="#class-viewer-pane-<%=currentId%>"
-                            aria-controls="class-viewer-pane-<%=currentId%>"
-                            type="button" role="tab" aria-selected="true">
-                        ${classViewer.className}
-                    </button>
-                </li>
-                <%
-                    for (String depName : classViewer.getDependencies().keySet()) {
-                        currentId++;
-                %>
+    <c:choose>
+        <c:when test="${!classViewer.hasDependencies()}">
+            <%-- no dependencies -> no tabs --%>
+            <div class="card-body p-0 codemirror-fill loading">
+                <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
+            </div>
+        </c:when>
+        <c:otherwise>
+            <%-- dependencies exist -> tab system --%>
+            <div class="card-header">
+                <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link py-1" data-bs-toggle="tab"
-                                id="class-viewer-tab-<%=currentId%>"
-                                data-bs-target="#class-viewer-pane-<%=currentId%>"
-                                aria-controls="class-viewer-pane-<%=currentId%>"
+                        <button class="nav-link py-1 active" data-bs-toggle="tab"
+                                id="class-viewer-tab-0"
+                                data-bs-target="#class-viewer-pane-0"
+                                aria-controls="class-viewer-pane-0"
                                 type="button" role="tab" aria-selected="true">
-                            <%=depName%>
+                                ${classViewer.className}
                         </button>
                     </li>
-                <%
-                    }
-                %>
-            </ul>
-        </div>
+                    <c:forEach var="depName" items="${classViewer.dependencies.keySet()}" varStatus="s">
+                        <c:set var="id" value="${s.index + 1}"/>
 
-        <%
-            currentId = 0;
-        %>
-
-        <div class="card-body p-0 codemirror-fill loading">
-            <div class="tab-content">
-                <div class="tab-pane active"
-                     id="class-viewer-pane-<%=currentId%>"
-                     aria-labelledby="class-viewer-tab-<%=currentId%>"
-                     role="tabpanel">
-                    <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
-                </div>
-
-                <%
-                    for (String depCode : classViewer.getDependencies().values()) {
-                        currentId++;
-                %>
-                    <div class="tab-pane"
-                         id="class-viewer-pane-<%=currentId%>"
-                         aria-labelledby="class-viewer-tab-<%=currentId%>"
-                         role="tabpanel">
-                             <pre class="m-0"><textarea id="class-viewer-code-<%=currentId%>"
-                                                        name="class-viewer-code-<%=currentId%>"
-                                                        title="class-viewer-code-<%=currentId%>"
-                                                        readonly><%=depCode%></textarea></pre>
-                    </div>
-                <%
-                    }
-                %>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link py-1" data-bs-toggle="tab"
+                                    id="class-viewer-tab-${id}"
+                                    data-bs-target="#class-viewer-pane-${id}"
+                                    aria-controls="class-viewer-pane-${id}"
+                                    type="button" role="tab" aria-selected="true">
+                                ${depName}
+                            </button>
+                        </li>
+                    </c:forEach>
+                </ul>
             </div>
-        </div>
 
-    <% } %>
+            <div class="card-body p-0 codemirror-fill loading">
+                <div class="tab-content">
+                    <div class="tab-pane active"
+                         id="class-viewer-pane-0"
+                         aria-labelledby="class-viewer-tab-0"
+                         role="tabpanel">
+                        <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
+                    </div>
+
+                    <c:forEach var="depCode" items="${classViewer.dependencies.values()}" varStatus="s">
+                        <c:set var="id" value="${s.index + 1}"/>
+
+                        <div class="tab-pane"
+                             id="class-viewer-pane-${id}"
+                             aria-labelledby="class-viewer-tab-${id}"
+                             role="tabpanel">
+                                 <pre class="m-0"><textarea id="class-viewer-code-${id}"
+                                                            name="class-viewer-code-${id}"
+                                                            title="class-viewer-code-${id}"
+                                                            readonly>${depCode}</textarea></pre>
+                        </div>
+                    </c:forEach>
+                </div>
+            </div>
+
+        </c:otherwise>
+    </c:choose>
 
     <div class="card-footer">
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
