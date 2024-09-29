@@ -1,6 +1,6 @@
 public class Puzzle {
 
-    public int testMe(int x, int y) {
+    public int run(int x, int y) {
         int z = -1;
 
         if (y > x) {
@@ -10,7 +10,11 @@ public class Puzzle {
             z = 1;
         }
 
-        return z;
+        if (z > x) {
+            return z;
+        } else {
+            return x;
+        }
     }
 
 }
