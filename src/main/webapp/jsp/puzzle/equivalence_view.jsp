@@ -30,6 +30,7 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -45,6 +46,7 @@
     final GameClass cut = game.getCUT();
     final Mutant equivMutant = game.getMutants().get(0);
     final String mutantClaimedMessage = "Mutant " + equivMutant.getId() + " automatically claimed equivalent";
+    final boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
@@ -52,6 +54,7 @@
     pageContext.setAttribute("description", puzzle.getDescription());
     pageContext.setAttribute("equivMutant", equivMutant);
     pageContext.setAttribute("mutantClaimedMessage", mutantClaimedMessage);
+    pageContext.setAttribute("showTestAccordion", showTestAccordion);
 %>
 
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
@@ -237,8 +240,14 @@
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
                     <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
                 </div>
-
             </div>
+
+            <c:if test="${showTestAccordion}">
+                <div id="tests-div">
+                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                    <t:test_accordion/>
+                </div>
+            </c:if>
         </div>
 
         <t:game_js_init/>
