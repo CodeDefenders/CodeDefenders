@@ -243,9 +243,13 @@
             </div>
 
             <c:if test="${showTestAccordion}">
-                <div id="tests-div">
-                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
-                    <t:test_accordion/>
+                <div class="row">
+                    <div class="col-xl-6 col-12">
+                        <div id="tests-div">
+                            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                            <t:test_accordion/>
+                        </div>
+                    </div>
                 </div>
             </c:if>
         </div>
