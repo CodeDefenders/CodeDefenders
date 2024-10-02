@@ -311,28 +311,13 @@ public class FileUtils {
      * @return A path pointing to the non-existent file.
      */
     public static Path nextFreePath(Path directory, String name) {
-        return nextFreePath(directory, name, 2);
-    }
-
-    private static Path nextFreePath(Path directory, String name, int retries) {
         try (Stream<Path> files = Files.walk(directory, 1)) {
             List<String> filenames = files
                     .map(Path::getFileName)
                     .map(Path::toString)
                     .toList();
             String numberedName = nextFreeName(filenames, name);
-            Path freePath = directory.resolve(numberedName);
-
-            if (Files.exists(freePath)) {
-                logger.warn("Path already exists: '{}'", freePath);
-                if (retries > 0) {
-                    return nextFreePath(directory, name, retries - 1);
-                } else {
-                    throw new RuntimeException("Couldn't find free path.");
-                }
-            }
-
-            return freePath;
+            return directory.resolve(numberedName);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
