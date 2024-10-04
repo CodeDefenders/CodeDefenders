@@ -51,6 +51,7 @@ import static org.codedefenders.persistence.database.util.QueryUtils.batchParams
 import static org.codedefenders.persistence.database.util.ResultSetUtils.generatedKeyFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
+import static org.codedefenders.util.NamingUtils.nextFreeName;
 
 /**
  * This class handles the database logic for Java classes.
@@ -367,6 +368,7 @@ public class GameClassRepository {
 
         if (key.isPresent()) {
             logger.debug("Successfully stored class in database[Name={}, Alias={}].", cut.getName(), cut.getAlias());
+            cut.setId(key.get());
             return key.get();
         } else {
             throw new UncheckedSQLException("Could not store class to database.");
@@ -483,5 +485,15 @@ public class GameClassRepository {
         @Language("SQL") String query =
                 "SELECT Class_ID FROM classes WHERE Class_ID in (%s);".formatted(idsString);
         return queryRunner.query(query, listFromRS(rs -> rs.getInt("Class_ID")));
+    }
+
+    public String nextFreeAlias(String bareAlias) {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM classes
+                WHERE Alias LIKE CONCAT(?, '%');
+                """;
+        List<String> similarAliases = queryRunner.query(query, listFromRS(rs -> rs.getString("Alias")), bareAlias);
+        return nextFreeName(similarAliases, bareAlias);
     }
 }

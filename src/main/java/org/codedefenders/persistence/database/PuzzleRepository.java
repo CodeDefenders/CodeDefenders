@@ -297,6 +297,7 @@ public class PuzzleRepository {
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
 
+
     /**
      * Stores the given {@link PuzzleChapter} in the database.
      *
@@ -304,21 +305,26 @@ public class PuzzleRepository {
      * @return The ID of the stored puzzle chapter, or -1 if the insert failed.
      */
     public int storePuzzleChapter(PuzzleChapter chapter) {
+        @Language("SQL") String positionQuery = """
+            SELECT MAX(position) AS max_position FROM puzzle_chapters;
+        """;
+
+        int maxPosition = queryRunner.query(positionQuery, oneFromRS(rs -> rs.getInt("max_position")))
+                .orElse(0);
+
         @Language("SQL") String query = """
                 INSERT INTO puzzle_chapters
 
-                (Chapter_ID,
-                Position,
+                (Position,
                 Title,
                 Description)
 
-                VALUES (?, ?, ?, ?);
+                VALUES (?, ?, ?);
         """;
 
         return queryRunner.insert(query,
                 generatedKeyFromRS(),
-                chapter.getChapterId(),
-                chapter.getPosition(),
+                maxPosition + 1,
                 chapter.getTitle(),
                 chapter.getDescription()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
