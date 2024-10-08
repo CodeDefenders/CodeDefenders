@@ -153,8 +153,9 @@
     position: relative;
     overflow: hidden;
 
-    padding: 0.5rem;
+    padding: .6rem .9rem;
     border-radius: 4px;
+    box-shadow: 3px 3px 0.75rem 0 #0007;
 
     min-height: 8rem;
 }
@@ -165,12 +166,10 @@
 
 .puzzle.puzzle-attacker {
     background-color: var(--bg-attacker);
-    border: 3px var(--bg-attacker) outset;
 }
 
 .puzzle.puzzle-defender {
     background-color: var(--bg-defender);
-    border: 3px var(--bg-defender) outset;
 }
 
 .puzzle__watermark {

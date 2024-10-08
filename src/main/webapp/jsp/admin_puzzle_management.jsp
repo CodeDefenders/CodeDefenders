@@ -113,6 +113,12 @@
                         group: 'puzzles',
                         onMove: function() {
                             isUnsavedChanges = true;
+                        },
+                        onChoose: function(e) {
+                            e.item.classList.add('shadow-none');
+                        },
+                        onUnchoose: function(e) {
+                            e.item.classList.remove('shadow-none');
                         }
                     });
 
