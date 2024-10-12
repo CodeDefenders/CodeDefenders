@@ -215,12 +215,8 @@
                                         testProgressBar.activate();
                                     });
                                 </script>
-
                             </div>
-
-                            <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
                         </form>
-
                     </div>
                 </div>
 
