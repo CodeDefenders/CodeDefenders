@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,7 +95,7 @@ public class Installer {
     public Installer(BackendExecutorService backend,
                      CoverageGenerator coverageGenerator,
                      KillMapService killMapService,
-            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+                     @SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
                      TestRepository testRepo,
                      MutantRepository mutantRepo,
                      PuzzleRepository puzzleRepo,
@@ -139,7 +138,7 @@ public class Installer {
     /**
      * Maps the chapter IDs from the uploaded puzzle files to their ID in the database.
      */
-    private final Map<Integer, Integer> chapterIdMapping =  new HashMap<>();
+    private final Map<Integer, Integer> chapterIdMapping = new HashMap<>();
 
     /**
      * Looks for puzzle related files in a given directory.
@@ -189,7 +188,7 @@ public class Installer {
     }
 
     private void run(List<File> cuts, List<File> mutants, List<File> tests,
-            List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
+                     List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
         for (File cutFile : cuts) {
             try {
                 installCUT(cutFile);
@@ -478,13 +477,20 @@ public class Installer {
                 .map(Integer::parseInt)
                 .orElse(null);
 
+        // Allow only one mutant for equivalence puzzles
+        if (isEquivalencePuzzle && originalMutants.size() > 1) {
+            logger.warn("Equivalence puzzles should only have one mutant.");
+            originalMutants = List.of(originalMutants.get(0));
+        }
+
         // Default values
         int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS; // TODO: Don't use default value for puzzles
 
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, isEquivalent, isEquivalencePuzzle, level, maxAssertionsPerTest,
-                mutantValidatorLevel, editableLinesStart, editableLinesEnd, databaseChapterId, position, title, description);
+        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, isEquivalent, isEquivalencePuzzle, level,
+                maxAssertionsPerTest, mutantValidatorLevel, editableLinesStart, editableLinesEnd, databaseChapterId,
+                position, title, description);
         int puzzleId = puzzleRepo.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
