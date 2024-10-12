@@ -66,7 +66,7 @@
 /* Container for highlighting the components for resolving an equivalence duel
 ----------------------------------------------------------------------------- */
 .equivalence-container {
-    border: 5px dashed #f00;
+    border: 2px dashed var(--bs-danger);
     border-radius: 5px;
     width: 100%;
     padding: .5rem 1rem;
