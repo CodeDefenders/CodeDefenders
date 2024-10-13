@@ -22,9 +22,10 @@ public class MessageUtils {
     /**
      * Choose the singular or plural form of a string according to the given amount.
      * The plural form is returned if {@code (amount == 0 | amount > 1)}
-     * @param amount The amount.
+     *
+     * @param amount   The amount.
      * @param singular The singular form of the string.
-     * @param plural The plural form of the string.
+     * @param plural   The plural form of the string.
      * @return The singular or plural from of the string.
      */
     public static String pluralize(int amount, String singular, String plural) {
@@ -33,5 +34,18 @@ public class MessageUtils {
         } else {
             return singular;
         }
+    }
+
+    /**
+     * Choose the singular or plural form of a string according to the given amount.
+     * The plural form is returned if {@code (amount == 0 | amount > 1)}
+     * The plural form is the singular form with an appended 's'.
+     *
+     * @param amount   The amount.
+     * @param singular The singular form of the string.
+     * @return The singular or plural from of the string.
+     */
+    public static String pluralize(int amount, String singular) {
+        return pluralize(amount, singular, singular + "s");
     }
 }
