@@ -48,4 +48,26 @@ public class MessageUtils {
     public static String pluralize(int amount, String singular) {
         return pluralize(amount, singular, singular + "s");
     }
+
+    /**
+     * Returns the ordinal suffix (st, nd, rd, th) of a number.
+     *
+     * @param i The number.
+     * @return The ordinal suffix of the number.
+     */
+    public static String ordinalSuffix(int i) {
+        var j = i % 10;
+        var k = i % 100;
+
+        if (j == 1 && k != 11) {
+            return "st";
+        }
+        if (j == 2 && k != 12) {
+            return "nd";
+        }
+        if (j == 3 && k != 13) {
+            return "rd";
+        }
+        return "th";
+    }
 }
