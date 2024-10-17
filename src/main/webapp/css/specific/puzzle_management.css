@@ -136,7 +136,7 @@
 #chapter-unassigned .puzzles,
 #chapter-archived .puzzles {
     max-height: 30rem;
-    overflow: scroll;
+    overflow: auto;
 }
 
 /* ==================== Puzzles ==================== */
