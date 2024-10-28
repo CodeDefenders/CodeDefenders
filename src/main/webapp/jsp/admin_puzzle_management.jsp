@@ -1,402 +1,961 @@
-<%--
-
-    Copyright (C) 2016-2019 Code Defenders contributors
-
-    This file is part of Code Defenders.
-
-    Code Defenders is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or (at
-    your option) any later version.
-
-    Code Defenders is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
-
---%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <p:main_page title="Puzzle Management">
-    <div class="container">
-        <t:admin_navigation activePage="adminPuzzles"/>
+    <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/puzzle_management.css")}" rel="stylesheet">
+    </jsp:attribute>
+    <jsp:body>
+        <div class="container">
+            <t:admin_navigation activePage="adminPuzzles"/>
+            <div id="puzzle-management">
+                <div id="puzzle-management-controls">
+                    <div class="d-flex gap-2">
+                        <button type="button" id="button-upload-chapters" class="btn btn-sm btn-outline-secondary">
+                            Upload chapters
+                            <i class="fa fa-upload ms-1"></i>
+                        </button>
+                        <button type="button" id="button-upload-puzzles" class="btn btn-sm btn-outline-secondary">
+                            Upload puzzles
+                            <i class="fa fa-upload ms-1"></i>
+                        </button>
+                        <button type="button" id="button-add-chapter" class="btn btn-sm btn-outline-secondary">
+                            Add empty chapter
+                            <i class="fa fa-plus ms-1"></i>
+                        </button>
+                    </div>
+                    <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight">
+                        Save
+                        <i class="fa fa-save ms-1"></i>
+                    </button>
+                </div>
 
-        <h3 class="mb-3">Puzzle Chapters</h3>
-        <table id="tableChapters" class="table table-striped table-v-align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Position</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-        </table>
+                <div class="chapter" id="chapter-unassigned">
+                    <div class="chapter__header">
+                        <span class="chapter__title">Unassigned Puzzles</span>
+                    </div>
+                    <div class="puzzles"></div>
+                </div>
 
-        <h3 class="mt-4 mb-3">Puzzles</h3>
-        <table id="tablePuzzles" class="table table-striped table-v-align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Chapter</th>
-                    <th>Position</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Class</th>
-                    <th>Update</th>
-                    <th>Delete</th>
-                </tr>
-            </thead>
-        </table>
+                <div id="chapters"></div>
+
+                <div class="chapter" id="chapter-archived">
+                    <div class="chapter__header">
+                        <span class="chapter__title">Archived Puzzles</span>
+                    </div>
+                    <div class="puzzles"></div>
+                </div>
+            </div>
+        </div>
+        <div id="toasts" class="position-fixed top-0 end-0 p-3 d-flex flex-column gap-1" style="z-index: 11"></div>
 
         <script type="module">
-            import DataTable from '${url.forPath("/js/datatables.mjs")}';
-            import $ from '${url.forPath("/js/jquery.mjs")}';
+            import {Toast} from '${url.forPath('/js/bootstrap.mjs')}';
+            import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
+            import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-            import {PuzzleAPI, DeferredPromise} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            const watermarkUrl = '${url.forPath("/images/achievements/")}';
+            const puzzlePreviewUrl = '${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}';
 
-            let puzzleTable = null;
-            let chapterTable = null;
-            let puzzleTablePromise = new DeferredPromise();
-            let chapterTablePromise = new DeferredPromise();
+            // ==== Init Data ==========================================================================================
 
-            $(document).ready(async function() {
-                const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            const puzzles = puzzleData.puzzles;
+            const chapters = puzzleData.chapters;
 
-                const chapters = puzzleData.puzzleChapters;
-                if (chapters) {
-                    chapterTable = new DataTable('#tableChapters', {
-                        "data": chapters,
-                        "columns": [
-                            { "data": "id" },
-                            {
-                                "data": "position",
-                                "defaultContent": "none"
-                            },
-                            { "data": "title" },
-                            { "data": "description" },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(chapter, type, row, meta) {
-                                    return `
-    <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal" data-bs-target="#updatePuzzleChapter-\${chapter.id}">
-        <i class="fa fa-edit"></i>
-    </button>
-    <div class="modal fade" id="updatePuzzleChapter-\${chapter.id}" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Update Puzzle Chapter \${chapter.id}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="form-group">
-                                <label for="positionForPuzzleChapter\${chapter.id}" class="form-label">Position</label>
-                                <input type="number" class="form-control"
-                                    id="positionForPuzzleChapter\${chapter.id}" value="\${chapter.position}"
-                                    placeholder="Number or empty.">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="form-group">
-                                <label for="titleForPuzzleChapter\${chapter.id}" class="form-label">Title</label>
-                                <input type="text" class="form-control"
-                                    id="titleForPuzzleChapter\${chapter.id}" value="\${chapter.title}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-2">
-                            <div class="form-group">
-                                <label for="descriptionForPuzzleChapter\${chapter.id}" class="form-label">Description</label>
-                                <input type="text" class="form-control"
-                                    id="descriptionForPuzzleChapter\${chapter.id}" value="\${chapter.description}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary updatePuzzleChapter" data-bs-dismiss="modal"
-                                data-chapter-id="\${chapter.id}">
-                            Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-                                    `;
-                                },
-                                "orderable": false
-                            },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(data, type, row, meta) {
-                                    return `<button class="btn btn-sm btn-danger removePuzzleChapter"
-                                               data-chapter-id="\${data.id}">
-                                               <i class="fa fa-trash"></i>
-                                           </button>`;
-                                },
-                                "orderable": false
-                            }
-                        ],
-                        "scrollY": "600px",
-                        "scrollCollapse": true,
-                        "paging": false,
-                        "language": {"info": "Showing _TOTAL_ entries"},
-                        "order": [[ 1, "asc" ]]
-                    });
-                    chapterTablePromise.resolve();
+            const puzzlesPerChapter = new Map();
+            puzzlesPerChapter.set('unassigned', []);
+            puzzlesPerChapter.set('archived', []);
+            for (const puzzle of puzzles) {
+                if (!puzzle.active) {
+                    puzzlesPerChapter.get('archived').push(puzzle);
+                } else if (puzzle.chapterId === null) {
+                    puzzlesPerChapter.get('unassigned').push(puzzle);
+                } else {
+                    if (!puzzlesPerChapter.has(puzzle.chapterId)) {
+                        puzzlesPerChapter.set(puzzle.chapterId, [puzzle])
+                    } else {
+                        puzzlesPerChapter.get(puzzle.chapterId).push(puzzle);
+                    }
                 }
-
-                const puzzles = puzzleData.puzzles;
-                if (puzzles) {
-                    puzzleTable = new DataTable('#tablePuzzles', {
-                        "data": puzzles,
-                        "columns": [
-                            { "data": "id" },
-                            {
-                                "data": "chapterId",
-                                "defaultContent": "none"
-                            },
-                            {
-                                "data": "position",
-                                "defaultContent": "none"
-                            },
-                            { "data": "title" },
-                            { "data": "description" },
-                            { "data": "classId" },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(puzzle, type, row, meta) {
-                                    return `
-    <button type="button" class="btn btn-sm btn-primary"
-            data-bs-toggle="modal" data-bs-target="#updatePuzzle-\${puzzle.id}">
-        <i class="fa fa-edit"></i>
-    </button>
-    <div class="modal fade" id="updatePuzzle-\${puzzle.id}" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Update Puzzle \${puzzle.id}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label for="chapterIdForPuzzle\${puzzle.id}" class="form-label">Chapter ID</label>
-                                <input type="number" class="form-control"
-                                    id="chapterIdForPuzzle\${puzzle.id}"
-                                    value="\${puzzle.chapterId}" placeholder="Identifier of a chapter or empty.">
-                            </div>
-                            <div class="col-6">
-                                <label for="positionForPuzzle\${puzzle.id}" class="form-label">Position in Chapter</label>
-                                <input type="number" class="form-control"
-                                    id="positionForPuzzle\${puzzle.id}" value="\${puzzle.position}"
-                                    placeholder="Number or empty.">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="titleForPuzzle\${puzzle.id}" class="form-label">Title</label>
-                                <input type="text" class="form-control"
-                                    id="titleForPuzzle\${puzzle.id}" value="\${puzzle.title}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="descriptionForPuzzle\${puzzle.id}" class="form-label">Description</label>
-                                <input type="text" class="form-control"
-                                    id="descriptionForPuzzle\${puzzle.id}" value="\${puzzle.description}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <label for="maxAssertionsPerTestForPuzzle\${puzzle.id}" class="form-label">Max. Assertions</label>
-                                <input type="number" class="form-control"
-                                    id="maxAssertionsPerTestForPuzzle\${puzzle.id}" value="\${puzzle.maxAssertionsPerTest}">
-                            </div>
-                        </div>
-
-                        <div class="row g-3 mb-2">
-                            <div class="col-6">
-                                <label for="editableLinesStartForPuzzle\${puzzle.id}" class="form-label">First Editable Line</label>
-                                <input type="number" class="form-control"
-                                    id="editableLinesStartForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesStart}">
-                            </div>
-                            <div class="col-6">
-                                <label for="editableLinesEndForPuzzle\${puzzle.id}" class="form-label">Last Editable Line</label>
-                                <input type="number" class="form-control"
-                                    id="editableLinesEndForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesEnd}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary updatePuzzle" data-bs-dismiss="modal"
-                                data-puzzle-id="\${puzzle.id}">
-                            Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-                                    `;
-                                },
-                                "orderable": false
-                            },
-                            {
-                                "data": null,
-                                "defaultContent": "",
-                                "render": function(data, type, row, meta) {
-                                    return `<button class="btn btn-sm btn-danger removePuzzle"
-                                               data-puzzle-id="\${data.id}">
-                                               <i class="fa fa-trash"></i>
-                                           </button>`;
-                                },
-                                "orderable": false
-                            }
-                        ],
-                        "scrollY": "600px",
-                        "scrollCollapse": true,
-                        "paging": false,
-                        "language": {"info": "Showing _TOTAL_ entries"},
-                        "order": [[ 1, "asc" ], [ 2, "asc" ]]
-                    });
-                    puzzleTablePromise.resolve();
-                }
-            });
-
-            function parseIntOrNull(value) {
-                let newVal = parseInt(value);
-                if (isNaN(newVal)) {
-                    return null;
-                }
-                return newVal;
             }
 
-            function updatePuzzleChapter(puzzleChapterId, row) {
-                let updateChapterData = {
-                    id: puzzleChapterId,
-                    title: String(document.getElementById(`titleForPuzzleChapter\${puzzleChapterId}`).value),
-                    description: String(document.getElementById(`descriptionForPuzzleChapter\${puzzleChapterId}`).value),
-                    position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter\${puzzleChapterId}`).value)
-                };
+            chapters.sort((a, b) => a.position - b.position);
+            for (const puzzles of puzzlesPerChapter.values()) {
+                puzzles.sort((a, b) => a.position - b.position);
+            }
 
-                PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
-                    .then(responseJSON => {
-                        chapterTable.row(row).data(updateChapterData);
+            // ==== Globals ============================================================================================
 
-                        // Redraw, so ordering is restored, too.
-                        chapterTable.rows().invalidate('data').draw();
-                    }).catch(error => {
-                        alert(`Puzzle chapter \${puzzleChapterId} could not be updated.`);
+            let archivedChapter;
+            let unassignedChapter;
+            const chaptersContainer = document.getElementById('chapters');
+            let isUnsavedChanges = false;
+
+            // ==== Components =========================================================================================
+
+            class ChapterComponent {
+                constructor(container = null) {
+                    this.container = container === null
+                        ? ChapterComponent._createElement()
+                        : container;
+                    this.title = this.container.querySelector('.chapter__title');
+                    this.description = this.container.querySelector('.chapter__description');
+                    this.puzzlesContainer = this.container.querySelector('.puzzles');
+                    this.puzzles = this.puzzlesContainer.children;
+
+                    Sortable.create(this.puzzlesContainer, {
+                        animation: 200,
+                        group: 'puzzles',
+                        onMove: function() {
+                            isUnsavedChanges = true;
+                        },
+                        onChoose: function(e) {
+                            e.item.classList.add('shadow-none');
+                        },
+                        onUnchoose: function(e) {
+                            e.item.classList.remove('shadow-none');
+                        }
+                    });
+
+                    this.container.chapterComp = this;
+                }
+
+                static _createElement() {
+                    const container = document.createElement('div');
+                    container.classList.add('chapter');
+                    container.innerHTML = `
+                        <div class="chapter__header">
+                            <div class="chapter__info">
+                                <div class="d-flex align-items-stretch">
+                                    <span class="chapter__index"></span>
+                                    <span class="chapter__title"></span>
+                                </div>
+                                <div class="chapter__description"></div>
+                            </div>
+                            <div class="chapter__controls">
+                                <div class="chapter__handle me-3" title="Drag to move chapter"></div>
+                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="Upload Puzzles">
+                                    <i class="fa fa-upload"></i>
+                                </button>
+                                <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="puzzles"></div>`;
+
+                    const controls = container.querySelector('.chapter__controls');
+                    controls.firstElementChild.insertAdjacentElement('afterend', createChapterSelectDropdown({
+                        label: 'Move to position:',
+                        tooltip: 'Move to position'
+                    }));
+
+                    return container;
+                }
+
+                static forChapter(chapter) {
+                    const chapterComp = new ChapterComponent();
+                    chapterComp.chapter = chapter;
+                    chapterComp.container.dataset.id = chapter.id;
+
+                    chapterComp.title.innerText = chapter.title;
+                    chapterComp.title.title = chapter.title;
+                    chapterComp.description.innerText = chapter.description;
+                    chapterComp.description.description = chapter.description;
+                    return chapterComp;
+                }
+
+                static fromChild(childElement) {
+                    return childElement.closest('.chapter').chapterComp;
+                }
+
+                addPuzzle(puzzleComp) {
+                    this.puzzlesContainer.appendChild(puzzleComp.container);
+                }
+
+                moveToIndex(index) {
+                    index--; // 1-indexed
+
+                    const clampedIndex = Math.max(0, Math.min(chaptersContainer.children.length - 1, index));
+                    const ownIndex = [...chaptersContainer.children].indexOf(this.container);
+
+                    if (ownIndex > clampedIndex) {
+                        chaptersContainer.children.item(clampedIndex)
+                                .insertAdjacentElement('beforebegin', this.container);
+                    } else if (ownIndex < clampedIndex) {
+                        chaptersContainer.children.item(clampedIndex)
+                                .insertAdjacentElement('afterend', this.container);
+                    }
+                }
+            }
+
+            class PuzzleComponent {
+                constructor() {
+                    this.container = PuzzleComponent._createElement();
+                    this.title = this.container.querySelector('.puzzle__title');
+                    this.description = this.container.querySelector('.puzzle__description');
+                    this.tags = {
+                        id: this.container.querySelector('.puzzle__tag__id'),
+                        games: this.container.querySelector('.puzzle__tag__games')
+                    };
+                    this.container.puzzleComp = this;
+                }
+
+                static _createElement() {
+                    const watermark = document.createElement('img');
+                    watermark.classList.add('puzzle__watermark');
+
+                    const container = document.createElement('div');
+                    container.classList.add('puzzle')
+                    container.innerHTML = `
+                        <div class="puzzle__content">
+                            <div class="puzzle__info">
+                                <div class="puzzle__title"></div>
+                                <div class="puzzle__description"></div>
+                            </div>
+                            <div class="puzzle__tags">
+                                <span class="badge puzzle__tag puzzle__tag__id"></span>
+                                <span class="badge puzzle__tag puzzle__tag__games"></span>
+                            </div>
+                        </div>
+                        <div class="puzzle__controls">
+                            <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="Edit">
+                                <i class="fa fa-edit"></i>
+                            </button>
+
+                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="Unassign">
+                                <i class="fa fa-times"></i>
+                            </button>
+
+                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="Archive">
+                                <i class="fa fa-archive"></i>
+                            </button>
+
+                            <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="Delete">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>`;
+
+                    container.appendChild(watermark);
+                    container.querySelector('.puzzle__controls').firstElementChild
+                            .insertAdjacentElement('afterend', createChapterSelectDropdown({
+                                label: 'Move to chapter:',
+                                tooltip: 'Move to chapter'
+                            }));
+                    return container;
+                }
+
+                static forPuzzle(puzzle) {
+                    const puzzleComp = new PuzzleComponent();
+                    puzzleComp.puzzle = puzzle;
+                    puzzleComp.container.dataset.id = puzzle.id;
+
+                    puzzleComp.title.innerText = puzzle.title;
+                    puzzleComp.title.title = puzzle.title;
+                    puzzleComp.description.innerText = puzzle.description;
+                    puzzleComp.description.title = puzzle.title;
+                    puzzleComp.tags.id.innerText = '#' + puzzle.id;
+                    puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
+
+                    puzzleComp.container.classList.add(`puzzle-\${puzzle.activeRole.toLowerCase()}`);
+                    puzzleComp.container.querySelector('.puzzle__watermark').src =
+                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+
+                    if (puzzle.gameCount > 0) {
+                        const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
+                        deleteButton.disabled = true;
+                        deleteButton.title = "Puzzles with existing games can't be deleted";
+                    }
+
+                    return puzzleComp;
+                }
+
+                static fromChild(childElement) {
+                    return childElement.closest('.puzzle').puzzleComp;
+                }
+
+                moveToChapterIndex(index) {
+                    index--; // 1-indexed
+
+                    const clampedIndex = Math.max(0, Math.min(chaptersContainer.children.length - 1, index));
+                    const chapterComp = chaptersContainer.children.item(clampedIndex).chapterComp;
+                    chapterComp.addPuzzle(this);
+                }
+            }
+
+            // ==== Functions ==========================================================================================
+
+            /**
+             * Creates a button that opens a dropdown menu for selecting chapters.
+             * The menu contains a label, a select for the puzzle chapters, and a confirm button.
+             */
+            function createChapterSelectDropdown({
+                     tooltip = 'Move',
+                     label = 'Move to chapter:',
+                     showButtonClasses = 'btn btn-xs btn-primary btn-fixed',
+                     showButtonContent = '<i class="fa fa-arrow-right"></i>',
+                     moveButtonContent = 'Move'
+                }) {
+                const dropdown = document.createElement('div');
+                dropdown.classList.add('dropdown', 'chapter_select', 'd-flex');
+                dropdown.title = tooltip;
+                dropdown.innerHTML = `
+                    <button class="\${showButtonClasses} chapter_select__show"
+                            data-bs-toggle="dropdown" data-bs-offset="0,8">
+                            \${showButtonContent}
+                    </button>
+                    <div class="dropdown-menu chapter_select__menu">
+                        <div class="d-flex flex-column gap-1">
+                            <div class="chapter_select__label">\${label}</div>
+                            <div class="d-flex flex-row gap-2">
+                                <select class="form-select form-select-sm chapter_select__position"></select>
+                                <button type="button" class="btn btn-primary btn-sm chapter_select__confirm">
+                                    \${moveButtonContent}
+                                </button>
+                            </div>
+                        </div
+                    </div>`;
+                return dropdown;
+            }
+
+            /**
+             * Creates the options for the chapter-select dropdown as a DocumentFragment.
+             * @param currentChapter A ChapterComponent for the current chapter. Will be greyed out in the list.
+             */
+            function createChapterSelectOptions(currentChapter = null) {
+                let options = document.createDocumentFragment();
+                let index = 1;
+                for (const chapterElem of chaptersContainer.children) {
+                    const title = chapterElem.chapterComp.chapter.title;
+                    const option = document.createElement('option');
+                    option.value = String(index);
+                    option.innerText = `\${index} | \${title}`;
+                    if (chapterElem.chapterComp === currentChapter) {
+                        option.disabled = true;
+                    }
+                    options.appendChild(option);
+                    index++;
+                }
+                return options;
+            }
+
+            function showToast({colorClass = 'bg-primary', title = '', secondary = '', body = ''}) {
+                const toastElem = document.createElement('div');
+                toastElem.classList.add('toast', 'bg-white');
+                toastElem.role = 'alert';
+                toastElem.innerHTML = `
+                    <div class="toast-header">
+                        <div class="toast-color p-2 me-2 rounded-1"></div>
+                        <strong class="toast-title me-auto"></strong>
+                        <small class="toast-secondary text-body-secondary"></small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body"></div>`;
+
+                toastElem.querySelector('.toast-color').classList.add(colorClass);
+                toastElem.querySelector('.toast-title').innerText = title;
+                toastElem.querySelector('.toast-secondary').innerText = secondary;
+                toastElem.querySelector('.toast-body').innerText = body;
+
+                document.getElementById('toasts').appendChild(toastElem);
+                new Toast(toastElem).show();
+
+                toastElem.addEventListener('hidden.bs.toast', () => {
+                    setTimeout(() => toastElem.remove(), 1000);
                 });
             }
 
-            function removePuzzleChapter(puzzleChapterId, row) {
-                let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
-                    + ' This will not remove the puzzles of the chapter.');
-                if (confirmResult) {
-                    PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
-                        .then(responseJSON => {
-                            chapterTable.row(row).remove();
+            /**
+             * Gathers the positions of unassigned puzzles, archived puzzles and all puzzle chapters.
+             */
+            function getPuzzlePositions() {
+                const data = {};
 
-                            // Forces re-rendering to update row index
-                            chapterTable.rows().invalidate('data').draw();
-                        }).catch(error => {
-                            chapterTable.row(row).node().querySelector('.removePuzzleChapter').disabled = true;
-                            alert(`Puzzle chapter \${puzzleChapterId} could not be removed.`);
+                data.unassignedPuzzles = [...unassignedChapter.puzzles]
+                        .map(puzzlesElem => PuzzleComponent.fromChild(puzzlesElem).puzzle.id);
+
+                data.archivedPuzzles = [...archivedChapter.puzzles]
+                        .map(puzzlesElem => PuzzleComponent.fromChild(puzzlesElem).puzzle.id);
+
+                data.chapters = [];
+                for (const chapterElem of chaptersContainer.children) {
+                    const chapterComp = ChapterComponent.fromChild(chapterElem);
+                    data.chapters.push({
+                        id: chapterComp.chapter.id,
+                        puzzles: [...chapterComp.puzzles]
+                                .map(puzzlesElem => PuzzleComponent.fromChild(puzzlesElem).puzzle.id)
+                    });
+                }
+
+                return data;
+            }
+
+            // ==== Init Code ==========================================================================================
+
+            function initChaptersAndPuzzles() {
+                unassignedChapter = new ChapterComponent(document.getElementById('chapter-unassigned'));
+                for (const puzzle of puzzlesPerChapter.get('unassigned')) {
+                    unassignedChapter.addPuzzle(PuzzleComponent.forPuzzle(puzzle));
+                }
+
+                for (const chapter of chapters) {
+                    const chapterComp = ChapterComponent.forChapter(chapter);
+                    chaptersContainer.appendChild(chapterComp.container);
+                    const puzzles = puzzlesPerChapter.get(chapter.id) ?? [];
+                    for (const puzzle of puzzles) {
+                        chapterComp.addPuzzle(PuzzleComponent.forPuzzle(puzzle));
+                    }
+                }
+
+                archivedChapter = new ChapterComponent(document.getElementById('chapter-archived'));
+                for (const puzzle of puzzlesPerChapter.get('archived')) {
+                    archivedChapter.addPuzzle(PuzzleComponent.forPuzzle(puzzle));
+                }
+            }
+
+            function initChapterSelects() {
+                // --- Init 'Scroll to chapter' ------------------------------------------------------------------------
+
+                const scrollDropdown = createChapterSelectDropdown({
+                    tooltip: 'Scroll to chapter',
+                    label: 'Scroll to chapter:',
+                    moveButtonContent: 'Go',
+                    showButtonClasses: 'btn btn-sm btn-outline-secondary',
+                    showButtonContent: 'Scroll to chapter <i class="fa fa-arrow-down ms-1"></i>',
+                });
+                document.getElementById('button-add-chapter').insertAdjacentElement('afterend', scrollDropdown);
+
+                scrollDropdown.querySelector('.chapter_select__confirm').addEventListener('click', function (event) {
+                    const select = event.target.closest('.chapter_select').querySelector('.chapter_select__position');
+                    const index = Number(select.value) - 1;
+
+                    chaptersContainer.children.item(index).scrollIntoView();
+                });
+
+                scrollDropdown.querySelector('.chapter_select__show').addEventListener('click', function (event) {
+                    const options = createChapterSelectOptions();
+                    const select = event.target.closest('.chapter_select').querySelector('.chapter_select__position');
+                    select.innerText = '';
+                    select.appendChild(options);
+                });
+
+                // --- Init 'Move chapter' -----------------------------------------------------------------------------
+
+                document.getElementById('puzzle-management').addEventListener('show.bs.dropdown', function (event) {
+                    const toggleButton = event.target.closest('.chapter__controls .chapter_select__show');
+                    if (toggleButton === null) {
+                        return;
+                    }
+
+                    const chapterComp = ChapterComponent.fromChild(event.target);
+                    const options = createChapterSelectOptions(chapterComp);
+                    const select = chapterComp.container.querySelector('.chapter_select__position');
+                    select.innerText = '';
+                    select.appendChild(options);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const moveButton = event.target.closest('.chapter__controls .chapter_select__confirm');
+                    if (moveButton === null) {
+                        return;
+                    }
+
+                    const chapterComp = ChapterComponent.fromChild(event.target);
+                    const select = chapterComp.container.querySelector('.chapter_select__position');
+                    const position = Number(select.value);
+                    chapterComp.moveToIndex(position);
+                    isUnsavedChanges = true;
+                });
+
+                // --- Init 'Move puzzle' ------------------------------------------------------------------------------
+
+                document.getElementById('puzzle-management').addEventListener('show.bs.dropdown', function (event) {
+                    const toggleButton = event.target.closest('.puzzle__controls .chapter_select__show');
+                    if (toggleButton === null) {
+                        return;
+                    }
+
+                    const puzzle = PuzzleComponent.fromChild(event.target);
+                    const chapter = ChapterComponent.fromChild(puzzle.container);
+                    const options = createChapterSelectOptions(chapter);
+
+                    const select = puzzle.container.querySelector('.chapter_select__position');
+                    select.innerText = '';
+                    select.appendChild(options);
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const moveButton = event.target.closest('.puzzle__controls .chapter_select__confirm');
+                    if (moveButton === null) {
+                        return;
+                    }
+
+                    const puzzle = PuzzleComponent.fromChild(event.target);
+                    const select = puzzle.container.querySelector('.chapter_select__position');
+                    const position = Number(select.value);
+                    puzzle.moveToChapterIndex(position);
+                    isUnsavedChanges = true;
+                });
+            }
+
+            function initModals() {
+                // Edit Chapter Modal
+                chaptersContainer.addEventListener('click', function (event) {
+                    const editButton = event.target.closest('.chapter__button__edit');
+                    if (editButton === null) {
+                        return;
+                    }
+
+                    const chapterComp = ChapterComponent.fromChild(event.target);
+                    const chapter = chapterComp.chapter;
+
+                    const modal = new Modal();
+                    modal.body.innerHTML =`
+                        <form class="" novalidate>
+                            <div class="row mb-3">
+                                <div class="form-group">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" name="title" class="form-control" value=""
+                                        placeholder="Title"
+                                        required minlength="1" maxlength="100">
+                                    <div class="invalid-feedback">Please enter a title.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <input type="text" name="description" class="form-control" value=""
+                                        placeholder="Description"
+                                        maxlength="1000">
+                                </div>
+                            </div>
+                        </form>`;
+                    modal.title.innerText = 'Edit Chapter';
+                    modal.footerCloseButton.innerText = 'Cancel';
+                    modal.modal.dataset.id = chapter.id;
+                    modal.body.querySelector('input[name="title"]').value = chapter.title;
+                    modal.body.querySelector('input[name="description"]').value = chapter.description;
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-primary');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Save';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
+                        const title = modal.body.querySelector('input[name="title"]').value;
+                        const description = modal.body.querySelector('input[name="description"]').value;
+
+                        PuzzleAPI.updatePuzzleChapter(chapter.id, {
+                            title: title,
+                            description: description
+                        }).then(response => {
+                            chapter.title = response.chapter.title;
+                            chapter.description = response.chapter.description;
+                            chapterComp.title.innerText = response.chapter.title;
+                            chapterComp.description.innerText = response.chapter.description;
+                            showToast({title: 'Success', body: response.message});
+                        }).catch(async response => {
+                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                        }).finally(() => {
+                            modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
                         });
-                }
-            }
-
-            function updatePuzzle(puzzleId, row) {
-                let puzzleData = puzzleTable.row(row).data();
-
-                let updatedPuzzleData = {
-                    id: puzzleId,
-                    title: String(document.getElementById(`titleForPuzzle` + puzzleId).value),
-                    description: String(document.getElementById(`descriptionForPuzzle` + puzzleId).value),
-                    chapterId: parseIntOrNull(document.getElementById(`chapterIdForPuzzle` + puzzleId).value),
-                    position: parseIntOrNull(document.getElementById(`positionForPuzzle` + puzzleId).value),
-                    classId: puzzleData.classId,
-                    maxAssertionsPerTest: parseIntOrNull(document.getElementById(`maxAssertionsPerTestForPuzzle` + puzzleId).value),
-                    forceHamcrest: puzzleData.forceHamcrest,
-                    editableLinesStart: parseIntOrNull(document.getElementById(`editableLinesStartForPuzzle` + puzzleId).value),
-                    editableLinesEnd: parseIntOrNull(document.getElementById(`editableLinesEndForPuzzle` + puzzleId).value)
-                };
-
-                PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
-                    .then(responseJSON => {
-                        puzzleTable.row(row).data(updatedPuzzleData);
-
-                        // Redraw, so ordering is restored, too.
-                        puzzleTable.rows().invalidate('data').draw();
-                    }).catch(error => {
-                        alert(`Puzzle \${puzzleId} could not be updated.`);
                     });
-            }
 
-            function removePuzzle(puzzleId, row) {
-                let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
-                if (confirmResult) {
-                    PuzzleAPI.deletePuzzle(puzzleId)
-                        .then(responseJSON => {
-                            puzzleTable.row(row).remove();
+                    modal.controls.show();
+                });
 
-                            // Forces re-rendering to update row index
-                            puzzleTable.rows().invalidate('data').draw();
-                        }).catch(error => {
-                            puzzleTable.row(row).node().querySelector('.removePuzzle').disabled = true;
-                            alert(`Puzzle \${puzzleId} could not be removed.`);
-                    });
-                }
-            }
-
-            puzzleTablePromise.promise.then(() => {
-                puzzleTable.table().container().addEventListener('click', function (event) {
-                    if (event.target.classList.contains('updatePuzzle')) {
-                        updatePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
+                // Edit Puzzle Modal
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const editButton = event.target.closest('.puzzle__button__edit');
+                    if (editButton === null) {
+                        return;
                     }
-                    if (event.target.classList.contains('removePuzzle')) {
-                        removePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
+
+                    const puzzleComp = PuzzleComponent.fromChild(event.target);
+                    const puzzle = puzzleComp.puzzle;
+
+                    const modal = new Modal();
+                    modal.body.innerHTML = `
+                        <form class="" novalidate>
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Title</label>
+                                    <input type="text" class="form-control" value="" name="title"
+                                        placeholder="Title"
+                                        required minlength="1" maxlength="100">
+                                    <div class="invalid-feedback">Please enter a title.</div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <input type="text" class="form-control" value="" name="description"
+                                        placeholder="Description"
+                                        maxlength="1000">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">Max. Assertions</label>
+                                    <input type="number" class="form-control" value="" name="maxAssertionsPerTest"
+                                        min="1">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-2 editable-lines">
+                                <div class="col-6">
+                                    <label class="form-label">First Editable Line</label>
+                                    <input type="number" class="form-control" value="" name="editableLinesStart"
+                                        min="1">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Last Editable Line</label>
+                                    <input type="number" class="form-control" value="" name="editableLinesEnd"
+                                        min="1">
+                                </div>
+                            </div>
+                        </form>`;
+                    modal.title.innerText = 'Edit Puzzle';
+                    modal.footerCloseButton.innerText = 'Cancel';
+                    modal.modal.dataset.id = puzzle.id;
+                    modal.body.querySelector('input[name="title"]').value = puzzle.title;
+                    modal.body.querySelector('input[name="description"]').value = puzzle.description;
+                    modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
+                    if (puzzle.activeRole === 'DEFENDER') {
+                        modal.body.querySelector('.editable-lines').remove();
+                    } else {
+                        modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
+                        modal.body.querySelector('input[name="editableLinesEnd"]').value = puzzle.editableLinesEnd;
+                    }
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-primary');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Save';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
+                        const title = modal.body.querySelector('input[name="title"]').value;
+                        const description = modal.body.querySelector('input[name="description"]').value;
+                        let maxAssertionsPerTest = modal.body.querySelector('input[name="maxAssertionsPerTest"]').value;
+                        maxAssertionsPerTest = Number(maxAssertionsPerTest);
+                        let editableLinesStart = modal.body.querySelector('input[name="editableLinesStart"]')?.value;
+                        editableLinesStart = editableLinesStart ? Number(editableLinesStart) : null;
+                        let editableLinesEnd = modal.body.querySelector('input[name="editableLinesEnd"]')?.value;
+                        editableLinesEnd = editableLinesEnd ? Number(editableLinesEnd) : null;
+
+                        PuzzleAPI.updatePuzzle(puzzle.id, {
+                            title,
+                            description,
+                            maxAssertionsPerTest,
+                            editableLinesStart,
+                            editableLinesEnd
+                        }).then(response => {
+                            puzzle.title = response.puzzle.title;
+                            puzzle.description = response.puzzle.description;
+                            puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
+                            puzzle.editableLinesStart = response.puzzle.editableLinesStart;
+                            puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
+                            puzzleComp.title.innerText = response.puzzle.title;
+                            puzzleComp.description.innerText = response.puzzle.description;
+                            showToast({title: 'Success', body: response.message});
+                        }).catch(async response => {
+                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                        }).finally(() => {
+                            modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
+                        });
+                    });
+
+                    modal.controls.show();
+                });
+
+                // Delete Chapter Modal
+                chaptersContainer.addEventListener('click', function (event) {
+                    const deleteButton = event.target.closest('.chapter__button__delete');
+                    if (deleteButton === null) {
+                        return;
+                    }
+
+                    const chapterComp = ChapterComponent.fromChild(event.target);
+                    const chapter = chapterComp.chapter;
+
+                    const modal = new Modal();
+                    modal.body.innerHTML = `
+                        <div>
+                            Are you sure you want to delete chapter
+                            <span class="px-1 border rounded-1 edit-chapter-title"></span>?
+                            Any puzzles left in the chapter will be moved to
+                            <span class="px-1 border rounded-1">Unassigned</span>.
+                        </div>`;
+
+                    modal.title.innerText = 'Delete Chapter';
+                    modal.footerCloseButton.innerText = 'Cancel';
+                    modal.modal.dataset.id = chapter.id;
+                    modal.body.querySelector('.edit-chapter-title').innerText = chapter.title;
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-danger');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Delete';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        isUnsavedChanges = true;
+                        PuzzleAPI.deletePuzzleChapter(chapter.id)
+                                .then(response => {
+                                    for (const puzzleElem of [...chapterComp.puzzles]) {
+                                        unassignedChapter.addPuzzle(PuzzleComponent.fromChild(puzzleElem));
+                                    }
+                                    chapterComp.container.remove();
+                                    showToast({title: 'Success', body: response.message});
+                                }).catch(async response => {
+                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                }).finally(() => {
+                                    modal.controls.hide();
+                                    setTimeout(() => modal.modal.remove(), 1000);
+                                });
+                    });
+
+                    modal.controls.show();
+                });
+
+                // Delete Puzzle Modal
+                chaptersContainer.addEventListener('click', function (event) {
+                    const deleteButton = event.target.closest('.puzzle__button__delete');
+                    if (deleteButton === null) {
+                        return;
+                    }
+
+                    const puzzleComp = PuzzleComponent.fromChild(event.target);
+                    const puzzle = puzzleComp.puzzle;
+
+                    const modal = new Modal();
+                    modal.body.innerHTML = `
+                        <div>
+                            Are you sure you want to permanently delete puzzle
+                            <span class="px-1 border rounded-1 edit-puzzle-title"></span>?
+                        </div>`;
+
+                    modal.title.innerText = 'Delete Puzzle';
+                    modal.footerCloseButton.innerText = 'Cancel';
+                    modal.modal.dataset.id = puzzle.id;
+                    modal.body.querySelector('.edit-puzzle-title').innerText = puzzle.title;
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-danger');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Delete';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        PuzzleAPI.deletePuzzle(puzzle.id)
+                                .then(response => {
+                                    puzzleComp.container.remove();
+                                    showToast({title: 'Success', body: response.message});
+                                }).catch(async response => {
+                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                }).finally(() => {
+                                    modal.controls.hide();
+                                    setTimeout(() => modal.modal.remove(), 1000);
+                                });
+                    });
+
+                    modal.controls.show();
+                });
+
+                // Add Chapter Modal
+                document.getElementById('button-add-chapter').addEventListener('click', function (event) {
+                    const modal = new Modal();
+                    modal.body.innerHTML =`
+                            <form class="" novalidate>
+                                <div class="row mb-3">
+                                    <div class="form-group">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="title" class="form-control" value=""
+                                            placeholder="Title"
+                                            required minlength="1" maxlength="100">
+                                        <div class="invalid-feedback">Please enter a title.</div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-2">
+                                    <div class="form-group">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="description" class="form-control" value=""
+                                            placeholder="Description"
+                                            maxlength="1000">
+                                    </div>
+                                </div>
+                            </form>`;
+                    modal.title.innerText = 'Create New Chapter';
+                    modal.footerCloseButton.innerText = 'Cancel';
+
+                    const saveButton = document.createElement('button');
+                    saveButton.classList.add('btn', 'btn-primary');
+                    saveButton.role = 'button';
+                    saveButton.innerText = 'Save';
+                    modal.footer.insertAdjacentElement('beforeend', saveButton);
+
+                    saveButton.addEventListener('click', function(event) {
+                        const form = modal.modal.querySelector('form');
+                        if (!form.checkValidity()) {
+                            form.classList.add('was-validated');
+                            return;
+                        }
+
+                        const title = modal.body.querySelector('input[name="title"]').value;
+                        const description = modal.body.querySelector('input[name="description"]').value;
+
+                        PuzzleAPI.createPuzzleChapter({
+                            title: title,
+                            description: description,
+                        }).then(response => {
+                            const chapterComp = ChapterComponent.forChapter({
+                                id: response.chapter.id,
+                                title: response.chapter.title,
+                                description: response.chapter.description
+                            });
+                            chaptersContainer.appendChild(chapterComp.container);
+                            showToast({title: 'Success', body: response.message});
+                        }).catch(async response => {
+                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                        }).finally(() => {
+                            modal.controls.hide();
+                            setTimeout(() => modal.modal.remove(), 1000);
+                        });
+                    });
+
+                    modal.controls.show();
+                });
+
+                // Preview Puzzle Modal
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const puzzleContent = event.target.closest('.puzzle__content');
+                    if (puzzleContent === null) {
+                        return;
+                    }
+
+                    const puzzleComp = PuzzleComponent.fromChild(event.target);
+                    const puzzle = puzzleComp.puzzle;
+
+                    const modal = new Modal();
+                    modal.title.innerText = puzzle.title;
+                    modal.title.classList.add('d-flex', 'align-items-center', 'gap-2');
+                    modal.footerCloseButton.innerText = 'Close';
+                    modal.modal.dataset.id = puzzle.id;
+                    modal.dialog.classList.add('modal-dialog-responsive');
+                    modal.body.classList.add('d-flex', 'p-0');
+
+                    const tag = document.createElement('span');
+                    tag.innerText = `#\${puzzle.id}`;
+                    tag.classList.add('badge', 'bg-secondary');
+                    modal.title.appendChild(tag);
+
+                    const iframe = document.createElement('iframe');
+                    iframe.src = `\${puzzlePreviewUrl}?previewPuzzleId=\${puzzle.id}`;
+                    iframe.style.width = '50rem';
+                    iframe.style.height = '700px';
+                    modal.body.appendChild(iframe);
+
+                    modal.modal.addEventListener('hidden.bs.modal', () => {
+                        setTimeout(() => modal.modal.remove(), 1000);
+                    });
+
+                    modal.controls.show();
+                });
+            }
+
+            function init() {
+                initChaptersAndPuzzles();
+                initChapterSelects();
+                initModals();
+
+                window.addEventListener('beforeunload', function(event) {
+                    if (isUnsavedChanges) {
+                        event.preventDefault();
                     }
                 });
-            });
-            chapterTablePromise.promise.then(() => {
-                chapterTable.table().container().addEventListener('click', function (event) {
-                    if (event.target.classList.contains('updatePuzzleChapter')) {
-                        updatePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
-                    }
-                    if (event.target.classList.contains('removePuzzleChapter')) {
-                        removePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
+
+                Sortable.create(chaptersContainer, {
+                    animation: 200,
+                    group: 'chapters',
+                    handle: '.chapter__handle',
+                    onMove: function() {
+                        isUnsavedChanges = true;
                     }
                 });
-            });
+
+                for (const puzzlesContainer of [unassignedChapter.puzzlesContainer, archivedChapter.puzzlesContainer]) {
+                    Sortable.create(puzzlesContainer, {
+                        animation: 200,
+                        group: 'puzzles',
+                        onMove: function() {
+                            isUnsavedChanges = true;
+                        }
+                    });
+                }
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const archiveButton = event.target.closest('.puzzle__button__archive');
+                    if (archiveButton === null) {
+                        return;
+                    }
+
+                    const puzzle = PuzzleComponent.fromChild(event.target);
+                    archivedChapter.addPuzzle(puzzle);
+                    isUnsavedChanges = true;
+                });
+
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
+                    const unassignButton = event.target.closest('.puzzle__button__unassign');
+                    if (unassignButton === null) {
+                        return;
+                    }
+
+                    const puzzle = PuzzleComponent.fromChild(event.target)
+                    unassignedChapter.addPuzzle(puzzle);
+                    isUnsavedChanges = true;
+                });
+
+                document.getElementById('button-save').addEventListener('click', function (event) {
+                    PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
+                            .then(response => {
+                                isUnsavedChanges = false
+                                showToast({title: 'Success', body: response.message});
+                            }).catch(async response => {
+                        showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                        alert('Could not save changes.');
+                    });
+                });
+            }
+
+            init();
         </script>
-
-    </div>
+    </jsp:body>
 </p:main_page>

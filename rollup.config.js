@@ -50,10 +50,8 @@ const moduleConfig = {
         `${SRC_DIR}/game/index.js`,
         `${SRC_DIR}/main/index.js`,
         `${SRC_DIR}/init/index.js`,
-        `${SRC_DIR}/thirdparty/bootstrap.js`,
-        `${SRC_DIR}/thirdparty/codemirror.js`,
-        `${SRC_DIR}/thirdparty/datatables.js`,
-        `${SRC_DIR}/thirdparty/jquery.js`,
+        ...fs.readdirSync(`${SRC_DIR}/thirdparty`)
+                .map(name => `${SRC_DIR}/thirdparty/${name}`)
     ],
     plugins: PLUGINS,
     output: {

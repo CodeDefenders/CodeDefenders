@@ -39,17 +39,25 @@ import com.google.gson.annotations.Expose;
 public class MutantAccordionBean {
     private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
 
-    private final AbstractGame game;
+    private Integer gameId;
 
-    private final List<MutantDTO> mutantList;
-    private final List<MutantAccordionCategory> categories;
+    private List<MutantDTO> mutantList;
+    private List<MutantAccordionCategory> categories;
+
 
     @Inject
     public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer) {
-        game = gameProducer.getGame();
-        mutantList = gameService.getMutants(login.getUserId(), game.getId());
+        var game = gameProducer.getGame();
+        if (game != null) {
+            var mutantList = gameService.getMutants(login.getUserId(), game.getId());
+            init(game.getCUT(), mutantList, game.getId());
+        }
+    }
 
-        GameClass cut = game.getCUT();
+    public void init(GameClass cut, List<MutantDTO> mutantList, Integer gameId) {
+        this.mutantList = mutantList;
+        this.gameId = gameId;
+
         List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
         GameAccordionMapping mapping = GameAccordionMapping.computeForMutants(methodDescriptions, mutantList);
 
@@ -77,7 +85,7 @@ public class MutantAccordionBean {
     }
 
     public Integer getGameId() {
-        return game.getId();
+        return gameId;
     }
 
     public List<MutantDTO> getMutants() {

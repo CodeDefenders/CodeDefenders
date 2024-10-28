@@ -19,7 +19,7 @@ class PuzzleAPI {
         }
         const response = await fetch(url, request);
         if (!response.ok) {
-            return Promise.reject();
+            throw await response.json();
         }
         return await response.json();
     }
@@ -36,12 +36,23 @@ class PuzzleAPI {
         return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?id=${chapterId}`, 'PUT', chapterData);
     }
 
+    static async createPuzzleChapter(chapterData) {
+        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?create`, 'PUT', chapterData);
+    }
+
     static async deletePuzzle(puzzleId) {
         return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/puzzle?id=${puzzleId}`, 'DELETE');
     }
 
     static async deletePuzzleChapter(puzzleChapterId) {
         return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?id=${puzzleChapterId}`, 'DELETE');
+    }
+
+    static async batchUpdatePuzzlePositions(puzzlePositions) {
+        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles`, 'PUT', puzzlePositions);
+        // current plan:
+        // - send whole configuration on save
+        // - create / edit and delete chapters eagerly
     }
 }
 
