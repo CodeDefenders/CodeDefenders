@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -37,7 +38,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
@@ -69,9 +72,12 @@ public class LandingPage extends HttpServlet {
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
 
+    @Inject
+    private MeleeGameRepository meleeGameRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+                         HttpServletResponse response) throws ServletException, IOException {
 
         if (login.isLoggedIn()) {
             // User logged in? Send him to the games overview.
@@ -86,14 +92,23 @@ public class LandingPage extends HttpServlet {
                     .filter(game -> !game.getAttackerPlayers().isEmpty())
                     .limit(15)
                     .collect(Collectors.toList());
-
             request.setAttribute("openMultiplayerGames", availableMultiplayerGames);
 
-            Map<Integer, String> gameCreatorNames = availableMultiplayerGames.stream()
-                    .collect(Collectors.toMap(AbstractGame::getId,
-                            game -> userService.getSimpleUserById(game.getCreatorId())
-                                    .map(SimpleUser::getName)
-                                    .orElse("Unknown user")));
+            List<MeleeGame> availableMeleeGames = meleeGameRepo.getAvailableMeleeGames();
+            Collections.shuffle(availableMeleeGames, new Random(LocalDate.now().getLong(ChronoField.EPOCH_DAY)));
+            availableMeleeGames = availableMeleeGames
+                    .stream()
+                    .filter(game -> !game.getPlayers().isEmpty())
+                    .limit(15)
+                    .collect(Collectors.toList());
+            request.setAttribute("openMeleeGames", availableMeleeGames);
+
+            Map<Integer, String> gameCreatorNames =
+                    Stream.concat(availableMultiplayerGames.stream(), availableMeleeGames.stream())
+                            .collect(Collectors.toMap(AbstractGame::getId,
+                                    game -> userService.getSimpleUserById(game.getCreatorId())
+                                            .map(SimpleUser::getName)
+                                            .orElse("Unknown user")));
 
             request.setAttribute("gameCreatorNames", gameCreatorNames);
 
