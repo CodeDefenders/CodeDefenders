@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -115,6 +116,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                     // When no file is uploaded, the field name is given, but the filename isn't.
                     return item.getName() != null && !item.getName().isEmpty();
                 })
+                .sorted(Comparator.comparing(DiskFileItem::getName))
                 .map(DiskFileItem::get)
                 .toList();
 
