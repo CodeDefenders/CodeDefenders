@@ -44,19 +44,24 @@ public class TestAccordionBean {
      * One category containing all tests and one category for each method of the class,
      * containing the tests that cover the method.
      */
-    private final List<TestAccordionCategory> categories;
+    private List<TestAccordionCategory> categories;
 
     /**
      * Maps test ids to tests.
      */
-    private final Map<Integer, TestDTO> tests;
+    private Map<Integer, TestDTO> tests;
 
     @Inject
     public TestAccordionBean(CodeDefendersAuth login, GameService gameService, GameProducer gameProducer) {
-        AbstractGame game = gameProducer.getGame();
-        List<TestDTO> testsList = gameService.getTests(login.getUserId(), game.getId());
+        var game = gameProducer.getGame();
+        if (game != null) {
+            GameClass cut = game.getCUT();
+            List<TestDTO> testsList = gameService.getTests(login.getUserId(), game.getId());
+            init(cut, testsList);
+        }
+    }
 
-        GameClass cut = game.getCUT();
+    public void init(GameClass cut, List<TestDTO> testsList) {
         List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
         GameAccordionMapping mapping = GameAccordionMapping.computeForTests(methodDescriptions, testsList);
 

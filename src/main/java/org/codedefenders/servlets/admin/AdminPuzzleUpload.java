@@ -19,11 +19,10 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.zip.ZipFile;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -34,140 +33,158 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
-import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.installer.Installer;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.CompileException;
+import org.codedefenders.importer.PuzzleImporter;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.SimpleFile;
 import org.codedefenders.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
- *
- * <p>{@code GET} requests redirect to the admin puzzle upload page.
- * and {@code POST} requests handle batch uploading puzzle related information.
- *
- * <p>Serves under {@code /admin/puzzles/upload}.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
+ * {@code POST} requests handle uploading puzzles and chapters.
  */
 @WebServlet(Paths.ADMIN_PUZZLE_UPLOAD)
 public class AdminPuzzleUpload extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleUpload.class);
 
     @Inject
-    private Installer installer;
+    private PuzzleImporter puzzleImporter;
 
     @Inject
     private MessagesBean messages;
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher(Constants.ADMIN_PUZZLE_UPLOAD_JSP).forward(request, response);
-    }
-
-    @SuppressWarnings("Duplicates")
-    @Override
     protected void doPost(HttpServletRequest request,
                           HttpServletResponse response) throws ServletException, IOException {
-
-        List<DiskFileItem> items;
+        // Parse request parameters.
+        List<DiskFileItem> parameters;
         try {
             var fileUpload = new JakartaServletFileUpload<>(DiskFileItemFactory.builder().get());
-            items = fileUpload.parseRequest(request);
+            parameters = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
-            logger.error("Failed to upload puzzles. Failed to get file upload parameters.", e);
+            logger.error("Failed to get file upload parameters.", e);
+            messages.add("Failed to get file upload parameters.");
             Redirect.redirectBack(request, response);
             return;
         }
 
-        final Map<Boolean, List<DiskFileItem>> parameters = items
-                .stream()
-                .collect(Collectors.partitioningBy(FileItem::isFormField));
-        final List<DiskFileItem> uploadParameters = parameters.get(true);
-        final List<DiskFileItem> fileParameters = parameters.get(false);
-
-        String action = null;
-
-        for (DiskFileItem uploadParameter : uploadParameters) {
-            final String fieldName = uploadParameter.getFieldName();
-            final String fieldValue = uploadParameter.getString();
-            logger.debug("Upload parameter {" + fieldName + ":" + fieldValue + "}");
-            switch (fieldName) {
-                case "formType": {
-                    action = fieldValue;
-                    break;
-                }
-                default: {
-                    logger.warn("Unrecognized parameter: " + fieldName);
-                    Redirect.redirectBack(request, response);
-                    return;
-                }
-            }
-        }
-
-        if (action == null) {
+        // Find formType parameter.
+        Optional<String> formType = parameters.stream()
+                .filter(DiskFileItem::isFormField)
+                .filter(item -> item.getFieldName().equals("formType"))
+                .map(DiskFileItem::getString)
+                .findAny();
+        if (formType.isEmpty()) {
             logger.warn("No formType provided. Aborting request.");
+            messages.add("No formType provided.");
             Redirect.redirectBack(request, response);
             return;
         }
 
-        switch (action) {
-            case "uploadPuzzles": {
-                createPuzzles(request, fileParameters);
+        Optional<Integer> chapterId;
+        try {
+            chapterId = parameters.stream()
+                    .filter(DiskFileItem::isFormField)
+                    .filter(item -> item.getFieldName().equals("chapterId"))
+                    .map(DiskFileItem::getString)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::parseInt)
+                    .findAny();
+        } catch (NumberFormatException e) {
+            logger.warn("Invalid chapterId. Aborting request.", e);
+            messages.add("Invalid chapterId.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        List<byte[]> fileParametersContents = parameters.stream()
+                .filter(item -> {
+                    // Filter out regular parameters.
+                    return !item.isFormField();
+                })
+                .filter(item -> {
+                    // Filter out empty file upload fields.
+                    // When no file is uploaded, the field name is given, but the filename isn't.
+                    return item.getName() != null && !item.getName().isEmpty();
+                })
+                .sorted(Comparator.comparing(DiskFileItem::getName))
+                .map(DiskFileItem::get)
+                .toList();
+
+        if (fileParametersContents.isEmpty()) {
+            messages.add("No file parameters found.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        switch (formType.get()) {
+            case "uploadPuzzleChapters":
+                installPuzzleChapters(fileParametersContents);
                 Redirect.redirectBack(request, response);
                 break;
-            }
-            default: {
-                logger.info("Action not recognised: {}", action);
+            case "uploadPuzzles":
+                installPuzzles(fileParametersContents, chapterId.orElse(null));
                 Redirect.redirectBack(request, response);
                 break;
-            }
+            default:
+                logger.info("Action not recognised: {}", formType);
+                Redirect.redirectBack(request, response);
+                break;
         }
     }
 
-    private void createPuzzles(HttpServletRequest request, List<? extends FileItem<?>> fileParameters) throws IOException {
-        for (FileItem<?> fileParameter : fileParameters) {
-            final String fieldName = fileParameter.getFieldName();
-            final String fileName = FilenameUtils.getName(fileParameter.getName());
-            logger.debug("Upload file parameter {" + fieldName + ":" + fileName + "}");
-            if (fileName == null || fileName.isEmpty()) {
-                // even if no file is uploaded, the fieldname is given, but no filename -> skip
-                continue;
+    private void installPuzzles(List<byte[]> files, Integer chapterId) {
+        for (byte[] fileContent : files) {
+            try {
+                Collection<SimpleFile> puzzleFiles = ZipFileUtils.readZipRecursive(fileContent);
+                puzzleImporter.importPuzzle(puzzleFiles, chapterId);
+                logger.info("Successfully uploaded puzzle.");
+            } catch (CoverageGenerator.CoverageGeneratorException e) {
+                messages.add("Error while computing coverage.");
+                logger.info("Error while computing coverage", e);
+            } catch (CompileException e) {
+                messages.add("Error while compiling.");
+                logger.info("Error while compiling", e);
+            } catch (IOException e) {
+                messages.add("IO Error.");
+                logger.info("IO Error", e);
+            } catch (BackendExecutorService.ExecutionException e) {
+                messages.add("Execution Error");
+                logger.info("Execution Error", e);
             }
-            byte[] fileContentBytes = fileParameter.get();
-            if (fileContentBytes.length == 0) {
-                logger.error("Puzzle upload. Given zip file {} was empty.", fileName);
-                return;
-            }
+            messages.add("Successfully uploaded puzzle(s). As of now, please check the logs for errors.");
+        }
+    }
 
-            switch (fieldName) {
-                case "fileUploadPuzzles": {
-                    final ZipFile zip = ZipFileUtils.createZip(fileContentBytes);
-                    final Path rootDirectory = ZipFileUtils.extractZipGetRootDir(zip, true);
-
-                    installer.installPuzzles(rootDirectory);
-
-                    FileUtils.forceDelete(rootDirectory.toFile());
-
-                    messages.add("Successfully uploaded puzzles. As of now, please check the logs for errors.");
-                    logger.info("Successfully uploaded puzzles.");
-
-                    break;
-                }
-                default: {
-                    logger.warn("Unrecognized parameter: " + fieldName);
-                    break;
-                }
+    private void installPuzzleChapters(List<byte[]> files) {
+        for (byte[] fileContent : files) {
+            try {
+                Collection<SimpleFile> chapterFiles = ZipFileUtils.readZipRecursive(fileContent);
+                puzzleImporter.importPuzzleChapter(chapterFiles);
+                logger.info("Successfully uploaded chapter.");
+            } catch (CoverageGenerator.CoverageGeneratorException e) {
+                messages.add("Error while computing coverage.");
+                logger.info("Error while computing coverage", e);
+            } catch (CompileException e) {
+                messages.add("Error while compiling.");
+                logger.info("Error while compiling", e);
+            } catch (IOException e) {
+                messages.add("IO Error.");
+                logger.info("IO Error", e);
+            } catch (BackendExecutorService.ExecutionException e) {
+                messages.add("Execution Error:" + e.getMessage());
+                logger.info("Execution Error", e);
             }
         }
+        messages.add("Successfully uploaded chapter(s). As of now, please check the logs for errors.");
     }
 }

@@ -136,7 +136,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     /**
      * {@inheritDoc}
      */
-    public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
+    public void testOriginal(GameClass cut, String testDir, String testClassName) throws ExecutionException {
         AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName,
                 config.isForceLocalExecution());
 
@@ -148,7 +148,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
             }
 
             logger.error("Test {} failed to run against class under test", testClassName);
-            throw new Exception("Test failed to run against class under test.");
+            throw new ExecutionException("Test failed to run against class under test.");
         } else {
             logger.info("Successfully tested original ");
         }
@@ -431,5 +431,4 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         }
         return res;
     }
-
 }

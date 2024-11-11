@@ -217,22 +217,19 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
-        if (game.getPuzzle().isEquivalencePuzzle()) {
-            // claim all mutants as equivalent
-            game.getMutants().forEach(m -> m.setEquivalent(Mutant.Equivalence.PENDING_TEST));
-            request.getRequestDispatcher(PUZZLE_GAME_EQUIVALENCE_VIEW_JSP).forward(request, response);
-            return;
-        }
-        final Role role = game.getActiveRole();
-        switch (role) {
+        switch (game.getType()) {
             case ATTACKER:
                 request.getRequestDispatcher(PUZZLE_GAME_ATTACKER_VIEW_JSP).forward(request, response);
                 break;
             case DEFENDER:
                 request.getRequestDispatcher(PUZZLE_GAME_DEFENDER_VIEW_JSP).forward(request, response);
                 break;
+            case EQUIVALENCE:
+                game.getMutants().forEach(m -> m.setEquivalent(Mutant.Equivalence.PENDING_TEST));
+                request.getRequestDispatcher(PUZZLE_GAME_EQUIVALENCE_VIEW_JSP).forward(request, response);
+                break;
             default:
-                logger.error("Trying to enter puzzle game with illegal role {}", role);
+                logger.error("Trying to enter puzzle game with unknown type {}", game.getType());
                 response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
         }
     }

@@ -45,6 +45,15 @@ public class GameAccordionMapping {
                                                    Function<T, Integer> getIdForElement,
                                                    Function<T, Collection<Integer>> getLinesForElement) {
         GameAccordionMapping mapping = new GameAccordionMapping();
+        if (methodDescriptions.isEmpty()) {
+            elements.stream()
+                    .map(getIdForElement)
+                    .forEach(id -> {
+                        mapping.allElements.add(id);
+                        mapping.elementsOutsideMethods.add(id);
+                    });
+            return mapping;
+        }
 
         // Populate map of method descriptions to ids
         for (MethodDescription methodDescription : methodDescriptions) {

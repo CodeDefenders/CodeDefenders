@@ -36,9 +36,9 @@ public interface BackendExecutorService {
      * @param cut the class under test that is tested.
      * @param testDir the directory the generated {@code jacoco.exec} file is placed as a {@link String}.
      * @param testClassName the qualified name of the test class to be executed.
-     * @throws Exception when the test failed to execute or during execution.
+     * @throws ExecutionException when the test failed to execute or during execution.
      */
-    void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception;
+    void testOriginal(GameClass cut, String testDir, String testClassName) throws ExecutionException;
 
     /**
      * Executes a test against the original code.
@@ -47,7 +47,7 @@ public interface BackendExecutorService {
      * @param test A {@link Test} object
      * @return A {@link TargetExecution} object
      */
-    TargetExecution testOriginal(File dir, Test test);
+    TargetExecution testOriginal(File dir, Test test); // TODO: add ExecutionException to signature?
 
     /**
      * Executes a test against a mutant.
@@ -56,5 +56,15 @@ public interface BackendExecutorService {
      * @param t A {@link Test} object
      * @return A {@link TargetExecution} object
      */
-    TargetExecution testMutant(Mutant m, Test t);
+    TargetExecution testMutant(Mutant m, Test t); // TODO: add ExecutionException to signature?
+
+
+    class ExecutionException extends Exception {
+        public ExecutionException(String message) {
+            super(message);
+        }
+        public ExecutionException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

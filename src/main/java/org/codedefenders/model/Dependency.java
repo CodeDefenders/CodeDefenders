@@ -61,4 +61,8 @@ public class Dependency {
     public String getClassFile() {
         return classFile;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 }

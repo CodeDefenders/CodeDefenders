@@ -83,4 +83,21 @@ public class NamingUtils {
                 .orElse(0);
         return formatNumberedName(bareName, number + 1);
     }
+
+    /**
+     * Gets the next free number for a set of number strings. Input names that aren't parsable as a number are ignored.
+     * @param takenNames Names that are already taken.
+     * @return The next free number that doesn't exist within the taken names.
+     */
+    public static int nextFreeNumber(Collection<String> takenNames) {
+        return takenNames.stream()
+                .mapToInt(s -> {
+                    try {
+                        return Integer.parseInt(s);
+                    } catch (NumberFormatException e) {
+                        return 0;
+                    }
+                })
+                .max().orElse(0) + 1;
+    }
 }

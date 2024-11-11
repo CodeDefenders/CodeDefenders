@@ -44,7 +44,13 @@ public class ClassViewerBean {
     @Inject
     public ClassViewerBean(GameClassRepository gameClassRepo, GameProducer gameProducer) {
         this.gameClassRepo = gameClassRepo;
-        GameClass clazz = gameProducer.getGame().getCUT();
+        var game = gameProducer.getGame();
+        if (game != null) {
+            init(game.getCUT());
+        }
+    }
+
+    public void init(GameClass clazz) {
         setClassCode(clazz);
         setDependenciesForClass(clazz);
     }

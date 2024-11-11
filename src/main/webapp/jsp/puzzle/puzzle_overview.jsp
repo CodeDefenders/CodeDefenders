@@ -68,11 +68,11 @@
                     <div class="next-puzzle__title">
                         <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.activeRole}"
                                 <c:choose>
-                                    <c:when test="${nextPuzzleObj.puzzle.equivalencePuzzle}">
+                                    <c:when test="${puzzle.type == 'EQUIVALENCE'}">
                                         src="${url.forPath("/images/ingameicons/equivalence.png")}"
                                     </c:when>
                                     <c:otherwise>
-                                        src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"
+                                        src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
                                     </c:otherwise>
                                 </c:choose>
                         />
@@ -114,11 +114,11 @@
                             >
                                 <img class="chapter__level__watermark" alt="${puzzle.activeRole}"
                                         <c:choose>
-                                            <c:when test="${puzzle.equivalencePuzzle}">
+                                            <c:when test="${puzzle.type == 'EQUIVALENCE'}">
                                                 src="${url.forPath("/images/ingameicons/equivalence.png")}"
                                             </c:when>
                                             <c:otherwise>
-                                                src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png"
+                                                src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
                                             </c:otherwise>
                                         </c:choose>
                                 />

@@ -43,20 +43,14 @@ public class Puzzle {
     private int classId;
 
     /**
-     * The {@link Role} the player takes in the puzzle.
+     * The type of the puzzle.
      */
-    private Role activeRole;
+    private PuzzleType type;
 
     /**
      * Whether the mutant is an equivalent mutant.
      */
     private boolean isEquivalent;
-
-    /**
-     * Whether the puzzle is an equivalence puzzle.
-     * TODO: use subclass instead of flag
-     */
-    private boolean isEquivalencePuzzle;
 
     /**
      * The {@link GameLevel} the puzzle is played on.
@@ -114,9 +108,8 @@ public class Puzzle {
      * @param puzzleId             ID of the chapter.
      * @param classId              Class ID of the class the puzzle uses.
      *                             The mutants and test for the puzzle come together with the class.
-     * @param activeRole           The {@link Role} the player takes in the puzzle.
-     * @param isEquivalent         Whether the mutant is an equivalent mutant.
-     * @param isEquivalencePuzzle  Whether the puzzle is an equivalence puzzle.
+     * @param type                 The type of the puzzle.
+     * @param isEquivalent         For equivalence puzzles: Whether the mutant is an equivalent mutant.
      * @param level                The {@link GameLevel} the puzzle is played on.
      * @param maxAssertionsPerTest Maximum number of allowed assertions per submitted test.
      * @param mutantValidatorLevel Validation level used to check submitted mutants.
@@ -129,8 +122,9 @@ public class Puzzle {
      */
     public Puzzle(int puzzleId,
                   int classId,
-                  Role activeRole,
-                  boolean isEquivalent, boolean isEquivalencePuzzle, GameLevel level,
+                  PuzzleType type,
+                  boolean isEquivalent,
+                  GameLevel level,
                   int maxAssertionsPerTest,
                   CodeValidatorLevel mutantValidatorLevel,
                   Integer editableLinesStart,
@@ -141,9 +135,8 @@ public class Puzzle {
                   String description) {
         this.puzzleId = puzzleId;
         this.classId = classId;
-        this.activeRole = activeRole;
+        this.type = type;
         this.isEquivalent = isEquivalent;
-        this.isEquivalencePuzzle = isEquivalencePuzzle;
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.mutantValidatorLevel = mutantValidatorLevel;
@@ -164,7 +157,7 @@ public class Puzzle {
                                        int maxAssertionsPerTest,
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
-        return new Puzzle(puzzleId, -1, null, false, false, null, maxAssertionsPerTest,
+        return new Puzzle(puzzleId, -1, null, false, null, maxAssertionsPerTest,
             null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
@@ -184,12 +177,12 @@ public class Puzzle {
         this.classId = classId;
     }
 
-    public Role getActiveRole() {
-        return activeRole;
+    public PuzzleType getType() {
+        return type;
     }
 
-    public void setActiveRole(Role activeRole) {
-        this.activeRole = activeRole;
+    public void setType(PuzzleType type) {
+        this.type = type;
     }
 
     public GameLevel getLevel() {
@@ -283,9 +276,5 @@ public class Puzzle {
 
     public boolean isEquivalent() {
         return isEquivalent;
-    }
-
-    public boolean isEquivalencePuzzle() {
-        return isEquivalencePuzzle;
     }
 }

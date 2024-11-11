@@ -1,0 +1,304 @@
+#puzzle-management {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+#puzzle-management-controls {
+    background-color: #ffffffa0;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    align-items: end;
+    justify-content: space-between;
+}
+
+/* ==================== Chapters / Puzzle Containers ==================== */
+
+#chapters {
+    counter-reset: chapter 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.chapter {
+    padding: 1em;
+    background-color: #eeeeee;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+#chapter-archived {
+    background-color: #dc354531;
+    border-color: #dc354517;
+}
+
+.chapter__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 1rem;
+}
+
+.chapter__info {
+    display: flex;
+    align-items: baseline;
+    flex-shrink: 1;
+    gap: 1rem;
+    max-width: calc(100% - 20rem);
+}
+
+.chapter__index::before {
+    counter-increment: chapter;
+    content: counter(chapter);
+}
+
+.chapter__index {
+    border: 1px solid var(--bs-primary);
+    color: #1165e1;
+    background-color: white;
+    border-radius: 0.25rem 0 0 0.25rem;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.chapter__index + .chapter__title {
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.chapter__title {
+    max-width: 30rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    color: white;
+    background-color: var(--bs-primary);
+
+    line-height: 1.65;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    border-radius: 0.25rem;
+}
+
+#chapter-archived .chapter__title {
+    background-color: var(--bs-danger);
+}
+
+#chapter-unassigned .chapter__title {
+    background-color: var(--bs-secondary);
+}
+
+.chapter__description {
+    font-size: 0.9rem;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    flex-shrink: 1;
+}
+
+.chapter__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.chapter__handle {
+    background-image: radial-gradient(#bfbfbf 1px, transparent 0);
+    background-size: 4px 4px;
+
+    height: 12px;
+    width: 10rem;
+
+    align-self: start;
+    margin-top: 1px;
+
+    cursor: pointer;
+}
+
+.chapter:only-child .chapter__controls .chapter_select__show {
+    pointer-events: none;
+    opacity: .65;
+}
+
+.puzzles {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 1), 1fr);
+    gap: 0.75rem;
+
+    min-height: 2rem;
+}
+
+#chapter-unassigned .puzzles,
+#chapter-archived .puzzles {
+    max-height: 30rem;
+    overflow: auto;
+}
+
+/* ==================== Puzzles ==================== */
+
+.puzzle {
+    position: relative;
+    overflow: hidden;
+
+    padding: .6rem .9rem;
+    border-radius: 4px;
+    box-shadow: 3px 3px 0.75rem 0 #0007;
+
+    min-height: 8rem;
+}
+
+.puzzle:not([disabled]) {
+    cursor: pointer;
+}
+
+.puzzle.puzzle-attacker {
+    background-color: var(--bg-attacker);
+}
+
+.puzzle.puzzle-defender {
+    background-color: var(--bg-defender);
+}
+
+.puzzle__watermark {
+    position: absolute;
+    bottom: -0.75rem;
+    right: -0.75rem;
+
+    width: auto;
+    height: 6rem;
+    object-fit: contain;
+
+    user-select: none;
+    pointer-events: none;
+
+    opacity: 0.15;
+    filter: saturate(0) brightness(0) invert(1);
+}
+
+.puzzle__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+
+    color: white;
+}
+
+.puzzle__title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-weight: bold;
+
+    max-width: 15rem;
+    margin-bottom: 0.25rem;
+}
+
+.puzzle__description {
+    height: 100%;
+    max-height: 4.5rem;
+
+    font-size: 0.9em;
+    line-height: 1.3;
+
+    /* Fade out long descriptions. */
+    mask-image: linear-gradient(180deg, #000 85%, transparent);
+}
+
+.puzzle__tags {
+    margin-top: 0.5rem;
+}
+
+.puzzle__tag {
+    background-color: #00000070;
+}
+
+.puzzle__controls {
+    position: absolute;
+    top: -2.5rem;
+    right: 0.25rem;
+    opacity: 0;
+
+    display: flex;
+    gap: 0.25rem;
+
+    background-color: #ffffffa0;
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+
+    transition:
+        top 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.puzzle:hover .puzzle__controls,
+.puzzle:focus .puzzle__controls,
+.puzzle:focus-within .puzzle__controls {
+    top: 0.25rem;
+    opacity: 1;
+}
+
+#chapter-archived .puzzle__button__archive {
+    pointer-events: none;
+    opacity: .65;
+}
+#chapter-unassigned .puzzle__button__unassign {
+    pointer-events: none;
+    opacity: .65;
+}
+
+/* ==================== Chapter Select Menu ==================== */
+
+.chapter_select__menu {
+    width: max-content;
+    padding: 0.4rem;
+    border-radius: 0.5rem;
+}
+
+.chapter_select__position {
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chapter_select__label {
+    font-size: .85rem;
+    color: var(--bs-secondary);
+    margin-bottom: -1px;
+}
+
+/* ==================== Other ==================== */
+
+.btn-fixed {
+    width: 1.75rem;
+}
+
+@media (min-width: 470px) {
+    .puzzles {
+        --cols: 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .puzzles {
+        --cols: 3;
+    }
+}
+
+@media (min-width: 992px) {
+    .puzzles {
+        --cols: 4;
+    }
+}
+
+@media (min-width: 1200px) {
+    .puzzles {
+        --cols: 5;
+    }
+}
