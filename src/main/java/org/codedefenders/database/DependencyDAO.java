@@ -61,7 +61,7 @@ public class DependencyDAO {
      * @return the generated identifier of the dependency as an {@code int}.
      * @throws Exception If storing the dependency was not successful.
      */
-    public static int storeDependency(Dependency dependency) throws Exception {
+    public static int storeDependency(Dependency dependency) {
         int classId = dependency.getClassId();
         String relativeJavaFile = FileUtils.getRelativeDataPath(dependency.getJavaFile()).toString();
         String relativeClassFile = FileUtils.getRelativeDataPath(dependency.getClassFile()).toString();
@@ -77,7 +77,7 @@ public class DependencyDAO {
         if (result != -1) {
             return result;
         } else {
-            throw new Exception("Could not store dependency to database.");
+            throw new UncheckedSQLException("Could not store dependency to database.");
         }
     }
 

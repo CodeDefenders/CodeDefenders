@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -37,6 +39,8 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Streams;
 
 /**
  * This class offers static utility classes for creating and
@@ -182,5 +186,56 @@ public class ZipFileUtils {
         final byte[] bytes = baos.toByteArray();
         baos.close();
         return bytes;
+    }
+
+
+    /**
+     * Reads a zip file's contents into memory.
+     */
+    public static List<SimpleFile> readZip(byte[] bytes) throws IOException {
+        Path zipPath = null;
+        try (ZipFile zipFile = ZipFileUtils.createZip(bytes)) {
+            zipPath = Path.of(zipFile.getName());
+            return Streams.stream(zipFile.entries().asIterator())
+                    .filter(entry -> !entry.isDirectory())
+                    .map(entry -> {
+                        try {
+                            Path path = Paths.get(entry.getName());
+                            byte[] content = zipFile.getInputStream(entry).readAllBytes();
+                            return new SimpleFile(path, content);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).toList();
+        } finally {
+            if (zipPath != null) {
+                Files.delete(zipPath);
+            }
+        }
+    }
+
+
+    /**
+     * Reads a zip file's contents into memory, recursively unpacking any nested zip files and replacing them with a
+     * directory of the same name.
+     */
+    public static List<SimpleFile> readZipRecursive(byte[] bytes) throws IOException {
+        return readZip(bytes).stream()
+                .flatMap(file -> {
+                    if (file.getPath().toString().endsWith(".zip")) {
+                        String oldPath = file.getPath().toString();
+                        String newPath = oldPath.substring(0, oldPath.length() - 4);
+                        try {
+                            return readZipRecursive(file.getContent()).stream()
+                                    .map(innerFile -> new SimpleFile(
+                                            Path.of(newPath).resolve(innerFile.getPath()),
+                                            innerFile.getContent()));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        return Optional.of(file).stream();
+                    }
+                }).toList();
     }
 }

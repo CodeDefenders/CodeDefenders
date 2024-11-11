@@ -28,7 +28,7 @@
                             <i class="fa fa-plus ms-1"></i>
                         </button>
                     </div>
-                    <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight">
+                    <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
                         Save
                         <i class="fa fa-save ms-1"></i>
                     </button>
@@ -53,8 +53,204 @@
         </div>
         <div id="toasts" class="position-fixed top-0 end-0 p-3 d-flex flex-column gap-1" style="z-index: 11"></div>
 
+        <t:modal title="Unsaved changes" id="unsaved-changes-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                You have unsaved changes. Please save first.
+            </jsp:attribute>
+            <jsp:attribute name="footer">
+                <button type="button" class="btn btn-primary button-save">
+                    Save
+                    <i class="fa fa-save ms-1"></i>
+                </button>
+            </jsp:attribute>
+        </t:modal>
+
+        <form id="uploadPuzzles" name="uploadPuzzles" action="${url.forPath(Paths.ADMIN_PUZZLE_UPLOAD)}"
+            method="post" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="formType" value="uploadPuzzles">
+            <input type="hidden" name="chapterId" value="">
+
+            <t:modal title="Upload Puzzles" id="upload-puzzle-modal" modalDialogClasses="modal-dialog-responsive">
+                <jsp:attribute name="content">
+                    <div style="width: 700px;">
+                        <p>
+                            Puzzles are uploaded in <code>.zip</code> archives.
+                            You can upload multiple puzzle archives at once by selecting multiple in the file dialog.
+                            For details on the convention, please expand the explanations.
+                        </p>
+
+                        <input class="form-control mb-4" type="file" id="fileUploadPuzzle" name="fileUploadPuzzle"
+                               accept=".zip" multiple>
+
+                        <details class="border rounded p-2 mb-3">
+                            <summary>Puzzle Format Explanation</summary>
+                            <div class="mt-3 p-1">
+                                <t:import_puzzle_explanation/>
+                            </div>
+                        </details>
+                        <details class="border rounded p-2 mb-3">
+                            <summary>Puzzle Properties Explanation</summary>
+                            <div class="mt-3 p-1">
+                                <t:import_puzzle_properties_explanation/>
+                            </div>
+                        </details>
+                        <details class="border rounded p-2">
+                            <summary>Downloads</summary>
+                            <div class="mt-3 p-1">
+                                <ul>
+                                    <li>
+                                        Empty puzzle template:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
+                                            puzzle_template.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example properties file:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_properties.zip")}" download>
+                                            puzzle.properties
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example attacker puzzle:
+                                        <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
+                                            puzzle_attacker.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example defender puzzle:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
+                                            puzzle_defender.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example puzzle with dependencies:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
+                                            puzzle_deps.zip
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </jsp:attribute>
+                <jsp:attribute name="footer">
+                    <button class="btn btn-primary" type="submit" id="uploadPuzzlesButton"
+                            onclick="this.form.submit(); this.disabled = true; this.innerText='Uploading...';">
+                        Upload
+                    </button>
+                </jsp:attribute>
+            </t:modal>
+        </form>
+
+        <form id="uploadChapters" name="uploadChapters" action="${url.forPath(Paths.ADMIN_PUZZLE_UPLOAD)}"
+            class="form-width" method="post" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="formType" value="uploadPuzzleChapters">
+
+            <t:modal title="Upload Chapters" id="upload-chapter-modal" modalDialogClasses="modal-dialog-responsive">
+                <jsp:attribute name="content">
+                    <div style="width: 700px;">
+                        <p>
+                            Chapters are uploaded in <code>.zip</code> archives.
+                            You can upload multiple chapter archives at once by selecting multiple in the file dialog.
+                            For details on the convention, please expand the explanation.
+                        </p>
+
+                        <p>
+                            Uploading large chapters may take several minutes.
+                        </p>
+
+                        <input class="form-control mb-4" type="file" id="fileUploadChapter" name="fileUploadChapter"
+                               accept=".zip" multiple>
+
+                        <details class="border rounded p-2 mb-3">
+                            <summary>Chapter Format Explanation</summary>
+                            <div class="mt-3 p-1">
+                                <t:import_puzzle_chapter_explanation/>
+                            </div>
+                        </details>
+                        <details class="border rounded p-2 mb-3">
+                            <summary>Puzzle Format Explanation</summary>
+                            <div class="mt-3 p-1">
+                                <t:import_puzzle_explanation/>
+                            </div>
+                        </details>
+                        <details class="border rounded p-2 mb-3">
+                            <summary>Puzzle Properties Explanation</summary>
+                            <div class="mt-3 p-1">
+                                <t:import_puzzle_properties_explanation/>
+                            </div>
+                        </details>
+                        <details class="border rounded p-2">
+                            <summary>Downloads</summary>
+                            <div class="mt-3 p-1">
+                                <ul>
+                                    <li>
+                                        Example chapter:
+                                        <a href="${url.forPath("puzzle-importer/chapter_example.zip")}" download>
+                                            chapter_example.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example properties file:
+                                        <a href="${url.forPath("puzzle-importer/chapter.properties")}" download>
+                                            chapter.properties
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Empty chapter template:
+                                        <a href="${url.forPath("puzzle-importer/chapter_template.zip")}" download>
+                                            chapter_template.zip
+                                        </a>
+                                    </li>
+                                </ul>
+                                <p>Puzzle Downloads:</p>
+                                <ul>
+                                    <li>
+                                        Empty puzzle template:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
+                                            puzzle_template.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example properties file:
+                                        <a href="${url.forPath("puzzle-importer/puzzle.properties")}" download>
+                                            puzzle.properties
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example attacker puzzle:
+                                        <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
+                                            puzzle_attacker.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example defender puzzle:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
+                                            puzzle_defender.zip
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Example puzzle with dependencies:
+                                        <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
+                                            puzzle_deps.zip
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                </jsp:attribute>
+                <jsp:attribute name="footer">
+                        <button class="btn btn-primary" type="submit" id="uploadChaptersButton"
+                                onclick="this.form.submit(); this.disabled = true; this.innerText='Uploading...';">
+                            Upload
+                        </button>
+                </jsp:attribute>
+            </t:modal>
+        </form>
+
         <script type="module">
-            import {Toast} from '${url.forPath('/js/bootstrap.mjs')}';
+            import {Toast, Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
             import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
@@ -265,9 +461,9 @@
                     puzzleComp.tags.id.innerText = '#' + puzzle.id;
                     puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
 
-                    puzzleComp.container.classList.add(`puzzle-\${puzzle.activeRole.toLowerCase()}`);
+                    puzzleComp.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
                     puzzleComp.container.querySelector('.puzzle__watermark').src =
-                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.activeRole == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
 
                     if (puzzle.gameCount > 0) {
                         const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
@@ -640,7 +836,7 @@
                     modal.body.querySelector('input[name="title"]').value = puzzle.title;
                     modal.body.querySelector('input[name="description"]').value = puzzle.description;
                     modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
-                    if (puzzle.activeRole === 'DEFENDER') {
+                    if (puzzle.type === 'DEFENDER') {
                         modal.body.querySelector('.editable-lines').remove();
                     } else {
                         modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
@@ -746,7 +942,7 @@
                 });
 
                 // Delete Puzzle Modal
-                chaptersContainer.addEventListener('click', function (event) {
+                document.getElementById('puzzle-management').addEventListener('click', function (event) {
                     const deleteButton = event.target.closest('.puzzle__button__delete');
                     if (deleteButton === null) {
                         return;
@@ -943,15 +1139,66 @@
                     isUnsavedChanges = true;
                 });
 
-                document.getElementById('button-save').addEventListener('click', function (event) {
-                    PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
-                            .then(response => {
-                                isUnsavedChanges = false
-                                showToast({title: 'Success', body: response.message});
-                            }).catch(async response => {
-                        showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
-                        alert('Could not save changes.');
+                const saveButtons = document.querySelectorAll('.button-save');
+                for (const saveButton of saveButtons) {
+                    saveButton.addEventListener('click', function (event) {
+                        for (const btn of saveButtons) {
+                            btn.disabled = true;
+                            btn.innerText = 'Saving...';
+                        }
+                        PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
+                                .then(response => {
+                                    isUnsavedChanges = false
+                                    showToast({title: 'Success', body: response.message});
+                                }).catch(async response => {
+                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                    alert('Could not save changes.');
+                                }).finally(function() {
+                                    unsavedChangesModal.hide();
+                                    for (const btn of saveButtons) {
+                                        btn.disabled = false;
+                                        btn.innerText = 'Save';
+                                    }
+                                });
                     });
+                }
+
+                const unsavedChangesModal = new BootstrapModal(document.getElementById('unsaved-changes-modal'));
+
+
+                const uploadChapterModal = new BootstrapModal(document.getElementById("upload-chapter-modal"));
+                document.getElementById('button-upload-chapters').addEventListener('click', function(event) {
+                    if (isUnsavedChanges) {
+                        unsavedChangesModal.show();
+                    } else {
+                        uploadChapterModal.show();
+                    }
+                });
+
+
+                const uploadPuzzleModal = new BootstrapModal(document.getElementById("upload-puzzle-modal"));
+                const uploadPuzzleTitle = document.querySelector("#upload-puzzle-modal .modal-title");
+                const uploadPuzzleChapterId = document.querySelector('#uploadPuzzles input[name="chapterId"]');
+
+                document.getElementById('button-upload-puzzles').addEventListener('click', function(event) {
+                    if (isUnsavedChanges) {
+                        unsavedChangesModal.show();
+                    } else {
+                        uploadPuzzleTitle.innerText = 'Upload Puzzles';
+                        uploadPuzzleChapterId.value = '';
+                        uploadPuzzleModal.show();
+                    }
+                });
+                chaptersContainer.addEventListener('click', function (event) {
+                    const uploadButton = event.target.closest('.chapter__button__upload');
+                    if (uploadButton === null) {
+                        return;
+                    }
+
+                    const chapter = ChapterComponent.fromChild(uploadButton).chapter;
+                    uploadPuzzleTitle.innerText = `Upload Puzzles to \${chapter.title}`;
+                    uploadPuzzleChapterId.value = String(chapter.id);
+                    uploadPuzzleModal.show();
                 });
             }
 

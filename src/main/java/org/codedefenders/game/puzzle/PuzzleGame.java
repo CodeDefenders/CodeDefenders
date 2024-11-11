@@ -64,9 +64,9 @@ public class PuzzleGame extends AbstractGame {
     private int currentRound;
 
     /**
-     * The {@link Role} the player takes in the puzzle.
+     * The type of the puzzle.
      */
-    private Role activeRole;
+    private PuzzleType type;
 
     /**
      * The ID of the {@link Puzzle} this is an instance of.
@@ -100,7 +100,7 @@ public class PuzzleGame extends AbstractGame {
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
-        this.activeRole = puzzle.getActiveRole();
+        this.type = puzzle.getType();
 
         /* Own attributes */
         this.puzzleId = puzzle.getPuzzleId();
@@ -112,7 +112,7 @@ public class PuzzleGame extends AbstractGame {
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
             int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound,
-            Role activeRole) {
+            PuzzleType type) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -128,7 +128,7 @@ public class PuzzleGame extends AbstractGame {
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
-        this.activeRole = activeRole;
+        this.type = type;
 
         /* Own attributes */
         this.puzzleId = puzzleId;
@@ -218,7 +218,14 @@ public class PuzzleGame extends AbstractGame {
     }
 
     public Role getActiveRole() {
-        return activeRole;
+        return switch (type) {
+            case ATTACKER -> Role.ATTACKER;
+            case DEFENDER -> Role.DEFENDER;
+        };
+    }
+
+    public PuzzleType getType() {
+        return type;
     }
 
     public int getPuzzleId() {
@@ -283,7 +290,7 @@ public class PuzzleGame extends AbstractGame {
                 }
                 break;
             default:
-                if (role != activeRole) {
+                if (role != getActiveRole()) {
                     logger.warn("Tried adding player to puzzle game with wrong role: " + role);
                     return false;
                 }

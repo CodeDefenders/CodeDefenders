@@ -104,6 +104,7 @@ public class ShiroConfig {
 
         // org.codedefenders.util.Paths.PROJECT_EXPORT = "/project-export";
         fcMan.createChain(org.codedefenders.util.Paths.PROJECT_EXPORT, "authc");
+        fcMan.createChain(org.codedefenders.util.Paths.PUZZLE_IMPORT, "authc");
 
         // org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME = "/equivalence-duels";
         fcMan.createChain(org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME, "authc");

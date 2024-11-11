@@ -200,8 +200,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
-        final Role role = game.getActiveRole();
-        switch (role) {
+        switch (game.getType()) {
             case ATTACKER:
                 request.getRequestDispatcher(PUZZLE_GAME_ATTACKER_VIEW_JSP).forward(request, response);
                 break;
@@ -209,7 +208,7 @@ public class PuzzleGameManager extends HttpServlet {
                 request.getRequestDispatcher(PUZZLE_GAME_DEFENDER_VIEW_JSP).forward(request, response);
                 break;
             default:
-                logger.error("Trying to enter puzzle game with illegal role {}", role);
+                logger.error("Trying to enter puzzle game with unknown type {}", game.getType());
                 response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
         }
     }
