@@ -254,7 +254,11 @@
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
             import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-            const watermarkUrl = '${url.forPath("/images/achievements/")}';
+            const watermarkUrls = {
+                ATTACKER: '${url.forPath("/images/achievements/codedefenders_achievements_1_lvl_0.png")}',
+                DEFENDER: '${url.forPath("/images/achievements/codedefenders_achievements_2_lvl_0.png")}',
+                EQUIVALENCE: '${url.forPath("/images/ingameicons/equivalence.png")}'
+            }
             const puzzlePreviewUrl = '${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}';
 
             // ==== Init Data ==========================================================================================
@@ -462,8 +466,7 @@
                     puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
 
                     puzzleComp.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
-                    puzzleComp.container.querySelector('.puzzle__watermark').src =
-                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+                    puzzleComp.container.querySelector('.puzzle__watermark').src = watermarkUrls[puzzle.type];
 
                     if (puzzle.gameCount > 0) {
                         const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
