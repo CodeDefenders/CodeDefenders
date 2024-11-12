@@ -417,6 +417,7 @@ public class PuzzleImporter {
 
             // Read values from specification file
             PuzzleType type = PuzzleType.valueOf(cfg.getProperty("type"));
+            boolean isEquivalent = Boolean.parseBoolean(cfg.getProperty("isEquivalent", "false"));
             GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
             String title = cfg.getProperty("title");
             String description = cfg.getProperty("description");
@@ -428,13 +429,6 @@ public class PuzzleImporter {
                     .flatMap(s -> s.isEmpty() ? Optional.empty() : Optional.of(s))
                     .map(Integer::parseInt)
                     .orElse(null);
-
-            boolean isEquivalent;
-            if (type == PuzzleType.EQUIVALENCE) {
-                isEquivalent = Boolean.parseBoolean(cfg.getProperty("description"));
-            } else {
-                isEquivalent = false;
-            }
 
             // Default values
             // TODO: Don't use default value for puzzles

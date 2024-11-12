@@ -437,8 +437,8 @@ public class PuzzleRepository {
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
-                puzzle.getPuzzleId(),
-                puzzle.isEquivalent()
+                puzzle.isEquivalent(),
+                puzzle.getPuzzleId()
         );
         return updatedRows > 0;
     }
