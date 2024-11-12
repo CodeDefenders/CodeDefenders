@@ -66,7 +66,7 @@
                         </div>
                     </div>
                     <div class="next-puzzle__title">
-                        <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.activeRole}"
+                        <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.type}"
                                 <c:choose>
                                     <c:when test="${puzzle.type == 'EQUIVALENCE'}">
                                         src="${url.forPath("/images/ingameicons/equivalence.png")}"
@@ -112,7 +112,7 @@
                                         </c:otherwise>
                                     </c:choose>
                             >
-                                <img class="chapter__level__watermark" alt="${puzzle.activeRole}"
+                                <img class="chapter__level__watermark" alt="${puzzle.type}"
                                         <c:choose>
                                             <c:when test="${puzzle.type == 'EQUIVALENCE'}">
                                                 src="${url.forPath("/images/ingameicons/equivalence.png")}"
