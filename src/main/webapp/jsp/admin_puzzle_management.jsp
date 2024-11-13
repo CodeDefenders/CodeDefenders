@@ -832,6 +832,18 @@
                                         min="1">
                                 </div>
                             </div>
+
+                            <div class="row g-3 mb-2 mutant-equivalent">
+                                <div class="col-12">
+                                    <label class="form-label">Equivalence</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent">
+                                        <label class="form-check-label">
+                                            Mutant equivalent
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </form>`;
                     modal.title.innerText = 'Edit Puzzle';
                     modal.footerCloseButton.innerText = 'Cancel';
@@ -840,10 +852,15 @@
                     modal.body.querySelector('input[name="description"]').value = puzzle.description;
                     modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
                     if (puzzle.type === 'DEFENDER') {
+                        modal.body.querySelector('.mutant-equivalent').remove();
                         modal.body.querySelector('.editable-lines').remove();
-                    } else {
+                    } else if (puzzle.type === 'ATTACKER') {
+                        modal.body.querySelector('.mutant-equivalent').remove();
                         modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
                         modal.body.querySelector('input[name="editableLinesEnd"]').value = puzzle.editableLinesEnd;
+                    } else if (puzzle.type === 'EQUIVALENCE') {
+                        modal.body.querySelector('.editable-lines').remove();
+                        modal.body.querySelector('input[name="mutantEquivalent"]').checked = puzzle.isEquivalent;
                     }
 
                     const saveButton = document.createElement('button');
@@ -867,21 +884,23 @@
                         editableLinesStart = editableLinesStart ? Number(editableLinesStart) : null;
                         let editableLinesEnd = modal.body.querySelector('input[name="editableLinesEnd"]')?.value;
                         editableLinesEnd = editableLinesEnd ? Number(editableLinesEnd) : null;
+                        const isEquivalent = modal.body.querySelector('input[name="mutantEquivalent"]')?.checked;
 
                         PuzzleAPI.updatePuzzle(puzzle.id, {
                             title,
                             description,
                             maxAssertionsPerTest,
                             editableLinesStart,
-                            editableLinesEnd
+                            editableLinesEnd,
+                            isEquivalent
                         }).then(response => {
                             puzzle.title = response.puzzle.title;
                             puzzle.description = response.puzzle.description;
                             puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
                             puzzle.editableLinesStart = response.puzzle.editableLinesStart;
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
-                            puzzleComp.title.innerText = response.puzzle.title;
-                            puzzleComp.description.innerText = response.puzzle.description;
+                            puzzle.isEquivalent = response.puzzle.isEquivalent;
+                            puzzleComp.reloadPuzzle(puzzle);
                             showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
                             showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
