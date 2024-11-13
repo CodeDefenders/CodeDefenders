@@ -404,7 +404,8 @@
                     this.description = this.container.querySelector('.puzzle__description');
                     this.tags = {
                         id: this.container.querySelector('.puzzle__tag__id'),
-                        games: this.container.querySelector('.puzzle__tag__games')
+                        games: this.container.querySelector('.puzzle__tag__games'),
+                        equivalent: this.container.querySelector('.puzzle__tag__equivalent'),
                     };
                     this.container.puzzleComp = this;
                 }
@@ -424,6 +425,9 @@
                             <div class="puzzle__tags">
                                 <span class="badge puzzle__tag puzzle__tag__id"></span>
                                 <span class="badge puzzle__tag puzzle__tag__games"></span>
+                                <span class="badge puzzle__tag puzzle__tag__equivalent hidden">
+                                    <i class="fa fa-flag"></i>
+                                </span>
                             </div>
                         </div>
                         <div class="puzzle__controls">
@@ -453,27 +457,36 @@
                     return container;
                 }
 
-                static forPuzzle(puzzle) {
-                    const puzzleComp = new PuzzleComponent();
-                    puzzleComp.puzzle = puzzle;
-                    puzzleComp.container.dataset.id = puzzle.id;
+                setPuzzle(puzzle) {
+                    this.puzzle = puzzle;
+                    this.container.dataset.id = puzzle.id;
 
-                    puzzleComp.title.innerText = puzzle.title;
-                    puzzleComp.title.title = puzzle.title;
-                    puzzleComp.description.innerText = puzzle.description;
-                    puzzleComp.description.title = puzzle.title;
-                    puzzleComp.tags.id.innerText = '#' + puzzle.id;
-                    puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
+                    this.title.innerText = puzzle.title;
+                    this.title.title = puzzle.title;
+                    this.description.innerText = puzzle.description;
+                    this.description.title = puzzle.title;
+                    this.tags.id.innerText = '#' + puzzle.id;
+                    this.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
 
-                    puzzleComp.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
-                    puzzleComp.container.querySelector('.puzzle__watermark').src = watermarkUrls[puzzle.type];
+                    if (puzzle.type === 'EQUIVALENCE' && puzzle.isEquivalent) {
+                        this.tags.equivalent.removeAttribute('hidden');
+                    } else {
+                        this.tags.equivalent.setAttribute('hidden', '');
+                    }
+
+                    this.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
+                    this.container.querySelector('.puzzle__watermark').src = watermarkUrls[puzzle.type];
 
                     if (puzzle.gameCount > 0) {
-                        const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
+                        const deleteButton = this.container.querySelector('.puzzle__button__delete');
                         deleteButton.disabled = true;
                         deleteButton.title = "Puzzles with existing games can't be deleted";
                     }
+                }
 
+                static forPuzzle(puzzle) {
+                    const puzzleComp = new PuzzleComponent();
+                    puzzleComp.setPuzzle(puzzle);
                     return puzzleComp;
                 }
 
@@ -900,7 +913,7 @@
                             puzzle.editableLinesStart = response.puzzle.editableLinesStart;
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
                             puzzle.isEquivalent = response.puzzle.isEquivalent;
-                            puzzleComp.reloadPuzzle(puzzle);
+                            puzzleComp.setPuzzle(puzzle);
                             showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
                             showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
