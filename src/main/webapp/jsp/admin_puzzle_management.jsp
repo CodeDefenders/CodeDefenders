@@ -423,9 +423,9 @@
                                 <div class="puzzle__description"></div>
                             </div>
                             <div class="puzzle__tags">
-                                <span class="badge puzzle__tag puzzle__tag__id"></span>
-                                <span class="badge puzzle__tag puzzle__tag__games"></span>
-                                <span class="badge puzzle__tag puzzle__tag__equivalent hidden">
+                                <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
+                                <span class="badge puzzle__tag puzzle__tag__games" title="Number of games with the puzzle"></span>
+                                <span class="badge puzzle__tag puzzle__tag__equivalent title="Mutant is equivalent" hidden">
                                     <i class="fa fa-flag"></i>
                                 </span>
                             </div>
