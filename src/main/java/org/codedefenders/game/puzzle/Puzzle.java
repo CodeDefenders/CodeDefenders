@@ -277,4 +277,8 @@ public class Puzzle {
     public boolean isEquivalent() {
         return isEquivalent;
     }
+
+    public void setEquivalent(boolean equivalent) {
+        this.isEquivalent = equivalent;
+    }
 }
