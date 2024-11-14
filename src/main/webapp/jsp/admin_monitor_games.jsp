@@ -537,11 +537,10 @@
     <% for (MultiplayerGame g : multiplayerGames) { %>
     <% if (g.getRole(login.getUserId()) == Role.NONE) { %>
     <form id="joinGameForm_observer_<%=g.getId()%>"
-          action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
+          action="${url.forPath(Paths.ADMIN_MONITOR)}"
           method="post">
-        <input type="hidden" name="formType" value="joinGame">
+        <input type="hidden" name="formType" value="joinGameAsObserver">
         <input type="hidden" name="gameId" value=<%=g.getId()%>>
-        <input type="hidden" name="observer" value=1>
     </form>
     <% } %>
     <% } %>
