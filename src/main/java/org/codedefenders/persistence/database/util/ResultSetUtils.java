@@ -107,6 +107,7 @@ public class ResultSetUtils {
      * @see ResultSetUtils#oneFromRS(ResultSetHandler)
      */
     public static ResultSetHandler<Optional<Integer>> generatedKeyFromRS() {
-        return oneFromRS(rs ->  rs.getInt(1));
+        // Insert queries with 'ON DUPLICATE KEY UPDATE' return multiple keys. The first key should be the updated one.
+        return nextFromRS(rs ->  rs.getInt(1));
     }
 }
