@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -33,8 +34,9 @@ public class AdminCreateGamesBean extends CreateGamesBean {
                                 MeleeGameRepository meleeGameRepo,
                                 MultiplayerGameRepository multiplayerGameRepo,
                                 CreateGamesService createGamesService,
-                                GameClassRepository gameClassRepo) {
-        super(stagedGames, messages, eventDAO, userRepo, createGamesService, gameClassRepo);
+                                GameClassRepository gameClassRepo,
+                                CodeDefendersAuth login) {
+        super(stagedGames, messages, eventDAO, userRepo, createGamesService, gameClassRepo, login);
         this.userRepo = userRepo;
         this.meleeGameRepo = meleeGameRepo;
         this.multiplayerGameRepo = multiplayerGameRepo;

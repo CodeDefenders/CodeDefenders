@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;
@@ -65,6 +66,7 @@ public abstract class CreateGamesBean implements Serializable {
     private final UserRepository userRepo;
     private final CreateGamesService createGamesService;
     private final GameClassRepository gameClassRepo;
+    private final CodeDefendersAuth login;
 
     protected final StagedGameList stagedGames;
 
@@ -74,13 +76,15 @@ public abstract class CreateGamesBean implements Serializable {
                            EventDAO eventDAO,
                            UserRepository userRepo,
                            CreateGamesService createGamesService,
-                           GameClassRepository gameClassRepo) {
+                           GameClassRepository gameClassRepo,
+                           CodeDefendersAuth login) {
         this.messages = messages;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
         this.createGamesService = createGamesService;
         this.stagedGames = stagedGames;
         this.gameClassRepo = gameClassRepo;
+        this.login = login;
     }
 
     /**
@@ -188,6 +192,9 @@ public abstract class CreateGamesBean implements Serializable {
                                     RoleAssignmentStrategy.Type roleAssignmentType,
                                     GameAssignmentStrategy.Type gameAssignmentType,
                                     int attackersPerGame, int defendersPerGame) {
+        // Remove creator
+        userIds.remove(login.getUserId());
+
         RoleAssignmentStrategy roleAssignmentStrategy = gameSettings.getGameType() == MELEE
                 ? new MeleeRoleAssignmentStrategy()
                 : getRoleAssignment(roleAssignmentType);
