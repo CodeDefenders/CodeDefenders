@@ -50,7 +50,7 @@ public class NotificationService implements INotificationService {
     public NotificationService(ExecutorServiceProvider executorServiceProvider) {
         eventBus = new AsyncEventBus(executorServiceProvider.createExecutorService("notificationServiceEventBus", NUM_THREADS), ((exception, context) -> {
             logger.warn("Got {} while calling notification handler.", exception.getClass().getSimpleName(), exception);
-            logger.warn("Event was: {}", new Gson().toJson(context.getEvent()));
+            logger.warn("Event was: {} {}", context.getEvent().getClass().getSimpleName(), new Gson().toJson(context.getEvent()));
         }));
     }
 
