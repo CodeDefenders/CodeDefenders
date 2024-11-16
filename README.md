@@ -1,137 +1,106 @@
 # Code Defenders
 
-This is Code Defenders, a mutation testing game. Publicly available at [code-defenders.org](<http://code-defenders.org>).
-
-For information regarding running Code Defenders via docker see [the corresponding documentation](docker/README.md).
+This is Code Defenders, a mutation testing game. Publicly available at [code-defenders.org](http://code-defenders.org).
 
 ## Vagrant
+The repository contains a `Vagrantfile` for use with [Vagrant](https://www.vagrantup.com/) to quickly create a development environment.
 
-The repository contains a `Vagrantfile` for use with [Vagrant](https://www.vagrantup.com/) to quickly create a dev(!) environment.
+### Steps to Use Vagrant:
+1. Install and configure Vagrant on your system.
+2. Run the following command to create a virtual machine:
+   ```bash
+   vagrant up
+   ```
+   - This creates a VM with all required software installed but does not deploy the `codedefenders.war` file.
+3. By default, the following port forwarding settings are configured:
+   - Tomcat server: Port 8080
+   - JVM remote debugging: Port 8000
+   - Database: Port 3306
+4. Default credentials:
+   - Database: Username: `codedefenders`, Password: `codedefenders`
+   - Tomcat manager application: Username: `manager`, Password: `manager`
+   - Admin access to Code Defenders: Username: `admin`, Password: `admin`
 
-If you have `vagrant` installed and configured, simply execute `vagrant up`. This will create a VM with all required software installed, but initially without the `codedefenders.war` file deployed.  
-By default port forwarding for the tomcat server to port 8080, JVM remote debugging to port 8000 and for the database port to port 3306 are set up.
+After the VM setup, deploy Code Defenders via the [Maven deployment steps](#automatic-deployment-via-maven).
 
-The database name, user and password are all `codedefenders`.  
-The tomcat manager application (api and web) can be accessed with username and password `manager`.  
-Admin access to codedefenders is possible with username and password `admin`.
-
-Codedefenders can be deployed to the VM e.g. via the [maven deployment steps](#automatic-deployment-via-maven) mentioned below and the `manager` credentials mentioned above. Everything required should already be setup.
-
-## Installation & Configuration
-
-### Software Requirements
-
+## Prerequisites
+This project requires the following software:
 - Java (Version 1.8 or later)
 - Tomcat Server (Version 10)
 - Apache Maven
 - Apache Ant
-- MySQL (e.g. [MariaDB](https://mariadb.org/))
+- MySQL (e.g., [MariaDB](https://mariadb.org/))
 
-### Setup
+## Installation Steps
+### Manual Installation
+1. **Copy the configuration file**:
+   Copy the `example.codedefenders.properties` file to `/var/lib/tomcat10/conf/codedefenders.properties` and set the values to match your environment.
+   - The `data.dir` property is required, while other properties have default values.
+2. **Adapt systemd service**:
+   On Debian 10, modify the `tomcat10` service to allow `data.dir` outside the `/var/lib/tomcat10/webapps/` hierarchy:
+   ```ini
+   [Service]
+   ReadWritePaths="/path/to/data.dir"
+   ```
+3. **Setup the database**:
+   Create the MySQL or MariaDB database and user. Ensure the user has privileges to create databases, tables, and indexes.
+4. **Create the data directory**:
+   Create the `data.dir` folder with appropriate permissions for the tomcat user.
+5. **Run the installation script**:
+   Execute the `setup.sh` script:
+   ```bash
+   cd installation
+   ./setup.sh /var/lib/tomcat10/conf/codedefenders.properties
+   ```
+   - The script verifies software availability, creates the required folder structure, and downloads dependencies.
 
-This guide assumes:
- - you are running Debian 12 as OS
- - you installed all the required software
+   **Notes**:
+   - If Tomcat runs under a different user, ensure data directory ownership is adjusted.
+   - Root access may be needed for folder creation.
 
-#### Modify the configuration
+6. **Set up admin users**:
+   To assign admin privileges, add a mapping in the `tomcat-users.xml` file (default location: `/path/to/tomcat/conf`):
+   ```xml
+   <role rolename="codedefenders-admin"/>
+   <user username="admin_user" roles="codedefenders-admin"/>
+   ```
 
-Copy the `example.codedefenders.properties` file to `/var/lib/tomcat10/conf/codedefenders.properties` and set the values to match your environment.  
-The only required value is `data.dir`, all other properties have sensible default values.
+### Automatic Deployment via Maven
+1. **Configure Maven and Tomcat**:
+   - Add a user with the `manager-script` role in `tomcat-users.xml`:
+     ```xml
+     <role rolename="manager-script"/>
+     <user username="YOUR_USER" password="YOUR_PASSWORD" roles="manager-script"/>
+     ```
+2. **Deploy using Maven**:
+   ```bash
+   mvn clean deploy -DskipTests
+   ```
+   - Ensure the `tomcat10-admin` package is installed for Debian-based systems.
 
-#### Adapt the systemd service
+### Verification
+Run the application by accessing it on the configured Tomcat server port (default: 8080).
 
-On Debian 10 tomcat10 by default has only very limited write permissions.  
-To allow the `data.dir` to be located outside of the `/var/lib/tomcat10/webapps/` folder hierarchy you have to `systemctl edit tomcat10` and add the following code:  
-```ini
-[Service]
-ReadWritePaths="<data.dir path>"
-```
+## Build and Deployment
+- To manually deploy, copy the `codedefenders.war` file to the Tomcat `webapps` directory.
+- Ensure Tomcat and MySQL services are running.
+- Download the `.war` file from the [latest release](https://github.com/CodeDefenders/CodeDefenders/releases) or build it with:
+  ```bash
+  mvn clean package -DskipTests
+  ```
 
-#### Setup the database
+## External Documents
+For more details, refer to:
+- [Docker Documentation](docker/README.md)
+- [Testing Document](docs/Testing.md)
 
-The MySQL or MariaDB database and the user to access the database have to be created before the first run.
+## Help and Support
+For FAQs and commonly encountered errors, check our pull requests and issues channel.
 
-#### Create the data.dir and run the installation script
+For troubleshooting errors like `INDEX command denied to user`, ensure the MySQL user has appropriate privileges.
 
-Create the `data.dir` folder with the appropriate owner/group and permissions.  
-CodeDefenders (resp. the tomcat user) requires write permissions to the folder to create missing directories/files and to save the source code files.
+## Version History
+Refer to the [releases](https://github.com/CodeDefenders/CodeDefenders/releases) for version details.
 
-To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder with the appropriate user and pass the `codedefenders.properties` file as input.
-
-```bash
-cd installation
-./setup.sh /var/lib/tomcat10/conf/codedefenders.properties
-```
-
-The script performs a basic availability check of required software. The data directory folder structures created. All the required dependencies and files are automatically downloaded.
-
-If any installation step fails, the installation process aborts and prints an error message.
-
-**Note:** Depending on the chosen data directory and Tomcat installation in place, root access may be necessary to create required folders. Similarly, additional configurations might be needed. For example, if Tomcat runs under a different user, data directory accesses and ownership might be need to be adjusted.
-
-**Note:** Code Defenders also requires that its MySQL user owns specific privileges to create databases and tables. Additionally, it requires INDEX privileges, otherwise the installation fails with an error message similar to:
-
-```ERROR 1142 (42000) at line 183: INDEX command denied to user```
-
-
-#### Set up Code Defenders admin users
-
-Code Defenders currently relies on the Tomcat authentication system for providing a `username`-`role` mapping that can be used to assign admin privileges.
-
-Assigning admin privileges to a Code Defenders users can be done by setting up a mapping between the username (`<CODEDEFENDERS_USERNAME>`) and the configured `auth.admin.role` (`codedefenders-admin` by default) in the `tomcat-users.xml` file.  
-This file is per default located in `${CATALINA_HOME}/conf`.
-
-```xml
-  <role rolename="codedefenders-admin"/>
-  <user username="<CODEDEFENDERS_USERNAME>" roles="codedefenders-admin"/>
-```
-
-Care should be taken, so the chosen `CODEDEFENDERS_USERNAME` can not be simply registered by anyone.
-
-All system configuration and privileged features are accessible for admin users under the `/admin` page. Configurations are organized in three groups:
-
-* Game management: Create bulk games for an entire class, distribute students among the games, and assign roles to students.
-* User management: Check and update users settings, and forcefully reset passwords.
-* System settings: Customize technical aspects of Code Defenders and include several advanced settings.
-
-
-### Build and Deployment
-
-For successful deployment, both Tomcat and MySQL services must be running.
-
-Tests can be skipped via `-DskipTests`  
-If you want to run the tests be sure the library `libncurses.so.5` is present on your system as the database tests depend on it.
-
-For additional information on the system- and integration-tests see the [Testing document](docs/Testing.md).
-
-#### Manual
-
-To deploy you simply need to copy the `codedefenders.war` file to the tomcat `webapps` directory, with the context path as name.  
-E.g to deploy codedefenders at the tomcat root path (`http://localhost:8080/`) you can simply `cp target/codedefenders.war /var/lib/tomcat10/webapps/ROOT.war`
-
-You can either download the `codedefenders.war` file from the latest [release](https://github.com/CodeDefenders/CodeDefenders/releases/) or build it yourself with `mvn clean package -DskipTests`.
-
-#### Automatic Deployment via Maven
-
-Alternatively you can automatically deploy with maven. For this, Tomcat requires a user with `manager-script` role, which can be configured in `$CATALINA_BASE/conf/tomcat-users.xml` (`CATALINA_BASE` is the Tomcat installation directory).
-
-The maven deployment is configured via a `config.properties` file. Simply copy the `example.config.properties` file over and adjust the values to your needs.
-
-```xml
-<role rolename="manager-script"/>
-<user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
-```
-
-**Note:** This requires the tomcat manager application to be installed, which on Debian is provided by the `tomcat10-admin` package.
-
-Code Defenders is built and deployed with Maven using the following commands.
-
-```bash
-mvn clean deploy -DskipTests
-```
-
-### Supporters
-
-This project is supported [IMPRESS](https://impress-project.eu/).
-Check the [official website](https://code-defenders.org/about) for a detailed
-list of supporters.
+## Supporters
+This project is supported by [IMPRESS](https://impress-project.eu/). Visit [the official website](https://code-defenders.org/about) for a detailed list of supporters.
