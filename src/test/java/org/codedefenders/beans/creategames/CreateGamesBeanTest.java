@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;
@@ -58,6 +59,7 @@ public class CreateGamesBeanTest {
     private MultiplayerGameRepository multiplayerGameRepo;
     private CreateGamesService createGamesService;
     private GameClassRepository gameClassRepo;
+    private CodeDefendersAuth login;
 
 
     @BeforeEach
@@ -81,6 +83,7 @@ public class CreateGamesBeanTest {
         multiplayerGameRepo = Mockito.mock(MultiplayerGameRepository.class);
         createGamesService = Mockito.mock(CreateGamesService.class);
         gameClassRepo = Mockito.mock(GameClassRepository.class);
+        login = Mockito.mock(CodeDefendersAuth.class);
 
         /* Initialize bean. */
         stagedGameList = new StagedGameList();
@@ -92,7 +95,8 @@ public class CreateGamesBeanTest {
                 meleeGameRepo,
                 multiplayerGameRepo,
                 createGamesService,
-                gameClassRepo
+                gameClassRepo,
+                login
         ) {
             @Override
             public Map<Integer, CreateGamesBean.UserInfo> fetchUserInfos() {

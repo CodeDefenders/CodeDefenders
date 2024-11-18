@@ -92,13 +92,13 @@ public class CreateGamesService {
     public AdminCreateGamesBean getContextForAdmin(int userId) {
         StagedGameList stagedGames = getStagedGamesForAdmin(userId);
         return new AdminCreateGamesBean(stagedGames, messages, eventDAO, userRepo, meleeGameRepo,
-                multiplayerGameRepo, this, gameClassRepo);
+                multiplayerGameRepo, this, gameClassRepo, login);
     }
 
     public ClassroomCreateGamesBean getContextForClassroom(int userId, int classroomId) {
         StagedGameList stagedGames = getStagedGamesForClassroom(userId, classroomId);
         return new ClassroomCreateGamesBean(classroomId, stagedGames, messages, eventDAO, userRepo,
-                classroomService, meleeGameRepo, multiplayerGameRepo, this, gameClassRepo);
+                classroomService, meleeGameRepo, multiplayerGameRepo, this, gameClassRepo, login);
     }
 
     /**
