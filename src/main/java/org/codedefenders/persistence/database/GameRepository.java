@@ -103,14 +103,13 @@ public class GameRepository {
                 ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
         """;
 
-        var key = queryRunner.insert(query, generatedKeyFromRS(),
+        int numRows = queryRunner.update(query,
                 gameId,
                 userId,
                 role.toString(),
                 role.toString()
         );
-        // TODO: This will return false if a player with the same values already exists
-        return key.isPresent();
+        return numRows > 0;
     }
 
     /**

@@ -434,11 +434,14 @@ public class MutantRepository {
 
     public void insertEquivalence(Mutant mutant, int defender) {
         @Language("SQL") String query = """
+            IF NOT EXISTS(SELECT Mutant_ID FROM equivalences WHERE Mutant_ID = ?) THEN
                 INSERT INTO equivalences (Mutant_ID, Defender_ID, Mutant_Points)
-                VALUES (?, ?, ?)
+                VALUES (?, ?, ?);
+            END IF;
         """;
 
         queryRunner.insert(query, rs -> null,
+                mutant.getId(),
                 mutant.getId(),
                 defender,
                 mutant.getScore()
