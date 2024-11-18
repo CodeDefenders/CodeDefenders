@@ -46,10 +46,13 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.notification.events.server.game.GameJoinedEvent;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
@@ -57,13 +60,17 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.service.game.MeleeGameService;
 import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JspWorkaround;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminMonitorGames.class);
 
     @Inject
     private MessagesBean messages;
@@ -106,6 +113,12 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
+
+    @Inject
+    private PlayerRepository playerRepo;
+
+    @Inject
+    private NotificationService notificationService;
 
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -165,6 +178,9 @@ public class AdminMonitorGames extends HttpServlet {
 
             case "startStopGame":
                 startStopGame(request, response);
+                break;
+            case "joinGameAsObserver":
+                joinGameAsObserver(request, response);
                 break;
             default:
                 System.err.println("Action not recognised");
@@ -321,5 +337,49 @@ public class AdminMonitorGames extends HttpServlet {
             return (testScores.get(pid)).getTotalScore();
         }
         return 0;
+    }
+
+    private void joinGameAsObserver(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        var gameId = ServletUtils.getIntParameter(request, "gameId");
+        if (gameId.isEmpty()) {
+            messages.add("Missing game id from request");
+            logger.info("Missing game id from request");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        AbstractGame game = gameRepo.getGame(gameId.get());
+        if (game == null) {
+            messages.add("Game doesn't exist: " + gameId);
+            logger.info("Game doesn't exist: " + gameId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        if (game.getCreatorId() == login.getUserId()) {
+            messages.add("You're already the creator of this game.");
+            logger.info("User is already the creator of game: " + gameId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), game.getId());
+        if (playerId != -1) {
+            logger.info("You are already part of this game");
+            logger.info("User {} already in the requested game as player {}", login.getUserId(), playerId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        game.addPlayer(login.getUserId(), Role.OBSERVER);
+
+        // Create the event, publish if successfully joined
+        GameJoinedEvent gje = new GameJoinedEvent();
+        gje.setGameId(game.getId());
+        gje.setUserId(login.getUserId());
+        gje.setUserName(login.getSimpleUser().getName());
+        notificationService.post(gje);
+
+        response.sendRedirect(url.forPath(Paths.ADMIN_MONITOR));
     }
 }
