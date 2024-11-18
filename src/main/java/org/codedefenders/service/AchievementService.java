@@ -218,8 +218,11 @@ public class AchievementService {
         Test test = testRepo.getKillingTestForMutantId(mutantId);
         if (test != null) {
             int playerId = test.getPlayerId();
-            int userId = playerRepo.getPlayer(playerId).getUser().getId();
-            updateAchievement(userId, Achievement.Id.KILL_MUTANTS, 1);
+            Player player = playerRepo.getPlayer(playerId);
+            if (player != null) { // Player can be null if a system player killed the mutant.
+                int userId = player.getUser().getId();
+                updateAchievement(userId, Achievement.Id.KILL_MUTANTS, 1);
+            }
         }
     }
 
