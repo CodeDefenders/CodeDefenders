@@ -54,15 +54,19 @@
     SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
     String mutantClaimedMessage = null;
+    int mutantLine = 0;
     if (openEquivalenceDuel) {
         mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
                 ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
                 : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
+        mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
     }
 
     // These two are set in the MeleeGameManager, since we need to do a getUserIdForPlayerId lookup for test filtering.
     final List<Test> playerTests = (List<Test>) request.getAttribute("playerTests");
     final List<Test> enemyTests = (List<Test>) request.getAttribute("enemyTests");
+
+    pageContext.setAttribute("mutantLine", mutantLine);
 %>
 
 <jsp:useBean id="previousSubmission"
@@ -267,6 +271,11 @@
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+        <script type="module">
+            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            const classViewer = await objects.await("classViewer");
+            classViewer.jumpToLine(${mutantLine});
+        </script>
     </div>
 
 <% } else { %>
