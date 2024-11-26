@@ -81,6 +81,7 @@
     } else {
         testEditor.setTestCodeForClass(cut);
     }
+    testEditor.setReadonly(game.getState() == GameState.SOLVED);
 %>
 
 

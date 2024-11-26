@@ -1,3 +1,4 @@
+import CodeMirror from '../thirdparty/codemirror'
 import CodeCompletion from './code_completion';
 import {LoadingAnimation} from '../main';
 
@@ -15,8 +16,10 @@ class MutantEditor {
      *      Null if the text should be editable to the end.
      * @param {string} keymap
      *      Given by [${login.user.keyMap.CMName}]
+     * @param {boolean} readonly
+     *      Whether the editor is readonly.
      */
-    constructor (editorElement, dependencyEditorElements, editableLinesStart, editableLinesEnd, keymap) {
+    constructor (editorElement, dependencyEditorElements, editableLinesStart, editableLinesEnd, keymap, readonly) {
         /**
          * The text area element of the editor.
          * @type {HTMLTextAreaElement}
@@ -69,6 +72,11 @@ class MutantEditor {
          */
         this._codeCompletion = null;
 
+        /**
+         * Whether the editor should be readonly.
+         * @type {boolean}
+         */
+        this._readonly = readonly;
 
         this._init();
     }
@@ -96,8 +104,12 @@ class MutantEditor {
                 'CodeMirror-linenumbers',
                 'CodeMirror-mutantIcons'
             ],
-            autoRefresh: true
+            autoRefresh: true,
+            readOnly: this._readonly
         });
+        if (this._readonly) {
+            this.editor.getWrapperElement().classList.add('codemirror-readonly');
+        }
 
         /* Refresh editor when resized. */
         if (window.hasOwnProperty('ResizeObserver')) {

@@ -19,8 +19,10 @@ class TestEditor {
      *      Given by [${testEditor.assertionLibrary}]
      * @param {string} keymap
      *      Given by [${login.user.keyMap.CMName}]
+     * @param {boolean} readonly
+     *      Whether the editor is readonly.
      */
-    constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, assertionLibrary, keymap) {
+    constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, assertionLibrary, keymap, readonly) {
         /**
          * The text area element of the editor.
          * @type {HTMLTextAreaElement}
@@ -70,6 +72,11 @@ class TestEditor {
          */
         this._codeCompletion = null;
 
+        /**
+         * Whether the editor should be readonly.
+         * @type {boolean}
+         */
+        this._readonly = readonly;
 
         this._init();
     }
@@ -97,8 +104,12 @@ class TestEditor {
                     'CodeMirror-linenumbers',
                     'CodeMirror-mutantIcons'
             ],
-            autoRefresh: true
+            autoRefresh: true,
+            readOnly: this._readonly
         });
+        if (this._readonly) {
+            this.editor.getWrapperElement().classList.add('codemirror-readonly');
+        }
 
         /* Refresh editor when resized. */
         if (window.hasOwnProperty('ResizeObserver')) {

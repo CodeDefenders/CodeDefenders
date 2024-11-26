@@ -40,11 +40,17 @@ public class TestEditorBean {
      */
     private AssertionLibrary assertionLibrary;
 
+    /**
+     * Whether the editor is readonly.
+     */
+    private boolean readonly;
+
     public TestEditorBean() {
         testCode = null;
         editableLinesStart = null;
         editableLinesEnd = null;
         mockingEnabled = null;
+        readonly = false;
     }
 
     public void setTestCodeForClass(GameClass clazz) {
@@ -105,5 +111,13 @@ public class TestEditorBean {
 
     public AssertionLibrary getAssertionLibrary() {
         return assertionLibrary;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
     }
 }
