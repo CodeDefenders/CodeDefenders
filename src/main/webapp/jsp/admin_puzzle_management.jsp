@@ -406,6 +406,7 @@
                     this.tags = {
                         id: this.container.querySelector('.puzzle__tag__id'),
                         games: this.container.querySelector('.puzzle__tag__games'),
+                        level: this.container.querySelector('.puzzle__tag__level'),
                         equivalent: this.container.querySelector('.puzzle__tag__equivalent'),
                     };
                     this.container.puzzleComp = this;
@@ -426,6 +427,7 @@
                             <div class="puzzle__tags">
                                 <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
                                 <span class="badge puzzle__tag puzzle__tag__games" title="Number of games with the puzzle"></span>
+                                <span class="badge puzzle__tag puzzle__tag__level" title="Puzzle level"></span>
                                 <span class="badge puzzle__tag puzzle__tag__equivalent title="Mutant is equivalent" hidden">
                                     <i class="fa fa-flag"></i>
                                 </span>
@@ -468,6 +470,7 @@
                     this.description.title = puzzle.title;
                     this.tags.id.innerText = '#' + puzzle.id;
                     this.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
+                    this.tags.level.innerText = puzzle.level.toLowerCase();
 
                     if (puzzle.type === 'EQUIVALENCE' && puzzle.isEquivalent) {
                         this.tags.equivalent.removeAttribute('hidden');
