@@ -4,6 +4,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
 
 <p:main_page title="Puzzle Management">
     <jsp:attribute name="additionalImports">
@@ -846,6 +847,24 @@
                                 </div>
                             </div>
 
+                            <div class="row g-3 mb-2 difficulty-level">
+                                <div class="col-12">
+                                    <label class="form-label">Game Level</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
+                                               value="${GameLevel.EASY}" required>
+                                        <label class="form-check-label" for="level-radio-easy">Easy</label>
+                                        <div class="invalid-feedback">Please select a level.</div>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
+                                               value="${GameLevel.HARD}" required
+                                               checked>
+                                        <label class="form-check-label" for="level-radio-hard">Hard</label>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row g-3 mb-2 mutant-equivalent">
                                 <div class="col-12">
                                     <label class="form-label">Equivalence</label>
@@ -861,19 +880,22 @@
                     modal.title.innerText = 'Edit Puzzle';
                     modal.footerCloseButton.innerText = 'Cancel';
                     modal.modal.dataset.id = puzzle.id;
-                    modal.body.querySelector('input[name="title"]').value = puzzle.title;
-                    modal.body.querySelector('input[name="description"]').value = puzzle.description;
-                    modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
+
+                    const form = modal.body.querySelector("form");
+                    form["title"].value = puzzle.title;
+                    form["description"].value = puzzle.description;
+                    form["maxAssertionsPerTest"].value = puzzle.maxAssertionsPerTest;
+                    form["level"].value = puzzle.level;
                     if (puzzle.type === 'DEFENDER') {
                         modal.body.querySelector('.mutant-equivalent').remove();
                         modal.body.querySelector('.editable-lines').remove();
                     } else if (puzzle.type === 'ATTACKER') {
                         modal.body.querySelector('.mutant-equivalent').remove();
-                        modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
-                        modal.body.querySelector('input[name="editableLinesEnd"]').value = puzzle.editableLinesEnd;
+                        form["editableLinesStart"].value = puzzle.editableLinesStart;
+                        form["editableLinesEnd"].value = puzzle.editableLinesEnd;
                     } else if (puzzle.type === 'EQUIVALENCE') {
                         modal.body.querySelector('.editable-lines').remove();
-                        modal.body.querySelector('input[name="mutantEquivalent"]').checked = puzzle.isEquivalent;
+                        form["mutantEquivalent"].checked = puzzle.isEquivalent;
                     }
 
                     const saveButton = document.createElement('button');
@@ -889,19 +911,21 @@
                             return;
                         }
 
-                        const title = modal.body.querySelector('input[name="title"]').value;
-                        const description = modal.body.querySelector('input[name="description"]').value;
-                        let maxAssertionsPerTest = modal.body.querySelector('input[name="maxAssertionsPerTest"]').value;
+                        const title = form["title"].value;
+                        const description = form["description"].value;
+                        const level = form["level"].value;
+                        let maxAssertionsPerTest = form["maxAssertionsPerTest"].value;
                         maxAssertionsPerTest = Number(maxAssertionsPerTest);
-                        let editableLinesStart = modal.body.querySelector('input[name="editableLinesStart"]')?.value;
+                        let editableLinesStart = form["editableLinesStart"]?.value;
                         editableLinesStart = editableLinesStart ? Number(editableLinesStart) : null;
-                        let editableLinesEnd = modal.body.querySelector('input[name="editableLinesEnd"]')?.value;
+                        let editableLinesEnd = form["editableLinesEnd"]?.value;
                         editableLinesEnd = editableLinesEnd ? Number(editableLinesEnd) : null;
-                        const isEquivalent = modal.body.querySelector('input[name="mutantEquivalent"]')?.checked;
+                        const isEquivalent = form["mutantEquivalent"]?.checked;
 
                         PuzzleAPI.updatePuzzle(puzzle.id, {
                             title,
                             description,
+                            level,
                             maxAssertionsPerTest,
                             editableLinesStart,
                             editableLinesEnd,
@@ -909,6 +933,7 @@
                         }).then(response => {
                             puzzle.title = response.puzzle.title;
                             puzzle.description = response.puzzle.description;
+                            puzzle.level = response.puzzle.level;
                             puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
                             puzzle.editableLinesStart = response.puzzle.editableLinesStart;
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;

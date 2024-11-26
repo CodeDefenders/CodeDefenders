@@ -425,6 +425,7 @@ public class PuzzleRepository {
                     Max_Assertions       = ?,
                     Editable_Lines_Start = ?,
                     Editable_Lines_End   = ?,
+                    Level                = ?,
                     IsEquivalent         = ?
                 WHERE Puzzle_ID = ?;
         """;
@@ -437,6 +438,7 @@ public class PuzzleRepository {
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
+                puzzle.getLevel().toString(),
                 puzzle.isEquivalent(),
                 puzzle.getPuzzleId()
         );
