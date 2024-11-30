@@ -22,11 +22,13 @@
 
 <%@ attribute name="game" required="true" type="org.codedefenders.game.puzzle.PuzzleGame" %>
 
+<span>
 <c:choose>
     <c:when test="${game.state == 'SOLVED'}">
-        Puzzle solved in ${game.currentRound} ${fn:pluralizeWithS(game.currentRound, "attempt")}.
+        <i class="fa fa-check"></i> Puzzle solved in ${game.currentRound} ${fn:pluralizeWithS(game.currentRound, "attempt")}.
     </c:when>
     <c:otherwise>
         This is your ${game.currentRound}${fn:ordinalSuffix(game.currentRound)} attempt.
     </c:otherwise>
 </c:choose>
+</span>
