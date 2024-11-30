@@ -977,11 +977,8 @@ public class PuzzleGameManager extends HttpServlet {
          * solved only after this message is generated.
          */
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            // Skip chapters before this one
-            if (puzzleChapter.getChapterId() < currentChapter) {
-                continue;
-            } else if (puzzleChapter.getChapterId() >= currentChapter) {
-                // Check in current and next chapters
+            // Check in current and next chapters
+            if (puzzleChapter.getChapterId() >= currentChapter) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * and empty, not-null list if there's not puzzles
@@ -1015,10 +1012,10 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         /*
-         * If we got here, the user has solved all the puzzles ?
+         * If we got here, the user has solved all the puzzles in a chapter
          */
         message.append(" ")
-                .append("You solved all the puzzles, go back to the <a href=")
+                .append("You solved all the puzzles of the current chapter, go back to the <a href=")
                 .append(url.forPath(Paths.PUZZLE_GAME))
                 .append(">Puzzle Overview</a>.");
         return message.toString();
