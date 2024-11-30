@@ -850,8 +850,8 @@
                                 <div class="col-12">
                                     <label class="form-label">Equivalence</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent">
-                                        <label class="form-check-label">
+                                        <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent" id="mutantEquivalent">
+                                        <label class="form-check-label" for="mutantEquivalent">
                                             Mutant equivalent
                                         </label>
                                     </div>
