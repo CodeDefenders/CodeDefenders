@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -141,7 +142,17 @@
                                 </div>
                                 <div class="chapter__level__title">
                                     <h3>${puzzle.title}</h3>
-                                    <p>${puzzle.description}</p>
+                                    <c:choose>
+                                        <c:when test="${status == 'solved'}">
+                                            <p>
+                                                Puzzle solved in ${puzzleEntry.rounds}
+                                                    ${fn:pluralizeWithS(puzzleEntry.rounds, "attempt")}.
+                                            </p>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <p>${puzzle.description}</p>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </a>
                         </c:forEach>
