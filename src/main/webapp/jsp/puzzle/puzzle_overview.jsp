@@ -68,7 +68,7 @@
                     <div class="next-puzzle__title">
                         <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.type}"
                                 <c:choose>
-                                    <c:when test="${puzzle.type == 'EQUIVALENCE'}">
+                                    <c:when test="${nextPuzzleObj.puzzle.type == 'EQUIVALENCE'}">
                                         src="${url.forPath("/images/ingameicons/equivalence.png")}"
                                     </c:when>
                                     <c:otherwise>
