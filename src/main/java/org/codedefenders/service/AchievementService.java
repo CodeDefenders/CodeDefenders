@@ -26,6 +26,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Achievement;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
@@ -87,10 +88,10 @@ public class AchievementService {
      * @param notificationService   the notification service
      */
     @Inject
-       public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
-                                 TestSmellRepository testSmellRepo, EventDAO eventDAO,
-                                 GameRepository gameRepo, PuzzleRepository puzzleRepo,
-                                 TestRepository testRepo, PlayerRepository playerRepo) {
+    public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
+                              TestSmellRepository testSmellRepo, EventDAO eventDAO,
+                              GameRepository gameRepo, PuzzleRepository puzzleRepo,
+                              TestRepository testRepo, PlayerRepository playerRepo) {
         repo = achievementRepository;
         this.testSmellRepo = testSmellRepo;
         this.eventDAO = eventDAO;
@@ -169,6 +170,16 @@ public class AchievementService {
     private void addMultiplayerGameResult(int userId, ScoreboardBean.PlayerStatus status) {
         getMultiplayerGameResultAchievementIdForStatus(status)
                 .forEach(achievementId -> updateAchievement(userId, achievementId, 1));
+    }
+
+    private void addPuzzleSolved(int userId) {
+        updateAchievement(userId, Achievement.Id.SOLVE_PUZZLES, 1);
+    }
+
+    private void addPuzzleSolvedInFewTries(int userId, int currentRound) {
+        if (currentRound == 1) {
+            updateAchievement(userId, Achievement.Id.PUZZLES_SOLVED_ON_FIRST_TRY, 1);
+        }
     }
 
     private void addTestWritten(int userId) {
@@ -370,12 +381,11 @@ public class AchievementService {
         @Subscribe
         @SuppressWarnings("unused")
         public void handlePuzzleGameSolvedEvent(GameSolvedEvent event) {
+            PuzzleGame game = puzzleRepo.getPuzzleGameForId(event.getGameId());
             int userId = puzzleRepo.getPuzzleGameForId(event.getGameId()).getCreatorId();
-            Achievement.Id achievementId = Achievement.Id.SOLVE_PUZZLES;
-            if (repo.updateAchievementForUser(userId, achievementId, 1) > 0) {
-                logger.info("Updated achievement {} for user with id {}", achievementId, userId);
-                enqueueAchievementNotification(userId, achievementId);
-            }
+
+            addPuzzleSolved(userId);
+            addPuzzleSolvedInFewTries(userId, game.getCurrentRound());
         }
 
         /**

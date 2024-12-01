@@ -63,18 +63,22 @@ public class Achievement implements Serializable {
     }
 
     public String getName() {
-        return name;
+        return format(name);
     }
 
     public String getDescription() {
-        return description;
+        return format(description);
     }
 
     public String getProgressText() {
+        return format(progressText);
+    }
+
+    private String format(String text) {
         List<Integer> args = new ArrayList<>();
         args.add(metricCurrent);
         getNumMetricNeededForNextLevel().ifPresent(args::add);
-        return MessageFormat.format(progressText, args.toArray());
+        return MessageFormat.format(text, args.toArray());
     }
 
     public int getMetricForCurrentLevel() {
@@ -147,6 +151,8 @@ public class Achievement implements Serializable {
         MAX_TESTS_IN_SHORT_TIME(17),
         @SerializedName("18")
         MAX_MUTANTS_IN_SHORT_TIME(18),
+        @SerializedName("19")
+        PUZZLES_SOLVED_ON_FIRST_TRY(19),
         ; // format for better git diffs
 
         private final int id;
