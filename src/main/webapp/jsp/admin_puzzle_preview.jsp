@@ -23,6 +23,7 @@
 <%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleType" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -90,6 +91,75 @@
                 <div class="game-component-header"><h3>Class Under Test</h3></div>
                 <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                 <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            </div>
+
+            <div>
+                <div class="game-component-header">
+                    <h3>Properties</h3>
+                </div>
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <td>Title</td>
+                            <td>${puzzle.title}</td>
+                        </tr>
+                        <tr>
+                            <td>Description</td>
+                            <td>${puzzle.description}</td>
+                        </tr>
+                        <tr>
+                            <td>Type</td>
+                            <td>${puzzle.type}</td>
+                        </tr>
+                        <tr>
+                            <td class="pe-3">Mutant Equivalent</td>
+                            <c:choose>
+                                <c:when test="${puzzle.type == PuzzleType.EQUIVALENCE}">
+                                    <td>${puzzle.equivalent ? "yes" : "no"}</td>
+                                </c:when>
+                                <c:otherwise>
+                                    <td>N/A</td>
+                                </c:otherwise>
+                            </c:choose>
+                        </tr>
+                        <tr>
+                            <td>Level</td>
+                            <td>${puzzle.level}</td>
+                        </tr>
+                        <tr>
+                            <td>Editable lines start</td>
+                            <td>${puzzle.editableLinesStart != null ? puzzle.editableLinesStart : "N/A"}</td>
+                        </tr>
+                        <tr>
+                            <td>Editable lines end</td>
+                            <td>${puzzle.editableLinesEnd != null ? puzzle.editableLinesEnd : "N/A"}</td>
+                        </tr>
+                        <tr>
+                            <td>Max. assertions per test</td>
+                            <td>${puzzle.maxAssertionsPerTest}</td>
+                        </tr>
+                        <tr>
+                            <td>Mutant validator level</td>
+                            <td>${puzzle.mutantValidatorLevel}</td>
+                        </tr>
+                        <tr>
+                            <td>Puzzle ID</td>
+                            <td>${puzzle.puzzleId}</td>
+                        </tr>
+                        <tr>
+                            <td>Class ID</td>
+                            <td>${puzzle.classId}</td>
+                        </tr>
+                        <tr>
+                            <td>Chapter ID</td>
+                            <td>${puzzle.chapterId}</td>
+                        </tr>
+                        <tr>
+                            <td>Position</td>
+                            <td>${puzzle.position}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 

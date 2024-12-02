@@ -254,7 +254,11 @@
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
             import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-            const watermarkUrl = '${url.forPath("/images/achievements/")}';
+            const watermarkUrls = {
+                ATTACKER: '${url.forPath("/images/achievements/codedefenders_achievements_1_lvl_0.png")}',
+                DEFENDER: '${url.forPath("/images/achievements/codedefenders_achievements_2_lvl_0.png")}',
+                EQUIVALENCE: '${url.forPath("/images/ingameicons/equivalence.png")}'
+            }
             const puzzlePreviewUrl = '${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}';
 
             // ==== Init Data ==========================================================================================
@@ -400,7 +404,8 @@
                     this.description = this.container.querySelector('.puzzle__description');
                     this.tags = {
                         id: this.container.querySelector('.puzzle__tag__id'),
-                        games: this.container.querySelector('.puzzle__tag__games')
+                        games: this.container.querySelector('.puzzle__tag__games'),
+                        equivalent: this.container.querySelector('.puzzle__tag__equivalent'),
                     };
                     this.container.puzzleComp = this;
                 }
@@ -418,8 +423,11 @@
                                 <div class="puzzle__description"></div>
                             </div>
                             <div class="puzzle__tags">
-                                <span class="badge puzzle__tag puzzle__tag__id"></span>
-                                <span class="badge puzzle__tag puzzle__tag__games"></span>
+                                <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
+                                <span class="badge puzzle__tag puzzle__tag__games" title="Number of games with the puzzle"></span>
+                                <span class="badge puzzle__tag puzzle__tag__equivalent title="Mutant is equivalent" hidden">
+                                    <i class="fa fa-flag"></i>
+                                </span>
                             </div>
                         </div>
                         <div class="puzzle__controls">
@@ -449,28 +457,36 @@
                     return container;
                 }
 
-                static forPuzzle(puzzle) {
-                    const puzzleComp = new PuzzleComponent();
-                    puzzleComp.puzzle = puzzle;
-                    puzzleComp.container.dataset.id = puzzle.id;
+                setPuzzle(puzzle) {
+                    this.puzzle = puzzle;
+                    this.container.dataset.id = puzzle.id;
 
-                    puzzleComp.title.innerText = puzzle.title;
-                    puzzleComp.title.title = puzzle.title;
-                    puzzleComp.description.innerText = puzzle.description;
-                    puzzleComp.description.title = puzzle.title;
-                    puzzleComp.tags.id.innerText = '#' + puzzle.id;
-                    puzzleComp.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
+                    this.title.innerText = puzzle.title;
+                    this.title.title = puzzle.title;
+                    this.description.innerText = puzzle.description;
+                    this.description.title = puzzle.title;
+                    this.tags.id.innerText = '#' + puzzle.id;
+                    this.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
 
-                    puzzleComp.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
-                    puzzleComp.container.querySelector('.puzzle__watermark').src =
-                            `\${watermarkUrl}codedefenders_achievements_\${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png`;
+                    if (puzzle.type === 'EQUIVALENCE' && puzzle.isEquivalent) {
+                        this.tags.equivalent.removeAttribute('hidden');
+                    } else {
+                        this.tags.equivalent.setAttribute('hidden', '');
+                    }
+
+                    this.container.classList.add(`puzzle-\${puzzle.type.toLowerCase()}`);
+                    this.container.querySelector('.puzzle__watermark').src = watermarkUrls[puzzle.type];
 
                     if (puzzle.gameCount > 0) {
-                        const deleteButton = puzzleComp.container.querySelector('.puzzle__button__delete');
+                        const deleteButton = this.container.querySelector('.puzzle__button__delete');
                         deleteButton.disabled = true;
                         deleteButton.title = "Puzzles with existing games can't be deleted";
                     }
+                }
 
+                static forPuzzle(puzzle) {
+                    const puzzleComp = new PuzzleComponent();
+                    puzzleComp.setPuzzle(puzzle);
                     return puzzleComp;
                 }
 
@@ -829,6 +845,18 @@
                                         min="1">
                                 </div>
                             </div>
+
+                            <div class="row g-3 mb-2 mutant-equivalent">
+                                <div class="col-12">
+                                    <label class="form-label">Equivalence</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent" id="mutantEquivalent">
+                                        <label class="form-check-label" for="mutantEquivalent">
+                                            Mutant equivalent
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
                         </form>`;
                     modal.title.innerText = 'Edit Puzzle';
                     modal.footerCloseButton.innerText = 'Cancel';
@@ -837,10 +865,15 @@
                     modal.body.querySelector('input[name="description"]').value = puzzle.description;
                     modal.body.querySelector('input[name="maxAssertionsPerTest"]').value = puzzle.maxAssertionsPerTest;
                     if (puzzle.type === 'DEFENDER') {
+                        modal.body.querySelector('.mutant-equivalent').remove();
                         modal.body.querySelector('.editable-lines').remove();
-                    } else {
+                    } else if (puzzle.type === 'ATTACKER') {
+                        modal.body.querySelector('.mutant-equivalent').remove();
                         modal.body.querySelector('input[name="editableLinesStart"]').value = puzzle.editableLinesStart;
                         modal.body.querySelector('input[name="editableLinesEnd"]').value = puzzle.editableLinesEnd;
+                    } else if (puzzle.type === 'EQUIVALENCE') {
+                        modal.body.querySelector('.editable-lines').remove();
+                        modal.body.querySelector('input[name="mutantEquivalent"]').checked = puzzle.isEquivalent;
                     }
 
                     const saveButton = document.createElement('button');
@@ -864,21 +897,23 @@
                         editableLinesStart = editableLinesStart ? Number(editableLinesStart) : null;
                         let editableLinesEnd = modal.body.querySelector('input[name="editableLinesEnd"]')?.value;
                         editableLinesEnd = editableLinesEnd ? Number(editableLinesEnd) : null;
+                        const isEquivalent = modal.body.querySelector('input[name="mutantEquivalent"]')?.checked;
 
                         PuzzleAPI.updatePuzzle(puzzle.id, {
                             title,
                             description,
                             maxAssertionsPerTest,
                             editableLinesStart,
-                            editableLinesEnd
+                            editableLinesEnd,
+                            isEquivalent
                         }).then(response => {
                             puzzle.title = response.puzzle.title;
                             puzzle.description = response.puzzle.description;
                             puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
                             puzzle.editableLinesStart = response.puzzle.editableLinesStart;
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
-                            puzzleComp.title.innerText = response.puzzle.title;
-                            puzzleComp.description.innerText = response.puzzle.description;
+                            puzzle.isEquivalent = response.puzzle.isEquivalent;
+                            puzzleComp.setPuzzle(puzzle);
                             showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
                             showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});

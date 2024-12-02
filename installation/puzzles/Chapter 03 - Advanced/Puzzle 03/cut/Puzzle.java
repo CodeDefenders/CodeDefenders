@@ -1,12 +1,14 @@
 public class Puzzle {
 
-    public int run(int x) {
-        int y = 9;
-        int z = x;
-        while (z % y > 0) {
-            y = y - 1;
+    public int run(int x, int y) {
+        int z = 0;
+
+        while (x > 0) {
+            z += x + y;
+            x--;
         }
-        return y;
+
+        return z;
     }
 
 }

@@ -48,6 +48,11 @@ public class Puzzle {
     private PuzzleType type;
 
     /**
+     * Whether the mutant is an equivalent mutant.
+     */
+    private boolean isEquivalent;
+
+    /**
      * The {@link GameLevel} the puzzle is played on.
      */
     private GameLevel level;
@@ -100,23 +105,25 @@ public class Puzzle {
     /**
      * Constructs a new Puzzle instance.
      *
-     * @param puzzleId ID of the chapter.
-     * @param classId Class ID of the class the puzzle uses.
-     *                The mutants and test for the puzzle come together with the class.
-     * @param type The type of the puzzle.
-     * @param level The {@link GameLevel} the puzzle is played on.
-     * @param mutantValidatorLevel Validation level used to check submitted mutants.
+     * @param puzzleId             ID of the chapter.
+     * @param classId              Class ID of the class the puzzle uses.
+     *                             The mutants and test for the puzzle come together with the class.
+     * @param type                 The type of the puzzle.
+     * @param isEquivalent         For equivalence puzzles: Whether the mutant is an equivalent mutant.
+     * @param level                The {@link GameLevel} the puzzle is played on.
      * @param maxAssertionsPerTest Maximum number of allowed assertions per submitted test.
-     * @param editableLinesStart First editable line of the class or test. Can be null.
-     * @param editableLinesEnd Last editable line of the class or test. Can be null.
-     * @param chapterId ID of the chapter the puzzle belongs to. Can be null.
-     * @param position Position of the puzzle inside the chapter. Can be null.
-     * @param title Title of the puzzle. Can be null.
-     * @param description Description of the puzzle. Can be null.
+     * @param mutantValidatorLevel Validation level used to check submitted mutants.
+     * @param editableLinesStart   First editable line of the class or test. Can be null.
+     * @param editableLinesEnd     Last editable line of the class or test. Can be null.
+     * @param chapterId            ID of the chapter the puzzle belongs to. Can be null.
+     * @param position             Position of the puzzle inside the chapter. Can be null.
+     * @param title                Title of the puzzle. Can be null.
+     * @param description          Description of the puzzle. Can be null.
      */
     public Puzzle(int puzzleId,
                   int classId,
                   PuzzleType type,
+                  boolean isEquivalent,
                   GameLevel level,
                   int maxAssertionsPerTest,
                   CodeValidatorLevel mutantValidatorLevel,
@@ -129,6 +136,7 @@ public class Puzzle {
         this.puzzleId = puzzleId;
         this.classId = classId;
         this.type = type;
+        this.isEquivalent = isEquivalent;
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.mutantValidatorLevel = mutantValidatorLevel;
@@ -149,7 +157,7 @@ public class Puzzle {
                                        int maxAssertionsPerTest,
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
-        return new Puzzle(puzzleId, -1, null, null, maxAssertionsPerTest,
+        return new Puzzle(puzzleId, -1, null, false, null, maxAssertionsPerTest,
             null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
@@ -264,5 +272,13 @@ public class Puzzle {
 
     public void setChapter(PuzzleChapter chapter) {
         this.chapter = chapter;
+    }
+
+    public boolean isEquivalent() {
+        return isEquivalent;
+    }
+
+    public void setEquivalent(boolean equivalent) {
+        this.isEquivalent = equivalent;
     }
 }

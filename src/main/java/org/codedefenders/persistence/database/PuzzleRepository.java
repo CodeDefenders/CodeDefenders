@@ -313,9 +313,10 @@ public class PuzzleRepository {
                 Chapter_ID,
                 Position,
                 Title,
-                Description)
+                Description,
+                IsEquivalent)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner.insert(query,
@@ -330,7 +331,8 @@ public class PuzzleRepository {
                 puzzle.getChapterId(),
                 puzzle.getPosition(),
                 puzzle.getTitle(),
-                puzzle.getDescription()
+                puzzle.getDescription(),
+                puzzle.isEquivalent()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
 
@@ -384,10 +386,11 @@ public class PuzzleRepository {
                 MutantValidator,
                 State,
                 CurrentRound,
+                ActiveRole,
                 Mode,
                 Puzzle_ID)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner.insert(query,
@@ -399,6 +402,7 @@ public class PuzzleRepository {
                 game.getMutantValidatorLevel().toString(),
                 game.getState().toString(),
                 game.getCurrentRound(),
+                game.getActiveRole().toString(),
                 game.getMode().toString(),
                 game.getPuzzleId()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle game."));
@@ -420,7 +424,8 @@ public class PuzzleRepository {
                     Description          = ?,
                     Max_Assertions       = ?,
                     Editable_Lines_Start = ?,
-                    Editable_Lines_End   = ?
+                    Editable_Lines_End   = ?,
+                    IsEquivalent         = ?
                 WHERE Puzzle_ID = ?;
         """;
 
@@ -432,6 +437,7 @@ public class PuzzleRepository {
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
+                puzzle.isEquivalent(),
                 puzzle.getPuzzleId()
         );
         return updatedRows > 0;
@@ -479,6 +485,7 @@ public class PuzzleRepository {
                     MutantValidator = ?,
                     State = ?,
                     CurrentRound = ?,
+                    ActiveRole = ?,
                     Puzzle_ID = ?
 
                 WHERE ID = ?;
@@ -492,6 +499,7 @@ public class PuzzleRepository {
                 game.getMutantValidatorLevel().toString(),
                 game.getState().toString(),
                 game.getCurrentRound(),
+                game.getActiveRole().toString(),
                 game.getPuzzleId(),
                 game.getId()
         );
@@ -549,7 +557,7 @@ public class PuzzleRepository {
      * @param chapter the puzzle chapter to be removed.
      * @return {@code true} when the removal was successful, {@code false} otherwise.
      */
-    public boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
+    public boolean removePuzzleChapter(@Nonnull PuzzleChapter chapter) {
         @Language("SQL") String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
         int updatedRows = queryRunner.update(query,
                 chapter.getChapterId()
@@ -756,8 +764,9 @@ public class PuzzleRepository {
             editableLinesEnd = null;
         }
 
-        return new Puzzle(puzzleId, classId, type, level, maxAssertions, mutantValidatorLevel,
-                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+        boolean isEquivalent = rs.getBoolean("puzzles.IsEquivalent");
+        return new Puzzle(puzzleId, classId, type, isEquivalent, level, maxAssertions,
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
     /**

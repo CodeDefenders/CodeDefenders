@@ -1,12 +1,8 @@
 public class Puzzle {
 
-    public int makeNegative(int x) {
-        return min(x, -x);
-    }
-
-    private int min(int x, int y) {
-        if (x > y) {
-            return y;
+    public int run(int x) {
+        if (x % 3 == 0) {
+            return x / 3;
         }
         return x;
     }

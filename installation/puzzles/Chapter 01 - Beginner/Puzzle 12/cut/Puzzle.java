@@ -1,17 +1,20 @@
 public class Puzzle {
 
-    public int testMe(int x, int y) {
-        int z = 0;
+    public int run(int x, int y) {
+        int z = -1;
 
-        if (x == 42) {
+        if (y > x) {
+            z = 0;
+        }
+        if (x > y) {
             z = 1;
         }
 
-        if (y == 100) {
-            z = 2;
+        if (z > x) {
+            return z;
+        } else {
+            return x;
         }
-
-        return z;
     }
 
 }

@@ -1,14 +1,10 @@
 public class Puzzle {
 
-    public int testMe(int x, int y) {
-        int z = 4;
-        if (x == 42) {
-            z = 6;
+    public int run(int x, int y) {
+        if (x == 5 && y != 7) {
+            return x + y;
         }
-        if (y == 100) {
-            z++;
-        }
-        return z;
+        return x;
     }
 
 }

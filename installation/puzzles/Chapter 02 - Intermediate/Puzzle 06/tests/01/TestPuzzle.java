@@ -6,8 +6,9 @@ public class TestPuzzle {
 
     @Test(timeout = 4000)
     public void test() {
-        Puzzle b = new Puzzle();
-        assertEquals(7, b.run(5, 7));
+        Puzzle foo = new Puzzle();
+        String result = foo.run(7);
+        assertEquals("OOOOOOO", result);
     }
 
 }

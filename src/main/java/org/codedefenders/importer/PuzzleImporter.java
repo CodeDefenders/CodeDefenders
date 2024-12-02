@@ -178,7 +178,9 @@ public class PuzzleImporter {
         }
     }
 
-    private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
+    public record PuzzleChapterProperties(String title, String description) { }
+
+    public PuzzleChapterProperties readPuzzleChapterProperties(SimpleFile propertiesFile) throws IOException {
         Properties cfg = new Properties();
         cfg.load(new ByteArrayInputStream(propertiesFile.getContent()));
 
@@ -188,6 +190,11 @@ public class PuzzleImporter {
         }
 
         String description = cfg.getProperty("description");
+        return new PuzzleChapterProperties(title, description);
+    }
+
+    private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
+        var props = readPuzzleChapterProperties(propertiesFile);
 
         // Find next free position.
         int position = puzzleRepo.getPuzzleChapters().stream()
@@ -197,7 +204,7 @@ public class PuzzleImporter {
                 .max()
                 .orElse(0) + 1;
 
-        PuzzleChapter chapter = new PuzzleChapter(-1, position, title, description);
+        PuzzleChapter chapter = new PuzzleChapter(-1, position, props.title, props.description);
         int chapterId = puzzleRepo.storePuzzleChapter(chapter);
         chapter.setChapterId(chapterId);
 
@@ -243,6 +250,7 @@ public class PuzzleImporter {
         private final Integer chapterId;
 
         // Working data
+        private PuzzleProperties properties;
         private List<JavaFileObject> dependencyFiles;
         private Path cutDir;
         private GameClass cut;
@@ -260,6 +268,7 @@ public class PuzzleImporter {
             String cutName = FilenameUtils.removeExtension(puzzleData.cut.getFilename());
             cutDir = FileUtils.nextFreeClassDirectory(cutName);
 
+            readPuzzleProperties();
             installCUT();
             installMutants();
             installTests();
@@ -335,7 +344,13 @@ public class PuzzleImporter {
         private void installMutants() throws CompileException, IOException {
             mutants = new ArrayList<>();
 
-            for (SimpleFile mutantFile : puzzleData.mutants) {
+            List<SimpleFile> mutantsQueue = new ArrayList<>(puzzleData.mutants);
+            if (properties.type == PuzzleType.EQUIVALENCE && mutantsQueue.size() > 1) {
+                logger.warn("Equivalence puzzles should only have one mutant.");
+                mutantsQueue = List.of(mutantsQueue.get(0));
+            }
+
+            for (SimpleFile mutantFile : mutantsQueue) {
                 // Create the mutants directory if it doesn't exist.
                 Path mutantsListDir = cutDir.resolve(Constants.CUTS_MUTANTS_DIR);
                 if (!Files.exists(mutantsListDir)) {
@@ -406,17 +421,17 @@ public class PuzzleImporter {
             }
         }
 
-        private void installPuzzle() throws IOException {
-            // Store the properties file.
-            FileUtils.storeFile(cutDir, puzzleData.properties.getFilename(),
-                    puzzleData.properties.getContentAsString());
+        public record PuzzleProperties(PuzzleType type, boolean isEquivalent, GameLevel level, String title,
+                                       String description, Integer editableLinesStart, Integer editableLinesEnd) { }
 
+        public void readPuzzleProperties() throws IOException {
             // Load config.
             Properties cfg = new Properties();
             cfg.load(new ByteArrayInputStream(puzzleData.properties.getContent()));
 
             // Read values from specification file
             PuzzleType type = PuzzleType.valueOf(cfg.getProperty("type"));
+            boolean isEquivalent = Boolean.parseBoolean(cfg.getProperty("isEquivalent", "false"));
             GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
             String title = cfg.getProperty("title");
             String description = cfg.getProperty("description");
@@ -428,6 +443,15 @@ public class PuzzleImporter {
                     .flatMap(s -> s.isEmpty() ? Optional.empty() : Optional.of(s))
                     .map(Integer::parseInt)
                     .orElse(null);
+
+            this.properties = new PuzzleProperties(type, isEquivalent, level, title, description, editableLinesStart,
+                    editableLinesEnd);
+        }
+
+        private void installPuzzle() throws IOException {
+            // Store the properties file.
+            FileUtils.storeFile(cutDir, puzzleData.properties.getFilename(),
+                    puzzleData.properties.getContentAsString());
 
             // Default values
             // TODO: Don't use default value for puzzles
@@ -445,10 +469,12 @@ public class PuzzleImporter {
                     .max()
                     .orElse(0) + 1;
 
+            var props = this.properties;
+
             // Store puzzle to DB.
-            Puzzle puzzle = new Puzzle(-1, cut.getId(), type, level, maxAssertionsPerTest,
-                    mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title,
-                    description);
+            Puzzle puzzle = new Puzzle(-1, cut.getId(), props.type, props.isEquivalent, props.level,
+                    maxAssertionsPerTest, mutantValidatorLevel, props.editableLinesStart, props.editableLinesEnd,
+                    chapterId, position, props.title, props.description);
             int puzzleId = puzzleRepo.storePuzzle(puzzle);
             puzzle.setPuzzleId(puzzleId);
 

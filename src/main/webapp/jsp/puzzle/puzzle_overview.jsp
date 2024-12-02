@@ -67,7 +67,15 @@
                     </div>
                     <div class="next-puzzle__title">
                         <img class="next-puzzle__watermark" alt="${nextPuzzleObj.puzzle.type}"
-                             src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
+                                <c:choose>
+                                    <c:when test="${nextPuzzleObj.puzzle.type == 'EQUIVALENCE'}">
+                                        src="${url.forPath("/images/ingameicons/equivalence.png")}"
+                                    </c:when>
+                                    <c:otherwise>
+                                        src="${url.forPath("/images/achievements/")}codedefenders_achievements_${nextPuzzleObj.puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
+                                    </c:otherwise>
+                                </c:choose>
+                        />
                         <h2>
                             <span class="next-puzzle__title__next-puzzle">Next puzzle:</span><br>
                             <span class="next-puzzle__title__chapter">${nextPuzzleObj.puzzle.chapter.title},</span>
@@ -105,7 +113,15 @@
                                     </c:choose>
                             >
                                 <img class="chapter__level__watermark" alt="${puzzle.type}"
-                                     src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"/>
+                                        <c:choose>
+                                            <c:when test="${puzzle.type == 'EQUIVALENCE'}">
+                                                src="${url.forPath("/images/ingameicons/equivalence.png")}"
+                                            </c:when>
+                                            <c:otherwise>
+                                                src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
+                                            </c:otherwise>
+                                        </c:choose>
+                                />
                                 <div class="chapter__level__image">
                                     <c:if test="${status == 'next'}">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">

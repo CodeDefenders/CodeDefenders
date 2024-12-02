@@ -337,6 +337,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         puzzle.setMaxAssertionsPerTest(maxAssertionsPerTest);
         puzzle.setEditableLinesStart(editableLinesStart);
         puzzle.setEditableLinesEnd(editableLinesEnd);
+        puzzle.setEquivalent(puzzleData.isEquivalent());
         boolean success = puzzleRepo.updatePuzzle(puzzle);
         if (!success) {
             writeJSONMessage(response, 500, "Failed to update puzzle.");
@@ -520,6 +521,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
                     .name("chapterId").value(puzzle.getChapterId())
                     .name("classId").value(puzzle.getClassId())
+                    .name("isEquivalent").value(puzzle.isEquivalent())
                     .endObject();
         }
 
@@ -591,6 +593,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("chapterId").value(info.puzzle.getChapterId())
                     .name("classId").value(info.puzzle.getClassId())
                     .name("type").value(info.puzzle.getType().name())
+                    .name("isEquivalent").value(info.puzzle().isEquivalent())
                     .name("gameCount").value(info.gameCount)
                     .name("active").value(info.active)
                     .endObject();
@@ -620,5 +623,6 @@ public class AdminPuzzleAPI extends HttpServlet {
             String description,
             int maxAssertionsPerTest,
             Integer editableLinesStart,
-            Integer editableLinesEnd) {}
+            Integer editableLinesEnd,
+            boolean isEquivalent) {}
 }

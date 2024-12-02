@@ -1,16 +1,13 @@
 public class Puzzle {
 
-    public int testMe(int x, int y) {
-        int z = -1;
-
-        if (y > x) {
-            z = 10;
+    public int run(int x) {
+        if (x == 3) {
+            return 0;
+        } else if (x == 0) {
+            return 1;
+        } else {
+            return 1;
         }
-        if (x > y) {
-            z = 1;
-        }
-
-        return z;
     }
 
 }

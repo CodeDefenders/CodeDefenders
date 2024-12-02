@@ -1,11 +1,14 @@
 public class Puzzle {
 
-    public int run(int x) {
-        int y = 1;
-        if (x == 5) {
-            y = 5;
+    public int makeNegative(int x) {
+        return min(x, x);
+    }
+
+    private int min(int x, int y) {
+        if (x > y) {
+            return y;
         }
-        return (y * 8);
+        return x;
     }
 
 }

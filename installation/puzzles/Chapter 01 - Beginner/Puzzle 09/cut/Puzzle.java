@@ -1,10 +1,11 @@
 public class Puzzle {
 
-    public int run(int x, int y) {
-        if (x == 5 && y == 7) {
-            return x + y;
+    public int run(int x) {
+        int y = 1;
+        if (x == 5) {
+            y = 3;
         }
-        return x;
+        return (y * 8);
     }
 
 }

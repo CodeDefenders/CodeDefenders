@@ -322,7 +322,7 @@ public class MutantRepository {
                 mutantId
         );
         if (updatedRows != 1) {
-            throw new UncheckedSQLException("Couldn't update test.");
+            throw new UncheckedSQLException("Couldn't update mutant.");
         }
     }
 

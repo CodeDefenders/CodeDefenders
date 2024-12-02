@@ -1,18 +1,15 @@
 public class Puzzle {
 
-    public int run(int x, int y) {
-        int z = 0;
-
-        if (x == 5) {
-            z = x;
-            if (y == 7) {
-                z = y;
+    public String run(int x) {
+        String result = "";
+        for (int i = 1; i <= x; i++) {
+            if ((i + 1) % 10 == 0) {
+                result += "X";
+            } else {
+                result += "O";
             }
-        } else {
-            z = x - y;
         }
-
-        return z;
+        return result;
     }
 
 }

@@ -219,7 +219,7 @@ public class PuzzleGame extends AbstractGame {
 
     public Role getActiveRole() {
         return switch (type) {
-            case ATTACKER -> Role.ATTACKER;
+            case ATTACKER, EQUIVALENCE -> Role.ATTACKER;
             case DEFENDER -> Role.DEFENDER;
         };
     }
