@@ -1,4 +1,4 @@
-INSERT INTO achievements
+INSERT INTO achievements (ID, Level, `Index`, Name, Description, ProgressText, Metric)
 VALUES (19, 0, 750, 'No puzzles solved on the first try', 'Solve a puzzle on the first try to unlock this achievement',
         '{0} of {1} puzzles solved on the first try', 0),
        (19, 1, 750, 'One and Done', 'Solve your first puzzle on the first try',
