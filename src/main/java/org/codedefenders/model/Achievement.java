@@ -37,7 +37,7 @@ public class Achievement implements Serializable {
         this.achievementId = achievementId;
         this.level = level;
         this.index = index;
-        this.name = name;
+        this.name = MessageFormat.format(name, metricForCurrentLevel);
         this.description = MessageFormat.format(description, metricForCurrentLevel);
         this.progressText = progressText;
         this.metricForCurrentLevel = metricForCurrentLevel;
@@ -63,11 +63,11 @@ public class Achievement implements Serializable {
     }
 
     public String getName() {
-        return format(name);
+        return name;
     }
 
     public String getDescription() {
-        return format(description);
+        return description;
     }
 
     public String getProgressText() {
