@@ -82,14 +82,6 @@ public class UserProfileBean {
         isSelf = self;
     }
 
-    public UserStats.PuzzleStats getPuzzleStats() {
-        return puzzleStats;
-    }
-
-    public void setPuzzleStats(UserStats.PuzzleStats puzzleStats) {
-        this.puzzleStats = puzzleStats;
-    }
-
     public void setPuzzleGames(SortedSet<PuzzleChapterEntry> puzzlesByChapter) {
         this.puzzleGames = puzzlesByChapter;
     }

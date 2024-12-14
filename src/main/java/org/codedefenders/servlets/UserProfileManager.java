@@ -156,7 +156,6 @@ public class UserProfileManager extends HttpServlet {
         // load stats
         final UserEntity user = urlParamUser.orElseGet(() -> userRepo.getUserById(login.getUserId()).get());
         final Map<GameType, UserStats> stats = userStatsService.getStatsByUserId(user.getId());
-        final UserStats.PuzzleStats puzzleStats = userStatsService.getPuzzleStatsByUserId(user.getId());
         final SortedSet<PuzzleChapterEntry> puzzles = puzzleRepository.getPuzzleChapters()
                 .stream()
                 .map(puzzleChapter -> {
@@ -184,7 +183,6 @@ public class UserProfileManager extends HttpServlet {
         userProfileBean.setUser(user);
         userProfileBean.setSelf(isSelf);
         userProfileBean.setStats(stats);
-        userProfileBean.setPuzzleStats(puzzleStats);
         userProfileBean.setPuzzleGames(puzzles);
         userProfileBean.setAchievements(achievements);
         request.setAttribute("profile", userProfileBean);
