@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -34,9 +38,15 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.GameType;
+import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.PuzzleChapterEntry;
+import org.codedefenders.model.PuzzleEntry;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.UserStatsService;
@@ -66,6 +76,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private UserStatsService userStatsService;
+
+    @Inject
+    private PuzzleRepository puzzleRepository;
 
     @Inject
     private AchievementService achievementService;
@@ -144,6 +157,27 @@ public class UserProfileManager extends HttpServlet {
         final UserEntity user = urlParamUser.orElseGet(() -> userRepo.getUserById(login.getUserId()).get());
         final Map<GameType, UserStats> stats = userStatsService.getStatsByUserId(user.getId());
         final UserStats.PuzzleStats puzzleStats = userStatsService.getPuzzleStatsByUserId(user.getId());
+        final SortedSet<PuzzleChapterEntry> puzzles = puzzleRepository.getPuzzleChapters()
+                .stream()
+                .map(puzzleChapter -> {
+                    final Set<PuzzleEntry> puzzleEntries =
+                            puzzleRepository.getPuzzlesForChapterId(puzzleChapter.getChapterId())
+                                    .stream()
+                                    .map((Puzzle entry) -> {
+                                        PuzzleGame puzzleGame = puzzleRepository.getLatestPuzzleGameForPuzzleAndUser(
+                                                entry.getPuzzleId(),
+                                                user.getId());
+                                        boolean solved =
+                                                puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
+                                        int tries = puzzleGame != null ? puzzleGame.getCurrentRound() : 0;
+                                        return new PuzzleEntry(entry, false, solved, tries);
+                                    })
+                                    .filter(PuzzleEntry::isSolved)
+                                    .collect(Collectors.toSet());
+                    return new PuzzleChapterEntry(puzzleChapter, puzzleEntries);
+                })
+                .collect(Collectors.toCollection(TreeSet::new));
+
         final Collection<Achievement> achievements = achievementService.getAchievementsForUser(user.getId());
 
         // Pass values to JSP page
@@ -151,6 +185,7 @@ public class UserProfileManager extends HttpServlet {
         userProfileBean.setSelf(isSelf);
         userProfileBean.setStats(stats);
         userProfileBean.setPuzzleStats(puzzleStats);
+        userProfileBean.setPuzzleGames(puzzles);
         userProfileBean.setAchievements(achievements);
         request.setAttribute("profile", userProfileBean);
 

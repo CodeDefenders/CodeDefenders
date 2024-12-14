@@ -21,12 +21,14 @@ package org.codedefenders.beans.user;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.SortedSet;
 
 import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.UserEntity;
 
 /**
@@ -38,10 +40,12 @@ public class UserProfileBean {
     private Map<GameType, UserStats> stats;
     private boolean isSelf;
     private UserStats.PuzzleStats puzzleStats;
+    private SortedSet<PuzzleChapterEntry> puzzleGames;
     private Collection<Achievement> achievements;
 
     /**
      * Show the profile page for this user.
+     *
      * @return user whose profile page was requested.
      */
     public UserEntity getUser() {
@@ -59,6 +63,7 @@ public class UserProfileBean {
 
     /**
      * Stores whether the profile page shows the currently logged-in user or someone else.
+     *
      * @return {@code true} if the logged-in user views their own profile.
      */
     public boolean isSelf() {
@@ -83,6 +88,14 @@ public class UserProfileBean {
 
     public void setPuzzleStats(UserStats.PuzzleStats puzzleStats) {
         this.puzzleStats = puzzleStats;
+    }
+
+    public void setPuzzleGames(SortedSet<PuzzleChapterEntry> puzzlesByChapter) {
+        this.puzzleGames = puzzlesByChapter;
+    }
+
+    public SortedSet<PuzzleChapterEntry> getPuzzleGames() {
+        return puzzleGames;
     }
 
     public Collection<Achievement> getAchievements() {

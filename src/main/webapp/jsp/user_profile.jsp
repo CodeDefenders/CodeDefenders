@@ -40,7 +40,7 @@
             <section>
                 <h2>Achievements</h2>
                 <div class="achievements">
-                    <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
+                        <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
                     <c:if test="${profile.unlockedAchievements.size() == 0}">
                         <div class="no-achievements">No achievement unlocked yet.</div>
                     </c:if>
@@ -54,11 +54,11 @@
                     </button>
                     <script>
                         const button = document.currentScript.previousElementSibling;
-                        button.addEventListener("click", function(event) {
+                        button.addEventListener("click", function (event) {
                             document.querySelector('.locked-achievements').classList.toggle('hidden');
                             button.innerText = button.innerText === 'Show all achievements'
-                                    ? 'Hide locked achievements'
-                                    : 'Show all achievements';
+                                ? 'Hide locked achievements'
+                                : 'Show all achievements';
                         });
                     </script>
                     <div class="achievements locked-achievements hidden">
@@ -165,19 +165,15 @@
                 <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
 
                 <dl class="other-stats">
-                        <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
-                        <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
-                        <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
-                    <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
-                        <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
-                        <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
-                        <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
-                        <dd ${hasPlayed}>
-                            <c:choose><c:when test="${maxPuzzle != 0}">
-                                highest puzzle solved is puzzle ${maxPuzzle}
-                            </c:when><c:otherwise>
-                                chapter not played yet
-                            </c:otherwise></c:choose>
+                    <c:forEach items="${profile.puzzleGames}" var="chapter">
+                        <dt>Chapter ${chapter.chapter.position} - ${chapter.chapter.title}:</dt>
+                        <dd>
+                            <c:forEach items="${chapter.puzzleEntries}" var="puzzle">
+                                <div class="badge bg-success">
+                                    <span>${puzzle.puzzle.title}</span><br>
+                                    <span>Finished in ${puzzle.rounds} tries</span>
+                                </div>
+                            </c:forEach>
                         </dd>
                     </c:forEach>
                 </dl>
