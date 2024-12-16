@@ -231,33 +231,46 @@
                 <div class="details-content__item">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h3 class="mb-0">Class under test</h3>
-                        <div data-bs-toggle="tooltip" data-bs-html="true"
-                             title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
-                            <input class="btn-check" type="checkbox" id="highlighting-switch" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="highlighting-switch">
-                                Enemy Coverage
-                                <i class="fa fa-check ms-1 btn-check-active"></i>
-                            </label>
-                        </div>
+                        <c:choose>
+                            <c:when test="${role == Role.OBSERVER}">
+                                <div data-bs-toggle="tooltip" data-bs-html="true"
+                                     title="<p>You are an observer in this game.</p><p>The coverage of all player tests is shown.</p>">
+                                    <i class="fa fa-eye"></i>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div data-bs-toggle="tooltip" data-bs-html="true"
+                                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
+                                    <input class="btn-check" type="checkbox" id="highlighting-switch"
+                                           autocomplete="off">
+                                    <label class="btn btn-outline-secondary" for="highlighting-switch">
+                                        Enemy Coverage
+                                        <i class="fa fa-check ms-1 btn-check-active"></i>
+                                    </label>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
                     <script type="module">
                         import $ from '${url.forPath("/js/jquery.mjs")}';
-
                         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-
 
                         const gameHighlighting = await objects.await('gameHighlighting');
 
-                        $('#highlighting-switch').change(function () {
-                            gameHighlighting.clearCoverage();
-                            if (this.checked) {
-                                gameHighlighting.highlightAlternativeCoverage();
-                            } else {
-                                gameHighlighting.highlightCoverage();
-                            }
-                        })
+                        if (${role == Role.OBSERVER}) {
+                            gameHighlighting.highlightAlternativeCoverage();
+                        } else {
+                            $('#highlighting-switch').change(function () {
+                                gameHighlighting.clearCoverage();
+                                if (this.checked) {
+                                    gameHighlighting.highlightAlternativeCoverage();
+                                } else {
+                                    gameHighlighting.highlightCoverage();
+                                }
+                            });
+                        }
                     </script>
                 </div>
 
