@@ -234,13 +234,13 @@
                         <c:choose>
                             <c:when test="${role == Role.OBSERVER}">
                                 <div data-bs-toggle="tooltip" data-bs-html="true"
-                                     title="<p>You are an observer in this game.</p><p>The coverage of all player tests is shown.</p>">
+                                     title="<p>You are an observer in this game.<br>The coverage of all player tests is shown.</p>">
                                     <i class="fa fa-eye"></i>
                                 </div>
                             </c:when>
                             <c:otherwise>
                                 <div data-bs-toggle="tooltip" data-bs-html="true"
-                                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
+                                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p>'>
                                     <input class="btn-check" type="checkbox" id="highlighting-switch"
                                            autocomplete="off">
                                     <label class="btn btn-outline-secondary" for="highlighting-switch">
