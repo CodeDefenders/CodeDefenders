@@ -997,7 +997,7 @@ public class MeleeGameManager extends HttpServlet {
                 .forEach(line -> {
                     noneCovered.set(false);
                     mutantsAlive.stream()
-                            // Keep only the mutants which containts the claimed line
+                            // Keep only the mutants that contain the claimed line
                             .filter(m -> m.getLines().contains(line)
                                     && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
                             // Keep only the mutant that do not belong to the user. TODO Sometimes creator
