@@ -3,33 +3,14 @@ package org.codedefenders.servlets.api.llm;
 import java.util.List;
 
 import org.codedefenders.game.AssertionLibrary;
-import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.model.EventType;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.github.javaparser.quality.Nullable;
 
 public class Common {
-    public record GameDTO(
-            CutDTO cut,
-            List<PlayerDTO> players,
-            List<MutantDTO> mutants,
-            List<TestDTO> tests,
-            List<EventDTO> history,
-
-            long startTime,
-            int duration,
-
-            GameLevel level,
-            CodeValidatorLevel mutantValidatorLevel,
-            int maxAssertionsPerTest,
-            int automaticEquivalenceThreshold
-    ) {
-    }
-
     public record CutDTO(
             int classId,
             String alias,
@@ -46,7 +27,6 @@ public class Common {
         ) {
         }
     }
-
 
     public record PlayerDTO(
             int playerId,
