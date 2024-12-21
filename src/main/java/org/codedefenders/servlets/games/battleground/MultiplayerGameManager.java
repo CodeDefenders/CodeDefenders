@@ -632,13 +632,11 @@ public class MultiplayerGameManager extends HttpServlet {
             messages.add(MUTANT_COMPILED_MESSAGE);
             result.mutationTesterMessage().ifPresent(messages::add);
             logger.info("Successfully created mutant {} ", mutant.getId());
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
 
         } else {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
                     result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).fadeOut(false));
                 }
                 case DUPLICATE_MUTANT_FOUND -> {

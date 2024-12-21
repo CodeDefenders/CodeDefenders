@@ -2,6 +2,7 @@ package org.codedefenders.servlets.api.llm;
 
 import java.util.List;
 
+import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -72,6 +73,23 @@ public class Common {
             @Nullable
             String killMessage // null if alive
     ) {
+        public static MutantDTO fromMutantDTO(org.codedefenders.dto.MutantDTO mutant) {
+             Integer killedByTestId = mutant.getKilledByTestId() != -1 ? mutant.getKilledByTestId() : null;
+             return new Common.MutantDTO(
+                    mutant.getId(),
+                    mutant.getPlayerId(),
+                    mutant.isCanView(),
+                    mutant.getPatchString(),
+                    mutant.getLines(),
+                    mutant.getPoints(),
+                    mutant.getState(),
+                    mutant.getCovered(),
+                    mutant.isCanMarkEquivalent(),
+                    killedByTestId,
+                    mutant.getKillMessage()
+            );
+        }
+
     }
 
     public record EventDTO(

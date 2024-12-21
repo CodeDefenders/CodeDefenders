@@ -27,7 +27,7 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@WebServlet("/llm-api/game")
+@WebServlet("/llm-api/battleground")
 public class GameAPI extends HttpServlet {
     @Inject
     protected GameService gameService;
@@ -113,19 +113,8 @@ public class GameAPI extends HttpServlet {
                 .toList();
 
         List<Common.MutantDTO> mutants = gameService.getMutants(userId, game.getId()).stream()
-                .map(mutant -> new Common.MutantDTO(
-                                mutant.getId(),
-                                mutant.getPlayerId(),
-                                mutant.isCanView(),
-                                mutant.getPatchString(),
-                                mutant.getLines(),
-                                mutant.getPoints(),
-                                mutant.getState(),
-                                mutant.getCovered(),
-                                mutant.isCanMarkEquivalent(),
-                                mutant.getKilledByTestId(),
-                                mutant.getKillMessage()
-                        )).toList();
+                .map(Common.MutantDTO::fromMutantDTO)
+                .toList();
 
         List<Common.TestDTO> tests = gameService.getTests(userId, game.getId()).stream()
                 .map(test -> new Common.TestDTO(
