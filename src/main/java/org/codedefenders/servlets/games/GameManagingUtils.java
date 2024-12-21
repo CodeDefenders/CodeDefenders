@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +56,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -66,7 +68,10 @@ import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
+import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
+import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -90,6 +95,8 @@ import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
+import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
@@ -97,6 +104,10 @@ import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -257,8 +268,10 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public record CreateBattlegroundMutantResult(
             boolean isSuccess,
+            // on success
             Optional<Mutant> mutant,
             Optional<String> mutationTesterMessage,
+            // on failure
             Optional<FailureReason> failureReason,
             Optional<ValidationMessage> validationErrorMessage,
             Optional<String> compilationError
@@ -435,6 +448,136 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         return newTest;
+    }
+
+    public enum CanUserSubmitTestResult {
+        USER_NOT_PART_OF_THE_GAME,
+        USER_NOT_A_DEFENDER,
+        GAME_NOT_ACTIVE,
+        YES
+    }
+
+    public CanUserSubmitTestResult canUserSubmitTest(AbstractGame game, int userId) {
+        Player player = playerRepo.getPlayerForUserAndGame(userId, game.getId());
+        if (player == null) {
+            return CanUserSubmitTestResult.USER_NOT_PART_OF_THE_GAME;
+        }
+
+        Role role = player.getRole();
+        if (role != Role.ATTACKER) {
+            return CanUserSubmitTestResult.USER_NOT_A_DEFENDER;
+        }
+
+        if (game.getState() != GameState.ACTIVE) {
+            return CanUserSubmitTestResult.GAME_NOT_ACTIVE;
+        }
+
+        return CanUserSubmitTestResult.YES;
+    }
+
+    public record CreateBattlegroundTestResult(
+            boolean isSuccess,
+            // on success
+            Optional<Test> test,
+            Optional<String> mutationTesterMessage,
+            // on failure
+            Optional<FailureReason> failureReason,
+            Optional<List<String>> validationErrorMessages,
+            Optional<String> compilationError,
+            Optional<String> testCutError
+    ) {
+        public enum FailureReason {
+            VALIDATION_FAILED,
+            COMPILATION_FAILED,
+            TEST_DID_NOT_PASS_ON_CUT,
+        }
+
+        public static CreateBattlegroundTestResult success(Test test, String mutationTesterMessage) {
+            return new CreateBattlegroundTestResult(
+                    true,
+                    Optional.of(test),
+                    Optional.of(mutationTesterMessage),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty());
+        }
+
+        public static CreateBattlegroundTestResult failure(
+                Test test, FailureReason reason, List<String> validationErrorMessages, String compilationError, String testCutError) {
+            return new CreateBattlegroundTestResult(false, Optional.ofNullable(test), Optional.empty(),
+                    Optional.of(reason), Optional.ofNullable(validationErrorMessages),
+                    Optional.ofNullable(compilationError), Optional.ofNullable(testCutError));
+        }
+    }
+
+    public CreateBattlegroundTestResult createBattlegroundTest(MultiplayerGame game, int userId, String code)
+            throws IOException {
+        TestSubmittedEvent tse = new TestSubmittedEvent();
+        tse.setGameId(game.getId());
+        tse.setUserId(userId);
+        notificationService.post(tse);
+
+        // Do the validation even before creating the mutant
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+                code,
+                game.getMaxAssertionsPerTest(),
+                game.getCUT().getAssertionLibrary());
+        boolean validationSuccess = validationMessage.isEmpty();
+
+        TestValidatedEvent tve = new TestValidatedEvent();
+        tve.setGameId(game.getId());
+        tve.setUserId(userId);
+        tve.setSuccess(validationSuccess);
+        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+        notificationService.post(tve);
+
+        if (!validationSuccess) {
+            return CreateBattlegroundTestResult.failure(
+                    null, CreateBattlegroundTestResult.FailureReason.VALIDATION_FAILED,
+                    validationMessage, null, null);
+        }
+
+        // From this point on we assume that test is valid according to the rules (but it might still not compile)
+        Test newTest = createTest(game.getId(), game.getClassId(), code, userId, MODE_BATTLEGROUND_DIR);
+        logger.debug("New Test {} by user {}", newTest.getId(), userId);
+        TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
+
+        if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
+            return CreateBattlegroundTestResult.failure(
+                    newTest, CreateBattlegroundTestResult.FailureReason.COMPILATION_FAILED,
+                    null, compileTestTarget.message, null
+            );
+        }
+
+        TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
+        if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+            return CreateBattlegroundTestResult.failure(
+                    newTest, CreateBattlegroundTestResult.FailureReason.TEST_DID_NOT_PASS_ON_CUT,
+                    null, null, testOriginalTarget.message
+            );
+        }
+
+        var user = userService.getSimpleUserById(userId);
+        final String notificationMsg = user.map(SimpleUser::getName)
+                .orElse("User with the id " + userId) + " created a mutant.";
+        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        final Event notif = new Event(-1, game.getId(), userId, notificationMsg, EventType.DEFENDER_TEST_CREATED,
+                EventStatus.GAME, timestamp);
+        eventDAO.insert(notif);
+
+
+        String mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
+        game.update();
+        logger.info("Successfully created test {} ", newTest.getId());
+
+        TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+        ttme.setGameId(game.getId());
+        ttme.setUserId(userId);
+        ttme.setTestId(newTest.getId());
+        notificationService.post(ttme);
+
+        return CreateBattlegroundTestResult.success(newTest, mutationTesterMessage);
     }
 
     // Enable testability. it can be declared also protected

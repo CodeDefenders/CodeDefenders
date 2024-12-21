@@ -280,7 +280,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             case "createTest": {
-                createTest(request, response, gameId, game);
+                createTest(request, response, game);
                 // After a test is submitted, there's the chance that one or more mutants already survived enough tests
                 checkAutomaticMutantEquivalenceForGame(game);
                 return;
@@ -370,191 +370,106 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     @SuppressWarnings("Duplicates")
-    private void createTest(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game)
-            throws IOException {
-
-        if (game.getRole(login.getUserId()) != Role.DEFENDER) {
-            messages.add("Can only submit tests if you are an Defender!");
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-        if (game.getState() != GameState.ACTIVE) {
-            messages.add(GRACE_PERIOD_MESSAGE);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-
+    private void createTest(HttpServletRequest request,
+                            HttpServletResponse response,
+                            MultiplayerGame game) throws IOException {
         // Get the text submitted by the user.
-        final Optional<String> test = ServletUtils.getStringParameter(request, "test");
-        if (test.isEmpty()) {
+        final Optional<String> testText = ServletUtils.getStringParameter(request, "test");
+        if (testText.isEmpty()) {
             previousSubmission.clear();
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-        final String testText = test.get();
-
-        TestSubmittedEvent tse = new TestSubmittedEvent();
-        tse.setGameId(gameId);
-        tse.setUserId(login.getUserId());
-        notificationService.post(tse);
-
-        // Do the validation even before creating the mutant
-        // TODO Here we need to account for #495
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
-                testText,
-                game.getMaxAssertionsPerTest(),
-                game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessage.isEmpty();
-
-        TestValidatedEvent tve = new TestValidatedEvent();
-        tve.setGameId(gameId);
-        tve.setUserId(login.getUserId());
-        tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
-        notificationService.post(tve);
-
-        if (!validationSuccess) {
-            messages.addAll(validationMessage);
-            previousSubmission.setTestCode(testText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+            messages.add("Parameter 'test' is missing.");
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
-        // From this point on we assume that test is valid according to the rules (but it might still not compile)
-        Test newTest;
-        try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_BATTLEGROUND_DIR);
-        } catch (IOException io) {
-            messages.add(TEST_GENERIC_ERROR_MESSAGE);
-            previousSubmission.setTestCode(testText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        previousSubmission.setMutantCode(testText.get());
+
+        var selectedLines = ServletUtils.getStringParameter(request, "selected_lines")
+                .map(DefenderIntention::parseIntentionFromCommaSeparatedValueString);
+        if (game.isCapturePlayersIntention() && (selectedLines.isEmpty() || selectedLines.get().isEmpty())) {
+            messages.add("You cannot submit a test without specifying a line to cover.");
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
-        /*
-         * Validation of Players Intention: if intentions must be
-         * collected but none are specified in the user request we fail
-         * the request, but keep the test code in the session
-         */
-        Set<Integer> selectedLines = new HashSet<>();
-        Set<Integer> selectedMutants = new HashSet<>();
-
-        if (game.isCapturePlayersIntention()) {
-            boolean validatedCoveredLines = true;
-            // boolean validatedKilledMutants = true;
-
-            // Prepare the validation message
-            StringBuilder userIntentionsValidationMessage = new StringBuilder();
-            userIntentionsValidationMessage.append("Cheeky! You cannot submit a test without specifying");
-
-            final String selected_lines = request.getParameter("selected_lines");
-            if (selected_lines != null) {
-                Set<Integer> selectLinesSet =
-                        DefenderIntention.parseIntentionFromCommaSeparatedValueString(selected_lines);
-                selectedLines.addAll(selectLinesSet);
-            }
-
-            if (selectedLines.isEmpty()) {
-                validatedCoveredLines = false;
-                userIntentionsValidationMessage.append(" a line to cover");
-            }
-            // NOTE: We consider only covering lines at the moment
-            // if (request.getParameter("selected_mutants") != null) {
-            // selectedMutants.addAll(DefenderIntention
-            // .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-            // }
-            // if( selectedMutants.isEmpty() &&
-            // game.isDeclareKilledMutants()) {
-            // validatedKilledMutants = false;
-            //
-            // if( selectedLines.isEmpty() &&
-            // game.isCapturePlayersIntention() ){
-            // validationMessage.append(" or");
-            // }
-            //
-            // validationMessage.append(" a mutant to kill");
-            // }
-            userIntentionsValidationMessage.append(".");
-
-            if (!validatedCoveredLines) { // || !validatedKilledMutants
-                messages.add(userIntentionsValidationMessage.toString());
-                // Keep the test around
-                previousSubmission.setTestCode(testText);
-                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        switch (gameManagingUtils.canUserSubmitTest(game, login.getUserId())) {
+            case USER_NOT_PART_OF_THE_GAME -> {
+                messages.add("User is not a player in the game.");
+                logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
+            case USER_NOT_A_DEFENDER -> {
+                messages.add("Can only submit tests if you are an Defender!");
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            case GAME_NOT_ACTIVE -> {
+                messages.add(GRACE_PERIOD_MESSAGE);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            case YES -> {
+            }
         }
 
-        logger.debug("New Test {} by user {}", newTest.getId(), login.getUserId());
-        TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
-
-        if (game.isCapturePlayersIntention()) {
-            collectDefenderIntentions(newTest, selectedLines, selectedMutants);
-            // Store intentions in the session in case tests is broken we automatically re-select the same line
-            // TODO At the moment, there is one and only one line
-            previousSubmission.setSelectedLine(selectedLines.iterator().next());
-        }
-
-        if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
-            // We escape the content of the message for new tests since user can embed there anything
-            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
-            // Extract the line numbers of the errors
-            List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
-            // Store them in the session so they can be picked up later
-            previousSubmission.setErrorLines(errorLines);
-            // We introduce our decoration
-            String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate).escape(false).fadeOut(false);
-
-            previousSubmission.setTestCode(testText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-        TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
-        if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
-            // testOriginalTarget.state.equals(TargetExecution.Status.FAIL)
-            //     || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-            messages.add(testOriginalTarget.message).fadeOut(false);
-            previousSubmission.setTestCode(testText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        GameManagingUtils.CreateBattlegroundTestResult result;
+        try {
+            result = gameManagingUtils.createBattlegroundTest(game, login.getUserId(), testText.get());
+        } catch (IOException e) {
+            messages.add(TEST_GENERIC_ERROR_MESSAGE);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
-        messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+        if (result.isSuccess()) {
+            var test = result.test().orElseThrow();
 
-        // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest);
+            messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+            includeDetectTestSmellsInMessages(test);
+            result.mutationTesterMessage().ifPresent(messages::add);
 
-        final String message = login.getSimpleUser().getName() + " created a test";
-        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.DEFENDER_TEST_CREATED,
-                EventStatus.GAME, timestamp);
-        eventDAO.insert(notif);
+            // Clear the mutant code only if mutant is accepted
+            previousSubmission.clear();
 
-        messages.add(mutationTester.runTestOnAllMultiplayerMutants(game, newTest));
-        game.update();
-        logger.info("Successfully created test {} ", newTest.getId());
+        } else {
+            switch (result.failureReason().orElseThrow()) {
+                case VALIDATION_FAILED -> {
+                    result.validationErrorMessages().ifPresent(errors -> {
+                        for (var error : errors) {
+                            messages.add(error).fadeOut(false);
+                        }
+                    });
+                }
+                case COMPILATION_FAILED -> {
+                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+                    result.compilationError().ifPresent(this::handleCompilationError);
+                }
+                case TEST_DID_NOT_PASS_ON_CUT -> {
+                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
+                    result.testCutError().ifPresent(error -> messages.add(error).fadeOut(false));
+                }
+            }
 
-        TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
-        ttme.setGameId(gameId);
-        ttme.setUserId(login.getUserId());
-        ttme.setTestId(newTest.getId());
-        notificationService.post(ttme);
+            if (game.isCapturePlayersIntention() && result.test().isPresent()) {
+                collectDefenderIntentions(result.test().get(), selectedLines.get(), Set.of());
+                // Store intentions in the session in case tests is broken we automatically re-select the same line
+                // TODO At the moment, there is one and only one line
+                var firstLine = selectedLines.get().stream().findFirst().get();
+                previousSubmission.setSelectedLine(firstLine);
+            }
+        }
 
-        // Clean up the session
-        previousSubmission.clear();
-        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
     }
 
-    private void handleCompilationError(String errorMessage, String mutantText) {
+
+    private void handleCompilationError(String errorMessage) {
         // We escape the content of the message for new tests since user can embed there anything
         String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
         // Extract the line numbers of the errors
         List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
         // Store them in the session so they can be picked up later
-        previousSubmission.setMutantCode(mutantText);
         previousSubmission.setErrorLines(errorLines);
         // We introduce our decoration
         String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
@@ -568,6 +483,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Optional<String> mutantText = ServletUtils.getStringParameter(request, "mutant");
         if (mutantText.isEmpty()) {
             previousSubmission.clear();
+            messages.add("Parameter 'mutant' is missing.");
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -641,11 +557,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);
-                    result.compilationError().ifPresent(error -> handleCompilationError(error, mutantText.get()));
+                    result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case COMPILATION_FAILED -> {
                     messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
-                    result.compilationError().ifPresent(error -> handleCompilationError(error, mutantText.get()));
+                    result.compilationError().ifPresent(this::handleCompilationError);
                 }
             }
         }
