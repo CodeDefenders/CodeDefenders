@@ -23,10 +23,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -35,16 +37,34 @@ import java.util.regex.Pattern;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
+import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -53,11 +73,14 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +89,14 @@ import io.prometheus.client.Histogram;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -129,6 +157,15 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private GameClassRepository gameClassRepo;
 
+    @Inject
+    private IMutationTester mutationTester;
+
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private EventDAO eventDAO;
+
     /**
      * {@inheritDoc}
      */
@@ -184,6 +221,167 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Compile the mutant and add it to the game if possible; otherwise,
         // TODO: delete these files created?
         return classCompiler.compileMutant(newMutantDir, mutantFilePath.toString(), gameId, classMutated, ownerUserId);
+    }
+
+    public enum CanUserSubmitMutantResult {
+        USER_NOT_PART_OF_THE_GAME,
+        USER_NOT_AN_ATTACKER,
+        GAME_NOT_ACTIVE,
+        USER_HAS_PENDING_EQUIVALENCE_DUELS,
+        YES
+    }
+
+    public CanUserSubmitMutantResult canUserSubmitMutant(AbstractGame game, int userId,
+                                                         boolean blockOnPendingEquivalences) {
+        Player player = playerRepo.getPlayerForUserAndGame(userId, game.getId());
+        if (player == null) {
+            return CanUserSubmitMutantResult.USER_NOT_PART_OF_THE_GAME;
+        }
+
+        Role role = player.getRole();
+        if (role != Role.ATTACKER) {
+            return CanUserSubmitMutantResult.USER_NOT_AN_ATTACKER;
+        }
+
+        if (game.getState() != GameState.ACTIVE) {
+            return CanUserSubmitMutantResult.GAME_NOT_ACTIVE;
+        }
+
+        // If the user has pending duels we cannot accept the mutant.
+        if (blockOnPendingEquivalences && hasAttackerPendingMutantsInGame(game.getId(), player.getId())) {
+            return CanUserSubmitMutantResult.USER_HAS_PENDING_EQUIVALENCE_DUELS;
+        }
+
+        return CanUserSubmitMutantResult.YES;
+    }
+
+    public record CreateBattlegroundMutantResult(
+            boolean isSuccess,
+            Optional<Mutant> mutant,
+            Optional<String> mutationTesterMessage,
+            Optional<FailureReason> failureReason,
+            Optional<ValidationMessage> validationErrorMessage,
+            Optional<String> compilationError
+    ) {
+        public enum FailureReason {
+            VALIDATION_FAILED,
+            DUPLICATE_MUTANT_FOUND,
+            COMPILATION_FAILED,
+        }
+
+        public static CreateBattlegroundMutantResult success(Mutant mutant, String mutationTesterMessage) {
+            return new CreateBattlegroundMutantResult(
+                    true,
+                    Optional.of(mutant),
+                    Optional.of(mutationTesterMessage),
+                    Optional.empty(),
+                    Optional.empty(),
+                    Optional.empty());
+        }
+
+        public static CreateBattlegroundMutantResult failure(
+                FailureReason reason, ValidationMessage validationErrorMessage, String compilationError) {
+            return new CreateBattlegroundMutantResult(false, Optional.empty(), Optional.empty(), Optional.of(reason),
+                    Optional.ofNullable(validationErrorMessage), Optional.ofNullable(compilationError));
+        }
+    }
+
+    public static class MutantCreationException extends Exception {
+    }
+
+    public CreateBattlegroundMutantResult createBattlegroundMutant(MultiplayerGame game, int userId, String code)
+            throws IOException, MutantCreationException {
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(game.getId());
+        mse.setUserId(userId);
+        notificationService.post(mse);
+
+        // Do the validation even before creating the mutant
+        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
+        ValidationMessage validationMessage =
+                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(game.getId());
+        mve.setUserId(userId);
+        mve.setSuccess(validationSuccess);
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
+            return CreateBattlegroundMutantResult.failure(
+                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationMessage, null);
+        }
+
+        Mutant existingMutant = existingMutant(game.getId(), code);
+        boolean duplicateCheckSuccess = existingMutant == null;
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(game.getId());
+        mdce.setUserId(userId);
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
+            // Check if the duplicate mutant had a compilation error and reuse the error message if it has.
+            String compilationError = null;
+            TargetExecution existingMutantTarget =
+                    TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
+            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
+                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
+                compilationError = existingMutantTarget.message;
+            }
+
+            return CreateBattlegroundMutantResult.failure(
+                    CreateBattlegroundMutantResult.FailureReason.DUPLICATE_MUTANT_FOUND,
+                    null, compilationError);
+        }
+
+        Mutant newMutant = createMutant(game.getId(), game.getClassId(), code, userId, MODE_BATTLEGROUND_DIR);
+        if (newMutant == null) {
+            throw new MutantCreationException();
+        }
+
+        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
+                COMPILE_MUTANT);
+        boolean compileSuccess = compileMutantTarget != null
+                && compileMutantTarget.status == TargetExecution.Status.SUCCESS;
+        String errorMessage = (compileMutantTarget != null
+                && compileMutantTarget.message != null
+                && !compileMutantTarget.message.isEmpty())
+                ? compileMutantTarget.message : null;
+
+        MutantCompiledEvent mce = new MutantCompiledEvent();
+        mce.setGameId(game.getId());
+        mce.setUserId(userId);
+        mce.setMutantId(newMutant.getId());
+        mce.setSuccess(compileSuccess);
+        mce.setErrorMessage(errorMessage);
+        notificationService.post(mce);
+
+        if (!compileSuccess) {
+            return CreateBattlegroundMutantResult.failure(
+                    CreateBattlegroundMutantResult.FailureReason.COMPILATION_FAILED, null, errorMessage);
+        }
+
+        var user = userService.getSimpleUserById(userId);
+        final String notificationMsg = user.map(SimpleUser::getName)
+                .orElse("User with the id " + userId) + " created a mutant.";
+        Event notif = new Event(-1, game.getId(), userId, notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
+        eventDAO.insert(notif);
+
+        String mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
+        game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(game.getId());
+        mte.setUserId(userId);
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
+
+        return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
 
     /**

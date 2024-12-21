@@ -123,7 +123,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * <p>Serves under {@code /multiplayergame}.
  *
- * @see org.codedefenders.util.Paths#BATTLEGROUND_GAME
+ * @see Paths#BATTLEGROUND_GAME
  */
 @WebServlet({Paths.BATTLEGROUND_GAME, Paths.BATTLEGROUND_HISTORY})
 public class MultiplayerGameManager extends HttpServlet {
@@ -274,7 +274,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         switch (action) {
             case "createMutant": {
-                createMutant(request, response, gameId, game);
+                createMutant(request, response, game);
                 // After creating a mutant, there's the chance that the mutant already survived enough tests
                 checkAutomaticMutantEquivalenceForGame(game);
                 return;
@@ -548,177 +548,111 @@ public class MultiplayerGameManager extends HttpServlet {
         response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
     }
 
+    private void handleCompilationError(String errorMessage, String mutantText) {
+        // We escape the content of the message for new tests since user can embed there anything
+        String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
+        // Extract the line numbers of the errors
+        List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
+        // Store them in the session so they can be picked up later
+        previousSubmission.setMutantCode(mutantText);
+        previousSubmission.setErrorLines(errorLines);
+        // We introduce our decoration
+        String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+        messages.add(decorate).escape(false).fadeOut(false);
+    }
+
     private void createMutant(HttpServletRequest request,
                               HttpServletResponse response,
-                              int gameId,
                               MultiplayerGame game) throws IOException {
-
-        if (game.getRole(login.getUserId()) != Role.ATTACKER) {
-            messages.add("Can only submit mutants if you are an Attacker!");
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-
-        if (game.getState() != GameState.ACTIVE) {
-            messages.add(GRACE_PERIOD_MESSAGE);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
         // Get the text submitted by the user.
-        final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
-        if (mutant.isEmpty()) {
+        final Optional<String> mutantText = ServletUtils.getStringParameter(request, "mutant");
+        if (mutantText.isEmpty()) {
             previousSubmission.clear();
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-        final String mutantText = mutant.get();
-
-        int attackerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
-
-        // If the user has pending duels we cannot accept the mutant, but we keep it around
-        // so students do not lose mutants once the duel is solved.
-        if (gameManagingUtils.hasAttackerPendingMutantsInGame(gameId, attackerId)
-                && config.isBlockAttacker()) {
-            messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
-            // Keep the mutant code in the view for later
-            previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
-        MutantSubmittedEvent mse = new MutantSubmittedEvent();
-        mse.setGameId(gameId);
-        mse.setUserId(login.getUserId());
-        notificationService.post(mse);
+        previousSubmission.setMutantCode(mutantText.get());
 
-        // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage =
-                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, codeValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-
-        MutantValidatedEvent mve = new MutantValidatedEvent();
-        mve.setGameId(gameId);
-        mve.setUserId(login.getUserId());
-        mve.setSuccess(validationSuccess);
-        notificationService.post(mve);
-
-        if (!validationSuccess) {
-            // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get());
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        var intention = ServletUtils.getStringParameter(request, "attacker_intention").map(AttackerIntention::fromString);
+        if (game.isCapturePlayersIntention() && intention.isEmpty()) {
+            messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.get());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
-        Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
-        boolean duplicateCheckSuccess = existingMutant == null;
-
-        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
-        mdce.setGameId(gameId);
-        mdce.setUserId(login.getUserId());
-        mdce.setSuccess(duplicateCheckSuccess);
-        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
-        notificationService.post(mdce);
-
-        if (!duplicateCheckSuccess) {
-            messages.add(MUTANT_DUPLICATED_MESSAGE);
-            TargetExecution existingMutantTarget =
-                    TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
-            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
-                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                // We escape the content of the message for new tests since user can embed there
-                // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
-                // Extract the line numbers of the errors
-                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
-                // Store them in the session so they can be picked up later
-                previousSubmission.setErrorLines(errorLines);
-                // We introduce our decoration
-                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false);
-            }
-            previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-
-        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText,
-                login.getUserId(), MODE_BATTLEGROUND_DIR);
-        if (newMutant == null) {
-            messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            previousSubmission.setMutantCode(mutantText);
-            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
-                    gameId, game.getClassId(), login.getUserId(), mutantText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-
-        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
-                COMPILE_MUTANT);
-        boolean compileSuccess = compileMutantTarget != null
-                && compileMutantTarget.status == TargetExecution.Status.SUCCESS;
-        String errorMessage = (compileMutantTarget != null
-                && compileMutantTarget.message != null
-                && !compileMutantTarget.message.isEmpty())
-                ? compileMutantTarget.message : null;
-
-        MutantCompiledEvent mce = new MutantCompiledEvent();
-        mce.setGameId(gameId);
-        mce.setUserId(login.getUserId());
-        mce.setMutantId(newMutant.getId());
-        mce.setSuccess(compileSuccess);
-        mce.setErrorMessage(errorMessage);
-        notificationService.post(mce);
-
-        if (!compileSuccess) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
-            // There's a ton of defensive programming here...
-            if (errorMessage != null) {
-                // We escape the content of the message for new tests since user can embed there anything
-                String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
-                // Extract the line numbers of the errors
-                List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
-                // Store them in the session so they can be picked up later
-                previousSubmission.setErrorLines(errorLines);
-                // We introduce our decoration
-                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false).fadeOut(false);
-            }
-            previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
-        }
-
-        messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = login.getSimpleUser().getName() + " created a mutant.";
-        Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
-                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
-        eventDAO.insert(notif);
-
-        messages.add(mutationTester.runAllTestsOnMutant(game, newMutant));
-        game.update();
-
-        MutantTestedEvent mte = new MutantTestedEvent();
-        mte.setGameId(gameId);
-        mte.setUserId(login.getUserId());
-        mte.setMutantId(newMutant.getId());
-        notificationService.post(mte);
-
-        if (game.isCapturePlayersIntention()) {
-            AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
-            // This parameter is required !
-            if (intention == null) {
-                messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
-                previousSubmission.setMutantCode(mutantText);
-                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        switch (gameManagingUtils.canUserSubmitMutant(game, login.getUserId(), config.isBlockAttacker())) {
+            case USER_NOT_PART_OF_THE_GAME -> {
+                messages.add("User is not a player in the game.");
+                logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
-            collectAttackerIntentions(newMutant, intention);
+            case USER_NOT_AN_ATTACKER -> {
+                messages.add("Can only submit mutants if you are an Attacker.");
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            case GAME_NOT_ACTIVE -> {
+                messages.add(GRACE_PERIOD_MESSAGE);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            case USER_HAS_PENDING_EQUIVALENCE_DUELS -> {
+                messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
+                // Keep the submitted Mutant around so students do not lose mutants once the duel is solved.
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            case YES -> {
+            }
         }
-        // Clean the mutated code only if mutant is accepted
-        previousSubmission.clear();
-        logger.info("Successfully created mutant {} ", newMutant.getId());
-        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+
+        GameManagingUtils.CreateBattlegroundMutantResult result;
+        try {
+            result = gameManagingUtils.createBattlegroundMutant(
+                    game, login.getUserId(), mutantText.get());
+        } catch (GameManagingUtils.MutantCreationException e) {
+            messages.add(MUTANT_CREATION_ERROR_MESSAGE);
+            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
+                    game.getId(), game.getClassId(), login.getUserId(), mutantText);
+            response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            return;
+        }
+
+        if (result.isSuccess()) {
+            var mutant = result.mutant().orElseThrow();
+            if (game.isCapturePlayersIntention()) {
+                collectAttackerIntentions(mutant, intention.orElseThrow());
+            }
+
+            // Clear the mutant code only if mutant is accepted
+            previousSubmission.clear();
+
+            messages.add(MUTANT_COMPILED_MESSAGE);
+            result.mutationTesterMessage().ifPresent(messages::add);
+            logger.info("Successfully created mutant {} ", mutant.getId());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+
+        } else {
+            switch (result.failureReason().orElseThrow()) {
+                case VALIDATION_FAILED -> {
+                    // Mutant is either the same as the CUT or it contains invalid code
+                    response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).fadeOut(false));
+                }
+                case DUPLICATE_MUTANT_FOUND -> {
+                    messages.add(MUTANT_DUPLICATED_MESSAGE);
+                    result.compilationError().ifPresent(error -> handleCompilationError(error, mutantText.get()));
+                }
+                case COMPILATION_FAILED -> {
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
+                    result.compilationError().ifPresent(error -> handleCompilationError(error, mutantText.get()));
+                }
+            }
+        }
+
+        response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
     }
 
     @SuppressWarnings("Duplicates")
@@ -925,7 +859,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     final String message = login.getSimpleUser().getName() + " killed mutant "
                             + mutPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, login.getUserId(), message,
-                            EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT,EventStatus.GAME,
+                            EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis())
                     );
                     eventDAO.insert(notif);
