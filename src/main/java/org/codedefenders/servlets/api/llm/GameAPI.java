@@ -27,7 +27,7 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@WebServlet("/llm-api/battleground")
+@WebServlet("/llm-api/battleground/game")
 public class GameAPI extends HttpServlet {
     @Inject
     protected GameService gameService;
