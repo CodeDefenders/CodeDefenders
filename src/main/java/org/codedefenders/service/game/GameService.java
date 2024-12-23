@@ -188,7 +188,7 @@ public class GameService implements IGameService {
     }
 
     private IGameService getGameServiceForGameId(int gameId) {
-        GameMode mode = gameRepo.getGameMode(gameId);
+        GameMode mode = gameRepo.getGameMode(gameId).orElseThrow();
         switch (mode) {
             case PARTY:
                 return multiplayerGameService;

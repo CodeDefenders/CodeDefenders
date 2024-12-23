@@ -37,6 +37,9 @@ import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.ParallelMutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
@@ -95,7 +98,10 @@ public class GameManagingUtilsTest {
                         MultiplayerGameRepository.class,
                         PuzzleRepository.class,
                         PlayerRepository.class,
-                        GameClassRepository.class)
+                        GameClassRepository.class,
+                        IMutationTester.class,
+                        MutationTester.class,
+                        ParallelMutationTester.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)
