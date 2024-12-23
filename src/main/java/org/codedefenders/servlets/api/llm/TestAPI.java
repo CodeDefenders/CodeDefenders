@@ -149,7 +149,7 @@ public class TestAPI extends HttpServlet {
 
     public record SubmitTestResponseDTO(
             boolean success,
-            ArrayList<String> message,
+            ArrayList<String> messages,
 
             @Nullable
             Common.TestDTO test, // null if request failed
