@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -47,19 +48,18 @@ public class MutantAPI extends HttpServlet {
     @Inject
     protected GameManagingUtils gameManagingUtils;
 
+    @Inject
+    protected CodeDefendersAuth login;
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final var gameId = ServletUtils.getIntParameter(request, "gameId");
-        final var userId = ServletUtils.getIntParameter(request, "userId");
         final var code = ServletUtils.getStringParameter(request, "code");
 
-        if (gameId.isEmpty() || userId.isEmpty() || code.isEmpty()) {
+        if (gameId.isEmpty() || code.isEmpty()) {
             if (gameId.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'gameId' missing."));
-            } else if (userId.isEmpty()) {
-                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                        new Common.ErrorResponseDTO("Parameter 'userId' missing."));
             } else {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'code' missing."));
@@ -75,7 +75,7 @@ public class MutantAPI extends HttpServlet {
             return;
         }
 
-        var canSubmit = gameManagingUtils.canUserSubmitMutant(game, userId.get(), false);
+        var canSubmit = gameManagingUtils.canUserSubmitMutant(game, login.getUserId(), false);
         switch (canSubmit) {
             case YES -> {}
             default -> {
@@ -87,7 +87,7 @@ public class MutantAPI extends HttpServlet {
 
         GameManagingUtils.CreateBattlegroundMutantResult result;
         try {
-            result = gameManagingUtils.createBattlegroundMutant(game, userId.get(), code.get());
+            result = gameManagingUtils.createBattlegroundMutant(game, login.getUserId(), code.get());
         } catch (GameManagingUtils.MutantCreationException e) {
             writeResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     new Common.ErrorResponseDTO("Server error while creating the mutant."));
@@ -106,7 +106,7 @@ public class MutantAPI extends HttpServlet {
                     new SubmitMutantResponseDTO(
                             true,
                             messages,
-                            Common.MutantDTO.fromMutantDTO(gameService.getMutant(userId.get(), mutant.getId())),
+                            Common.MutantDTO.fromMutantDTO(gameService.getMutant(login.getUserId(), mutant.getId())),
                             null
                     ));
 

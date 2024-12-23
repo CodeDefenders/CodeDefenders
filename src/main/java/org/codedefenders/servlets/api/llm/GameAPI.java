@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -41,20 +42,17 @@ public class GameAPI extends HttpServlet {
     @Inject
     protected GameProducer gameProducer;
 
+    @Inject
+    protected CodeDefendersAuth login;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         final var gameId = ServletUtils.getIntParameter(request, "gameId");
-        final var userId = ServletUtils.getIntParameter(request, "userId");
 
-        if (gameId.isEmpty() || userId.isEmpty()) {
-            if (gameId.isEmpty()) {
-                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                        new Common.ErrorResponseDTO("Parameter 'gameId' missing."));
-            } else {
-                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                        new Common.ErrorResponseDTO("Parameter 'userId' missing."));
-            }
+        if (gameId.isEmpty()) {
+            writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+                    new Common.ErrorResponseDTO("Parameter 'gameId' missing."));
             return;
         }
 
@@ -67,14 +65,14 @@ public class GameAPI extends HttpServlet {
             return;
         }
 
-        if (game.getRole(userId.get()) == Role.NONE) {
+        if (game.getRole(login.getUserId()) == Role.NONE) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             writeResponse(response, HttpServletResponse.SC_FORBIDDEN,
                     new Common.ErrorResponseDTO("User is not a player in the game."));
             return;
         }
 
-        var gameDTO = prepareGame(game, userId.get());
+        var gameDTO = prepareGame(game, login.getUserId());
         writeResponse(response, HttpServletResponse.SC_OK, gameDTO);
     }
 
