@@ -464,7 +464,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         Role role = player.getRole();
-        if (role != Role.ATTACKER) {
+        if (role != Role.DEFENDER) {
             return CanUserSubmitTestResult.USER_NOT_A_DEFENDER;
         }
 
@@ -762,5 +762,18 @@ public class GameManagingUtils implements IGameManagingUtils {
             }
         }
         return decorated.toString();
+    }
+
+    public Optional<String> getTestSmellsMessage(Test test) {
+        List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(test.getId());
+        if (!detectedTestSmells.isEmpty()) {
+            if (detectedTestSmells.size() == 1) {
+                return Optional.of("Your test has the following smell: " + detectedTestSmells.get(0));
+            } else {
+                String join = String.join(", ", detectedTestSmells);
+                return Optional.of("Your test has the following smells: " + join);
+            }
+        }
+        return Optional.empty();
     }
 }

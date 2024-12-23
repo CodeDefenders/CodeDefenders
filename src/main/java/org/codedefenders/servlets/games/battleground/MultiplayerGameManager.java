@@ -426,7 +426,7 @@ public class MultiplayerGameManager extends HttpServlet {
             var test = result.test().orElseThrow();
 
             messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-            includeDetectTestSmellsInMessages(test);
+            gameManagingUtils.getTestSmellsMessage(test).ifPresent(messages::add);
             result.mutationTesterMessage().ifPresent(messages::add);
 
             // Clear the mutant code only if mutant is accepted
@@ -945,17 +945,6 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
-    private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(newTest.getId());
-        if (!detectedTestSmells.isEmpty()) {
-            if (detectedTestSmells.size() == 1) {
-                messages.add("Your test has the following smell: " + detectedTestSmells.get(0));
-            } else {
-                String join = String.join(", ", detectedTestSmells);
-                messages.add("Your test has the following smells: " + join);
-            }
-        }
-    }
 
     /**
      * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled

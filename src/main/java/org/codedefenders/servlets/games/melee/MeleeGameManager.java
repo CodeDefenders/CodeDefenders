@@ -514,7 +514,7 @@ public class MeleeGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest);
+        gameManagingUtils.getTestSmellsMessage(newTest).ifPresent(messages::add);
 
         final String message = user.getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -1068,18 +1068,6 @@ public class MeleeGameManager extends HttpServlet {
             intentionRepository.storeIntentionForMutant(newMutant, intention);
         } catch (Exception e) {
             logger.error("Cannot store intention to database.", e);
-        }
-    }
-
-    private void includeDetectTestSmellsInMessages(Test newTest) {
-        List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(newTest.getId());
-        if (!detectedTestSmells.isEmpty()) {
-            if (detectedTestSmells.size() == 1) {
-                messages.add("Your test has the following smell: " + detectedTestSmells.get(0));
-            } else {
-                String join = String.join(", ", detectedTestSmells);
-                messages.add("Your test has the following smells: " + join);
-            }
         }
     }
 }

@@ -3,6 +3,7 @@ package org.codedefenders.servlets.api.llm;
 import java.util.List;
 
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -52,6 +53,18 @@ public class Common {
             List<Integer> coveredMutants,
             List<Integer> killedMutants
     ) {
+        public static TestDTO fromTestDTO(org.codedefenders.dto.TestDTO test) {
+            return new Common.TestDTO(
+                    test.getId(),
+                    test.getPlayerId(),
+                    test.isCanView(),
+                    test.getSource(),
+                    test.getPoints(),
+                    test.getLinesCovered(),
+                    test.getCoveredMutantIds(),
+                    test.getKilledMutantIds()
+            );
+        }
     }
 
     public record MutantDTO(
