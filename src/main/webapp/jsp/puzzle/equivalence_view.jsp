@@ -47,6 +47,7 @@
     final Mutant equivMutant = game.getMutants().get(0);
     final String mutantClaimedMessage = "Mutant " + equivMutant.getId() + " automatically claimed equivalent";
     final boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
+    final int mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
@@ -55,6 +56,7 @@
     pageContext.setAttribute("equivMutant", equivMutant);
     pageContext.setAttribute("mutantClaimedMessage", mutantClaimedMessage);
     pageContext.setAttribute("showTestAccordion", showTestAccordion);
+    pageContext.setAttribute("mutantLine", mutantLine);
 %>
 
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
@@ -226,6 +228,11 @@
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
                     <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
+                    <script type="module">
+                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                        const classViewer = await objects.await("classViewer");
+                        classViewer.jumpToLine(${mutantLine});
+                    </script>
                 </div>
             </div>
 

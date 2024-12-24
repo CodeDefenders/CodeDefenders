@@ -44,10 +44,13 @@
 
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
+    final int mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
 
     final String mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
             ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
             : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
+
+    pageContext.setAttribute("mutantLine", mutantLine);
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -184,6 +187,11 @@
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
+        <script type="module">
+            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            const classViewer = await objects.await("classViewer");
+            classViewer.jumpToLine(${mutantLine});
+        </script>
     </div>
 
 </div>
