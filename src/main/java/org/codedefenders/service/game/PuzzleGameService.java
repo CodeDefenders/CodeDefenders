@@ -63,7 +63,6 @@ public class PuzzleGameService extends AbstractGameService {
                 || game.getLevel() == GameLevel.EASY
                 || puzzleGame.getPuzzle().getType() == PuzzleType.ATTACKER
                 || puzzleGame.getPuzzle().getType() == PuzzleType.EQUIVALENCE
-                || playerRole == Role.ATTACKER
                 || mutant.getState() == Mutant.State.KILLED;
     }
 
@@ -79,7 +78,6 @@ public class PuzzleGameService extends AbstractGameService {
         return test.getPlayerId() == player.getId()
                 || game.isFinished()
                 || game.getLevel() == GameLevel.EASY
-                || puzzleGame.getPuzzle().getType() == PuzzleType.DEFENDER
-                || playerRole == Role.DEFENDER;
+                || puzzleGame.getPuzzle().getType() == PuzzleType.DEFENDER;
     }
 }
