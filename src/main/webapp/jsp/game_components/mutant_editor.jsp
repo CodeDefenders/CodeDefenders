@@ -106,6 +106,7 @@
     const editableLinesEnd = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
     const keymap = '${login.user.keyMap.CMName}';
     const numDependencies = ${mutantEditor.hasDependencies() ? mutantEditor.dependencies.size() : 0};
+    const readonly = Boolean(${mutantEditor.readonly ? 1 : 0});
 
     const editorElement = document.getElementById('mutant-code');
     const dependencyEditorElements = [];
@@ -118,7 +119,8 @@
             dependencyEditorElements,
             editableLinesStart,
             editableLinesEnd,
-            keymap);
+            keymap,
+            readonly);
 
 
     objects.register('mutantEditor', mutantEditor);

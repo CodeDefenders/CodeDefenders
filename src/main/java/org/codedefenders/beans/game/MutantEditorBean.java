@@ -12,6 +12,7 @@ import jakarta.inject.Named;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Dependency;
@@ -57,6 +58,11 @@ public class MutantEditorBean {
      */
     private Integer editableLinesEnd;
 
+    /**
+     * Whether the editor is readonly.
+     */
+    private boolean readonly;
+
     @Inject
     public MutantEditorBean(GameClassRepository gameClassRepo, GameProducer gameProducer,
                             PreviousSubmissionBean previousSubmission) {
@@ -79,6 +85,7 @@ public class MutantEditorBean {
         if (game instanceof PuzzleGame p) {
             setEditableLinesForPuzzle(p.getPuzzle());
         }
+        setReadonly(game.getState() == GameState.SOLVED || game.getState() == GameState.FINISHED);
     }
 
     /**
@@ -154,5 +161,13 @@ public class MutantEditorBean {
 
     public boolean hasEditableLinesEnd() {
         return editableLinesEnd != null;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
     }
 }

@@ -44,6 +44,7 @@
     const mockingEnabled = ${testEditor.mockingEnabled};
     const assertionLibrary = '${testEditor.assertionLibrary.name()}';
     const keymap = '${login.user.keyMap.CMName}';
+    const readonly = Boolean(${testEditor.readonly ? 1 : 0});
 
     const editorElement = document.getElementById('test-code');
 
@@ -53,7 +54,8 @@
             editableLinesEnd,
             mockingEnabled,
             assertionLibrary,
-            keymap);
+            keymap,
+            readonly);
 
 
     objects.register('testEditor', testEditor);
