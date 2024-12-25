@@ -34,6 +34,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -54,6 +55,8 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 
 /**
  * HTTP based JSON API for {@link Puzzle Puzzles} and {@link PuzzleChapter PuzzleChapters}.
@@ -338,6 +341,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         puzzle.setEditableLinesStart(editableLinesStart);
         puzzle.setEditableLinesEnd(editableLinesEnd);
         puzzle.setEquivalent(puzzleData.isEquivalent());
+        puzzle.setLevel(puzzleData.level());
         boolean success = puzzleRepo.updatePuzzle(puzzle);
         if (!success) {
             writeJSONMessage(response, 500, "Failed to update puzzle.");
@@ -521,6 +525,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
                     .name("chapterId").value(puzzle.getChapterId())
                     .name("classId").value(puzzle.getClassId())
+                    .name("level").value(puzzle.getLevel().toString())
                     .name("isEquivalent").value(puzzle.isEquivalent())
                     .endObject();
         }
@@ -594,6 +599,7 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("classId").value(info.puzzle.getClassId())
                     .name("type").value(info.puzzle.getType().name())
                     .name("isEquivalent").value(info.puzzle().isEquivalent())
+                    .name("level").value(info.puzzle.getLevel().toString())
                     .name("gameCount").value(info.gameCount)
                     .name("active").value(info.active)
                     .endObject();
@@ -624,5 +630,6 @@ public class AdminPuzzleAPI extends HttpServlet {
             int maxAssertionsPerTest,
             Integer editableLinesStart,
             Integer editableLinesEnd,
+            GameLevel level,
             boolean isEquivalent) {}
 }
