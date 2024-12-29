@@ -189,6 +189,24 @@
     height: 80%;
 }
 
+.puzzle-attempt-counter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    transform: translate(30%, 35%);
+
+    height: 1.625rem;
+    width: 1.625rem;
+    border: 2px solid #198754;
+    border-radius: 5rem;
+
+    text-align: center;
+    font-size: .9rem;
+    color: #198754;
+    background-color: white;
+}
+
+
 @media (min-width: 470px) {
     .chapter__levels {
         --cols: 2;
