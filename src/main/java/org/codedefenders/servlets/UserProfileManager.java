@@ -171,7 +171,7 @@ public class UserProfileManager extends HttpServlet {
                                         int tries = puzzleGame != null ? puzzleGame.getCurrentRound() : 0;
                                         return new PuzzleEntry(entry, false, solved, tries);
                                     })
-                                    .filter(PuzzleEntry::isSolved)
+                                    //.filter(PuzzleEntry::isSolved)
                                     .collect(Collectors.toSet());
                     return new PuzzleChapterEntry(puzzleChapter, puzzleEntries);
                 })
