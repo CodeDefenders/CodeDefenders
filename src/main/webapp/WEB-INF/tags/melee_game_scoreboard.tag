@@ -27,6 +27,8 @@
     <thead>
     <tr>
         <th>User</th>
+        <th>Mutants</th>
+        <th>Tests</th>
         <th>Attack</th>
         <th>Defense</th>
         <th>Duels</th>
@@ -37,6 +39,8 @@
     <c:forEach items="${meleeScoreboard.scoreItems}" var="scoreItem">
         <tr class="${login.userId eq scoreItem.user.id ? "bg-warning bg-gradient" : ""}">
             <td>${scoreItem.user.name}</td>
+            <td>${scoreItem.attackScore.quantity}</td>
+            <td>${scoreItem.defenseScore.quantity}</td>
             <td>${scoreItem.attackScore.totalScore}</td>
             <td>${scoreItem.defenseScore.totalScore}</td>
             <td>${scoreItem.duelScore.totalScore}</td>
