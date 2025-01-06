@@ -39,6 +39,7 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @see PuzzleChapterEntry
  */
 public class PuzzleEntry implements Comparable<PuzzleEntry> {
+
     public enum Type {
         PUZZLE,
         GAME
@@ -51,6 +52,7 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
 
     private boolean locked;
     private boolean solved;
+    private int rounds;
 
     /**
      * Constructs a new puzzle entry for a given puzzle and locked status.
@@ -59,10 +61,11 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
      * @param locked the locked status of this puzzle.
      * @param solved whether the puzzle is solved or not.
      */
-    public PuzzleEntry(Puzzle puzzle, boolean locked, boolean solved) {
+    public PuzzleEntry(Puzzle puzzle, boolean locked, boolean solved, int rounds) {
         this.puzzle = puzzle;
         this.locked = locked;
         this.solved = solved;
+        this.rounds = rounds;
 
         this.type = Type.PUZZLE;
         this.game = null;
@@ -71,12 +74,13 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
     /**
      * Constructs a new puzzle entry for a given puzzle game.
      *
-     * @param game the puzzle game of this entry.
+     * @param game   the puzzle game of this entry.
      * @param solved whether the puzzle is solved or not.
      */
     public PuzzleEntry(PuzzleGame game, boolean solved) {
         this.game = game;
         this.solved = solved;
+        this.rounds = game.getCurrentRound();
 
         this.type = Type.GAME;
         this.puzzle = null;
@@ -108,6 +112,10 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
                 // ignored
         }
         return null;
+    }
+
+    public int getRounds() {
+        return rounds;
     }
 
     public void lock() {

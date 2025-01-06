@@ -157,20 +157,11 @@ public class PuzzleOverview extends HttpServlet {
                     return new PuzzleEntry(activePuzzle, solved);
                 }
             }
-            boolean solved = isPuzzleSolvedForUser(entry, userId);
-            return new PuzzleEntry(entry, false, solved);
-        };
-    }
 
-    /**
-     * Returns whether a given puzzle is solved for a given user.
-     *
-     * @param entry  the checked puzzle.
-     * @param userId the user which the puzzle may be solved for.
-     * @return {@code true} if the user has solved the puzzle, {@code false} otherwise.
-     */
-    private boolean isPuzzleSolvedForUser(Puzzle entry, int userId) {
-        PuzzleGame puzzleGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
-        return puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
+            PuzzleGame puzzleGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
+            boolean solved = puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
+            int tries = puzzleGame != null ? puzzleGame.getCurrentRound() : 0;
+            return new PuzzleEntry(entry, false, solved, tries);
+        };
     }
 }

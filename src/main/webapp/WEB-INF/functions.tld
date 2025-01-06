@@ -37,4 +37,14 @@
         <function-class>org.codedefenders.util.MessageUtils</function-class>
         <function-signature>java.lang.String pluralize(int,java.lang.String,java.lang.String)</function-signature>
     </function>
+    <function>
+        <name>pluralizeWithS</name>
+        <function-class>org.codedefenders.util.MessageUtils</function-class>
+        <function-signature>java.lang.String pluralize(int,java.lang.String)</function-signature>
+    </function>
+    <function>
+        <name>ordinalSuffix</name>
+        <function-class>org.codedefenders.util.MessageUtils</function-class>
+        <function-signature>java.lang.String ordinalSuffix(int)</function-signature>
+    </function>
 </taglib>

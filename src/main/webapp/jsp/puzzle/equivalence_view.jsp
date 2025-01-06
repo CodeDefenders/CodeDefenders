@@ -145,7 +145,10 @@
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${description}</h4>
-                <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                <div class="align-items-center d-flex gap-4">
+                    <t:round_counter game="${game}"/>
+                    <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                </div>
             </div>
             <hr>
 
