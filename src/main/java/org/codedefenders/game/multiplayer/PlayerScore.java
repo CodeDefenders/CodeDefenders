@@ -76,6 +76,7 @@ public class PlayerScore {
     }
 
     // TODO What's this? Quantity of what?
+    // Answer: Quantity of mutants (if attacker) or tests (if defender).
     public void increaseQuantity() {
         quantity++;
     }

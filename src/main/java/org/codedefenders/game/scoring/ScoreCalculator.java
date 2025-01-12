@@ -19,8 +19,10 @@ import org.codedefenders.persistence.database.TestRepository;
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants
  * and defending/tests score.
- *
- * <p>Ideally Gmae
+ * <p>
+ * Currently only used for melee games.
+ * <p>
+ * Ideally Gmae
  *
  * @author gambi
  */
@@ -66,6 +68,7 @@ public class ScoreCalculator {
             /* playerScore can be null if the mutant belongs to a system user. */
             if (playerScore != null) {
                 playerScore.increaseTotalScore(mutant.getScore());
+                playerScore.increaseQuantity();
             }
         }
 
@@ -96,6 +99,7 @@ public class ScoreCalculator {
             /* playerScore can be null if the mutant belongs to a system user. */
             if (playerScore != null) {
                 playerScore.increaseTotalScore(test.getScore());
+                playerScore.increaseQuantity();
             }
         }
 
