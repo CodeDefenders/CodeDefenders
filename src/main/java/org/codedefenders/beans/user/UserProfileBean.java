@@ -39,7 +39,6 @@ public class UserProfileBean {
     private UserEntity user;
     private Map<GameType, UserStats> stats;
     private boolean isSelf;
-    private UserStats.PuzzleStats puzzleStats;
     private SortedSet<PuzzleChapterEntry> puzzleGames;
     private Collection<Achievement> achievements;
 
