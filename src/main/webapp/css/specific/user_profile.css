@@ -147,6 +147,50 @@
     margin-left: 0;
 }
 
+.puzzle-stats dt {
+    font-size: 1.5rem;
+    font-weight: normal;
+}
+
+.puzzle-stats dd {
+    margin-left: 0;
+    margin-bottom: 1.5rem;
+    margin-top: .5rem;
+}
+
+.puzzle-stats .chapter__levels {
+    gap: .5rem;
+}
+
+.puzzle-stats .chapter__level {
+    padding: 1rem 1.25rem;
+    gap: 1.25rem;
+}
+
+.puzzle-stats .chapter__level__image {
+    transform: translateY(-.125rem);
+}
+
+.puzzle-stats .chapter__level .chapter__level__title h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.puzzle-stats .chapter__level .chapter__level__title p {
+    font-size: .9rem;
+}
+
+.puzzle-stats .chapter__level:hover,
+.puzzle-stats .chapter__level:focus,
+.puzzle-stats .chapter__level:focus-within {
+    outline-color: transparent;
+}
+
+.puzzle-stats .puzzle-attempt-counter {
+    cursor: default;
+}
+
+
 /* dashboard semantic coloring */
 
 .dashboard-box .legend:nth-child(1) .legend-title::before {

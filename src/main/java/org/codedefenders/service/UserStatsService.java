@@ -26,7 +26,6 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
-import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserStatsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,12 +38,10 @@ public class UserStatsService {
     private static final Logger logger = LoggerFactory.getLogger(UserStatsService.class);
 
     private final UserStatsDAO userStatsDAO;
-    private final PuzzleRepository puzzleRepo;
 
     @Inject
-    private UserStatsService(UserStatsDAO userStatsDAO, PuzzleRepository puzzleRepo) {
+    private UserStatsService(UserStatsDAO userStatsDAO) {
         this.userStatsDAO = userStatsDAO;
-        this.puzzleRepo = puzzleRepo;
     }
 
     /**
@@ -83,11 +80,5 @@ public class UserStatsService {
         }
 
         return us;
-    }
-
-    public UserStats.PuzzleStats getPuzzleStatsByUserId(int userId) {
-        final UserStats.PuzzleStats puzzleStats = userStatsDAO.getPuzzleStatsByUser(userId);
-        puzzleStats.setChapters(puzzleRepo.getPuzzleChapters());
-        return puzzleStats;
     }
 }
