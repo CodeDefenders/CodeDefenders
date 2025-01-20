@@ -447,15 +447,15 @@ public class ClassUploadManager extends HttpServlet {
                 try {
                     Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
                     if (duplicateName) {
-                        logger.info("Multiple dependency files with name {}. " +
-                                "Putting the new files in separate directories.", dependencyFileName);
+                        logger.info("Multiple dependency files with name {}. "
+                                + "Putting the new files in separate directories.", dependencyFileName);
 
                         try {
                             Path packageStructure = FileUtils.getPackagePathFromJavaFile(dependencyFileContent);
                             folderPath = folderPath.resolve(packageStructure);
                         } catch (IllegalArgumentException e) {
-                            logger.error("Class upload failed. No valid package declaration found in dependency file {}"
-                                    , dependencyFileName);
+                            logger.error("Class upload failed. No valid package declaration found "
+                                    + "in dependency file {}", dependencyFileName);
                             messages.add("Class upload failed. No valid package declaration found in dependency file "
                                     + dependencyFileName);
                             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
@@ -464,8 +464,8 @@ public class ClassUploadManager extends HttpServlet {
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
                             .toString();
-                    final String depClassFilePath = cutDir.resolve(CUTS_DEPENDENCY_DIR).resolve(dependencyFileName.
-                            replace(".java", ".class")).toString();
+                    final String depClassFilePath = cutDir.resolve(CUTS_DEPENDENCY_DIR).resolve(dependencyFileName
+                            .replace(".java", ".class")).toString();
                     dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
                     logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
@@ -894,10 +894,10 @@ public class ClassUploadManager extends HttpServlet {
      * @throws IOException When an error during redirecting occurs.
      */
     private void abortRequestAndCleanUp(HttpServletRequest request,
-                                               HttpServletResponse response,
-                                               Path cutDir,
-                                               List<CompiledClass> compiledClasses,
-                                               String... files) throws IOException {
+                                        HttpServletResponse response,
+                                        Path cutDir,
+                                        List<CompiledClass> compiledClasses,
+                                        String... files) throws IOException {
         logger.debug("Aborting request...");
         if (cutDir != null) {
             final List<Integer> cuts = new LinkedList<>();
