@@ -2,7 +2,9 @@ package org.codedefenders.beans.game;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
@@ -112,10 +114,27 @@ public class MutantEditorBean {
 
     public void setDependenciesForClass(GameClass clazz) {
         dependencies = new HashMap<>();
-        for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
+
+        List<Dependency> dependencyList = gameClassRepo.getMappedDependenciesForClassId(clazz.getId());
+        List<String> names = new ArrayList<>();
+        boolean duplicate = false;
+        for (Dependency dependency : dependencyList) {
+            String name = FileUtils.extractFileNameNoExtension(Paths.get(dependency.getJavaFile()));
+            if (names.contains(name)) {
+                duplicate = true;
+                break;
+            }
+            names.add(name);
+        }
+
+        for (Dependency dependency : dependencyList) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
             String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
+
+            if (duplicate) {
+                className = FileUtils.getPackagePathFromJavaFile(classCode).resolve(className).toString();
+            }
             dependencies.put(className, classCode);
         }
     }
