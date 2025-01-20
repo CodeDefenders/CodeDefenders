@@ -378,4 +378,27 @@ public class FileUtils {
         }
         return duplicateName;
     }
+
+    /**
+     * Returns the package path of a java file.
+     * @param dependencyFileContent The content of a java file.
+     * @return The package path as declared in the file, meaning that a file containing
+     * {@code package org.codedefenders.util;} will return {@code org/codedefenders/util} as a {@link Path} object.
+     * @throws IllegalArgumentException Thrown if the file does not contain a valid package declaration.
+     */
+    public static Path getPackagePathFromJavaFile(String dependencyFileContent) throws IllegalArgumentException{
+        Path path = Paths.get("");
+
+        if (!dependencyFileContent.matches("(?s).*package\\s+.*;.*")) {
+            throw new IllegalArgumentException("The file does not contain a package declaration.");
+        }
+        String packageName = dependencyFileContent.substring(dependencyFileContent.indexOf("package") + 8,
+                dependencyFileContent.indexOf(";")).trim();
+        String[] directories = packageName.split("\\.");
+
+        for (String directory : directories) {
+            path = path.resolve(directory.trim());
+        }
+        return path;
+    }
 }

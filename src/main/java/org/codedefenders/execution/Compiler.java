@@ -213,11 +213,6 @@ public class Compiler {
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
         final Boolean success = task.call();
-        /*try {
-            Thread.sleep(100000000); //TODO UNBEDINGT ENTFERNEN!
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }*/
 
         if (cleanUpDependencyClassFiles) {
             // Remove dependency .class files generated in baseDir
@@ -384,7 +379,7 @@ public class Compiler {
             try {
                 final Path oldPath;
                 if (!duplicates) { //Only check for file name.
-                    oldPath = getClassPath(dependency, baseDirectory); //TODO: Unsicher, dass die richtige .class-Datei genommen wird
+                    oldPath = getClassPath(dependency, baseDirectory);
                 } else { //Check for correct path, to make sure the correct .class file is moved.
                     Path fullJavaPath = Path.of(dependency.getPath());
                     Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
@@ -392,7 +387,7 @@ public class Compiler {
                 }
                 // path relative from the base directory, {@code dependencies/} folder just has to be added between them
                 final Path classFileStructure = baseDirectory.relativize(
-                        Paths.get(oldPath.toString().replace(".java", ".class"))); //TODO ist doch schon replaced??
+                        Paths.get(oldPath.toString().replace(".java", ".class")));
                 final Path newPath =
                         Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
 

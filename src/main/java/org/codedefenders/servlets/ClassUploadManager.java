@@ -447,28 +447,26 @@ public class ClassUploadManager extends HttpServlet {
                 try {
                     Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
                     if (duplicateName) {
-                        logger.info("Multiple dependency file with name {}. Putting the new file in a " +
-                                "different directory.", dependencyFileName);
+                        logger.info("Multiple dependency files with name {}. " +
+                                "Putting the new files in separate directories.", dependencyFileName);
 
-                        // Get the package folder structure from the first line of the dependency file. TODO Was passiert, wenn CuT auch in einem package ist?
-                        //TODO auslagern in util-class?
-                        String firstLine = dependencyFileContent.substring(0, dependencyFileContent.indexOf(System.lineSeparator())); //TODO Auch hier vorher überprüfen
-                        logger.debug(firstLine);
-                        String packageName = firstLine.substring(firstLine.indexOf("package") + 8,
-                                firstLine.indexOf(";")).trim(); //TODO Vorher überprüfen, um ArrayIndexOutOfBoundsException zu vermeiden
-                        String[] directories = packageName.split("\\.");
-
-                        for (String directory : directories) {
-                            folderPath = folderPath.resolve(directory);
+                        try {
+                            Path packageStructure = FileUtils.getPackagePathFromJavaFile(dependencyFileContent);
+                            folderPath = folderPath.resolve(packageStructure);
+                        } catch (IllegalArgumentException e) {
+                            logger.error("Class upload failed. No valid package declaration found in dependency file {}"
+                                    , dependencyFileName);
+                            messages.add("Class upload failed. No valid package declaration found in dependency file "
+                                    + dependencyFileName);
+                            abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                         }
 
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
-                            .toString();//TODO Hier ist der Fehler
-                    //final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
+                            .toString();
                     final String depClassFilePath = cutDir.resolve(CUTS_DEPENDENCY_DIR).resolve(dependencyFileName.
-                            replace(".java", ".class")).toString(); //TODO Schöner machen
-                    dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath)); //TODO Nur für die Datenbank
+                            replace(".java", ".class")).toString();
+                    dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
                     logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -481,11 +479,6 @@ public class ClassUploadManager extends HttpServlet {
                 dependencies.set(index, new JavaFileObject(depJavaFilePath, dependencyFileContent));
             }
 
-            /*try {
-                Thread.sleep(10000000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e); //TODO UNBEDINGT ENTFERNEN!
-            }*/
             try {
                 cutClassFilePath = Compiler.compileJavaFileWithDependencies(cutJavaFilePath, dependencies);
             } catch (CompileException e) {
