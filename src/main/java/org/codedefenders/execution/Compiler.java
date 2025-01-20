@@ -35,6 +35,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -376,16 +377,7 @@ public class Compiler {
      */
     private static void moveDependencies(List<JavaFileObject> dependencies, Path baseDirectory, Boolean logError) {
 
-        final List<String> names = new ArrayList<>(); //TODO Sehr ähnlich wie im ClassUploadManager, auslagern?
-        boolean duplicates = false;
-        for (JavaFileObject d : dependencies) {
-            String s = d.getName();
-            if (names.contains(s)) {
-                duplicates = true;
-                break;
-            }
-            names.add(d.getName());
-        }
+        boolean duplicates = FileUtils.hasDuplicateFilenames(dependencies);
 
         for (JavaFileObject dependency : dependencies) {
 

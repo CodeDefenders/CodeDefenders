@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.model.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -362,5 +363,19 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean hasDuplicateFilenames(List<JavaFileObject> dependencies) {
+        boolean duplicateName = false;
+        List<String> dependencyNames = new ArrayList<>();
+        for (JavaFileObject dependency : dependencies) {
+            if (dependencyNames.contains(dependency.getName())) {
+                duplicateName = true;
+                break;
+            } else {
+                dependencyNames.add(dependency.getName());
+            }
+        }
+        return duplicateName;
     }
 }

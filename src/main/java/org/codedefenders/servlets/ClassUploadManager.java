@@ -421,16 +421,7 @@ public class ClassUploadManager extends HttpServlet {
             }
 
             //check if there are two dependency classes with the same name
-            boolean duplicateName = false;
-            List<String> dependencyNames = new ArrayList<>();
-            for (JavaFileObject dependency : dependencies) {
-                if (dependencyNames.contains(dependency.getName())) {
-                    duplicateName = true;
-                    break;
-                } else {
-                    dependencyNames.add(dependency.getName());
-                }
-            }
+            final boolean duplicateName = FileUtils.hasDuplicateFilenames(dependencies);
 
             for (int index = 0; index < dependencies.size(); index++) {
                 final JavaFileObject dependencyFile = dependencies.get(index);
