@@ -34,7 +34,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.DependencyDAO;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -362,5 +366,15 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<String> getCodeFromDependencies(int cutId) {
+        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class).getMappedDependenciesForClassId(cutId);
+        List<String> code = new ArrayList<>();
+        for (Dependency dep : dependencies) {
+            Path filePath = Path.of(dep.getJavaFile());
+            code.add(StringEscapeUtils.escapeJson(readJavaFileWithDefault(filePath)));
+        }
+        return code;
     }
 }
