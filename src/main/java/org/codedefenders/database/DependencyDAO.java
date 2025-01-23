@@ -111,14 +111,4 @@ public class DependencyDAO {
 
         queryRunner.batch(query, batchParamsFromList(dependencies));
     }
-
-    /*public static List<String> getPathsFromCutId(int cutId) {
-        @Language("SQL") String query = "SELECT JavaFile FROM dependencies WHERE Class_ID = ?;";
-
-        List<String> results = DB.executeQueryReturnList(query, rs -> rs.getString("JavaFile"), cutId);
-
-        QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
-        //List<String>  results = queryRunner.execute(query, rs -> rs.getString("JavaFile"), cutId);
-        return results;
-    }*/
 }
