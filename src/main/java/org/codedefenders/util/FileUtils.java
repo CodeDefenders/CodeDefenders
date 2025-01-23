@@ -368,6 +368,11 @@ public class FileUtils {
         }
     }
 
+    /**
+     * Returns the code of the dependencies belonging to a class under test.
+     * @param cutId The id of the class under test.
+     * @return A list of String, properly escaped for JSON usage, containing the code of the dependencies.
+     */
     public static List<String> getCodeFromDependencies(int cutId) {
         List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class).getMappedDependenciesForClassId(cutId);
         List<String> code = new ArrayList<>();
