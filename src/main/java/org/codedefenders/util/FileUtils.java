@@ -374,7 +374,8 @@ public class FileUtils {
      * @return A list of String, properly escaped for JSON usage, containing the code of the dependencies.
      */
     public static List<String> getCodeFromDependencies(int cutId) {
-        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class).getMappedDependenciesForClassId(cutId);
+        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class)
+                .getMappedDependenciesForClassId(cutId);
         List<String> code = new ArrayList<>();
         for (Dependency dep : dependencies) {
             Path filePath = Path.of(dep.getJavaFile());
