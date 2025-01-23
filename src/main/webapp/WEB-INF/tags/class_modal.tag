@@ -12,8 +12,8 @@
 <%@ tag import="com.google.gson.Gson" %>
 <%
     List<String> deps = FileUtils.getCodeFromDependencies(Integer.parseInt(classId));
-    String numberOfDeps = String.valueOf(deps.size() - 1);
     String depsJson = new Gson().toJson(deps);
+    request.setAttribute("number_of_dependencies", FileUtils.getCodeFromDependencies(Integer.parseInt(classId)).size());
 %>
 
 <div>
@@ -26,7 +26,7 @@
                     <pre class="m-0"><textarea></textarea></pre>
                 </div>
             </div>
-            <c:forEach var="i" begin="0" end="2">
+            <c:forEach var="i" begin="1" end="${number_of_dependencies}">
                     <div class="card">
                         <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
                             <pre class="m-0"><textarea id="dependency-area-${i}"></textarea></pre>
@@ -41,6 +41,8 @@
             const modal = document.currentScript.parentElement.querySelector('.modal');
             const cutTextArea = document.currentScript.parentElement.querySelector('textarea');
             const dependencyTextAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
+            const deps = JSON.parse('<%= depsJson%>');
+            const classId = <%= classId %>;
 
             modal.addEventListener('shown.bs.modal', async function () {
                 const codeMirrorContainer = this.querySelector('.CodeMirror');
@@ -60,25 +62,20 @@
                 });
                 editor.getWrapperElement().classList.add('codemirror-readonly');
 
-                await InfoApi.setClassEditorValue(editor, ${classId});
+                await InfoApi.setClassEditorValue(editor, classId);
                 LoadingAnimation.hideAnimation(cutTextArea);
-
-                await dependencyTextAreas.forEach(setContentForTextarea);
+                await dependencyTextAreas.forEach((textarea, index) => {
+                    setContentForTextarea(textarea, deps[index]);
+                });
                 const codeMirrorContainers = this.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
                 if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
                     codeMirrorContainers.forEach(container => container.CodeMirror.refresh());
-                    return;
                 }
             });
         })();
 
-        async function setContentForTextarea(textarea, index) {
-            const deps = JSON.parse('<%= depsJson%>');
-            const dependencyCode = deps[index]; //TODO schauen, dass das nicht jedes Mal gemacht wird
+        async function setContentForTextarea(textarea, dependencyCode) {
             const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
-            const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-
-
             const dependencyEditor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,
                 readOnly: true,
