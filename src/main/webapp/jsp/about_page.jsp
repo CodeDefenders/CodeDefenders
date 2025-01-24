@@ -26,6 +26,8 @@
 <%
     String version = VersionUtils.getCodeDefendersVersion();
     pageContext.setAttribute("version", version);
+    boolean dirty = VersionUtils.getGitDirty();
+    pageContext.setAttribute("dirty", dirty);
 %>
 
 <c:set var="title" value="About Code Defenders"/>
@@ -39,8 +41,13 @@
             <h3>Version</h3>
             <div class="bg-light rounded-3 p-3 mb-3">
                 <p class="mb-0">
-                    This is Code Defenders version ${version}.
+                    This is Code Defenders running on git commit ${version}.
                 </p>
+                <c:if test="${dirty}">
+                    <p class="mb-0">
+                        The version is dirty, i.e., the working directory contains uncommitted changes.
+                    </p>
+                </c:if>
             </div>
         </c:if>
 
