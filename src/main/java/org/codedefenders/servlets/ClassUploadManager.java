@@ -420,9 +420,6 @@ public class ClassUploadManager extends HttpServlet {
                 return;
             }
 
-            //check if there are two dependency classes with the same name
-            final boolean duplicateName = FileUtils.hasDuplicateFilenames(dependencies);
-
             for (int index = 0; index < dependencies.size(); index++) {
                 final JavaFileObject dependencyFile = dependencies.get(index);
                 final Path path = Paths.get(dependencyFile.getName());
@@ -446,21 +443,15 @@ public class ClassUploadManager extends HttpServlet {
                 final String depJavaFilePath;
                 try {
                     Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
-                    if (duplicateName) {
-                        logger.info("Multiple dependency files with name {}. "
-                                + "Putting the new files in separate directories.", dependencyFileName);
-
-                        try {
-                            Path packageStructure = FileUtils.getPackagePathFromJavaFile(dependencyFileContent);
-                            folderPath = folderPath.resolve(packageStructure);
-                        } catch (IllegalArgumentException e) {
-                            logger.error("Class upload failed. No valid package declaration found "
-                                    + "in dependency file {}", dependencyFileName);
-                            messages.add("Class upload failed. No valid package declaration found in dependency file "
-                                    + dependencyFileName);
-                            abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                        }
-
+                    try {
+                        Path packageStructure = FileUtils.getPackagePathFromJavaFile(dependencyFileContent);
+                        folderPath = folderPath.resolve(packageStructure);
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Class upload failed. No valid package declaration found "
+                                + "in dependency file {}", dependencyFileName);
+                        messages.add("Class upload failed. No valid package declaration found in dependency file "
+                                + dependencyFileName);
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
                             .toString();

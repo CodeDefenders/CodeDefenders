@@ -371,20 +371,12 @@ public class Compiler {
      * @param logError      {@code true} if IOExceptions should be logged.
      */
     private static void moveDependencies(List<JavaFileObject> dependencies, Path baseDirectory, Boolean logError) {
-
-        boolean duplicates = FileUtils.hasDuplicateFilenames(dependencies);
-
         for (JavaFileObject dependency : dependencies) {
-
             try {
                 final Path oldPath;
-                if (!duplicates) { //Only check for file name.
-                    oldPath = getClassPath(dependency, baseDirectory);
-                } else { //Check for correct path, to make sure the correct .class file is moved.
-                    Path fullJavaPath = Path.of(dependency.getPath());
-                    Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
-                    oldPath = baseDirectory.resolve(withoutBase.toString().replace(".java", ".class"));
-                }
+                Path fullJavaPath = Path.of(dependency.getPath());
+                Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
+                oldPath = baseDirectory.resolve(withoutBase.toString().replace(".java", ".class"));
                 // path relative from the base directory, {@code dependencies/} folder just has to be added between them
                 final Path classFileStructure = baseDirectory.relativize(
                         Paths.get(oldPath.toString().replace(".java", ".class")));

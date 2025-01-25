@@ -31,13 +31,12 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.PackageDeclaration;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.model.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import javassist.ClassPool;
 import javassist.CtClass;
 
@@ -416,21 +415,5 @@ public class FileUtils {
                 return path;
             }
         }
-
-
-
-        /*Path path = Paths.get("");
-
-        if (!dependencyFileContent.matches("(?s).*package\\s+.*;.*")) {
-            throw new IllegalArgumentException("The file does not contain a package declaration.");
-        }
-        String packageName = dependencyFileContent.substring(dependencyFileContent.indexOf("package") + 8,
-                dependencyFileContent.indexOf(";")).trim();
-        String[] directories = packageName.split("\\.");
-
-        for (String directory : directories) {
-            path = path.resolve(directory.trim());
-        }
-        return path;*/
     }
 }
