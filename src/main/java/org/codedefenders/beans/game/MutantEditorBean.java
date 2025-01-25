@@ -21,6 +21,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.concurrent.EditorUtils;
 
 /**
  * <p>Provides data for the mutant editor game component.</p>
@@ -113,31 +114,7 @@ public class MutantEditorBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
-        dependencies = new HashMap<>();
-
-        List<Dependency> dependencyList = gameClassRepo.getMappedDependenciesForClassId(clazz.getId());
-        List<String> names = new ArrayList<>();
-        boolean duplicate = false;
-        for (Dependency dependency : dependencyList) {
-            String name = FileUtils.extractFileNameNoExtension(Paths.get(dependency.getJavaFile()));
-            if (names.contains(name)) {
-                duplicate = true;
-                break;
-            }
-            names.add(name);
-        }
-
-        for (Dependency dependency : dependencyList) {
-            Path path = Paths.get(dependency.getJavaFile());
-            String className = FileUtils.extractFileNameNoExtension(path);
-            String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
-
-            if (duplicate) {
-                String packageName = FileUtils.getPackageNameFromJavaFile(classCode);
-                className = packageName.isEmpty() ? className : packageName + "." + className;
-            }
-            dependencies.put(className, classCode);
-        }
+        dependencies = EditorUtils.getDependencyHashMap(clazz.getId(), gameClassRepo);
     }
 
     public void setEditableLinesForPuzzle(Puzzle puzzle) {
