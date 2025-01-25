@@ -21,29 +21,21 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<%@ page import="org.codedefenders.util.VersionUtils" %>
-
-<%
-    String version = VersionUtils.getCodeDefendersVersion();
-    pageContext.setAttribute("version", version);
-    boolean dirty = VersionUtils.getGitDirty();
-    pageContext.setAttribute("dirty", dirty);
-%>
-
 <c:set var="title" value="About Code Defenders"/>
 
 <p:main_page title="${title}">
+    <jsp:useBean id="aboutPageBean" class="org.codedefenders.beans.about.AboutPageBean" scope="application"/>
     <div class="container">
 
         <h2 class="mb-4">${title}</h2>
 
-        <c:if test="${version != null}">
+        <c:if test="<%= aboutPageBean.getVersion() != null %>">
             <h3>Version</h3>
             <div class="bg-light rounded-3 p-3 mb-3">
                 <p class="mb-0">
-                    This is Code Defenders running on git commit ${version}.
+                    This is Code Defenders running on git commit ${aboutPageBean.version}.
                 </p>
-                <c:if test="${dirty}">
+                <c:if test="<%= aboutPageBean.isDirty()%>">
                     <p class="mb-0">
                         The version is dirty, i.e., the working directory contains uncommitted changes.
                     </p>
