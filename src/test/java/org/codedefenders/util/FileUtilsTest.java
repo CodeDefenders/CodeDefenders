@@ -323,4 +323,32 @@ public class FileUtilsTest {
         final String missingSemicolon = "package top" + System.lineSeparator() + "public class Test {}";
         assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(missingSemicolon));
     }
+
+    @Test
+    public void testInvalidPackageDeclarations() {
+        final String packageInString =
+                """
+                        public class Test {
+                            private String s = "package top;";
+                        }
+
+                        """;
+        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageInString));
+
+        final String packageInComment =
+                """
+                        public class Test {
+                            private String s = "package top;";
+                        }
+                        """;
+        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageInComment));
+
+        final String packageJustSlash =
+                """
+                        package /;
+                        public class Test {
+                        }
+                        """;
+        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageJustSlash));
+    }
 }

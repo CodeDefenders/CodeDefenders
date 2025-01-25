@@ -28,12 +28,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.model.Dependency;
 import org.slf4j.Logger;
@@ -397,7 +396,30 @@ public class FileUtils {
      * @throws IllegalArgumentException Thrown if the file does not contain a valid package declaration.
      */
     public static Path getPackagePathFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
-        Path path = Paths.get("");
+
+        Optional<CompilationUnit> s = JavaParserUtils.parse(dependencyFileContent);
+        if (s.isEmpty()) {
+            throw new IllegalArgumentException("Could not parse code:" + dependencyFileContent);
+        } else {
+            CompilationUnit compilationUnit = s.get();
+            Optional<PackageDeclaration> packageDeclaration = compilationUnit.getPackageDeclaration();
+            if (packageDeclaration.isEmpty()) {
+                throw new IllegalArgumentException("The file does not contain a package declaration.");
+            } else {
+                String packageName = packageDeclaration.get().getNameAsString();
+                String[] directories = packageName.split("\\.");
+
+                Path path = Paths.get("");
+                for (String directory : directories) {
+                    path = path.resolve(directory.trim());
+                }
+                return path;
+            }
+        }
+
+
+
+        /*Path path = Paths.get("");
 
         if (!dependencyFileContent.matches("(?s).*package\\s+.*;.*")) {
             throw new IllegalArgumentException("The file does not contain a package declaration.");
@@ -409,6 +431,6 @@ public class FileUtils {
         for (String directory : directories) {
             path = path.resolve(directory.trim());
         }
-        return path;
+        return path;*/
     }
 }
