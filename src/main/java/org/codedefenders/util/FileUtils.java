@@ -386,16 +386,14 @@ public class FileUtils {
     }
 
     /**
-     * Returns the package path of a java file.
+     * Returns the package name of a java file by parsing the file content.
      *
      * @param dependencyFileContent The content of a java file.
-     * @return The package path as declared in the file, meaning that a file
-     * containing {@code package org.codedefenders.util;}
-     * will return {@code org/codedefenders/util} as a {@link Path} object.
-     * @throws IllegalArgumentException Thrown if the file does not contain a valid package declaration.
+     * @return The package name as declared in the file, e.g. {@code org.codedefenders.util}. Return value is empty if
+     * the file does not contain a package declaration.
+     * @throws IllegalArgumentException Thrown if the file cannot be parsed.
      */
-    public static Path getPackagePathFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
-
+    public static String getPackageNameFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
         Optional<CompilationUnit> s = JavaParserUtils.parse(dependencyFileContent);
         if (s.isEmpty()) {
             throw new IllegalArgumentException("Could not parse code:" + dependencyFileContent);
@@ -403,17 +401,31 @@ public class FileUtils {
             CompilationUnit compilationUnit = s.get();
             Optional<PackageDeclaration> packageDeclaration = compilationUnit.getPackageDeclaration();
             if (packageDeclaration.isEmpty()) {
-                throw new IllegalArgumentException("The file does not contain a package declaration.");
+                return "";
             } else {
-                String packageName = packageDeclaration.get().getNameAsString();
-                String[] directories = packageName.split("\\.");
-
-                Path path = Paths.get("");
-                for (String directory : directories) {
-                    path = path.resolve(directory.trim());
-                }
-                return path;
+                return packageDeclaration.get().getNameAsString();
             }
         }
+    }
+
+    /**
+     * Returns the package path of a java file.
+     *
+     * @param dependencyFileContent The content of a java file.
+     * @return The package path as declared in the file, meaning that a file
+     * containing {@code package org.codedefenders.util;}
+     * will return {@code org/codedefenders/util} as a {@link Path} object.
+     * Returns an empty path if the file does not contain a package declaration.
+     * @throws IllegalArgumentException Thrown if the content cannot be parsed.
+     */
+    public static Path getPackagePathFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
+        String packageName = getPackageNameFromJavaFile(dependencyFileContent);
+        String[] directories = packageName.split("\\.");
+
+        Path path = Paths.get("");
+        for (String directory : directories) {
+            path = path.resolve(directory.trim());
+        }
+        return path;
     }
 }

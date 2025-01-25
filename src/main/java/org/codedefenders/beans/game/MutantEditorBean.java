@@ -133,7 +133,8 @@ public class MutantEditorBean {
             String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
 
             if (duplicate) {
-                className = FileUtils.getPackagePathFromJavaFile(classCode).resolve(className).toString();
+                String packageName = FileUtils.getPackageNameFromJavaFile(classCode);
+                className = packageName.isEmpty() ? className : packageName + "." + className;
             }
             dependencies.put(className, classCode);
         }

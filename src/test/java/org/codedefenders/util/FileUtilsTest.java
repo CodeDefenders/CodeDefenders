@@ -299,6 +299,7 @@ public class FileUtilsTest {
 
     @Test
     public void testGetPackagePathFromJavaFile() {
+        Path emptyPath = Paths.get("");
         Path expected = Paths.get("top");
         final String legalFile = "package top;" + System.lineSeparator() + "public class Test {}";
         assertEquals(expected, FileUtils.getPackagePathFromJavaFile(legalFile));
@@ -318,14 +319,15 @@ public class FileUtilsTest {
         assertEquals(expected, FileUtils.getPackagePathFromJavaFile(legalFileWithManyWhitespaces));
 
         final String missingDeclaration = "public class Test {}";
-        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(missingDeclaration));
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingDeclaration));
 
         final String missingSemicolon = "package top" + System.lineSeparator() + "public class Test {}";
-        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(missingSemicolon));
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingSemicolon));
     }
 
     @Test
     public void testInvalidPackageDeclarations() {
+        Path emptyPath = Paths.get("");
         final String packageInString =
                 """
                         public class Test {
@@ -333,7 +335,7 @@ public class FileUtilsTest {
                         }
 
                         """;
-        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageInString));
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageInString));
 
         final String packageInComment =
                 """
@@ -341,7 +343,7 @@ public class FileUtilsTest {
                             private String s = "package top;";
                         }
                         """;
-        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageInComment));
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageInComment));
 
         final String packageJustSlash =
                 """
@@ -349,6 +351,6 @@ public class FileUtilsTest {
                         public class Test {
                         }
                         """;
-        assertThrows(IllegalArgumentException.class, () -> FileUtils.getPackagePathFromJavaFile(packageJustSlash));
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
     }
 }
