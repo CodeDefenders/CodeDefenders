@@ -24,18 +24,17 @@
 <c:set var="title" value="About Code Defenders"/>
 
 <p:main_page title="${title}">
-    <jsp:useBean id="aboutPageBean" class="org.codedefenders.beans.about.AboutPageBean" scope="application"/>
     <div class="container">
 
         <h2 class="mb-4">${title}</h2>
 
-        <c:if test="<%= aboutPageBean.getVersion() != null %>">
+        <c:if test="${aboutPage.version != null}">
             <h3>Version</h3>
             <div class="bg-light rounded-3 p-3 mb-3">
                 <p class="mb-0">
-                    This is Code Defenders running on git commit ${aboutPageBean.version}.
+                    This is Code Defenders running on git commit ${aboutPage.version}.
                 </p>
-                <c:if test="<%= aboutPageBean.isDirty()%>">
+                <c:if test="${aboutPage.dirty}">
                     <p class="mb-0">
                         The version is dirty, i.e., the working directory contains uncommitted changes.
                     </p>
