@@ -391,22 +391,18 @@ public class FileUtils {
      * @param dependencyFileContent The content of a java file.
      * @return The package name as declared in the file, e.g. {@code org.codedefenders.util}. Return value is empty if
      * the file does not contain a package declaration.
-     * @throws IllegalArgumentException Thrown if the file cannot be parsed.
+     * @throws IllegalArgumentException Thrown if the file cannot be parsed. Note: Right now even many java files that
+     * can not be compiled will return "" rather than throw this exception, so a return value of "" does not
+     * indicate that the file is valid.
      */
     public static String getPackageNameFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
-        Optional<CompilationUnit> s = JavaParserUtils.parse(dependencyFileContent);
-        if (s.isEmpty()) {
-            throw new IllegalArgumentException("Could not parse code:" + dependencyFileContent);
-        } else {
-            CompilationUnit compilationUnit = s.get();
-            Optional<PackageDeclaration> packageDeclaration = compilationUnit.getPackageDeclaration();
-            if (packageDeclaration.isEmpty()) {
-                return "";
-            } else {
-                return packageDeclaration.get().getNameAsString();
-            }
-        }
+        return JavaParserUtils.parse(dependencyFileContent)
+                .orElseThrow(() -> new IllegalArgumentException("Could not parse code:" + dependencyFileContent))
+                .getPackageDeclaration()
+                .map(PackageDeclaration::getNameAsString)
+                .orElse("");
     }
+
 
     /**
      * Returns the package path of a java file.
