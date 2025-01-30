@@ -340,7 +340,7 @@ public class FileUtilsTest {
         final String packageInComment =
                 """
                         public class Test {
-                            private String s = "package top;";
+                            //package top;
                         }
                         """;
         assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageInComment));
