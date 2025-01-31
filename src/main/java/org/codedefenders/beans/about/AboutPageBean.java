@@ -8,19 +8,25 @@ import org.codedefenders.util.VersionUtils;
 @Named("aboutPage")
 @ApplicationScoped
 public class AboutPageBean {
+    private final String gitCommitHash;
     private final String version;
     private final boolean dirty;
 
     public AboutPageBean() {
-        version = VersionUtils.getCodeDefendersVersion();
+        gitCommitHash = VersionUtils.getGitCommitId();
         dirty = VersionUtils.getGitDirty();
+        version = VersionUtils.getCodeDefendersVersion();
     }
 
-    public String getVersion() {
-        return version;
+    public String getGitCommitHash() {
+        return gitCommitHash;
     }
 
     public boolean isDirty() {
         return dirty;
+    }
+
+    public String getVersion() {
+        return version;
     }
 }
