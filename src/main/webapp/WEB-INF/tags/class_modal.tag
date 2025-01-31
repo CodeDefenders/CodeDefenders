@@ -8,12 +8,10 @@
 <%@ attribute name="classAlias" required="true" %>
 <%@ attribute name="htmlId" required="true" %>
 <%@ tag import="org.codedefenders.util.FileUtils" %>
-<%@ tag import="java.util.List" %>
-<%@ tag import="com.google.gson.Gson" %>
 <%
-    List<String> deps = FileUtils.getCodeFromDependencies(Integer.parseInt(classId));
-    String depsJson = new Gson().toJson(deps);
-    request.setAttribute("number_of_dependencies", FileUtils.getCodeFromDependencies(Integer.parseInt(classId)).size());
+    //List<String> deps = FileUtils.getCodeFromDependencies(Integer.parseInt(classId));
+    //String depsJson = new Gson().toJson(deps);
+    request.setAttribute("number_of_dependencies", FileUtils.getCodeFromDependencies(Integer.parseInt(classId)).size());//TODO
 %>
 
 <div>
@@ -41,7 +39,6 @@
             const modal = document.currentScript.parentElement.querySelector('.modal');
             const cutTextArea = document.currentScript.parentElement.querySelector('textarea');
             const dependencyTextAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
-            const deps = JSON.parse('<%= depsJson%>');
             const classId = <%= classId %>;
 
             modal.addEventListener('shown.bs.modal', async function () {
@@ -65,7 +62,17 @@
                 await InfoApi.setClassEditorValue(editor, classId);
                 LoadingAnimation.hideAnimation(cutTextArea);
                 await dependencyTextAreas.forEach((textarea, index) => {
-                    setContentForTextarea(textarea, deps[index]);
+                    const dependencyEditor = CodeMirror.fromTextArea(textarea, {
+                        lineNumbers: true,
+                        readOnly: true,
+                        mode: 'text/x-java',
+                        autoRefresh: true
+                    });
+                    dependencyEditor.getWrapperElement().classList.add('codemirror-readonly');
+                    InfoApi.setDependencyEditorValue(dependencyEditor, classId, index);
+
+
+                    //setContentForTextarea(textarea, deps[index]);
                 });
                 const codeMirrorContainers = this.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
                 if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
@@ -73,18 +80,5 @@
                 }
             });
         })();
-
-        async function setContentForTextarea(textarea, dependencyCode) {
-            const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
-            const dependencyEditor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: true,
-                readOnly: true,
-                mode: 'text/x-java',
-                autoRefresh: true
-            });
-            dependencyEditor.getWrapperElement().classList.add('codemirror-readonly');
-
-            dependencyEditor.setValue(dependencyCode);
-        }
     </script>
 </div>

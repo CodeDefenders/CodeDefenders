@@ -291,6 +291,10 @@ public class GameClass {
         return Collections.unmodifiableList(getClassAnalysis().getMethodDescriptions());
     }
 
+    public List<String> getDependencyCode() {
+        return FileUtils.getCodeFromDependencies(id);
+    }
+
     @Override
     public String toString() {
         return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";

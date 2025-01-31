@@ -368,6 +368,10 @@ public class FileUtils {
         }
     }
 
+    public static int getNumberOfDependencies(int cutId) {
+        return CDIUtil.getBeanFromCDI(GameClassRepository.class).getMappedDependencyIdsForClassId(cutId).size();
+    }
+
     /**
      * Returns the code of the dependencies belonging to a class under test.
      * @param cutId The id of the class under test.
@@ -379,7 +383,7 @@ public class FileUtils {
         List<String> code = new ArrayList<>();
         for (Dependency dep : dependencies) {
             Path filePath = Path.of(dep.getJavaFile());
-            code.add(StringEscapeUtils.escapeJson(readJavaFileWithDefault(filePath)));
+            code.add(readJavaFileWithDefault(filePath));
         }
         return code;
     }
