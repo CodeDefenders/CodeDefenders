@@ -405,9 +405,6 @@ public class PuzzleGameManager extends HttpServlet {
                     game.setState(GameState.SOLVED);
 
                     messages.clear();
-                    boolean playerWroteKillingTest = false;
-                    messages.add(generateEquivalencePuzzleWonMessage(game, playerWroteKillingTest)).escape(false)
-                            .fadeOut(false);
 
                     GameSolvedEvent gse = new GameSolvedEvent();
                     gse.setGameId(gameId);
@@ -522,7 +519,6 @@ public class PuzzleGameManager extends HttpServlet {
 
                     game.setState(GameState.SOLVED);
                     messages.clear();
-                    messages.add(generateEquivalencePuzzleWonMessage(game, true)).escape(false).fadeOut(false);
 
                     GameSolvedEvent gse = new GameSolvedEvent();
                     gse.setGameId(gameId);
@@ -943,16 +939,6 @@ public class PuzzleGameManager extends HttpServlet {
             }
         }
         return Optional.empty();
-    }
-
-    private String generateEquivalencePuzzleWonMessage(PuzzleGame game, boolean killingTest) {
-        StringBuilder message = new StringBuilder();
-        if (killingTest) {
-            message.append("Congratulations, your test killed the equivalent mutant!");
-        } else {
-            message.append("Congratulations, this mutant is equivalent to the class under test!");
-        }
-        return generateNextPuzzleMessage(game, message);
     }
 
     private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message) {

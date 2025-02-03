@@ -151,7 +151,25 @@
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                 </div>
             </div>
+
             <hr>
+
+            <c:if test="${game.state == GameState.SOLVED}">
+                <div class="alert alert-success" role="alert">
+                    <p class="m-0">
+                        <strong class="alert-heading">Congratulations!</strong>
+                        <c:choose>
+                            <c:when test="${puzzle.equivalent}">
+                                This mutant is equivalent to the class under test.
+                            </c:when>
+                            <c:otherwise>
+                                Your test killed the mutant flagged as equivalent.
+                            </c:otherwise>
+                        </c:choose>
+                            ${requestScope.nextPuzzleMessage}
+                    </p>
+                </div>
+            </c:if>
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="equivmut-div">
