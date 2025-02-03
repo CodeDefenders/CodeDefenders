@@ -37,7 +37,7 @@
 --%>
 
 <%
-	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
 %>
 
@@ -56,6 +56,7 @@
 --%>
 
 
+<%--
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <%
     testEditor.setEditableLinesForClass(cut);
@@ -67,6 +68,7 @@
         testEditor.setTestCodeForClass(cut);
     }
 %>
+%-->
 
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
@@ -128,7 +130,7 @@
                 <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                    <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend
                 </button>
 

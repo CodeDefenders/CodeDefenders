@@ -1,16 +1,23 @@
 package org.codedefenders.beans.game;
 
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.servlets.games.GameProducer;
 
 /**
  * <p>Provides data for the test editor game component.</p>
  * <p>Bean Name: {@code testEditor}</p>
  */
 @RequestScoped
+@Named("testEditor")
 public class TestEditorBean {
     /**
      * The test code to display.
@@ -45,12 +52,28 @@ public class TestEditorBean {
      */
     private boolean readonly;
 
-    public TestEditorBean() {
-        testCode = null;
-        editableLinesStart = null;
-        editableLinesEnd = null;
-        mockingEnabled = null;
-        readonly = false;
+    @Inject
+    public TestEditorBean(GameProducer gameProducer, PreviousSubmissionBean previousSubmission) {
+        AbstractGame game = gameProducer.getGame();
+        GameClass cut = game.getCUT();
+
+        setEditableLinesForClass(cut);
+
+        if (game instanceof PuzzleGame) {
+            setMockingEnabled(false);
+            setReadonly(game.getState() == GameState.SOLVED);
+        } else {
+            setMockingEnabled(cut.isMockingEnabled());
+        }
+
+        setAssertionLibrary(cut.getAssertionLibrary());
+
+        if (previousSubmission.hasTest()) {
+            // TODO (from player-view): don't display the wrong previous submission for equivalence duels
+            setPreviousTestCode(previousSubmission.getTestCode());
+        } else {
+            setTestCodeForClass(cut);
+        }
     }
 
     public void setTestCodeForClass(GameClass clazz) {

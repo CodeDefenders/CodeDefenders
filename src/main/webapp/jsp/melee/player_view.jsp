@@ -164,6 +164,7 @@
     mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel());
 %>
 
+<%--
 <jsp:useBean id="testEditor"
              class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <%
@@ -176,6 +177,7 @@
         testEditor.setTestCodeForClass(cut);
     }
 %>
+--%>
 
 <%--
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -188,21 +190,23 @@
 
 <div class="row">
 
-<% if (openEquivalenceDuel) { %>
+    <% if (openEquivalenceDuel) { %>
 
     <%-- -------------------------------------------------------------------------------- --%>
     <%-- Equivalence Duel view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
     <div class="col-xl-6 col-12" id="equivmut-div">
-        <div class="game-component-header"><h3><%=mutantClaimedMessage%></h3></div>
+        <div class="game-component-header"><h3><%=mutantClaimedMessage%>
+        </h3></div>
 
         <div class="equivalence-container">
 
             <h3>Diff</h3>
             <div class="card">
                 <div class="card-body p-0 loading loading-height-200">
-                    <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff" readonly><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
+                    <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff"
+                                                             readonly><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
                 </div>
             </div>
 
@@ -235,11 +239,14 @@
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <div class="d-flex justify-content-between mt-2 mb-2">
-                    <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent</button>
-                    <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
+                    <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent
+                    </button>
+                    <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test
+                    </button>
 
                     <script type="module">
                         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
                         const testProgressBar = objects.await('testProgressBar');
 
 
@@ -273,12 +280,13 @@
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         <script type="module">
             import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
             const classViewer = await objects.await("classViewer");
             classViewer.jumpToLine(${mutantLine});
         </script>
     </div>
 
-<% } else { %>
+    <% } else { %>
 
     <%-- -------------------------------------------------------------------------------- --%>
     <%-- Attacker view --%>
@@ -366,6 +374,7 @@
 
                 <script type="module">
                     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
                     const testProgressBar = await objects.await('testProgressBar');
 
 
@@ -390,7 +399,7 @@
 
     </div>
 
-<% } %>
+    <% } %>
 
 </div>
 

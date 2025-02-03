@@ -94,7 +94,6 @@
     classViewer.setClassCode(game.getCUT());
     classViewer.setDependenciesForClass(game.getCUT());
 %>
---%>
 
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <%
@@ -110,6 +109,7 @@
     }
     testEditor.setReadonly(game.getState() == GameState.SOLVED);
 %>
+--%>
 
 
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
@@ -234,6 +234,7 @@
                     <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
                     <script type="module">
                         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
                         const classViewer = await objects.await("classViewer");
                         classViewer.jumpToLine(${mutantLine});
                     </script>

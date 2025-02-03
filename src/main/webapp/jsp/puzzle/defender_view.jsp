@@ -68,7 +68,7 @@
 %>
 --%>
 
-
+<%--
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <%
     // Set editable lines from class since they depend on the generated test template
@@ -83,6 +83,7 @@
     }
     testEditor.setReadonly(game.getState() == GameState.SOLVED);
 %>
+--%>
 
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>

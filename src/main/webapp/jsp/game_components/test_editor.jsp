@@ -26,7 +26,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%--<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>--%>
 
 <div class="card game-component-resize loading">
     <div class="card-body p-0 codemirror-fill">
@@ -49,13 +49,13 @@
     const editorElement = document.getElementById('test-code');
 
     const testEditor = new TestEditor(
-            editorElement,
-            editableLinesStart,
-            editableLinesEnd,
-            mockingEnabled,
-            assertionLibrary,
-            keymap,
-            readonly);
+        editorElement,
+        editableLinesStart,
+        editableLinesEnd,
+        mockingEnabled,
+        assertionLibrary,
+        keymap,
+        readonly);
 
 
     objects.register('testEditor', testEditor);
