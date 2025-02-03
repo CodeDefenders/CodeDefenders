@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -150,25 +151,32 @@
                     <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
                     <div class="game-component-header">
-                        <h3>Write a new JUnit test here</h3>
+                        <c:choose>
+                            <c:when test="${game.state == GameState.SOLVED}">
+                                <h3>Solving JUnit Test</h3>
+                            </c:when>
+                            <c:otherwise>
+                                <h3>Write a new JUnit test here</h3>
+                            </c:otherwise>
+                        </c:choose>
                         <div>
                             <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                                ${game.state != GameState.ACTIVE ? 'disabled' : ''}>
+                                ${game.state == GameState.SOLVED ? 'disabled' : ''}>
                                 Defend
                             </button>
+                            <c:if test="${game.state == GameState.ACTIVE}">
+                                <script type="module">
+                                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-                            <script type="module">
-                                import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                                    const testProgressBar = await objects.await('testProgressBar');
 
-                                const testProgressBar = await objects.await('testProgressBar');
-
-
-                                document.getElementById('submitTest').addEventListener('click', function (event) {
-                                    this.form.submit();
-                                    this.disabled = true;
-                                    testProgressBar.activate();
-                                });
-                            </script>
+                                    document.getElementById('submitTest').addEventListener('click', function (event) {
+                                        this.form.submit();
+                                        this.disabled = true;
+                                        testProgressBar.activate();
+                                    });
+                                </script>
+                            </c:if>
                         </div>
                     </div>
 
