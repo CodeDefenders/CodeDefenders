@@ -121,7 +121,6 @@
 
     <jsp:body>
         <div id="game-container" class="container-fluid">
-
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzle.description}</h4>
@@ -130,10 +129,44 @@
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                 </div>
             </div>
+
             <hr>
+
+            <c:if test="${game.state == GameState.SOLVED}">
+                <div class="alert alert-success" role="alert">
+                    <p class="m-0">
+                        <strong class="alert-heading">Congratulations!</strong>
+                        You solved the puzzle successfully. ${requestScope.nextPuzzleMessage}
+                    </p>
+                </div>
+            </c:if>
 
             <div class="row">
                 <div class="col-xl-6 col-12">
+                    <c:if test="${game.state == GameState.SOLVED}">
+                        <div class="game-component-header"><h3>Solving mutant</h3></div>
+                        <div class="card mb-3">
+                            <div class="card-body p-0 codemirror-expand">
+                                <!-- solved attacker games have exactly one alive mutant = the solving mutant -->
+                                <pre class="m-0"><textarea id="solving-mutant-code" title="solving-mutant"
+                                >${game.aliveMutants[0].HTMLEscapedPatchString}</textarea></pre>
+                            </div>
+                        </div>
+                        <script type="module">
+                            import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
+
+                            const textarea = document.getElementById('solving-mutant-code');
+                            const editor = CodeMirror.fromTextArea(textarea, {
+                                lineNumbers: true,
+                                matchBrackets: true,
+                                mode: 'text/x-diff',
+                                readOnly: true,
+                                autoRefresh: true
+                            });
+                            editor.getWrapperElement().classList.add('codemirror-readonly');
+                        </script>
+                    </c:if>
+
                     <t:mutant_accordion/>
 
                     <c:if test="${showTestAccordion}">
@@ -148,7 +181,14 @@
                     <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
                     <div class="game-component-header">
-                        <h3>Create a mutant here</h3>
+                        <c:choose>
+                            <c:when test="${game.state == GameState.SOLVED}">
+                                <h3>Class under test</h3>
+                            </c:when>
+                            <c:otherwise>
+                                <h3>Create a mutant here</h3>
+                            </c:otherwise>
+                        </c:choose>
                         <div>
 
                             <form id="reset" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">

@@ -34,7 +34,6 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -216,6 +215,10 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
+
+        if (game.getState() == GameState.SOLVED) {
+            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder()));
+        }
 
         switch (game.getType()) {
             case ATTACKER:
@@ -707,7 +710,7 @@ public class PuzzleGameManager extends HttpServlet {
 
             messages.clear();
             boolean isAnAttackGame = false;
-            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
+            messages.add(generateWinningMessage(request, game, isAnAttackGame))
                     .escape(false).fadeOut(false);
 
             GameSolvedEvent gse = new GameSolvedEvent();
