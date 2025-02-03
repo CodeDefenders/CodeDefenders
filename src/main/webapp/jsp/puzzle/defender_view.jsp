@@ -136,7 +136,17 @@
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                 </div>
             </div>
+
             <hr>
+
+            <c:if test="${game.state == GameState.SOLVED}">
+                <div class="alert alert-success" role="alert">
+                    <p class="m-0">
+                        <strong class="alert-heading">Congratulations!</strong>
+                        Your test solved the puzzle. ${requestScope.nextPuzzleMessage}
+                    </p>
+                </div>
+            </c:if>
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="cut-div">

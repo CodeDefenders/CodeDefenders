@@ -706,16 +706,13 @@ public class PuzzleGameManager extends HttpServlet {
             messages.add("Your test did not solve the puzzle. Try another one...");
             game.incrementCurrentRound();
         } else {
-            game.setState(GameState.SOLVED);
-
             messages.clear();
-            boolean isAnAttackGame = false;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame))
-                    .escape(false).fadeOut(false);
+
+            game.setState(GameState.SOLVED);
 
             GameSolvedEvent gse = new GameSolvedEvent();
             gse.setGameId(gameId);
-            gse.setAttackPuzzle(isAnAttackGame);
+            gse.setAttackPuzzle(false);
             notificationService.post(gse);
         }
         puzzleRepo.updatePuzzleGame(game);
@@ -908,16 +905,13 @@ public class PuzzleGameManager extends HttpServlet {
             messages.add("Your mutant did not solve the puzzle. Try another one...");
             game.incrementCurrentRound();
         } else {
-            game.setState(GameState.SOLVED);
-
             messages.clear();
-            boolean isAnAttackGame = true;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame))
-                    .escape(false).fadeOut(false);
+
+            game.setState(GameState.SOLVED);
 
             GameSolvedEvent gse = new GameSolvedEvent();
             gse.setGameId(gameId);
-            gse.setAttackPuzzle(isAnAttackGame);
+            gse.setAttackPuzzle(true);
             notificationService.post(gse);
         }
         puzzleRepo.updatePuzzleGame(game);
@@ -949,14 +943,6 @@ public class PuzzleGameManager extends HttpServlet {
             }
         }
         return Optional.empty();
-    }
-
-    private String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
-        StringBuilder message = new StringBuilder();
-        message.append("Congratulations, your ")
-                .append(isAnAttackGame ? "mutant" : "test")
-                .append(" solved the puzzle!");
-        return generateNextPuzzleMessage(game, message);
     }
 
     private String generateEquivalencePuzzleWonMessage(PuzzleGame game, boolean killingTest) {

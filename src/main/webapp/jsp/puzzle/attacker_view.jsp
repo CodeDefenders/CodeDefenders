@@ -136,7 +136,7 @@
                 <div class="alert alert-success" role="alert">
                     <p class="m-0">
                         <strong class="alert-heading">Congratulations!</strong>
-                        You solved the puzzle successfully. ${requestScope.nextPuzzleMessage}
+                        Your mutant solved the puzzle. ${requestScope.nextPuzzleMessage}
                     </p>
                 </div>
             </c:if>
