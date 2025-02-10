@@ -32,7 +32,7 @@ import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 
 @WebServlet("/llm-api/battleground/submit-mutant")
-public class MutantAPI extends HttpServlet {
+public class MutantAPI extends APIServlet {
     @Inject
     protected GameService gameService;
 
@@ -135,17 +135,6 @@ public class MutantAPI extends HttpServlet {
                                 case COMPILATION_FAILED -> MutantRejectReason.COMPILATION_FAILED;
                             }));
         }
-    }
-
-    protected void writeResponse(HttpServletResponse response, int statusCode, Object responseBody) throws IOException {
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .create();
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setStatus(statusCode);
-        gson.toJson(responseBody, out);
-        out.flush();
     }
 
     public record SubmitMutantResponseDTO(

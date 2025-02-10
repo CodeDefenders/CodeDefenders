@@ -30,7 +30,7 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 @WebServlet("/llm-api/battleground/submit-test")
-public class TestAPI extends HttpServlet {
+public class TestAPI extends APIServlet {
     @Inject
     protected GameService gameService;
 
@@ -134,17 +134,6 @@ public class TestAPI extends HttpServlet {
                                 case TEST_DID_NOT_PASS_ON_CUT -> TestRejectReason.TEST_DID_NOT_PASS_ON_CUT;
                             }));
         }
-    }
-
-    protected void writeResponse(HttpServletResponse response, int statusCode, Object responseBody) throws IOException {
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .create();
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setStatus(statusCode);
-        gson.toJson(responseBody, out);
-        out.flush();
     }
 
     public record SubmitTestResponseDTO(

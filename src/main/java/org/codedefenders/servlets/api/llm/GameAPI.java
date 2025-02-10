@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 @WebServlet("/llm-api/battleground/game")
-public class GameAPI extends HttpServlet {
+public class GameAPI extends APIServlet {
     @Inject
     protected GameService gameService;
 
@@ -74,17 +74,6 @@ public class GameAPI extends HttpServlet {
 
         var gameDTO = prepareGame(game, login.getUserId());
         writeResponse(response, HttpServletResponse.SC_OK, gameDTO);
-    }
-
-    protected void writeResponse(HttpServletResponse response, int statusCode, Object responseBody) throws IOException {
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .create();
-        PrintWriter out = response.getWriter();
-        response.setContentType("application/json");
-        response.setStatus(statusCode);
-        gson.toJson(responseBody, out);
-        out.flush();
     }
 
     private BattlegroundGameDTO prepareGame(MultiplayerGame game, int userId) {
