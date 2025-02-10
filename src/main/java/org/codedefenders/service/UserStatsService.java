@@ -24,6 +24,7 @@ import java.util.Map;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.codedefenders.dto.DuelStats;
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
 import org.codedefenders.persistence.database.UserStatsDAO;
@@ -80,5 +81,13 @@ public class UserStatsService {
         }
 
         return us;
+    }
+
+    public DuelStats getDefenderDuelStats(int userId) {
+        return userStatsDAO.getDefenderDuelStats(userId);
+    }
+
+    public DuelStats getAttackerDuelStats(int userId) {
+        return userStatsDAO.getAttackerDuelStats(userId);
     }
 }

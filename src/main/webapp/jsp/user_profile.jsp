@@ -163,6 +163,39 @@
                 </dl>
             </section>
 
+            <section class="mt-5 statistics" aria-labelledby="stats-melee">
+                <h2 class="mb-3" id="stats-duel">Statistics for Equivalence Duels</h2>
+
+                <div class="dashboards">
+                    <c:set var="duelStats" value="${profile.totalDuelStats}"/>
+                    <t:dashboard_pie
+                            type="points" title="All duels"
+                            total="${duelStats.duelsTotal}"
+                            percentage="${duelStats.winPercentage}"
+                            label1="Total equivalence duels won:" value1="${duelStats.duelsWon}"
+                            label2="Total equivalence duels lost:" value2="${duelStats.duelsLost}"
+                    />
+
+                    <c:set var="duelStats" value="${profile.attackerDuelStats}"/>
+                    <t:dashboard_pie
+                            type="points" title="Duels as attacker"
+                            total="${duelStats.duelsTotal}"
+                            percentage="${duelStats.winPercentage}"
+                            label1="Duels won as attacker:" value1="${duelStats.duelsWon}"
+                            label2="Duels lost as attacker:" value2="${duelStats.duelsLost}"
+                    />
+
+                    <c:set var="duelStats" value="${profile.defenderDuelStats}"/>
+                    <t:dashboard_pie
+                            type="points" title="Duels as defender"
+                            total="${duelStats.duelsTotal}"
+                            percentage="${duelStats.winPercentage}"
+                            label1="Duels won as defender:" value1="${duelStats.duelsWon}"
+                            label2="Duels lost as defender:" value2="${duelStats.duelsLost}"
+                    />
+                </div>
+            </section>
+
             <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
                 <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
 
