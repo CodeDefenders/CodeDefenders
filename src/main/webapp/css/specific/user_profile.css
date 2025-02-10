@@ -212,7 +212,8 @@
 }
 
 .dashboard-points,
-.dashboard-games {
+.dashboard-games,
+.dashboard-duels {
     --color-primary: var(--bg-codedefenders-lighter, #008080);
     --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }

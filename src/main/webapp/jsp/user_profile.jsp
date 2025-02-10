@@ -169,29 +169,29 @@
                 <div class="dashboards">
                     <c:set var="duelStats" value="${profile.totalDuelStats}"/>
                     <t:dashboard_pie
-                            type="points" title="All duels"
+                            type="duels" title="All duels"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Total equivalence duels won:" value1="${duelStats.duelsWon}"
-                            label2="Total equivalence duels lost:" value2="${duelStats.duelsLost}"
+                            label1="Equivalence duels won:" value1="${duelStats.duelsWon}"
+                            label2="Equivalence duels lost:" value2="${duelStats.duelsLost}"
                     />
 
                     <c:set var="duelStats" value="${profile.attackerDuelStats}"/>
                     <t:dashboard_pie
-                            type="points" title="Duels as attacker"
+                            type="duels" title="Duels as attacker"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Duels won as attacker:" value1="${duelStats.duelsWon}"
-                            label2="Duels lost as attacker:" value2="${duelStats.duelsLost}"
+                            label1="Rejected equivalence claim:" value1="${duelStats.duelsWon}"
+                            label2="Failed to reject claim:" value2="${duelStats.duelsLost}"
                     />
 
                     <c:set var="duelStats" value="${profile.defenderDuelStats}"/>
                     <t:dashboard_pie
-                            type="points" title="Duels as defender"
+                            type="duels" title="Duels as defender"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Duels won as defender:" value1="${duelStats.duelsWon}"
-                            label2="Duels lost as defender:" value2="${duelStats.duelsLost}"
+                            label1="Successfully claimed as equivalent:" value1="${duelStats.duelsWon}"
+                            label2="Incorrectly claimed mutants:" value2="${duelStats.duelsLost}"
                     />
                 </div>
             </section>

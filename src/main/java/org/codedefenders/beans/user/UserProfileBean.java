@@ -134,10 +134,4 @@ public class UserProfileBean {
         return DuelStats.sum(defenderDuelStats, attackerDuelStats);
     }
 
-    private Achievement getAchievementById(Achievement.Id id) {
-        return achievements.stream()
-                .filter(achievement -> achievement.getId() == id)
-                .findAny()
-                .orElseThrow(() -> new IllegalArgumentException("Achievement with id " + id + " not found."));
-    }
 }
