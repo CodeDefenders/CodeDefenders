@@ -28,16 +28,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import javassist.ClassPool;
 import javassist.CtClass;
 
@@ -308,7 +307,7 @@ public class FileUtils {
      * but doesn't require adding a level of depth to the file system.
      *
      * @param directory The directory to find a free filename in.
-     * @param name The desired filename.
+     * @param name      The desired filename.
      * @return A path pointing to the non-existent file.
      */
     public static Path nextFreePath(Path directory, String name) {
@@ -326,6 +325,7 @@ public class FileUtils {
 
     /**
      * Uses nextFreeName to choose a non-existing storage directory for a class.
+     *
      * @param alias The alias of the class.
      * @return A path pointing to the non-existent directory.
      */
@@ -362,5 +362,66 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Checks if there are two files in the list with identical names.
+     *
+     * @param files A list of {@link JavaFileObject}s. Only the results of {@link JavaFileObject#getName()} are
+     *              considered.
+     * @return True, if there are at least two objects with the same name, false otherwise.
+     */
+    public static boolean hasDuplicateFilenames(List<JavaFileObject> files) {
+        boolean duplicateName = false;
+        List<String> dependencyNames = new ArrayList<>();
+        for (JavaFileObject dependency : files) {
+            if (dependencyNames.contains(dependency.getName())) {
+                duplicateName = true;
+                break;
+            } else {
+                dependencyNames.add(dependency.getName());
+            }
+        }
+        return duplicateName;
+    }
+
+    /**
+     * Returns the package name of a java file by parsing the file content.
+     *
+     * @param dependencyFileContent The content of a java file.
+     * @return The package name as declared in the file, e.g. {@code org.codedefenders.util}. Return value is empty if
+     * the file does not contain a package declaration.
+     * @throws IllegalArgumentException Thrown if the file cannot be parsed. Note: Right now even many java files that
+     * can not be compiled will return "" rather than throw this exception, so a return value of "" does not
+     * indicate that the file is valid.
+     */
+    public static String getPackageNameFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
+        return JavaParserUtils.parse(dependencyFileContent)
+                .orElseThrow(() -> new IllegalArgumentException("Could not parse code:" + dependencyFileContent))
+                .getPackageDeclaration()
+                .map(PackageDeclaration::getNameAsString)
+                .orElse("");
+    }
+
+
+    /**
+     * Returns the package path of a java file.
+     *
+     * @param dependencyFileContent The content of a java file.
+     * @return The package path as declared in the file, meaning that a file
+     * containing {@code package org.codedefenders.util;}
+     * will return {@code org/codedefenders/util} as a {@link Path} object.
+     * Returns an empty path if the file does not contain a package declaration.
+     * @throws IllegalArgumentException Thrown if the content cannot be parsed.
+     */
+    public static Path getPackagePathFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
+        String packageName = getPackageNameFromJavaFile(dependencyFileContent);
+        String[] directories = packageName.split("\\.");
+
+        Path path = Paths.get("");
+        for (String directory : directories) {
+            path = path.resolve(directory.trim());
+        }
+        return path;
     }
 }
