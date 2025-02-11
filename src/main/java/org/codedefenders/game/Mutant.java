@@ -344,6 +344,26 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
+    public void removeSingleLineWhitespaceChanges(Patch<String> patch) {
+        outer: for (var delta : new ArrayList<>(patch.getDeltas())) {
+            var source = delta.getSource().getLines();
+            var target = delta.getTarget().getLines();
+            if (source.size() != target.size()) {
+                continue;
+            }
+
+            for (int i = 0; i < source.size(); i++) {
+                var sourceLine =  source.get(i).replaceAll(regex, "");
+                var targetLine =  target.get(i).replaceAll(regex, "");
+                if (!sourceLine.equals(targetLine)) {
+                    continue outer;
+                }
+            }
+
+            patch.getDeltas().remove(delta);
+        }
+    }
+
     public String getPatchString() {
         GameClass sut = getCUT();
 
@@ -354,6 +374,8 @@ public class Mutant implements Serializable {
         List<String> mutantLines = FileUtils.readLines(mutantFile);
 
         Patch<String> patch = DiffUtils.diff(sutLines, mutantLines);
+        removeSingleLineWhitespaceChanges(patch);
+
         List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
         for (String s : unifiedPatches) {
