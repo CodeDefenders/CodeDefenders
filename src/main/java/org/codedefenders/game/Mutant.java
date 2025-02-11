@@ -345,22 +345,41 @@ public class Mutant implements Serializable {
     }
 
     public void removeSingleLineWhitespaceChanges(Patch<String> patch) {
-        outer: for (var delta : new ArrayList<>(patch.getDeltas())) {
+        for (var delta : new ArrayList<>(patch.getDeltas())) {
             var source = delta.getSource().getLines();
             var target = delta.getTarget().getLines();
-            if (source.size() != target.size()) {
-                continue;
-            }
+            int sourcePos = delta.getSource().getPosition();
+            int targetPos = delta.getTarget().getPosition();
 
-            for (int i = 0; i < source.size(); i++) {
+            boolean discardDelta = true;
+            boolean updateDelta = false;
+
+            for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
                 var sourceLine =  source.get(i).replaceAll(regex, "");
                 var targetLine =  target.get(i).replaceAll(regex, "");
                 if (!sourceLine.equals(targetLine)) {
-                    continue outer;
+                    discardDelta = false;
+                } else {
+                    updateDelta = true;
+                    source.remove(i);
+                    target.remove(i);
+                    if (i == 0) {
+                        sourcePos++;
+                        targetPos++;
+                    }
+                    i--;
                 }
             }
 
-            patch.getDeltas().remove(delta);
+            if (discardDelta) {
+                patch.getDeltas().remove(delta);
+            } else if (updateDelta) {
+                patch.getDeltas().remove(delta);
+                patch.getDeltas().add(delta.withChunks(
+                    new Chunk<>(sourcePos, source),
+                    new Chunk<>(targetPos, target)
+                ));
+            }
         }
     }
 
