@@ -190,7 +190,8 @@ public class AdminKillmapManagement extends HttpServlet {
                         idsString = "[" + idsString + "]";
                     }
                     Gson gson = new Gson();
-                    ids = gson.fromJson(idsString, new TypeToken<List<Integer>>(){}.getType());
+                    ids = gson.fromJson(idsString, new TypeToken<List<Integer>>() {
+                    }.getType());
                 } catch (JsonSyntaxException e) {
                     messages.add("Invalid request. Invalid IDs.");
                     break;
@@ -250,7 +251,7 @@ public class AdminKillmapManagement extends HttpServlet {
                 if (!KillmapDAO.enqueueJob(new KillMapJob(killmapType, id))) {
                     logger.warn("Failed to queue killmap for {}: {}", killmapType, StringUtils.join(ids));
                     messages.add(String.format("Failed to queue selected %s.",
-                            pluralize(ids.size(), "killmap", "killmaps")));
+                            pluralize(ids.size(), "killmap")));
                 } else {
                     successfulIds.add(id);
                 }
@@ -259,9 +260,9 @@ public class AdminKillmapManagement extends HttpServlet {
             logger.info("User {} queued killmaps for {}: {}",
                     login.getUserId(), killmapType, StringUtils.join(successfulIds));
             messages.add(String.format("Successfully queued %d %s.",
-                    successfulIds.size(), pluralize(successfulIds.size(), "killmap", "killmaps")));
+                    successfulIds.size(), pluralize(successfulIds.size(), "killmap")));
 
-        /* Otherwise, construct an error message with the missing ids. */
+            /* Otherwise, construct an error message with the missing ids. */
         } else {
             Set<Integer> existingIdsSet = new TreeSet<>(existingIds);
             String missingIds = ids.stream()
@@ -287,7 +288,7 @@ public class AdminKillmapManagement extends HttpServlet {
             }
 
             messages.add(String.format("Invalid request. No %s for %s %s exist. No killmaps were queued.",
-                    type, pluralize(count, "ID", "IDs"), missingIds));
+                    type, pluralize(count, "ID"), missingIds));
         }
     }
 
@@ -297,7 +298,7 @@ public class AdminKillmapManagement extends HttpServlet {
             logger.info("User {} canceled killmap jobs for {}: {}",
                     login.getUserId(), killmapType, StringUtils.join(ids, ", "));
             messages.add(String.format("Successfully canceled %d %s.",
-                    ids.size(), pluralize(ids.size(), "job", "jobs")));
+                    ids.size(), pluralize(ids.size(), "job")));
         } else {
             logger.warn("Failed to cancel killmap jobs: " + StringUtils.join(ids, ", "));
             messages.add("Failed to cancel selected jobs.");
@@ -311,7 +312,7 @@ public class AdminKillmapManagement extends HttpServlet {
         logger.info("User {} deleted killmaps for {}: {}",
                 login.getUserId(), killmapType, StringUtils.join(ids, ", "));
         messages.add(String.format("Successfully deleted %d %s.",
-                ids.size(), pluralize(ids.size(), "killmap", "killmaps")));
+                ids.size(), pluralize(ids.size(), "killmap")));
 
         /* logger.warn("Failed to delete killmaps: {}", StringUtils.join(ids, ", "));
         addMessage(request.getSession(), "Failed to delete selected killmaps."); */
@@ -341,6 +342,7 @@ public class AdminKillmapManagement extends HttpServlet {
 
     /**
      * Sets the page attribute in the request according to the path info in the URL.
+     *
      * @return The page according to the path info.
      */
     private KillmapPage setPage(HttpServletRequest request) {

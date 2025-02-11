@@ -35,6 +35,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -372,7 +373,10 @@ public class Compiler {
     private static void moveDependencies(List<JavaFileObject> dependencies, Path baseDirectory, Boolean logError) {
         for (JavaFileObject dependency : dependencies) {
             try {
-                final Path oldPath = getClassPath(dependency, baseDirectory);
+                final Path oldPath;
+                Path fullJavaPath = Path.of(dependency.getPath());
+                Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
+                oldPath = baseDirectory.resolve(withoutBase.toString().replace(".java", ".class"));
                 // path relative from the base directory, {@code dependencies/} folder just has to be added between them
                 final Path classFileStructure = baseDirectory.relativize(
                         Paths.get(oldPath.toString().replace(".java", ".class")));

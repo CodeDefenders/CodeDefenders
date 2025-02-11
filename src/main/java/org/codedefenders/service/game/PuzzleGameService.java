@@ -24,9 +24,12 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -51,15 +54,16 @@ public class PuzzleGameService extends AbstractGameService {
         return mutant.isCovered(game.getTests(true));
     }
 
-    // TODO: This doesn't use playerRole. Why not?! Doesn't {@link #determineRole} doesn't work for PuzzleGames?
     @Override
     protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole) {
-        if (player != null) {
-            return player.getRole() != null && player.getRole() != Role.NONE;
-        } else {
-            return false;
-        }
+        PuzzleGame puzzleGame = (PuzzleGame) game;
+        return mutant.getCreatorId() == user.getId()
+                || game.isFinished()
+                || game.getLevel() == GameLevel.EASY
+                || puzzleGame.getPuzzle().getType() == PuzzleType.ATTACKER
+                || puzzleGame.getPuzzle().getType() == PuzzleType.EQUIVALENCE
+                || mutant.getState() == Mutant.State.KILLED;
     }
 
     @Override
@@ -70,6 +74,10 @@ public class PuzzleGameService extends AbstractGameService {
 
     @Override
     protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
-        return true;
+        PuzzleGame puzzleGame = (PuzzleGame) game;
+        return test.getPlayerId() == player.getId()
+                || game.isFinished()
+                || game.getLevel() == GameLevel.EASY
+                || puzzleGame.getPuzzle().getType() == PuzzleType.DEFENDER;
     }
 }

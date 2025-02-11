@@ -22,9 +22,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.codedefenders.dto.UserStats;
-import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.util.QueryRunner;
@@ -83,13 +80,13 @@ public class UserStatsDAO {
 
     private int getNumMutantsByUser(int userId, boolean alive, GameType gameType) {
         @Language("SQL") final String query = """
-                SELECT count(Mutant_ID) AS mutants
-                FROM view_valid_user_mutants mutants
-                JOIN %s AS games
-                ON mutants.Game_ID = games.ID
-                WHERE User_ID = ?
-                AND Alive = ?;
-        """.formatted(
+                        SELECT count(Mutant_ID) AS mutants
+                        FROM view_valid_user_mutants mutants
+                        JOIN %s AS games
+                        ON mutants.Game_ID = games.ID
+                        WHERE User_ID = ?
+                        AND Alive = ?;
+                """.formatted(
                 getViewForGameType(gameType)
         );
 
@@ -125,13 +122,13 @@ public class UserStatsDAO {
 
     private int getNumTestsByUser(int userId, GameType gameType, boolean killingTest) {
         @Language("SQL") final String query = """
-                SELECT count(Test_ID) AS tests
-                FROM view_valid_user_tests tests
-                JOIN %s AS games
-                ON tests.Game_ID = games.ID
-                WHERE User_ID = ?
-                AND MutantsKilled %s 0;
-        """.formatted(
+                        SELECT count(Test_ID) AS tests
+                        FROM view_valid_user_tests tests
+                        JOIN %s AS games
+                        ON tests.Game_ID = games.ID
+                        WHERE User_ID = ?
+                        AND MutantsKilled %s 0;
+                """.formatted(
                 getViewForGameType(gameType),
                 killingTest ? ">" : "="
         );
@@ -167,12 +164,12 @@ public class UserStatsDAO {
 
     private double getPointsTestByUser(int userId, GameType gameType, boolean avg) {
         @Language("SQL") final String query = """
-                SELECT %s(Points) AS points
-                FROM view_valid_user_tests tests
-                JOIN %s AS games
-                ON tests.Game_ID = games.ID
-                WHERE User_ID = ?;
-        """.formatted(
+                        SELECT %s(Points) AS points
+                        FROM view_valid_user_tests tests
+                        JOIN %s AS games
+                        ON tests.Game_ID = games.ID
+                        WHERE User_ID = ?;
+                """.formatted(
                 avg ? "avg" : "sum",
                 getViewForGameType(gameType)
         );
@@ -208,12 +205,12 @@ public class UserStatsDAO {
 
     private double getPointsMutantByUser(int userId, GameType gameType, boolean avg) {
         @Language("SQL") final String query = """
-                SELECT %s(Points) AS points
-                FROM view_valid_user_mutants mutants
-                JOIN %s AS games
-                ON mutants.Game_ID = games.ID
-                WHERE User_ID = ?;
-        """.formatted(
+                        SELECT %s(Points) AS points
+                        FROM view_valid_user_mutants mutants
+                        JOIN %s AS games
+                        ON mutants.Game_ID = games.ID
+                        WHERE User_ID = ?;
+                """.formatted(
                 avg ? "avg" : "sum",
                 getViewForGameType(gameType)
         );
@@ -254,13 +251,13 @@ public class UserStatsDAO {
         }
 
         @Language("SQL") final String query = """
-                SELECT count(view_players.Game_ID) AS games
-                FROM view_players
-                JOIN %s AS g
-                ON view_players.Game_ID = g.ID
-                WHERE User_ID = ?
-                AND Role = ?
-        """.formatted(
+                        SELECT count(view_players.Game_ID) AS games
+                        FROM view_players
+                        JOIN %s AS g
+                        ON view_players.Game_ID = g.ID
+                        WHERE User_ID = ?
+                        AND Role = ?
+                """.formatted(
                 getViewForGameType(gameType)
         );
 
@@ -272,43 +269,15 @@ public class UserStatsDAO {
         ).orElse(0);
     }
 
-    public UserStats.PuzzleStats getPuzzleStatsByUser(int userId) {
-        @Language("SQL") final String query = """
-                SELECT puzzle_chapters.Position AS chapter, MAX(puzzles.Position) AS puzzle
-                FROM puzzles, puzzle_chapters, games
-                WHERE puzzles.Chapter_ID = puzzle_chapters.Chapter_ID
-                  AND games.Puzzle_ID = puzzles.Puzzle_ID
-                  AND games.Mode = ?
-                  AND games.State = ?
-                  AND games.Creator_ID = ?
-                GROUP BY puzzle_chapters.Position
-        """;
-
-        return queryRunner.query(
-                query,
-                resultSet -> {
-                    final UserStats.PuzzleStats stats = new UserStats.PuzzleStats();
-                    while (resultSet.next()) {
-                        stats.addPuzzle(
-                                resultSet.getInt("chapter"),
-                                resultSet.getInt("puzzle")
-                        );
-                    }
-                    return stats;
-                },
-                GameMode.PUZZLE.toString(), GameState.SOLVED.toString(), userId
-        );
-    }
-
     public int getTotalGamesByUser(int userId, GameType gameType) {
         @Language("SQL") final String query = """
-                SELECT count(view_players.Game_ID) AS games
-                FROM view_players
-                JOIN %s AS g
-                ON view_players.Game_ID = g.ID
-                WHERE User_ID = ?
-        """.formatted(
-            getViewForGameType(gameType)
+                        SELECT count(view_players.Game_ID) AS games
+                        FROM view_players
+                        JOIN %s AS g
+                        ON view_players.Game_ID = g.ID
+                        WHERE User_ID = ?
+                """.formatted(
+                getViewForGameType(gameType)
         );
 
         return queryRunner.query(

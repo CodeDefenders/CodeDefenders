@@ -2,7 +2,9 @@ package org.codedefenders.beans.game;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.enterprise.context.RequestScoped;
@@ -12,12 +14,14 @@ import jakarta.inject.Named;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.concurrent.EditorUtils;
 
 /**
  * <p>Provides data for the mutant editor game component.</p>
@@ -57,6 +61,11 @@ public class MutantEditorBean {
      */
     private Integer editableLinesEnd;
 
+    /**
+     * Whether the editor is readonly.
+     */
+    private boolean readonly;
+
     @Inject
     public MutantEditorBean(GameClassRepository gameClassRepo, GameProducer gameProducer,
                             PreviousSubmissionBean previousSubmission) {
@@ -79,6 +88,7 @@ public class MutantEditorBean {
         if (game instanceof PuzzleGame p) {
             setEditableLinesForPuzzle(p.getPuzzle());
         }
+        setReadonly(game.getState() == GameState.SOLVED || game.getState() == GameState.FINISHED);
     }
 
     /**
@@ -104,13 +114,7 @@ public class MutantEditorBean {
     }
 
     public void setDependenciesForClass(GameClass clazz) {
-        dependencies = new HashMap<>();
-        for (Dependency dependency : gameClassRepo.getMappedDependenciesForClassId(clazz.getId())) {
-            Path path = Paths.get(dependency.getJavaFile());
-            String className = FileUtils.extractFileNameNoExtension(path);
-            String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
-            dependencies.put(className, classCode);
-        }
+        dependencies = EditorUtils.getDependencyHashMap(clazz.getId(), gameClassRepo);
     }
 
     public void setEditableLinesForPuzzle(Puzzle puzzle) {
@@ -154,5 +158,13 @@ public class MutantEditorBean {
 
     public boolean hasEditableLinesEnd() {
         return editableLinesEnd != null;
+    }
+
+    public boolean isReadonly() {
+        return readonly;
+    }
+
+    public void setReadonly(boolean readonly) {
+        this.readonly = readonly;
     }
 }

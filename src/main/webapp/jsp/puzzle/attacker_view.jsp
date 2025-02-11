@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -124,7 +125,10 @@
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzle.description}</h4>
-                <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                <div class="align-items-center d-flex gap-4">
+                    <t:round_counter game="${game}"/>
+                    <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                </div>
             </div>
             <hr>
 

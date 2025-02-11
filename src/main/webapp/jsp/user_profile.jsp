@@ -23,6 +23,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="profile" type="org.codedefenders.beans.user.UserProfileBean"--%>
@@ -32,6 +33,7 @@
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link rel="stylesheet" href="${url.forPath("/css/specific/user_profile.css")}">
+        <link rel="stylesheet" href="${url.forPath("/css/specific/puzzle_overview.css")}">
     </jsp:attribute>
     <jsp:body>
         <div class="container">
@@ -40,7 +42,7 @@
             <section>
                 <h2>Achievements</h2>
                 <div class="achievements">
-                    <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
+                        <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
                     <c:if test="${profile.unlockedAchievements.size() == 0}">
                         <div class="no-achievements">No achievement unlocked yet.</div>
                     </c:if>
@@ -54,11 +56,11 @@
                     </button>
                     <script>
                         const button = document.currentScript.previousElementSibling;
-                        button.addEventListener("click", function(event) {
+                        button.addEventListener("click", function (event) {
                             document.querySelector('.locked-achievements').classList.toggle('hidden');
                             button.innerText = button.innerText === 'Show all achievements'
-                                    ? 'Hide locked achievements'
-                                    : 'Show all achievements';
+                                ? 'Hide locked achievements'
+                                : 'Show all achievements';
                         });
                     </script>
                     <div class="achievements locked-achievements hidden">
@@ -164,20 +166,60 @@
             <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
                 <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
 
-                <dl class="other-stats">
-                        <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
-                        <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
-                        <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
-                    <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
-                        <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
-                        <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
-                        <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
-                        <dd ${hasPlayed}>
-                            <c:choose><c:when test="${maxPuzzle != 0}">
-                                highest puzzle solved is puzzle ${maxPuzzle}
-                            </c:when><c:otherwise>
-                                chapter not played yet
-                            </c:otherwise></c:choose>
+                <dl class="puzzle-stats">
+                    <c:forEach items="${profile.puzzleGames}" var="chapter">
+                        <dt>Chapter ${chapter.chapter.position} - ${chapter.chapter.title}</dt>
+                        <dd>
+                            <div class="chapter__levels">
+                                <c:set var="solvedPuzzles"
+                                       value="${chapter.puzzleEntries.stream().filter(p -> p.solved).count()}"/>
+                                <c:set var="unsolvedPuzzles" value="${chapter.puzzleEntries.size() - solvedPuzzles}"/>
+
+                                <c:forEach items="${chapter.puzzleEntries}" var="puzzle">
+                                    <c:if test="${puzzle.solved}">
+                                        <div class="chapter__level puzzle-solved">
+                                            <img class="chapter__level__watermark" alt="${puzzle.puzzle.type}"
+                                                    <c:choose>
+                                                        <c:when test="${puzzle.puzzle.type == 'EQUIVALENCE'}">
+                                                            src="${url.forPath("/images/ingameicons/equivalence.png")}"
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                            />
+                                            <div class="chapter__level__image">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                                    <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"></path>
+                                                </svg>
+                                                <span class="puzzle-attempt-counter"
+                                                      data-bs-toggle="tooltip"
+                                                      title="Puzzle solved in ${puzzle.rounds} ${fn:pluralizeWithS(puzzle.rounds, "attempt")}."
+                                                >${puzzle.rounds}</span>
+                                            </div>
+                                            <div class="chapter__level__title">
+                                                <h3>${puzzle.puzzle.title}</h3>
+                                                <p>${puzzle.puzzle.type == 'EQUIVALENCE' ? 'Equivalence'
+                                                        : puzzle.puzzle.type == 'ATTACKER' ? 'Attacker' : 'Defender'}
+                                                    puzzle</p>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                </c:forEach>
+                                <c:if test="${unsolvedPuzzles > 0}">
+                                    <div class="chapter__level puzzle-locked">
+                                        <div class="chapter__level__image">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="chapter__level__title">
+                                            <h3>${unsolvedPuzzles} ${fn:pluralizeWithS(unsolvedPuzzles, "puzzle")}
+                                                unsolved</h3>
+                                        </div>
+                                    </div>
+                                </c:if>
+                            </div>
                         </dd>
                     </c:forEach>
                 </dl>

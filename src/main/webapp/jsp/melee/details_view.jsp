@@ -28,6 +28,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.auth.CodeDefendersAuth" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
@@ -36,31 +37,31 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MeleeGame"--%>
-<%--@elvariable id="playerId" type="java.lang.Integer"--%>
+<%--@elvariable id="playerId" type="java.util.Optional"--%>
 <%--@elvariable id="meleeScoreboard" type="org.codedefenders.beans.game.MeleeScoreboardBean"--%>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%
-	MeleeGame game = (MeleeGame) request.getAttribute("game");
-	Role role = game.getRole(login.getUserId());
+    MeleeGame game = (MeleeGame) request.getAttribute("game");
+    Role role = game.getRole(login.getUserId());
     pageContext.setAttribute("role", role);
 %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 <%
-	playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
-	playerFeedback.setPlayerInfo(login.getUserId(), role);
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUserId(), role);
 %>
 
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
-	history.setLogin(login);
-	history.setGameId(game.getId());
+    history.setLogin(login);
+    history.setGameId(game.getId());
 
     Player userPlayer = null;
-	List<Player> otherPlayers = new ArrayList<>();
+    List<Player> otherPlayers = new ArrayList<>();
     for (Player player : game.getPlayers()) {
         if (player.getUser().getId() == login.getUserId()) {
             userPlayer = player;
@@ -69,8 +70,8 @@
         }
     }
 
-	// We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
-	history.setPlayers(Collections.singletonList(userPlayer), otherPlayers);
+    // We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
+    history.setPlayers(Collections.singletonList(userPlayer), otherPlayers);
 %>
 
 <%--
@@ -83,20 +84,25 @@
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
-    final CodeDefendersAuth finalLogin = login;
-    int playerId = game.getPlayers().stream()
+    final CodeDefendersAuth finalLogin = login; // login is not considered effectively final
+    Optional<Integer> playerId = game.getPlayers().stream()
             .filter(p -> p.getUser().getId() == finalLogin.getUserId())
             .map(Player::getId)
-            .findFirst()
-            .orElseThrow();
-    List<Test> enemyTests = game.getTests()
-            .stream()
-            .filter(t -> t.getPlayerId() != playerId)
-            .collect(Collectors.toList());
-    List<Test> playerTests = game.getTests()
-            .stream()
-            .filter(t -> t.getPlayerId() == playerId)
-            .collect(Collectors.toList());
+            .findFirst();
+    List<Test> enemyTests = game.getTests();
+    List<Test> playerTests = game.getTests();
+    if (playerId.isPresent()) {
+        int pId = playerId.get();
+        enemyTests = enemyTests.stream()
+                .filter(t -> t.getPlayerId() != pId)
+                .collect(Collectors.toList());
+        playerTests = playerTests.stream()
+                .filter(t -> t.getPlayerId() == pId)
+                .collect(Collectors.toList());
+    } else {
+        // the user is not a player in this game, but only a spectator
+        playerTests = Collections.emptyList();
+    }
 
     gameHighlighting.setGameData(game.getMutants(), playerTests, login.getUserId());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
@@ -156,7 +162,7 @@
                     </a>
                 </div>
             </div>
-            <%-- /HEADER --%>
+                <%-- /HEADER --%>
 
             <div class="details-content">
                 <div class="details-content__item">
@@ -182,7 +188,7 @@
                     <c:set var="duration" value="${game.gameDurationMinutes}"/>
                     <c:set var="startTime" value="${game.startTimeUnixSeconds}"/>
 
-                    <%-- Progress Bar --%>
+                        <%-- Progress Bar --%>
                     <div class="progress mb-3" style="height: 1em;">
                         <div class="progress-bar progress-bar-striped time-left"
                              data-type="progress"
@@ -193,7 +199,7 @@
                         </div>
                     </div>
 
-                    <%-- Duration Info --%>
+                        <%-- Duration Info --%>
                     <div class="row text-center">
                         <div class="col-6 d-flex flex-column align-items-center">
                             <small>Total Duration</small>
@@ -225,33 +231,46 @@
                 <div class="details-content__item">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <h3 class="mb-0">Class under test</h3>
-                        <div data-bs-toggle="tooltip" data-bs-html="true"
-                             title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
-                            <input class="btn-check" type="checkbox" id="highlighting-switch" autocomplete="off">
-                            <label class="btn btn-outline-secondary" for="highlighting-switch">
-                                Enemy Coverage
-                                <i class="fa fa-check ms-1 btn-check-active"></i>
-                            </label>
-                        </div>
+                        <c:choose>
+                            <c:when test="${role == Role.OBSERVER}">
+                                <div data-bs-toggle="tooltip" data-bs-html="true"
+                                     title="<p>You are an observer in this game.<br>The coverage of all player tests is shown.</p>">
+                                    <i class="fa fa-eye"></i>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div data-bs-toggle="tooltip" data-bs-html="true"
+                                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p>'>
+                                    <input class="btn-check" type="checkbox" id="highlighting-switch"
+                                           autocomplete="off">
+                                    <label class="btn btn-outline-secondary" for="highlighting-switch">
+                                        Enemy Coverage
+                                        <i class="fa fa-check ms-1 btn-check-active"></i>
+                                    </label>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
                     <script type="module">
                         import $ from '${url.forPath("/js/jquery.mjs")}';
-
                         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
-
 
                         const gameHighlighting = await objects.await('gameHighlighting');
 
-                        $('#highlighting-switch').change(function () {
-                            gameHighlighting.clearCoverage();
-                            if (this.checked) {
-                                gameHighlighting.highlightAlternativeCoverage();
-                            } else {
-                                gameHighlighting.highlightCoverage();
-                            }
-                        })
+                        if (${role == Role.OBSERVER}) {
+                            gameHighlighting.highlightAlternativeCoverage();
+                        } else {
+                            $('#highlighting-switch').change(function () {
+                                gameHighlighting.clearCoverage();
+                                if (this.checked) {
+                                    gameHighlighting.highlightAlternativeCoverage();
+                                } else {
+                                    gameHighlighting.highlightCoverage();
+                                }
+                            });
+                        }
                     </script>
                 </div>
 

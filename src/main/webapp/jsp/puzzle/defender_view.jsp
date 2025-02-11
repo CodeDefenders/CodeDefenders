@@ -81,6 +81,7 @@
     } else {
         testEditor.setTestCodeForClass(cut);
     }
+    testEditor.setReadonly(game.getState() == GameState.SOLVED);
 %>
 
 
@@ -128,15 +129,18 @@
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
                 <h4 class="m-0">${puzzle.description}</h4>
-                <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                <div class="align-items-center d-flex gap-4">
+                    <t:round_counter game="${game}"/>
+                    <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                </div>
             </div>
             <hr>
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="cut-div">
                     <div class="game-component-header"><h3>Class Under Test</h3></div>
-                    <%-- <t:defender_intention_collection_note/>
-                         for defender intetion collection, not needed here --%>
+                        <%-- <t:defender_intention_collection_note/>
+                             for defender intetion collection, not needed here --%>
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
                 </div>
@@ -148,12 +152,13 @@
                         <h3>Write a new JUnit test here</h3>
                         <div>
                             <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                                    ${game.state != GameState.ACTIVE ? 'disabled' : ''}>
+                                ${game.state != GameState.ACTIVE ? 'disabled' : ''}>
                                 Defend
                             </button>
 
                             <script type="module">
                                 import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
                                 const testProgressBar = await objects.await('testProgressBar');
 
 
@@ -171,8 +176,8 @@
                           method="post">
                         <input type="hidden" name="formType" value="createTest">
                         <input type="hidden" name="gameId" value="${game.id}">
-                        <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
-                             for defender intention collection, not needed here --%>
+                            <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
+                                 for defender intention collection, not needed here --%>
 
                         <jsp:include page="/jsp/game_components/test_editor.jsp"/>
                     </form>

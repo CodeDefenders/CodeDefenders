@@ -18,12 +18,6 @@
  */
 package org.codedefenders.dto;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.codedefenders.game.puzzle.PuzzleChapter;
-
 /**
  * These Data Transfer Objects contain all statistics of a user shown on each profile page.
  */
@@ -174,46 +168,4 @@ public class UserStats {
         return defenderGames;
     }
 
-    public static class PuzzleStats {
-        Map<Integer, Integer> maxPuzzlePerChapter;
-        Collection<PuzzleChapter> chapters;
-
-        public PuzzleStats() {
-            maxPuzzlePerChapter = new HashMap<>();
-        }
-
-        /**
-         * Updates the highest puzzle number of a chapter, if the given puzzle number is higher than the current one.
-         *
-         * @param chapter The chapter of the puzzle.
-         * @param puzzle  The puzzle number.
-         */
-        public void addPuzzle(int chapter, int puzzle) {
-            if (maxPuzzlePerChapter.containsKey(chapter)) {
-                if (maxPuzzlePerChapter.get(chapter) < puzzle) {
-                    maxPuzzlePerChapter.put(chapter, puzzle);
-                }
-            } else {
-                maxPuzzlePerChapter.put(chapter, puzzle);
-            }
-        }
-
-        /**
-         * Returns the highest puzzle number of a chapter.
-         *
-         * @param chapter The chapter of the puzzle.
-         * @return The highest puzzle number of the chapter or 0 if the chapter hasn't been played yet.
-         */
-        public int getMaxPuzzle(int chapter) {
-            return maxPuzzlePerChapter.getOrDefault(chapter, 0);
-        }
-
-        public void setChapters(Collection<PuzzleChapter> chapters) {
-            this.chapters = chapters;
-        }
-
-        public Collection<PuzzleChapter> getChapters() {
-            return chapters;
-        }
-    }
 }
