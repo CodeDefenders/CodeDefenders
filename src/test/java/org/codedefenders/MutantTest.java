@@ -435,6 +435,116 @@ public class MutantTest {
             return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
         }
 
+        private Arguments testIfNonAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString() {
+            String originalCode = """
+                        line 1
+                        line 2
+                        line 3
+                        line 4
+                        line 5
+                    }""".stripIndent();
+
+            String mutantCode = """
+                          line   1
+                        line 2
+                        line changed
+                        line 4
+                          line   5
+                    }""".stripIndent();
+
+            Consumer<Mutant> assertions = mutant -> {
+                var expected = """
+                    --- /dev/null
+                    +++ /dev/null
+                    @@ -0,6 +1,6 @@
+                         line 1
+                         line 2
+                    -    line 3
+                    +    line changed
+                         line 4
+                         line 5
+                     }
+                    """.stripIndent();
+                assertEquals(expected, mutant.getPatchString());
+            };
+
+            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+        }
+
+        private Arguments testIfAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString() {
+            String originalCode = """
+                        line 1
+                        line 2
+                        line 3
+                        line 4
+                        line 5
+                    }""".stripIndent();
+
+            String mutantCode = """
+                        line 1
+                          line   2
+                        line changed
+                          line   4
+                        line 5
+                    }""".stripIndent();
+
+            Consumer<Mutant> assertions = mutant -> {
+                var expected = """
+                    --- /dev/null
+                    +++ /dev/null
+                    @@ -0,6 +1,6 @@
+                         line 1
+                         line 2
+                    -    line 3
+                    +    line changed
+                         line 4
+                         line 5
+                     }
+                    """.stripIndent();
+                assertEquals(expected, mutant.getPatchString());
+            };
+
+            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+        }
+
+        private Arguments testIfSingleLineWhitespaceChangesInStringsAreFilteredNotOutForPatchString() {
+            String originalCode = """
+                        "line 1"
+                        "line 2"
+                        "line 3"
+                        "line 4"
+                        "line 5"
+                    }""".stripIndent();
+
+            String mutantCode = """
+                          "line   1"
+                        "line 2"
+                        "line changed"
+                          "line   4"
+                        "line 5"
+                    }""".stripIndent();
+
+            Consumer<Mutant> assertions = mutant -> {
+                var expected = """
+                    --- /dev/null
+                    +++ /dev/null
+                    @@ -1,6 +1,6 @@
+                    -    "line 1"
+                    +      "line   1"
+                         "line 2"
+                    -    "line 3"
+                    -    "line 4"
+                    +    "line changed"
+                    +      "line   4"
+                         "line 5"
+                     }
+                    """.stripIndent();
+                assertEquals(expected, mutant.getPatchString());
+            };
+
+            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+        }
+
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
             return Stream.of(
@@ -445,7 +555,10 @@ public class MutantTest {
                     testGetLinesForChangeLineAndInsertMultipleLines(),
                     testGetLinesForInsertionMutantOnDisjointLines(),
                     testGetLinesForEmptySpaces(),
-                    testGetLinesForEmptySpacesOutsideStrings()
+                    testGetLinesForEmptySpacesOutsideStrings(),
+                    testIfNonAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString(),
+                    testIfAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString(),
+                    testIfSingleLineWhitespaceChangesInStringsAreFilteredNotOutForPatchString()
             );
         }
     }
