@@ -435,6 +435,10 @@ public class MutantTest {
             return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
         }
 
+        /**
+         * Test if whitespace changes are discarded when they are not adjacent to a non-whitespace change.
+         * In this case, the whitespace changes are in a different chunk of the diff than the non-whitespace change.
+         */
         private Arguments testIfNonAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString() {
             String originalCode = """
                         line 1
@@ -471,6 +475,10 @@ public class MutantTest {
             return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
         }
 
+        /**
+         * Test if whitespace changes are discarded when they are adjacent to a non-whitespace change.
+         * In this case, the whitespace changes are in the same chunk of the diff as the non-whitespace change.
+         */
         private Arguments testIfAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString() {
             String originalCode = """
                         line 1
@@ -507,6 +515,9 @@ public class MutantTest {
             return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
         }
 
+        /**
+         * Test if whitespace changes inside of strings are preserved.
+         */
         private Arguments testIfSingleLineWhitespaceChangesInStringsAreFilteredNotOutForPatchString() {
             String originalCode = """
                         "line 1"

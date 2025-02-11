@@ -314,6 +314,10 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
+    /**
+     * Removes single-line whitespace changes from a patch.
+     * Whitespace inside of strings ("") is preserved.
+     */
     public void removeSingleLineWhitespaceChanges(Patch<String> patch) {
         for (var delta : new ArrayList<>(patch.getDeltas())) {
             var source = delta.getSource().getLines();
@@ -334,6 +338,7 @@ public class Mutant implements Serializable {
                     source.remove(i);
                     target.remove(i);
                     if (i == 0) {
+                        // adjust the chunk's start line if the first lines contain only whitespace changes
                         sourcePos++;
                         targetPos++;
                     }
@@ -342,8 +347,10 @@ public class Mutant implements Serializable {
             }
 
             if (discardDelta) {
+                // discard the whole chunk if it only consists of whitespace changes
                 patch.getDeltas().remove(delta);
             } else if (updateDelta) {
+                // update the chunk if it contains lines with only whitespace changes
                 patch.getDeltas().remove(delta);
                 patch.getDeltas().add(delta.withChunks(
                     new Chunk<>(sourcePos, source),
