@@ -72,6 +72,7 @@
             const dependencyTextAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
             const dependencyHeaders = document.currentScript.parentElement.querySelectorAll('button[id^="class-header-"]');
             const classId = <%= classId %>;
+            const hasDependencies = dependencyHeaders.length > 0;
 
             modal.addEventListener('shown.bs.modal', async function () {
                 const codeMirrorContainer = this.querySelector('.CodeMirror');
@@ -91,13 +92,22 @@
                 });
                 editor.getWrapperElement().classList.add('codemirror-readonly');
 
-                await InfoApi.setClassEditorValue(editor, classId);
+                const classInfo = await InfoApi.getClassInfo(classId, hasDependencies);
 
-                const classInfo = await InfoApi.getClassInfo(classId, true);
-                cutTitle.textContent = classInfo.name;
-
+                try {
+                    editor.setValue(classInfo.source)
+                    cutTitle.textContent = classInfo.name;
+                } catch (e) {
+                    editor.setValue("Could not fetch class.\nPlease try again later.");
+                    cutTitle.textContent = "Error";
+                }
+                
                 await dependencyHeaders.forEach((header, index) => {
-                    header.textContent = classInfo.dependency_names[index];
+                    try {
+                        header.textContent = classInfo.dependency_names[index];
+                    } catch (e) {
+                        header.textContent = "Error";
+                    }
                 });
 
                 await dependencyTextAreas.forEach((textarea, index) => {
@@ -108,7 +118,11 @@
                         autoRefresh: true
                     });
                     dependencyEditor.getWrapperElement().classList.add('codemirror-readonly');
-                    InfoApi.setDependencyEditorValue(dependencyEditor, classId, index);
+                    try {
+                        dependencyEditor.setValue(classInfo.dependency_code[index])
+                    } catch (e) {
+                        dependencyEditor.setValue("Could not fetch dependency \n Please try again later.");
+                    }
                 });
                 const codeMirrorContainers = this.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
                 if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
