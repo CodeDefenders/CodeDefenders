@@ -3,42 +3,74 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
 
 <%@ attribute name="classId" required="true" %>
 <%@ attribute name="classAlias" required="true" %>
 <%@ attribute name="htmlId" required="true" %>
 <%@ tag import="org.codedefenders.util.FileUtils" %>
 <%
-    //List<String> deps = FileUtils.getCodeFromDependencies(Integer.parseInt(classId));
-    //String depsJson = new Gson().toJson(deps);
-    request.setAttribute("number_of_dependencies", FileUtils.getCodeFromDependencies(Integer.parseInt(classId)).size());//TODO
+    request.setAttribute("number_of_dependencies", FileUtils.getNumberOfDependencies(Integer.parseInt(classId)));//TODO
 %>
 
 <div>
     <t:modal title="${classAlias}" id="${htmlId}"
              modalDialogClasses="modal-dialog-responsive"
              modalBodyClasses="loading loading-bg-gray loading-height-200">
+
         <jsp:attribute name="content">
-            <div class="card">
-                <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
-                    <pre class="m-0"><textarea></textarea></pre>
-                </div>
-            </div>
-            <c:forEach var="i" begin="1" end="${number_of_dependencies}">
                     <div class="card">
+                        <div class="card-header">
+                            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link py-1 active" data-bs-toggle="tab"
+                                            id="cut-header-${classId}"
+                                            data-bs-target="#cut-body-${classId}"
+                                            aria-controls="cut-body-${classId}"
+                                            type="button" role="tab" aria-selected="true">
+                                    </button>
+                                </li>
+                                <c:forEach var="i" begin="1" end="${number_of_dependencies}">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-1" data-bs-toggle="tab"
+                                                id="class-header-${classId}-${i}"
+                                                data-bs-target="#class-body-${classId}-${i}"
+                                                aria-controls="class-body-${classId}-${i}"
+                                                type="button" role="tab" aria-selected="false">
+                                        </button>
+                                    </li>
+                                </c:forEach>
+                            </ul>
+                        </div>
                         <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
-                            <pre class="m-0"><textarea id="dependency-area-${i}"></textarea></pre>
+                            <div class="tab-content">
+                                <div class="tab-pane active"
+                                     id="cut-body-${classId}"
+                                     aria-labelledby="cut-header-${classId}"
+                                     role="tabpanel">
+                                    <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly></textarea></pre>
+                                </div>
+                                <c:forEach var="i" begin="1" end="${number_of_dependencies}">
+                                    <div class="tab-pane"
+                                         id="class-body-${classId}-${i}"
+                                         aria-labelledby="class-header-${classId}-${i}"
+                                         role="tabpanel">
+                                        <pre class="m-0"><textarea id="dependency-area-${i}" name="dependency-${i}" title="dependency-${i}" readonly></textarea></pre>
+                                    </div>
+                                </c:forEach>
+                            </div>
                         </div>
                     </div>
-            </c:forEach>
-        </jsp:attribute>
+            </jsp:attribute>
     </t:modal>
 
     <script>
         (function () {
             const modal = document.currentScript.parentElement.querySelector('.modal');
-            const cutTextArea = document.currentScript.parentElement.querySelector('textarea');
+            const cutTextArea = document.currentScript.parentElement.querySelector('textarea[id="sut"]');
+            const cutTitle = document.currentScript.parentElement.querySelector('button[id^="cut-header"]');
             const dependencyTextAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
+            const dependencyHeaders = document.currentScript.parentElement.querySelectorAll('button[id^="class-header-"]');
             const classId = <%= classId %>;
 
             modal.addEventListener('shown.bs.modal', async function () {
@@ -60,7 +92,14 @@
                 editor.getWrapperElement().classList.add('codemirror-readonly');
 
                 await InfoApi.setClassEditorValue(editor, classId);
-                LoadingAnimation.hideAnimation(cutTextArea);
+
+                const classInfo = await InfoApi.getClassInfo(classId, true);
+                cutTitle.textContent = classInfo.name;
+
+                await dependencyHeaders.forEach((header, index) => {
+                    header.textContent = classInfo.dependency_names[index];
+                });
+
                 await dependencyTextAreas.forEach((textarea, index) => {
                     const dependencyEditor = CodeMirror.fromTextArea(textarea, {
                         lineNumbers: true,
@@ -70,14 +109,12 @@
                     });
                     dependencyEditor.getWrapperElement().classList.add('codemirror-readonly');
                     InfoApi.setDependencyEditorValue(dependencyEditor, classId, index);
-
-
-                    //setContentForTextarea(textarea, deps[index]);
                 });
                 const codeMirrorContainers = this.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
                 if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
                     codeMirrorContainers.forEach(container => container.CodeMirror.refresh());
                 }
+                LoadingAnimation.hideAnimation(cutTextArea);
             });
         })();
     </script>

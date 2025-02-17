@@ -295,6 +295,10 @@ public class GameClass {
         return FileUtils.getCodeFromDependencies(id);
     }
 
+    public List<String> getDependencyNames() {
+        return FileUtils.getDependencyNames(id);
+    }
+
     @Override
     public String toString() {
         return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";

@@ -375,7 +375,7 @@ public class FileUtils {
     /**
      * Returns the code of the dependencies belonging to a class under test.
      * @param cutId The id of the class under test.
-     * @return A list of String, properly escaped for JSON usage, containing the code of the dependencies.
+     * @return A list of Strings containing the code of the dependencies.
      */
     public static List<String> getCodeFromDependencies(int cutId) {
         List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class)
@@ -386,5 +386,22 @@ public class FileUtils {
             code.add(readJavaFileWithDefault(filePath));
         }
         return code;
+    }
+
+    /**
+     * Returns the names of the dependencies belonging to a class under test.
+     * @param cutId The id of the class under test.
+     * @return A list of Strings containing the dependency name. These names should be in the same order as the results
+     * of {@link FileUtils#getCodeFromDependencies(int)}.
+     */
+    public static List<String> getDependencyNames(int cutId) {
+        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class)
+                .getMappedDependenciesForClassId(cutId);
+        List<String> names = new ArrayList<>();
+        for (Dependency dep : dependencies) {
+            Path filePath = Path.of(dep.getJavaFile());
+            names.add(extractFileNameNoExtension(filePath));
+        }
+        return names;
     }
 }

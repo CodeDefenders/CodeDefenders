@@ -98,7 +98,10 @@ public class GameClassAPI extends HttpServlet {
         root.add("source", gson.toJsonTree(gameClass.getSourceCode(), String.class));
 
         if (withDependencies) {
-            root.add("dependency_code", gson.toJsonTree(gameClass.getDependencyCode().toArray(), String[].class));
+            root.add("dependency_names",
+                    gson.toJsonTree(gameClass.getDependencyNames().toArray(), String[].class));
+            root.add("dependency_code",
+                    gson.toJsonTree(gameClass.getDependencyCode().toArray(), String[].class));
         }
 
         return gson.toJson(root);
