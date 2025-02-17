@@ -21,13 +21,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<%@ page import="org.codedefenders.util.VersionUtils" %>
-
-<%
-    String version = VersionUtils.getCodeDefendersVersion();
-    pageContext.setAttribute("version", version);
-%>
-
 <c:set var="title" value="About Code Defenders"/>
 
 <p:main_page title="${title}">
@@ -35,12 +28,31 @@
 
         <h2 class="mb-4">${title}</h2>
 
-        <c:if test="${version != null}">
+        <c:if test="${aboutPage.version != null || aboutPage.gitCommitHash != null}">
             <h3>Version</h3>
             <div class="bg-light rounded-3 p-3 mb-3">
-                <p class="mb-0">
-                    This is Code Defenders version ${version}.
-                </p>
+                <c:if test="${aboutPage.version != null}">
+                    <p class="mb-0">
+                        This is Code Defenders version ${aboutPage.version}.
+                    </p>
+                </c:if>
+                <c:if test="${aboutPage.gitCommitHash != null}">
+                    <p class="mb-0">
+                        <c:choose>
+                            <c:when test="${aboutPage.version == null}">
+                                This is Code Defenders running on git commit ${aboutPage.gitCommitHash}.
+                            </c:when>
+                            <c:otherwise>
+                                The git commit hash is ${aboutPage.gitCommitHash}.
+                            </c:otherwise>
+                        </c:choose>
+                    </p>
+                    <c:if test="${aboutPage.dirty}">
+                        <p class="mb-0">
+                            The version is dirty, i.e., the working directory contains uncommitted changes.
+                        </p>
+                    </c:if>
+                </c:if>
             </div>
         </c:if>
 
@@ -48,7 +60,8 @@
         <div class="bg-light rounded-3 p-3 mb-3">
             <p class="mb-0">
                 CodeDefenders is developed and maintained at the
-                <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering&nbspII</a>
+                <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software
+                    Engineering&nbspII</a>
                 at the University of Passau and the
                 <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
             </p>
@@ -63,14 +76,16 @@
         <h3 class="mt-4 mb-3">Contributors</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (University of Passau)</a></li>
+                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser
+                    (University of Passau)</a></li>
                 <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (University of Leicester)</a></li>
             </ul>
             <ul class="mb-0">
                 <li>Ben Clegg (The University of Sheffield)</li>
                 <li>Alexander Degenhart (University of Passau)</li>
                 <li>Sabina Galdobin (University of Passau)</li>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi (University of Passau)</a></li>
+                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi
+                    (University of Passau)</a></li>
                 <li>Marvin Kreis (University of Passau)</li>
                 <li>Kassian K&ouml;ck (University of Passau)</li>
                 <li>Rob Sharp (The University of Sheffield)</li>
@@ -83,8 +98,11 @@
         <h3 class="mt-4 mb-3">Supporters</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul class="mb-0">
-                <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in Software Engineering Courses through Gamification)</li>
-                <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a></li>
+                <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in
+                    Software Engineering Courses through Gamification)
+                </li>
+                <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a>
+                </li>
                 <li><a href="http://royalsociety.org/">Royal Society (Grant RG160969)</a></li>
             </ul>
         </div>

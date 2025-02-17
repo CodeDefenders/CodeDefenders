@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -294,5 +295,62 @@ public class FileUtilsTest {
 
         assumeTrue(path.toFile().delete());
         assumeTrue(dir.toFile().delete());
+    }
+
+    @Test
+    public void testGetPackagePathFromJavaFile() {
+        Path emptyPath = Paths.get("");
+        Path expected = Paths.get("top");
+        final String legalFile = "package top;" + System.lineSeparator() + "public class Test {}";
+        assertEquals(expected, FileUtils.getPackagePathFromJavaFile(legalFile));
+
+        final String validFileWithLicenseText = """
+                /*
+                 * License
+                 */
+                package top;
+                public class Test {}
+                """;
+        assertEquals(expected, FileUtils.getPackagePathFromJavaFile(validFileWithLicenseText));
+
+        expected = Paths.get("top", "middle", "bottom");
+        final String legalFileWithManyWhitespaces = "  package    \ttop .middle.  bottom  ;\t" + System.lineSeparator() + "public class Test {}"
+                + System.lineSeparator();
+        assertEquals(expected, FileUtils.getPackagePathFromJavaFile(legalFileWithManyWhitespaces));
+
+        final String missingDeclaration = "public class Test {}";
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingDeclaration));
+
+        final String missingSemicolon = "package top" + System.lineSeparator() + "public class Test {}";
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingSemicolon));
+    }
+
+    @Test
+    public void testInvalidPackageDeclarations() {
+        Path emptyPath = Paths.get("");
+        final String packageInString =
+                """
+                        public class Test {
+                            private String s = "package top;";
+                        }
+
+                        """;
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageInString));
+
+        final String packageInComment =
+                """
+                        public class Test {
+                            //package top;
+                        }
+                        """;
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageInComment));
+
+        final String packageJustSlash =
+                """
+                        package /;
+                        public class Test {
+                        }
+                        """;
+        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
     }
 }
