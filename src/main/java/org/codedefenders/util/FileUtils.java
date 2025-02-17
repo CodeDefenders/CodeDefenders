@@ -403,6 +403,7 @@ public class FileUtils {
             names.add(extractFileNameNoExtension(filePath));
         }
         return names;
+    }
 
     /**
      * Checks if there are two files in the list with identical names.
