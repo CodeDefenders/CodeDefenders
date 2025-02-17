@@ -19,6 +19,15 @@
              modalBodyClasses="loading loading-bg-gray loading-height-200">
 
         <jsp:attribute name="content">
+            <c:choose>
+                <c:when test="${number_of_dependencies == 0}">
+                    <div class="card">
+                        <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
+                            <pre class="m-0"><textarea id="cut-area"></textarea></pre>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
                     <div class="card">
                         <div class="card-header">
                             <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
@@ -48,28 +57,32 @@
                                      id="cut-body-${classId}"
                                      aria-labelledby="cut-header-${classId}"
                                      role="tabpanel">
-                                    <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly></textarea></pre>
+                                    <pre class="m-0"><textarea id="cut-area" name="cut" title="cut"
+                                                               readonly></textarea></pre>
                                 </div>
                                 <c:forEach var="i" begin="1" end="${number_of_dependencies}">
                                     <div class="tab-pane"
                                          id="class-body-${classId}-${i}"
                                          aria-labelledby="class-header-${classId}-${i}"
                                          role="tabpanel">
-                                        <pre class="m-0"><textarea id="dependency-area-${i}" name="dependency-${i}" title="dependency-${i}" readonly></textarea></pre>
+                                        <pre class="m-0"><textarea id="dependency-area-${i}" name="dependency-${i}"
+                                                                   title="dependency-${i}" readonly></textarea></pre>
                                     </div>
                                 </c:forEach>
                             </div>
                         </div>
                     </div>
-            </jsp:attribute>
+                </c:otherwise>
+            </c:choose>
+        </jsp:attribute>
     </t:modal>
 
     <script>
         (function () {
             const modal = document.currentScript.parentElement.querySelector('.modal');
-            const cutTextArea = document.currentScript.parentElement.querySelector('textarea[id="sut"]');
-            const cutTitle = document.currentScript.parentElement.querySelector('button[id^="cut-header"]');
-            const dependencyTextAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
+            const cutArea = document.currentScript.parentElement.querySelector('textarea[id="cut-area"]');
+            const cutHeader = document.currentScript.parentElement.querySelector('button[id^="cut-header"]');
+            const dependencyAreas = document.currentScript.parentElement.querySelectorAll('textarea[id^="dependency-area-"]');
             const dependencyHeaders = document.currentScript.parentElement.querySelectorAll('button[id^="class-header-"]');
             const classId = <%= classId %>;
             const hasDependencies = dependencyHeaders.length > 0;
@@ -84,7 +97,7 @@
                 const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
                 const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
 
-                const editor = CodeMirror.fromTextArea(cutTextArea, {
+                const editor = CodeMirror.fromTextArea(cutArea, {
                     lineNumbers: true,
                     readOnly: true,
                     mode: 'text/x-java',
@@ -94,14 +107,19 @@
 
                 const classInfo = await InfoApi.getClassInfo(classId, hasDependencies);
 
+
                 try {
                     editor.setValue(classInfo.source)
-                    cutTitle.textContent = classInfo.name;
+                    if (hasDependencies) {
+                        cutHeader.textContent = classInfo.name;
+                    }
                 } catch (e) {
                     editor.setValue("Could not fetch class.\nPlease try again later.");
-                    cutTitle.textContent = "Error";
+                    if (hasDependencies) {
+                        cutHeader.textContent = "Error";
+                    }
                 }
-                
+
                 await dependencyHeaders.forEach((header, index) => {
                     try {
                         header.textContent = classInfo.dependency_names[index];
@@ -110,7 +128,7 @@
                     }
                 });
 
-                await dependencyTextAreas.forEach((textarea, index) => {
+                await dependencyAreas.forEach((textarea, index) => {
                     const dependencyEditor = CodeMirror.fromTextArea(textarea, {
                         lineNumbers: true,
                         readOnly: true,
@@ -128,7 +146,7 @@
                 if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
                     codeMirrorContainers.forEach(container => container.CodeMirror.refresh());
                 }
-                LoadingAnimation.hideAnimation(cutTextArea);
+                LoadingAnimation.hideAnimation(cutArea);
             });
         })();
     </script>
