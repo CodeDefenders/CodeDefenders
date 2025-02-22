@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import com.google.gson.Gson;
@@ -131,6 +132,45 @@ public class JSONUtils {
 
             @Override
             public Set<T> read(JsonReader jsonReader) {
+                throw new UnsupportedOperationException();
+            }
+        }
+    }
+
+    /**
+     * Serializes an {@link Optional} as a scalar.
+     */
+    public static class OptionalTypeAdapterFactory implements TypeAdapterFactory {
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (Optional.class.isAssignableFrom(type.getRawType())) {
+                return (TypeAdapter<T>) new OptionalTypeAdapter<>(gson);
+            }
+            return null;
+        }
+
+        public static class OptionalTypeAdapter<T> extends TypeAdapter<Optional<T>> {
+            private final Gson gson;
+
+            public OptionalTypeAdapter(Gson gson) {
+                this.gson = gson;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public void write(JsonWriter jsonWriter, Optional<T> opt) throws IOException {
+                if (opt.isEmpty()) {
+                    jsonWriter.nullValue();
+                    return;
+                }
+
+                TypeAdapter<T> valueAdapter = (TypeAdapter<T>) gson.getAdapter(opt.get().getClass());
+                valueAdapter.write(jsonWriter, opt.get());
+            }
+
+            @Override
+            public Optional<T> read(JsonReader jsonReader) {
                 throw new UnsupportedOperationException();
             }
         }
