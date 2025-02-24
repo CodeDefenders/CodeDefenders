@@ -25,6 +25,7 @@ import java.util.SortedSet;
 
 import jakarta.enterprise.context.RequestScoped;
 
+import org.codedefenders.dto.DuelStats;
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
 import org.codedefenders.model.Achievement;
@@ -38,6 +39,8 @@ import org.codedefenders.model.UserEntity;
 public class UserProfileBean {
     private UserEntity user;
     private Map<GameType, UserStats> stats;
+    private DuelStats defenderDuelStats;
+    private DuelStats attackerDuelStats;
     private boolean isSelf;
     private SortedSet<PuzzleChapterEntry> puzzleGames;
     private Collection<Achievement> achievements;
@@ -77,6 +80,14 @@ public class UserProfileBean {
         this.stats = userStats;
     }
 
+    public void setDefenderDuelStats(DuelStats defenderDuelStats) {
+        this.defenderDuelStats = defenderDuelStats;
+    }
+
+    public void setAttackerDuelStats(DuelStats attackerDuelStats) {
+        this.attackerDuelStats = attackerDuelStats;
+    }
+
     public void setSelf(boolean self) {
         isSelf = self;
     }
@@ -110,4 +121,17 @@ public class UserProfileBean {
                 .sorted(Comparator.comparingInt(Achievement::getIndex))
                 .toList();
     }
+
+    public DuelStats getDefenderDuelStats() {
+        return defenderDuelStats;
+    }
+
+    public DuelStats getAttackerDuelStats() {
+        return attackerDuelStats;
+    }
+
+    public DuelStats getTotalDuelStats() {
+        return DuelStats.sum(defenderDuelStats, attackerDuelStats);
+    }
+
 }
