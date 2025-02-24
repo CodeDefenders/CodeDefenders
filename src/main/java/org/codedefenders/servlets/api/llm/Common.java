@@ -2,8 +2,6 @@ package org.codedefenders.servlets.api.llm;
 
 import java.util.List;
 
-import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;

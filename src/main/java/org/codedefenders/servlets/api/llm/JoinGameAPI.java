@@ -1,7 +1,6 @@
 package org.codedefenders.servlets.api.llm;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;

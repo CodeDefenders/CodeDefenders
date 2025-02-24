@@ -21,12 +21,9 @@ package org.codedefenders.servlets.games.battleground;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -41,44 +38,23 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.dto.SimpleUser;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.execution.KillMapService;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
-import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
-import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
-import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
-import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
-import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -88,8 +64,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,13 +71,7 @@ import org.slf4j.LoggerFactory;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 
-import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
-import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
-import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
@@ -145,18 +113,6 @@ public class MultiplayerGameManager extends HttpServlet {
     private GameManagingUtils gameManagingUtils;
 
     @Inject
-    private IMutationTester mutationTester;
-
-    @Inject
-    private TestSmellRepository testSmellRepo;
-
-    @Inject
-    private ITestCaseSelector regressionTestCaseSelector;
-
-    @Inject
-    private INotificationService notificationService;
-
-    @Inject
     private MessagesBean messages;
 
     @Inject
@@ -182,9 +138,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
-
-    @Inject
-    private KillMapService killMapService;
 
     @Inject
     private TestRepository testRepo;
