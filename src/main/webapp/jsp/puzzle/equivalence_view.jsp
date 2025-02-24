@@ -205,25 +205,18 @@
                         <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
                         <c:choose>
-                            <c:when test="${game.state == GameState.SOLVED}">
-                                <c:choose>
-                                    <c:when test="${puzzle.equivalent}">
-                                        <h3 class="mt-3">The mutant is equivalent!</h3>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <h3 class="mt-3">Not equivalent! Your killing test:</h3>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:when>
-                            <c:otherwise>
-                                <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
-                            </c:otherwise>
-                        </c:choose>
-                        <c:choose>
                             <c:when test="${game.state == GameState.SOLVED and puzzle.equivalent}">
+                                <h3 class="mt-3">The mutant is equivalent!</h3>
                                 <p>The mutant was accepted as equivalent</p>
                             </c:when>
-                            <c:otherwise>
+                            <c:when test="${game.state == GameState.SOLVED and not puzzle.equivalent}">
+                                <h3 class="mt-3">Not equivalent! Your killing test:</h3>
+                                <form id="equivalenceForm">
+                                    <jsp:include page="/jsp/game_components/test_editor.jsp"/>
+                                </form>
+                            </c:when>
+                            <c:when test="${game.state == GameState.ACTIVE}">
+                                <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
                                 <form id="equivalenceForm" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
                                     <input type="hidden" name="formType" value="resolveEquivalence">
                                     <input type="hidden" name="gameId" value="${game.id}">
@@ -233,38 +226,36 @@
 
                                     <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
-                                    <c:if test="${game.state == GameState.ACTIVE}">
-                                        <div class="d-flex justify-content-between mt-2 mb-2">
-                                            <button class="btn btn-danger" id="accept-equivalent-button" type="button"
-                                                ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Accept As Equivalent
-                                            </button>
-                                            <button class="btn btn-primary" id="reject-equivalent-button" type="button"
-                                                ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Submit Killing Test
-                                            </button>
+                                    <div class="d-flex justify-content-between mt-2 mb-2">
+                                        <button class="btn btn-danger" id="accept-equivalent-button" type="button"
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Accept As Equivalent
+                                        </button>
+                                        <button class="btn btn-primary" id="reject-equivalent-button" type="button"
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Submit Killing Test
+                                        </button>
 
-                                            <script type="module">
-                                                import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                                        <script type="module">
+                                            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-                                                const testProgressBar = await objects.await('testProgressBar');
+                                            const testProgressBar = await objects.await('testProgressBar');
 
-                                                document.getElementById("accept-equivalent-button").addEventListener('click', function () {
-                                                    if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
-                                                        this.form['resolveAction'].value = 'accept';
-                                                        this.form.submit();
-                                                        this.disabled = true;
-                                                    }
-                                                });
-                                                document.getElementById("reject-equivalent-button").addEventListener('click', function () {
-                                                    this.form['resolveAction'].value = 'reject';
+                                            document.getElementById("accept-equivalent-button").addEventListener('click', function () {
+                                                if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
+                                                    this.form['resolveAction'].value = 'accept';
                                                     this.form.submit();
                                                     this.disabled = true;
-                                                    testProgressBar.activate();
-                                                });
-                                            </script>
-                                        </div>
-                                    </c:if>
+                                                }
+                                            });
+                                            document.getElementById("reject-equivalent-button").addEventListener('click', function () {
+                                                this.form['resolveAction'].value = 'reject';
+                                                this.form.submit();
+                                                this.disabled = true;
+                                                testProgressBar.activate();
+                                            });
+                                        </script>
+                                    </div>
                                 </form>
-                            </c:otherwise>
+                            </c:when>
                         </c:choose>
                     </div>
                 </div>
