@@ -45,9 +45,14 @@ import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.ParallelMutationTester;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.game.tcs.impl.KillCountTestCaseSelector;
+import org.codedefenders.game.tcs.impl.PrioritizedTestCaseSelector;
+import org.codedefenders.game.tcs.impl.RandomTestCaseSelector;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -110,7 +115,12 @@ public class GameManagingUtilsTest {
                         GameClassRepository.class,
                         IMutationTester.class,
                         MutationTester.class,
-                        ParallelMutationTester.class)
+                        ParallelMutationTester.class,
+                        ITestCaseSelector.class,
+                        KillCountTestCaseSelector.class,
+                        PrioritizedTestCaseSelector.class,
+                        KillMapService.class,
+                        UserRepository.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)
