@@ -75,21 +75,6 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
-<%-- Mutant editor in player mode is the same as class viewer in defender --%>
-<%--
-<jsp:useBean id="mutantEditor"
-             class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-<%
-    mutantEditor.setClassName(cut.getName());
-    mutantEditor.setDependenciesForClass(game.getCUT());
-    if (previousSubmission.hasMutant()) {
-        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
-%>
---%>
-
 
 <jsp:useBean id="gameHighlighting"
              class="org.codedefenders.beans.game.GameHighlightingBean"
@@ -121,26 +106,6 @@
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
 %>
-<%--
-<jsp:useBean id="mutantAccordion"
-             class="org.codedefenders.beans.game.MutantAccordionBean"
-             scope="request"/>
-<%
-    mutantAccordion.setGame(game);
-    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-    mutantAccordion.setEnableFlagging(true);
-    mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
-%>
---%>
-
-<%--
-<jsp:useBean id="testAccordion"
-             class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<%
-    testAccordion.setTestAccordionData(cut, playerTests, game.getMutants());
-%>
---%>
 
 <jsp:useBean id="mutantProgressBar"
              class="org.codedefenders.beans.game.MutantProgressBarBean"
@@ -163,29 +128,6 @@
 <%
     mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel());
 %>
-
-<%--
-<jsp:useBean id="testEditor"
-             class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    testEditor.setEditableLinesForClass(cut);
-    testEditor.setMockingEnabled(cut.isMockingEnabled());
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) { // TODO: don't display the wron previous submission for equivalence duels
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-%>
---%>
-
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
 
 
 <div class="row">

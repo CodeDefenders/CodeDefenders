@@ -47,60 +47,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
-
-
-<%--
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    testEditor.setEditableLinesForClass(cut);
-    testEditor.setMockingEnabled(cut.isMockingEnabled());
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) {
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-%>
-%-->
-
-
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<%
-    gameHighlighting.setGameData(game.getMutants(), game.getTests());
-    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-    gameHighlighting.setEnableFlagging(true);
-%>
-
-
-<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
-<%
-    if (previousSubmission.hasErrorLines()) {
-        testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
-    }
-%>
-
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<%
-    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-    mutantAccordion.setEnableFlagging(true);
-    mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
-%>
---%>
-
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
---%>
-
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 

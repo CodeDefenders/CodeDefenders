@@ -64,21 +64,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<%--
-<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-<%
-    mutantEditor.setDependenciesForClass(game.getCUT());
-    mutantEditor.setClassName(cut.getName());
-    mutantEditor.setEditableLinesForPuzzle(puzzle);
-    if (previousSubmission.hasMutant()) {
-        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
-%>
---%>
-
-
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
@@ -94,14 +79,6 @@
     }
 %>
 
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<%
-    if (showTestAccordion) {
-        testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants());
-    }
-%>
---%>
 
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 <% mutantProgressBar.setGameId(game.getId()); %>

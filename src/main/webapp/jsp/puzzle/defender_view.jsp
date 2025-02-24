@@ -61,32 +61,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
-
-<%--
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    // Set editable lines from class since they depend on the generated test template
-    testEditor.setEditableLinesForClass(cut);
-
-    testEditor.setMockingEnabled(false);
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) {
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-    testEditor.setReadonly(game.getState() == GameState.SOLVED);
-%>
---%>
-
-
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
@@ -102,10 +76,6 @@
     }
 %>
 
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
---%>
 
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>

@@ -59,28 +59,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
-
-
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    testEditor.setEditableLinesForClass(cut);
-    testEditor.setMockingEnabled(cut.isMockingEnabled());
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) {
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-%>
---%>
-
-
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
