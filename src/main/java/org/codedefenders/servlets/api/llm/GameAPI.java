@@ -1,32 +1,30 @@
 package org.codedefenders.servlets.api.llm;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @WebServlet("/llm-api/battleground/game")
 public class GameAPI extends APIServlet {
@@ -38,6 +36,9 @@ public class GameAPI extends APIServlet {
 
     @Inject
     protected GameClassRepository gameClassRepo;
+
+    @Inject
+    protected PlayerRepository playerRepo;
 
     @Inject
     protected GameProducer gameProducer;
@@ -77,6 +78,8 @@ public class GameAPI extends APIServlet {
     }
 
     private BattlegroundGameDTO prepareGame(MultiplayerGame game, int userId) {
+        var playerId = playerRepo.getPlayerIdForUserAndGame(userId, game.getId());
+
         List<Common.PlayerDTO> players = gameRepo.getValidPlayersForGame(game.getId()).stream()
                 .map(player -> {
                     boolean isSystemPlayer = player.getUser().getId() < 5;
@@ -138,12 +141,19 @@ public class GameAPI extends APIServlet {
                 ))
                 .orElseThrow();
 
+        var pendingEquivalentMutant = game.getMutantsMarkedEquivalentPending()
+                .stream()
+                .filter(m -> m.getPlayerId() == playerId)
+                .map(Mutant::getId)
+                .findFirst();
+
         return new BattlegroundGameDTO(
                 cut,
                 players,
                 mutants,
                 tests,
                 events,
+                pendingEquivalentMutant,
                 game.getStartTimeUnixSeconds(),
                 game.getGameDurationMinutes(),
                 game.getLevel(),
@@ -159,6 +169,7 @@ public class GameAPI extends APIServlet {
             List<Common.MutantDTO> mutants,
             List<Common.TestDTO> tests,
             List<Common.EventDTO> history,
+            Optional<Integer> pendingEquivalentMutant,
 
             long startTime,
             int duration,
