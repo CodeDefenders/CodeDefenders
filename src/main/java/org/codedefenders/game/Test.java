@@ -141,7 +141,8 @@ public class Test {
     }
 
     public boolean isMutantCovered(Mutant mutant) {
-        return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
+        return mutant.isOutsideOfMethods() ||
+                CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
     }
 
     public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
@@ -149,7 +150,7 @@ public class Test {
         Set<Mutant> coveredMutants = new TreeSet<>(Comparator.comparing(Mutant::getId));
 
         for (Mutant m : mutants) {
-            if (CollectionUtils.containsAny(coverage, m.getLines())) {
+            if (m.isOutsideOfMethods() || CollectionUtils.containsAny(coverage, m.getLines())) {
                 coveredMutants.add(m);
             }
         }

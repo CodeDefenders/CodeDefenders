@@ -22,10 +22,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -95,6 +92,8 @@ public class Mutant implements Serializable {
     private int roundKilled;
 
     private int playerId;
+
+    private Optional<Boolean> isOutsideOfMethods = Optional.empty();
 
     /**
      * Indicates how many times this mutant is
@@ -432,6 +431,17 @@ public class Mutant implements Serializable {
 
         // Generate the summaryString
         summaryString = String.join(",", fragementSummary);
+
+        GameAccordionMapping mapping = GameAccordionMapping.compute(getCUT().getMethodDescriptions(),
+                List.of(this), Mutant::getId, Mutant::getLines);
+        isOutsideOfMethods = Optional.of(!mapping.elementsOutsideMethods.isEmpty());
+    }
+
+    public boolean isOutsideOfMethods() {
+        if (isOutsideOfMethods.isEmpty()) {
+            computeLinesAndDescription();
+        }
+        return isOutsideOfMethods.get();
     }
 
     public synchronized List<String> getHTMLReadout() {
