@@ -431,15 +431,13 @@ public class Mutant implements Serializable {
 
         // Generate the summaryString
         summaryString = String.join(",", fragementSummary);
-
-        GameAccordionMapping mapping = GameAccordionMapping.compute(getCUT().getMethodDescriptions(),
-                List.of(this), Mutant::getId, Mutant::getLines);
-        isOutsideOfMethods = Optional.of(!mapping.elementsOutsideMethods.isEmpty());
     }
 
     public boolean isOutsideOfMethods() {
         if (isOutsideOfMethods.isEmpty()) {
-            computeLinesAndDescription();
+            GameAccordionMapping mapping = GameAccordionMapping.compute(getCUT().getMethodDescriptions(),
+                    List.of(this), Mutant::getId, Mutant::getLines);
+            isOutsideOfMethods = Optional.of(!mapping.elementsOutsideMethods.isEmpty());
         }
         return isOutsideOfMethods.get();
     }
