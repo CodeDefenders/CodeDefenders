@@ -29,10 +29,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,8 +95,6 @@ public class Mutant implements Serializable {
 
     private int playerId;
 
-    private Optional<Boolean> isOutsideOfMethods = Optional.empty();
-
     /**
      * Indicates how many times this mutant is
      * killed by an AI test.
@@ -141,7 +141,7 @@ public class Mutant implements Serializable {
      * @param playerId  The ID of the player who submitted the mutant.
      */
     public Mutant(int gameId, int classId, String javaFile, String classFile, boolean alive, int playerId,
-            int roundCreated) {
+                  int roundCreated) {
         this.gameId = gameId;
         this.classId = classId;
         this.roundCreated = roundCreated;
@@ -153,7 +153,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-            int roundCreated, int roundKilled, int playerId) {
+                  int roundCreated, int roundKilled, int playerId) {
         this(gid, classId, javaFile, classFile, alive, playerId, roundCreated);
         this.id = mid;
         this.equivalent = equiv;
@@ -164,7 +164,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-            int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
+                  int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
         this(mid, classId, gid, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
         this.md5 = md5;
         this.killMessage = killMessage;
@@ -431,15 +431,6 @@ public class Mutant implements Serializable {
 
         // Generate the summaryString
         summaryString = String.join(",", fragementSummary);
-    }
-
-    public boolean isOutsideOfMethods() {
-        if (isOutsideOfMethods.isEmpty()) {
-            GameAccordionMapping mapping = GameAccordionMapping.compute(getCUT().getMethodDescriptions(),
-                    List.of(this), Mutant::getId, Mutant::getLines);
-            isOutsideOfMethods = Optional.of(!mapping.elementsOutsideMethods.isEmpty());
-        }
-        return isOutsideOfMethods.get();
     }
 
     public synchronized List<String> getHTMLReadout() {

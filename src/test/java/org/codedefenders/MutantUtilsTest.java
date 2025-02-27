@@ -18,10 +18,18 @@
  */
 package org.codedefenders;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.Patch;
+import org.codedefenders.analysis.gameclass.MethodDescription;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.util.MutantUtils;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MutantUtilsTest {
 
@@ -192,6 +200,184 @@ public class MutantUtilsTest {
 
         // Now
         assertEquals(expectedCode, cleanedCode);
+    }
+
+
+    @Test
+    public void testIsOutsideOfMethod() {
+        String mutantCode;
+        String cutCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        MethodDescription fooDescription = new MethodDescription("public void foo()", 2, 5);
+        MethodDescription barDescription = new MethodDescription("public void bar()", 7, 10);
+        List<MethodDescription> methodDescriptions = List.of(fooDescription, barDescription);
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+                    int x = 5;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+
+                    int x = 5;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                        int x = 2;
+                    }
+
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertFalse(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    int x = 5;
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    int x = 5;public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+                    int x = 5;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        //Right now, this is the expected behaviour, even if it isn't 100% correct
+        mutantCode = """
+                public class Cut {
+                    public void foo(int x) {
+                        int a = 1;
+                        int b = 2;
+                    }
+                    int x = 5;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                        int x = 3;
+                    }
+                    int y = 3;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+                    int x = 5;
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }int x = 5;
+
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+
+        mutantCode = """
+                public class Cut {
+                    public void foo() {
+                        int a = 1;
+                        int b = 2;
+                    }
+
+                    public void bar() {
+                        int c = 3;
+                        int d = 4;
+                    }
+
+                    int y = 5;
+                }""";
+        assertTrue(isOutsideOfMethods(cutCode, mutantCode, methodDescriptions));
+    }
+
+    private boolean isOutsideOfMethods(String cutCode, String mutantCode, List<MethodDescription> methodDescriptions) {
+        List<String> cutLines = new ArrayList<>(cutCode.lines().toList());
+        cutLines.replaceAll(s -> s.replaceAll(Mutant.regex, ""));
+        List<String> mutantLines = new ArrayList<>(mutantCode.lines().toList());
+        mutantLines.replaceAll(s -> s.replaceAll(Mutant.regex, ""));
+        Patch<String> difference = DiffUtils.diff(cutLines, mutantLines);
+        return MutantUtils.isOutsideOfMethods(methodDescriptions, difference);
     }
 
 }
