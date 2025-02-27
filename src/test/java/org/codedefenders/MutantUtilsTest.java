@@ -18,15 +18,16 @@
  */
 package org.codedefenders;
 
-import com.github.difflib.DiffUtils;
-import com.github.difflib.patch.Patch;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.util.MutantUtils;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.Patch;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;

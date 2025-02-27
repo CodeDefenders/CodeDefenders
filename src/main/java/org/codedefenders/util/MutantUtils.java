@@ -27,12 +27,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.codedefenders.analysis.gameclass.MethodDescription;
+
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Chunk;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
-import org.codedefenders.analysis.gameclass.MethodDescription;
 
 /**
  * Basic utilities for mutants.
