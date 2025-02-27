@@ -47,6 +47,7 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_IMPORT_STATEMENT("Invalid mutant, sorry! Your mutant changes one or more import statements"),
     MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
     MUTANT_VALIDATION_CLASS_SIGNATURE("Invalid mutant, sorry! Your mutant changes a class signature"),
+    MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED("Invalid mutant, sorry! Your mutant adds a new method or field."),
 
     MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),

@@ -153,6 +153,11 @@ public class CodeValidator {
             return ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
         }
 
+        // Check if new members were added
+        if (mutantAddsMethodOrField(originalCU, mutatedCU)) {
+            return ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED;
+        }
+
         // If the mutants contains changes to method signatures, mark it as not valid
         if (level == CodeValidatorLevel.STRICT && mutantChangesMethodSignatures(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
@@ -453,6 +458,32 @@ public class CodeValidator {
         Set<String> mutantImportStatements = new HashSet<>(extractImportStatements(muta));
 
         return !cutImportStatements.equals(mutantImportStatements);
+    }
+
+    private static boolean mutantAddsMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
+        Set<String> cutFieldNames = new HashSet<>();
+        Set<String> mutantFieldNames = new HashSet<>();
+        Set<String> cutMethodSignatures = new HashSet<>();
+        Set<String> mutantMethodSignatures = new HashSet<>();
+
+        for (TypeDeclaration<?> td : orig.getTypes()) {
+            cutFieldNames.addAll(extractFieldNamesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : muta.getTypes()) {
+            mutantFieldNames.addAll(extractFieldNamesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : orig.getTypes()) {
+            cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : muta.getTypes()) {
+            mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
+        }
+
+        return mutantFieldNames.size() > cutFieldNames.size()
+                || mutantMethodSignatures.size() > cutMethodSignatures.size();
     }
 
     private static boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {

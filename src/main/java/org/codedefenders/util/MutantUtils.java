@@ -85,7 +85,13 @@ public class MutantUtils {
         return String.join("\n", mutantLines);
     }
 
-    public static boolean isOutsideOfMethods(List<MethodDescription> methodDescriptions, Patch<String> differences) { //TODO woanders hin
+    /**
+     * Checks if any of the changes in the differences are outside the methods. A single difference outside any methods
+     * is enough to return true, even if there are other differences inside methods.
+     * Will also return true if there are changes in the first or last line of a method (this includes the signature and
+     * the closing bracket).
+     */
+    public static boolean isOutsideOfMethods(List<MethodDescription> methodDescriptions, Patch<String> differences) {
         methodDescriptions = new ArrayList<>(methodDescriptions);
         methodDescriptions.sort(Comparator.comparingInt(MethodDescription::getStartLine));
 
