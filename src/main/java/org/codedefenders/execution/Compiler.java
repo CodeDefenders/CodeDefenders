@@ -46,7 +46,7 @@ import static org.codedefenders.util.Constants.TEST_CLASSPATH;
  * content from the hard disk or providing it. The resulting {@code .class} file path
  * is returned.
  *
- * <p>Dependency files of a Java class are either removed stay where they are,
+ * <p>Dependency files of a Java class are either removed or stay where they are,
  * based on the parent directory of the associated Java class.
  *
  * <p>Test cases can also be compiled, but require a reference to the tested class.

@@ -26,6 +26,7 @@
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
+		<pathelement location="${cuts.deps}"/>
 	</path>
 
 	<path id="test.cp">
@@ -37,7 +38,7 @@
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<!--pathelement location="${cuts.deps}"/-->
+		<pathelement location="${cuts.deps}"/>
 	</path>
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
