@@ -45,8 +45,6 @@ public class Constants {
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
-    // dependencies, mutants and tests subdirectories for CUTs
-    public static final String CUTS_DEPENDENCY_DIR = "dependencies";
     public static final String CUTS_MUTANTS_DIR = "mutants";
     public static final String CUTS_TESTS_DIR = "tests";
 

@@ -25,7 +25,7 @@
 		<pathelement path="${common.cp}"/>
 
 		<!-- CUT and deps -->
-		<pathelement location="${cuts.deps}"/>
+		<pathelement location="${cut.dir}"/>
 	</path>
 
 	<path id="test.cp">
@@ -37,7 +37,7 @@
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<pathelement location="${cuts.deps}"/>
+		<!--pathelement location="${cuts.deps}"/-->
 	</path>
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
@@ -91,9 +91,9 @@
             <sysproperty key="codedef.home" value="${codedef.home}"/>
 
 			<!-- Sets the content of the classpath to the mutant -->
-			<classpath refid="nocut.cp"/>
 			<classpath location="${mutant.file}"/>
 			<classpath location="${test.file}"/>
+			<classpath refid="nocut.cp"/>
 
 			<!-- testname -->
 			<test name="${testClassname}"/>
@@ -124,9 +124,9 @@
             <sysproperty key="codedef.home" value="${codedef.home}"/>
 
 			<!-- Sets the content of the classpath to the mutant -->
-			<classpath refid="nocut.cp"/>
 			<classpath location="${mutant.file}"/>
 			<classpath location="${mutant.test.file}"/>
+			<classpath refid="nocut.cp"/>
 
 			<!-- testname -->
 			<test name="${testClassname}"/>

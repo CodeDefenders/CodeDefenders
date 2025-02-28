@@ -27,20 +27,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 
 /**
@@ -51,7 +46,7 @@ import static org.codedefenders.util.Constants.TEST_CLASSPATH;
  * content from the hard disk or providing it. The resulting {@code .class} file path
  * is returned.
  *
- * <p>Dependency files of a Java class are either removed or moved into {@link Constants#CUTS_DEPENDENCY_DIR}
+ * <p>Dependency files of a Java class are either removed stay where they are,
  * based on the parent directory of the associated Java class.
  *
  * <p>Test cases can also be compiled, but require a reference to the tested class.
@@ -217,9 +212,6 @@ public class Compiler {
         if (cleanUpDependencyClassFiles) {
             // Remove dependency .class files generated in baseDir
             cleanUpDependencies(dependencies, baseDir, success);
-        } else {
-            // Move dependency .class files generated to baseDir/dependencies
-            moveDependencies(dependencies, baseDir, success);
         }
         if (success) {
             try {
@@ -357,46 +349,6 @@ public class Compiler {
             } catch (IOException e) {
                 if (logError) {
                     logger.warn("Failed to remove dependency class file in folder:{}", baseDirectory);
-                }
-            }
-        }
-    }
-
-    /**
-     * Move generated {@code .class} files to {@code dependencies/} subdirectory for a given list of files.
-     *
-     * @param dependencies  the {@code .java} files the {@code .class} were generated from
-     *                      and will be moved.
-     * @param baseDirectory the base directory the files or the package folders were in.
-     * @param logError      {@code true} if IOExceptions should be logged.
-     */
-    private static void moveDependencies(List<JavaFileObject> dependencies, Path baseDirectory, Boolean logError) {
-        for (JavaFileObject dependency : dependencies) {
-            try {
-                final Path oldPath;
-                Path fullJavaPath = Path.of(dependency.getPath());
-                Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
-                oldPath = baseDirectory.resolve(withoutBase.toString().replace(".java", ".class"));
-                // path relative from the base directory, {@code dependencies/} folder just has to be added between them
-                final Path classFileStructure = baseDirectory.relativize(
-                        Paths.get(oldPath.toString().replace(".java", ".class")));
-                final Path newPath =
-                        Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
-
-                Files.createDirectories(newPath.getParent());
-                Files.move(oldPath, newPath);
-
-                //Move compiled subclasses
-                String pattern = dependency.getName().replace(".java", "") + "\\$.+\\.class";
-                Predicate<Path> predicate = (Path p) -> p.getFileName().toString().matches(pattern);
-                for (Path p : Files.list(oldPath.getParent()).filter(predicate).collect(Collectors.toSet())) {
-                    Path toPath = Paths.get(
-                            newPath.toString().replace(newPath.getFileName().toString(), p.getFileName().toString()));
-                    Files.move(p, toPath);
-                }
-            } catch (IOException e) {
-                if (logError) {
-                    logger.error("Failed to move dependency class.", e);
                 }
             }
         }

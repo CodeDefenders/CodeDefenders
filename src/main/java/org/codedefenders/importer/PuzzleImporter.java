@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +49,6 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -72,7 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Streams;
 
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.FileUtils.nextFreeNumberPath;
 
 
@@ -312,7 +309,7 @@ public class PuzzleImporter {
         }
 
         private void storeDependenciesSources() throws IOException {
-            Path storagePath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
+            Path storagePath = cutDir;
             dependencyFiles = new ArrayList<>();
 
             for (SimpleFile depFile : puzzleData.deps) {

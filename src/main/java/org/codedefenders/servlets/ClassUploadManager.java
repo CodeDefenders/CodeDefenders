@@ -81,7 +81,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 
@@ -442,7 +441,7 @@ public class ClassUploadManager extends HttpServlet {
 
                 final String depJavaFilePath;
                 try {
-                    Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
+                    Path folderPath = cutDir;
                     try {
                         Path packageStructure = FileUtils.getPackagePathFromJavaFile(dependencyFileContent);
                         folderPath = folderPath.resolve(packageStructure);
@@ -455,7 +454,7 @@ public class ClassUploadManager extends HttpServlet {
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
                             .toString();
-                    final String depClassFilePath = cutDir.resolve(CUTS_DEPENDENCY_DIR).resolve(dependencyFileName
+                    final String depClassFilePath = cutDir.resolve(dependencyFileName
                             .replace(".java", ".class")).toString();
                     dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
