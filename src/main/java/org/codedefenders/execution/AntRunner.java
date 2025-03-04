@@ -318,7 +318,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         ProcessBuilder pb = new ProcessBuilder();
         Map<String, String> env = pb.environment();
         List<String> command = new ArrayList<>();
-        String cutDir = Paths.get(cut.getJavaFile()).getParent().toString();
+        String cutDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
+                Paths.get(cut.getJavaFile())).toString();
 
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));

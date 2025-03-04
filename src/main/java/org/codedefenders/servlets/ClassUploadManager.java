@@ -369,7 +369,8 @@ public class ClassUploadManager extends HttpServlet {
 
         final String cutJavaFilePath;
         try {
-            cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
+            Path packageStructure = FileUtils.getPackagePathFromJavaFile(fileContent);
+            cutJavaFilePath = FileUtils.storeFile(cutDir.resolve(packageStructure), fileName, fileContent).toString();
         } catch (IOException e) {
             logger.error("Class upload failed. Could not store java file " + fileName, e);
             messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -666,7 +667,9 @@ public class ClassUploadManager extends HttpServlet {
             String javaFilePath;
             try {
 
-                final Path folderPath = cutDir.resolve(CUTS_MUTANTS_DIR).resolve(String.valueOf(index));
+                Path folderPath = cutDir.resolve(CUTS_MUTANTS_DIR).resolve(String.valueOf(index));
+                Path packageStructure = FileUtils.getPackagePathFromJavaFile(fileContent);
+                folderPath = folderPath.resolve(packageStructure);
                 javaFilePath = FileUtils.storeFile(folderPath, fileName, fileContent).toString();
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store mutant java file " + fileName, e);

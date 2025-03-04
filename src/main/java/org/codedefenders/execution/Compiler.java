@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,8 +139,7 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation. Otherwise they are moved to
-     *                                    {@code dependencies/}.
+     *                                    are removed after compilation.
      * @see #compileJavaFileForContentWithDependencies(String, String, List)
      */
     public static String compileJavaFileForContentWithDependencies(String javaFilePath,
@@ -174,8 +174,7 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation. Otherwise they are moved to
-     *                                    {@code dependencies/}.
+     *                                    are removed after compilation.
      * @see #compileJavaFileWithDependencies(String, List)
      */
     public static String compileJavaFileWithDependencies(String javaFilePath,
@@ -197,7 +196,7 @@ public class Compiler {
             throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path baseDir = Paths.get(javaFile.getPath()).getParent();
+        final Path baseDir = FileUtils.getTopLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();

@@ -100,8 +100,6 @@ public class FileUtils {
      *                 Test<ClassName>.class
      *                 jacoco.exec
      *
-     * Notes: We split the CUT and it's dependencies in separate directories, so one can swap the CUT
-     * with a mutant.
      * Normal classpath: <data dir>/sources/<ClassAlias>:<data dir>/sources/<ClassAlias>/dependencies
      * Mutant classpath: <data dir>/
      */
@@ -423,5 +421,21 @@ public class FileUtils {
             path = path.resolve(directory.trim());
         }
         return path;
+    }
+
+    /**
+     * Returns the "top-level" directory for an uploaded CuT with dependencies,
+     * i.e. the directory below the "sources" directory.
+     * @param javaFilePath The path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
+        if (!javaFilePath.startsWith(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is not inside the sources directory.");
+
+        }
+        Path relativePath = sourcesDir.relativize(javaFilePath);
+        return sourcesDir.resolve(relativePath.getName(0));
     }
 }
