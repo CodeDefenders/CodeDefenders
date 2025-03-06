@@ -49,7 +49,7 @@
             const cutArea = document.currentScript.parentElement.querySelector('textarea[id="cut-area"]');
             const cutHeader = document.currentScript.parentElement.querySelector('button[id^="cut-header"]');
             const cardHeader = document.currentScript.parentElement.querySelector('.card-header');
-            const classId = <%= classId %>;
+            const classId = ${classId};
 
             modal.addEventListener('shown.bs.modal', async function () {
 
@@ -91,20 +91,20 @@
                     dependencyTitle.role = "presentation";
                     dependencyTitle.innerHTML = `
                         <button class="nav-link py-1" data-bs-toggle="tab"
-                        ` +
-                                "id=\"class-header-${classId}-" + index + "\""
-                                + " data-bs-target=\"#class-body-${classId}-" + index + "\""
-                                + " aria-controls=\"class-body-${classId}-" + index + "\""
-                                + " type=\"button\" role=\"tab\" aria-selected=\"false\">"
-                            + name
-                            + "</button>"
+                                id="class-header-\${classId}-\${index}"
+                                data-bs-target="#class-body-\${classId}-\${index}"
+                                aria-controls="class-body-\${classId}-\${index}"
+                                type="button" role="tab" aria-selected="false">
+                            \${name}
+                        </button>
+                    `;
 
                     headerNav.appendChild(dependencyTitle);
 
                     const dependencyContent = document.createElement("div");
                     dependencyContent.classList.add("tab-pane");
-                    dependencyContent.id = "class-body-${classId}-" + index;
-                    dependencyContent.setAttribute("aria-labelledby", "class-header-${classId}-" + index);
+                    dependencyContent.id = `class-body-\${classId}-\${index}`;
+                    dependencyContent.setAttribute("aria-labelledby", `class-header-\${classId}-\${index}`);
                     dependencyContent.role = "tabpanel";
 
                     const dependencyPre = document.createElement("pre");
