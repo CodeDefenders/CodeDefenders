@@ -44,6 +44,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Alias</th>
+                    <th>Assertion Library</th>
                     <th>#Games</th>
                     <th>Manage Class</th>
                 </tr>
@@ -73,6 +74,7 @@
                             </a>
                             <t:class_modal classId="${classId}" classAlias="${gameClass.alias}" htmlId="class-modal-${classId}"/>
                         </td>
+                        <td>${gameClass.assertionLibrary.description}</td>
                         <td>${classInfo.gamesWithClass}</td>
                         <td>
                             <div class="d-flex flex-row gap-1">

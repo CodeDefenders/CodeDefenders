@@ -32,6 +32,9 @@
     <div class="card-body p-0 codemirror-fill">
         <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
     </div>
+    <div class="card-footer">
+        <span class="align-content-end me-1">Assertion Library: ${testEditor.assertionLibrary.description}</span>
+    </div>
 </div>
 
 <script type="module">
