@@ -27,42 +27,19 @@
         The game to be displayed.
 --%>
 <%
-	MeleeGame game = (MeleeGame) request.getAttribute("game");
+    MeleeGame game = (MeleeGame) request.getAttribute("game");
 %>
 
 
 <%-- -------------------------------------------------------------------------------- --%>
 
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-	classViewer.setClassCode(game.getCUT());
-	classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
-
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
-	gameHighlighting.setGameData(game.getMutants(), game.getTests());
-	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-	gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
 %>
-
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<%
-	mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-	mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-	mutantAccordion.setEnableFlagging(false);
-	mutantAccordion.setViewDiff(true);
-%>
---%>
-
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
---%>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
@@ -72,19 +49,19 @@
 
 
 <div class="row">
-	<div class="col-xl-6 col-12">
-		<t:mutant_accordion/>
+    <div class="col-xl-6 col-12">
+        <t:mutant_accordion/>
 
-		<div id="tests-div">
+        <div id="tests-div">
             <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
-		</div>
-	</div>
+        </div>
+    </div>
 
-	<div class="col-xl-6 col-12" id="cut-div">
+    <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
-		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-	</div>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+    </div>
 </div>

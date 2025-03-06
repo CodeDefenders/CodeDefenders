@@ -34,7 +34,6 @@ import jakarta.servlet.http.HttpSession;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -216,6 +215,10 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
+
+        if (game.getState() == GameState.SOLVED) {
+            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder()));
+        }
 
         switch (game.getType()) {
             case ATTACKER:
@@ -402,9 +405,6 @@ public class PuzzleGameManager extends HttpServlet {
                     game.setState(GameState.SOLVED);
 
                     messages.clear();
-                    boolean playerWroteKillingTest = false;
-                    messages.add(generateEquivalencePuzzleWonMessage(game, playerWroteKillingTest)).escape(false)
-                            .fadeOut(false);
 
                     GameSolvedEvent gse = new GameSolvedEvent();
                     gse.setGameId(gameId);
@@ -519,7 +519,6 @@ public class PuzzleGameManager extends HttpServlet {
 
                     game.setState(GameState.SOLVED);
                     messages.clear();
-                    messages.add(generateEquivalencePuzzleWonMessage(game, true)).escape(false).fadeOut(false);
 
                     GameSolvedEvent gse = new GameSolvedEvent();
                     gse.setGameId(gameId);
@@ -703,16 +702,13 @@ public class PuzzleGameManager extends HttpServlet {
             messages.add("Your test did not solve the puzzle. Try another one...");
             game.incrementCurrentRound();
         } else {
-            game.setState(GameState.SOLVED);
-
             messages.clear();
-            boolean isAnAttackGame = false;
-            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
-                    .escape(false).fadeOut(false);
+
+            game.setState(GameState.SOLVED);
 
             GameSolvedEvent gse = new GameSolvedEvent();
             gse.setGameId(gameId);
-            gse.setAttackPuzzle(isAnAttackGame);
+            gse.setAttackPuzzle(false);
             notificationService.post(gse);
         }
         puzzleRepo.updatePuzzleGame(game);
@@ -905,16 +901,13 @@ public class PuzzleGameManager extends HttpServlet {
             messages.add("Your mutant did not solve the puzzle. Try another one...");
             game.incrementCurrentRound();
         } else {
-            game.setState(GameState.SOLVED);
-
             messages.clear();
-            boolean isAnAttackGame = true;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame))
-                    .escape(false).fadeOut(false);
+
+            game.setState(GameState.SOLVED);
 
             GameSolvedEvent gse = new GameSolvedEvent();
             gse.setGameId(gameId);
-            gse.setAttackPuzzle(isAnAttackGame);
+            gse.setAttackPuzzle(true);
             notificationService.post(gse);
         }
         puzzleRepo.updatePuzzleGame(game);
@@ -946,24 +939,6 @@ public class PuzzleGameManager extends HttpServlet {
             }
         }
         return Optional.empty();
-    }
-
-    private String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
-        StringBuilder message = new StringBuilder();
-        message.append("Congratulations, your ")
-                .append(isAnAttackGame ? "mutant" : "test")
-                .append(" solved the puzzle!");
-        return generateNextPuzzleMessage(game, message);
-    }
-
-    private String generateEquivalencePuzzleWonMessage(PuzzleGame game, boolean killingTest) {
-        StringBuilder message = new StringBuilder();
-        if (killingTest) {
-            message.append("Congratulations, your test killed the equivalent mutant!");
-        } else {
-            message.append("Congratulations, this mutant is equivalent to the class under test!");
-        }
-        return generateNextPuzzleMessage(game, message);
     }
 
     private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message) {
