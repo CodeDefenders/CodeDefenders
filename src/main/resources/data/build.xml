@@ -20,13 +20,14 @@
 	- jacoco.cp
 	-->
 
-	<path id="nocut.cp">
+	<path id="nocut.cp"> <!--- TODO anderen Namen, stimmt ja mittlerweile gar nicht mehr -->
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
 		<pathelement path="${common.cp}"/>
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<pathelement location="${cuts.deps}"/>
+		<pathelement location="${legacy.deps}"/> <!-- For backwards compatibility -->
+		<pathelement location="${legacy.cut}"/> <!-- For backwards compatibility -->
 	</path>
 
 	<path id="test.cp">
@@ -38,7 +39,8 @@
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<pathelement location="${cuts.deps}"/>
+		<pathelement location="${legacy.deps}"/> <!-- For backwards compatibility -->
+		<pathelement location="${legacy.cut}"/> <!-- For backwards compatibility -->
 	</path>
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
@@ -46,7 +48,7 @@
 	</taskdef>
 
 	<!-- requires mutant to compile only -->
-	<target name="compile-mutant" description="compile a single mutant">
+	<target name="compile-mutant" description="compile a single mutant"> <!--- TODO ausprobieren ohne deps -->
 		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.release.version}" classpathref="nocut.cp"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>

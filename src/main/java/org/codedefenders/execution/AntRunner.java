@@ -318,8 +318,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         ProcessBuilder pb = new ProcessBuilder();
         Map<String, String> env = pb.environment();
         List<String> command = new ArrayList<>();
-        String cutDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
+
+        //This is the directory directly below "sources"
+        String topDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
                 Paths.get(cut.getJavaFile())).toString();
+        String cutDir = Paths.get(topDir, Constants.CUTS_CLASSES_DIR).toString();
 
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
@@ -373,7 +376,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dtest.file=" + testDir);
         command.add("-Dcut.dir=" + cutDir);
         command.add("-DtestClassname=" + testClassName);
-        command.add("-Dcuts.deps=" + Paths.get(cutDir, Constants.CUTS_DEPENDECY_DIR));
+        command.add("-Dlegacy.cut=" + topDir);
+        command.add("-Dlegacy.deps=" + Paths.get(topDir, Constants.CUTS_DEPENDECY_DIR));
 
         command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
         command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);

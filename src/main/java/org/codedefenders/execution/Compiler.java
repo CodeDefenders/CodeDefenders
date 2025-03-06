@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
@@ -95,19 +96,19 @@ public class Compiler {
     private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path baseDir = Paths.get(javaFile.getPath()).getParent();
+        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
         final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
-        final List<String> options = getCliParameters(baseDir.toString(), null);
+        final List<String> options = getCliParameters(classesDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 
         final Boolean success = task.call();
         if (success) {
             try {
-                return getClassPath(javaFile, baseDir).toString();
+                return getClassPath(javaFile, classesDir).toString();
             } catch (IOException e) {
                 throw new CompileException(e);
             }
@@ -196,25 +197,25 @@ public class Compiler {
             throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path baseDir = FileUtils.getTopLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
+        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
 
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
         compilationUnits.add(javaFile);
-        final List<String> options = getCliParameters(baseDir.toString(), null);
+        final List<String> options = getCliParameters(classesDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
         final Boolean success = task.call();
 
         if (cleanUpDependencyClassFiles) {
             // Remove dependency .class files generated in baseDir
-            cleanUpDependencies(dependencies, baseDir, success);
+            cleanUpDependencies(dependencies, classesDir, success);
         }
         if (success) {
             try {
-                return getClassPath(javaFile, baseDir).toString();
+                return getClassPath(javaFile, classesDir).toString();
             } catch (IOException e) {
                 throw new CompileException(e);
             }

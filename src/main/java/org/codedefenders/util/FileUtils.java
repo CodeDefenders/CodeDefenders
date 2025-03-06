@@ -426,7 +426,7 @@ public class FileUtils {
     /**
      * Returns the "top-level" directory for an uploaded CuT with dependencies,
      * i.e. the directory below the "sources" directory.
-     * @param javaFilePath The path of any file inside that folder. Doesn't even have to be real.
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
      */
     public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
         Path sourcesDir = getConfig().getSourcesDir().toPath();
@@ -437,5 +437,26 @@ public class FileUtils {
         }
         Path relativePath = sourcesDir.relativize(javaFilePath);
         return sourcesDir.resolve(relativePath.getName(0));
+    }
+
+    /**
+     * Returns the directory below the "top-level" directory as defined in
+     * {@link #getTopLevelDirectoryFromJavaFile(Path)}, for example "sources" or "mutants", that is still an ancestor
+     * of the given file.
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getMidLevelDirectoryFromJavaFile(Path javaFilePath) {
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
+        if (!javaFilePath.startsWith(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is not inside the sources directory.");
+
+        }
+        if (javaFilePath.equals(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is the sources directory itself.");
+        }
+        Path relativePath = sourcesDir.relativize(javaFilePath);
+        return sourcesDir.resolve(relativePath.subpath(0, 2));
     }
 }

@@ -249,7 +249,7 @@ public class PuzzleImporter {
         // Working data
         private PuzzleProperties properties;
         private List<JavaFileObject> dependencyFiles;
-        private Path cutDir;
+        private Path topDir; //The directory right below "sources"
         private GameClass cut;
         private List<Dependency> dependencies;
         private List<Mutant> mutants;
@@ -263,7 +263,7 @@ public class PuzzleImporter {
         public void install() throws CompileException, IOException, CoverageGenerator.CoverageGeneratorException,
                 BackendExecutorService.ExecutionException {
             String cutName = FilenameUtils.removeExtension(puzzleData.cut.getFilename());
-            cutDir = FileUtils.nextFreeClassDirectory(cutName);
+            topDir = FileUtils.nextFreeClassDirectory(cutName);
 
             readPuzzleProperties();
             installCUT();
@@ -277,7 +277,8 @@ public class PuzzleImporter {
             String alias = gameClassRepo.nextFreeAlias(cutName);
 
             // Store cut file.
-            Path cutPath = FileUtils.storeFile(cutDir,puzzleData.cut.getFilename(),
+            Path packageStructure = FileUtils.getPackagePathFromJavaFile(puzzleData.cut.getContentAsString());
+            Path cutPath = FileUtils.storeFile(topDir.resolve(packageStructure), puzzleData.cut.getFilename(),
                     puzzleData.cut.getContentAsString());
 
             // Store dependencies files.
@@ -309,15 +310,13 @@ public class PuzzleImporter {
         }
 
         private void storeDependenciesSources() throws IOException {
-            Path storagePath = cutDir;
+            Path storagePath = topDir;
             dependencyFiles = new ArrayList<>();
 
             for (SimpleFile depFile : puzzleData.deps) {
                 String fileContent = depFile.getContentAsString();
-                Path internalPath = depFile.getPath().getParent();
-                Path fullStoragePath = internalPath != null
-                        ? storagePath.resolve(internalPath)
-                        : storagePath;
+                Path internalPath = FileUtils.getPackagePathFromJavaFile(fileContent);
+                Path fullStoragePath = storagePath.resolve(internalPath);
                 Path depPath = FileUtils.storeFile(fullStoragePath, depFile.getFilename(), fileContent);
                 dependencyFiles.add(new JavaFileObject(depPath.toString(), fileContent));
             }
@@ -349,7 +348,7 @@ public class PuzzleImporter {
 
             for (SimpleFile mutantFile : mutantsQueue) {
                 // Create the mutants directory if it doesn't exist.
-                Path mutantsListDir = cutDir.resolve(Constants.CUTS_MUTANTS_DIR);
+                Path mutantsListDir = topDir.resolve(Constants.CUTS_MUTANTS_DIR);
                 if (!Files.exists(mutantsListDir)) {
                     Files.createDirectories(mutantsListDir);
                 }
@@ -384,7 +383,7 @@ public class PuzzleImporter {
 
             for (SimpleFile testFile : puzzleData.tests) {
                 // Create the tests directory if it doesn't exist.
-                Path testsPath = cutDir.resolve(Constants.CUTS_TESTS_DIR);
+                Path testsPath = topDir.resolve(Constants.CUTS_TESTS_DIR);
                 if (!Files.exists(testsPath)) {
                     Files.createDirectories(testsPath);
                 }
@@ -447,7 +446,7 @@ public class PuzzleImporter {
 
         private void installPuzzle() throws IOException {
             // Store the properties file.
-            FileUtils.storeFile(cutDir, puzzleData.properties.getFilename(),
+            FileUtils.storeFile(topDir, puzzleData.properties.getFilename(),
                     puzzleData.properties.getContentAsString());
 
             // Default values
@@ -520,7 +519,7 @@ public class PuzzleImporter {
                         } else if (parts.length > 2
                                 && parts[1].equals("deps")
                                 && parts[parts.length-1].endsWith(".java")) {
-                            deps.add(subpath.apply(file, 2));
+                            deps.add(subpath.apply(file, 2)); //TODO eigentlich unnötig, da die interne Struktur nicht relevant ist
                             continue;
                         }
                     }
