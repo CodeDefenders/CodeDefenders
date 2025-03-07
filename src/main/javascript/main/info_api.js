@@ -19,8 +19,8 @@ class InfoApi {
         return await response.json();
     }
 
-    static async getClassInfo (classId) {
-        return await InfoApi.fetchJSON(`${contextPath}api/class?classId=${classId}`);
+    static async getClassInfo (classId, withDependencies) {
+        return await InfoApi.fetchJSON(`${contextPath}api/class?classId=${classId}&withDependencies=${withDependencies ? 1 : 0}`);
     }
 
     static async getMutantInfo (mutantId) {
@@ -33,10 +33,19 @@ class InfoApi {
 
     static async setClassEditorValue (editor, classId) {
         try {
-            const classInfo = await InfoApi.getClassInfo(classId);
+            const classInfo = await InfoApi.getClassInfo(classId, false);
             editor.setValue(classInfo.source)
         } catch (e) {
             editor.setValue("Could not fetch class.\nPlease try again later.");
+        }
+    }
+
+    static async setDependencyEditorValue (editor, classId, dependencyIndex) {
+        try {
+            const classInfo = await InfoApi.getClassInfo(classId, true);
+            editor.setValue(classInfo.dependency_code[dependencyIndex])
+        } catch (e) {
+            editor.setValue("Could not fetch dependency \n Please try again later.");
         }
     }
 
