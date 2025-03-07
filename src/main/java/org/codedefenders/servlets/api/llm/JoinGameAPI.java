@@ -11,10 +11,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -29,6 +31,9 @@ public class JoinGameAPI extends APIServlet {
 
     @Inject
     protected GameClassRepository gameClassRepo;
+
+    @Inject
+    protected ClassroomService classroomService;
 
     @Inject
     protected GameProducer gameProducer;
@@ -72,6 +77,18 @@ public class JoinGameAPI extends APIServlet {
             writeResponse(response, HttpServletResponse.SC_FORBIDDEN,
                     new Common.ErrorResponseDTO("User is already a player in the game."));
             return;
+        }
+
+        if (role.get() == Role.OBSERVER) {
+            boolean isClassroomModerator = game.getClassroomId()
+                    .flatMap(id -> classroomService.getMemberForClassroomAndUser(id, login.getUserId()))
+                    .map(member -> member.getRole() == ClassroomRole.MODERATOR || member.getRole() == ClassroomRole.OWNER)
+                    .orElse(false);
+            if (!login.isAdmin() && !isClassroomModerator) {
+                writeResponse(response, HttpServletResponse.SC_FORBIDDEN,
+                        new Common.ErrorResponseDTO("Could not join the game as Observer. "
+                            + "Only admins and classroom moderators/owners can do that."));
+            }
         }
 
         if (joinGame(game, role.get())) {
