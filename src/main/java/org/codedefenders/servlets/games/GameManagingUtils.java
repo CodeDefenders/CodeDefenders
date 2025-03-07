@@ -965,6 +965,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         if (mutantLines.isEmpty()) {
             messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
+            return new ClaimEquivalentResult(List.of(), messages);
         }
 
         List<Mutant> claimedMutants = new ArrayList<>();
