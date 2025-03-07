@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -102,9 +103,9 @@ public class MutantTest {
         assertEquals(mutantCode, patchedCode);
     }
 
-    @ParameterizedTest(name = "[{index}] {0}")
+    @ParameterizedTest(name = "[{index}] {3}")
     @ArgumentsSource(MutantTestArguments.class)
-    public void test(String name, String originalCode, String mutantCode, Consumer<Mutant> assertions)
+    public void test(String originalCode, String mutantCode, Consumer<Mutant> assertions, String name)
             throws IOException {
         File cutJavaFile = tempDir.resolve("original.java").toFile();
         FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
@@ -159,7 +160,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(7), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForChangeSingleLine", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForChangeMultipleLines() {
@@ -196,7 +197,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(7), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForChangeMultipleLines", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForInsertSingeLine() {
@@ -231,7 +232,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(9), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForInsertSingeLine", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForInsertMultipleLines() {
@@ -267,7 +268,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(8), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForInsertMultipleLines", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForChangeLineAndInsertMultipleLines() {
@@ -304,7 +305,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(7, 9), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForChangeLineAndInsertMultipleLines", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForInsertionMutantOnDisjointLines() {
@@ -350,7 +351,7 @@ public class MutantTest {
                 assertEquals(Arrays.asList(9, 13), mutant.getLines());
             };
 
-            return Arguments.of("testGetLinesForInsertionMutantOnDisjointLines", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForEmptySpaces() {
@@ -391,7 +392,7 @@ public class MutantTest {
                 assertEquals(1, p.getDeltas().size());
             };
 
-            return Arguments.of("testGetLinesForEmptySpaces", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         private Arguments testGetLinesForEmptySpacesOutsideStrings() {
@@ -432,7 +433,7 @@ public class MutantTest {
                 assertEquals(0, patch.getDeltas().size());
             };
 
-            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         /**
@@ -472,7 +473,7 @@ public class MutantTest {
                 assertEquals(expected, mutant.getPatchString());
             };
 
-            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         /**
@@ -512,7 +513,7 @@ public class MutantTest {
                 assertEquals(expected, mutant.getPatchString());
             };
 
-            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         /**
@@ -553,24 +554,25 @@ public class MutantTest {
                 assertEquals(expected, mutant.getPatchString());
             };
 
-            return Arguments.of("testGetLinesForEmptySpacesOutsideStrings", originalCode, mutantCode, assertions);
+            return Arguments.of(originalCode, mutantCode, assertions);
         }
 
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
-            return Stream.of(
-                    testGetLinesForChangeSingleLine(),
-                    testGetLinesForChangeMultipleLines(),
-                    testGetLinesForInsertSingeLine(),
-                    testGetLinesForInsertMultipleLines(),
-                    testGetLinesForChangeLineAndInsertMultipleLines(),
-                    testGetLinesForInsertionMutantOnDisjointLines(),
-                    testGetLinesForEmptySpaces(),
-                    testGetLinesForEmptySpacesOutsideStrings(),
-                    testIfNonAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString(),
-                    testIfAdjacentSingleLineWhitespaceChangesAreFilteredOutForPatchString(),
-                    testIfSingleLineWhitespaceChangesInStringsAreFilteredNotOutForPatchString()
-            );
+            return Arrays.stream(getClass().getDeclaredMethods())
+                .filter(method -> method.getReturnType().equals(Arguments.class))
+                .filter(method -> !method.isSynthetic())
+                .map(method -> {
+                    try {
+                        method.setAccessible(true);
+                        var args = ((Arguments) method.invoke(this)).get();
+                        var newArgs = Arrays.copyOf(args, args.length + 1);
+                        newArgs[args.length] = method.getName();
+                        return Arguments.of(newArgs);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         }
     }
 }
