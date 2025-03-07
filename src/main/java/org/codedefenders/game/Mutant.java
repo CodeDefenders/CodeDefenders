@@ -57,7 +57,7 @@ public class Mutant implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
     // https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
-    public static String regex =
+    public static String unquotedWhitespaceRegex =
             "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
     private int id;
@@ -337,9 +337,9 @@ public class Mutant implements Serializable {
         List<String> sutLines = FileUtils.readLines(sourceFile.toPath());
         List<String> mutantLines = FileUtils.readLines(mutantFile.toPath());
 
-        sutLines.replaceAll(s -> s.replaceAll(regex, ""));
+        sutLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
-        mutantLines.replaceAll(s -> s.replaceAll(regex, ""));
+        mutantLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
@@ -359,8 +359,8 @@ public class Mutant implements Serializable {
             boolean updateDelta = false;
 
             for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
-                var sourceLine =  source.get(i).replaceAll(regex, "");
-                var targetLine =  target.get(i).replaceAll(regex, "");
+                var sourceLine =  source.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                var targetLine =  target.get(i).replaceAll(unquotedWhitespaceRegex, "");
                 if (!sourceLine.equals(targetLine)) {
                     discardDelta = false;
                 } else {
