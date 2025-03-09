@@ -47,6 +47,22 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(true);
+%>
+
+
+<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%
+    if (previousSubmission.hasErrorLines()) {
+        testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+    }
+%>
+
+
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 
@@ -62,8 +78,8 @@
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
         <t:defender_intention_collection_note/>
-        <jsp:include page="../game_components/class_viewer.jsp"/>
-        <jsp:include page="../game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>
 
     <div class="col-xl-6 col-12" id="utest-div">
