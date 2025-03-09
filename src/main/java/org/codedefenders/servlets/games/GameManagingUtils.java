@@ -103,6 +103,7 @@ import testsmell.TestSmellDetector;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -525,13 +526,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         public static CreateBattlegroundTestResult failure(
                 Test test, FailureReason reason, List<String> validationErrorMessages, String compilationError, String testCutError) {
             return new CreateBattlegroundTestResult(
-                false,
-                Optional.ofNullable(test),
-                Optional.empty(),
-                Optional.of(reason),
-                Optional.ofNullable(validationErrorMessages),
-                Optional.ofNullable(compilationError),
-                Optional.ofNullable(testCutError)
+                    false,
+                    Optional.ofNullable(test),
+                    Optional.empty(),
+                    Optional.of(reason),
+                    Optional.ofNullable(validationErrorMessages),
+                    Optional.ofNullable(compilationError),
+                    Optional.ofNullable(testCutError)
             );
         }
     }
@@ -645,7 +646,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public record AcceptBattlegroundEquivalenceResult(
-        boolean mutantKillable
+            boolean mutantKillable
     ){}
     public enum ResolveBattlegroundEquivalenceAction {
         ACCEPT,
@@ -655,14 +656,13 @@ public class GameManagingUtils implements IGameManagingUtils {
     public AcceptBattlegroundEquivalenceResult acceptBattlegroundEquivalence(
             MultiplayerGame game, int userId, Mutant equivMutant) {
         SimpleUser user = userService.getSimpleUserById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User must exist."));
+                .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 
         // Here we check if the accepted equivalence is "possibly" equivalent
         boolean isMutantKillable = isMutantKillableByOtherTests(equivMutant);
 
-        String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
         String notification = String.format("%s accepts that their mutant %d is equivalent",
-            user.getName(), equivMutant.getId());
+                user.getName(), equivMutant.getId());
         if (isMutantKillable) {
             logger.warn("Mutant {} was accepted as equivalence but it is killable", equivMutant.getId());
             notification = notification + " " + " However, the mutant was killable!";
@@ -677,28 +677,28 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Notify the attacker
         Event notifEquiv = new Event(-1, game.getId(),
-            userId,
-            notification,
-            EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-            new Timestamp(System.currentTimeMillis()));
+                userId,
+                notification,
+                EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notifEquiv);
 
         EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
         edwe.setGameId(game.getId());
         userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
-            .ifPresent(edwe::setUserId);
+                .ifPresent(edwe::setUserId);
         edwe.setMutantId(equivMutant.getId());
         notificationService.post(edwe);
 
-        // Notify the defender which triggered the duel about it !
+        // Notify the defender which triggered the duel about it!
         if (isMutantKillable) {
             int defenderId = mutantRepo.getEquivalentDefenderId(equivMutant);
             Optional<Integer> defenderUserId = userRepo.getUserIdForPlayerId(defenderId);
             notification = user.getName() + " accepts that the mutant " + equivMutant.getId()
-            + "that you claimed equivalent is equivalent, but that mutant was killable.";
+                    + "that you claimed equivalent is equivalent, but that mutant was killable.";
             Event notifDefenderEquiv = new Event(-1, game.getId(), defenderUserId.orElse(0), notification,
-                EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
-                new Timestamp(System.currentTimeMillis()));
+                    EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
             eventDAO.insert(notifDefenderEquiv);
         }
 
@@ -758,7 +758,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     public RejectBattlegroundEquivalenceResult rejectBattlegroundEquivalence(
             MultiplayerGame game, int userId, Mutant equivMutant, String code) throws IOException {
         SimpleUser user = userService.getSimpleUserById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User must exist."));
+                .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(game.getId());
@@ -766,9 +766,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tse);
 
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
-            code,
-            game.getMaxAssertionsPerTest(),
-            game.getCUT().getAssertionLibrary());
+                code,
+                game.getMaxAssertionsPerTest(),
+                game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -809,21 +809,23 @@ public class GameManagingUtils implements IGameManagingUtils {
         boolean killedClaimed = false;
         int killedOthers = 0;
         boolean isMutantKillable = false;
-        String mutationTesterMessage;
 
         for (Mutant mutPending : mutantsPendingTests) {
             // TODO: (from MultiplayerGameManger) Doesnt distinguish between failing because the test didnt
             //  run at all and failing because it detected the mutant
             mutationTester.runEquivalenceTest(newTest, mutPending); // updates mutPending
 
-            if (mutPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
+            if (mutPending.getEquivalent() == PROVEN_NO) {
                 logger.debug("Test {} killed mutant {} and proved it non-equivalent",
-                    newTest.getId(), mutPending.getId());
+                        newTest.getId(), mutPending.getId());
+
+                // You can win equivalence duels of mutants from other players as well:
+
                 final String message = user.getName() + " killed mutant "
-                    + mutPending.getId() + " in an equivalence duel.";
+                        + mutPending.getId() + " in an equivalence duel.";
                 Event notif = new Event(-1, game.getId(), userId, message,
-                    EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-                    new Timestamp(System.currentTimeMillis())
+                        EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis())
                 );
                 eventDAO.insert(notif);
 
@@ -834,17 +836,17 @@ public class GameManagingUtils implements IGameManagingUtils {
                 notificationService.post(edwe);
 
                 if (mutPending.getId() == equivMutant.getId()) {
-                    killedClaimed = true;
+                    killedClaimed = true; // won equivalence duel of their own, claimed mutant
                 } else {
-                    killedOthers++;
+                    killedOthers++; // won other equivalence duel
                 }
             } else { // ASSUMED_YES
                 if (mutPending.getId() == equivMutant.getId()) {
                     // Here we check if the accepted equivalence is "possibly" equivalent
                     isMutantKillable = isMutantKillableByOtherTests(mutPending);
                     String notification = user.getName()
-                        + " lost an equivalence duel. Mutant " + mutPending.getId()
-                        + " is assumed equivalent.";
+                            + " lost an equivalence duel. Mutant " + mutPending.getId()
+                            + " is assumed equivalent.";
 
                     if (isMutantKillable) {
                         notification = notification + " " + "However, the mutant was killable!";
@@ -854,12 +856,12 @@ public class GameManagingUtils implements IGameManagingUtils {
                     mutantRepo.killMutant(mutPending, Equivalence.ASSUMED_YES);
 
                     Event notif = new Event(-1, game.getId(), userId, notification,
-                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
+                            EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
                 }
                 logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
-                    newTest.getId(), mutPending.getId());
+                        newTest.getId(), mutPending.getId());
             }
         }
 
@@ -872,9 +874,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         testRepo.updateTest(newTest);
         game.update();
         return RejectBattlegroundEquivalenceResult.testValid(
-            newTest,
-            killedClaimed,
-            killedOthers,
+                newTest,
+                killedClaimed,
+                killedOthers,
             isMutantKillable
         );
     }
@@ -949,8 +951,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public record ClaimEquivalentResult(
-        List<Mutant> claimedMutants,
-        List<String> messages
+            List<Mutant> claimedMutants,
+            List<String> messages
     ){}
     public ClaimEquivalentResult claimBattlegroundEquivalence(MultiplayerGame game, int userId, List<Integer> mutantLines) throws IOException {
         var user = userService.getSimpleUserById(userId).orElseThrow();
@@ -960,8 +962,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         List<String> messages = new ArrayList<>();
 
         mutantLines = mutantLines.stream()
-            .filter(game::isLineCovered)
-            .toList();
+                .filter(game::isLineCovered)
+                .toList();
 
         if (mutantLines.isEmpty()) {
             messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
