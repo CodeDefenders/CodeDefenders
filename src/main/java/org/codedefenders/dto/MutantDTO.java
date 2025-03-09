@@ -51,7 +51,7 @@ public class MutantDTO {
     @Expose
     private final String description;
     @Expose
-    private final Boolean covered;
+    private final boolean covered;
     @Expose
     private final List<Integer> lines;
     private final Integer gameId;
@@ -135,7 +135,7 @@ public class MutantDTO {
         return lineString;
     }
 
-    public Boolean getCovered() {
+    public boolean getCovered() {
         return covered;
     }
 

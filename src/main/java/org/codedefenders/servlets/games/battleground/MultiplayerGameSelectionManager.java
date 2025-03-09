@@ -298,12 +298,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
      */
     private boolean isClassroomModeratorForGame(MultiplayerGame game) {
         return game.getClassroomId()
-                .map(classroomService::getMembersForClassroom)
-                .orElse(List.of())
-                .stream()
-                .filter(member -> member.getUserId() == login.getUserId())
-                .map(ClassroomMember::getRole)
-                .anyMatch(role -> role == ClassroomRole.MODERATOR || role == ClassroomRole.OWNER);
+                .flatMap(id -> classroomService.getMemberForClassroomAndUser(id, login.getUserId()))
+                .map(member -> member.getRole() == ClassroomRole.MODERATOR || member.getRole() == ClassroomRole.OWNER)
+                .orElse(false);
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
