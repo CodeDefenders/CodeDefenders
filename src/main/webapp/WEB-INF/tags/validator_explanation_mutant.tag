@@ -23,6 +23,7 @@
 <ul>
     <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
     <li>No mutants with only changes to comments or formatting</li>
+    <li>No renaming of methods or fields, no additional methods or fields</li>
 </ul>
 <b>Moderate</b> <br>
 <ul>
