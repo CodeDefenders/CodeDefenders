@@ -52,6 +52,7 @@ import com.github.difflib.patch.Chunk;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -60,6 +61,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
+import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ReferenceType;
@@ -154,7 +156,7 @@ public class CodeValidator {
         }
 
         // Check if new members were added
-        if (mutantAddsMethodOrField(originalCU, mutatedCU)) {
+        if (mutantAddsOrRenamesMethodOrField(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED;
         }
 
@@ -411,6 +413,25 @@ public class CodeValidator {
         return methodSignatures;
     }
 
+    /**
+     * Extracts only the names of methods, constructors and compact constructors in this class and inner classes,
+     * no other signature information.
+     */
+    private static Set<String> extractMethodNamesByType(TypeDeclaration<?> td) {
+        Set<String> methodNames = new HashSet<>();
+        // Method signatures in the class including constructors
+        for (BodyDeclaration<?> bd : td.getMembers()) {
+            if (bd instanceof TypeDeclaration<?> innerClass) {
+                // Inner classes
+                methodNames.addAll(extractMethodNamesByType(innerClass));
+            }
+            else if (bd instanceof NodeWithSimpleName<?> nameNode) {
+                methodNames.add(nameNode.getNameAsString());
+            }
+        }
+        return methodNames;
+    }
+
     private static Set<String> extractImportStatements(CompilationUnit cu) {
         return cu.getImports()
                 .stream()
@@ -460,7 +481,7 @@ public class CodeValidator {
         return !cutImportStatements.equals(mutantImportStatements);
     }
 
-    private static boolean mutantAddsMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
+    private static boolean mutantAddsOrRenamesMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();
         Set<String> cutMethodSignatures = new HashSet<>();
@@ -475,15 +496,14 @@ public class CodeValidator {
         }
 
         for (TypeDeclaration<?> td : orig.getTypes()) {
-            cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
+            cutMethodSignatures.addAll(extractMethodNamesByType(td));
         }
 
         for (TypeDeclaration<?> td : muta.getTypes()) {
-            mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
+            mutantMethodSignatures.addAll(extractMethodNamesByType(td));
         }
 
-        return mutantFieldNames.size() > cutFieldNames.size()
-                || mutantMethodSignatures.size() > cutMethodSignatures.size();
+        return !cutMethodSignatures.containsAll(mutantMethodSignatures) || !cutFieldNames.containsAll(mutantFieldNames);
     }
 
     private static boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
