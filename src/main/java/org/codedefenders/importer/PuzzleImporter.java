@@ -278,8 +278,8 @@ public class PuzzleImporter {
 
             // Store cut file.
             Path packageStructure = FileUtils.getPackagePathFromJavaFile(puzzleData.cut.getContentAsString());
-            Path cutPath = FileUtils.storeFile(topDir.resolve(packageStructure), puzzleData.cut.getFilename(),
-                    puzzleData.cut.getContentAsString());
+            Path cutPath = FileUtils.storeFile(topDir.resolve(Constants.CUTS_CLASSES_DIR).resolve(packageStructure),
+                    puzzleData.cut.getFilename(), puzzleData.cut.getContentAsString());
 
             // Store dependencies files.
             storeDependenciesSources();
