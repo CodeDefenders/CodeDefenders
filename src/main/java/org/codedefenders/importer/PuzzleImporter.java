@@ -310,7 +310,7 @@ public class PuzzleImporter {
         }
 
         private void storeDependenciesSources() throws IOException {
-            Path storagePath = topDir;
+            Path storagePath = topDir.resolve(Constants.CUTS_CLASSES_DIR);
             dependencyFiles = new ArrayList<>();
 
             for (SimpleFile depFile : puzzleData.deps) {
