@@ -972,14 +972,28 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
-                        message.append(" ")
-                                .append("Try to solve the <a href=")
-                                .append(url.forPath(Paths.PUZZLE_GAME))
-                                .append("?puzzleId=")
-                                .append(puzzle.getPuzzleId())
-                                .append(">next Puzzle</a>, or go back to the <a href=")
-                                .append(url.forPath(Paths.PUZZLE_GAME))
-                                .append(">Puzzle Overview</a>.");
+                        if (puzzleChapter.getChapterId() > currentChapter) {
+                            message.append("<br>")
+                                    .append("You solved all the puzzles of the current chapter! ")
+                                    .append("Start with the <a href=\"")
+                                    .append(url.forPath(Paths.PUZZLE_GAME))
+                                    .append("?puzzleId=")
+                                    .append(puzzle.getPuzzleId())
+                                    .append("\">first puzzle</a> of the next chapter \"")
+                                    .append(puzzleChapter.getTitle())
+                                    .append("\", or go back to the <a href=\"")
+                                    .append(url.forPath(Paths.PUZZLE_GAME))
+                                    .append("\">Puzzle Overview</a>.");
+                        } else {
+                            message.append(" ")
+                                    .append("Try to solve the <a href=\"")
+                                    .append(url.forPath(Paths.PUZZLE_GAME))
+                                    .append("?puzzleId=")
+                                    .append(puzzle.getPuzzleId())
+                                    .append("\">next Puzzle</a>, or go back to the <a href=\"")
+                                    .append(url.forPath(Paths.PUZZLE_GAME))
+                                    .append("\">Puzzle Overview</a>.");
+                        }
                         return message.toString();
                     }
                 }
