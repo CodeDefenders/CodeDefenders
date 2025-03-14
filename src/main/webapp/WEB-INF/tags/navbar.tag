@@ -52,6 +52,7 @@
                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Puzzles</a>
                                 <ul class="dropdown-menu header-puzzle-menu" aria-labelledby="header-puzzle">
                                     <li><a class="dropdown-item" id="header-puzzle-overview"
+                                           title="Puzzle Overview: See all puzzles and your progress."
                                            href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Overview</a></li>
                                     <c:if test="${puzzleNavigation.hasNextPuzzle()}">
                                         <%--@elvariable id="nextPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
@@ -59,6 +60,7 @@
                                         <li><a class="dropdown-item" id="header-puzzle-next"
                                                href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}"
                                                title="Next puzzle: ${nextPuzzleObj.puzzle.chapter.title}, ${nextPuzzleObj.puzzle.title}"
+                                               data-bs-toggle="tooltip"
                                         >Play next puzzle</a></li>
                                     </c:if>
                                     <li class="dropdown-divider"></li>
