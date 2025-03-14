@@ -56,6 +56,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.Event;
@@ -623,7 +624,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         Role role = player.getRole();
-        if (role != Role.ATTACKER) {
+        if (role != Role.ATTACKER && game instanceof MultiplayerGame ||
+                role != Role.PLAYER && game instanceof MeleeGame) {
             return CanUserResolveEquivalenceResult.USER_NOT_AN_ATTACKER;
         }
 

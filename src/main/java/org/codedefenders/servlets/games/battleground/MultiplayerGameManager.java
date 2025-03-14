@@ -525,6 +525,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
         String resolveAction = request.getParameter("resolveAction");
+        Mutant equivMutant = mutantRepo.getMutantById(equivMutantId.get());
 
         switch (gameManagingUtils.canUserResolveEquivalence(game, login.getUserId(), equivMutantId.get())) {
             case USER_NOT_PART_OF_THE_GAME -> {
@@ -556,7 +557,6 @@ public class MultiplayerGameManager extends HttpServlet {
             case MUTANT_IS_NOT_PENDING -> {
                 logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                         login.getUserId(), equivMutantId.get());
-                var equivMutant = mutantRepo.getMutantById(equivMutantId.get());
                 if (equivMutant.getState() == KILLED) {
                     messages.add("Too late. The mutant was already killed and therefore proven to be not equivalent.");
                     // TODO: Continue with the resolution to give them the option to win other duels? (only if action=="reject")
@@ -567,7 +567,6 @@ public class MultiplayerGameManager extends HttpServlet {
             case YES -> {}
         }
 
-        Mutant equivMutant = mutantRepo.getMutantById(equivMutantId.get());
 
         if ("accept".equals(resolveAction)) {
             var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
