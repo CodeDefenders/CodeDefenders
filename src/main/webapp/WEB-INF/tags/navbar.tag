@@ -50,7 +50,7 @@
                             <li class="nav-item nav-item-highlight dropdown me-3">
                                 <a class="nav-link dropdown-toggle" id="header-puzzle" role="button"
                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Puzzles</a>
-                                <ul class="dropdown-menu" aria-labelledby="header-puzzle">
+                                <ul class="dropdown-menu header-puzzle-menu" aria-labelledby="header-puzzle">
                                     <li><a class="dropdown-item" id="header-puzzle-overview"
                                            href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Overview</a></li>
                                     <c:if test="${puzzleNavigation.hasNextPuzzle()}">
@@ -59,7 +59,7 @@
                                         <li><a class="dropdown-item" id="header-puzzle-next"
                                                href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}"
                                                title="Next puzzle: ${nextPuzzleObj.puzzle.chapter.title}, ${nextPuzzleObj.puzzle.title}"
-                                        ></a></li>
+                                        >Play next puzzle</a></li>
                                     </c:if>
                                     <li class="dropdown-divider"></li>
                                     <c:if test="${puzzleNavigation.puzzleChapters.size() == 0}">
@@ -80,6 +80,8 @@
                                                     <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
                                                     <c:set var="status"
                                                            value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
+                                                    <c:set var="icon"
+                                                           value="${puzzleEntry.equals(nextPuzzleObj) ? 'fa-chevron-right' : (puzzleEntry.solved ? 'fa-check' : 'fa-lock')}"/>
                                                     <li><a class="dropdown-item header-puzzle-${status}"
                                                            id="header-puzzle-chapter-${chapter.position}-${puzzle.position}"
                                                             <c:choose>
@@ -92,7 +94,7 @@
                                                                     title="This puzzle is locked."
                                                                 </c:otherwise>
                                                             </c:choose>
-                                                    >${puzzle.title}</a></li>
+                                                    ><i class="fa ${icon}"></i> ${puzzle.title}</a></li>
                                                 </c:forEach>
                                             </ul>
                                         </li>
