@@ -101,13 +101,11 @@ public class JoinGameAPI extends APIServlet {
     }
 
     private boolean joinGame(MultiplayerGame game, Role role) throws IOException {
-        // Create the event, publish if successfully joined
-        GameJoinedEvent gje = new GameJoinedEvent();
-        gje.setGameId(game.getId());
-        gje.setUserId(login.getUserId());
-        gje.setUserName(login.getSimpleUser().getName());
-
         if (game.addPlayer(login.getUserId(), role)) {
+            GameJoinedEvent gje = new GameJoinedEvent();
+            gje.setGameId(game.getId());
+            gje.setUserId(login.getUserId());
+            gje.setUserName(login.getSimpleUser().getName());
             notificationService.post(gje);
             return true;
         }
