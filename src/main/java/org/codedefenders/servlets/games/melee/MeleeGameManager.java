@@ -254,7 +254,8 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED || gameRepo.isGameExpired(gameId);
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
         final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.PLAYER) {

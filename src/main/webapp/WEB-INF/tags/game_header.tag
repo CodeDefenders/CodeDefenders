@@ -37,7 +37,6 @@
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
         role = ((MeleeGame) game).getRole(login.getUserId());
         duration = ((MeleeGame) game).getGameDurationMinutes();
-        startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
 
         if (game.getState() == GameState.ACTIVE) {
             startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
