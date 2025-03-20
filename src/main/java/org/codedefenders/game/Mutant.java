@@ -344,11 +344,22 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
+    public boolean isTrailingWhitespaceChange(String sourceLine, String targetLine) {
+        if (targetLine.length() > sourceLine.length()) {
+            return sourceLine.equals(targetLine.substring(0, sourceLine.length()))
+                && targetLine.substring(sourceLine.length()).isBlank();
+        } else if (sourceLine.length() > targetLine.length()) {
+            return targetLine.equals(sourceLine.substring(0, targetLine.length()))
+                && sourceLine.substring(targetLine.length()).isBlank();
+        } else {
+            return false;
+        }
+    }
+
     /**
-     * Removes single-line whitespace changes from a patch.
-     * Whitespace inside of strings ("") is preserved.
+     * Removes trailing single-line whitespace changes from a patch.
      */
-    public void removeSingleLineWhitespaceChanges(Patch<String> patch) {
+    public void removeTrailingSingleLineWhitespaceChanges(Patch<String> patch) {
         for (var delta : new ArrayList<>(patch.getDeltas())) {
             var source = delta.getSource().getLines();
             var target = delta.getTarget().getLines();
@@ -359,9 +370,7 @@ public class Mutant implements Serializable {
             boolean updateDelta = false;
 
             for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
-                var sourceLine =  source.get(i).replaceAll(unquotedWhitespaceRegex, "");
-                var targetLine =  target.get(i).replaceAll(unquotedWhitespaceRegex, "");
-                if (!sourceLine.equals(targetLine)) {
+                if (!isTrailingWhitespaceChange(source.get(i), target.get(i))) {
                     discardDelta = false;
                 } else {
                     updateDelta = true;
@@ -400,7 +409,7 @@ public class Mutant implements Serializable {
         List<String> mutantLines = FileUtils.readLines(mutantFile);
 
         Patch<String> patch = DiffUtils.diff(sutLines, mutantLines);
-        removeSingleLineWhitespaceChanges(patch);
+        removeTrailingSingleLineWhitespaceChanges(patch);
 
         List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
