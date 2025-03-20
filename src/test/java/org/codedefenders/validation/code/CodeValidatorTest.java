@@ -54,6 +54,7 @@ import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDAT
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_OPERATORS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
@@ -323,8 +324,8 @@ public class CodeValidatorTest {
                     testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
 
                     // MUTANT_VALIDATION_FIELD_NAME - is only forbidden with STRICT validation
-                    testCases("fields/changedName", STRICT, MUTANT_VALIDATION_FIELD_NAME),
-                    testCases("fields/changedNameOfNested", STRICT, MUTANT_VALIDATION_FIELD_NAME),
+                    testCases("fields/changedName", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
+                    testCases("fields/changedNameOfNested", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
 
                     testCases("identical/newLineAdded", RELAXED, MUTANT_VALIDATION_IDENTICAL),
                     testCases("identical/same", RELAXED, MUTANT_VALIDATION_IDENTICAL),
@@ -370,7 +371,7 @@ public class CodeValidatorTest {
                     testCases("methodSignature/changedConstructor", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
                     testCases("methodSignature/changedConstructorOfInnerClass", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
                     testCases("methodSignature/changedPrivateMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedProtectedMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
                     testCases("methodSignature/changedPublicMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
 
                     // Bit Shifts are only forbidden with STRICT validation
