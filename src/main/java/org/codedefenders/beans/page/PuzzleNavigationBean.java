@@ -1,7 +1,7 @@
 package org.codedefenders.beans.page;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -39,7 +39,9 @@ public class PuzzleNavigationBean {
     public PuzzleNavigationBean(PuzzleRepository puzzleRepo, CodeDefendersAuth login) {
         this.puzzleRepo = puzzleRepo;
 
-        final Set<PuzzleGame> activePuzzles = new HashSet<>(puzzleRepo.getActivePuzzleGamesForUser(login.getUserId()));
+        // maps the puzzle id to the puzzle game
+        final Map<Integer, PuzzleGame> activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
+                .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity()));
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
@@ -101,10 +103,9 @@ public class PuzzleNavigationBean {
      * @param activePuzzles a set of active puzzle games which replace puzzles.
      * @return a function which converts a puzzle chapter to a puzzle chapter entry.
      * @see PuzzleChapterEntry
-     * @see #toPuzzleChapterEntry(int, Set)
      */
     private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId,
-                                                                             Set<PuzzleGame> activePuzzles) {
+                                                                             Map<Integer, PuzzleGame> activePuzzles) {
         return puzzleChapter -> {
             final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())
                     .stream()
@@ -127,14 +128,14 @@ public class PuzzleNavigationBean {
      * @return a function which converts a puzzle to a puzzle entry.
      * @see PuzzleEntry
      */
-    private Function<Puzzle, PuzzleEntry> toPuzzleEntry(int userId, Set<PuzzleGame> activePuzzles) {
+    private Function<Puzzle, PuzzleEntry> toPuzzleEntry(int userId, Map<Integer, PuzzleGame> activePuzzles) {
         return entry -> {
             int pid = entry.getPuzzleId();
-            for (PuzzleGame activePuzzle : activePuzzles) {
-                if (activePuzzle.getPuzzleId() == pid) {
-                    boolean solved = activePuzzle.getState().equals(GameState.SOLVED);
-                    return new PuzzleEntry(activePuzzle, solved);
-                }
+
+            if (activePuzzles.containsKey(pid)) {
+                PuzzleGame activePuzzle = activePuzzles.get(pid);
+                boolean solved = activePuzzle.getState().equals(GameState.SOLVED);
+                return new PuzzleEntry(activePuzzle, solved);
             }
 
             PuzzleGame puzzleGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
