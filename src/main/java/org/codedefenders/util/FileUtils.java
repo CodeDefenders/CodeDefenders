@@ -299,6 +299,29 @@ public class FileUtils {
     }
 
     /**
+     * Copies a file tree from a source to a target directory.
+     * Replaces existing files, but not directories with the same name.
+     */
+    public static void copyFileTree(Path source, Path target) throws IOException {
+        try (Stream<Path> paths = Files.walk(source)) {
+            paths.forEach(sourcePath -> {
+                try {
+                    Path targetPath = target.resolve(source.relativize(sourcePath));
+                    if (Files.isDirectory(sourcePath)) {
+                        if (!Files.exists(targetPath)) {
+                            Files.copy(sourcePath, targetPath);
+                        }
+                    } else {
+                        Files.copy(sourcePath, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    /**
      * Uses nextFreeName to choose a non-existing filename within a directory.
      *
      * <p>In comparison to {@link FileUtils#getNextSubDir(Path)}, this method sidesteps collisions less effectively,
