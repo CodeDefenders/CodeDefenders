@@ -519,7 +519,7 @@ public class PuzzleImporter {
                         } else if (parts.length > 2
                                 && parts[1].equals("deps")
                                 && parts[parts.length-1].endsWith(".java")) {
-                            deps.add(subpath.apply(file, 2)); //TODO eigentlich unnötig, da die interne Struktur nicht relevant ist
+                            deps.add(subpath.apply(file, 2));
                             continue;
                         }
                     }

@@ -46,7 +46,6 @@ public class Constants {
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
     // classes, dependencies, mutants and tests subdirectories for CUTs
-    public static final String CUTS_DEPENDECY_DIR = "dependencies"; //only kept for backwards compatibility
     public static final String CUTS_MUTANTS_DIR = "mutants";
     public static final String CUTS_TESTS_DIR = "tests";
     public static final String CUTS_CLASSES_DIR = "classes";

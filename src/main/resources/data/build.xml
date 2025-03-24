@@ -20,14 +20,12 @@
 	- jacoco.cp
 	-->
 
-	<path id="nocut.cp"> <!--- TODO anderen Namen, stimmt ja mittlerweile gar nicht mehr -->
+	<path id="sources.cp">
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
 		<pathelement path="${common.cp}"/>
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<pathelement location="${legacy.deps}"/> <!-- For backwards compatibility -->
-		<pathelement location="${legacy.cut}"/> <!-- For backwards compatibility -->
 	</path>
 
 	<path id="test.cp">
@@ -39,8 +37,6 @@
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
-		<pathelement location="${legacy.deps}"/> <!-- For backwards compatibility -->
-		<pathelement location="${legacy.cut}"/> <!-- For backwards compatibility -->
 	</path>
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
@@ -48,8 +44,8 @@
 	</taskdef>
 
 	<!-- requires mutant to compile only -->
-	<target name="compile-mutant" description="compile a single mutant"> <!--- TODO ausprobieren ohne deps -->
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.release.version}" classpathref="nocut.cp"
+	<target name="compile-mutant" description="compile a single mutant">
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.release.version}" classpathref="sources.cp"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
@@ -96,7 +92,7 @@
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath location="${mutant.file}"/>
 			<classpath location="${test.file}"/>
-			<classpath refid="nocut.cp"/>
+			<classpath refid="sources.cp"/>
 
 			<!-- testname -->
 			<test name="${testClassname}"/>
@@ -113,7 +109,7 @@
 	<target name="recompile-test-with-mutant" description="compile a single test including the mutant in the classpath"
 			depends="compile-mutant, compile-test">
 		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.release.version}"
-			   classpathref="nocut.cp" classpath="${mutant.file}"
+			   classpathref="sources.cp" classpath="${mutant.file}"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
@@ -129,7 +125,7 @@
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath location="${mutant.file}"/>
 			<classpath location="${mutant.test.file}"/>
-			<classpath refid="nocut.cp"/>
+			<classpath refid="sources.cp"/>
 
 			<!-- testname -->
 			<test name="${testClassname}"/>

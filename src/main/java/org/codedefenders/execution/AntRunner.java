@@ -376,8 +376,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dtest.file=" + testDir);
         command.add("-Dcut.dir=" + cutDir);
         command.add("-DtestClassname=" + testClassName);
-        command.add("-Dlegacy.cut=" + topDir);
-        command.add("-Dlegacy.deps=" + Paths.get(topDir, Constants.CUTS_DEPENDECY_DIR));
 
         command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
         command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);
