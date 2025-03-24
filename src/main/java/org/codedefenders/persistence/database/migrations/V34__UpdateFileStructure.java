@@ -19,7 +19,7 @@
 
 package org.codedefenders.persistence.database.migrations;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -45,7 +45,6 @@ import org.flywaydb.core.api.migration.Context;
 public class V34__UpdateFileStructure extends BaseJavaMigration {
 
     private final String dataDir;
-    private Connection conn;
     private final QueryRunner queryRunner = new QueryRunner();
 
     @Inject
@@ -60,44 +59,39 @@ public class V34__UpdateFileStructure extends BaseJavaMigration {
 
     @Override
     public void migrate(Context context) throws Exception {
-        conn = context.getConnection();
+        Connection conn = context.getConnection();
+        Path dataPath = Path.of(dataDir);
+
         String query = "SELECT * FROM classes WHERE JavaFile NOT LIKE '%classes/%';";
         List<GameClass> wrongClasses = queryRunner.query(conn, query,
                 ResultSetUtils.listFromRS(GameClassRepository::gameClassFromRS));
-        for (GameClass gameClass : wrongClasses) {
 
+        for (GameClass gameClass : wrongClasses) {
             //Move .java-file from CuT into correct package structure
-            Path originalCutPath = Path.of(dataDir).resolve(gameClass.getJavaFile());
+            Path originalCutPath = dataPath.resolve(gameClass.getJavaFile());
+            Path classRoot = originalCutPath.getParent();
             String javaFileNameWithoutExtension = originalCutPath.getFileName().toString().replace(".java", "");
-            Path packageStructure = FileUtils.getPackagePathFromJavaFile(originalCutPath.toString());
-            Path classesDir = originalCutPath.getParent().resolve(Constants.CUTS_CLASSES_DIR);
-            Files.createDirectories(classesDir);
-            Path newJavaFilePath = Files.move(originalCutPath,
+            Path packageStructure = FileUtils.getPackagePathFromJavaFile(Files.readString(originalCutPath));
+            Path classesDir = classRoot.resolve(Constants.CUTS_CLASSES_DIR);
+            Files.createDirectories(classesDir.resolve(packageStructure));
+            Path fullJavaFilePath = Files.move(originalCutPath,
                     classesDir.resolve(packageStructure).resolve(originalCutPath.getFileName()));
 
             //Move generated .class-files from the CuT, including inner classes, into correct package structure
-            try (Stream<Path> findStream = Files.find(originalCutPath.resolve(packageStructure), 1,
-                    (path, attr) -> path.toString().matches(
-                            javaFileNameWithoutExtension + "[.]*\\.class"))) {
-                List<Path> cutClassFiles = findStream.toList();
-                for (Path cutClassFile : cutClassFiles) {
-                    Files.move(cutClassFile, classesDir.resolve(packageStructure)
-                            .resolve(cutClassFile.getFileName()));
-                }
-            } catch (FileNotFoundException ignored) {
-                //This should only happen for very specific edge cases that were broken before this refactoring.
-                //Since it was broken before, it should not be fixed now.
-            }
+            moveClassFiles(classRoot.resolve(packageStructure),
+                    classesDir.resolve(packageStructure), javaFileNameWithoutExtension);
 
             //Adjust DB entries for CuT
-            Path newClassFile = newJavaFilePath.resolveSibling(newJavaFilePath.getFileName().toString()
-                    .replace(".java", ".class"));
-            String updateSQL = "UPDATE classes SET JavaFile = ?, ClassFile = ? WHERE Class_ID = ?;";
-            queryRunner.update(conn, updateSQL, newJavaFilePath.toString(), newClassFile.toString(), gameClass.getId());
+            String newJavaFileEntry = dataPath.relativize(fullJavaFilePath).toString();
 
-            if (Files.exists(originalCutPath.resolve(Constants.CUTS_DEPENDECY_DIR))) {
+            String newClassFileEntry = newJavaFileEntry.replace(".java", ".class");
+            String updateSQL = "UPDATE classes SET JavaFile = ?, ClassFile = ? WHERE Class_ID = ?;";
+            queryRunner.update(conn, updateSQL, newJavaFileEntry, newClassFileEntry, gameClass.getId());
+
+            Path dependenciesDir = classRoot.resolve("dependencies");
+            if (Files.exists(dependenciesDir)) {
                 //Move dependencies
-                FileUtils.copyFileTree(originalCutPath.resolve(Constants.CUTS_DEPENDECY_DIR), classesDir);
+                FileUtils.copyFileTree(dependenciesDir, classesDir);
 
                 //Adjust DB entries for dependencies
                 int classId = gameClass.getId();
@@ -105,26 +99,51 @@ public class V34__UpdateFileStructure extends BaseJavaMigration {
                 //TODO Warum wird an dieser Stelle die classId als Argument gebraucht? Warum nicht aus dem ResultSet
                 //TODO holen?
                 List<Dependency> dependencies = queryRunner.query(conn, dependencyQuery,
-                        ResultSetUtils.listFromRS((rs) -> DependencyDAO.dependencyFromRS(rs, classId)));
+                        ResultSetUtils.listFromRS((rs) -> DependencyDAO.dependencyFromRS(rs, classId)), classId);
                 for (Dependency dependency : dependencies) {
                     int depId = dependency.getId();
-                    String[] oldJavaFile = dependency.getJavaFile().split(System.lineSeparator());
-                    String[] oldClassFile = dependency.getClassFile().split(System.lineSeparator());
-                    oldJavaFile[3] = oldJavaFile[3].replace("dependencies", "classes");
-                    oldClassFile[3] = oldClassFile[3].replace("dependencies", "classes");
-                    String newDepJavaFile = String.join(System.lineSeparator(), oldJavaFile);
-                    String newDepClassFile = String.join(System.lineSeparator(), oldClassFile);
+
+                    String oldJavaFileEntry = dataPath.relativize(Path.of(dependency.getJavaFile())).toString();
+                    String newDepJavaFile = replaceDependencyPathString(oldJavaFileEntry);
+
+                    String oldClassFileEntry = dataPath.relativize(Path.of(dependency.getClassFile())).toString();
+                    String newDepClassFile = replaceDependencyPathString(oldClassFileEntry);
 
                     String updateDepSQL = "UPDATE dependencies SET JavaFile = ?, ClassFile = ? " +
                             "WHERE Dependency_ID = ?;";
                     queryRunner.update(conn, updateDepSQL, newDepJavaFile, newDepClassFile, depId);
-                    //TODO Muss das noch committet werden?
                 }
 
                 //Remove old dependency directory
-                org.apache.commons.io.FileUtils.deleteDirectory(
-                        originalCutPath.resolve(Constants.CUTS_DEPENDECY_DIR).toFile());
+                org.apache.commons.io.FileUtils.deleteDirectory(dependenciesDir.toFile());
             }
+        }
+    }
+
+
+    static String replaceDependencyPathString(String path) {
+        String sep = FileUtils.getFileSeparator();
+        String[] pathComponents = path.split(sep.equals("\\") ? "\\\\" : sep);
+        if (pathComponents.length < 3) {
+            return path;
+        } else {
+            pathComponents[2] = pathComponents[2].replace("dependencies", "classes");
+            return String.join(sep, pathComponents);
+        }
+    }
+
+    static void moveClassFiles(Path source, Path target, String classname) throws IOException {
+        String sep = FileUtils.getFileSeparator().equals("\\") ? "\\\\" : FileUtils.getFileSeparator();
+        try (Stream<Path> findStream = Files.find(source, 1,
+                (path, attr) -> path.toString().matches(
+                        "(.*" + sep + ")*" + classname + "(\\$[^\n\r" + sep + "]*)?\\.class"))) {
+            findStream.forEach((path) -> {
+                try {
+                    Files.move(path, target.resolve(path.getFileName()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
     }
 }
