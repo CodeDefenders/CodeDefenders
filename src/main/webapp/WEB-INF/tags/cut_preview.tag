@@ -21,44 +21,174 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <div id="create-game-cut-preview" class="w-100 h-100">
-<div class="card" style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
-    <div class="card-body p-0 codemirror-fill w-100 h-100">
-        <pre class="m-0"><textarea name=""></textarea></pre>
+    <div class="card loading loading-bg-gray loading-height-200"
+         style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
+        <div class="card-header" hidden>
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1 active" data-bs-toggle="tab"
+                            id="cut-header"
+                            data-bs-target="#cut-body"
+                            aria-controls="cut-body"
+                            type="button" role="tab" aria-selected="true">
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
+            <div class="tab-content">
+                <div class="tab-pane active"
+                     id="cut-body"
+                     aria-labelledby="cut-header"
+                     role="tabpanel">
+                            <pre class="m-0"><textarea id="cut-area" name="cut" title="cut"
+                                                       readonly></textarea></pre>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
+    <script type="module">
+        import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
 
-    import {InfoApi} from '${url.forPath("/js/codedefenders_main.mjs")}';
+        import {InfoApi} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
-    const cutPreview = document.querySelector('#create-game-cut-preview')
+        const cutPreview = document.querySelector('#create-game-cut-preview')
 
-    const classSelector = document.querySelector('#class-select');
-    const textarea = cutPreview.querySelector('textarea');
+        const classSelector = document.querySelector('#class-select');
 
-    const updatePreview = function () {
-        const classId = Number(classSelector.value);
-        const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
+        const updatePreview = async function () {
+            const classId = Number(classSelector.value);
+            const cutArea = cutPreview.querySelector('textarea[id="cut-area"]');
+            const cutHeader = cutPreview.querySelector('button[id="cut-header"]');
+            const cardHeader = cutPreview.querySelector('.card-header');
+            const cutBody = cutPreview.querySelector('#cut-body');
+            const card = cutPreview.querySelector('.card');
 
-        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-            InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
-        } else {
-            const editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: true,
-                readOnly: true,
-                mode: 'text/x-java',
-                autoRefresh: true
+
+            //---------------------------------------------- Reset
+
+            //Change active tab to CuT
+            document.querySelectorAll(".nav-item").forEach(header =>
+                    header.classList.remove("active")
+            );
+            cutHeader.classList.add("active");
+            document.querySelectorAll(".tab-pane").forEach(tab =>
+                    tab.classList.remove("active")
+            );
+            cutBody.classList.add("active");
+
+            cardHeader.setAttribute("hidden", "true");
+            card.setAttribute("class", "card loading loading-bg-gray loading-height-200");
+
+            //Remove all dependency tabs
+            const headerNav = cutPreview.querySelector('.nav');
+            while (headerNav.children.length > 1) {
+                headerNav.removeChild(headerNav.children[1]);
+            }
+
+            //Reset the CuT editor, if it already exists, otherwise create a new one
+            let cutEditorWrapper = cutPreview.querySelector('#cut-editor');
+            let cutEditor;
+            if (cutEditorWrapper && cutEditorWrapper.CodeMirror) {
+                cutEditor = cutEditorWrapper.CodeMirror;
+                cutEditor.setValue("");
+            } else {
+                const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
+
+                cutEditor = CodeMirror.fromTextArea(cutArea, {
+                    lineNumbers: true,
+                    readOnly: true,
+                    mode: 'text/x-java',
+                    autoRefresh: true
+                });
+                cutEditor.getWrapperElement().classList.add('codemirror-readonly');
+                cutEditor.getWrapperElement().id = "cut-editor";
+            }
+
+
+            //----------------------------------------------
+
+
+            const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
+            const classInfo = await InfoApi.getClassInfo(classId, true);
+            const hasDependencies = classInfo.dependency_names.length > 0;
+
+            try {
+                cutEditor.setValue(classInfo.source)
+                if (hasDependencies) {
+                    cutHeader.textContent = classInfo.name;
+                }
+            } catch (e) {
+                cutEditor.setValue("Could not fetch class.\nPlease try again later.");
+                if (hasDependencies) {
+                    cutHeader.textContent = "Error";
+                }
+            }
+
+            const bodyContent = cutPreview.querySelector('.tab-content');
+            classInfo.dependency_names.forEach((name, index) => {
+                const dependencyTitle = document.createElement("li");
+                dependencyTitle.classList.add("nav-item");
+                dependencyTitle.role = "presentation";
+                dependencyTitle.innerHTML = `
+                        <button class="nav-link py-1" data-bs-toggle="tab"
+                                id="class-header-\${classId}-\${index}"
+                                data-bs-target="#class-body-\${classId}-\${index}"
+                                aria-controls="class-body-\${classId}-\${index}"
+                                type="button" role="tab" aria-selected="false">
+                            \${name}
+                        </button>
+                    `;
+
+                headerNav.appendChild(dependencyTitle);
+
+                const dependencyContent = document.createElement("div");
+                dependencyContent.classList.add("tab-pane");
+                dependencyContent.id = `class-body-\${classId}-\${index}`;
+                dependencyContent.setAttribute("aria-labelledby", `class-header-\${classId}-\${index}`);
+                dependencyContent.role = "tabpanel";
+
+                const dependencyPre = document.createElement("pre");
+                dependencyPre.classList.add("m-0");
+
+                const dependencyTextArea = document.createElement("textarea");
+                dependencyTextArea.readonly = true;
+
+                dependencyPre.appendChild(dependencyTextArea);
+                dependencyContent.appendChild(dependencyPre);
+                bodyContent.appendChild(dependencyContent);
+
+                const dependencyEditor = CodeMirror.fromTextArea(dependencyTextArea, {
+                    lineNumbers: true,
+                    readOnly: true,
+                    mode: 'text/x-java',
+                    autoRefresh: true
+                });
+                dependencyEditor.getWrapperElement().classList.add('codemirror-readonly');
+                try {
+                    dependencyEditor.setValue(classInfo.dependency_code[index])
+                } catch (e) {
+                    dependencyEditor.setValue("Could not fetch dependency \n Please try again later.");
+                }
+
+
             });
-            editor.getWrapperElement().classList.add('codemirror-readonly');
-            InfoApi.setClassEditorValue(editor, classId);
-        }
-    };
 
-    // Load initial selected class
-    document.addEventListener("DOMContentLoaded", updatePreview);
+            const codeMirrorContainers = this.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
+            if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
+                codeMirrorContainers.forEach(container => container.CodeMirror.refresh());
+            }
+            if (hasDependencies) {
+                cardHeader.removeAttribute("hidden")
+            }
+            LoadingAnimation.hideAnimation(card);
+        };
 
-    classSelector.addEventListener('change', updatePreview);
-</script>
+        // Load initial selected class
+        document.addEventListener("DOMContentLoaded", updatePreview);
+
+        classSelector.addEventListener('change', updatePreview);
+    </script>
 </div>
