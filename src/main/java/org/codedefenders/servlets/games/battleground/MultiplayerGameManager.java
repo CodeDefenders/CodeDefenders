@@ -571,7 +571,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if ("accept".equals(resolveAction)) {
             var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
             if (result.mutantKillable()) {
-                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " " + " However, the mutant was killable!");
+                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " " + "However, the mutant was killable!");
             } else {
                 messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
             }

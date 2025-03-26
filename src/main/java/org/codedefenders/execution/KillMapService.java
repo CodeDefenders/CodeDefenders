@@ -267,22 +267,12 @@ public class KillMapService {
 
                         } else {
                             TargetExecution executedTarget = backendExecutorService.testMutant(mutant, test);
-                            KillMapEntry.Status status;
-
-                            switch (executedTarget.status) {
-                                case FAIL:
-                                    status = KILL;
-                                    break;
-                                case SUCCESS:
-                                    status = NO_KILL;
-                                    break;
-                                case ERROR:
-                                    status = ERROR;
-                                    break;
-                                default:
-                                    status = UNKNOWN;
-                                    break;
-                            }
+                            KillMapEntry.Status status = switch (executedTarget.status) {
+                                case FAIL -> KILL;
+                                case SUCCESS -> NO_KILL;
+                                case ERROR -> ERROR;
+                                default -> UNKNOWN;
+                            };
 
                             entry = new KillMapEntry(test, mutant, status);
                         }
@@ -314,7 +304,7 @@ public class KillMapService {
             }
         }
 
-        logger.info("Computation of killmap finished after " + Duration.between(startTime, Instant.now()).getSeconds()
-                + " seconds");
+        logger.info("Computation of killmap finished after {} seconds. Killmap: {}",
+                Duration.between(startTime, Instant.now()).getSeconds(), killMap.getEntries());
     }
 }
