@@ -8,6 +8,7 @@ import ProgressBar from './progress_bar_common';
 import PushSocket from './push_socket';
 import PuzzleAPI from './puzzle_api';
 import AchievementNotifications from './achievement_notifications';
+import DynamicClassViewer from "../game/dynamic_class_viewer";
 
 
 export {
@@ -20,7 +21,8 @@ export {
     ProgressBar,
     PushSocket,
     PuzzleAPI,
-    AchievementNotifications
+    AchievementNotifications,
+    DynamicClassViewer
 }
 
 export * from './utils';
