@@ -21,7 +21,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <div id="create-game-cut-preview" class="w-100 h-100">
-    <div class="card loading loading-bg-gray loading-height-200"
+    <div class="card loading loading-bg-gray loading-height-200" id="class-preview-card"
          style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
         <div class="card-header" hidden>
             <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
@@ -58,15 +58,11 @@
 
         const updatePreview = async function () {
             const classId = Number(classSelector.value);
-            const cutHeader = cutPreview.querySelector('button[id="cut-header"]');
-            const cutBody = cutPreview.querySelector('#cut-body');
-            console.log('updatePreview', classId, cutHeader, cutBody);
-
-            await DynamicClassViewer.show_code(classId, cutHeader, cutBody);
+            const card = cutPreview.querySelector('#class-preview-card');
+            await DynamicClassViewer.show_code(classId, card);
         };
 
         // Load initial selected class
-        document.addEventListener("DOMContentLoaded", function () {updatePreview();});
         updatePreview();
         classSelector.addEventListener('change', updatePreview);
     </script>

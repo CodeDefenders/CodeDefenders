@@ -7,22 +7,22 @@ import {LoadingAnimation} from "../main";
  */
 class DynamicClassViewer {
 
-    //TODO Konstruktor?
-
     /**
      * Fills an existing card with header and body elements for the class under test and its dependencies.
-     * See {@code cut_preview.tag} for an example. The card should not come with an element with the ID "cut-editor".
+     * The card has to follow a specific format, see {@code cut_preview.tag} for an example.
      *
      * @param classId The ID of the class to display.
-     * @param cutHeader The header element referring to the class under test.
-     * @param cutBody The body element referring to the class under test.
+     * @param card The card element to fill.
      * @returns {Promise<void>}
      */
-    static async show_code(classId, cutHeader, cutBody) {
-        const card = cutHeader.closest('.card');
+    static async show_code(classId, card) {
+
         const cardHeader = card.querySelector('.card-header');
+        const cutHeader = cardHeader.querySelector('button');
+
         const cardBody = card.querySelector('.card-body');
-        const cutArea = cardBody.querySelector("textarea");
+        const cutBody = cardBody.querySelector('.tab-pane');
+        const cutArea = cutBody.querySelector("textarea");
 
         //---------------------------------------------- Reset
 
@@ -46,9 +46,9 @@ class DynamicClassViewer {
         }
 
         //Reset the CuT editor, if it already exists, otherwise create a new one
-        let cutEditorWrapper = card.querySelector('#cut-editor'); //TODO Kleinteiliger?
+        let cutEditorWrapper = cutBody.querySelector('.CodeMirror');
         let cutEditor;
-        if (cutEditorWrapper && cutEditorWrapper.CodeMirror) {
+        if (cutEditorWrapper) {
             cutEditor = cutEditorWrapper.CodeMirror;
             cutEditor.setValue("");
         } else {
@@ -61,12 +61,11 @@ class DynamicClassViewer {
                 autoRefresh: true
             });
             cutEditor.getWrapperElement().classList.add('codemirror-readonly');
-            cutEditor.getWrapperElement().id = "cut-editor";
         }
 
 
-        //----------------------------------------------
 
+        //----------------------------------------------
 
         const {InfoApi, LoadingAnimation} = await import('../main/index.js');
         const classInfo = await InfoApi.getClassInfo(classId, true);
@@ -85,6 +84,7 @@ class DynamicClassViewer {
         }
 
         const bodyContent = cardBody.querySelector('.tab-content');
+
         classInfo.dependency_names.forEach((name, index) => {
             const dependencyTitle = document.createElement("li");
             dependencyTitle.classList.add("nav-item");
@@ -135,7 +135,6 @@ class DynamicClassViewer {
 
 
         });
-
         const codeMirrorContainers = cardBody.querySelectorAll('.CodeMirror'); //refresh all CodeMirror instances
         if (codeMirrorContainers.length > 0 && codeMirrorContainers[0].CodeMirror) {
             codeMirrorContainers.forEach(container => container.CodeMirror.refresh());
