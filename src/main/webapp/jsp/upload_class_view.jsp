@@ -239,7 +239,7 @@
                             <tr>
                                 <td>${clazz.id}</td>
                                 <td>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-${clazz.id}>">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-${clazz.id}">
                                         ${clazz.baseName.equals(clazz.alias)
                                             ? clazz.baseName
                                             : clazz.baseName += ' (alias ' += clazz.alias += ')'}
