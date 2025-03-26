@@ -107,6 +107,11 @@ public class KillMap {
         }
     }
 
+    public void addEntry(KillMapEntry entry) {
+        matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
+        entries.add(entry);
+    }
+
     public int getClassId() {
         return classId;
     }

@@ -296,8 +296,7 @@ public class KillMapService {
         for (Future<KillMapEntry> result : executionResults) {
             try {
                 KillMapEntry entry = result.get();
-                killMap.getEntries().add(entry);
-                killMap.getMatrix()[killMap.indexOf(entry.test)][killMap.indexOf(entry.mutant)] = entry;
+                killMap.addEntry(entry);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new InterruptedException("Got interrupted while waiting for results");
