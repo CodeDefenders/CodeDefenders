@@ -33,8 +33,6 @@
                              id="cut-body-${classId}"
                              aria-labelledby="cut-header-${classId}"
                              role="tabpanel">
-                            <pre class="m-0"><textarea id="cut-area" name="cut" title="cut"
-                                                       readonly></textarea></pre>
                         </div>
                     </div>
                 </div>

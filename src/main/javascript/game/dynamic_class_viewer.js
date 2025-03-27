@@ -9,6 +9,7 @@ class DynamicClassViewer {
 
     /**
      * Fills an existing card with header and body elements for the class under test and its dependencies.
+     * Code will be displayed using CodeMirrors in read-only mode.
      * The card has to follow a specific format, see {@code cut_preview.tag} for an example.
      *
      * @param classId The ID of the class to display.
@@ -22,7 +23,6 @@ class DynamicClassViewer {
 
         const cardBody = card.querySelector('.card-body');
         const cutBody = cardBody.querySelector('.tab-pane');
-        const cutArea = cutBody.querySelector("textarea");
 
         //---------------------------------------------- Reset
 
@@ -54,7 +54,7 @@ class DynamicClassViewer {
         } else {
             const {default: CodeMirror} = await import('../thirdparty/codemirror.js');
 
-            cutEditor = CodeMirror.fromTextArea(cutArea, {
+            cutEditor = CodeMirror(cutBody, {
                 lineNumbers: true,
                 readOnly: true,
                 mode: 'text/x-java',
@@ -110,17 +110,9 @@ class DynamicClassViewer {
             dependencyContent.setAttribute("aria-labelledby", `class-header-${classId}-${index}`);
             dependencyContent.role = "tabpanel";
 
-            const dependencyPre = document.createElement("pre");
-            dependencyPre.classList.add("m-0");
-
-            const dependencyTextArea = document.createElement("textarea");
-            dependencyTextArea.readonly = true;
-
-            dependencyPre.appendChild(dependencyTextArea);
-            dependencyContent.appendChild(dependencyPre);
             bodyContent.appendChild(dependencyContent);
 
-            const dependencyEditor = CodeMirror.fromTextArea(dependencyTextArea, {
+            const dependencyEditor = CodeMirror(dependencyContent, {
                 lineNumbers: true,
                 readOnly: true,
                 mode: 'text/x-java',

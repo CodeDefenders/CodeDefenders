@@ -35,14 +35,12 @@
                 </li>
             </ul>
         </div>
-        <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
+        <div class="card-body p-0 codemirror-expand">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="cut-body"
                      aria-labelledby="cut-header"
                      role="tabpanel">
-                            <pre class="m-0"><textarea id="cut-area" name="cut" title="cut"
-                                                       readonly></textarea></pre>
                 </div>
             </div>
         </div>
