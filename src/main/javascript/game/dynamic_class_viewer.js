@@ -45,6 +45,11 @@ class DynamicClassViewer {
             headerNav.removeChild(headerNav.children[1]);
         }
 
+        //Remove all dependency content
+        cardBody.querySelectorAll("div[id^='class-body']").forEach(tab => {
+            tab.parentElement.removeChild(tab);
+        })
+
         //Reset the CuT editor, if it already exists, otherwise create a new one
         let cutEditorWrapper = cutBody.querySelector('.CodeMirror');
         let cutEditor;
