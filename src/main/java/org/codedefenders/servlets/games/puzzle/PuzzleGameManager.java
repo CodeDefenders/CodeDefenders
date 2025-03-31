@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -972,14 +973,30 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
-                        message.append(" ")
-                                .append("Try to solve the <a href=")
-                                .append(url.forPath(Paths.PUZZLE_GAME))
-                                .append("?puzzleId=")
-                                .append(puzzle.getPuzzleId())
-                                .append(">next Puzzle</a>, or go back to the <a href=")
-                                .append(url.forPath(Paths.PUZZLE_GAME))
-                                .append(">Puzzle Overview</a>.");
+                        if (puzzleChapter.getChapterId() > currentChapter) {
+                            message.append(MessageFormat.format("""
+                                                <br>
+                                                You solved all the puzzles of the current chapter!
+                                                Start with the
+                                                <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
+                                                of the next chapter "{2}", or go back to the
+                                                <a href="{0}">Puzzle Overview</a>.
+                                            """.stripIndent(),
+                                    url.forPath(Paths.PUZZLE_GAME),
+                                    puzzle.getPuzzleId(),
+                                    puzzleChapter.getTitle()
+                            ));
+                        } else {
+                            message.append(MessageFormat.format("""
+                                                Try to solve the
+                                                <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
+                                                or go back to the
+                                                <a href="{0}">Puzzle Overview</a>.
+                                            """,
+                                    url.forPath(Paths.PUZZLE_GAME),
+                                    puzzle.getPuzzleId()
+                            ));
+                        }
                         return message.toString();
                     }
                 }
