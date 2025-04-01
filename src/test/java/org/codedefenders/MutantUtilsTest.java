@@ -374,9 +374,9 @@ public class MutantUtilsTest {
 
     private boolean isOutsideOfMethods(String cutCode, String mutantCode, List<MethodDescription> methodDescriptions) {
         List<String> cutLines = new ArrayList<>(cutCode.lines().toList());
-        cutLines.replaceAll(s -> s.replaceAll(Mutant.regex, ""));
+        cutLines.replaceAll(s -> s.replaceAll(Mutant.unquotedWhitespaceRegex, ""));
         List<String> mutantLines = new ArrayList<>(mutantCode.lines().toList());
-        mutantLines.replaceAll(s -> s.replaceAll(Mutant.regex, ""));
+        mutantLines.replaceAll(s -> s.replaceAll(Mutant.unquotedWhitespaceRegex, ""));
         Patch<String> difference = DiffUtils.diff(cutLines, mutantLines);
         return MutantUtils.isOutsideOfMethods(methodDescriptions, difference);
     }
