@@ -57,7 +57,7 @@ public class Mutant implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
     // https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
-    public static String regex =
+    public static String unquotedWhitespaceRegex =
             "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
     private int id;
@@ -337,11 +337,57 @@ public class Mutant implements Serializable {
         List<String> sutLines = FileUtils.readLines(sourceFile.toPath());
         List<String> mutantLines = FileUtils.readLines(mutantFile.toPath());
 
-        sutLines.replaceAll(s -> s.replaceAll(regex, ""));
+        sutLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
-        mutantLines.replaceAll(s -> s.replaceAll(regex, ""));
+        mutantLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
         difference = DiffUtils.diff(sutLines, mutantLines);
+    }
+
+    /**
+     * Removes single-line whitespace changes from a patch.
+     * Whitespace inside of strings ("") is preserved.
+     */
+    public void removeSingleLineWhitespaceChanges(Patch<String> patch) {
+        for (var delta : new ArrayList<>(patch.getDeltas())) {
+            var source = delta.getSource().getLines();
+            var target = delta.getTarget().getLines();
+            int sourcePos = delta.getSource().getPosition();
+            int targetPos = delta.getTarget().getPosition();
+
+            boolean discardDelta = true;
+            boolean updateDelta = false;
+
+            for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
+                var sourceLine =  source.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                var targetLine =  target.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                if (!sourceLine.equals(targetLine)) {
+                    discardDelta = false;
+                } else {
+                    updateDelta = true;
+                    source.remove(i);
+                    target.remove(i);
+                    if (i == 0) {
+                        // adjust the chunk's start line if the first lines contain only whitespace changes
+                        sourcePos++;
+                        targetPos++;
+                    }
+                    i--;
+                }
+            }
+
+            if (discardDelta) {
+                // discard the whole chunk if it only consists of whitespace changes
+                patch.getDeltas().remove(delta);
+            } else if (updateDelta) {
+                // update the chunk if it contains lines with only whitespace changes
+                patch.getDeltas().remove(delta);
+                patch.getDeltas().add(delta.withChunks(
+                    new Chunk<>(sourcePos, source),
+                    new Chunk<>(targetPos, target)
+                ));
+            }
+        }
     }
 
     public String getPatchString() {
@@ -354,6 +400,8 @@ public class Mutant implements Serializable {
         List<String> mutantLines = FileUtils.readLines(mutantFile);
 
         Patch<String> patch = DiffUtils.diff(sutLines, mutantLines);
+        removeSingleLineWhitespaceChanges(patch);
+
         List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
         for (String s : unifiedPatches) {
