@@ -49,20 +49,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<%--
-<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-<%
-    mutantEditor.setClassName(cut.getName());
-    mutantEditor.setDependenciesForClass(game.getCUT());
-    if (previousSubmission.hasMutant()) {
-        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
-%>
---%>
-
-
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
@@ -78,24 +64,6 @@
     }
 %>
 
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<%
-    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-    mutantAccordion.setEnableFlagging(false);
-    mutantAccordion.setViewDiff(true);
-%>
---%>
-
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<%
-    if (showTestAccordion) {
-        testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants());
-    }
-%>
---%>
 
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 <% mutantProgressBar.setGameId(game.getId()); %>
@@ -113,10 +81,10 @@
         <t:mutant_accordion/>
 
         <% if (showTestAccordion) { %>
-            <div id="tests-div">
-                <div class="game-component-header"><h3>JUnit Tests</h3></div>
-                <t:test_accordion/>
-            </div>
+        <div id="tests-div">
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+            <t:test_accordion/>
+        </div>
         <% } %>
     </div>
 

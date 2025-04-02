@@ -57,7 +57,7 @@ public class Mutant implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
     // https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
-    public static String regex =
+    public static String unquotedWhitespaceRegex =
             "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
     private int id;
@@ -88,7 +88,37 @@ public class Mutant implements Serializable {
 
     /* Mutant Equivalence */
     public enum Equivalence {
-        ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO
+
+        /**
+         * Default state.
+         */
+        ASSUMED_NO,
+
+        /**
+         * The mutant was flagged as potentially equivalent to the original CUT by a defender/ other player.
+         * The mutant's creator has not yet participated in the equivalence duel.
+         */
+        PENDING_TEST,
+
+        /**
+         * The mutant's creator has declared that the mutant is equivalent to the original CUT.
+         * (Even though the mutant might not be equivalent.)
+         * The creator will not receive any points for this mutant.
+         */
+        DECLARED_YES,
+
+        /**
+         * The mutant's creator failed to prove that the mutant is not equivalent to the original CUT.
+         * (Even though the mutant might not be equivalent.)
+         * The creator will not receive any points for this mutant.
+         */
+        ASSUMED_YES,
+
+        /**
+         * The mutant's creator wrote a test that kills the mutant, thereby proving that the mutant is not
+         * equivalent to the original CUT.
+         */
+        PROVEN_NO
     }
 
     private int roundCreated;
@@ -142,7 +172,7 @@ public class Mutant implements Serializable {
      * @param playerId  The ID of the player who submitted the mutant.
      */
     public Mutant(int gameId, int classId, String javaFile, String classFile, boolean alive, int playerId,
-            int roundCreated) {
+                  int roundCreated) {
         this.gameId = gameId;
         this.classId = classId;
         this.roundCreated = roundCreated;
@@ -154,7 +184,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-            int roundCreated, int roundKilled, int playerId) {
+                  int roundCreated, int roundKilled, int playerId) {
         this(gid, classId, javaFile, classFile, alive, playerId, roundCreated);
         this.id = mid;
         this.equivalent = equiv;
@@ -165,7 +195,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-            int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
+                  int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
         this(mid, classId, gid, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
         this.md5 = md5;
         this.killMessage = killMessage;
@@ -307,9 +337,9 @@ public class Mutant implements Serializable {
         List<String> sutLines = FileUtils.readLines(sourceFile.toPath());
         List<String> mutantLines = FileUtils.readLines(mutantFile.toPath());
 
-        sutLines.replaceAll(s -> s.replaceAll(regex, ""));
+        sutLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
-        mutantLines.replaceAll(s -> s.replaceAll(regex, ""));
+        mutantLines.replaceAll(s -> s.replaceAll(unquotedWhitespaceRegex, ""));
 
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
@@ -329,8 +359,8 @@ public class Mutant implements Serializable {
             boolean updateDelta = false;
 
             for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
-                var sourceLine =  source.get(i).replaceAll(regex, "");
-                var targetLine =  target.get(i).replaceAll(regex, "");
+                var sourceLine =  source.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                var targetLine =  target.get(i).replaceAll(unquotedWhitespaceRegex, "");
                 if (!sourceLine.equals(targetLine)) {
                     discardDelta = false;
                 } else {

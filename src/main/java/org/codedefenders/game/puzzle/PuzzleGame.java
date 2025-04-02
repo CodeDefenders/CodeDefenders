@@ -111,8 +111,8 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-            int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound,
-            PuzzleType type) {
+                      int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state,
+                      int currentRound, PuzzleType type) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -174,45 +174,6 @@ public class PuzzleGame extends AbstractGame {
         return mutants.stream().filter(m -> m.getPlayerId() != DUMMY_ATTACKER_USER_ID).collect(Collectors.toList());
     }
 
-    /**
-     * Returns the player-written mutants. If the tests are requested for the first
-     * time for this instance, they will be queried from the database.
-     *
-     * @return The player-written mutants.
-     */
-    public List<Test> getPlayerTests() {
-        if (tests == null) {
-            tests = getTests(false);
-        }
-        return tests.stream().filter(t -> t.getPlayerId() != DUMMY_DEFENDER_USER_ID).collect(Collectors.toList());
-    }
-
-    /**
-     * Returns the number of valid mutants and tests the player submitted in the
-     * game. This counts every mutant that was successfully validated and compiled,
-     * and every test that was successfully validated, compiled and tested against
-     * the original class.
-     *
-     * @return Rhe number of valid mutants and tests the player submitted in the
-     *         game.
-     */
-    public int getValidSubmissionCount() {
-        return getPlayerTests().size() + getPlayerMutants().size();
-    }
-
-    /**
-     * Returns the number of invalid mutants and tests the player submitted in the
-     * game. This counts every mutant that couldn't be validated or compiled, and
-     * every test that couldn't be validated or compiled, or failed against the
-     * original class.
-     *
-     * @return Rhe number of valid mutants and tests the player submitted in the
-     *         game.
-     */
-    public int getInvalidSubmissionCount() {
-        return currentRound - getValidSubmissionCount() - 1;
-    }
-
     public int getCurrentRound() {
         return currentRound;
     }
@@ -268,7 +229,7 @@ public class PuzzleGame extends AbstractGame {
      * @param userId The user ID.
      * @param role   The {@link Role}.
      * @return {@code true} Id the player was successfully added to the puzzle,
-     *         {@code false} otherwise.
+     * {@code false} otherwise.
      * @see Constants#DUMMY_ATTACKER_USER_ID
      * @see Constants#DUMMY_DEFENDER_USER_ID
      */

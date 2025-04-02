@@ -56,3 +56,23 @@ body {
 #messages .alert:first-of-type {
     margin-top: 1rem; /* Corresponds to .mt-3 in Bootstrap. */
 }
+
+/* Puzzle navigation menu */
+.header-puzzle-menu .fa {
+    display: inline-block;
+    width: 1rem;
+    margin-inline-end: .25rem;
+    text-align: center;
+}
+
+.header-puzzle-menu .header-puzzle-locked {
+    color: var(--bs-gray);
+}
+
+.header-puzzle-menu .header-puzzle-next i {
+    color: var(--fg-defender);
+}
+
+.header-puzzle-menu .header-puzzle-solved i {
+    color: var(--bs-success);
+}

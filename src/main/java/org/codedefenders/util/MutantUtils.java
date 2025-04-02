@@ -24,10 +24,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+
+import org.codedefenders.analysis.gameclass.MethodDescription;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Chunk;
 import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.Patch;
 
@@ -79,5 +83,60 @@ public class MutantUtils {
             mutantLines.remove(index.intValue());
         }
         return String.join("\n", mutantLines);
+    }
+
+    /**
+     * Checks if any of the changes in the differences are outside the methods. A single difference outside any methods
+     * is enough to return true, even if there are other differences inside methods.
+     * Will also return true if there are changes in the first or last line of a method (this includes the signature and
+     * the closing bracket).
+     */
+    public static boolean isOutsideOfMethods(List<MethodDescription> methodDescriptions, Patch<String> differences) {
+        methodDescriptions = new ArrayList<>(methodDescriptions);
+        methodDescriptions.sort(Comparator.comparingInt(MethodDescription::getStartLine));
+
+        List<AbstractDelta<String>> deltas = new ArrayList<>(differences.getDeltas());
+        deltas.sort(Comparator.comparingInt(d -> d.getSource().getPosition()));
+
+        for (int i = 0; i < methodDescriptions.size(); i++) {
+            MethodDescription m = methodDescriptions.get(i);
+            for (AbstractDelta<String> d : deltas) {
+                Chunk<String> source = d.getSource();
+                int startInSource = source.getPosition() + 1;
+                int endInSource = startInSource + source.getLines().size() - 1;
+                if (startInSource > m.getEndLine()) {
+                    //No mutation inside this method.
+                    if (i == methodDescriptions.size() - 1) {
+                        //The mutation is located after the last method.
+                        return true;
+                    }
+                    break;
+                } else if (endInSource < m.getStartLine()) {
+                    //This delta ends before the method starts.
+                    if (i == 0 || methodDescriptions.get(i - 1).getEndLine() < startInSource) {
+                        //The mutation is located before the first method or between two methods.
+                        return true;
+                    }
+                    continue;
+                } else if (startInSource > m.getStartLine()) {
+                    //Mutation starts inside the method.
+                    if (endInSource >= m.getEndLine()) {
+                        //Mutation ends after the method. There must be changes outside the method.
+                        return true;
+                    } else {
+                        //Mutation ends inside the method.
+                        continue;
+                    }
+                } else {
+                    //The first line of the method is inside the mutation. Since it is possible that the method
+                    //declaration has been changed, we cannot easily determine if the mutation is outside the
+                    // method without actually parsing the code. Best to assume that there is code outside the
+                    // method.
+                    return true;
+                }
+            }
+        }
+        //No code outside of methods has been found.
+        return false;
     }
 }

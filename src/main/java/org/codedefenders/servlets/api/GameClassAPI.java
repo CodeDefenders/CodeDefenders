@@ -50,6 +50,8 @@ import com.google.gson.JsonObject;
 @WebServlet(org.codedefenders.util.Paths.API_CLASS)
 public class GameClassAPI extends HttpServlet {
 
+    private boolean withDependencies;
+
     @Inject
     private GameClassRepository gameClassRepo;
 
@@ -58,6 +60,19 @@ public class GameClassAPI extends HttpServlet {
                          HttpServletResponse response) throws ServletException, IOException {
         final Optional<GameClass> classId = ServletUtils.getIntParameter(request, "classId")
                 .flatMap(gameClassRepo::getClassForId);
+
+        int withDependenciesInt = ServletUtils.getIntParameter(request, "withDependencies").orElse(0);
+        switch (withDependenciesInt) {
+            case 0:
+                withDependencies = false;
+                break;
+            case 1:
+                withDependencies = true;
+                break;
+            default:
+                response.setStatus(HttpStatus.SC_BAD_REQUEST);
+                return;
+        }
 
         if (classId.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -81,6 +96,13 @@ public class GameClassAPI extends HttpServlet {
         root.add("name", gson.toJsonTree(gameClass.getName(), String.class));
         root.add("alias", gson.toJsonTree(gameClass.getAlias(), String.class));
         root.add("source", gson.toJsonTree(gameClass.getSourceCode(), String.class));
+
+        if (withDependencies) {
+            root.add("dependency_names",
+                    gson.toJsonTree(gameClass.getDependencyNames().toArray(), String[].class));
+            root.add("dependency_code",
+                    gson.toJsonTree(gameClass.getDependencyCode().toArray(), String[].class));
+        }
 
         return gson.toJson(root);
 

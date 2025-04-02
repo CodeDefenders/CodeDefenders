@@ -25,23 +25,12 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
-    Displays all puzzles for a user. Puzzles may link to active puzzle games
-    or are locked for the logged in user.
-
-    @param SortedSet<PuzzleChapterEntry> puzzleChapterEntries
-        A set of puzzle chapters, which contains chapter information and all
-        associated puzzles. The set is sorted ascendingly on puzzle chapters position.
-        Associated puzzles are sorted on the puzzle identifier.
-
-    @param Optional<PuzzleEntry> nextPuzzle
-        The next puzzle to be solved by the user. This puzzle is the first puzzle
-        in the set of puzzles that was not solved yet.
-
+Displays all puzzles for a user. Puzzles may link to active puzzle games
+or are locked for the logged in user.
 --%>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="puzzleChapterEntries" type="java.util.SortedSet"--%>
-<%--@elvariable id="nextPuzzle" type="java.util.Optional"--%>
+<%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 
 <c:set var="title" value="Puzzles"/>
 
@@ -54,9 +43,9 @@
         <div class="container">
             <h1 class="mb-3">${title}</h1>
 
-            <c:if test="${nextPuzzle.present}">
+            <c:if test="${puzzleNavigation.hasNextPuzzle()}">
                 <%--@elvariable id="nextPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
-                <c:set var="nextPuzzleObj" value="${nextPuzzle.get()}"/>
+                <c:set var="nextPuzzleObj" value="${puzzleNavigation.nextPuzzle.get()}"/>
                 <a class="next-puzzle" href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}">
                     <div class="next-puzzle__image">
                         <img src="${url.forPath("/images/defender_puzzle.png")}" alt="Preview Image Puzzle Game">
@@ -86,10 +75,10 @@
                     </div>
                 </a>
             </c:if>
-            <c:if test="${puzzleChapterEntries.size() == 0}">
+            <c:if test="${puzzleNavigation.puzzleChapters.size() == 0}">
                 <div class="no-puzzles">There are currently no puzzles available.</div>
             </c:if>
-            <c:forEach items="${puzzleChapterEntries}" var="ChapterEntry">
+            <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
                 <c:set var="chapter" value="${ChapterEntry.chapter}"/>
                 <div class="chapter">

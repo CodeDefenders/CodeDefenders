@@ -20,6 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -66,19 +67,6 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
-<%--
-<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-<%
-    mutantEditor.setDependenciesForClass(game.getCUT());
-    mutantEditor.setClassName(cut.getName());
-    mutantEditor.setEditableLinesForPuzzle(puzzle);
-    if (previousSubmission.hasMutant()) {
-        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
-%>
---%>
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 <%
@@ -86,29 +74,6 @@
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(false);
     // gameHighlighting.setCodeDivSelector("#cut-div");
-%>
-
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
-
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    // Set editable lines from class since they depend on the generated test template
-    testEditor.setEditableLinesForClass(cut);
-
-    testEditor.setMockingEnabled(false);
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) {
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-    testEditor.setReadonly(game.getState() == GameState.SOLVED);
 %>
 
 
@@ -120,10 +85,6 @@
     }
 %>
 
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
---%>
 
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
@@ -150,7 +111,25 @@
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                 </div>
             </div>
+
             <hr>
+
+            <c:if test="${game.state == GameState.SOLVED}">
+                <div class="alert alert-success" role="alert">
+                    <p class="m-0">
+                        <strong class="alert-heading">Congratulations!</strong>
+                        <c:choose>
+                            <c:when test="${puzzle.equivalent}">
+                                This mutant is equivalent to the class under test.
+                            </c:when>
+                            <c:otherwise>
+                                Your test killed the mutant flagged as equivalent.
+                            </c:otherwise>
+                        </c:choose>
+                            ${requestScope.nextPuzzleMessage}
+                    </p>
+                </div>
+            </c:if>
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="equivmut-div">
@@ -185,44 +164,59 @@
 
                         <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
-                        <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
-                        <form id="equivalenceForm" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
-                            <input type="hidden" name="formType" value="resolveEquivalence">
-                            <input type="hidden" name="gameId" value="${game.id}">
-                            <input type="hidden" id="equivMutantId" name="equivMutantId" value="${equivMutant.id}">
-                            <input type="hidden" id="resolveAction" name="resolveAction" value="">
+                        <c:choose>
+                            <c:when test="${game.state == GameState.SOLVED and puzzle.equivalent}">
+                                <h3 class="mt-3">The mutant is equivalent!</h3>
+                                <p>The mutant was accepted as equivalent</p>
+                            </c:when>
+                            <c:when test="${game.state == GameState.SOLVED and not puzzle.equivalent}">
+                                <h3 class="mt-3">Not equivalent! Your killing test:</h3>
+                                <form id="equivalenceForm">
+                                    <jsp:include page="/jsp/game_components/test_editor.jsp"/>
+                                </form>
+                            </c:when>
+                            <c:when test="${game.state == GameState.ACTIVE}">
+                                <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
+                                <form id="equivalenceForm" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
+                                    <input type="hidden" name="formType" value="resolveEquivalence">
+                                    <input type="hidden" name="gameId" value="${game.id}">
+                                    <input type="hidden" id="equivMutantId" name="equivMutantId"
+                                           value="${equivMutant.id}">
+                                    <input type="hidden" id="resolveAction" name="resolveAction" value="">
 
-                            <jsp:include page="/jsp/game_components/test_editor.jsp"/>
+                                    <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
-                            <div class="d-flex justify-content-between mt-2 mb-2">
-                                <button class="btn btn-danger" id="accept-equivalent-button" type="button"
-                                    ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Accept As Equivalent
-                                </button>
-                                <button class="btn btn-primary" id="reject-equivalent-button" type="button"
-                                    ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Submit Killing Test
-                                </button>
+                                    <div class="d-flex justify-content-between mt-2 mb-2">
+                                        <button class="btn btn-danger" id="accept-equivalent-button" type="button"
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Accept As Equivalent
+                                        </button>
+                                        <button class="btn btn-primary" id="reject-equivalent-button" type="button"
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Submit Killing Test
+                                        </button>
 
-                                <script type="module">
-                                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+                                        <script type="module">
+                                            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-                                    const testProgressBar = await objects.await('testProgressBar');
+                                            const testProgressBar = await objects.await('testProgressBar');
 
-                                    document.getElementById("accept-equivalent-button").addEventListener('click', function () {
-                                        if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
-                                            this.form['resolveAction'].value = 'accept';
-                                            this.form.submit();
-                                            this.disabled = true;
-                                        }
-                                    });
-                                    document.getElementById("reject-equivalent-button").addEventListener('click', function () {
-                                        this.form['resolveAction'].value = 'reject';
-                                        this.form.submit();
-                                        this.disabled = true;
-                                        testProgressBar.activate();
-                                    });
-                                </script>
-                            </div>
-                        </form>
+                                            document.getElementById("accept-equivalent-button").addEventListener('click', function () {
+                                                if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
+                                                    this.form['resolveAction'].value = 'accept';
+                                                    this.form.submit();
+                                                    this.disabled = true;
+                                                }
+                                            });
+                                            document.getElementById("reject-equivalent-button").addEventListener('click', function () {
+                                                this.form['resolveAction'].value = 'reject';
+                                                this.form.submit();
+                                                this.disabled = true;
+                                                testProgressBar.activate();
+                                            });
+                                        </script>
+                                    </div>
+                                </form>
+                            </c:when>
+                        </c:choose>
                     </div>
                 </div>
 
@@ -234,6 +228,7 @@
                     <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
                     <script type="module">
                         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+
                         const classViewer = await objects.await("classViewer");
                         classViewer.jumpToLine(${mutantLine});
                     </script>
