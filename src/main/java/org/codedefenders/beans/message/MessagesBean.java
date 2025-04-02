@@ -62,6 +62,22 @@ public class MessagesBean implements Serializable {
         }
     }
 
+    public Message addDirect(Message msg) {
+        Message message = new Message(
+                msg.getText(),
+                currentId++)
+                .fadeOut(msg.isFadeOut())
+                .escape(msg.isEscape());
+        messages.add(message);
+        return message;
+    }
+
+    public void addAllDirect(List<Message> messages) {
+        for (var msg : messages) {
+            addDirect(msg);
+        }
+    }
+
     /**
      * Clears the messages.
      */

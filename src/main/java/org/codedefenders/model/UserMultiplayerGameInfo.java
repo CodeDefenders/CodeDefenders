@@ -37,7 +37,7 @@ import org.codedefenders.game.multiplayer.PlayerScore;
  */
 public class UserMultiplayerGameInfo extends GameInfo {
 
-    protected MultiplayerGame game;
+    public MultiplayerGame game;
 
     /**
      * Use {@link #forOpen(int, MultiplayerGame, String) forActive()},

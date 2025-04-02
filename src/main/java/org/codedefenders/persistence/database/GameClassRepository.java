@@ -136,6 +136,14 @@ public class GameClassRepository {
     }
 
     /**
+     * Retrieves a game class for a by its alias.
+     */
+    public Optional<GameClass> getClassForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
+        @Language("SQL") String query = "SELECT * FROM classes WHERE Alias = ?";
+        return queryRunner.query(query, oneFromRS(GameClassRepository::gameClassFromRS), alias);
+    }
+
+    /**
      * Retrieves a game class for a given identifier of a {@link AbstractGame Game}.
      *
      * @param gameId the given game identifier.

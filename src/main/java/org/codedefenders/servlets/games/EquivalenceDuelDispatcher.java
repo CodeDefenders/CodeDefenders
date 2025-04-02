@@ -69,7 +69,7 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
 
     private void forwardEquivalenceAction(HttpServletRequest request, HttpServletResponse response, int gameId)
             throws IOException, ServletException {
-        final GameMode gameType = gameRepo.getGameMode(gameId);
+        final GameMode gameType = gameRepo.getGameMode(gameId).orElseThrow();
 
         ServletContext context = this.getServletContext();
 
