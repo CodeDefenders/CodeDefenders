@@ -107,7 +107,7 @@ public class SystemStartStop implements ServletContextListener {
         try {
             dependencyProvider.installDependencies();
         } catch (MavenDependencyResolver.MavenDependencyResolverException e) {
-            logger.error("Could not install dependencies!", e);
+            logger.error("Could not install dependencies.", e);
             throw new RuntimeException(e);
         }
     }

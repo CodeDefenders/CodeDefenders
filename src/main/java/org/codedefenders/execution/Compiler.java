@@ -32,13 +32,13 @@ import java.util.stream.Stream;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import org.codedefenders.dependencies.DependencyProvider;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 
 /**
  * This class handles compilation of Java classes using the
@@ -312,7 +312,8 @@ public class Compiler {
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
         compilationUnits.add(testFile);
 
-        final List<String> options = getCliParameters(baseDir.toString(), TEST_CLASSPATH);
+        DependencyProvider dependencyProvider = CDIUtil.getBeanFromCDI(DependencyProvider.class);
+        final List<String> options = getCliParameters(baseDir.toString(), dependencyProvider.getTestClasspath());
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 

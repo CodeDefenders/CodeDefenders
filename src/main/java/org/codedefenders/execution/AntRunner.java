@@ -37,6 +37,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -52,8 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
 
-import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
-import static org.codedefenders.util.Constants.JACOCO_CLASSPATH;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
@@ -78,11 +77,13 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final MutantRepository mutantRepo;
     private final TestRepository testRepo;
     private final GameClassRepository gameClassRepo;
+    private final DependencyProvider dependencyProvider;
 
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
-                     MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo) {
+                     MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo,
+                     DependencyProvider dependencyProvider) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
@@ -90,6 +91,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         this.mutantRepo = mutantRepo;
         this.testRepo = testRepo;
         this.gameClassRepo = gameClassRepo;
+        this.dependencyProvider = dependencyProvider;
     }
 
     /**
@@ -378,8 +380,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dcut.dir=" + cutDir);
         command.add("-DtestClassname=" + testClassName);
 
-        command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
-        command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);
+        command.add("-Dcommon.cp=" + dependencyProvider.getCommonClasspath());
+        command.add("-Djacoco.cp=" + dependencyProvider.getJacocoClasspath());
 
         if (mutantDir != null && testDir != null
                 // Limit this code path to targets that depend on the `mutant.test.file` variable.
