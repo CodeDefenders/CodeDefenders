@@ -11,6 +11,7 @@
 		<junit5.version>5.10.0</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
 		<prometheus-client.version>0.16.0</prometheus-client.version>
+		<maven-resolver.version>2.0.7</maven-resolver.version>
 
 		<config.properties>config.properties</config.properties>
 
@@ -921,6 +922,38 @@
 			<artifactId>annotations</artifactId>
 			<version>24.1.0</version>
 			<scope>compile</scope>
+		</dependency>
+
+	    <!-- Maven Dependency Resolver -->
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-api</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-impl</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-connector-basic</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-file</artifactId>
+			<version>${maven-resolver.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-transport-http</artifactId>
+			<version>1.9.22</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.resolver</groupId>
+			<artifactId>maven-resolver-supplier-mvn4</artifactId>
+			<version>${maven-resolver.version}</version>
 		</dependency>
 
 		<!-- Begin Misc Dependencies -->
