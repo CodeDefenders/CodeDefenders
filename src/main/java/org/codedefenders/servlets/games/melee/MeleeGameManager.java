@@ -94,6 +94,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.State.KILLED;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
@@ -705,26 +706,64 @@ public class MeleeGameManager extends HttpServlet {
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
             int gameId, MeleeGame game,
             int playerId) throws IOException {
-
-        final HttpSession session = request.getSession();
-        session.setAttribute("messages", messages);
-
-        if (game.getState() == GameState.FINISHED) {
-            messages.add(String.format("Game %d has finished.", gameId));
-            response.sendRedirect(url.forPath(Paths.MELEE_SELECTION));
+        final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
+        if (equivMutantId.isEmpty()) {
+            logger.debug("Missing equivMutantId parameter.");
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
             return;
         }
 
         String resolveAction = request.getParameter("resolveAction");
+        Mutant equivMutant = mutantRepo.getMutantById(equivMutantId.get());
+
+        switch (gameManagingUtils.canUserResolveEquivalence(game, login.getUserId(), equivMutantId.get())) {
+            case USER_NOT_PART_OF_THE_GAME -> {
+                messages.add("User is not a player in the game.");
+                logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
+            case USER_NOT_AN_ATTACKER -> {
+                messages.add("Can only resolve equivalence duels if you are a Player!");
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            case GAME_NOT_ACTIVE -> {
+                messages.add(String.format("Game %d has finished.", gameId));
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
+            case MUTANT_DOES_NOT_EXIST -> {
+                messages.add("Mutant does not exist.");
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            case USER_DID_NOT_CREATE_MUTANT -> {
+                logger.info(
+                        "User {} tried to accept equivalence for mutant {}, but mutant is written by another player.",
+                        login.getUserId(), equivMutantId.get());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            case MUTANT_IS_NOT_PENDING -> {
+                logger.info(
+                        "User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
+                        login.getUserId(), equivMutantId.get());
+                if (equivMutant.getState() == KILLED) {
+                    messages.add("Too late. The mutant was already killed and therefore proven to be not equivalent.");
+                    // TODO: Continue with the resolution to give them the option to win other duels? (only if action=="reject")
+                }
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            case YES -> {
+            }
+        }
+
+        final HttpSession session = request.getSession();
+        session.setAttribute("messages", messages);
 
         if ("accept".equals(resolveAction)) {
             // Accepting equivalence
-            final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
-            if (equivMutantId.isEmpty()) {
-                logger.debug("Missing equivMutantId parameter.");
-                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-                return;
-            }
             int mutantId = equivMutantId.get();
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
@@ -818,13 +857,6 @@ public class MeleeGameManager extends HttpServlet {
                 return;
             }
 
-            final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
-            if (equivMutantId.isEmpty()) {
-                logger.info("Missing equivMutantId parameter.");
-                previousSubmission.setTestCode(testText);
-                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-                return;
-            }
             int mutantId = equivMutantId.get();
 
             logger.debug("Executing Action resolveEquivalence for mutant {} and test {}", mutantId, newTest.getId());

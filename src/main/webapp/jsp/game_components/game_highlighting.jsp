@@ -42,7 +42,7 @@
 
     const data = JSON.parse('${gameHighlighting.JSON}');
     const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
-    const gameId = ${gameHighlighting.gameId};
+    const gameId = Number(${gameHighlighting.gameId});
 
     const gameHighlighting = await new GameHighlighting(
             data,

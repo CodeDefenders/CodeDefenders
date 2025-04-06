@@ -71,6 +71,7 @@ import org.slf4j.LoggerFactory;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 
+import static org.codedefenders.game.Mutant.State.KILLED;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
@@ -524,6 +525,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
         String resolveAction = request.getParameter("resolveAction");
+        Mutant equivMutant = mutantRepo.getMutantById(equivMutantId.get());
 
         switch (gameManagingUtils.canUserResolveEquivalence(game, login.getUserId(), equivMutantId.get())) {
             case USER_NOT_PART_OF_THE_GAME -> {
@@ -555,13 +557,16 @@ public class MultiplayerGameManager extends HttpServlet {
             case MUTANT_IS_NOT_PENDING -> {
                 logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                         login.getUserId(), equivMutantId.get());
+                if (equivMutant.getState() == KILLED) {
+                    messages.add("Too late. The mutant was already killed and therefore proven to be not equivalent.");
+                    // TODO: Continue with the resolution to give them the option to win other duels? (only if action=="reject")
+                }
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
             case YES -> {}
         }
 
-        Mutant equivMutant = mutantRepo.getMutantById(equivMutantId.get());
 
         if ("accept".equals(resolveAction)) {
             var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
@@ -628,7 +633,6 @@ public class MultiplayerGameManager extends HttpServlet {
                 }
             }
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-            return;
         }
     }
 
@@ -669,8 +673,8 @@ public class MultiplayerGameManager extends HttpServlet {
         List<Integer> equivLines;
         try {
             equivLines = Arrays.stream(equivLinesParam.get().split(","))
-                .map(Integer::valueOf)
-                .toList();
+                    .map(Integer::valueOf)
+                    .toList();
         } catch (NumberFormatException e) {
             logger.debug("Invalid 'equivLines' parameter.");
             Redirect.redirectBack(request, response);
