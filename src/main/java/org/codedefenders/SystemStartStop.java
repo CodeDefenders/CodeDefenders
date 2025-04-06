@@ -32,6 +32,8 @@ import org.codedefenders.auth.SystemSubject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.CronJobManager;
+import org.codedefenders.dependencies.DependencyProvider;
+import org.codedefenders.dependencies.MavenDependencyResolver;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
@@ -64,6 +66,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private SystemSubject systemSubject;
+
+    @Inject
+    private DependencyProvider dependencyProvider;
 
 
     /**
@@ -98,6 +103,13 @@ public class SystemStartStop implements ServletContextListener {
 
         cronJobManager.startup();
         achievementService.registerEventHandler();
+
+        try {
+            dependencyProvider.installDependencies();
+        } catch (MavenDependencyResolver.MavenDependencyResolverException e) {
+            logger.error("Could not install dependencies!", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
