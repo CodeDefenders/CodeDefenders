@@ -64,7 +64,7 @@ public class FileUtils {
      *   lib/                                    <- Contains .jar files we need for execution e.g. JUnit
      *   sources/                                <- Contains a folder per uploaded class under test
      *     <ClassAlias>/
-     *       <sources>/                          <- Contains the CuT and dependency source and class files.
+     *       sources/                          <- Contains the CuT and dependency source and class files.
      *         <PackageStructure>/
      *           <ClassName>.java
      *           <ClassName>.class
@@ -72,8 +72,8 @@ public class FileUtils {
      *           <DependencyClassName>.java
      *           <DependencyClassName>.class
      *           <DependencyClassName>$<InnerClassName>.class
-     *         <tests>/                          <- Contains the test files that were uploaded when creating the class
-     *         <mutants>/                        <- Contains the mutant files that were uploaded when creating the class
+     *         tests/                          <- Contains the test files that were uploaded when creating the class
+     *         mutants/                        <- Contains the mutant files that were uploaded when creating the class
      *   mutants/
      *     mp/
      *       <GameId>/
