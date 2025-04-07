@@ -35,7 +35,7 @@
                 </li>
             </ul>
         </div>
-        <div class="card-body p-0 codemirror-expand">
+        <div class="card-body p-0 codemirror-fill">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="cut-body"
