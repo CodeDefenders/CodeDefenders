@@ -21,6 +21,7 @@ package org.codedefenders.execution;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -320,9 +321,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         List<String> command = new ArrayList<>();
 
         //This is the directory directly below "sources"
-        String topDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
-                Paths.get(cut.getJavaFile())).toString();
-        String cutDir = Paths.get(topDir, Constants.CUTS_CLASSES_DIR).toString();
+        Path topDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
+                Paths.get(cut.getJavaFile()));
+        Path cutDir = topDir.resolve(Constants.CUTS_CLASSES_DIR);
 
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
