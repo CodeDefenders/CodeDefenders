@@ -19,6 +19,7 @@
 
 package org.codedefenders.persistence.database.migrations;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,13 +44,14 @@ import org.flywaydb.core.api.migration.Context;
 
 @Singleton
 public class V34__UpdateFileStructure extends BaseJavaMigration {
-
     private final String dataDir;
+    private final File sourcesDir;
     private final QueryRunner queryRunner = new QueryRunner();
 
     @Inject
     public V34__UpdateFileStructure(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
         String dataDirPath = config.getDataDir().toString();
+        sourcesDir = config.getSourcesDir();
         if (!dataDirPath.endsWith("/")) {
             dataDir = dataDirPath + "/";
         } else {
@@ -122,10 +124,9 @@ public class V34__UpdateFileStructure extends BaseJavaMigration {
                 }
 
 
-                //Remove old dependency directory TODO ist jetzt leer
-                org.apache.commons.io.FileUtils.deleteDirectory(dependenciesDir.toFile());
             }
         }
+        FileUtils.deleteEmptySubdirectories(sourcesDir);
     }
 
     static void moveClassFiles(Path source, Path target, String classname) throws IOException {

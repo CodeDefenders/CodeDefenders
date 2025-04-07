@@ -503,6 +503,29 @@ public class FileUtils {
         return sourcesDir.resolve(relativePath.subpath(0, 2));
     }
 
+    /**
+     * Deletes all empty subdirectories of a given directory, recursively.
+     *
+     * @param root The directory to start the deletion from. If it is empty, it will also be deleted.
+     */
+    public static void deleteEmptySubdirectories(File root) throws IOException {
+
+        try (Stream<Path> paths = Files.walk(root.toPath())) {
+            paths.filter(Files::isDirectory)
+                    .forEach(path -> {
+                        Collection<File> descendents =
+                                org.apache.commons.io.FileUtils.listFiles(path.toFile(), null, true);
+                        if (descendents.isEmpty()) {
+                            try {
+                                org.apache.commons.io.FileUtils.deleteDirectory(path.toFile());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+        }
+    }
+
     public static String getFileSeparator() {
         return File.separator;
     }

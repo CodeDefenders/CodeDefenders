@@ -383,4 +383,31 @@ public class FileUtilsTest {
         assertEquals(3, javaFiles.size());
 
     }
+
+    @Test
+    public void testDeleteEmptySubdirectories() throws IOException {
+        Path root = Files.createTempDirectory("codedefenders-testdir-");
+        Path tree1 = root.resolve("tree1"); //not empty
+        Path tree2 = tree1.resolve("tree2"); //empty
+        Path tree3 = tree2.resolve("tree3"); //empty
+        Path subDir2 = root.resolve("subDir2"); //Not empty
+        Path subDir3 = tree2.resolve("subDir3"); //empty
+
+        Files.createDirectories(tree3);
+        Files.createDirectories(subDir2);
+        Files.createDirectories(subDir3);
+
+        Path file1 = Files.createFile(tree1.resolve("file1.txt"));
+        Path file2 = Files.createFile(subDir2.resolve("file2.txt"));
+
+        FileUtils.deleteEmptySubdirectories(root.toFile());
+        assertTrue(Files.exists(tree1));
+        assertTrue(Files.exists(subDir2));
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.exists(file2));
+
+        assertFalse(Files.exists(tree2));
+        assertFalse(Files.exists(tree3));
+        assertFalse(Files.exists(subDir3));
+    }
 }
