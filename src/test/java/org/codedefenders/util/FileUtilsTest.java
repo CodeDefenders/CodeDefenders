@@ -353,4 +353,34 @@ public class FileUtilsTest {
                         """;
         assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
     }
+
+    @Test
+    public void testGetAllFilesFromTypeInDirectory() throws IOException {
+        Path dir = Files.createTempDirectory("codedefenders-testdir-");
+        Path dir2 = dir.resolve("dir2");
+        Path dir3 = dir2.resolve("dir3");
+        Files.createDirectories(dir2);
+        Files.createDirectories(dir3);
+        Path java1 = dir.resolve("test1.java");
+        Path java2 = dir2.resolve("test2.java");
+        Path java3 = dir3.resolve("test3.java");
+
+        Path class1 = dir.resolve("test1.class");
+        Path class2 = dir2.resolve("test2.class");
+        Path class3 = dir3.resolve("test3.class");
+
+        Files.createFile(java1);
+        Files.createFile(java2);
+        Files.createFile(java3);
+        Files.createFile(class1);
+        Files.createFile(class2);
+        Files.createFile(class3);
+        List<Path> javaFiles = FileUtils.getAllFilesOfTypeInDirectory(dir, ".java");
+
+        assertTrue(javaFiles.contains(java1));
+        assertTrue(javaFiles.contains(java2));
+        assertTrue(javaFiles.contains(java3));
+        assertEquals(3, javaFiles.size());
+
+    }
 }

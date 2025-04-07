@@ -322,6 +322,24 @@ public class FileUtils {
     }
 
     /**
+     * Returns the paths of all files of a given file extension in a directory and its subdirectories.
+     */
+    public static List<Path> getAllFilesOfTypeInDirectory(Path directory, String extension) {
+        List<Path> files = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.filter(Files::isRegularFile)
+                    .forEach((f) -> {
+                        if (f.toString().endsWith(extension)) {
+                            files.add(f);
+                        }
+                    });
+        } catch (IOException e) {
+            logger.error("Error reading files from directory.", e);
+        }
+        return files;
+    }
+
+    /**
      * Uses nextFreeName to choose a non-existing filename within a directory.
      *
      * <p>In comparison to {@link FileUtils#getNextSubDir(Path)}, this method sidesteps collisions less effectively,
@@ -413,8 +431,8 @@ public class FileUtils {
      * @return The package name as declared in the file, e.g. {@code org.codedefenders.util}. Return value is empty if
      * the file does not contain a package declaration.
      * @throws IllegalArgumentException Thrown if the file cannot be parsed. Note: Right now even many java files that
-     * can not be compiled will return "" rather than throw this exception, so a return value of "" does not
-     * indicate that the file is valid.
+     *                                  can not be compiled will return "" rather than throw this exception, so a return value of "" does not
+     *                                  indicate that the file is valid.
      */
     public static String getPackageNameFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
         return JavaParserUtils.parse(dependencyFileContent)
@@ -449,6 +467,7 @@ public class FileUtils {
     /**
      * Returns the "top-level" directory for an uploaded CuT with dependencies,
      * i.e. the directory below the "sources" directory.
+     *
      * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
      */
     public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
@@ -466,6 +485,7 @@ public class FileUtils {
      * Returns the directory below the "top-level" directory as defined in
      * {@link #getTopLevelDirectoryFromJavaFile(Path)}, for example "sources" or "mutants", that is still an ancestor
      * of the given file.
+     *
      * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
      */
     public static Path getMidLevelDirectoryFromJavaFile(Path javaFilePath) {

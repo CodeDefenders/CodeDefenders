@@ -90,45 +90,41 @@ public class V34__UpdateFileStructure extends BaseJavaMigration {
 
             Path dependenciesDir = classRoot.resolve("dependencies");
             if (Files.exists(dependenciesDir)) {
-                //Move dependencies
-                FileUtils.copyFileTree(dependenciesDir, classesDir);
-
-                //Adjust DB entries for dependencies
                 int classId = gameClass.getId();
-                String dependencyQuery = "SELECT * FROM dependencies WHERE class_id = ?;";
-                //TODO Warum wird an dieser Stelle die classId als Argument gebraucht? Warum nicht aus dem ResultSet
-                //TODO holen?
-                List<Dependency> dependencies = queryRunner.query(conn, dependencyQuery,
-                        ResultSetUtils.listFromRS((rs) -> DependencyDAO.dependencyFromRS(rs, classId)), classId);
-                for (Dependency dependency : dependencies) {
-                    int depId = dependency.getId();
+                List<Path> dependencyJavaFiles =
+                        FileUtils.getAllFilesOfTypeInDirectory(dependenciesDir, ".java");
+                for (Path dependencyJavaFile : dependencyJavaFiles) {
+                    //Move .java-file
+                    String content = Files.readString(dependencyJavaFile);
+                    Path dependencyPackagePath = FileUtils.getPackagePathFromJavaFile(content);
+                    Path targetPath = classesDir
+                            .resolve(dependencyPackagePath)
+                            .resolve(dependencyJavaFile.getFileName());
+                    Files.createDirectories(targetPath.getParent());
+                    Files.move(dependencyJavaFile, targetPath);
 
-                    String oldJavaFileEntry = dataPath.relativize(Path.of(dependency.getJavaFile())).toString();
-                    String newDepJavaFile = replaceDependencyPathString(oldJavaFileEntry);
-
-                    String oldClassFileEntry = dataPath.relativize(Path.of(dependency.getClassFile())).toString();
-                    String newDepClassFile = replaceDependencyPathString(oldClassFileEntry);
-
+                    //Update DB entry
+                    String newDepJavaFile = dataPath.relativize(targetPath).toString();
+                    String newDepClassFile = newDepJavaFile.replaceAll(".java$", ".class");
                     String updateDepSQL = "UPDATE dependencies SET JavaFile = ?, ClassFile = ? " +
-                            "WHERE Dependency_ID = ?;";
-                    queryRunner.update(conn, updateDepSQL, newDepJavaFile, newDepClassFile, depId);
+                            "WHERE Class_ID = ? AND JavaFile = ?;";
+                    queryRunner.update(conn, updateDepSQL, newDepJavaFile, newDepClassFile, classId,
+                            dataPath.relativize(dependencyJavaFile).toString());
+                }
+                List<Path> dependencyClassFiles =
+                        FileUtils.getAllFilesOfTypeInDirectory(dependenciesDir, ".class");
+                //Class files are already in the correct relative location, just have to be moved out of the
+                //dependencies directory
+                for (Path dependencyClassFile : dependencyClassFiles) {
+                    Path classFileRelativePath = dependenciesDir.relativize(dependencyClassFile);
+                    Path targetPath = classesDir.resolve(classFileRelativePath);
+                    Files.move(dependencyClassFile, targetPath);
                 }
 
-                //Remove old dependency directory
+
+                //Remove old dependency directory TODO ist jetzt leer
                 org.apache.commons.io.FileUtils.deleteDirectory(dependenciesDir.toFile());
             }
-        }
-    }
-
-
-    static String replaceDependencyPathString(String path) {
-        String sep = FileUtils.getFileSeparator();
-        String[] pathComponents = path.split(sep.equals("\\") ? "\\\\" : sep);
-        if (pathComponents.length < 3) {
-            return path;
-        } else {
-            pathComponents[2] = pathComponents[2].replace("dependencies", "classes");
-            return String.join(sep, pathComponents);
         }
     }
 
