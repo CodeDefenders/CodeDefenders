@@ -499,6 +499,43 @@ public class TestRepository {
         return killmapResultEntry.orElse(-1);
     }
 
+    /**
+     * Returns true if the given test is from a different game, but can kill one of the mutants declared or assumed
+     * equivalent (but is not according to the killmap) and created by the given user in the specified game.
+     *
+     * @param testId The ID of the test to check.
+     * @param userId The ID of the user wishing to access the test.
+     * @param gameId The ID of the game in which the user wants to access the test.
+     * @return True if the test is an external killing test of any equivalent mutant created by a given user in the
+     * specified game.
+     */
+    public boolean isExternalKillingTestOfAPlayersEquivalentMutant(int testId, int userId, int gameId) {
+        @Language("SQL") String query = """
+                        SELECT m.Mutant_ID as mutantId
+                        FROM killmap km
+                        JOIN mutants m on m.Mutant_ID = km.Mutant_ID
+                        JOIN tests t on km.Test_ID = t.Test_ID
+                        JOIN players p on p.ID = m.Player_ID
+                        WHERE m.Game_ID = ? AND p.User_ID = ? AND t.Test_ID = ?
+                        AND km.Status = ? AND m.Game_ID != t.Game_ID AND m.Equivalent in (?, ?)
+                        ORDER BY km.Test_ID DESC LIMIT 1;
+                """;
+
+        var killmapResultEntry = queryRunner.query(
+                query,
+                nextFromRS(rs -> rs.getInt("mutantId")),
+                gameId, userId, testId,
+                KillMap.KillMapEntry.Status.KILL.name(),
+                Mutant.Equivalence.DECLARED_YES.name(),
+                Mutant.Equivalence.ASSUMED_YES.name()
+        );
+
+        logger.info("isExternalKillingTestOfAPlayersEquivalentMutant for test: {} player: {} game: {}; result: {}",
+                testId, userId, gameId, killmapResultEntry.orElse(-1));
+
+        return killmapResultEntry.isPresent();
+    }
+
     public Optional<String> findKillMessageForMutant(int mutantId) {
         @Language("SQL") String query = """
                 SELECT te.*
