@@ -34,6 +34,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.database.SQLMappingException;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -470,6 +471,32 @@ public class TestRepository {
 
         // TODO: We shouldn't give away that we don't know which test killed the mutant?
         return targ.map(t -> t.testId).orElse(-1);
+    }
+
+    /**
+     * Returns the ID of a Test (from a different game) that can kill the mutant with the provided ID.
+     *
+     * @param mutantId The mutant ID.
+     * @return The ID of the killing test, or -1 if no such test exists.
+     */
+    public int getExternalKillingTestIdForMutant(int mutantId) {
+        @Language("SQL") String query = """
+                        SELECT t.Test_ID as testId
+                        FROM killmap km
+                        JOIN mutants m on m.Mutant_ID = km.Mutant_ID
+                        JOIN tests t on km.Test_ID = t.Test_ID
+                        WHERE km.Status = ? AND m.Game_ID != t.Game_ID AND m.Mutant_ID = ?
+                        ORDER BY km.Test_ID DESC LIMIT 1;
+                """;
+
+        var killmapResultEntry = queryRunner.query(
+                query,
+                nextFromRS(rs -> rs.getInt("testId")),
+                KillMap.KillMapEntry.Status.KILL.name(),
+                mutantId
+        );
+
+        return killmapResultEntry.orElse(-1);
     }
 
     public Optional<String> findKillMessageForMutant(int mutantId) {
