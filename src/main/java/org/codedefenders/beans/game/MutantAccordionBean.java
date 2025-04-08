@@ -73,7 +73,7 @@ public class MutantAccordionBean {
                     var externalKillingTest = testRepo.getTestById(testExec.testId);
                     var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
 
-                    newList.add(mutant.copyWithExternalKillingTest(
+                    newList.add(mutant.copyWithKillingTest(
                             testExec.testId,
                             killingTestCreator.orElseThrow(),
                             testExec.message

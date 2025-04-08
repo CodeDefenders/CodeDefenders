@@ -163,8 +163,7 @@ public class MutantDTO {
         return description;
     }
 
-    public MutantDTO copyWithExternalKillingTest(int externalKillingTestId, SimpleUser killedByUser,
-                                                 String killMessage) {
+    public MutantDTO copyWithKillingTest(int killedByTestId, SimpleUser killedByUser, String killMessage) {
         return new MutantDTO(
                 id,
                 creator,
@@ -176,7 +175,7 @@ public class MutantDTO {
                 canView,
                 canMarkEquivalent,
                 killedByUser,
-                externalKillingTestId,
+                killedByTestId,
                 killMessage,
                 gameId,
                 playerId,
