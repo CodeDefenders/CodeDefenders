@@ -486,7 +486,7 @@ public class TestRepository {
                     JOIN mutants m on m.Mutant_ID = te.Mutant_ID
                     JOIN tests t on te.Test_ID = t.Test_ID
                     WHERE te.Target = ? AND te.Status = ? AND m.Game_ID != t.Game_ID AND m.Mutant_ID = ?
-                    ORDER BY te.TargetExecution_ID DESC LIMIT 1;
+                    ORDER BY te.Test_ID DESC LIMIT 1;
                 """;
 
         return queryRunner.query(
