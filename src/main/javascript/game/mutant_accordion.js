@@ -333,8 +333,13 @@ class MutantAccordion {
                     return '';
                 }
             case "EQUIVALENT":
-                if (data.killedByTestId < 0) return ''; // else fall through to show external killing test
-            // noinspection FallThroughInSwitchStatementJS
+                if (data.killedByTestId < 0) {
+                    return '';
+                } else {
+                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
+                                    title="This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed."
+                            >View Example Killing Test</button>`;
+                }
             case "KILLED":
                 return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
             default:
