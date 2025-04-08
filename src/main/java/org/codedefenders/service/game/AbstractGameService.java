@@ -208,9 +208,19 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     protected TestDTO convertTest(Test test, SimpleUser user, Player player, AbstractGame game) {
-        Role playerRole = determineRole(user, player, game);
+        boolean viewable;
 
-        boolean viewable = canViewTest(test, game, player, playerRole);
+        if (player != null) {
+            Role playerRole = determineRole(user, player, game);
+            viewable = canViewTest(test, game, player, playerRole);
+        } else {
+            // The current user is probably not in the same game where the test was created, causing player to be null.
+            viewable = testRepo.isExternalKillingTestOfAPlayersEquivalentMutant(
+                    test.getId(),
+                    user.getId(),
+                    game.getId()
+            );
+        }
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
 
