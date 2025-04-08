@@ -332,6 +332,9 @@ class MutantAccordion {
                 } else {
                     return '';
                 }
+            case "EQUIVALENT":
+                if (data.killedByTestId < 0) return ''; // else fall through to show external killing test
+            // noinspection FallThroughInSwitchStatementJS
             case "KILLED":
                 return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
             default:
