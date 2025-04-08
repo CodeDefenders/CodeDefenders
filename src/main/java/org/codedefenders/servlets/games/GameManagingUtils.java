@@ -667,7 +667,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                 user.getName(), equivMutant.getId());
         if (isMutantKillable) {
             logger.warn("Mutant {} was accepted as equivalence but it is killable", equivMutant.getId());
-            notification = notification + " " + " However, the mutant was killable!";
+            notification = notification + " " +
+                    " However, the mutant was killable! You can view an example for a killing test in the mutant accordion.";
         }
 
         // At this point we where not able to kill the mutant will all the covering
@@ -851,7 +852,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                             + " is assumed equivalent.";
 
                     if (isMutantKillable) {
-                        notification = notification + " " + "However, the mutant was killable!";
+                        notification = notification + " " +
+                                "However, the mutant was killable! You can view an example for a killing test in the mutant accordion.";
                     }
 
                     // only kill the one mutant that was claimed
