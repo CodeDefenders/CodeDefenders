@@ -20,6 +20,7 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
@@ -53,7 +54,9 @@ public class MutantAccordionBean {
         var game = gameProducer.getGame();
         if (game != null) {
             var mutantList = gameService.getMutants(login.getUserId(), game.getId());
-            mutantList = addExternalKillingTests(testRepo, userService, mutantList);
+            if (!(game instanceof PuzzleGame)) {
+                mutantList = addExternalKillingTests(testRepo, userService, mutantList);
+            }
             init(game.getCUT(), mutantList, game.getId());
         }
     }
