@@ -178,7 +178,7 @@ public class TestRepository {
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
-     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
+     * <p>This includes valid user-submitted tests as well as instances of predefined tests in the game.
      */
     public List<Test> getValidTestsForGame(int gameId) {
         @Language("SQL") String query = """
@@ -193,7 +193,11 @@ public class TestRepository {
      * Returns the defender-written valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
-     * <p>This includes valid user-submitted mutants as well as instances of predefined mutants in the game.
+     * <p>This includes valid user-submitted tests as well as instances of predefined tests in the game.
+     *
+     * <p>Compared to {@link #getValidTestsForGame(int)}, this method does not return tests created by attackers for
+     * equivalence duels in battleground games.
+     * It does return all tests created by players in melee games, though.
      */
     public List<Test> getValidDefenderTestsForGame(int gameId) {
         @Language("SQL") String query = """
