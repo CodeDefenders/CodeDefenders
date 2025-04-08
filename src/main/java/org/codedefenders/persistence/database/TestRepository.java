@@ -479,24 +479,23 @@ public class TestRepository {
      * @param mutantId The mutant ID.
      * @return The ID of the killing test, or -1 if no such test exists.
      */
-    public int getExternalKillingTestIdForMutant(int mutantId) {
+    public Optional<TargetExecution> getExternalKillingTestExecutionForMutant(int mutantId) {
         @Language("SQL") String query = """
-                        SELECT t.Test_ID as testId
-                        FROM killmap km
-                        JOIN mutants m on m.Mutant_ID = km.Mutant_ID
-                        JOIN tests t on km.Test_ID = t.Test_ID
-                        WHERE km.Status = ? AND m.Game_ID != t.Game_ID AND m.Mutant_ID = ?
-                        ORDER BY km.Test_ID DESC LIMIT 1;
+                    SELECT *
+                    FROM targetexecutions te
+                    JOIN mutants m on m.Mutant_ID = te.Mutant_ID
+                    JOIN tests t on te.Test_ID = t.Test_ID
+                    WHERE te.Target = ? AND te.Status = ? AND m.Game_ID != t.Game_ID AND m.Mutant_ID = ?
+                    ORDER BY te.TargetExecution_ID DESC LIMIT 1;
                 """;
 
-        var killmapResultEntry = queryRunner.query(
+        return queryRunner.query(
                 query,
-                nextFromRS(rs -> rs.getInt("testId")),
-                KillMap.KillMapEntry.Status.KILL.name(),
+                nextFromRS(TargetExecutionDAO::targetExecutionFromRS),
+                TargetExecution.Target.TEST_MUTANT.name(),
+                TargetExecution.Status.FAIL.name(),
                 mutantId
         );
-
-        return killmapResultEntry.orElse(-1);
     }
 
     /**

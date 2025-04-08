@@ -61,22 +61,27 @@ public class MutantAccordionBean {
     private List<MutantDTO> addExternalKillingTests(TestRepository testRepo, UserService userService,
                                                     List<MutantDTO> mutantList) {
         List<MutantDTO> newList = new ArrayList<>(mutantList.size());
+
         for (MutantDTO mutant : mutantList) {
             if (mutant.getState() == Mutant.State.EQUIVALENT) {
-                int externalKillingTestId = testRepo.getExternalKillingTestIdForMutant(mutant.getId());
-                if (externalKillingTestId != -1) {
-                    var externalKillingTest = testRepo.getTestById(externalKillingTestId);
+                var testExecOpt = testRepo.getExternalKillingTestExecutionForMutant(mutant.getId());
+                if (testExecOpt.isPresent()) {
+                    var testExec = testExecOpt.get();
+                    var externalKillingTest = testRepo.getTestById(testExec.testId);
                     var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
+
                     newList.add(mutant.copyWithExternalKillingTest(
-                            externalKillingTestId,
+                            testExec.testId,
                             killingTestCreator.orElseThrow(),
-                            "empty for now"
+                            testExec.message
                     ));
                     continue;
                 }
             }
+
             newList.add(mutant);
         }
+
         return newList;
     }
 
