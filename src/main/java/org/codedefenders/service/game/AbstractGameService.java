@@ -215,11 +215,11 @@ public abstract class AbstractGameService implements IGameService {
             viewable = canViewTest(test, game, player, playerRole);
         } else {
             // The current user is probably not in the same game where the test was created, causing player to be null.
-            viewable = testRepo.isExternalKillingTestOfAPlayersEquivalentMutant(
-                    test.getId(),
-                    user.getId(),
-                    game.getId()
-            );
+
+            // Unfortunately, we don't know the gameID of the game the user is currently playing/requesting the killing
+            // test for, so it is viewable if the test is an external killing test for anyone of the player's mutants.
+
+            viewable = testRepo.isExternalKillingTestOfAPlayersEquivalentMutant(test.getId(), user.getId());
         }
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
