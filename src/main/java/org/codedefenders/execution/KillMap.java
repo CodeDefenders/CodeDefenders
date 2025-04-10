@@ -44,32 +44,32 @@ public class KillMap {
     /**
      * The tests the killmap is computed for.
      */
-    private List<Test> tests;
+    private final List<Test> tests;
     /**
      * The mutants the killmap is computed for.
      */
-    private List<Mutant> mutants;
+    private final List<Mutant> mutants;
     /**
      * ID of the class the killmap is computed for.
      */
-    private int classId;
+    private final int classId;
     /**
      * Maps each test to it's index in {@link KillMap#tests}.
      */
-    private Map<Test, Integer> indexOfTest;
+    private final Map<Test, Integer> indexOfTest;
     /**
      * Maps each mutant to it's index in {@link KillMap#mutants}.
      */
-    private Map<Mutant, Integer> indexOfMutant;
+    private final Map<Mutant, Integer> indexOfMutant;
 
     /**
      * The killmap data, as a list of "test vs. mutant" execution results.
      */
-    private List<KillMapEntry> entries;
+    private final List<KillMapEntry> entries;
     /**
      * The killmap data, as matrix between tests and mutants.
      */
-    private KillMapEntry[][] matrix;
+    private final KillMapEntry[][] matrix;
 
 
     /**
@@ -105,6 +105,11 @@ public class KillMap {
                 matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
             }
         }
+    }
+
+    public void addEntry(KillMapEntry entry) {
+        matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
+        entries.add(entry);
     }
 
     public int getClassId() {

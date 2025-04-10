@@ -893,6 +893,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     public boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {
         int validationThreshold = AdminDAO.getSystemSetting(FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
         if (validationThreshold <= 0) {
+            logger.debug("Validation of mutant {} skipped due to threshold being 0", mutantToValidate.getId());
             return false;
         }
 
