@@ -277,12 +277,6 @@ public class KillMapService {
                             entry = new KillMapEntry(test, mutant, status);
                         }
 
-                        // TODO(Alex): Move out of Lambda/Method?!
-                        //  There also exists: KillmapDAO.insertManyKillMapEntries(List<KillMapEntry>, int)
-                        if (!KillmapDAO.insertKillMapEntry(entry, killMap.getClassId())) {
-                            logger.error("An error occurred while inserting killmap entry into the DB: " + entry);
-                        }
-
                         return entry;
                     }));
                 }
@@ -305,5 +299,8 @@ public class KillMapService {
 
         logger.info("Computation of killmap finished after {} seconds. Killmap: {}",
                 Duration.between(startTime, Instant.now()).getSeconds(), killMap.getEntries());
+
+
+        KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), killMap.getClassId());
     }
 }
