@@ -53,12 +53,10 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
-import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -566,10 +564,10 @@ public class ClassUploadManager extends HttpServlet {
             // Since gameID = -1, DAOs cannot find the class linked to this
             // game, hence its if, which is needed instead inside mutants and
             // tests
-            KillMap killMap = killMapService.forCustom(tests, mutants, cutId, new ArrayList<>());
-            KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cutId);
+            // I checked and they are stored in the DB. Also I don't really understand the above comment.
+            killMapService.forCustom(tests, mutants, cutId, new ArrayList<>());
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Could error while calculating killmap for successfully uploaded class.", e);
+            logger.error("Caught error while calculating killmap for successfully uploaded class.", e);
         }
 
         // Handle the automatic redirection logic.
