@@ -162,15 +162,6 @@ public class Configuration {
                     validationErrors.add(setupDirectory(getSourcesDir()));
 
                     validationErrors.add(setupDirectory(getLibraryDir()));
-                    // TODO: Replace this with something which can resolve the dependencies.
-                    try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
-                        if (entries.findFirst().isEmpty()) {
-                            validationErrors.add("The library directory " + getLibraryDir().toPath()
-                                    + " is empty! Please download the dependencies via the installation-pom.xml!");
-                        }
-                    } catch (IOException ignored) {
-                        // ignored
-                    }
                 }
             }
 
