@@ -579,11 +579,8 @@ public class FileUtils {
         Path libraryDir = getConfig().getLibraryDir().toPath();
         try (Stream<Path> stream = Files.list(libraryDir)) {
             var archives =  stream
-                .filter(p -> {
-                    String[] parts = p.getFileName().toString().split("\\.");
-                    return parts[parts.length - 1].equals("jar");
-                })
-                .toList();
+                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
+                    .toList();
             for (var archive : archives) {
                 Files.delete(archive);
             }
