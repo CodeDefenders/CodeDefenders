@@ -76,8 +76,6 @@ public class MavenDependencyResolver implements AutoCloseable {
      *     All artifacts point to an installed JAR file in the local repo.
      */
     public MavenDependencies resolveDependencies(Collection<Artifact> artifacts) throws MavenDependencyResolverException {
-        Set<Artifact> resolvedDependencies = new HashSet<>();
-
         // CollectRequest finds the transitive dependencies and installs their POMs.
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRepositories(getRemoteRepos());
@@ -102,6 +100,7 @@ public class MavenDependencyResolver implements AutoCloseable {
         }
 
         // Gather resolved dependencies.
+        Set<Artifact> resolvedDependencies = new HashSet<>();
         var visitor = new PreorderDependencyNodeConsumerVisitor(node -> {
             var artifact = node.getArtifact();
             if (artifact != null) {
