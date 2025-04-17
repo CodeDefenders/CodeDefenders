@@ -9,6 +9,7 @@ import PushSocket from './push_socket';
 import PuzzleAPI from './puzzle_api';
 import AchievementNotifications from './achievement_notifications';
 import DynamicClassViewer from "../game/dynamic_class_viewer";
+import ShowToasts from './show_toasts'
 
 
 export {
@@ -22,7 +23,8 @@ export {
     PushSocket,
     PuzzleAPI,
     AchievementNotifications,
-    DynamicClassViewer
+    DynamicClassViewer,
+    ShowToasts
 }
 
 export * from './utils';
