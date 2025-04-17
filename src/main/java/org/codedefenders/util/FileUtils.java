@@ -335,6 +335,7 @@ public class FileUtils {
                     });
         } catch (IOException e) {
             logger.error("Error reading files from directory.", e);
+            throw new RuntimeException(e);
         }
         return files;
     }
