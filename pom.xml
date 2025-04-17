@@ -641,40 +641,6 @@
 			<id>IT</id>
 			<build>
 				<plugins>
-					<!-- Running integration tests require the lib folder to contains all
-						the libs -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-enforcer-plugin</artifactId>
-						<version>3.0.0-M1</version>
-						<executions>
-							<execution>
-								<id>enforce-libs-exist</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>enforce</goal>
-								</goals>
-								<configuration>
-									<rules>
-										<requireFilesExist>
-											<files>
-												<file>src/test/resources/itests/lib/hamcrest-all-1.3.jar</file>
-												<file>src/test/resources/itests/lib/junit-4.13.1.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.agent-0.8.6.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.ant-0.8.6.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.core-0.8.6.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.report-0.8.6.jar</file>
-												<file>src/test/resources/itests/lib/mockito-all-1.10.19.jar</file>
-											</files>
-										</requireFilesExist>
-									</rules>
-									<fail>true</fail>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
-
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
