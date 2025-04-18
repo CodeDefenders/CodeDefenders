@@ -52,7 +52,6 @@
                 </div>
             </div>
         </div>
-        <div id="toasts" class="position-fixed top-0 end-0 p-3 d-flex flex-column gap-1" style="z-index: 11"></div>
 
         <t:modal title="Unsaved changes" id="unsaved-changes-modal" closeButtonText="Cancel">
             <jsp:attribute name="content">
@@ -251,10 +250,9 @@
         </form>
 
         <script type="module">
-            import {Toast, Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
+            import {Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
-            import {PuzzleAPI, Modal, DynamicClassViewer, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
-            //import {showToast} from '${url.forPath("/js/toast.mjs")}';
+            import {PuzzleAPI, Modal, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const watermarkUrls = {
                 ATTACKER: '${url.forPath("/images/achievements/codedefenders_achievements_1_lvl_0.png")}',

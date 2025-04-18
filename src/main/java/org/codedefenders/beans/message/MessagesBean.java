@@ -36,6 +36,12 @@ public class MessagesBean implements Serializable {
 
     }
 
+    public synchronized List<Message> getFadeOutMessages(boolean fadeOut) {
+        return messages.stream()
+                .filter(msg -> msg.isFadeOut() == fadeOut)
+                .toList();
+    }
+
     /**
      * Returns the number of messages.
      * @return The number of messages.

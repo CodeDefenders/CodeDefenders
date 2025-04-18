@@ -4,19 +4,42 @@ class ShowToasts {
         const toastElem = document.createElement('div');
         toastElem.classList.add('toast', 'bg-white');
         toastElem.role = 'alert';
-        toastElem.innerHTML = `
-                    <div class="toast-header">
-                        <div class="toast-color p-2 me-2 rounded-1"></div>
-                        <strong class="toast-title me-auto"></strong>
-                        <small class="toast-secondary text-body-secondary"></small>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body"></div>`;
+        const toastBody = document.createElement('div');
+        toastBody.classList.add('toast-body');
 
-        toastElem.querySelector('.toast-color').classList.add(colorClass);
-        toastElem.querySelector('.toast-title').innerText = title;
-        toastElem.querySelector('.toast-secondary').innerText = secondary;
-        toastElem.querySelector('.toast-body').innerText = body;
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.classList.add('btn-close');
+        closeButton.setAttribute('data-bs-dismiss', 'toast');
+        closeButton.ariaLabel = 'Close';
+
+        if (title !== '' || secondary !== '') {
+            const toastHeader = document.createElement('div');
+            toastHeader.classList.add('toast-header');
+
+            const toastColor = document.createElement('div');
+            toastColor.classList.add('toast-color', 'p-2', 'me-2', 'rounded-1', colorClass);
+            toastHeader.appendChild(toastColor);
+
+
+            const toastTitle = document.createElement('strong');
+            toastTitle.classList.add('toast-title', 'me-auto');
+            toastTitle.innerText = title;
+            toastHeader.appendChild(toastTitle);
+
+            const toastSecondary = document.createElement('small');
+            toastSecondary.classList.add('toast-secondary', 'text-body-secondary');
+            toastSecondary.innerText = secondary;
+            toastHeader.appendChild(toastSecondary);
+
+            toastHeader.appendChild(closeButton);
+            toastElem.appendChild(toastHeader);
+
+        } else {
+            toastBody.appendChild(closeButton);
+        }
+        toastBody.innerText = body;
+        toastElem.appendChild(toastBody);
 
         document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
