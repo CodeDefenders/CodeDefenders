@@ -318,11 +318,12 @@ public class GameClassRepository {
                 SELECT
                    Dependency_ID,
                    JavaFile,
-                   ClassFile
+                   ClassFile,
+                   Class_ID
                 FROM dependencies WHERE Class_ID = ?;
         """;
         return queryRunner.query(query,
-                listFromRS(rs -> DependencyDAO.dependencyFromRS(rs, classId)),
+                listFromRS(DependencyDAO::dependencyFromRS),
                 classId);
     }
 
