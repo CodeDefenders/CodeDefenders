@@ -209,7 +209,8 @@ public class ClassUploadManager extends HttpServlet {
                     if (!validateAlias(classAlias)) {
                         logger.error("Class upload failed. Provided alias '{}' contained whitespaces or special "
                                 + "characters. Aborting.", classAlias);
-                        messages.add("Class upload failed. Alias must not contain whitespaces or special characters.");
+                        messages.add("Class upload failed. Alias must not contain whitespaces or special characters.")
+                                .fadeOut(false);
                         abortRequestAndCleanUp(request, response);
                         return;
                     }
@@ -256,7 +257,7 @@ public class ClassUploadManager extends HttpServlet {
             if (fileContentBytes.length == 0) {
                 logger.error("Class upload failed. Given file {} was empty", fileName);
                 messages.add("Class upload failed. File content for " + fileName
-                        + " could not be read. Please try again.");
+                        + " could not be read. Please try again.").fadeOut(false);
                 abortRequestAndCleanUp(request, response);
                 return;
             }
@@ -266,7 +267,7 @@ public class ClassUploadManager extends HttpServlet {
                     if (cutFile != null) {
                         // Upload of second CUT? Abort
                         logger.error("Class upload failed. Multiple classes under test uploaded.");
-                        messages.add("Class upload failed. Multiple classes under test uploaded.");
+                        messages.add("Class upload failed. Multiple classes under test uploaded.").fadeOut(false);
                         abortRequestAndCleanUp(request, response);
                         return;
                     }
@@ -277,7 +278,7 @@ public class ClassUploadManager extends HttpServlet {
                     if (dependenciesZipFile != null) {
                         // Upload of second dependency ZIP file? Abort
                         logger.error("Class upload failed. Multiple dependency ZIP files uploaded.");
-                        messages.add("Class upload failed. Multiple dependency ZIP files uploaded.");
+                        messages.add("Class upload failed. Multiple dependency ZIP files uploaded.").fadeOut(false);
                         abortRequestAndCleanUp(request, response);
                         return;
                     }
@@ -289,7 +290,7 @@ public class ClassUploadManager extends HttpServlet {
                     if (mutantsZipFile != null) {
                         // Upload of second mutant ZIP file? Abort
                         logger.error("Class upload failed. Multiple mutant ZIP files uploaded.");
-                        messages.add("Class upload failed. Multiple mutant ZIP files uploaded.");
+                        messages.add("Class upload failed. Multiple mutant ZIP files uploaded.").fadeOut(false);
                         abortRequestAndCleanUp(request, response);
                         return;
                     }
@@ -300,7 +301,7 @@ public class ClassUploadManager extends HttpServlet {
                     if (testsZipFile != null) {
                         // Upload of second test ZIP file? Abort
                         logger.error("Class upload failed. Multiple test ZIP files uploaded.");
-                        messages.add("Class upload failed. Multiple test ZIP files uploaded.");
+                        messages.add("Class upload failed. Multiple test ZIP files uploaded.").fadeOut(false);
                         abortRequestAndCleanUp(request, response);
                         return;
                     }
@@ -315,7 +316,7 @@ public class ClassUploadManager extends HttpServlet {
 
         if (cutFile == null) {
             logger.error("Class upload failed. No class under test uploaded.");
-            messages.add("Class upload failed. No class under test uploaded.");
+            messages.add("Class upload failed. No class under test uploaded.").fadeOut(false);
             abortRequestAndCleanUp(request, response);
             return;
         }
@@ -325,21 +326,21 @@ public class ClassUploadManager extends HttpServlet {
         final String fileContent = new String(cutFile.fileContent, StandardCharsets.UTF_8).trim();
         if (!fileName.endsWith(".java")) {
             logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
-            messages.add("Class upload failed. The class under test must be a .java file.");
+            messages.add("Class upload failed. The class under test must be a .java file.").fadeOut(false);
             abortRequestAndCleanUp(request, response);
             return;
         }
         if (reservedClassNames.contains(fileName)) {
             logger.error("Class with reserved name uploaded. Aborting.");
             messages.add("Class upload failed. " + fileName
-                    + " is a reserved class name, please rename your Java class.");
+                    + " is a reserved class name, please rename your Java class.").fadeOut(false);
             abortRequestAndCleanUp(request, response);
             return;
         }
         cutFileName = fileName;
         if (fileContent == null) {
             logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-            messages.add("Class upload failed. Internal error. Sorry about that!");
+            messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
             abortRequestAndCleanUp(request, response);
             return;
         }
@@ -349,7 +350,7 @@ public class ClassUploadManager extends HttpServlet {
         }
         if (gameClassRepo.classExistsForAlias(classAlias)) {
             logger.error("Class upload failed. Given alias {} was already used.", classAlias);
-            messages.add("Class upload failed. Given alias is already used.");
+            messages.add("Class upload failed. Given alias is already used.").fadeOut(false);
             abortRequestAndCleanUp(request, response);
             return;
         }
@@ -373,7 +374,7 @@ public class ClassUploadManager extends HttpServlet {
             cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
         } catch (IOException e) {
             logger.error("Class upload failed. Could not store java file " + fileName, e);
-            messages.add("Class upload failed. Internal error. Sorry about that!");
+            messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return;
         }
@@ -385,14 +386,16 @@ public class ClassUploadManager extends HttpServlet {
                 cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
             } catch (CompileException e) {
                 logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
-                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
+                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage())
+                        .fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
             } catch (IllegalStateException e) {
                 logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your "
                         + "installed version.", e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!")
+                        .fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
@@ -403,7 +406,8 @@ public class ClassUploadManager extends HttpServlet {
 
             if (!zipFileName.endsWith(".zip")) {
                 logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
-                messages.add("Class upload failed. Dependencies must be provided in a .zip file.");
+                messages.add("Class upload failed. Dependencies must be provided in a .zip file.")
+                        .fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
             }
@@ -415,7 +419,7 @@ public class ClassUploadManager extends HttpServlet {
                 dependencies.addAll(ZipFileUtils.getFilesFromZip(zip, true));
             } catch (IOException e) {
                 logger.error("Class upload failed. Failed to extract dependencies ZIP file.");
-                messages.add("Class upload failed. Failed to extract dependencies ZIP file.");
+                messages.add("Class upload failed. Failed to extract dependencies ZIP file.").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
             }
@@ -429,13 +433,13 @@ public class ClassUploadManager extends HttpServlet {
 
                 if (!dependencyFileName.endsWith(".java")) {
                     logger.error("Class upload failed. Given file {} was not a .java file.", dependencyFileName);
-                    messages.add("Class upload failed. Dependency must be a .java file.");
+                    messages.add("Class upload failed. Dependency must be a .java file.").fadeOut(false);
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
                 if (dependencyFileContent == null) {
                     logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
@@ -450,7 +454,7 @@ public class ClassUploadManager extends HttpServlet {
                         logger.error("Class upload failed. No valid package declaration found "
                                 + "in dependency file {}", dependencyFileName);
                         messages.add("Class upload failed. No valid package declaration found in dependency file "
-                                + dependencyFileName);
+                                + dependencyFileName).fadeOut(false);
                         abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
@@ -460,7 +464,7 @@ public class ClassUploadManager extends HttpServlet {
                     dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
                     logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
@@ -474,13 +478,14 @@ public class ClassUploadManager extends HttpServlet {
                 cutClassFilePath = Compiler.compileJavaFileWithDependencies(cutJavaFilePath, dependencies);
             } catch (CompileException e) {
                 logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
-                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
+                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage())
+                        .fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
             } catch (IllegalStateException e) {
                 logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your instance.", e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
@@ -492,7 +497,7 @@ public class ClassUploadManager extends HttpServlet {
             classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
         } catch (IOException e) {
             logger.error("Class upload failed. Could not get fully qualified name for " + fileName, e);
-            messages.add("Class upload failed. Internal error. Sorry about that!");
+            messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return;
@@ -512,7 +517,7 @@ public class ClassUploadManager extends HttpServlet {
             cutId = gameClassRepo.storeClass(cut);
         } catch (Exception e) {
             logger.error("Class upload failed. Could not store class to database.");
-            messages.add("Class upload failed. Internal error. Sorry about that!");
+            messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return;
         }
@@ -526,7 +531,7 @@ public class ClassUploadManager extends HttpServlet {
                     depId = DependencyDAO.storeDependency(new Dependency(cutId, dep.javaFile, dep.classFile));
                 } catch (Exception e) {
                     logger.error("Class upload failed. Could not store dependency class to database.");
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
@@ -622,7 +627,7 @@ public class ClassUploadManager extends HttpServlet {
 
         if (!zipFileName.endsWith(".zip")) {
             logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
-            messages.add("Class upload failed. Mutants must be provided in a .zip file.");
+            messages.add("Class upload failed. Mutants must be provided in a .zip file.").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return true;
         }
@@ -633,7 +638,7 @@ public class ClassUploadManager extends HttpServlet {
             mutants = ZipFileUtils.getFilesFromZip(zip, true);
         } catch (IOException e) {
             logger.error("Class upload failed. Failed to extract mutants ZIP file.");
-            messages.add("Class upload failed. Failed to extract mutants ZIP file.");
+            messages.add("Class upload failed. Failed to extract mutants ZIP file.").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return true;
         }
@@ -646,20 +651,21 @@ public class ClassUploadManager extends HttpServlet {
 
             if (!fileName.endsWith(".java")) {
                 logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
-                messages.add("Class upload failed. Mutant must be a .java file.");
+                messages.add("Class upload failed. Mutant must be a .java file.").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
             if (!fileName.equals(cutFileName)) {
                 logger.error("Class uploaded failed. Mutant {} has not the same class name as CUT, {}",
                         fileName, cutFileName);
-                messages.add("Class upload failed. Mutants must have same class name as class under test!");
+                messages.add("Class upload failed. Mutants must have same class name as class under test!")
+                        .fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
             if (fileContent == null) {
                 logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
@@ -671,7 +677,7 @@ public class ClassUploadManager extends HttpServlet {
                 javaFilePath = FileUtils.storeFile(folderPath, fileName, fileContent).toString();
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store mutant java file " + fileName, e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
@@ -682,14 +688,16 @@ public class ClassUploadManager extends HttpServlet {
                     classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
                 } catch (CompileException e) {
                     logger.error("Class upload failed. Could not compile mutant {}!\n\n{}", fileName, e.getMessage());
-                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
+                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage())
+                            .fadeOut(false);
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 } catch (IllegalStateException e) {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your"
                             + "installed version.", e);
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    messages.add("Class upload failed. Internal error. Sorry about that!")
+                            .fadeOut(false);
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
@@ -701,14 +709,15 @@ public class ClassUploadManager extends HttpServlet {
                 } catch (CompileException e) {
                     logger.error("Class upload failed. Could not compile mutant {} with dependencies{}!\n\n{}",
                             fileName, dependencies, e.getMessage());
-                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
+                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage())
+                            .fadeOut(false);
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 } catch (IllegalStateException e) {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your"
                             + "installed version.", e);
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
@@ -723,7 +732,7 @@ public class ClassUploadManager extends HttpServlet {
                 mutantRepo.mapMutantToClass(mutantId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store mutant to database.");
-                messages.add("Class upload failed. Seems like you uploaded two identical mutants.");
+                messages.add("Class upload failed. Seems like you uploaded two identical mutants.").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
                 return true;
@@ -762,7 +771,7 @@ public class ClassUploadManager extends HttpServlet {
 
         if (!zipFileName.endsWith(".zip")) {
             logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
-            messages.add("Class upload failed. The tests must be provided in a .zip file.");
+            messages.add("Class upload failed. The tests must be provided in a .zip file.").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return true;
         }
@@ -773,7 +782,7 @@ public class ClassUploadManager extends HttpServlet {
             tests = ZipFileUtils.getFilesFromZip(zip, true);
         } catch (IOException e) {
             logger.error("Class upload failed. Failed to extract tests ZIP file.");
-            messages.add("Class upload failed. Failed to extract tests ZIP file.");
+            messages.add("Class upload failed. Failed to extract tests ZIP file.").fadeOut(false);
             abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
             return true;
         }
@@ -786,13 +795,13 @@ public class ClassUploadManager extends HttpServlet {
 
             if (!fileName.endsWith(".java")) {
                 logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
-                messages.add("Class upload failed. The tests files must be .java file.");
+                messages.add("Class upload failed. The tests files must be .java file.").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
             if (fileContent == null) {
                 logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
             }
@@ -803,7 +812,7 @@ public class ClassUploadManager extends HttpServlet {
                 javaFilePath = FileUtils.storeFile(folderPath, fileName, fileContent).toString();
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store java file of test class " + fileName, e);
-                messages.add("Class upload failed. Could not store java file of test class " + fileName);
+                messages.add("Class upload failed. Could not store java file of test class " + fileName).fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
@@ -813,13 +822,14 @@ public class ClassUploadManager extends HttpServlet {
                 classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath, fileContent, dependencies, true);
             } catch (CompileException e) {
                 logger.error("Class upload failed. Could not compile test {}!\n\n{}", fileName, e.getMessage());
-                messages.add("Class upload failed. Could not compile test " + fileName + "!\n" + e.getMessage());
+                messages.add("Class upload failed. Could not compile test " + fileName + "!\n" + e.getMessage())
+                        .fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                 return true;
             } catch (IllegalStateException e) {
                 logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your instance.", e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                 return true;
@@ -833,7 +843,7 @@ public class ClassUploadManager extends HttpServlet {
                 backend.testOriginal(cut, testDir, qualifiedName);
             } catch (Exception e) {
                 logger.error("Class upload failed. Test " + fileName + " failed", e);
-                messages.add("Class upload failed. Test " + fileName + " failed");
+                messages.add("Class upload failed. Test " + fileName + " failed").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
                 return true;
@@ -844,7 +854,7 @@ public class ClassUploadManager extends HttpServlet {
                 lineCoverage = coverageGenerator.generate(cut, Paths.get(javaFilePath));
             } catch (CoverageGeneratorException e) {
                 logger.error("Class upload with test failed. Failed to compute coverage.", e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
                 return true;
@@ -858,7 +868,7 @@ public class ClassUploadManager extends HttpServlet {
                 testRepo.mapTestToClass(testId, cutId);
             } catch (UncheckedSQLException e) {
                 logger.error("Class upload with test failed. Could not store test to database.", e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                messages.add("Class upload failed. Internal error. Sorry about that!").fadeOut(false);
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
                 return true;
