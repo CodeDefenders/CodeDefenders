@@ -33,7 +33,6 @@ import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.Test;
-import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
@@ -57,39 +56,36 @@ public class TestAPI extends HttpServlet {
     CodeDefendersAuth login;
 
     @Inject
-    TestRepository testRepo;
+    GameService gameService;
 
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        final Optional<Test> test = ServletUtils.getIntParameter(request, "testId")
-                .map(id -> testRepo.getTestById(id));
+        final Optional<TestDTO> test = ServletUtils.getIntParameter(request, "testId")
+                .map(id -> gameService.getTest(login.getUserId(), id));
 
         if (test.isEmpty()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
         }
 
-        PrintWriter out = response.getWriter();
-
         String json = generateJsonForTest(test.get());
 
         response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
         out.print(json);
         out.flush();
     }
 
-    private String generateJsonForTest(Test test) {
+    private String generateJsonForTest(TestDTO test) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
         root.add("id", gson.toJsonTree(test.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(test.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(test.getGameId(), Integer.class));
-        root.add("source", gson.toJsonTree(test.getAsString(), String.class));
+        root.add("source", gson.toJsonTree(test.getSource(), String.class));
 
         return gson.toJson(root);
-
     }
-
 }

@@ -17,9 +17,12 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
@@ -46,12 +49,43 @@ public class MutantAccordionBean {
 
 
     @Inject
-    public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer) {
+    public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer,
+                               TestRepository testRepo, UserService userService) {
         var game = gameProducer.getGame();
         if (game != null) {
             var mutantList = gameService.getMutants(login.getUserId(), game.getId());
+            if (!(game instanceof PuzzleGame)) {
+                mutantList = addExternalKillingTests(testRepo, userService, mutantList);
+            }
             init(game.getCUT(), mutantList, game.getId());
         }
+    }
+
+    private List<MutantDTO> addExternalKillingTests(TestRepository testRepo, UserService userService,
+                                                    List<MutantDTO> mutantList) {
+        List<MutantDTO> newList = new ArrayList<>(mutantList.size());
+
+        for (MutantDTO mutant : mutantList) {
+            if (mutant.getState() == Mutant.State.EQUIVALENT) {
+                var testExecOpt = testRepo.getExternalKillingTestExecutionForMutant(mutant.getId());
+                if (testExecOpt.isPresent()) {
+                    var testExec = testExecOpt.get();
+                    var externalKillingTest = testRepo.getTestById(testExec.testId);
+                    var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
+
+                    newList.add(mutant.copyWithKillingTest(
+                            testExec.testId,
+                            killingTestCreator.orElseThrow(),
+                            testExec.message
+                    ));
+                    continue;
+                }
+            }
+
+            newList.add(mutant);
+        }
+
+        return newList;
     }
 
     public void init(GameClass cut, List<MutantDTO> mutantList, Integer gameId) {

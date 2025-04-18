@@ -163,6 +163,27 @@ public class MutantDTO {
         return description;
     }
 
+    public MutantDTO copyWithKillingTest(int killedByTestId, SimpleUser killedByUser, String killMessage) {
+        return new MutantDTO(
+                id,
+                creator,
+                state,
+                points,
+                description,
+                lineString,
+                covered,
+                canView,
+                canMarkEquivalent,
+                killedByUser,
+                killedByTestId,
+                killMessage,
+                gameId,
+                playerId,
+                lines,
+                patchString
+        );
+    }
+
 
     public static class LineNumberComparator implements Comparator<MutantDTO> {
 
