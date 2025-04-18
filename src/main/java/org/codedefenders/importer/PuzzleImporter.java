@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -39,18 +38,15 @@ import jakarta.inject.Inject;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.database.DependencyDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
-import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -482,8 +478,7 @@ public class PuzzleImporter {
 
             // Run killmap.
             try {
-                KillMap killMap = killMapService.forCustom(tests, mutants, cut.getId(), new ArrayList<>());
-                KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cut.getId());
+                killMapService.forCustom(tests, mutants, cut.getId(), new ArrayList<>());
             } catch (InterruptedException | ExecutionException e) {
                 logger.error("Error while calculating killmap for successfully installed puzzle.", e);
             }
