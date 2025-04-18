@@ -5,7 +5,8 @@ class ShowToasts {
         toastElem.classList.add('toast', 'bg-white');
         toastElem.role = 'alert';
         const toastBody = document.createElement('div');
-        toastBody.classList.add('toast-body');
+        toastBody.classList.add('toast-body', 'me-auto');
+        toastBody.innerText = body;
 
         const closeButton = document.createElement('button');
         closeButton.type = 'button';
@@ -13,14 +14,14 @@ class ShowToasts {
         closeButton.setAttribute('data-bs-dismiss', 'toast');
         closeButton.ariaLabel = 'Close';
 
+        const toastColor = document.createElement('div');
+        toastColor.classList.add('toast-color', 'p-2', 'ms-2', 'me-2', 'rounded-1', colorClass);
+
         if (title !== '' || secondary !== '') {
             const toastHeader = document.createElement('div');
             toastHeader.classList.add('toast-header');
 
-            const toastColor = document.createElement('div');
-            toastColor.classList.add('toast-color', 'p-2', 'me-2', 'rounded-1', colorClass);
             toastHeader.appendChild(toastColor);
-
 
             const toastTitle = document.createElement('strong');
             toastTitle.classList.add('toast-title', 'me-auto');
@@ -34,12 +35,18 @@ class ShowToasts {
 
             toastHeader.appendChild(closeButton);
             toastElem.appendChild(toastHeader);
+            toastElem.appendChild(toastBody);
 
         } else {
-            toastBody.appendChild(closeButton);
+            console.log('No title or secondary text provided');
+            const intermediate = document.createElement('div');
+            intermediate.classList.add("d-flex", "align-items-center", "justify-content-around");
+            closeButton.classList.add('me-2');
+            intermediate.appendChild(toastColor);
+            intermediate.appendChild(toastBody);
+            intermediate.appendChild(closeButton);
+            toastElem.appendChild(intermediate);
         }
-        toastBody.innerText = body;
-        toastElem.appendChild(toastBody);
 
         document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
