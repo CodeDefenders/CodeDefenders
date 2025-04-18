@@ -11,6 +11,12 @@
         <c:forEach items="${messages.getFadeOutMessages(false)}" var="message">
             <div id="message-${message.id}" class="alert alert-primary alert-dismissible fade show" role="alert">
                     <%-- Don't escape text here; message.getText() already escapes the text. --%>
+                <c:if test="${message.title != '' && message.secondary != ''}">
+                    <div class="d-flex justify-content-between align-content-center">
+                        <strong><c:out value="${message.title}"/></strong>
+                        <i><c:out value="${message.secondary}"/></i>
+                    </div>
+                </c:if>
                 <pre class="m-0"><c:out value="${message.text}" escapeXml="false"/></pre>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
@@ -22,7 +28,6 @@
         import {ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
         const API_URL = '${url.forPath(Paths.API_MESSAGES)}';
-
 
 
         $(document).ready(async () => {
