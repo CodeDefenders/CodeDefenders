@@ -181,6 +181,9 @@ public class Constants {
     public static final String MUTANT_ALIVE_N_MESSAGE
             = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
 
+    // Message titles
+    public static final String TITLE_SUCCESS = "Success!";
+
     // Request attributes
     public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 

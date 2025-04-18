@@ -12,6 +12,8 @@ public class Message implements Serializable {
     private String text;
     private boolean fadeOut;
     private boolean escape;
+    private String title;
+    private String secondary;
 
     /**
      * Constructs a new message with the given text. Use {@link MessagesBean#add(String)} instead of calling the
@@ -23,6 +25,8 @@ public class Message implements Serializable {
         this.text = text;
         this.fadeOut = true;
         this.escape = true;
+        this.title = "";
+        this.secondary = "";
     }
 
     /**
@@ -42,6 +46,28 @@ public class Message implements Serializable {
             return StringEscapeUtils.escapeHtml4(text);
         } else {
             return text;
+        }
+    }
+
+    /**
+     * Returns the title, escaped if set to.
+     */
+    public String getTitle() {
+        if (isEscape()) {
+            return StringEscapeUtils.escapeHtml4(title);
+        } else {
+            return title;
+        }
+    }
+
+    /**
+     * Returns the secondary text, escaped if set to.
+     */
+    public String getSecondary() {
+        if (isEscape()) {
+            return StringEscapeUtils.escapeHtml4(secondary);
+        } else {
+            return secondary;
         }
     }
 
@@ -70,6 +96,16 @@ public class Message implements Serializable {
 
     public Message escape(boolean escape) {
         this.escape = escape;
+        return this;
+    }
+
+    public Message setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Message setSecondary(String secondary) {
+        this.secondary = secondary;
         return this;
     }
 }

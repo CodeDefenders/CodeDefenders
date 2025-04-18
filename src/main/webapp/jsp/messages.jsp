@@ -39,8 +39,8 @@
             const list = await response.json();
 
             list.forEach((message) => {
-                const title = "";
-                const secondary = "";
+                const title = message.title;
+                const secondary = message.secondary;
                 const body = message.text;
                 ShowToasts.showToast({title: title, secondary: secondary, body: body});
             });

@@ -83,6 +83,7 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TITLE_SUCCESS;
 
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link MultiplayerGame battleground games}.
@@ -489,7 +490,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Clear the mutant code only if mutant is accepted
             previousSubmission.clear();
 
-            messages.add(MUTANT_COMPILED_MESSAGE);
+            messages.add(MUTANT_COMPILED_MESSAGE, TITLE_SUCCESS);
             result.mutationTesterMessage().ifPresent(messages::add);
             logger.info("Successfully created mutant {} ", mutant.getId());
 

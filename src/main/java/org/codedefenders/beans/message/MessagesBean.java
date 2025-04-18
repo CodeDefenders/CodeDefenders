@@ -62,6 +62,10 @@ public class MessagesBean implements Serializable {
         return message;
     }
 
+    public synchronized Message add(String text, String title) {
+        return add(text).setTitle(title);
+    }
+
     public void addAll(Collection<? extends String> texts) {
         for (String text : texts) {
             add(text);
