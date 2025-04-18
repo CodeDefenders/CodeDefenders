@@ -21,44 +21,47 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <div id="create-game-cut-preview" class="w-100 h-100">
-<div class="card" style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
-    <div class="card-body p-0 codemirror-fill w-100 h-100">
-        <pre class="m-0"><textarea name=""></textarea></pre>
+    <div class="card loading loading-bg-gray loading-height-200" id="class-preview-card"
+         style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
+        <div class="card-header" hidden>
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1 active" data-bs-toggle="tab"
+                            id="cut-header"
+                            data-bs-target="#cut-body"
+                            aria-controls="cut-body"
+                            type="button" role="tab" aria-selected="true">
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-0 codemirror-fill">
+            <div class="tab-content">
+                <div class="tab-pane active"
+                     id="cut-body"
+                     aria-labelledby="cut-header"
+                     role="tabpanel">
+                </div>
+            </div>
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
-
-    import {InfoApi} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    <script type="module">
+        const {DynamicClassViewer} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
 
 
-    const cutPreview = document.querySelector('#create-game-cut-preview')
+        const cutPreview = document.querySelector('#create-game-cut-preview')
 
-    const classSelector = document.querySelector('#class-select');
-    const textarea = cutPreview.querySelector('textarea');
+        const classSelector = document.querySelector('#class-select');
 
-    const updatePreview = function () {
-        const classId = Number(classSelector.value);
-        const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
+        const updatePreview = async function () {
+            const classId = Number(classSelector.value);
+            const card = cutPreview.querySelector('#class-preview-card');
+            await DynamicClassViewer.show_code(classId, card);
+        };
 
-        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-            InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
-        } else {
-            const editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: true,
-                readOnly: true,
-                mode: 'text/x-java',
-                autoRefresh: true
-            });
-            editor.getWrapperElement().classList.add('codemirror-readonly');
-            InfoApi.setClassEditorValue(editor, classId);
-        }
-    };
-
-    // Load initial selected class
-    document.addEventListener("DOMContentLoaded", updatePreview);
-
-    classSelector.addEventListener('change', updatePreview);
-</script>
+        // Load initial selected class
+        updatePreview();
+        classSelector.addEventListener('change', updatePreview);
+    </script>
 </div>

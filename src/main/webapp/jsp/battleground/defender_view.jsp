@@ -37,7 +37,7 @@
 --%>
 
 <%
-	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
 %>
 
@@ -45,28 +45,6 @@
 
 
 <%-- -------------------------------------------------------------------------------- --%>
-
-
-<%--
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<%
-    classViewer.setClassCode(game.getCUT());
-    classViewer.setDependenciesForClass(game.getCUT());
-%>
---%>
-
-
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<%
-    testEditor.setEditableLinesForClass(cut);
-    testEditor.setMockingEnabled(cut.isMockingEnabled());
-    testEditor.setAssertionLibrary(cut.getAssertionLibrary());
-    if (previousSubmission.hasTest()) {
-        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-%>
 
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
@@ -84,20 +62,6 @@
     }
 %>
 
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<%
-    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-    mutantAccordion.setEnableFlagging(true);
-    mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
-%>
---%>
-
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
---%>
 
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
@@ -114,8 +78,8 @@
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
         <t:defender_intention_collection_note/>
-        <jsp:include page="../game_components/class_viewer.jsp"/>
-        <jsp:include page="../game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>
 
     <div class="col-xl-6 col-12" id="utest-div">
@@ -128,7 +92,7 @@
                 <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                    <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend
                 </button>
 

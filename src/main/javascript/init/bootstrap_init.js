@@ -36,3 +36,36 @@ document.addEventListener('DOMContentLoaded', function() {
         new Tooltip(tooltipTriggerEl);
     }
 });
+
+/*
+ * Initialize multi-level dropdown.
+ *
+ * Adopted from https://github.com/dallaslu/bootstrap-5-multi-level-dropdown
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    (function (bs) {
+        const classname = 'has-child-dropdown-show';
+        bs.Dropdown.prototype.toggle = function (original) {
+            return function () {
+                document.querySelectorAll(`.${classname}`).forEach(function (e) {
+                    e.classList.remove(classname);
+                });
+                let dd = this._element.closest('.dropdown').parentNode.closest('.dropdown');
+                for (; dd && dd !== document; dd = dd.parentNode.closest('.dropdown')) {
+                    dd.classList.add(classname);
+                }
+                return original.call(this);
+            }
+        }(bs.Dropdown.prototype.toggle);
+
+        document.querySelectorAll('.dropdown').forEach(function (dd) {
+            dd.addEventListener('hide.bs.dropdown', function (e) {
+                if (this.classList.contains(classname)) {
+                    this.classList.remove(classname);
+                    e.preventDefault();
+                }
+                e.stopPropagation(); // do not need pop in multi level mode
+            });
+        });
+    })(bootstrap);
+});

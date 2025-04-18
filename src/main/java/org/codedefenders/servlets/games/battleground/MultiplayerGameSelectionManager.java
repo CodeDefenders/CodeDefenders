@@ -64,6 +64,8 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.game.GameState.ACTIVE;
+import static org.codedefenders.game.GameState.FINISHED;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
@@ -298,12 +300,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
      */
     private boolean isClassroomModeratorForGame(MultiplayerGame game) {
         return game.getClassroomId()
-                .map(classroomService::getMembersForClassroom)
-                .orElse(List.of())
-                .stream()
-                .filter(member -> member.getUserId() == login.getUserId())
-                .map(ClassroomMember::getRole)
-                .anyMatch(role -> role == ClassroomRole.MODERATOR || role == ClassroomRole.OWNER);
+                .flatMap(id -> classroomService.getMemberForClassroomAndUser(id, login.getUserId()))
+                .map(member -> member.getRole() == ClassroomRole.MODERATOR || member.getRole() == ClassroomRole.OWNER)
+                .orElse(false);
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -371,7 +370,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         int gameId = game.getId();
 
-        if (game.getState() == GameState.ACTIVE) {
+        if (game.getState() == ACTIVE) {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);
             gameService.closeGame(game);
 
@@ -401,6 +400,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MultiplayerGame game = gameProducer.getMultiplayerGame();
+
+        if (game == null || game.getState() == FINISHED) {
+            messages.add("The game is already over. You cannot change its duration.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         if (login.getUser().getId() != game.getCreatorId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
             messages.add("Only the creator or an observer of this game can change its duration.");
@@ -432,9 +437,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        final long startTime = game.getStartTimeUnixSeconds();
-        final long now = Instant.now().getEpochSecond();
-        final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+        int elapsedTimeMinutes = 0;
+        if (game.getState() == ACTIVE) {
+            final long startTime = game.getStartTimeUnixSeconds();
+            final long now = Instant.now().getEpochSecond();
+            elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+        }
 
         game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
         game.update();

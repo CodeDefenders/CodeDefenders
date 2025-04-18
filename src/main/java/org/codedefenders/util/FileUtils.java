@@ -31,7 +31,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.DependencyDAO;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.persistence.database.GameClassRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -402,6 +406,43 @@ public class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static int getNumberOfDependencies(int cutId) {
+        return CDIUtil.getBeanFromCDI(GameClassRepository.class).getMappedDependencyIdsForClassId(cutId).size();
+    }
+
+    /**
+     * Returns the code of the dependencies belonging to a class under test.
+     * @param cutId The id of the class under test.
+     * @return A list of Strings containing the code of the dependencies.
+     */
+    public static List<String> getCodeFromDependencies(int cutId) {
+        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class)
+                .getMappedDependenciesForClassId(cutId);
+        List<String> code = new ArrayList<>();
+        for (Dependency dep : dependencies) {
+            Path filePath = Path.of(dep.getJavaFile());
+            code.add(readJavaFileWithDefault(filePath));
+        }
+        return code;
+    }
+
+    /**
+     * Returns the names of the dependencies belonging to a class under test.
+     * @param cutId The id of the class under test.
+     * @return A list of Strings containing the dependency name. These names should be in the same order as the results
+     * of {@link FileUtils#getCodeFromDependencies(int)}.
+     */
+    public static List<String> getDependencyNames(int cutId) {
+        List<Dependency> dependencies = CDIUtil.getBeanFromCDI(GameClassRepository.class)
+                .getMappedDependenciesForClassId(cutId);
+        List<String> names = new ArrayList<>();
+        for (Dependency dep : dependencies) {
+            Path filePath = Path.of(dep.getJavaFile());
+            names.add(extractFileNameNoExtension(filePath));
+        }
+        return names;
     }
 
     /**

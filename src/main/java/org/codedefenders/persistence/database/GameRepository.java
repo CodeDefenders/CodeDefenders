@@ -21,6 +21,7 @@ package org.codedefenders.persistence.database;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -73,17 +74,13 @@ public class GameRepository {
      * @return The {@link AbstractGame} with the given ID or null if no game found.
      */
     public AbstractGame getGame(int gameId) {
-        GameMode gameMode = getGameMode(gameId);
-        if (gameMode == null) {
-            return null;
-        }
-
-        return switch (gameMode) {
+        var gameMode = getGameMode(gameId);
+        return gameMode.map(mode -> switch (mode) {
             case PARTY -> multiplayerGameRepo.getMultiplayerGame(gameId);
             case MELEE -> meleeGameRepo.getMeleeGame(gameId);
             case PUZZLE -> puzzleRepo.getPuzzleGameForId(gameId);
             default -> null;
-        };
+        }).orElse(null);
     }
 
 
@@ -208,13 +205,12 @@ public class GameRepository {
      * @param gameId The game ID.
      * @return The game mode.
      */
-    public GameMode getGameMode(int gameId) {
+    public Optional<GameMode> getGameMode(int gameId) {
         @Language("SQL") String query = "SELECT Mode FROM games WHERE ID = ?";
 
-        var gameMode = queryRunner.query(query,
+        return queryRunner.query(query,
                 oneFromRS(rs -> GameMode.valueOf(rs.getString("Mode"))),
                 gameId);
-        return gameMode.orElseThrow();
     }
 
     /**

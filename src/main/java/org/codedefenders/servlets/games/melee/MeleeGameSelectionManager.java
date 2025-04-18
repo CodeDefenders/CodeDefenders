@@ -65,6 +65,7 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.game.GameState.ACTIVE;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
@@ -398,6 +399,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MeleeGame game = gameProducer.getMeleeGame();
 
+        if (game == null || game.getState() == GameState.FINISHED) {
+            messages.add("The game is already over. You cannot change its duration.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         if (login.getUser().getId() != game.getCreatorId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
             messages.add("Only the creator or an observer of this game can change its duration.");
             Redirect.redirectBack(request, response);
@@ -428,9 +435,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        final long startTime = game.getStartTimeUnixSeconds();
-        final long now = Instant.now().getEpochSecond();
-        final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+        int elapsedTimeMinutes = 0;
+        if (game.getState() == ACTIVE) {
+            final long startTime = game.getStartTimeUnixSeconds();
+            final long now = Instant.now().getEpochSecond();
+            elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+        }
 
         game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
         game.update();

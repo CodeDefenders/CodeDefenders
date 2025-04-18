@@ -22,13 +22,19 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import org.codedefenders.dto.DuelStats;
 import org.codedefenders.game.GameType;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
@@ -285,5 +291,58 @@ public class UserStatsDAO {
                 resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
                 userId
         ).orElse(0);
+    }
+
+    public DuelStats getDefenderDuelStats(int userId) {
+        @Language("SQL") final String query = """
+                        SELECT m.Equivalent
+                        FROM equivalences e, players p, mutants m
+                        WHERE e.Defender_ID = p.ID
+                          AND p.User_ID = ?
+                          AND e.Mutant_ID = m.Mutant_ID
+                """;
+        var results = queryRunner.query(
+                query,
+                resultSet -> listFromRS(resultSet, rs -> Mutant.Equivalence.valueOf(rs.getString("Equivalent"))),
+                userId
+        );
+
+        int lost = 0, won = 0;
+        for (var result : results) {
+            if (result == DECLARED_YES || result == ASSUMED_YES) {
+                won++;
+            }
+            if (result == PROVEN_NO) {
+                lost++;
+            }
+        }
+
+        return new DuelStats(won, lost);
+    }
+
+    public DuelStats getAttackerDuelStats(int userId) {
+        @Language("SQL") final String query = """
+                        SELECT m.Equivalent
+                        FROM players p, mutants m
+                        WHERE m.Player_ID = p.ID
+                          AND p.User_ID = ?
+                """;
+        var results = queryRunner.query(
+                query,
+                resultSet -> listFromRS(resultSet, rs -> Mutant.Equivalence.valueOf(rs.getString("Equivalent"))),
+                userId
+        );
+
+        int lost = 0, won = 0;
+        for (var result : results) {
+            if (result == PROVEN_NO) {
+                won++;
+            }
+            if (result == DECLARED_YES || result == ASSUMED_YES) {
+                lost++;
+            }
+        }
+
+        return new DuelStats(won, lost);
     }
 }

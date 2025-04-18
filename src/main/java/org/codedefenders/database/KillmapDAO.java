@@ -699,7 +699,7 @@ public class KillmapDAO {
         int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
 
         int nrExpectedEntries = nrMutants * nrTests;
-        GameMode gameMode = gameRepo.getGameMode(gameId);
+        GameMode gameMode = gameRepo.getGameMode(gameId).orElseThrow();
 
         return new KillMapGameProgress(
                 nrTests, nrMutants, nrEntries, nrExpectedEntries,

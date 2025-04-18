@@ -30,6 +30,7 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.codedefenders.servlets.auth.BasicHttpAuthFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
@@ -53,7 +54,8 @@ public class ShiroConfig {
      */
     @Produces
     @Singleton
-    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc) {
+    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc,
+                                                      BasicHttpAuthFilter basicAuthc) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
@@ -65,6 +67,7 @@ public class ShiroConfig {
         FilterChainManager fcMan = new DefaultFilterChainManager();
         fcMan.addFilter("logout", logout);
         fcMan.addFilter("authc", authc);
+        fcMan.addFilter("basicAuthc", basicAuthc);
         // Additional 'default' filter e.g. `roles[…]` are also available
 
 
@@ -138,6 +141,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_TEST = "/api/test";
         // org.codedefenders.util.Paths.API_MUTANT = "/api/mutant";
         fcMan.createChain("/api/**", "authc");
+        fcMan.createChain("/llm-api/**", "basicAuthc");
 
         // Admin URLS. This does not necessary require authentication as we handle that
         // using tomcat. But for completeness, we force it now.

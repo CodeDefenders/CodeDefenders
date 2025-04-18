@@ -3,6 +3,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
 
 <%@ attribute name="classId" required="true" %>
 <%@ attribute name="classAlias" required="true" %>
@@ -10,12 +11,30 @@
 
 <div>
     <t:modal title="${classAlias}" id="${htmlId}"
-             modalDialogClasses="modal-dialog-responsive"
-             modalBodyClasses="loading loading-bg-gray loading-height-200">
+             modalDialogClasses="modal-dialog-responsive">
+
         <jsp:attribute name="content">
-            <div class="card">
+            <div class="card loading loading-bg-gray loading-height-200" id="class-modal-card-${classId}">
+                <div class="card-header" hidden>
+                    <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link py-1 active" data-bs-toggle="tab"
+                                    id="cut-header-${classId}"
+                                    data-bs-target="#cut-body-${classId}"
+                                    aria-controls="cut-body-${classId}"
+                                    type="button" role="tab" aria-selected="true">
+                            </button>
+                        </li>
+                    </ul>
+                </div>
                 <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
-                    <pre class="m-0"><textarea></textarea></pre>
+                    <div class="tab-content">
+                        <div class="tab-pane active"
+                             id="cut-body-${classId}"
+                             aria-labelledby="cut-header-${classId}"
+                             role="tabpanel">
+                        </div>
+                    </div>
                 </div>
             </div>
         </jsp:attribute>
@@ -24,7 +43,7 @@
     <script>
         (function () {
             const modal = document.currentScript.parentElement.querySelector('.modal');
-            const textarea = document.currentScript.parentElement.querySelector('textarea');
+            const classId = ${classId};
 
             modal.addEventListener('shown.bs.modal', async function () {
                 const codeMirrorContainer = this.querySelector('.CodeMirror');
@@ -33,19 +52,9 @@
                     return;
                 }
 
-                const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
-                const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-
-                const editor = CodeMirror.fromTextArea(textarea, {
-                    lineNumbers: true,
-                    readOnly: true,
-                    mode: 'text/x-java',
-                    autoRefresh: true
-                });
-                editor.getWrapperElement().classList.add('codemirror-readonly');
-
-                await InfoApi.setClassEditorValue(editor, ${classId});
-                LoadingAnimation.hideAnimation(textarea);
+                const {DynamicClassViewer} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
+                const card = modal.querySelector('#class-modal-card-${classId}');
+                await DynamicClassViewer.show_code(classId, card);
             });
         })();
     </script>

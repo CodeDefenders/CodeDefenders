@@ -8,6 +8,7 @@
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
+<%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 
 <%--
     Provides the navigation bar.
@@ -45,11 +46,9 @@
                                 <li><a class="dropdown-item" id="header-leaderboard" href="${url.forPath(Paths.LEADERBOARD_PAGE)}">Leaderboard</a></li>
                             </ul>
                         </li>
-                        <c:if test="${puzzleRepo.checkPuzzlesEnabled() && puzzleRepo.checkActivePuzzlesExist()}">
-                            <li class="nav-item nav-item-highlight me-3">
-                                <a class="nav-link" id="header-puzzle" href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Puzzles</a>
-                            </li>
-                        </c:if>
+
+                        <t:puzzle-navigation/>
+
                         <c:if test="${auth.admin}">
                             <li class="nav-item nav-item-highlight me-3">
                                 <a class="nav-link" id="header-admin" href="${url.forPath("/admin")}">Admin</a>
