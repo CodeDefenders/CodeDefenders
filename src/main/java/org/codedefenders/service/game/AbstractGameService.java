@@ -45,6 +45,9 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -56,8 +59,11 @@ public abstract class AbstractGameService implements IGameService {
     // @Inject
     // MutantDAO mutantDAO;
 
-    protected UserRepository userRepository;
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractGameService.class);
+
+    protected GameManagingUtils gameManagingUtils;
     protected UserService userService;
+    protected UserRepository userRepository;
     protected TestRepository testRepo;
     protected MutantRepository mutantRepo;
     protected GameRepository gameRepo;
@@ -65,9 +71,11 @@ public abstract class AbstractGameService implements IGameService {
     protected TestSmellRepository testSmellRepo;
 
     @Inject
-    public AbstractGameService(UserService userService, UserRepository userRepository,
+    public AbstractGameService(GameManagingUtils gameManagingUtils, UserService userService,
+                               UserRepository userRepository,
                                TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
                                PlayerRepository playerRepo, TestSmellRepository testSmellRepo) {
+        this.gameManagingUtils = gameManagingUtils;
         this.userService = userService;
         this.userRepository = userRepository;
         this.testRepo = testRepo;
@@ -261,6 +269,8 @@ public abstract class AbstractGameService implements IGameService {
     // Todo: only receive the game-Id as parameter and do not update the whole game
     @Override
     public boolean closeGame(AbstractGame game) {
+        resolveAllOpenDuels(game);
+
         game.setState(GameState.FINISHED);
         boolean updated = game.update();
 
@@ -271,6 +281,31 @@ public abstract class AbstractGameService implements IGameService {
         }
 
         return updated;
+    }
+
+    private void resolveAllOpenDuels(AbstractGame game) {
+        List<Mutant> mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
+        for (Mutant mutant : mutantsPendingTests) {
+            boolean isKillable = gameManagingUtils.isMutantKillableByOtherTests(mutant);
+
+            if (isKillable) {
+                mutantRepo.killMutant(mutant, Mutant.Equivalence.PROVEN_NO);
+                // attacker did not prove anything -> no extra point for attacker, but keep points
+                // TODO: is handled by MultiplayerGame.java:456. A new equivalence status would be needed to change the scoring.
+                // defender never loses points for mutants proven not equivalent
+            } else {
+                mutantRepo.killMutant(mutant, Mutant.Equivalence.ASSUMED_YES);
+                // per definition "no killing test is provided in time:"
+                // -> attacker loses all points for the mutant, defender gains one point
+                int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
+                playerRepo.increasePlayerPoints(1, playerIdDefender);
+            }
+
+            logger.info("Mutant {} was automatically resolved as {}.",
+                    mutant.getId(), isKillable ? "not equivalent" : "equivalent");
+
+            // TODO: create events like the EquivalenceDuelAttackerWonEvent?
+        }
     }
 
     // Todo: only receive the game-Id as parameter and do not update the whole game

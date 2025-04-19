@@ -67,13 +67,11 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 public class MultiplayerGameService extends AbstractGameService {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameService.class);
 
-    private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MultiplayerGameRepository multiplayerGameRepo;
-    private final TestSmellRepository testSmellRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -84,14 +82,13 @@ public class MultiplayerGameService extends AbstractGameService {
                                   MultiplayerGameRepository multiplayerGameRepo,
                                   PlayerRepository playerRepo,
                                   TestSmellRepository testSmellRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
-        this.gameManagingUtils = gameManagingUtils;
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo,
+                testSmellRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.multiplayerGameRepo = multiplayerGameRepo;
-        this.testSmellRepo = testSmellRepo;
     }
 
     @Override

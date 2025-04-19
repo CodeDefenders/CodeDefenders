@@ -68,13 +68,11 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 public class MeleeGameService extends AbstractGameService {
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameService.class);
 
-    private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MeleeGameRepository meleeGameRepo;
-    private final TestSmellRepository testSmellRepo;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,
@@ -83,14 +81,13 @@ public class MeleeGameService extends AbstractGameService {
                             TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
                             MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo,
                             TestSmellRepository testSmellRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo,
+                testSmellRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
-        this.gameManagingUtils = gameManagingUtils;
         this.meleeGameRepo = meleeGameRepo;
-        this.testSmellRepo = testSmellRepo;
     }
 
     @Override
