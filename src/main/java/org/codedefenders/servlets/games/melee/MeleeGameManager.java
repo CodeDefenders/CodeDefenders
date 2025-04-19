@@ -950,7 +950,7 @@ public class MeleeGameManager extends HttpServlet {
                 } else { // ASSUMED_YES
                     if (mPending.getId() == mutantId) {
                         // only kill the one mutant that was claimed
-                        logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
+                        logger.debug("Test {} did not kill mutant {} and so did not prove it non-equivalent",
                                 newTest.getId(), mPending.getId());
                         mutantRepo.killMutant(mPending, ASSUMED_YES);
                         final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("")
