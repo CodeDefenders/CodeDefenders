@@ -76,8 +76,13 @@ public class InvitePage extends HttpServlet {
 
             game.addPlayer(userId, Role.ATTACKER);
             notificationService.post(event);
-            resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+            logger.info("User {} joined game {}", userId, gameId);
+            messages.add("You successfully joined the game.");
+        } else {
+            logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
+            messages.add("You had already joined this game.");
         }
+        resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
     }
 
 
