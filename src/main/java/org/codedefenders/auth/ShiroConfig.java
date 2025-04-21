@@ -32,6 +32,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.codedefenders.servlets.auth.BasicHttpAuthFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
+import org.codedefenders.util.Paths;
 
 /**
  * This class configures Shiro.
@@ -173,6 +174,8 @@ public class ShiroConfig {
 
         fcMan.createChain("/classroom/**", "authc");
         fcMan.createChain("/classrooms", "authc");
+
+        fcMan.createChain(Paths.INVITE, "authc");
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(fcMan);
