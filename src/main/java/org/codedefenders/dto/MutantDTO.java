@@ -151,6 +151,18 @@ public class MutantDTO {
         return canView;
     }
 
+
+    /**
+     * killedByTestId is either:
+     * <ul>
+     * <li>a valid id >= 100 (only if the current user is an attacker),</li>
+     * <li>'0' to indicate that there exists an external test can kill the mutant (only for defenders),</li>
+     * <li>'-1' to indicate that the mutant is probably not killable</li>
+     * </ul>
+     *
+     * @return the test id that killed the mutant, or 0 if the external killing test is not specified, or -1 if the mutant
+     * is not killable by the selection of external tests.
+     */
     public int getKilledByTestId() {
         return killedByTestId;
     }

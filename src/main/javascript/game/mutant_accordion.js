@@ -336,7 +336,8 @@ class MutantAccordion {
                     return '';
                 }
             case "EQUIVALENT":
-                if (data.killedByTestId < 0) {
+                if (data.killedByTestId <= 0) {
+                    // In case of no killing test (-1) or the current user being a defender (0), the test isn't viewable.
                     return '';
                 } else {
                     return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
