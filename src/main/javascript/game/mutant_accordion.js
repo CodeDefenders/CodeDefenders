@@ -271,9 +271,12 @@ class MutantAccordion {
         const killedByText = data.state === 'KILLED' && data.killedBy
                 ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
                 : '';
+        const equivDuelResultText = data.state === 'EQUIVALENT' && data.killedByTestId >= 0
+            ? `<span class="ma-column-name mx-2">marked as equivalent</span>but is killable`
+            : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
             <span class="ma-column-name mx-2">by</span>${data.creator.name}
-            ${killedByText}`;
+            ${killedByText}${equivDuelResultText}`;
     }
 
     /** @private */
