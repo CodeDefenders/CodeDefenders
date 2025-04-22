@@ -268,7 +268,7 @@ class MutantAccordion {
 
     /** @private */
     _renderId (data) {
-        const killedByText =  data.killedBy
+        const killedByText = data.state === 'KILLED' && data.killedBy
                 ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
                 : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
