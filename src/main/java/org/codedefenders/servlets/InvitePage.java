@@ -11,7 +11,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
@@ -50,7 +52,7 @@ public class InvitePage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         logger.info("Invite page requested");
-        MultiplayerGame game = gameProducer.getMultiplayerGame();
+        AbstractGame game = gameProducer.getGame();
 
         String roleParameter = req.getParameter("role");
         if (roleParameter != null && !roleParameter.equals("attacker") && !roleParameter.equals("defender")) {
@@ -84,7 +86,18 @@ public class InvitePage extends HttpServlet {
             event.setGameId(gameId);
             event.setUserName(login.getSimpleUser().getName());
 
-            Role role = game.joinWithInvite(userId, roleParameter);
+            Role role;
+            if (game instanceof MultiplayerGame multiplayerGame) {
+                role = multiplayerGame.joinWithInvite(userId, roleParameter);
+            } else if (game instanceof MeleeGame) {
+                role = Role.PLAYER;
+                game.addPlayer(userId, role);
+            } else {
+                logger.warn("User {} tried to join puzzle game {}.", userId, gameId);
+                messages.add("You cannot join puzzle games with an invite link.").fadeOut(false);
+                resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
             notificationService.post(event);
             logger.info("User {} joined game {} as {}", userId, gameId, role);
             messages.add("You successfully joined the game as " + (role == Role.ATTACKER ? "an " : "a ") + role + ".");
@@ -92,7 +105,15 @@ public class InvitePage extends HttpServlet {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
             messages.add("You had already joined this game.");
         }
-        resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+        String redirectPath;
+        if (game instanceof MultiplayerGame) {
+            redirectPath = Paths.BATTLEGROUND_GAME;
+        } else if (game instanceof MeleeGame) {
+            redirectPath = Paths.MELEE_GAME;
+        } else {
+            throw new IllegalStateException("Game type not supported: " + game.getClass().getName());
+        }
+        resp.sendRedirect(url.forPath(redirectPath) + "?gameId=" + gameId);
     }
 
 
