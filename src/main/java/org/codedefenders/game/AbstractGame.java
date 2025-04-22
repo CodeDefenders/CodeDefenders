@@ -63,6 +63,8 @@ public abstract class AbstractGame {
     protected List<Mutant> mutants;
     protected List<Test> tests;
     protected List<Test> testsDefendersOnly;
+
+    protected boolean inviteOnly = false;
     /**
      * Validation level used to check submitted mutants.
      */

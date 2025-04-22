@@ -98,6 +98,7 @@ public class MultiplayerGame extends AbstractGame {
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
         private boolean allowPlayersToChooseRole = true;
+        private boolean inviteOnly = false;
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
@@ -217,6 +218,11 @@ public class MultiplayerGame extends AbstractGame {
 
         public Builder allowPlayersToChooseRole(boolean allow) {
             this.allowPlayersToChooseRole = allow;
+            return this;
+        }
+
+        public Builder inviteOnly(boolean inviteOnly) {
+            this.inviteOnly = inviteOnly;
             return this;
         }
 
