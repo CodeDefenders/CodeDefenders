@@ -82,6 +82,8 @@ public class MultiplayerGame extends AbstractGame {
 
     private Integer classroomId;
 
+    protected boolean allowPlayersToChooseRole = true;
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -95,6 +97,7 @@ public class MultiplayerGame extends AbstractGame {
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
+        private boolean allowPlayersToChooseRole = true;
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
@@ -212,6 +215,11 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder allowPlayersToChooseRole(boolean allow) {
+            this.allowPlayersToChooseRole = allow;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
@@ -238,6 +246,7 @@ public class MultiplayerGame extends AbstractGame {
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
+        this.allowPlayersToChooseRole = builder.allowPlayersToChooseRole;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
@@ -634,6 +643,30 @@ public class MultiplayerGame extends AbstractGame {
             default:
                 // ignored
         }
+    }
+
+    /**
+     * Adds a player that wants to join via an invite link.
+     * If {@link MultiplayerGame:allowPlayersToChooseRole} is true, the {@code wantedRole} is used to determine
+     * the role of the player. It must be either "attacker" or "defender".
+     * Otherwise, the player will be added to the side with fewer players, defaulting to "Attacker" when evenly matched.
+     * TODO: Is synchronization correct?
+     */
+    public synchronized Role joinWithInvite(int userId, String wantedRole) throws IllegalArgumentException {
+        Role role;
+        if (allowPlayersToChooseRole && wantedRole != null) {
+            if (wantedRole.equalsIgnoreCase("attacker")) {
+                role = Role.ATTACKER;
+            } else if (wantedRole.equalsIgnoreCase("defender")) {
+                role = Role.DEFENDER;
+            } else {
+                throw new IllegalArgumentException("Invalid role: " + wantedRole);
+            }
+        } else {
+            role = getAttackerPlayers().size() > getDefenderPlayers().size() ? Role.DEFENDER : Role.ATTACKER;
+        }
+        addPlayer(userId, role);
+        return role;
     }
 
     private boolean listContainsEvent(List<Event> events, EventType et) {

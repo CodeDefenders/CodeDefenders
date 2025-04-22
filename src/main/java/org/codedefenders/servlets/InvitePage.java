@@ -52,9 +52,19 @@ public class InvitePage extends HttpServlet {
         logger.info("Invite page requested");
         MultiplayerGame game = gameProducer.getMultiplayerGame();
 
+        String roleParameter = req.getParameter("role");
+        if (roleParameter != null && !roleParameter.equals("attacker") && !roleParameter.equals("defender")) {
+            logger.warn("Invalid role parameter in invite link: {}", roleParameter);
+            messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
+                    .fadeOut(false);
+            resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            return;
+        }
+
         if (game == null) {
-            logger.warn("gameProducer returned null");
-            messages.add("There is no game with this id.").fadeOut(false);
+            logger.warn("User {} tried to join game {}, but the game does not exist.", login.getUserId(),
+                    req.getParameter("gameId"));
+            messages.add("The game you were invited to does no longer exist.").fadeOut(false);
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
@@ -74,10 +84,10 @@ public class InvitePage extends HttpServlet {
             event.setGameId(gameId);
             event.setUserName(login.getSimpleUser().getName());
 
-            game.addPlayer(userId, Role.ATTACKER);
+            Role role = game.joinWithInvite(userId, roleParameter);
             notificationService.post(event);
-            logger.info("User {} joined game {}", userId, gameId);
-            messages.add("You successfully joined the game.");
+            logger.info("User {} joined game {} as {}", userId, gameId, role);
+            messages.add("You successfully joined the game as " + (role == Role.ATTACKER ? "an " : "a ") + role + ".");
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
             messages.add("You had already joined this game.");
