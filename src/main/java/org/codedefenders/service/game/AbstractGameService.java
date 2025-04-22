@@ -118,8 +118,6 @@ public abstract class AbstractGameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
-    // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
-    //  So the actual building of the MutantDTO could happen in this class.
     protected MutantDTO convertMutant(Mutant mutant, SimpleUser user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
