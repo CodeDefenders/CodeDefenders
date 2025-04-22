@@ -287,16 +287,17 @@ public abstract class AbstractGameService implements IGameService {
         List<Mutant> mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
         for (Mutant mutant : mutantsPendingTests) {
             boolean isKillable = gameManagingUtils.isMutantKillableByOtherTests(mutant);
-
+            /*
+             * Points are handled by MultiplayerGame.java:456, a new equivalence status would be needed to change the scoring.
+             * As the scoring rules are already hard to grasp for new players, this would introduce additional complexity.
+             *
+             * Additionally, the attacker's possibility to gain points from the auto-resolved duel stops the defenders
+             * from claiming all mutants as equivalent before the game ends without any risk.
+             */
             if (isKillable) {
                 mutantRepo.killMutant(mutant, Mutant.Equivalence.PROVEN_NO);
-                // attacker did not prove anything -> no extra point for attacker, but keep points
-                // TODO: is handled by MultiplayerGame.java:456. A new equivalence status would be needed to change the scoring.
-                // defender never loses points for mutants proven not equivalent
             } else {
                 mutantRepo.killMutant(mutant, Mutant.Equivalence.ASSUMED_YES);
-                // per definition "no killing test is provided in time:"
-                // -> attacker loses all points for the mutant, defender gains one point
                 int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
                 playerRepo.increasePlayerPoints(1, playerIdDefender);
             }
