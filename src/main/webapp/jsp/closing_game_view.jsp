@@ -32,6 +32,7 @@
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/closing_game.css")}" rel="stylesheet">
     </jsp:attribute>
+
     <jsp:body>
         <div class="content">
             <div class="branding">
@@ -45,10 +46,7 @@
                 User interactions are no longer possible while open equivalence duels are automatically resolved.
             </p>
         </div>
-        <script>
-            // retry every 10 seconds. TODO: passive waiting via event
-            setTimeout(() => window.location.reload(), 1e4);
-        </script>
+        <t:game_js_init/>
     </jsp:body>
 </p:main_page>
 
