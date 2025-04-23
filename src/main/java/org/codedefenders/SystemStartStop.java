@@ -35,6 +35,7 @@ import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.CronJobManager;
 import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.dependencies.MavenDependencyResolver;
+import org.codedefenders.game.GameStoppedEventHandlerContainer;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
@@ -59,6 +60,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private AchievementService achievementService;
+
+    @Inject
+    private GameStoppedEventHandlerContainer gameStoppedEventHandlerContainer;
 
     @Inject
     private MetricsRegistry metricsRegistry;
@@ -105,6 +109,7 @@ public class SystemStartStop implements ServletContextListener {
 
         cronJobManager.startup();
         achievementService.registerEventHandler();
+        gameStoppedEventHandlerContainer.registerEventHandler();
 
         try {
             FileUtils.cleanLeftoverDependencies();
