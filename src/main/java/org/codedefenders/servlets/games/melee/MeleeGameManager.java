@@ -257,7 +257,10 @@ public class MeleeGameManager extends HttpServlet {
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED
                 || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
-        final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
+        final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
+        final String jspPath = isGameClosed
+                ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.MELEE_DETAILS_VIEW_JSP)
+                : Constants.MELEE_GAME_VIEW_JSP;
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.PLAYER) {
             Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());

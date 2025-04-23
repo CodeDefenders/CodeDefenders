@@ -162,11 +162,9 @@ public class MultiplayerGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-
         int gameId = game.getId();
 
         int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
-
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
@@ -193,8 +191,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED
                 || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
+        final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
-                ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
+                ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.BATTLEGROUND_DETAILS_VIEW_JSP)
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.DEFENDER) {
