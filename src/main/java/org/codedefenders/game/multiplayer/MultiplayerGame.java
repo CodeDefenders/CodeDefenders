@@ -82,7 +82,7 @@ public class MultiplayerGame extends AbstractGame {
 
     private Integer classroomId;
 
-    protected boolean allowPlayersToChooseRole = true;
+    private boolean mayChooseRoles = true;
 
     public static class Builder {
         // mandatory values
@@ -97,7 +97,7 @@ public class MultiplayerGame extends AbstractGame {
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
-        private boolean allowPlayersToChooseRole = true;
+        private boolean mayChooseRoles = true;
         private boolean inviteOnly = false;
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
@@ -216,8 +216,8 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
-        public Builder allowPlayersToChooseRole(boolean allow) {
-            this.allowPlayersToChooseRole = allow;
+        public Builder mayChooseRoles(boolean mayChooseRoles) {
+            this.mayChooseRoles = mayChooseRoles;
             return this;
         }
 
@@ -252,11 +252,12 @@ public class MultiplayerGame extends AbstractGame {
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
-        this.allowPlayersToChooseRole = builder.allowPlayersToChooseRole;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
         this.classroomId = builder.classroomId;
+        this.inviteOnly = builder.inviteOnly;
+        this.mayChooseRoles = builder.mayChooseRoles;
     }
 
     public int getGameDurationMinutes() {
@@ -318,6 +319,10 @@ public class MultiplayerGame extends AbstractGame {
         } else {
             return Role.NONE;
         }
+    }
+
+    public boolean isMayChooseRoles() {
+        return mayChooseRoles;
     }
 
     public List<Player> getDefenderPlayers() {
@@ -660,7 +665,7 @@ public class MultiplayerGame extends AbstractGame {
      */
     public synchronized Role joinWithInvite(int userId, String wantedRole) throws IllegalArgumentException {
         Role role;
-        if (allowPlayersToChooseRole && wantedRole != null) {
+        if (mayChooseRoles && wantedRole != null) {
             if (wantedRole.equalsIgnoreCase("attacker")) {
                 role = Role.ATTACKER;
             } else if (wantedRole.equalsIgnoreCase("defender")) {

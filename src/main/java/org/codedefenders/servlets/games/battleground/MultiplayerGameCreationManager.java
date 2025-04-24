@@ -27,7 +27,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/multiplayer/create")
+import org.codedefenders.util.Paths;
+
+@WebServlet(Paths.BATTLEGROUND_CREATE)
 public class MultiplayerGameCreationManager extends HttpServlet {
 
     @Override

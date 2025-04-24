@@ -231,6 +231,28 @@
                         </div>
 
                         <div class="row mb-3"
+                             title="Allows player to choose their role (attacker or defender) when joining.">
+                            <label class="col-4 col-form-label" id="choose-role-label" for="choose-role-switch">Players may choose their role</label>
+                            <div class="col-8 d-flex align-items-center">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="choose-role-switch" name="mayChooseRoles" checked>
+                                    <label class="form-check-label" for="choose-role-switch">Allow players to choose their own roles</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3"
+                             title="Allows only whitelisted players to join the game.">
+                            <label class="col-4 col-form-label" id="invite-only-label" for="invite-only-switch">Invite only</label>
+                            <div class="col-8 d-flex align-items-center">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="invite-only-switch" name="inviteOnly">
+                                    <label class="form-check-label" for="invite-only-switch">Allow only whitelisted players to join</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3"
                              title="Select the role the creator (you) will have in the game.">
                             <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
                             <div class="col-8">

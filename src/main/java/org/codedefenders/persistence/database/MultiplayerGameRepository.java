@@ -116,7 +116,7 @@ public class MultiplayerGameRepository {
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .classroomId(classroomId)
-                .allowPlayersToChooseRole(mayChooseRole)
+                .mayChooseRoles(mayChooseRole)
                 .inviteOnly(inviteOnly)
                 .build();
     }
@@ -191,6 +191,8 @@ public class MultiplayerGameRepository {
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
         Integer classroomId = game.getClassroomId().orElse(null);
+        boolean inviteOnly = game.isInviteOnly();
+        boolean mayChooseRoles = game.isMayChooseRoles();
 
         @Language("SQL") String query = """
                 INSERT INTO games (
@@ -210,9 +212,11 @@ public class MultiplayerGameRepository {
                     CapturePlayersIntention,
                     EquivalenceThreshold,
                     Game_Duration_Minutes,
-                    Classroom_ID
+                    Classroom_ID,
+                    invite_only,
+                    may_choose_role
                 )
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
         """;
 
         return queryRunner.insert(query,
@@ -233,7 +237,9 @@ public class MultiplayerGameRepository {
                 capturePlayersIntention,
                 automaticMutantEquivalenceThreshold,
                 gameDurationMinutes,
-                classroomId
+                classroomId,
+                inviteOnly,
+                mayChooseRoles
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
     }
 

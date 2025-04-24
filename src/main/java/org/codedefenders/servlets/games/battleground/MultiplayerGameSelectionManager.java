@@ -21,7 +21,6 @@ package org.codedefenders.servlets.games.battleground;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +40,6 @@ import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -193,6 +191,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
+        boolean mayChooseRoles = parameterThenOrOther(request, "mayChooseRoles", true, false);
+        boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
 
         MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
@@ -203,6 +203,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .gameDurationMinutes(duration)
+                .mayChooseRoles(mayChooseRoles)
+                .inviteOnly(inviteOnly)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);

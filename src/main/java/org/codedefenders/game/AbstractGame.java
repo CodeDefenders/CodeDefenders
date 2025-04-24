@@ -151,6 +151,10 @@ public abstract class AbstractGame {
         return getTests(false);
     }
 
+    public boolean isInviteOnly() {
+        return inviteOnly;
+    }
+
     @Deprecated// Get tests through service instead and cache them
     public List<Test> getTests(boolean defendersOnly) {
         TestRepository testRepo = CDIUtil.getBeanFromCDI(TestRepository.class);
