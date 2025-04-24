@@ -66,6 +66,10 @@ class InfoApi {
             editor.setValue("Could not fetch test.\nPlease try again later.");
         }
     }
+
+    static async getInviteLinkDataWithoutGameId() {
+        return await InfoApi.fetchJSON(`${contextPath}api/invite-link`);
+    }
 }
 
 

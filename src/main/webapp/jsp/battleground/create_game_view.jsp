@@ -23,6 +23,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="CreateSingleGameBean" type="org.codedefenders.beans.CreateSingleGameBean"--%>
 
 <%@ page import="org.codedefenders.persistence.database.GameClassRepository" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
@@ -87,7 +88,8 @@
                         <input type="hidden" value="${fromAdmin}" name="fromAdmin">
 
                         <div class="row mb-3">
-                            <label class="col-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
+                            <label class="col-4 col-form-label" id="class-label" for="class-select">Class Under
+                                Test</label>
                             <div class="col-8 mb-3">
                                 <div class="input-group has-validation">
                                     <select class="form-select" id="class-select" name="class" required>
@@ -111,7 +113,8 @@
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="predefined-mutants-switch"
                                            name="withMutants">
-                                    <label class="form-check-label" for="predefined-mutants-switch">Include predefined mutants
+                                    <label class="form-check-label" for="predefined-mutants-switch">Include predefined
+                                        mutants
                                         (if available)</label>
                                 </div>
                             </div>
@@ -119,7 +122,8 @@
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="predefined-tests-switch"
                                            name="withTests">
-                                    <label class="form-check-label" for="predefined-tests-switch">Include predefined tests (if
+                                    <label class="form-check-label" for="predefined-tests-switch">Include predefined
+                                        tests (if
                                         available)</label>
                                 </div>
                             </div>
@@ -164,10 +168,10 @@
                                                id="mutant-validator-radio-${level.name().toLowerCase()}"
                                                name="mutantValidatorLevel"
                                                value="${level.name()}" required
-                                                ${level == CodeValidatorLevel.MODERATE ? "checked" : ""}>
+                                            ${level == CodeValidatorLevel.MODERATE ? "checked" : ""}>
                                         <label class="form-check-label"
                                                for="mutant-validator-radio-${level.name().toLowerCase()}">
-                                            ${level.displayName}
+                                                ${level.displayName}
                                         </label>
                                         <c:if test="${s.last}">
                                             <div class="invalid-feedback">Please select a mutant validator level.</div>
@@ -183,9 +187,12 @@
                                 Max. Assertions Per Test
                             </label>
                             <div class="col-8">
-                                <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
+                                <input type="number" class="form-control" id="max-assertions-input"
+                                       name="maxAssertionsPerTest"
                                        value="${DEFAULT_NB_ASSERTIONS}" min="1" required>
-                                <div class="invalid-feedback">Please provide a valid number. Must be greater than zero.</div>
+                                <div class="invalid-feedback">Please provide a valid number. Must be greater than
+                                    zero.
+                                </div>
                             </div>
                         </div>
 
@@ -201,19 +208,22 @@
                                 <input class="form-control" type="number" id="equiv-threshold-input"
                                        name="automaticEquivalenceTrigger"
                                        value="0" min="0" required>
-                                <div class="invalid-feedback">Please provide a valid number. Must be positive or zero.</div>
+                                <div class="invalid-feedback">Please provide a valid number. Must be positive or zero.
+                                </div>
                             </div>
                         </div>
 
                         <div class="row mb-1"
                              title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
-                            <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture
+                            <label class="col-4 col-form-label" id="capture-intentions-label"
+                                   for="capture-intentions-switch">Capture
                                 Intentions</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
                                            name="capturePlayersIntention">
-                                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players'
+                                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing
+                                        Players'
                                         Intentions</label>
                                 </div>
                             </div>
@@ -224,7 +234,8 @@
                             <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled" checked>
+                                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled"
+                                           checked>
                                     <label class="form-check-label" for="chat-switch">Enable Chat</label>
                                 </div>
                             </div>
@@ -232,22 +243,28 @@
 
                         <div class="row mb-3"
                              title="Allows player to choose their role (attacker or defender) when joining.">
-                            <label class="col-4 col-form-label" id="choose-role-label" for="choose-role-switch">Players may choose their role</label>
+                            <label class="col-4 col-form-label" id="choose-role-label" for="choose-role-switch">Players
+                                may choose their role</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="choose-role-switch" name="mayChooseRoles" checked>
-                                    <label class="form-check-label" for="choose-role-switch">Allow players to choose their own roles</label>
+                                    <input class="form-check-input" type="checkbox" id="choose-role-switch"
+                                           name="mayChooseRoles" checked>
+                                    <label class="form-check-label" for="choose-role-switch">Allow players to choose
+                                        their own roles</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3"
                              title="Allows only whitelisted players to join the game.">
-                            <label class="col-4 col-form-label" id="invite-only-label" for="invite-only-switch">Invite only</label>
+                            <label class="col-4 col-form-label" id="invite-only-label" for="invite-only-switch">Invite
+                                only</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="invite-only-switch" name="inviteOnly">
-                                    <label class="form-check-label" for="invite-only-switch">Allow only whitelisted players to join</label>
+                                    <input class="form-check-input" type="checkbox" id="invite-only-switch"
+                                           name="inviteOnly">
+                                    <label class="form-check-label" for="invite-only-switch">Allow only whitelisted
+                                        players to join</label>
                                 </div>
                             </div>
                         </div>
@@ -259,7 +276,7 @@
                                 <select class="form-select" id="role-select" name="roleSelection" required>
                                     <c:forEach items="${Role.multiplayerRoles()}" var="role">
                                         <option value="${role.name()}" ${role == Role.OBSERVER ? "selected" : ""}>
-                                            ${role.formattedString}
+                                                ${role.formattedString}
                                         </option>
                                     </c:forEach>
                                 </select>
@@ -286,7 +303,10 @@
                             </div>
 
                             <script type="module">
-                                import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                                import {
+                                    GameTimeValidator,
+                                    GameTime
+                                } from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                 const gameTimeValidator = new GameTimeValidator(
                                         Number(${maximumDuration}),
@@ -312,6 +332,37 @@
                             </c:otherwise>
                         </c:choose>
 
+
+                        <div title="Invite link" class="row mt-3">
+                            <input type="hidden" name="inviteId" id="invite-id" value=""/>
+                            <button type="button" id="copy-link-button"
+                                    class="btn-primary btn">Copy invite link
+                            </button>
+                            <script type="module">
+                                const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
+                                const linkButton = document.getElementById('copy-link-button');
+                                linkButton.addEventListener('click', async () => {
+                                    const inviteIdInput = document.getElementById('invite-id');
+                                    if (inviteIdInput.value !== "") {
+                                        return;
+                                    }
+                                    const linkData = await InfoApi.getInviteLinkDataWithoutGameId();
+                                    inviteIdInput.value = linkData.inviteId;
+                                    //TODO show toast
+                                    navigator.clipboard.writeText(linkData.inviteLink)
+                                            .then(() => {
+                                                linkButton.innerText = "Copied!";
+                                                setTimeout(() => {
+                                                    linkButton.innerText = "Copy invite link";
+                                                }, 2000);
+                                            })
+                                            .catch(err => {
+                                                console.error('Failed to copy: ', err);
+                                            });
+                                });
+                            </script>
+                        </div>
+
                     </form>
 
                     <t:modal id="levelExplanation" title="Level Explanation">
@@ -328,7 +379,8 @@
                 </jsp:attribute>
                     </t:modal>
 
-                    <t:modal id="automaticEquivalenceTriggerExplanation" title="Auto Equivalence Duel Threshold Explanation">
+                    <t:modal id="automaticEquivalenceTriggerExplanation"
+                             title="Auto Equivalence Duel Threshold Explanation">
                 <jsp:attribute name="content">
                     <t:automatic_duels_explanation/>
                 </jsp:attribute>

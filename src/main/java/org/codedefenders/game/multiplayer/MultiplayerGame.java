@@ -99,6 +99,7 @@ public class MultiplayerGame extends AbstractGame {
         private boolean capturePlayersIntention = false;
         private boolean mayChooseRoles = true;
         private boolean inviteOnly = false;
+        private Integer inviteId = null;
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
@@ -226,6 +227,11 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder inviteId(Integer inviteId) {
+            this.inviteId = inviteId;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
@@ -258,6 +264,7 @@ public class MultiplayerGame extends AbstractGame {
         this.classroomId = builder.classroomId;
         this.inviteOnly = builder.inviteOnly;
         this.mayChooseRoles = builder.mayChooseRoles;
+        this.inviteId = builder.inviteId;
     }
 
     public int getGameDurationMinutes() {

@@ -193,6 +193,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
         boolean mayChooseRoles = parameterThenOrOther(request, "mayChooseRoles", true, false);
         boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
+        Integer inviteId = getIntParameter(request, "inviteId").orElse(null);
 
         MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
@@ -205,6 +206,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .gameDurationMinutes(duration)
                 .mayChooseRoles(mayChooseRoles)
                 .inviteOnly(inviteOnly)
+                .inviteId(inviteId)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);

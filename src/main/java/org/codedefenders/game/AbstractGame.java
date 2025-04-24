@@ -19,6 +19,7 @@
 package org.codedefenders.game;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
@@ -65,6 +66,7 @@ public abstract class AbstractGame {
     protected List<Test> testsDefendersOnly;
 
     protected boolean inviteOnly = false;
+    protected Integer inviteId = null;
     /**
      * Validation level used to check submitted mutants.
      */
@@ -153,6 +155,14 @@ public abstract class AbstractGame {
 
     public boolean isInviteOnly() {
         return inviteOnly;
+    }
+
+    public void setInviteId(int id) {
+        this.inviteId = id;
+    }
+
+    public Integer getInviteId() {
+        return this.inviteId;
     }
 
     @Deprecated// Get tests through service instead and cache them
