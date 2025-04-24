@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
@@ -40,7 +38,6 @@ import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 
 /**
@@ -51,7 +48,7 @@ import static org.codedefenders.util.Constants.TEST_CLASSPATH;
  * content from the hard disk or providing it. The resulting {@code .class} file path
  * is returned.
  *
- * <p>Dependency files of a Java class are either removed or moved into {@link Constants#CUTS_DEPENDENCY_DIR}
+ * <p>Dependency files of a Java class are either removed or stay where they are,
  * based on the parent directory of the associated Java class.
  *
  * <p>Test cases can also be compiled, but require a reference to the tested class.
@@ -99,19 +96,19 @@ public class Compiler {
     private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path baseDir = Paths.get(javaFile.getPath()).getParent();
+        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
         final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
-        final List<String> options = getCliParameters(baseDir.toString(), null);
+        final List<String> options = getCliParameters(classesDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 
         final Boolean success = task.call();
         if (success) {
             try {
-                return getClassPath(javaFile, baseDir).toString();
+                return getClassPath(javaFile, classesDir).toString();
             } catch (IOException e) {
                 throw new CompileException(e);
             }
@@ -143,8 +140,7 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation. Otherwise they are moved to
-     *                                    {@code dependencies/}.
+     *                                    are removed after compilation.
      * @see #compileJavaFileForContentWithDependencies(String, String, List)
      */
     public static String compileJavaFileForContentWithDependencies(String javaFilePath,
@@ -179,8 +175,7 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation. Otherwise they are moved to
-     *                                    {@code dependencies/}.
+     *                                    are removed after compilation.
      * @see #compileJavaFileWithDependencies(String, List)
      */
     public static String compileJavaFileWithDependencies(String javaFilePath,
@@ -202,28 +197,25 @@ public class Compiler {
             throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path baseDir = Paths.get(javaFile.getPath()).getParent();
+        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
 
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
         compilationUnits.add(javaFile);
-        final List<String> options = getCliParameters(baseDir.toString(), null);
+        final List<String> options = getCliParameters(classesDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
         final Boolean success = task.call();
 
         if (cleanUpDependencyClassFiles) {
             // Remove dependency .class files generated in baseDir
-            cleanUpDependencies(dependencies, baseDir, success);
-        } else {
-            // Move dependency .class files generated to baseDir/dependencies
-            moveDependencies(dependencies, baseDir, success);
+            cleanUpDependencies(dependencies, classesDir, success);
         }
         if (success) {
             try {
-                return getClassPath(javaFile, baseDir).toString();
+                return getClassPath(javaFile, classesDir).toString();
             } catch (IOException e) {
                 throw new CompileException(e);
             }
@@ -357,46 +349,6 @@ public class Compiler {
             } catch (IOException e) {
                 if (logError) {
                     logger.warn("Failed to remove dependency class file in folder:{}", baseDirectory);
-                }
-            }
-        }
-    }
-
-    /**
-     * Move generated {@code .class} files to {@code dependencies/} subdirectory for a given list of files.
-     *
-     * @param dependencies  the {@code .java} files the {@code .class} were generated from
-     *                      and will be moved.
-     * @param baseDirectory the base directory the files or the package folders were in.
-     * @param logError      {@code true} if IOExceptions should be logged.
-     */
-    private static void moveDependencies(List<JavaFileObject> dependencies, Path baseDirectory, Boolean logError) {
-        for (JavaFileObject dependency : dependencies) {
-            try {
-                final Path oldPath;
-                Path fullJavaPath = Path.of(dependency.getPath());
-                Path withoutBase = baseDirectory.resolve(CUTS_DEPENDENCY_DIR).relativize(fullJavaPath);
-                oldPath = baseDirectory.resolve(withoutBase.toString().replace(".java", ".class"));
-                // path relative from the base directory, {@code dependencies/} folder just has to be added between them
-                final Path classFileStructure = baseDirectory.relativize(
-                        Paths.get(oldPath.toString().replace(".java", ".class")));
-                final Path newPath =
-                        Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
-
-                Files.createDirectories(newPath.getParent());
-                Files.move(oldPath, newPath);
-
-                //Move compiled subclasses
-                String pattern = dependency.getName().replace(".java", "") + "\\$.+\\.class";
-                Predicate<Path> predicate = (Path p) -> p.getFileName().toString().matches(pattern);
-                for (Path p : Files.list(oldPath.getParent()).filter(predicate).collect(Collectors.toSet())) {
-                    Path toPath = Paths.get(
-                            newPath.toString().replace(newPath.getFileName().toString(), p.getFileName().toString()));
-                    Files.move(p, toPath);
-                }
-            } catch (IOException e) {
-                if (logError) {
-                    logger.error("Failed to move dependency class.", e);
                 }
             }
         }

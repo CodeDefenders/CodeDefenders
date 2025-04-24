@@ -39,7 +39,6 @@ import org.codedefenders.persistence.database.GameClassRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -69,15 +68,16 @@ public class FileUtils {
      *   lib/                                    <- Contains .jar files we need for execution e.g. JUnit
      *   sources/                                <- Contains a folder per uploaded class under test
      *     <ClassAlias>/
-     *       <PackageStructure>/                 <- The CUT is direct in the folder (with package structure)
-     *         <ClassName>.java
-     *         <ClassName>.class
-     *         <ClassName>$<InnerClassName>.class
-     *       dependencies/
-     *         <PackageStructure>/               <- Dependencies of the CUT (like other source files) are in the 'dependencies' subdirectory
+     *       sources/                          <- Contains the CuT and dependency source and class files.
+     *         <PackageStructure>/
+     *           <ClassName>.java
+     *           <ClassName>.class
+     *           <ClassName>$<InnerClassName>.class
      *           <DependencyClassName>.java
      *           <DependencyClassName>.class
      *           <DependencyClassName>$<InnerClassName>.class
+     *         tests/                          <- Contains the test files that were uploaded when creating the class
+     *         mutants/                        <- Contains the mutant files that were uploaded when creating the class
      *   mutants/
      *     mp/
      *       <GameId>/
@@ -104,8 +104,6 @@ public class FileUtils {
      *                 Test<ClassName>.class
      *                 jacoco.exec
      *
-     * Notes: We split the CUT and it's dependencies in separate directories, so one can swap the CUT
-     * with a mutant.
      * Normal classpath: <data dir>/sources/<ClassAlias>:<data dir>/sources/<ClassAlias>/dependencies
      * Mutant classpath: <data dir>/
      */
@@ -305,6 +303,48 @@ public class FileUtils {
     }
 
     /**
+     * Copies a file tree from a source to a target directory.
+     * Replaces existing files, but not directories with the same name.
+     */
+    public static void copyFileTree(Path source, Path target) throws IOException {
+        try (Stream<Path> paths = Files.walk(source)) {
+            paths.forEach(sourcePath -> {
+                try {
+                    Path targetPath = target.resolve(source.relativize(sourcePath));
+                    if (Files.isDirectory(sourcePath)) {
+                        if (!Files.exists(targetPath)) {
+                            Files.copy(sourcePath, targetPath);
+                        }
+                    } else {
+                        Files.copy(sourcePath, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
+
+    /**
+     * Returns the paths of all files of a given file extension in a directory and its subdirectories.
+     */
+    public static List<Path> getAllFilesOfTypeInDirectory(Path directory, String extension) {
+        List<Path> files = new ArrayList<>();
+        try (Stream<Path> paths = Files.walk(directory)) {
+            paths.filter(Files::isRegularFile)
+                    .forEach((f) -> {
+                        if (f.toString().endsWith(extension)) {
+                            files.add(f);
+                        }
+                    });
+        } catch (IOException e) {
+            logger.error("Error reading files from directory.", e);
+            throw new RuntimeException(e);
+        }
+        return files;
+    }
+
+    /**
      * Uses nextFreeName to choose a non-existing filename within a directory.
      *
      * <p>In comparison to {@link FileUtils#getNextSubDir(Path)}, this method sidesteps collisions less effectively,
@@ -433,8 +473,8 @@ public class FileUtils {
      * @return The package name as declared in the file, e.g. {@code org.codedefenders.util}. Return value is empty if
      * the file does not contain a package declaration.
      * @throws IllegalArgumentException Thrown if the file cannot be parsed. Note: Right now even many java files that
-     * can not be compiled will return "" rather than throw this exception, so a return value of "" does not
-     * indicate that the file is valid.
+     *                                  can not be compiled will return "" rather than throw this exception, so a return value of "" does not
+     *                                  indicate that the file is valid.
      */
     public static String getPackageNameFromJavaFile(String dependencyFileContent) throws IllegalArgumentException {
         return JavaParserUtils.parse(dependencyFileContent)
@@ -464,5 +504,71 @@ public class FileUtils {
             path = path.resolve(directory.trim());
         }
         return path;
+    }
+
+    /**
+     * Returns the "top-level" directory for an uploaded CuT with dependencies,
+     * i.e. the directory below the "sources" directory.
+     *
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
+        if (!javaFilePath.startsWith(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is not inside the sources directory.");
+
+        }
+        Path relativePath = sourcesDir.relativize(javaFilePath);
+        return sourcesDir.resolve(relativePath.getName(0));
+    }
+
+    /**
+     * Returns the directory below the "top-level" directory as defined in
+     * {@link #getTopLevelDirectoryFromJavaFile(Path)}, for example "sources" or "mutants", that is still an ancestor
+     * of the given file.
+     *
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getMidLevelDirectoryFromJavaFile(Path javaFilePath) {
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
+        if (!javaFilePath.startsWith(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is not inside the sources directory.");
+
+        }
+        if (javaFilePath.equals(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is the sources directory itself.");
+        }
+        Path relativePath = sourcesDir.relativize(javaFilePath);
+        return sourcesDir.resolve(relativePath.subpath(0, 2));
+    }
+
+    /**
+     * Deletes all empty subdirectories of a given directory, recursively.
+     *
+     * @param root The directory to start the deletion from. If it is empty, it will also be deleted.
+     */
+    public static void deleteEmptySubdirectories(File root) throws IOException {
+
+        try (Stream<Path> paths = Files.walk(root.toPath())) {
+            paths.filter(Files::isDirectory)
+                    .forEach(path -> {
+                        Collection<File> descendents =
+                                org.apache.commons.io.FileUtils.listFiles(path.toFile(), null, true);
+                        if (descendents.isEmpty()) {
+                            try {
+                                org.apache.commons.io.FileUtils.deleteDirectory(path.toFile());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+        }
+    }
+
+    public static String getFileSeparator() {
+        return File.separator;
     }
 }

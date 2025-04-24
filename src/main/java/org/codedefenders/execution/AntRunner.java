@@ -21,6 +21,7 @@ package org.codedefenders.execution;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -45,13 +46,13 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
 
 import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.JACOCO_CLASSPATH;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
@@ -318,7 +319,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         ProcessBuilder pb = new ProcessBuilder();
         Map<String, String> env = pb.environment();
         List<String> command = new ArrayList<>();
-        String cutDir = Paths.get(cut.getJavaFile()).getParent().toString();
+
+        //This is the directory directly below "sources"
+        Path topDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
+                Paths.get(cut.getJavaFile()));
+        Path cutDir = topDir.resolve(Constants.CUTS_CLASSES_DIR);
 
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
@@ -372,7 +377,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dtest.file=" + testDir);
         command.add("-Dcut.dir=" + cutDir);
         command.add("-DtestClassname=" + testClassName);
-        command.add("-Dcuts.deps=" + Paths.get(cutDir, CUTS_DEPENDENCY_DIR));
 
         command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
         command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);
