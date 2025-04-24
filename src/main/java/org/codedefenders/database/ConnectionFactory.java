@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codedefenders.database;
 
 import java.sql.Connection;

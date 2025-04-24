@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2016-2025 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
 <%--
     @param String notification-ticket (TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)
         The ticket used for the WebSocket connection.
