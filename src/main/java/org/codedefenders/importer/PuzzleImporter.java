@@ -327,9 +327,8 @@ public class PuzzleImporter {
 
             for (JavaFileObject depFile : dependencyFiles) {
                 String javaFilePath = depFile.getPath();
-                String classFilePath = javaFilePath.replace(".java", ".class");
 
-                Dependency dependency = new Dependency(cut.getId(), javaFilePath, classFilePath);
+                Dependency dependency = new Dependency(cut.getId(), javaFilePath);
                 int id = DependencyDAO.storeDependency(dependency);
                 dependency.setId(id);
 

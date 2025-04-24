@@ -97,7 +97,7 @@ public class DatabaseValueTest {
     @Test
     public void testWrongDatabaseValueType() {
         assertThrows(IllegalArgumentException.class, () -> {
-            final Dependency value = new Dependency(1, 1, "", "");
+            final Dependency value = new Dependency(1, 1, "");
             try {
                 // Disable inspection because the type parameter information of 'DatabaseValue' is not retained at runtime,
                 // and so can't be used with reflection

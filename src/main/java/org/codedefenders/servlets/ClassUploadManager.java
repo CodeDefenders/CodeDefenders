@@ -382,7 +382,7 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         final String cutClassFilePath;
-        final List<JavaFileReferences> dependencyReferences = new LinkedList<>();
+        final List<String> dependencyJavaPaths = new LinkedList<>();
         if (!withDependencies) {
             try {
                 cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
@@ -458,9 +458,7 @@ public class ClassUploadManager extends HttpServlet {
                     }
                     depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
                             .toString();
-                    final String depClassFilePath = classesDir.resolve(dependencyFileName
-                            .replace(".java", ".class")).toString();
-                    dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
+                    dependencyJavaPaths.add(depJavaFilePath);
                 } catch (IOException e) {
                     logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -523,10 +521,10 @@ public class ClassUploadManager extends HttpServlet {
         compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId));
 
         if (withDependencies) {
-            for (JavaFileReferences dep : dependencyReferences) {
+            for (String dep : dependencyJavaPaths) {
                 final int depId;
                 try {
-                    depId = DependencyDAO.storeDependency(new Dependency(cutId, dep.javaFile, dep.classFile));
+                    depId = DependencyDAO.storeDependency(new Dependency(cutId, dep));
                 } catch (Exception e) {
                     logger.error("Class upload failed. Could not store dependency class to database.");
                     messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -980,20 +978,6 @@ public class ClassUploadManager extends HttpServlet {
         SimpleFile(String fileName, byte[] fileContent) {
             this.fileName = fileName;
             this.fileContent = fileContent;
-        }
-    }
-
-    /**
-     * Container for paths to {@code .java} and {@code .class}
-     * files of a java class.
-     */
-    private static class JavaFileReferences {
-        private String javaFile;
-        private String classFile;
-
-        JavaFileReferences(String javaFile, String classFile) {
-            this.javaFile = javaFile;
-            this.classFile = classFile;
         }
     }
 
