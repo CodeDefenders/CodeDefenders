@@ -17,6 +17,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameProducer;
@@ -41,6 +42,9 @@ public class InvitePage extends HttpServlet {
     private PlayerRepository playerRepo;
 
     @Inject
+    private GameRepository gameRepository;
+
+    @Inject
     private URLUtils url;
 
     @Inject
@@ -52,7 +56,20 @@ public class InvitePage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         logger.info("Invite page requested");
-        AbstractGame game = gameProducer.getGame();
+        AbstractGame game;
+
+        String inviteId = req.getParameter("inviteId");
+        if (inviteId == null) {
+            game = gameProducer.getGame();
+        } else {
+            try {
+                game = gameRepository.getGameForInviteId(Integer.parseInt(inviteId));
+            } catch (NumberFormatException e) {
+                logger.warn("Invalid invite ID: {}", inviteId);
+                messages.add("Your link is malformed, you could not join the game.").fadeOut(false);
+                return;
+            }
+        }
 
         String roleParameter = req.getParameter("role");
         if (roleParameter != null && !roleParameter.equals("attacker") && !roleParameter.equals("defender")) {

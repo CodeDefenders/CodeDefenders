@@ -271,4 +271,21 @@ public class GameRepository {
 
         return queryRunner.insert(query, generatedKeyFromRS(), gameId).orElseThrow();
     }
+
+    /**
+     * Retrieves the game for a given invitation link ID.
+     *
+     * @param inviteId The invitation link ID.
+     * @return The game ID or null if no game found.
+     */
+    public AbstractGame getGameForInviteId(int inviteId) {
+        @Language("SQL") String query = """
+                SELECT game_id
+                FROM invitation_links
+                WHERE invitation_id = ?
+        """;
+        //TODO This could be improved by using a join
+        int gameId = queryRunner.query(query, oneFromRS(rs -> rs.getInt("game_id")), inviteId).orElseThrow();
+        return getGame(gameId);
+    }
 }
