@@ -361,7 +361,7 @@ public class ClassUploadManager extends HttpServlet {
             } catch (IOException e) {
                 logger.error("Could not delete '" + topDir + "'. Please remove the file/directory manually and try again.");
                 messages.add("Class upload failed due to a file error. Please contact an admin and show them this message. Or try a different class alias.")
-                        .alert(true);
+                        .alert();
                 abortRequestAndCleanUp(request, response);
                 return;
             }

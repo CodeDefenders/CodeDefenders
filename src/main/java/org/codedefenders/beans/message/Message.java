@@ -107,8 +107,8 @@ public class Message implements Serializable {
 
     /* Builder-style setter methods. */
 
-    public Message alert(boolean alert) {
-        this.alert = alert;
+    public Message alert() {
+        this.alert = true;
         return this;
     }
 

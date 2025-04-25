@@ -94,8 +94,10 @@ public class MessagesBean implements Serializable {
         Message message = new Message(
                 msg.getText(),
                 currentId++)
-                .alert(msg.isAlert())
                 .escape(msg.isEscape());
+        if (msg.isAlert()) {
+            message.alert();
+        }
         messages.add(message);
         return message;
     }

@@ -382,17 +382,17 @@ public class MultiplayerGameManager extends HttpServlet {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {
                         for (var error : errors) {
-                            messages.add(error).alert(true);
+                            messages.add(error).alert();
                         }
                     });
                 }
                 case COMPILATION_FAILED -> {
-                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert(true);
+                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case TEST_DID_NOT_PASS_ON_CUT -> {
-                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert(true);
-                    result.testCutError().ifPresent(error -> messages.add(error).alert(true));
+                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+                    result.testCutError().ifPresent(error -> messages.add(error).alert());
                 }
             }
 
@@ -418,7 +418,7 @@ public class MultiplayerGameManager extends HttpServlet {
         previousSubmission.setErrorLines(errorLines);
         // We introduce our decoration
         String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-        messages.add(decorate).escape(false).alert(true);
+        messages.add(decorate).escape(false).alert();
     }
 
     private void createMutant(HttpServletRequest request,
@@ -498,14 +498,14 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert(true));
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case COMPILATION_FAILED -> {
-                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert(true);
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
             }
@@ -620,17 +620,17 @@ public class MultiplayerGameManager extends HttpServlet {
                     case VALIDATION_FAILED -> {
                         result.validationErrorMessages().ifPresent(errors -> {
                             for (var error : errors) {
-                                messages.add(error).alert(true);
+                                messages.add(error).alert();
                             }
                         });
                     }
                     case COMPILATION_FAILED -> {
-                        messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert(true);
+                        messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
                         result.compilationError().ifPresent(this::handleCompilationError);
                     }
                     case TEST_DID_NOT_PASS_ON_CUT -> {
-                        messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert(true);
-                        result.testCutError().ifPresent(error -> messages.add(error).alert(true));
+                        messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+                        result.testCutError().ifPresent(error -> messages.add(error).alert());
                     }
                 }
             }

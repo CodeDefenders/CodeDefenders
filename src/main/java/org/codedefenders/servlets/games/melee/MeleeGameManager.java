@@ -487,7 +487,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert(true);
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
             // We escape the content of the message for new tests since user can embed there
             // anything
             String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
@@ -497,7 +497,7 @@ public class MeleeGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate).escape(false).alert(true);
+            messages.add(decorate).escape(false).alert();
 
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
@@ -865,7 +865,7 @@ public class MeleeGameManager extends HttpServlet {
 
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
-                messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert(true);
+                messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
 
                 if (compileTestTarget != null) {
                     String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
@@ -875,7 +875,7 @@ public class MeleeGameManager extends HttpServlet {
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
                     String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
-                    messages.add(decorate).escape(false).alert(true);
+                    messages.add(decorate).escape(false).alert();
                 }
 
                 previousSubmission.setTestCode(testText);
@@ -888,8 +888,8 @@ public class MeleeGameManager extends HttpServlet {
                 // (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) ||
                 // testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
-                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert(true);
-                messages.add(testOriginalTarget.message).alert(true);
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+                messages.add(testOriginalTarget.message).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
