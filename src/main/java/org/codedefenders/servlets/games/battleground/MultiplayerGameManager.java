@@ -505,8 +505,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case COMPILATION_FAILED -> {
-                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE, "FAILURE").alert(true)
-                            .setSecondary("Could not compile");//TODO Just for demo purposes, remove before final merge
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert(true);
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
             }
