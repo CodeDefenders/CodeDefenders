@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2016-2025 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
 <div class="d-flex mb-3">
     <h2 class="w-50 text-center fg-attacker">Attackers</h2>
     <h2 class="w-50 text-center fg-defender">Defenders</h2>

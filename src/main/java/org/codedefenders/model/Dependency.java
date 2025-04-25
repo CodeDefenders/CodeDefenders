@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -31,19 +31,16 @@ public class Dependency {
     private int id;
     private int classId;
     private String javaFile;
-    private String classFile;
 
-    public Dependency(int id, int classId, String javaFile, String classFile) {
+    public Dependency(int id, int classId, String javaFile) {
         this.id = id;
         this.classId = classId;
         this.javaFile = javaFile;
-        this.classFile = classFile;
     }
 
-    public Dependency(int classId, String javaFile, String classFile) {
+    public Dependency(int classId, String javaFile) {
         this.classId = classId;
         this.javaFile = javaFile;
-        this.classFile = classFile;
     }
 
     public int getId() {
@@ -56,10 +53,6 @@ public class Dependency {
 
     public String getJavaFile() {
         return javaFile;
-    }
-
-    public String getClassFile() {
-        return classFile;
     }
 
     public void setId(int id) {

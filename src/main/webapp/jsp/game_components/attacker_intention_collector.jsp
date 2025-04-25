@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2016-2025 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,8 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-
 <script type="module">
     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {AttackerIntentionCollection} from '${url.forPath("/js/codedefenders_game.mjs")}';

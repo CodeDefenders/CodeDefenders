@@ -353,14 +353,22 @@
 				</executions>
 			</plugin>
 
-			<!--
-			Plugins without any configured <executions>
-			-->
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 
+			<!--
+			Plugins without any configured <executions>
+			-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -374,44 +382,32 @@
 
 		<pluginManagement>
 			<plugins>
-				<!-- TODO: Investigate switching to artifact by org.codehaus.mojo-->
 				<plugin>
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>3.0</version>
+					<version>5.0.0</version>
 					<configuration>
-						<header>src/etc/header.txt</header>
-						<useDefaultExcludes>true</useDefaultExcludes>
 						<mapping>
 							<java>SLASHSTAR_STYLE</java>
+							<tag>DYNASCRIPT_STYLE</tag>
 						</mapping>
-						<properties>
-							<year>2016-2019</year>
-						</properties>
-						<excludes>
-							<exclude>LICENSE.txt</exclude>
-							<exclude>README.md</exclude>
-							<exclude>**/.idea/**</exclude>
-							<exclude>**/*.js</exclude>
-							<exclude>**/*.css</exclude>
-							<exclude>**/*.txt</exclude>
-							<exclude>**/*.ts</exclude>
-							<exclude>**/*.</exclude>
-							<exclude>**/*.html</exclude>
-							<exclude>**/*.sql</exclude>
-							<exclude>**/*.xml</exclude>
-							<exclude>docker/**</exclude>
-							<exclude>config.properties</exclude>
-							<exclude>src/test/resources/**</exclude>
-							<exclude>installation/puzzles/**</exclude>
-							<exclude>local-repo/**</exclude>
-							<exclude>.editorconfig</exclude>
-							<exclude>.gitlab-ci.yml</exclude>
-							<exclude>makefile</exclude>
-							<exclude>.gitattributes</exclude>
-							<exclude>src/main/resources/codemirror/**</exclude>
-							<exclude>src/main/resources/js/libs/**</exclude>
-						</excludes>
+						<licenseSets>
+							<licenseSet>
+								<header>src/etc/header.txt</header>
+								<useDefaultExcludes>true</useDefaultExcludes>
+								<properties>
+									<year>2016-2025</year>
+								</properties>
+								<includes>
+									<include>src/**</include>
+								</includes>
+								<excludes>
+									<exclude>src/etc/**</exclude>
+									<exclude>**/resources/**</exclude>
+									<exclude>**/WEB-INF/data/**</exclude>
+								</excludes>
+							</licenseSet>
+						</licenseSets>
 					</configuration>
 				</plugin>
 
