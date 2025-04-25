@@ -23,7 +23,8 @@ import java.io.Serializable;
 import org.apache.commons.text.StringEscapeUtils;
 
 /**
- * Represents a message shown on to a user on page load.
+ * Represents a message shown on to a user on page load. By default, the message is HTML-escaped and fades out after a
+ * few seconds, this can be changed by using the builder-style setter methods.
  */
 public class Message implements Serializable {
     private long id;
@@ -99,7 +100,7 @@ public class Message implements Serializable {
 
     /**
      * Returns if the message should fade out or stay on screen.
-     * @return If the message should fade out or stay on screen.
+     * @return If true, the message will stay on the screen.
      */
     public boolean isAlert() {
         return alert;
