@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -573,7 +573,8 @@ public class MultiplayerGameManager extends HttpServlet {
         if ("accept".equals(resolveAction)) {
             var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
             if (result.mutantKillable()) {
-                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " " + "However, the mutant was killable!");
+                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " " +
+                        "However, the mutant was killable! You can view an example for a killing test in the mutant accordion.");
             } else {
                 messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
             }

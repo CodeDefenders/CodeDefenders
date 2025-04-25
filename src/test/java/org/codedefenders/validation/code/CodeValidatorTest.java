@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019,2022 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *

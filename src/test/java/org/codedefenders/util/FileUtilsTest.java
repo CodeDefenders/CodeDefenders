@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -352,5 +352,62 @@ public class FileUtilsTest {
                         }
                         """;
         assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
+    }
+
+    @Test
+    public void testGetAllFilesFromTypeInDirectory() throws IOException {
+        Path dir = Files.createTempDirectory("codedefenders-testdir-");
+        Path dir2 = dir.resolve("dir2");
+        Path dir3 = dir2.resolve("dir3");
+        Files.createDirectories(dir2);
+        Files.createDirectories(dir3);
+        Path java1 = dir.resolve("test1.java");
+        Path java2 = dir2.resolve("test2.java");
+        Path java3 = dir3.resolve("test3.java");
+
+        Path class1 = dir.resolve("test1.class");
+        Path class2 = dir2.resolve("test2.class");
+        Path class3 = dir3.resolve("test3.class");
+
+        Files.createFile(java1);
+        Files.createFile(java2);
+        Files.createFile(java3);
+        Files.createFile(class1);
+        Files.createFile(class2);
+        Files.createFile(class3);
+        List<Path> javaFiles = FileUtils.getAllFilesOfTypeInDirectory(dir, ".java");
+
+        assertTrue(javaFiles.contains(java1));
+        assertTrue(javaFiles.contains(java2));
+        assertTrue(javaFiles.contains(java3));
+        assertEquals(3, javaFiles.size());
+
+    }
+
+    @Test
+    public void testDeleteEmptySubdirectories() throws IOException {
+        Path root = Files.createTempDirectory("codedefenders-testdir-");
+        Path tree1 = root.resolve("tree1"); //not empty
+        Path tree2 = tree1.resolve("tree2"); //empty
+        Path tree3 = tree2.resolve("tree3"); //empty
+        Path subDir2 = root.resolve("subDir2"); //Not empty
+        Path subDir3 = tree2.resolve("subDir3"); //empty
+
+        Files.createDirectories(tree3);
+        Files.createDirectories(subDir2);
+        Files.createDirectories(subDir3);
+
+        Path file1 = Files.createFile(tree1.resolve("file1.txt"));
+        Path file2 = Files.createFile(subDir2.resolve("file2.txt"));
+
+        FileUtils.deleteEmptySubdirectories(root.toFile());
+        assertTrue(Files.exists(tree1));
+        assertTrue(Files.exists(subDir2));
+        assertTrue(Files.exists(file1));
+        assertTrue(Files.exists(file2));
+
+        assertFalse(Files.exists(tree2));
+        assertFalse(Files.exists(tree3));
+        assertFalse(Files.exists(subDir3));
     }
 }

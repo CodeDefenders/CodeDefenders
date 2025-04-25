@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codedefenders.service.game;
 
 import java.util.ArrayList;
@@ -208,9 +207,19 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     protected TestDTO convertTest(Test test, SimpleUser user, Player player, AbstractGame game) {
-        Role playerRole = determineRole(user, player, game);
+        boolean viewable;
 
-        boolean viewable = canViewTest(test, game, player, playerRole);
+        if (player != null) {
+            Role playerRole = determineRole(user, player, game);
+            viewable = canViewTest(test, game, player, playerRole);
+        } else {
+            // The current user is probably not in the same game where the test was created, causing player to be null.
+
+            // Unfortunately, we don't know the gameID of the game the user is currently playing/requesting the killing
+            // test for, so it is viewable if the test is an external killing test for anyone of the player's mutants.
+
+            viewable = testRepo.isExternalKillingTestOfAPlayersEquivalentMutant(test.getId(), user.getId());
+        }
 
         SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId()).orElse(null);
 

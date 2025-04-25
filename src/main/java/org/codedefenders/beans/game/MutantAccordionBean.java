@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
@@ -17,9 +35,12 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
@@ -46,12 +67,43 @@ public class MutantAccordionBean {
 
 
     @Inject
-    public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer) {
+    public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer,
+                               TestRepository testRepo, UserService userService) {
         var game = gameProducer.getGame();
         if (game != null) {
             var mutantList = gameService.getMutants(login.getUserId(), game.getId());
+            if (!(game instanceof PuzzleGame)) {
+                mutantList = addExternalKillingTests(testRepo, userService, mutantList);
+            }
             init(game.getCUT(), mutantList, game.getId());
         }
+    }
+
+    private List<MutantDTO> addExternalKillingTests(TestRepository testRepo, UserService userService,
+                                                    List<MutantDTO> mutantList) {
+        List<MutantDTO> newList = new ArrayList<>(mutantList.size());
+
+        for (MutantDTO mutant : mutantList) {
+            if (mutant.getState() == Mutant.State.EQUIVALENT) {
+                var testExecOpt = testRepo.getExternalKillingTestExecutionForMutant(mutant.getId());
+                if (testExecOpt.isPresent()) {
+                    var testExec = testExecOpt.get();
+                    var externalKillingTest = testRepo.getTestById(testExec.testId);
+                    var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
+
+                    newList.add(mutant.copyWithKillingTest(
+                            testExec.testId,
+                            killingTestCreator.orElseThrow(),
+                            testExec.message
+                    ));
+                    continue;
+                }
+            }
+
+            newList.add(mutant);
+        }
+
+        return newList;
     }
 
     public void init(GameClass cut, List<MutantDTO> mutantList, Integer gameId) {

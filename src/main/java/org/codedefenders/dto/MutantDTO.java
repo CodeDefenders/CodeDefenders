@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codedefenders.dto;
 
 import java.util.Collections;
@@ -161,6 +160,27 @@ public class MutantDTO {
 
     public String getDescription() {
         return description;
+    }
+
+    public MutantDTO copyWithKillingTest(int killedByTestId, SimpleUser killedByUser, String killMessage) {
+        return new MutantDTO(
+                id,
+                creator,
+                state,
+                points,
+                description,
+                lineString,
+                covered,
+                canView,
+                canMarkEquivalent,
+                killedByUser,
+                killedByTestId,
+                killMessage,
+                gameId,
+                playerId,
+                lines,
+                patchString
+        );
     }
 
 
