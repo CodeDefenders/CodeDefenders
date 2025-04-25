@@ -1,6 +1,5 @@
-package org.codedefenders.servlets.registration;
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -17,6 +16,7 @@ package org.codedefenders.servlets.registration;
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+package org.codedefenders.servlets.registration;
 
 import java.io.IOException;
 import java.security.SecureRandom;

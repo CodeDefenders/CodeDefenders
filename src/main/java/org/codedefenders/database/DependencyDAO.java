@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -48,10 +48,8 @@ public class DependencyDAO {
     public static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
         final int id = rs.getInt("Dependency_ID");
         final String javaFile = rs.getString("JavaFile");
-        final String classFile = rs.getString("ClassFile");
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
-        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
-        return new Dependency(id, classId, absoluteJavaFile, absoluteClassFile);
+        return new Dependency(id, classId, absoluteJavaFile);
     }
 
     /**
@@ -64,13 +62,11 @@ public class DependencyDAO {
     public static int storeDependency(Dependency dependency) {
         int classId = dependency.getClassId();
         String relativeJavaFile = FileUtils.getRelativeDataPath(dependency.getJavaFile()).toString();
-        String relativeClassFile = FileUtils.getRelativeDataPath(dependency.getClassFile()).toString();
 
-        @Language("SQL") String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
+        @Language("SQL") String query = "INSERT INTO dependencies (Class_ID, JavaFile) VALUES (?, ?);";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
-                DatabaseValue.of(relativeJavaFile),
-                DatabaseValue.of(relativeClassFile)
+                DatabaseValue.of(relativeJavaFile)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

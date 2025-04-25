@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +49,6 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -72,7 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Streams;
 
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.FileUtils.nextFreeNumberPath;
 
 
@@ -252,7 +249,7 @@ public class PuzzleImporter {
         // Working data
         private PuzzleProperties properties;
         private List<JavaFileObject> dependencyFiles;
-        private Path cutDir;
+        private Path topDir; //The directory right below "sources"
         private GameClass cut;
         private List<Dependency> dependencies;
         private List<Mutant> mutants;
@@ -266,7 +263,7 @@ public class PuzzleImporter {
         public void install() throws CompileException, IOException, CoverageGenerator.CoverageGeneratorException,
                 BackendExecutorService.ExecutionException {
             String cutName = FilenameUtils.removeExtension(puzzleData.cut.getFilename());
-            cutDir = FileUtils.nextFreeClassDirectory(cutName);
+            topDir = FileUtils.nextFreeClassDirectory(cutName);
 
             readPuzzleProperties();
             installCUT();
@@ -280,8 +277,9 @@ public class PuzzleImporter {
             String alias = gameClassRepo.nextFreeAlias(cutName);
 
             // Store cut file.
-            Path cutPath = FileUtils.storeFile(cutDir,puzzleData.cut.getFilename(),
-                    puzzleData.cut.getContentAsString());
+            Path packageStructure = FileUtils.getPackagePathFromJavaFile(puzzleData.cut.getContentAsString());
+            Path cutPath = FileUtils.storeFile(topDir.resolve(Constants.CUTS_CLASSES_DIR).resolve(packageStructure),
+                    puzzleData.cut.getFilename(), puzzleData.cut.getContentAsString());
 
             // Store dependencies files.
             storeDependenciesSources();
@@ -312,15 +310,13 @@ public class PuzzleImporter {
         }
 
         private void storeDependenciesSources() throws IOException {
-            Path storagePath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
+            Path storagePath = topDir.resolve(Constants.CUTS_CLASSES_DIR);
             dependencyFiles = new ArrayList<>();
 
             for (SimpleFile depFile : puzzleData.deps) {
                 String fileContent = depFile.getContentAsString();
-                Path internalPath = depFile.getPath().getParent();
-                Path fullStoragePath = internalPath != null
-                        ? storagePath.resolve(internalPath)
-                        : storagePath;
+                Path internalPath = FileUtils.getPackagePathFromJavaFile(fileContent);
+                Path fullStoragePath = storagePath.resolve(internalPath);
                 Path depPath = FileUtils.storeFile(fullStoragePath, depFile.getFilename(), fileContent);
                 dependencyFiles.add(new JavaFileObject(depPath.toString(), fileContent));
             }
@@ -331,9 +327,8 @@ public class PuzzleImporter {
 
             for (JavaFileObject depFile : dependencyFiles) {
                 String javaFilePath = depFile.getPath();
-                String classFilePath = javaFilePath.replace(".java", ".class");
 
-                Dependency dependency = new Dependency(cut.getId(), javaFilePath, classFilePath);
+                Dependency dependency = new Dependency(cut.getId(), javaFilePath);
                 int id = DependencyDAO.storeDependency(dependency);
                 dependency.setId(id);
 
@@ -352,7 +347,7 @@ public class PuzzleImporter {
 
             for (SimpleFile mutantFile : mutantsQueue) {
                 // Create the mutants directory if it doesn't exist.
-                Path mutantsListDir = cutDir.resolve(Constants.CUTS_MUTANTS_DIR);
+                Path mutantsListDir = topDir.resolve(Constants.CUTS_MUTANTS_DIR);
                 if (!Files.exists(mutantsListDir)) {
                     Files.createDirectories(mutantsListDir);
                 }
@@ -387,7 +382,7 @@ public class PuzzleImporter {
 
             for (SimpleFile testFile : puzzleData.tests) {
                 // Create the tests directory if it doesn't exist.
-                Path testsPath = cutDir.resolve(Constants.CUTS_TESTS_DIR);
+                Path testsPath = topDir.resolve(Constants.CUTS_TESTS_DIR);
                 if (!Files.exists(testsPath)) {
                     Files.createDirectories(testsPath);
                 }
@@ -450,7 +445,7 @@ public class PuzzleImporter {
 
         private void installPuzzle() throws IOException {
             // Store the properties file.
-            FileUtils.storeFile(cutDir, puzzleData.properties.getFilename(),
+            FileUtils.storeFile(topDir, puzzleData.properties.getFilename(),
                     puzzleData.properties.getContentAsString());
 
             // Default values
