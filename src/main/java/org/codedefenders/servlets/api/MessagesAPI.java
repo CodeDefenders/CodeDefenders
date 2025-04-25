@@ -29,19 +29,19 @@ public class MessagesAPI extends HttpServlet {
         logger.debug("GET request to MessagesAPI");
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        String fadeoutMessages = getFadeoutMessagesAsJSON();
+        String notificationMessages = getNotificationMessages();
         response.setStatus(HttpServletResponse.SC_OK);
-        out.print(fadeoutMessages);
+        out.print(notificationMessages);
         out.flush();
     }
 
-    private String getFadeoutMessagesAsJSON() {
+    private String getNotificationMessages() {
         List<Message> messagesList = messagesBean.getMessages();
         Gson gson = new Gson();
-        List<Message> fadeoutMessages = messagesList.stream()
-                .filter(Message::isFadeOut)
+        List<Message> notificationMessages = messagesList.stream()
+                .filter(message -> !message.isAlert())
                 .toList();
         messagesBean.clear();
-        return gson.toJson(fadeoutMessages);
+        return gson.toJson(notificationMessages);
     }
 }

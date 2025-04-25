@@ -8,7 +8,7 @@
 <div id="toasts" class="position-fixed top-0 end-0 p-3 d-flex flex-column gap-1" style="z-index: 11"></div>
 <c:if test="${messages.count > 0}">
     <div class="mx-3" id="messages">
-        <c:forEach items="${messages.getFadeOutMessages(false)}" var="message">
+        <c:forEach items="${messages.getAlertMessages(true)}" var="message">
             <div id="message-${message.id}" class="alert alert-primary alert-dismissible fade show" role="alert">
                     <%-- Don't escape text here; message.getText() already escapes the text. --%>
                 <c:if test="${message.title != '' && message.secondary != ''}">

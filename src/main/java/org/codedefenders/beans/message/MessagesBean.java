@@ -36,9 +36,9 @@ public class MessagesBean implements Serializable {
 
     }
 
-    public synchronized List<Message> getFadeOutMessages(boolean fadeOut) {
+    public synchronized List<Message> getAlertMessages(boolean alert) {
         return messages.stream()
-                .filter(msg -> msg.isFadeOut() == fadeOut)
+                .filter(msg -> msg.isAlert() == alert)
                 .toList();
     }
 
@@ -76,7 +76,7 @@ public class MessagesBean implements Serializable {
         Message message = new Message(
                 msg.getText(),
                 currentId++)
-                .fadeOut(msg.isFadeOut())
+                .alert(msg.isAlert())
                 .escape(msg.isEscape());
         messages.add(message);
         return message;

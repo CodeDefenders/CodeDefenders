@@ -10,7 +10,7 @@ import org.apache.commons.text.StringEscapeUtils;
 public class Message implements Serializable {
     private long id;
     private String text;
-    private boolean fadeOut;
+    private boolean alert;
     private boolean escape;
     private String title;
     private String secondary;
@@ -23,7 +23,7 @@ public class Message implements Serializable {
     public Message(String text, long id) {
         this.id = id;
         this.text = text;
-        this.fadeOut = true;
+        this.alert = false;
         this.escape = true;
         this.title = "";
         this.secondary = "";
@@ -83,14 +83,14 @@ public class Message implements Serializable {
      * Returns if the message should fade out or stay on screen.
      * @return If the message should fade out or stay on screen.
      */
-    public boolean isFadeOut() {
-        return fadeOut;
+    public boolean isAlert() {
+        return alert;
     }
 
     /* Builder-style setter methods. */
 
-    public Message fadeOut(boolean fadeOut) {
-        this.fadeOut = fadeOut;
+    public Message alert(boolean alert) {
+        this.alert = alert;
         return this;
     }
 
