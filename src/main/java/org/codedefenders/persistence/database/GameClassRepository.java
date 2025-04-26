@@ -321,7 +321,7 @@ public class GameClassRepository {
                 FROM dependencies WHERE Class_ID = ?;
         """;
         return queryRunner.query(query,
-                listFromRS(rs -> DependencyDAO.dependencyFromRS(rs, classId)),
+                listFromRS(DependencyDAO::dependencyFromRS),
                 classId);
     }
 
