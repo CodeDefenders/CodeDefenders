@@ -351,7 +351,8 @@ public class MultiplayerGameRepository {
                                FROM view_valid_users creators
                                WHERE g.Creator_ID = creators.User_ID) AS creatorName
                         FROM view_battleground_games AS g,
-                            view_valid_users u
+                            view_valid_users u,
+                            whitelist
                         WHERE u.User_ID = ?
                           AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
                           AND g.Creator_ID != u.User_ID
@@ -360,7 +361,10 @@ public class MultiplayerGameRepository {
                             FROM games ig
                             INNER JOIN players p ON ig.ID = p.Game_ID
                             WHERE p.User_ID = u.User_ID
-                            AND p.Active = TRUE);
+                            AND p.Active = TRUE)
+                          AND ((NOT g.invite_only) OR u.User_ID IN
+                                      (SELECT user_id from whitelist
+                                       WHERE game_id = g.ID));
                 """;
 
         return queryRunner.query(query,
