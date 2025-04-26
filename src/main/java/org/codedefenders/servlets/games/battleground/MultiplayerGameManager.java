@@ -83,6 +83,7 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TITLE_SUCCESS;
 
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link MultiplayerGame battleground games}.
@@ -381,17 +382,17 @@ public class MultiplayerGameManager extends HttpServlet {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {
                         for (var error : errors) {
-                            messages.add(error).fadeOut(false);
+                            messages.add(error).alert();
                         }
                     });
                 }
                 case COMPILATION_FAILED -> {
-                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case TEST_DID_NOT_PASS_ON_CUT -> {
-                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-                    result.testCutError().ifPresent(error -> messages.add(error).fadeOut(false));
+                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+                    result.testCutError().ifPresent(error -> messages.add(error).alert());
                 }
             }
 
@@ -417,7 +418,7 @@ public class MultiplayerGameManager extends HttpServlet {
         previousSubmission.setErrorLines(errorLines);
         // We introduce our decoration
         String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-        messages.add(decorate).escape(false).fadeOut(false);
+        messages.add(decorate).escape(false).alert();
     }
 
     private void createMutant(HttpServletRequest request,
@@ -489,7 +490,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Clear the mutant code only if mutant is accepted
             previousSubmission.clear();
 
-            messages.add(MUTANT_COMPILED_MESSAGE);
+            messages.add(MUTANT_COMPILED_MESSAGE, TITLE_SUCCESS);
             result.mutationTesterMessage().ifPresent(messages::add);
             logger.info("Successfully created mutant {} ", mutant.getId());
 
@@ -497,14 +498,14 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).fadeOut(false));
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
                 case COMPILATION_FAILED -> {
-                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
                     result.compilationError().ifPresent(this::handleCompilationError);
                 }
             }
@@ -619,17 +620,17 @@ public class MultiplayerGameManager extends HttpServlet {
                     case VALIDATION_FAILED -> {
                         result.validationErrorMessages().ifPresent(errors -> {
                             for (var error : errors) {
-                                messages.add(error).fadeOut(false);
+                                messages.add(error).alert();
                             }
                         });
                     }
                     case COMPILATION_FAILED -> {
-                        messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+                        messages.add(TEST_DID_NOT_COMPILE_MESSAGE).alert();
                         result.compilationError().ifPresent(this::handleCompilationError);
                     }
                     case TEST_DID_NOT_PASS_ON_CUT -> {
-                        messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-                        result.testCutError().ifPresent(error -> messages.add(error).fadeOut(false));
+                        messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+                        result.testCutError().ifPresent(error -> messages.add(error).alert());
                     }
                 }
             }

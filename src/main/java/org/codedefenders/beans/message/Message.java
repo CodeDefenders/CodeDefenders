@@ -23,13 +23,16 @@ import java.io.Serializable;
 import org.apache.commons.text.StringEscapeUtils;
 
 /**
- * Represents a message shown on to a user on page load.
+ * Represents a message shown on to a user on page load. By default, the message is HTML-escaped and fades out after a
+ * few seconds, this can be changed by using the builder-style setter methods.
  */
 public class Message implements Serializable {
     private long id;
     private String text;
-    private boolean fadeOut;
+    private boolean alert;
     private boolean escape;
+    private String title;
+    private String secondary;
 
     /**
      * Constructs a new message with the given text. Use {@link MessagesBean#add(String)} instead of calling the
@@ -39,8 +42,10 @@ public class Message implements Serializable {
     public Message(String text, long id) {
         this.id = id;
         this.text = text;
-        this.fadeOut = true;
+        this.alert = false;
         this.escape = true;
+        this.title = "";
+        this.secondary = "";
     }
 
     /**
@@ -64,6 +69,28 @@ public class Message implements Serializable {
     }
 
     /**
+     * Returns the title, escaped if set to.
+     */
+    public String getTitle() {
+        if (isEscape()) {
+            return StringEscapeUtils.escapeHtml4(title);
+        } else {
+            return title;
+        }
+    }
+
+    /**
+     * Returns the secondary text, escaped if set to.
+     */
+    public String getSecondary() {
+        if (isEscape()) {
+            return StringEscapeUtils.escapeHtml4(secondary);
+        } else {
+            return secondary;
+        }
+    }
+
+    /**
      * Returns if the message should be HTML-escaped.
      * @return If the message should be HTML-escaped.
      */
@@ -73,21 +100,31 @@ public class Message implements Serializable {
 
     /**
      * Returns if the message should fade out or stay on screen.
-     * @return If the message should fade out or stay on screen.
+     * @return If true, the message will stay on the screen.
      */
-    public boolean isFadeOut() {
-        return fadeOut;
+    public boolean isAlert() {
+        return alert;
     }
 
     /* Builder-style setter methods. */
 
-    public Message fadeOut(boolean fadeOut) {
-        this.fadeOut = fadeOut;
+    public Message alert() {
+        this.alert = true;
         return this;
     }
 
     public Message escape(boolean escape) {
         this.escape = escape;
+        return this;
+    }
+
+    public Message setTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public Message setSecondary(String secondary) {
+        this.secondary = secondary;
         return this;
     }
 }
