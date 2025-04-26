@@ -54,6 +54,12 @@ public class MessagesBean implements Serializable {
 
     }
 
+    public synchronized List<Message> getAlertMessages(boolean alert) {
+        return messages.stream()
+                .filter(msg -> msg.isAlert() == alert)
+                .toList();
+    }
+
     /**
      * Returns the number of messages.
      * @return The number of messages.
@@ -74,6 +80,10 @@ public class MessagesBean implements Serializable {
         return message;
     }
 
+    public synchronized Message add(String text, String title) {
+        return add(text).setTitle(title);
+    }
+
     public void addAll(Collection<? extends String> texts) {
         for (String text : texts) {
             add(text);
@@ -84,8 +94,10 @@ public class MessagesBean implements Serializable {
         Message message = new Message(
                 msg.getText(),
                 currentId++)
-                .fadeOut(msg.isFadeOut())
                 .escape(msg.isEscape());
+        if (msg.isAlert()) {
+            message.alert();
+        }
         messages.add(message);
         return message;
     }

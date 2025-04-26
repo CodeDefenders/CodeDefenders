@@ -97,6 +97,7 @@ public class Paths {
     public static final String API_MUTANT = "/api/mutant";
     public static final String API_GAME_CHAT = "/api/game-chat";
     public static final String API_CLASSROOM = "/api/classroom";
+    public static final String API_MESSAGES = "/api/messages";
 
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";

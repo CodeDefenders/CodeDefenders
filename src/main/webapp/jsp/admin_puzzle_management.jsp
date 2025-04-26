@@ -72,7 +72,6 @@
                 </div>
             </div>
         </div>
-        <div id="toasts" class="position-fixed top-0 end-0 p-3 d-flex flex-column gap-1" style="z-index: 11"></div>
 
         <t:modal title="Unsaved changes" id="unsaved-changes-modal" closeButtonText="Cancel">
             <jsp:attribute name="content">
@@ -271,9 +270,9 @@
         </form>
 
         <script type="module">
-            import {Toast, Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
+            import {Modal as BootstrapModal} from '${url.forPath('/js/bootstrap.mjs')}';
             import {Sortable} from '${url.forPath('/js/sortablejs.mjs')}';
-            import {PuzzleAPI, Modal} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            import {PuzzleAPI, Modal, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const watermarkUrls = {
                 ATTACKER: '${url.forPath("/images/achievements/codedefenders_achievements_1_lvl_0.png")}',
@@ -583,32 +582,6 @@
                 return options;
             }
 
-            function showToast({colorClass = 'bg-primary', title = '', secondary = '', body = ''}) {
-                const toastElem = document.createElement('div');
-                toastElem.classList.add('toast', 'bg-white');
-                toastElem.role = 'alert';
-                toastElem.innerHTML = `
-                    <div class="toast-header">
-                        <div class="toast-color p-2 me-2 rounded-1"></div>
-                        <strong class="toast-title me-auto"></strong>
-                        <small class="toast-secondary text-body-secondary"></small>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body"></div>`;
-
-                toastElem.querySelector('.toast-color').classList.add(colorClass);
-                toastElem.querySelector('.toast-title').innerText = title;
-                toastElem.querySelector('.toast-secondary').innerText = secondary;
-                toastElem.querySelector('.toast-body').innerText = body;
-
-                document.getElementById('toasts').appendChild(toastElem);
-                new Toast(toastElem).show();
-
-                toastElem.addEventListener('hidden.bs.toast', () => {
-                    setTimeout(() => toastElem.remove(), 1000);
-                });
-            }
-
             /**
              * Gathers the positions of unassigned puzzles, archived puzzles and all puzzle chapters.
              */
@@ -805,9 +778,9 @@
                             chapter.description = response.chapter.description;
                             chapterComp.title.innerText = response.chapter.title;
                             chapterComp.description.innerText = response.chapter.description;
-                            showToast({title: 'Success', body: response.message});
+                            ShowToasts.showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
-                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -962,9 +935,9 @@
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
                             puzzle.isEquivalent = response.puzzle.isEquivalent;
                             puzzleComp.setPuzzle(puzzle);
-                            showToast({title: 'Success', body: response.message});
+                            ShowToasts.showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
-                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -1012,9 +985,9 @@
                                         unassignedChapter.addPuzzle(PuzzleComponent.fromChild(puzzleElem));
                                     }
                                     chapterComp.container.remove();
-                                    showToast({title: 'Success', body: response.message});
+                                    ShowToasts.showToast({title: 'Success', body: response.message});
                                 }).catch(async response => {
-                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1056,9 +1029,9 @@
                         PuzzleAPI.deletePuzzle(puzzle.id)
                                 .then(response => {
                                     puzzleComp.container.remove();
-                                    showToast({title: 'Success', body: response.message});
+                                    ShowToasts.showToast({title: 'Success', body: response.message});
                                 }).catch(async response => {
-                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1121,9 +1094,9 @@
                                 description: response.chapter.description
                             });
                             chaptersContainer.appendChild(chapterComp.container);
-                            showToast({title: 'Success', body: response.message});
+                            ShowToasts.showToast({title: 'Success', body: response.message});
                         }).catch(async response => {
-                            showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -1232,9 +1205,9 @@
                         PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
                                 .then(response => {
                                     isUnsavedChanges = false
-                                    showToast({title: 'Success', body: response.message});
+                                    ShowToasts.showToast({title: 'Success', body: response.message});
                                 }).catch(async response => {
-                                    showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
                                     alert('Could not save changes.');
                                 }).finally(function() {
                                     unsavedChangesModal.hide();
