@@ -227,7 +227,13 @@ public class MultiplayerGameService extends AbstractGameService {
         boolean withTests = gameManagingUtils.hasPredefinedTests(game);
         Role creatorRole = game.getRole(game.getCreatorId());
 
-        // TODO: shouldn't the creator switch sides as well?
+        // switch creator role if active player
+        creatorRole = switch (creatorRole) {
+            case ATTACKER -> Role.DEFENDER;
+            case DEFENDER -> Role.ATTACKER;
+            default -> creatorRole;
+        };
+
         if (!createGame(newGame, withMutants, withTests, creatorRole)) {
             return Optional.empty();
         }
