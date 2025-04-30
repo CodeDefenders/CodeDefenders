@@ -266,6 +266,8 @@ public class GameService implements IGameService {
 
             // Remove tests which belong to the same game as the mutant
             tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
+            // Remove tests which are not covering the mutant
+            tests.removeIf(test -> !test.isMutantCovered(mutantToValidate));
 
             List<Test> selectedTests = regressionTestCaseSelector.select(tests, validationThreshold);
             logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
