@@ -345,25 +345,23 @@ public class MultiplayerGameRepository {
     public List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
                         SELECT DISTINCT g.*,
-                            u.User_ID AS `userId`,
-                            (SELECT creators.Username
-                               FROM view_valid_users creators
-                               WHERE g.Creator_ID = creators.User_ID) AS creatorName
+                                        u.User_ID AS `userId`,
+                                        (SELECT creators.Username
+                                         FROM view_valid_users creators
+                                         WHERE g.Creator_ID = creators.User_ID) AS creatorName
                         FROM view_battleground_games AS g,
-                            view_valid_users u,
-                            whitelist
+                             view_valid_users u
+                             LEFT JOIN whitelist w ON u.User_ID=w.user_id
                         WHERE u.User_ID = ?
                           AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
                           AND g.Creator_ID != u.User_ID
                           AND g.Classroom_ID IS NULL
                           AND g.ID NOT IN (SELECT ig.ID
-                            FROM games ig
-                            INNER JOIN players p ON ig.ID = p.Game_ID
-                            WHERE p.User_ID = u.User_ID
-                            AND p.Active = TRUE)
-                          AND ((NOT g.invite_only) OR u.User_ID IN
-                                      (SELECT user_id from whitelist
-                                       WHERE game_id = g.ID));
+                                           FROM games ig
+                                                    INNER JOIN players p ON ig.ID = p.Game_ID
+                                           WHERE p.User_ID = u.User_ID
+                                             AND p.Active = TRUE)
+                          AND ((NOT g.invite_only) OR w.game_id is not null)
                 """;
 
         return queryRunner.query(query,
