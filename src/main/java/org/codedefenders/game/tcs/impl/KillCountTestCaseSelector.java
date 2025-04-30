@@ -20,13 +20,18 @@ package org.codedefenders.game.tcs.impl;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.function.Function;
 
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
 
 public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
 
@@ -45,32 +50,20 @@ public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
              * calling KillMap.forClass(classId) which causes the re-computation
              * of the killMap
              */
-            List<KillMapEntry> allKillMapEntrie = KillmapDAO.getKillMapEntriesForClass(classId);
+            List<KillMapEntry> allKillMapEntries = KillmapDAO.getKillMapEntriesForClass(classId);
 
-            // Get only the kill entries that math the provided tests
-            // TODO Make this a stream
-            for (Test test : allTests) {
-                List<KillMapEntry> killMapEntriesForTest = allKillMapEntrie.stream()
-                        .filter(kme -> kme.test.getId() == test.getId()).collect(Collectors.toList());
-                /*
-                 * This should not make a difference since those tests are never
-                 * stored to the DB... I Hope !
-                 */
-                test.setScore(0);
-                for (KillMapEntry killMapEntry : killMapEntriesForTest) {
-                    if (KillMapEntry.Status.KILL.equals(killMapEntry.status)) {
-                        test.setScore(test.getScore() + 1);
-                    }
-                }
-            }
+            Map<Integer, Integer> testIdToKillCount = allKillMapEntries.stream()
+                    .filter(kme -> kme.status == KILL)
+                    .collect(groupingBy(kme -> kme.test.getId(), summingInt(kme -> 1)));
 
-            allTests.sort(Comparator.comparing(Test::getScore).reversed());
+            Function<Test, Integer> getKillCountByTest = test -> testIdToKillCount.getOrDefault(test.getId(), 0);
+            allTests.sort(Comparator.comparing(getKillCountByTest).reversed());
+
         } catch (Exception e) {
             logger.error("Cannot compute killmap:", e);
         }
         logger.debug("Prioritized test case {} ", allTests);
         return allTests;
-
     }
 
 }
