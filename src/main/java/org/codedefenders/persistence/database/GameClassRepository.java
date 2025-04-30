@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -321,7 +321,7 @@ public class GameClassRepository {
                 FROM dependencies WHERE Class_ID = ?;
         """;
         return queryRunner.query(query,
-                listFromRS(rs -> DependencyDAO.dependencyFromRS(rs, classId)),
+                listFromRS(DependencyDAO::dependencyFromRS),
                 classId);
     }
 

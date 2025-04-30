@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.codedefenders.service.game;
 
 import java.sql.Timestamp;
@@ -228,7 +227,13 @@ public class MultiplayerGameService extends AbstractGameService {
         boolean withTests = gameManagingUtils.hasPredefinedTests(game);
         Role creatorRole = game.getRole(game.getCreatorId());
 
-        // TODO: shouldn't the creator switch sides as well?
+        // switch creator role if active player
+        creatorRole = switch (creatorRole) {
+            case ATTACKER -> Role.DEFENDER;
+            case DEFENDER -> Role.ATTACKER;
+            default -> creatorRole;
+        };
+
         if (!createGame(newGame, withMutants, withTests, creatorRole)) {
             return Optional.empty();
         }

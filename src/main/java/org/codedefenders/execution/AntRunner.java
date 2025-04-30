@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -391,7 +391,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                 separator = "\\\\";
             }
             String[] tokens = mutantDir.split(separator);
-            String mutantFile = String.format("%s-%s", tokens[tokens.length - 2], tokens[tokens.length - 1]);
+            String mutantFile = String.format("%s-%s-%s", tokens[tokens.length - 3],
+                    tokens[tokens.length - 2], tokens[tokens.length - 1]);
             String testMutantFile = testDir.replace("original", mutantFile);
             // TODO This might need refactoring
             File testMutantFileDir = new File(testMutantFile);

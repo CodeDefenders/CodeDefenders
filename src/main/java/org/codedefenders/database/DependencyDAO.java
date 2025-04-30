@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2025 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -45,8 +45,9 @@ public class DependencyDAO {
      * @return The constructed dependency.
      * @see RSMapper
      */
-    public static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
+    public static Dependency dependencyFromRS(ResultSet rs) throws SQLException {
         final int id = rs.getInt("Dependency_ID");
+        final int classId = rs.getInt("Class_ID");
         final String javaFile = rs.getString("JavaFile");
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
         return new Dependency(id, classId, absoluteJavaFile);
