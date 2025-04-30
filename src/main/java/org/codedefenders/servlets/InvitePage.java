@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.servlets;
 
 import java.io.IOException;
@@ -66,7 +84,7 @@ public class InvitePage extends HttpServlet {
                 game = gameRepository.getGameForInviteId(Integer.parseInt(inviteId));
             } catch (NumberFormatException e) {
                 logger.warn("Invalid invite ID: {}", inviteId);
-                messages.add("Your link is malformed, you could not join the game.").fadeOut(false);
+                messages.add("Your link is malformed, you could not join the game.").alert();
                 return;
             }
         }
@@ -75,7 +93,7 @@ public class InvitePage extends HttpServlet {
         if (roleParameter != null && !roleParameter.equals("attacker") && !roleParameter.equals("defender")) {
             logger.warn("Invalid role parameter in invite link: {}", roleParameter);
             messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
-                    .fadeOut(false);
+                    .alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
@@ -83,7 +101,7 @@ public class InvitePage extends HttpServlet {
         if (game == null) {
             logger.warn("User {} tried to join game {}, but the game does not exist.", login.getUserId(),
                     req.getParameter("gameId"));
-            messages.add("The game you were invited to does no longer exist.").fadeOut(false);
+            messages.add("The game you were invited to does no longer exist.").alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
@@ -95,7 +113,7 @@ public class InvitePage extends HttpServlet {
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             if (!AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) {
                 logger.warn("User {} tried to join game {}, but game joining is disabled.", userId, gameId);
-                messages.add("Joining games is disabled.").fadeOut(false);
+                messages.add("Joining games is disabled.").alert();
             }
 
             GameJoinedEvent event = new GameJoinedEvent();
@@ -111,7 +129,7 @@ public class InvitePage extends HttpServlet {
                 game.addPlayer(userId, role);
             } else {
                 logger.warn("User {} tried to join puzzle game {}.", userId, gameId);
-                messages.add("You cannot join puzzle games with an invite link.").fadeOut(false);
+                messages.add("You cannot join puzzle games with an invite link.").alert();
                 resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
