@@ -108,4 +108,5 @@ public class Paths {
     public static final String API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
     public static final String API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";
     public static final String API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
+    public static final String WHITELIST_API = "/api/whitelist";
 }

@@ -245,5 +245,21 @@
         <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
 
         <t:game_chat/>
+
+        <form method="post" action="${url.forPath(Paths.WHITELIST_API)}">
+            <input type="hidden" name="gameId" value="<%=gameId%>">
+            <input type="hidden" name="formType" value="add-to-whitelist">
+            <label>
+                <input type="text" name="user-id" value="">
+            </label>
+            <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap"
+                    id="btnAddWhitelist"  name="add">
+                Add to whitelist
+            </button>
+            <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap"
+                    id="btnRemoveWhitelist" name="remove">
+                Remove from whitelist
+            </button>
+        </form>
     </div>
 </div>

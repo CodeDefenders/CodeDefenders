@@ -43,6 +43,7 @@ import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
@@ -391,6 +392,10 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean canJoinGame(int userId) {
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+        if (inviteOnly && !whitelistRepo.isWhitelisted(id, userId)) {
+            return false;
+        }
         return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
