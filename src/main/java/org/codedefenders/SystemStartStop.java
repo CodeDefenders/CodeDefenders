@@ -18,6 +18,7 @@
  */
 package org.codedefenders;
 
+import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,9 +33,12 @@ import org.codedefenders.auth.SystemSubject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.CronJobManager;
+import org.codedefenders.dependencies.DependencyProvider;
+import org.codedefenders.dependencies.MavenDependencyResolver;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
+import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +68,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private SystemSubject systemSubject;
+
+    @Inject
+    private DependencyProvider dependencyProvider;
 
 
     /**
@@ -98,6 +105,18 @@ public class SystemStartStop implements ServletContextListener {
 
         cronJobManager.startup();
         achievementService.registerEventHandler();
+
+        try {
+            FileUtils.cleanLeftoverDependencies();
+        } catch (IOException e) {
+            logger.error("Could not remove leftover dependencies.", e);
+        }
+        try {
+            dependencyProvider.installDependencies();
+        } catch (MavenDependencyResolver.MavenDependencyResolverException e) {
+            logger.error("Could not install dependencies.", e);
+            throw new RuntimeException(e);
+        }
     }
 
     /**

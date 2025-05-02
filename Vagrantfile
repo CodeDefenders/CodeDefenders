@@ -35,7 +35,6 @@ Vagrant.configure("2") do |config|
     end
 
     dev.vm.provision :shell do |s|
-      install_pom_xml = File.read("#{vagrant_file_dir}/installation/installation-pom.xml")
       sed_expression = 's|</tomcat-users>|  <role rolename="manager-script"/>\n  <role rolename="manager-gui"/>\n  <role rolename="codedefenders-admin"/>\n  <user username="'+admin_user+'" roles="codedefenders-admin"/>\n  <user username="manager" password="manager" roles="manager-gui,manager-script"/>\n</tomcat-users>|'
       tomcat10_overwrite = '[Service]\nEnvironment="CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000"\nReadWritePaths="/srv/codedefenders"\n'
       codedefenders_properties = <<-CONFIG
@@ -81,13 +80,6 @@ Vagrant.configure("2") do |config|
       systemctl daemon-reload
       systemctl restart tomcat10
 
-      # Install execution dependencies
-      mkdir -p /tmp/cdsetup
-      printf '#{install_pom_xml}' > /tmp/cdsetup/pom.xml
-      cd /tmp/cdsetup
-      mvn --batch-mode --quiet clean package -Dconfig.properties="/etc/tomcat10/codedefenders.properties"
-      chown -R tomcat:tomcat /srv/codedefenders
-      rm -rf /tmp/cdsetup
       SHELL
     end
   end

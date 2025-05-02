@@ -54,39 +54,6 @@ public class Constants {
     public static final String MODE_PUZZLE_DIR = "puzzle";
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
-
-    public static final String JACOCO_CLASSPATH = Stream.of(
-                    "org.jacoco.core-0.8.8.jar",
-                    "org.jacoco.report-0.8.8.jar",
-                    "org.jacoco.agent-0.8.8.jar",
-                    "org.jacoco.ant-0.8.8.jar"
-            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
-            .map(Path::toString)
-            .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
-
-    public static final String COMMON_CLASSPATH = Stream.of(
-                    // JUnit
-                    "junit-4.13.2.jar",
-                    "junit-jupiter-api-5.9.0.jar",
-                    "opentest4j-1.2.0.jar",
-                    "junit-platform-commons-1.9.0.jar",
-                    // Mockito
-                    "mockito-core-4.8.0.jar",
-                    "objenesis-3.2.jar",
-                    "byte-buddy-1.12.14.jar",
-                    "byte-buddy-agent-1.12.14.jar",
-                    // Hamcrest
-                    "hamcrest-2.2.jar",
-                    // Google Truth
-                    "truth-1.1.3.jar",
-                    "truth-java8-extension-1.1.3.jar",
-                    "guava-31.1-jre.jar"
-            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
-            .map(Path::toString)
-            .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
-
-    public static final String TEST_CLASSPATH = COMMON_CLASSPATH + File.pathSeparator + JACOCO_CLASSPATH;
-
     public static final String TEST_PREFIX = "Test";
     public static final String JAVA_SOURCE_EXT = ".java";
     public static final String JAVA_CLASS_EXT = ".class";

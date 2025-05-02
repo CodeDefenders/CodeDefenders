@@ -83,12 +83,6 @@ for FOLDER in "lib" "sources" "mutants" "tests" "ai"; do
     mkdir -vp "${data_dir}"/${FOLDER}
 done
 
-# Currently, this downloads more dependencies than necessary.
-# The issue is that jacoco agent comes with a broken manifest otherwise.
-
-echo "* Download dependencies and copy resources"
-mvn -f installation-pom.xml clean validate package -Dconfig.properties="${config_file}".tmp > /dev/null
-
 # Do we need to check/set group permissions?
 # This might be necessary if tomcat runs with a specifc user
 #chgrp -R defender defender/

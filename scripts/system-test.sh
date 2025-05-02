@@ -60,7 +60,7 @@ function __private_execute_sql(){
 	if [ -z ${sql} ]; then echo "Missing SQL script"; return 1; fi
 	## TODO Sanitize the query
 	. credentials.cfg-system-tests
-	mysql -u${DB_USER} -p${DB_PWD} -h${DB_HOST} ${DB_NAME} < ${sql} 2>/dev/null 
+	mysql -u${DB_USER} -p${DB_PWD} -h${DB_HOST} ${DB_NAME} < ${sql} 2>/dev/null
 }
 
 function __private_query_db(){
@@ -92,7 +92,7 @@ curl --data "formType=login&username=${username}&password=${password}" \
 function __private_do_join_game(){
 	local gameId=$1
 	local cookie=$2
-	
+
 #echo "Join game ${gameId}"
 
 curl -X GET \
@@ -109,7 +109,7 @@ function __private_do_attack() {
 
 #echo "Game ${gameId}: Attack with ${mutant}"
 
-  # This return the total time to complete the request 
+  # This return the total time to complete the request
 curl -X POST \
 --data "formType=createMutant&gameId=${gameId}" \
 --data-urlencode mutant@${mutant} \
@@ -141,9 +141,9 @@ function __private_run_user_on_game(){
 	local gameId=$2
 	local folder="${SYSTEM_TESTS_HOME}/${gameId}/${userId}"
 	local logFile="${SYSTEM_TESTS_HOME}/${gameId}/${userId}/requests.log"
-	
+
 	local role=$(head -1 ${folder}/role)
-	
+
 	# Do login
 	__private_do_login \
 		$(cat ${folder}/credentials | awk '{print $1}') \
@@ -163,27 +163,27 @@ while read -r timestamp <&3 && read -r codeFile <&4; do
 	# Start with the sleep so we do not have a hit of requests at the very beginning
 	echo "At " $(date) " -- In game ${gameId} ${userId} thinks for ${timestamp} sec"
 	sleep ${timestamp}
-	
+
 	if [ ${role} == "ATTACKER" ]; then
 		echo "At " $(date) " -- In game ${gameId} ${userId} attacks using ${codeFile}" | tee -a ${logFile}
 		local totTime=$(__private_do_attack \
 			${gameId} \
 			${codeFile} \
 			${folder}/cookie.txt)
-			
+
 		echo "At " $(date) " -- In game ${gameId} ${userId} attack ${i}/${tot} using ${codeFile} ends. It took ${totTime} secs" | tee -a ${logFile}
-		
+
 	else
 		echo "At " $(date) " -- In game ${gameId} ${userId} defends using ${codeFile}" | tee -a ${logFile}
-		
+
 		local totTime=$(__private_do_defend \
 			${gameId} \
 			${codeFile} \
 			${folder}/cookie.txt)
-			
-		echo "At " $(date) " -- In game ${gameId} ${userId} defense ${i}/${tot} using ${codeFile} ends.It took ${totTime} secs" | tee -a ${logFile}	
-	fi 
-	
+
+		echo "At " $(date) " -- In game ${gameId} ${userId} defense ${i}/${tot} using ${codeFile} ends.It took ${totTime} secs" | tee -a ${logFile}
+	fi
+
 done 3<${folder}/timeline 4< <(find ${folder} -iname "*.java" | sort)
 }
 
@@ -197,14 +197,14 @@ function __private_create_timeline(){
 	> ${timeline}
 	for i in $(seq 1 ${nUserEvents}); do
 		shuf -i 1-5 -n 1 >> ${timeline}
-	done 
+	done
 }
 
 function __private_create_mutants(){
 	local nUserEvents=$1
 	local userFolder=$2
 	local classAlias=$3
-	
+
 	local i=0
 	while read -r codeFile; do
 		printf -v mutantId '%03d' ${i}
@@ -227,7 +227,7 @@ function __private_create_tests(){
 	local nUserEvents=$1
 	local userFolder=$2
 	local classAlias=$3
-	
+
 	local i=0
 	while read -r codeFile; do
 		printf -v testId '%03d' ${i}
@@ -250,37 +250,37 @@ function __private_create_tests(){
 # TODO: Implement the replay of a real  game given it's ID. Note that this might require also to speed-up a bit the users
 
 # In any case, we do not replicate equivalence challenge and  checking, so the final score using systems
-# 	test might not be the same as the original game 
+# 	test might not be the same as the original game
 
 # RANDOM GAME
 function create_random_game(){
 	local gameSize=$1
 	local classAlias=$2
 	local nUserEvents=${3:-10}
-	
+
 	# Define game ID. We start from what's already in the DB
 	local gameId=$(__private_query_db 'select Max(ID) from games;')
 	if [ "${gameId}" == "NULL" ]; then gameId=0; fi
 	gameId=$((${gameId}+1))
-	
+
 	# Create Game Folder
 	local gameFolder="${SYSTEM_TESTS_HOME}/${gameId}"
 	#
 	while [ -e ${gameFolder} ]; do
-		
+
 		(>&2 echo "${gameFolder} exists. Try next one")
-		
+
 		gameId=$((${gameId}+1));
 		gameFolder="${SYSTEM_TESTS_HOME}/${gameId}";
 	done
 	mkdir ${gameFolder}
-	
+
 	local cutId=$(__private_query_db "SELECT Class_ID FROM classes WHERE Alias='${classAlias}';")
-	local TIMESTAMP=$(eval ${date_timestamp}) 
+	local TIMESTAMP=$(eval ${date_timestamp})
 	local START_TIMESTAMP=$(eval ${date_timestamp_start})
 	local END_TIMESTAMP=$(eval ${date_timestamp_end})
 	local CREATOR_ID=$(__private_query_db "SELECT User_ID FROM users WHERE Username='bot';")
-	
+
 	cat > ${gameFolder}/create_and_start_game.sql << EOL
 USE ${DB_NAME};
 LOCK TABLES games WRITE;
@@ -296,7 +296,7 @@ cat > ${gameFolder}/close_game.sql << EOL
 USE ${DB_NAME};
 UPDATE games set State='FINISHED' WHERE ID=${gameId};
 EOL
-	
+
 	# Create Users Folders: WHERE TO PICK THE CREDENTIALS FROM ?!
 	local role="ATTACKER";
 	while read -r line; do
@@ -304,15 +304,15 @@ EOL
 #		echo "Processing ${line}"
 		username=$(echo ${line} | awk '{print $1}')
 	 	password=$(echo ${line} | awk '{print $2}')
-		
+
 		local userFolder="${gameFolder}/${username}"
 		# Create user folder
 		mkdir ${userFolder}
-		
+
 		echo ${role} >> ${userFolder}/role
-		
+
 		echo ${line} >> ${userFolder}/credentials
-		
+
 		# Create a timeline of nUserEvents events
 		__private_create_timeline \
 			${nUserEvents} \
@@ -321,33 +321,33 @@ EOL
 		local userId=$(__private_query_db "SELECT User_ID FROM users WHERE Username='${username}';")
 			# Add to game file
 			echo "-- ${username} with id ${userId} plays as ${role} in game ${gameId}" >> ${gameFolder}/create_and_start_game.sql
-    
+
     		# We omit ID of player relation. Mysql will provide a new one
 			echo "INSERT INTO players (User_ID, Game_ID, Points, Role, Active) VALUES (${userId},${gameId},0,'${role}',1);" >> ${gameFolder}/create_and_start_game.sql
-		
-				
+
+
 		# Create files and Alternate roles
 		if [ ${role} == "ATTACKER" ]; then
-			
+
 			__private_create_mutants \
 				${nUserEvents} \
 				${userFolder} \
 				${classAlias}
-				
+
 			role="DEFENDER";
-		else 
+		else
 			__private_create_tests \
 				${nUserEvents} \
 				${userFolder} \
 				${classAlias}
-				
+
 			role="ATTACKER";
 		fi
-				
+
 	done< <(shuf -n ${gameSize} users.list)
 
 	echo "UNLOCK TABLES;" >> ${gameFolder}/create_and_start_game.sql
-	
+
 	echo "${gameId}"
 }
 
@@ -358,24 +358,24 @@ function replay_game(){
 	local gameFolder="${SYSTEM_TESTS_HOME}/${gameId}"
 	local logFile="${SYSTEM_TESTS_HOME}/${gameId}/game.log"
   (  # opening the subshell
-	
+
 	echo "At "$(date)" -- Starting the game ${gameId}"
 	__private_execute_sql ${gameFolder}/create_and_start_game.sql
-	
+
 	# Get the users and run the in background
 	while read -r username; do
 	 echo "Starting user ${username}"
     	__private_run_user_on_game ${username} ${gameId} &
 	done< <(find ${gameFolder} -maxdepth 1 -type d -not -ipath ${gameFolder} -exec basename {} \;)
 #	done< <(find ${gameFolder} -type d -depth 1 -exec basename {} \;)
-	
+
 	wait
-	
+
 	echo "At "$(date)" -- Closing the game ${gameId}"
 	__private_execute_sql ${gameFolder}/close_game.sql
    # closing and redirecting the subshell
   ) | tee -a ${logFile}
-}  
+}
 
 function __private_setup(){
 	# TODO: Remove all the Tests/Mutants from the test bed which by default is?
@@ -386,14 +386,13 @@ function __private_setup(){
 	mkdir -p ${SYSTEM_TESTS_HOME}/ai
 
 	cp -r ${CD_HOME}/sources ${SYSTEM_TESTS_HOME}/sources
-	cp -r ${CD_HOME}/lib ${SYSTEM_TESTS_HOME}/lib
-	
+
 	cp ${CD_HOME}/build.xml ${SYSTEM_TESTS_HOME}
 	cp ${CD_HOME}/security.policy ${SYSTEM_TESTS_HOME}
-	
+
 	# Restore Test-DB: recreate the tables and fill in users and classes.
 	__private_execute_sql sqlScripts/system-tests.sql
-	
+
 }
 
 function test(){
@@ -401,42 +400,42 @@ function test(){
 	local classAlias=$2
 	local nUserEvents=$3
 	local configurationFiles=${@:4:$#}
-	
+
 	for cFile in ${configurationFiles}; do
 		echo "> ${cFile}"
 	done
 }
-	
+
 function benchmark(){
 	local gameSize=$1
 	local classAlias=$2
 	local nUserEvents=$3
 	local configurationFiles=${@:4:$#}
-	
+
 	# Create a random game with given size and class, use 10 as default number of events per client
 	local gameId=$(create_random_game ${gameSize} ${classAlias} ${nUserEvents})
 	echo "> Playing GameID = ${gameId}"
-	
+
 	# TODO Show details about the game ?!
-	
+
 	for cFile in ${configurationFiles}; do
-		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ? 
-		echo "> Clean up" 
+		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ?
+		echo "> Clean up"
 		__private_setup
-	
+
 		echo "> Redeploy CD using ${cFile}"
 		cd ..
 		set -e
 			mvn clean compile package install war:war tomcat7:redeploy -Dconfig.properties=${cFile} -DskipTests
 		set +e
 		cd ${HERE}
-		
+
 		# Run the game
 		replay_game ${gameId}
-	
+
 		# Collect logs - TODO
 		mv -v "${SYSTEM_TESTS_HOME}/${gameId}/game.log" "${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log"
-		
+
 		# Output some Stats
 		echo "----- Stats ----- "
 		echo "Total "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
@@ -453,30 +452,30 @@ function multi_benchmark(){
 	local classAlias=$3
 	local nUserEvents=$4
 	local configurationFiles=${@:5:$#}
-	
+
 	# Create ${nGames} random games
 	local gameIds=""
 	for i in $(seq 1 ${nGames}); do
 		gameIds+=" $(create_random_game ${gameSize} ${classAlias} ${nUserEvents})"
 	done
-	
+
 	for gameId in "${gameIds}"; do
 		echo "${gameId}"
 	done
-	
+
 	for cFile in ${configurationFiles}; do
-		
+
 		# Automatically make ${configurationFiles} an absolute path
 		if [ "${cFile}" == "$(basename ${cFile})" ];
-		then 
+		then
 			cFile=$(pwd)/${cFile}
 		fi
-	
-		
-		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ? 
-		echo "> Clean up" 
+
+
+		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ?
+		echo "> Clean up"
 		__private_setup
-	
+
 		echo "> Redeploy CD using ${cFile}"
 		cd ..
 		# Stop on error
@@ -484,14 +483,14 @@ function multi_benchmark(){
 			mvn clean compile package install war:war tomcat7:redeploy -Dconfig.properties=${cFile} -DskipTests
 		set +e
 		cd ${HERE}
-		
+
 		for gameId in ${gameIds}; do
 			# Run the game in background
 			replay_game ${gameId} &
 		done
-		
+
 		wait
-	
+
 		# Collect logs
 		for gameId in ${gameIds}; do
 			mv -v "${SYSTEM_TESTS_HOME}/${gameId}/game.log" "${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log"

@@ -53,12 +53,6 @@ for FOLDER in "lib" "sources" "mutants" "tests" "ai"; do
   mkdir -vp "${data_dir}"/${FOLDER}
 done
 
-# Currently, this downloads more dependencies than necessary.
-# The issue is that jacoco agent comes with a broken manifest otherwise.
-
-echo "* Download dependencies and copy resources"
-mvn -f installation-pom.xml clean validate package -Dconfig.properties="${config_file}".tmp > /dev/null
-
 # This is tricky but necessary: we need to replace ./codedefenders with /codedefenders inside
 #echo "WARN Please manually update the $(find ${data_dir} -iname security.policy) file ... "
 echo "Update security.policy file"

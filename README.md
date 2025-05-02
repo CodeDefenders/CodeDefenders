@@ -63,7 +63,7 @@ cd installation
 ./setup.sh /var/lib/tomcat10/conf/codedefenders.properties
 ```
 
-The script performs a basic availability check of required software. The data directory folder structures created. All the required dependencies and files are automatically downloaded.
+The script performs a basic availability check of required software. The data directory folder structures created.
 
 If any installation step fails, the installation process aborts and prints an error message.
 

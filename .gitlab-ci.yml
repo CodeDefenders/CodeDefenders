@@ -102,21 +102,6 @@ build:
     reports:
       metrics: metrics.txt
 
-bundle-libs:
-  stage: build
-  needs: [ ]
-  cache:
-    - key: maven-repo-libs
-      paths:
-        - .m2/repository/
-  before_script:
-    - echo 'data.dir=.' >installation/config.properties
-  script:
-    - mvn $MAVEN_ARGS -f installation/installation-pom.xml clean validate package -Dconfig.properties="config.properties"
-  artifacts:
-    paths:
-      - installation/lib/
-
 
 ###
 ### Unit and Integration tests
@@ -298,7 +283,6 @@ container-images:
   cache: [ ]
   needs:
     - build
-    - bundle-libs
   variables:
     # Use vfs with buildah. Docker offers overlayfs as a default, but buildah
     # cannot stack overlayfs on top of another overlayfs filesystem.

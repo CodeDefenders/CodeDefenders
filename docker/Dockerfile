@@ -10,15 +10,6 @@ COPY ./src ./src/
 RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
 
 
-FROM docker.io/library/maven:3.9-eclipse-temurin-17 as bundle-libs
-
-RUN mkdir /installation/
-COPY ./installation/installation-pom.xml ./installation/
-
-RUN echo 'data.dir=.' >installation/config.properties && \
-    mvn --no-transfer-progress -f installation/installation-pom.xml clean package -Dconfig.properties=config.properties
-
-
 FROM docker.io/library/debian:12-slim AS debian-java-layer
 
 # Install Java
@@ -41,16 +32,7 @@ RUN apt-get update && \
     rm -f /var/log/alternatives.log /var/log/apt/history.log /var/log/apt/term.log /var/log/dpkg.log
 
 
-FROM debian-java-ant-layer AS debian-java-ant-libs-layer
-
-ENV LANG="C.UTF-8"
-
-RUN mkdir /srv/codedefenders
-
-COPY --from=bundle-libs installation/lib /srv/codedefenders-lib/
-
-
-FROM debian-java-ant-libs-layer AS debian-java-ant-libs-tomcat-layer
+FROM debian-java-ant-layer AS debian-java-ant-tomcat-layer
 
 # Install TOMCAT and CURL (for the health check)
 RUN apt-get update && \
@@ -65,13 +47,12 @@ ENV CATALINA_BASE="/var/lib/tomcat10"
 ENV CATALINA_TMPDIR="/tmp"
 WORKDIR "${CATALINA_BASE}"
 ENV CODEDEFENDERS_DATA_DIR="/srv/codedefenders"
-ENV CODEDEFENDERS_LIB_DIR="/srv/codedefenders-lib"
 ENV CODEDEFENDERS_ANT_HOME="/usr/share/ant"
 
 EXPOSE 8080
 
 
-FROM debian-java-ant-libs-layer AS integrationtest
+FROM debian-java-ant-layer AS integrationtest
 
 # Install MAVEN
 RUN apt-get update && \
@@ -79,7 +60,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 
-FROM debian-java-ant-libs-tomcat-layer AS systemtest
+FROM debian-java-ant-tomcat-layer AS systemtest
 
 # Install maven tomcat10-admin separately so the image layers before are shared with the production image
 RUN apt-get update && \
@@ -93,7 +74,7 @@ RUN printf '<?xml version="1.0" encoding="UTF-8"?>\n<tomcat-users xmlns="http://
 ENTRYPOINT ["/bin/sh", "-c", "JAVA_OPTS=\"-Djava.awt.headless=true -Dorg.apache.catalina.startup.EXIT_ON_INIT_FAILURE=true\" exec \"$CATALINA_HOME/bin/catalina.sh\" run"]
 
 
-FROM debian-java-ant-libs-tomcat-layer AS production
+FROM debian-java-ant-tomcat-layer AS production
 
 # opencontainers annotations are set in the scripts/ci/build-container-images script
 
