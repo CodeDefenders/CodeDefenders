@@ -57,6 +57,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -153,6 +154,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private PlayerRepository playerRepo;
 
+    @Inject
+    private GameService gameService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -195,6 +199,11 @@ public class MultiplayerGameManager extends HttpServlet {
         final String jspPath = isGameClosed
                 ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.BATTLEGROUND_DETAILS_VIEW_JSP)
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;
+
+        if (isGameClosed && hasOpenEquivDuels) {
+            // try to trigger the resolution of the open duels for this game
+            gameService.resolveAllOpenDuelsAsync(gameId);
+        }
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.DEFENDER) {
             Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());

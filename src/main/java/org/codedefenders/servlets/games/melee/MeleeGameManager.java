@@ -77,6 +77,7 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -191,6 +192,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private PlayerRepository playerRepo;
 
+    @Inject
+    GameService gameService;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -265,6 +269,11 @@ public class MeleeGameManager extends HttpServlet {
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.PLAYER) {
             Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());
             request.setAttribute("previousTest", prevTest);
+        }
+
+        if (isGameClosed && hasOpenEquivDuels) {
+            // try to trigger the resolution of the open duels for this game
+            gameService.resolveAllOpenDuelsAsync(gameId);
         }
 
         request.getRequestDispatcher(jspPath).forward(request, response);

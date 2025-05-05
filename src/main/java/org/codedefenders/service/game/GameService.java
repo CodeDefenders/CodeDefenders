@@ -81,6 +81,8 @@ public class GameService implements IGameService {
     private final KillMapService killMapService;
     private final NotificationService notificationService;
 
+    private final Set<Integer> gamesCurrentlyClosing = new HashSet<>();
+
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
@@ -357,8 +359,15 @@ public class GameService implements IGameService {
      *
      * @param gameId The game ID for which to resolve open duels.
      */
-    public void resolveAllOpenDuels(int gameId) {
     public CompletableFuture<Void> resolveAllOpenDuelsAsync(int gameId) {
+        if (gamesCurrentlyClosing.contains(gameId)) {
+            logger.debug("Game {} is already being closed, skipping resolution of open duels.", gameId);
+            return CompletableFuture.completedFuture(null);
+        } else {
+            logger.info("Game {} is being closed, resolving open duels.", gameId);
+            gamesCurrentlyClosing.add(gameId);
+        }
+
         var game = gameRepo.getGame(gameId);
         var mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
         var futures = mutantsPendingTests.stream().map(mutant -> {
@@ -381,14 +390,14 @@ public class GameService implements IGameService {
                 logger.info("Mutant {} was automatically resolved as {}.",
                         mutant.getId(), isKillable ? "not equivalent" : "equivalent");
 
-            // TODO: create events like the EquivalenceDuelAttackerWonEvent?
-        }
                 // TODO: create events like the EquivalenceDuelAttackerWonEvent?
 
             });
         }).toArray(CompletableFuture[]::new);
 
         return CompletableFuture.allOf(futures).thenRun(() -> {
+            gamesCurrentlyClosing.remove(gameId);
+
             var gse = new GameResolvedAllDuelsEvent();
             gse.setGameId(gameId);
             notificationService.post(gse);
