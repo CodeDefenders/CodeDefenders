@@ -23,8 +23,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -238,16 +240,51 @@ public class KillMapService {
         return killmap;
     }
 
-    /**
-     * Computes the missing entries of the killmap.
-     *
-     * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException   If an error occurred during an execution.
-     */
-    void compute(KillMap killMap, ExecutorService executor) throws InterruptedException, ExecutionException {
-        Instant startTime = Instant.now();
 
-        List<Future<KillMapEntry>> executionResults = new LinkedList<>();
+    /**
+     * Runs the killmap for the given tests against a mutant to validate if the claimed equivalent
+     * mutant is killable.
+     *
+     * <p>The tests and mutants must belong to the same class (with the same class id).
+     *
+     * <p><bf>This operation is done asynchronously and may take a long time</bf>
+     *
+     * @param tests   The tests used for the validation.
+     * @param mutant  The mutant to validate.
+     * @param classId The class id of the class the tests and mutants belong to.
+     * @return A CompletableFuture that will be completed when the computation is finished.
+     */
+    public CompletableFuture<KillMap> forMutantValidationAsync(List<Test> tests, Mutant mutant, int classId) {
+        List<KillMapEntry> entries = new ArrayList<>();
+        KillMap killmap = new KillMap(tests, Collections.singletonList(mutant), classId, entries);
+        logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests",
+                mutant, tests.size());
+
+        // TODO this creates a surge in the load as the number of executor services might grow
+        // by refactoring this into a CDI we should be able to easily control the situation and queue jobs.
+        /* TODO(Alex): Do we get any Threading/Concurrency issues if we use a shared ExecutorService here?!
+        ExecutorService executor = config.isParallelize()
+                ? Executors.newFixedThreadPool(config.getNumberOfKillmapThreads())
+                : Executors.newSingleThreadExecutor();
+         */
+
+        try {
+            return computeAsync(killmap, executor).thenCompose(v -> CompletableFuture.completedFuture(killmap));
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Exception while validating mutant {} using custom killmap", mutant.getId(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Prepares the execution tasks for the killmap.
+     * These tasks can then be executed either synchronously or asynchronously.
+     *
+     * @throws InterruptedException if the computation is interrupted before submitting the tasks.
+     */
+    List<Future<KillMapEntry>> prepareExecutionTasks(KillMap killMap, ExecutorService executor)
+            throws InterruptedException {
+        List<Future<KillMapEntry>> tasks = new LinkedList<>();
 
         if (Thread.currentThread().isInterrupted()) {
             throw new InterruptedException("Got interrupted before submitting tasks");
@@ -258,7 +295,7 @@ public class KillMapService {
             for (int m = 0; m < killMap.getMutants().size(); m++) {
                 Mutant mutant = killMap.getMutants().get(m);
                 if ((killMap.getMatrix()[t][m] == null)) {
-                    executionResults.add(executor.submit(() -> {
+                    tasks.add(executor.submit(() -> {
                         KillMapEntry entry;
 
                         if (config.isMutantCoverage() && !test.isMutantCovered(mutant)) {
@@ -290,7 +327,21 @@ public class KillMapService {
             throw new InterruptedException("Got interrupted after submitting tasks");
         }
 
-        for (Future<KillMapEntry> result : executionResults) {
+        return tasks;
+    }
+
+    /**
+     * Computes the missing entries of the killmap.
+     *
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException   If an error occurred during an execution.
+     */
+    void compute(KillMap killMap, ExecutorService executor) throws InterruptedException, ExecutionException {
+        Instant startTime = Instant.now();
+
+        List<Future<KillMapEntry>> tasks = prepareExecutionTasks(killMap, executor);
+
+        for (Future<KillMapEntry> result : tasks) {
             try {
                 KillMapEntry entry = result.get();
                 killMap.addEntry(entry);
@@ -302,5 +353,37 @@ public class KillMapService {
 
         logger.info("Computation of killmap finished after {} seconds. Killmap: {}",
                 Duration.between(startTime, Instant.now()).getSeconds(), killMap.getEntries());
+    }
+
+    /**
+     * Computes the missing entries of the killmap asynchronously.
+     *
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException   If an error occurred during an execution.
+     */
+    CompletableFuture<Void> computeAsync(KillMap killMap, ExecutorService executor)
+            throws InterruptedException, ExecutionException {
+        Instant startTime = Instant.now();
+
+        List<Future<KillMapEntry>> tasks = prepareExecutionTasks(killMap, executor);
+
+        List<CompletableFuture<Void>> futures = tasks.stream()
+                .map(result -> CompletableFuture.runAsync(() -> {
+                    try {
+                        KillMapEntry entry = result.get();
+                        killMap.addEntry(entry);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new RuntimeException("Got interrupted while waiting for results", e);
+                    } catch (ExecutionException e) {
+                        throw new RuntimeException("Execution exception while waiting for results", e);
+                    }
+                }, executor))
+                .toList();
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).whenComplete((r, e) -> {
+            logger.info("Computation of killmap finished after {} seconds. Killmap: {}",
+                    Duration.between(startTime, Instant.now()).getSeconds(), killMap.getEntries());
+        });
     }
 }

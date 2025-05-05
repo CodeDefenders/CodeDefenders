@@ -24,7 +24,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.game.GameResolvedAllDuelsEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.service.game.GameService;
 import org.slf4j.Logger;
@@ -68,11 +67,8 @@ public class GameStoppedEventHandlerContainer {
             var gameId = event.getGameId();
 
             logger.info("Game {} is closed. Resolving all open equivalence duels now.", gameId);
-            gameService.resolveAllOpenDuels(gameId);
 
-            var gse = new GameResolvedAllDuelsEvent();
-            gse.setGameId(gameId);
-            notificationService.post(gse);
+            gameService.resolveAllOpenDuelsAsync(gameId);
         }
     }
 }

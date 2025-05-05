@@ -18,7 +18,10 @@
  */
 package org.codedefenders.service.game;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -37,6 +40,8 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.notification.events.server.game.GameResolvedAllDuelsEvent;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
@@ -74,12 +79,13 @@ public class GameService implements IGameService {
     private final PlayerRepository playerRepo;
     private final ITestCaseSelector regressionTestCaseSelector;
     private final KillMapService killMapService;
+    private final NotificationService notificationService;
 
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
                        PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo,
-                       GameRepository gameRepo, PlayerRepository playerRepo,
+                       GameRepository gameRepo, PlayerRepository playerRepo, NotificationService notificationService,
                        ITestCaseSelector regressionTestCaseSelector, KillMapService killMapService) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
@@ -90,6 +96,7 @@ public class GameService implements IGameService {
         this.playerRepo = playerRepo;
         this.regressionTestCaseSelector = regressionTestCaseSelector;
         this.killMapService = killMapService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -294,36 +301,97 @@ public class GameService implements IGameService {
 
 
     /**
+     * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
+     * which cover the mutant but belongs to other games and executes them against the mutant.
+     *
+     * @param mutantToValidate The mutant why try to find a killing test for
+     * @return whether the mutant is killable or not/cannot be validated
+     */
+    public CompletableFuture<Boolean> isMutantKillableByOtherTestsAsync(Mutant mutantToValidate) {
+        int validationThreshold = AdminDAO.getSystemSetting(FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
+        if (validationThreshold <= 0) {
+            logger.debug("Validation of mutant {} skipped due to threshold being 0", mutantToValidate.getId());
+            return CompletableFuture.completedFuture(false);
+        }
+
+        // Get all the covering tests of this mutant which do not belong to this game
+        int classId = mutantToValidate.getClassId();
+        List<Test> tests = testRepo.getValidTestsForClass(classId);
+
+        // Remove tests which belong to the same game as the mutant
+        tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
+        // Remove tests which are not covering the mutant
+        tests.removeIf(test -> !test.isMutantCovered(mutantToValidate));
+
+        List<Test> selectedTests = regressionTestCaseSelector.select(tests, validationThreshold);
+        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
+
+        return killMapService.forMutantValidationAsync(selectedTests, mutantToValidate, classId)
+                .thenCompose(killmap -> {
+                    if (killmap == null) {
+                        // There was an error we cannot empirically prove the mutant was killable.
+                        logger.warn("An error prevents validation of mutant {}", mutantToValidate);
+                        return CompletableFuture.completedFuture(false);
+                    } else {
+                        for (KillMap.KillMapEntry killMapEntry : killmap.getEntries()) {
+                            if (killMapEntry.status.equals(KillMap.KillMapEntry.Status.KILL)
+                                    || killMapEntry.status.equals(KillMap.KillMapEntry.Status.ERROR)) {
+                                return CompletableFuture.completedFuture(true);
+                            }
+                        }
+                    }
+                    return CompletableFuture.completedFuture(false);
+                });
+    }
+
+
+    /**
      * Resolves all open duels by checking if the mutants are killable by tests from other games using the same class.
      * If they are, they are marked as not equivalent (PROVEN_NO).
      * Otherwise, they are marked as equivalent (ASSUMED_YES).
+     * <p>
+     * This method is asynchronous and returns a CompletableFuture.
+     * <p>
+     * Resolution of the equivalence duels can only be triggered once per game,
+     * all subsequent calls will have no effect.
      *
      * @param gameId The game ID for which to resolve open duels.
      */
     public void resolveAllOpenDuels(int gameId) {
+    public CompletableFuture<Void> resolveAllOpenDuelsAsync(int gameId) {
         var game = gameRepo.getGame(gameId);
         var mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
-        for (Mutant mutant : mutantsPendingTests) {
-            boolean isKillable = isMutantKillableByOtherTests(mutant);
-            /*
-             * Points are handled by MultiplayerGame.java:456, a new equivalence status would be needed to change the scoring.
-             * As the scoring rules are already hard to grasp for new players, this would introduce additional complexity.
-             *
-             * Additionally, the attacker's possibility to gain points from the auto-resolved duel stops the defenders
-             * from claiming all mutants as equivalent before the game ends without any risk.
-             */
-            if (isKillable) {
-                mutantRepo.killMutant(mutant, Mutant.Equivalence.PROVEN_NO);
-            } else {
-                mutantRepo.killMutant(mutant, Mutant.Equivalence.ASSUMED_YES);
-                int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
-                playerRepo.increasePlayerPoints(1, playerIdDefender);
-            }
+        var futures = mutantsPendingTests.stream().map(mutant -> {
+            return isMutantKillableByOtherTestsAsync(mutant).thenAccept(isKillable -> {
+                /*
+                 * Points are handled by MultiplayerGame.java:456, a new equivalence status would be needed to change the scoring.
+                 * As the scoring rules are already hard to grasp for new players, this would introduce additional complexity.
+                 *
+                 * Additionally, the attacker's possibility to gain points from the auto-resolved duel stops the defenders
+                 * from claiming all mutants as equivalent before the game ends without any risk.
+                 */
+                if (isKillable) {
+                    mutantRepo.killMutant(mutant, Mutant.Equivalence.PROVEN_NO);
+                } else {
+                    mutantRepo.killMutant(mutant, Mutant.Equivalence.ASSUMED_YES);
+                    int playerIdDefender = mutantRepo.getEquivalentDefenderId(mutant);
+                    playerRepo.increasePlayerPoints(1, playerIdDefender);
+                }
 
-            logger.info("Mutant {} was automatically resolved as {}.",
-                    mutant.getId(), isKillable ? "not equivalent" : "equivalent");
+                logger.info("Mutant {} was automatically resolved as {}.",
+                        mutant.getId(), isKillable ? "not equivalent" : "equivalent");
 
             // TODO: create events like the EquivalenceDuelAttackerWonEvent?
         }
+                // TODO: create events like the EquivalenceDuelAttackerWonEvent?
+
+            });
+        }).toArray(CompletableFuture[]::new);
+
+        return CompletableFuture.allOf(futures).thenRun(() -> {
+            var gse = new GameResolvedAllDuelsEvent();
+            gse.setGameId(gameId);
+            notificationService.post(gse);
+        });
     }
 }
