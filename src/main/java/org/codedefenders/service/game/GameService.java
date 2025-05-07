@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service.game;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -81,7 +82,7 @@ public class GameService implements IGameService {
     private final KillMapService killMapService;
     private final NotificationService notificationService;
 
-    private final Set<Integer> gamesCurrentlyClosing = new HashSet<>();
+    private final Set<Integer> gamesCurrentlyClosing = Collections.synchronizedSet(new HashSet<>());
 
 
     @Inject
@@ -360,12 +361,11 @@ public class GameService implements IGameService {
      * @param gameId The game ID for which to resolve open duels.
      */
     public CompletableFuture<Void> resolveAllOpenDuelsAsync(int gameId) {
-        if (gamesCurrentlyClosing.contains(gameId)) {
+        if (gamesCurrentlyClosing.add(gameId)) {
+            logger.info("Game {} is being closed, resolving open duels.", gameId);
+        } else {
             logger.debug("Game {} is already being closed, skipping resolution of open duels.", gameId);
             return CompletableFuture.completedFuture(null);
-        } else {
-            logger.info("Game {} is being closed, resolving open duels.", gameId);
-            gamesCurrentlyClosing.add(gameId);
         }
 
         var game = gameRepo.getGame(gameId);
