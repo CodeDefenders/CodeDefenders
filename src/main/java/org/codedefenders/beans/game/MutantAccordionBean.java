@@ -73,10 +73,12 @@ public class MutantAccordionBean {
                     var externalKillingTest = testRepo.getTestById(testExec.testId);
                     var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
                     var canViewKillingTest = mutant.getCreator().getId() == userId;
-                    var newMutant = canViewKillingTest
-                            ? mutant.copyWithKillingTest(testExec.testId, killingTestCreator.orElseThrow(),
-                            testExec.message)
-                            : mutant.copyWithKillingTest(0, null, null);
+                    var newMutant = mutant.copyWithKillingTest(
+                            testExec.testId,
+                            canViewKillingTest,
+                            killingTestCreator.orElseThrow(),
+                            testExec.message
+                    );
                     newList.add(newMutant);
                     continue;
                 }

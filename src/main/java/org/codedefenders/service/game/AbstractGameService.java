@@ -125,7 +125,8 @@ public abstract class AbstractGameService implements IGameService {
         int killedByTestId;
         String killMessage;
         Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
-        if (killingTest != null) {
+        boolean hasKillingTestFromSameGame = killingTest != null;
+        if (hasKillingTestFromSameGame) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
             killMessage = mutant.getKillMessage();
@@ -151,6 +152,7 @@ public abstract class AbstractGameService implements IGameService {
                 canMarkEquivalent,
                 killedBy,
                 killedByTestId,
+                hasKillingTestFromSameGame,
                 killMessage,
                 mutant.getGameId(),
                 mutant.getPlayerId(),
