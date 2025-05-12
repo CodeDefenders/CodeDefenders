@@ -246,7 +246,7 @@
 
         <t:game_chat/>
 
-        <form method="post" action="${url.forPath(Paths.WHITELIST_API)}">
+        <!--form method="post" action="${url.forPath(Paths.WHITELIST_API)}">
             <input type="hidden" name="gameId" value="<%=gameId%>">
             <input type="hidden" name="formType" value="add-to-whitelist">
             <label>
@@ -260,6 +260,10 @@
                     id="btnRemoveWhitelist" name="remove">
                 Remove from whitelist
             </button>
-        </form>
+        </form-->
+        <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>"/>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+            OPEN MODAL HREF
+        </a>
     </div>
 </div>

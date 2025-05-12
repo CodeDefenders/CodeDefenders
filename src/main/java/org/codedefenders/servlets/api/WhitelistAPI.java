@@ -28,9 +28,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 
 /**
@@ -38,9 +39,14 @@ import org.codedefenders.util.Paths;
  */
 @WebServlet(Paths.WHITELIST_API)
 public class WhitelistAPI extends HttpServlet {
+    @Inject
+    private MessagesBean messages;
 
     @Inject
     private WhitelistRepository whitelistRepo;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -51,14 +57,31 @@ public class WhitelistAPI extends HttpServlet {
                 return;
             }
             int gameId = Integer.parseInt(params.get("gameId")[0]);
-            int[] userIds = new int[params.get("user-id").length];
-            for (int i = 0; i < params.get("user-id").length; i++) {
-                userIds[i] = Integer.parseInt(params.get("user-id")[i]);
+
+            String[] userIdParams = params.get("user-id");
+            String[] userNameParams = params.get("user-name");
+
+            //Combines ids and names into one array
+            int[] userIds = new int[(userIdParams != null ? userIdParams.length : 0)
+                    + (userNameParams != null ? userNameParams.length : 0)];
+            if (userIdParams != null) {
+                for (int i = 0; i < userIdParams.length; i++) {
+                    userIds[i] = Integer.parseInt(userIdParams[i]);
+                }
+            }
+            int offset = userIdParams != null ? userIdParams.length : 0;
+            if (userNameParams != null) {
+                for (int i = 0;  i < userNameParams.length; i++) {
+                    int userId = userRepo.getUserByName(userNameParams[i]).orElseThrow().getId();
+                    userIds[offset + i] = userId;
+                }
             }
             if (params.containsKey("add")) {
                 for (int userId : userIds) {
                     whitelistRepo.addToWhitelist(gameId, userId);
                 }
+                //messages.add("Added " + userIds.length + " players to the whitelist!");
+                //TODO Feedback
             }
             if (params.containsKey("remove")) {
                 for (int userId : userIds) {
