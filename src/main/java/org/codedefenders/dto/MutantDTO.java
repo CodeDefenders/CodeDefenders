@@ -46,6 +46,8 @@ public class MutantDTO {
     @Expose
     private final int killedByTestId;
     @Expose
+    private final boolean canViewKillingTest;
+    @Expose
     private final String killMessage;
     @Expose
     private final String description;
@@ -69,6 +71,7 @@ public class MutantDTO {
             boolean canMarkEquivalent,
             SimpleUser killedBy,
             int killedByTestId,
+            boolean canViewKillingTest,
             String killMessage,
             int gameId,
             int playerId,
@@ -86,6 +89,7 @@ public class MutantDTO {
         this.canMarkEquivalent = canMarkEquivalent;
         this.killedBy = killedBy;
         this.killedByTestId = killedByTestId;
+        this.canViewKillingTest = canViewKillingTest;
         this.killMessage = killMessage;
 
         this.gameId = gameId;
@@ -150,6 +154,16 @@ public class MutantDTO {
         return canView;
     }
 
+
+    /**
+     * killedByTestId is either:
+     * <ul>
+     * <li>a valid id >= 100 or</li>
+     * <li>'-1' to indicate that the mutant is probably not killable</li>
+     * </ul>
+     *
+     * @return the test id that killed the mutant, or -1 if the mutant is not killable by the selection of external tests.
+     */
     public int getKilledByTestId() {
         return killedByTestId;
     }
@@ -162,7 +176,8 @@ public class MutantDTO {
         return description;
     }
 
-    public MutantDTO copyWithKillingTest(int killedByTestId, SimpleUser killedByUser, String killMessage) {
+    public MutantDTO copyWithKillingTest(int killedByTestId, boolean canViewKillingTest, SimpleUser killedByUser,
+                                         String killMessage) {
         return new MutantDTO(
                 id,
                 creator,
@@ -175,6 +190,7 @@ public class MutantDTO {
                 canMarkEquivalent,
                 killedByUser,
                 killedByTestId,
+                canViewKillingTest,
                 killMessage,
                 gameId,
                 playerId,

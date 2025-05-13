@@ -92,6 +92,7 @@ public class Configuration {
     protected String libDir;
     protected String antHome;
     protected String antJavaHome;
+    protected Integer antJavaVersion;
     protected String dbHost;
     protected Integer dbPort;
     protected String dbName;
@@ -161,15 +162,6 @@ public class Configuration {
                     validationErrors.add(setupDirectory(getSourcesDir()));
 
                     validationErrors.add(setupDirectory(getLibraryDir()));
-                    // TODO: Replace this with something which can resolve the dependencies.
-                    try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
-                        if (entries.findFirst().isEmpty()) {
-                            validationErrors.add("The library directory " + getLibraryDir().toPath()
-                                    + " is empty! Please download the dependencies via the installation-pom.xml!");
-                        }
-                    } catch (IOException ignored) {
-                        // ignored
-                    }
                 }
             }
 
@@ -197,8 +189,11 @@ public class Configuration {
                 if (antMajorJavaVersion.isEmpty()) {
                     validationErrors.add(String.format("%s: got an error while running the java executable '%s'. Please check the logs.",
                                     resolveAttributeName("antJavaHome"), javaExecutable));
-                } else if (antMajorJavaVersion.get() < 17) {
-                    validationErrors.add(resolveAttributeName("antJavaHome") + ": Ant Java version must be >= 17");
+                } else {
+                    antJavaVersion = antMajorJavaVersion.get();
+                    if (antMajorJavaVersion.get() < 17) {
+                        validationErrors.add(resolveAttributeName("antJavaHome") + ": Ant Java version must be >= 17");
+                    }
                 }
             }
 
@@ -380,6 +375,10 @@ public class Configuration {
         return antJavaHome == null
                 ? Optional.empty()
                 : Optional.of(new File(antJavaHome));
+    }
+
+    public Optional<Integer> getAntJavaVersion() {
+        return Optional.ofNullable(antJavaVersion);
     }
 
     public String getDbUrl() {

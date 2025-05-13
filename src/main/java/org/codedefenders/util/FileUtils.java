@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 Code Defenders contributors
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -570,5 +570,20 @@ public class FileUtils {
 
     public static String getFileSeparator() {
         return File.separator;
+    }
+
+    /**
+     * Removes any leftover dependencies in the library dir.
+     */
+    public static void cleanLeftoverDependencies() throws IOException {
+        Path libraryDir = getConfig().getLibraryDir().toPath();
+        try (Stream<Path> stream = Files.list(libraryDir)) {
+            var archives =  stream
+                    .filter(p -> p.getFileName().toString().endsWith(".jar"))
+                    .toList();
+            for (var archive : archives) {
+                Files.delete(archive);
+            }
+        }
     }
 }

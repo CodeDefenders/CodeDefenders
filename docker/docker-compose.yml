@@ -16,7 +16,6 @@ services:
     environment:
       # These three are already hardcoded in the image because they are determined by the image build layout, but we want to prevent them being overwritten by the .env file
       - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
-      - CODEDEFENDERS_LIB_DIR=/srv/codedefenders-lib
       - CODEDEFENDERS_ANT_HOME=/usr/share/ant
       # This one is hardcoded, because it is specific to this docker-compose file
       - CODEDEFENDERS_DB_HOST=database
