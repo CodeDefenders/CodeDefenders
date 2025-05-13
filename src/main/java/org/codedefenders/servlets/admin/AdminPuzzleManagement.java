@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.ClassViewerBean;
 import org.codedefenders.beans.game.MutantAccordionBean;
 import org.codedefenders.beans.game.TestAccordionBean;
@@ -164,12 +163,12 @@ public class AdminPuzzleManagement extends HttpServlet {
         SimpleUser killedBy = null;
         int killedByTestId = -1;
         String killMessage = null;
-        if (killingTest != null) {
+        boolean hasKillingTestFromSameGame = killingTest != null;
+        if (hasKillingTestFromSameGame) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
             killMessage = testRepo.findKillMessageForMutant(mutant.getId()).orElse(null);
-        }
-        if (killingTest == null) {
+        } else {
             // Mapped mutants are set to dead by default.
             mutant.setAlive(true);
         }
@@ -186,6 +185,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 false,
                 killedBy,
                 killedByTestId,
+                hasKillingTestFromSameGame,
                 killMessage,
                 mutant.getGameId(),
                 mutant.getPlayerId(),

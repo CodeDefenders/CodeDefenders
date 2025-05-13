@@ -38,6 +38,7 @@ import {Popover} from "../thirdparty/bootstrap";
  * @property {boolean} canMarkEquivalent
  * @property {boolean} canView
  * @property {number} killedByTestId
+ * @property {boolean} canViewKillingTest
  * @property {string} killMessage
  * @property {string} description
  * @property {boolean} covered

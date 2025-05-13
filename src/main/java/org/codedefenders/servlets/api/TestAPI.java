@@ -69,6 +69,11 @@ public class TestAPI extends HttpServlet {
             return;
         }
 
+        if (!test.get().isCanView()) {
+            response.setStatus(HttpStatus.SC_FORBIDDEN);
+            return;
+        }
+
         String json = generateJsonForTest(test.get());
 
         response.setContentType("application/json");

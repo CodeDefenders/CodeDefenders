@@ -117,8 +117,6 @@ public abstract class AbstractGameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
-    // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
-    //  So the actual building of the MutantDTO could happen in this class.
     protected MutantDTO convertMutant(Mutant mutant, SimpleUser user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
@@ -126,7 +124,8 @@ public abstract class AbstractGameService implements IGameService {
         int killedByTestId;
         String killMessage;
         Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
-        if (killingTest != null) {
+        boolean hasKillingTestFromSameGame = killingTest != null;
+        if (hasKillingTestFromSameGame) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
             killMessage = mutant.getKillMessage();
@@ -152,6 +151,7 @@ public abstract class AbstractGameService implements IGameService {
                 canMarkEquivalent,
                 killedBy,
                 killedByTestId,
+                hasKillingTestFromSameGame,
                 killMessage,
                 mutant.getGameId(),
                 mutant.getPlayerId(),

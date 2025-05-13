@@ -286,12 +286,15 @@ class MutantAccordion {
 
     /** @private */
     _renderId (data) {
-        const killedByText =  data.killedBy
+        const killedByText = data.state === 'KILLED' && data.killedBy
                 ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
                 : '';
+        const equivDuelResultText = data.state === 'EQUIVALENT' && data.killedByTestId >= 0
+            ? `<span class="ma-column-name mx-2">marked as equivalent</span>but is killable`
+            : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
             <span class="ma-column-name mx-2">by</span>${data.creator.name}
-            ${killedByText}`;
+            ${killedByText}${equivDuelResultText}`;
     }
 
     /** @private */
@@ -351,7 +354,8 @@ class MutantAccordion {
                     return '';
                 }
             case "EQUIVALENT":
-                if (data.killedByTestId < 0) {
+                if (data.killedByTestId < 0 || !data.canViewKillingTest) {
+                    // In case of no killing test (-1) or the current user being a defender, the test isn't viewable.
                     return '';
                 } else {
                     return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 

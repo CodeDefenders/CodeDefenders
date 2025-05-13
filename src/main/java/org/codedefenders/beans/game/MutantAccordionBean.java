@@ -73,13 +73,13 @@ public class MutantAccordionBean {
         if (game != null) {
             var mutantList = gameService.getMutants(login.getUserId(), game.getId());
             if (!(game instanceof PuzzleGame)) {
-                mutantList = addExternalKillingTests(testRepo, userService, mutantList);
+                mutantList = addExternalKillingTests(testRepo, userService, login.getUserId(), mutantList);
             }
             init(game.getCUT(), mutantList, game.getId());
         }
     }
 
-    private List<MutantDTO> addExternalKillingTests(TestRepository testRepo, UserService userService,
+    private List<MutantDTO> addExternalKillingTests(TestRepository testRepo, UserService userService, int userId,
                                                     List<MutantDTO> mutantList) {
         List<MutantDTO> newList = new ArrayList<>(mutantList.size());
 
@@ -90,16 +90,17 @@ public class MutantAccordionBean {
                     var testExec = testExecOpt.get();
                     var externalKillingTest = testRepo.getTestById(testExec.testId);
                     var killingTestCreator = userService.getSimpleUserByPlayerId(externalKillingTest.getPlayerId());
-
-                    newList.add(mutant.copyWithKillingTest(
+                    var canViewKillingTest = mutant.getCreator().getId() == userId;
+                    var newMutant = mutant.copyWithKillingTest(
                             testExec.testId,
+                            canViewKillingTest,
                             killingTestCreator.orElseThrow(),
                             testExec.message
-                    ));
+                    );
+                    newList.add(newMutant);
                     continue;
                 }
             }
-
             newList.add(mutant);
         }
 
