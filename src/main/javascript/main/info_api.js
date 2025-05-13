@@ -92,6 +92,10 @@ class InfoApi {
     static async getAllUserNames() {
         return await InfoApi.fetchJSON(`${contextPath}api/user`);
     }
+
+    static async getWhitelistedUserNames(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/whitelist?gameId=` + gameId);
+    }
 }
 
 

@@ -60,4 +60,17 @@ public class WhitelistRepository {
             return playerIds;
         }, gameId);
     }
+
+    public List<String> getWhiteListedPlayerNames(int gameId) {
+        @Language("SQL") String query = "SELECT Username FROM " +
+                "whitelist JOIN users ON whitelist.user_id = users.User_ID" +
+                " WHERE game_id = ?";
+        return queryRunner.query(query, rs -> {
+            List<String> playerNames = new java.util.ArrayList<>();
+            while (rs.next()) {
+                playerNames.add(rs.getString("Username"));
+            }
+            return playerNames;
+        }, gameId);
+    }
 }
