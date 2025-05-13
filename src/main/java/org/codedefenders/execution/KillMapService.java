@@ -346,12 +346,11 @@ public class KillMapService {
     CompletableFuture<KillMap> computeAsync(KillMap killMap, ExecutorService executor)
             throws InterruptedException, KillMapExecutionException {
         Instant startTime = Instant.now();
-        var synchronizer = new Object();
 
         List<CompletableFuture<KillMapEntry>> tasks = prepareExecutionTasks(killMap, executor);
         var newTasks = tasks.stream()
                 .map(future -> future.thenAccept(entry -> {
-                    synchronized (synchronizer) {
+                    synchronized (killMap) {
                         killMap.addEntry(entry);
                     }
                 }))
