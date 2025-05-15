@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
@@ -34,14 +33,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
-import org.codedefenders.analysis.coverage.CoverageGenerator;
-import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
-import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
-import org.codedefenders.analysis.coverage.line.CoverageTokenGenerator;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.IMutationTester;
@@ -52,7 +46,6 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.game.tcs.impl.KillCountTestCaseSelector;
 import org.codedefenders.game.tcs.impl.PrioritizedTestCaseSelector;
-import org.codedefenders.game.tcs.impl.RandomTestCaseSelector;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -67,6 +60,7 @@ import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
@@ -196,6 +190,11 @@ public class GameManagingUtilsTest {
         return null;
     }
 
+    @ApplicationScoped
+    @Produces
+    GameService produceGameService() {
+        return null;
+    }
 
     @Inject
     // Testing configuration ?

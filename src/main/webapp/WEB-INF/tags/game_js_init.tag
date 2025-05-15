@@ -53,6 +53,11 @@
             window.location.reload();
         });
 
+        socket.register('game.GameResolvedAllDuelsEvent', event => {
+            console.log('Game with Id ' + event.gameId + ' has finished auto-resolving all ongoing equivalence duels.');
+            window.location.reload();
+        });
+
         socket.register('game.GameStartedEvent', event => {
             console.log('Game with Id ' + event.gameId + ' was started.');
             window.location.reload();

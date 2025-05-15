@@ -37,6 +37,7 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.games.GameManagingUtils;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {
@@ -44,8 +45,9 @@ public class PuzzleGameService extends AbstractGameService {
     @Inject
     public PuzzleGameService(UserService userService, UserRepository userRepository, TestRepository testRepo,
                              MutantRepository mutantRepo, GameRepository gameRepo, PlayerRepository playerRepo,
-                             TestSmellRepository testSmellRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
+                             TestSmellRepository testSmellRepo, GameManagingUtils gameManagingUtils) {
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo,
+                testSmellRepo);
     }
 
     @Override

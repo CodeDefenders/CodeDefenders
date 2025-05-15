@@ -57,6 +57,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -153,6 +154,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private PlayerRepository playerRepo;
 
+    @Inject
+    private GameService gameService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -162,11 +166,9 @@ public class MultiplayerGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-
         int gameId = game.getId();
 
         int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
-
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
@@ -193,9 +195,15 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final boolean isGameClosed = game.getState() == GameState.FINISHED
                 || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
+        final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
-                ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
+                ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.BATTLEGROUND_DETAILS_VIEW_JSP)
                 : Constants.BATTLEGROUND_GAME_VIEW_JSP;
+
+        if (isGameClosed && hasOpenEquivDuels) {
+            // try to trigger the resolution of the open duels for this game
+            gameService.resolveAllOpenDuelsAsync(gameId);
+        }
 
         if (!isGameClosed && game.getRole(login.getUserId()) == Role.DEFENDER) {
             Test prevTest = testRepo.getLatestTestForGameAndUser(gameId, login.getUserId());
