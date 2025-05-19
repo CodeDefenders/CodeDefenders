@@ -149,16 +149,47 @@
             const matches = suggestions.filter(item => item.toLowerCase().startsWith(value)
                 && !toAddUsers.includes(item) && !alreadyWhitelistedUsers.includes(item));
             matches.forEach(match => {
-                const item = document.createElement("button");
-                item.classList.add("list-group-item", "list-group-item-action");
-                item.textContent = match;
-                item.type = "button";
-                item.addEventListener("click", function () {
+                const item = document.createElement("div");
+                item.classList.add("list-group-item", "d-flex", "flex-row", "gap-2");
+
+                const name = document.createElement("span");
+                name.textContent = match;
+                name.classList.add("flex-grow-1");
+                item.appendChild(name);
+                //item.type = "button";
+                /*item.addEventListener("click", function () {
                     item.remove();
                     addUserToWhitelist(match);
                     list.innerHTML = "";
                     input.value = "";
+                });*/
+                const defenderInvite = document.createElement("button");
+                defenderInvite.textContent = "Invite as defender";
+                defenderInvite.type = "button";
+                defenderInvite.classList.add("btn", "btn-primary", "btn-sm");
+                defenderInvite.addEventListener("click", function () {
+                    console.log("Add as defender clicked");
                 });
+                item.appendChild(defenderInvite);
+
+                const flexInvite = document.createElement("button");
+                flexInvite.textContent = "Open invite";
+                flexInvite.type = "button";
+                flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
+                flexInvite.addEventListener("click", function () {
+                    console.log("Add as flex clicked");
+                });
+                item.appendChild(flexInvite);
+
+                const attackerInvite = document.createElement("button");
+                attackerInvite.textContent = "Add as attacker";
+                //attackerInvite.type = "button";
+                attackerInvite.classList.add("btn", "btn-danger", "btn-sm");
+                attackerInvite.addEventListener("click", function () {
+                    console.log("Add as attacker clicked");
+                });
+                item.appendChild(attackerInvite);
+
                 list.appendChild(item);
             });
         });
