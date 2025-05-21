@@ -4,6 +4,9 @@ create table if not exists whitelist(
     foreign key (game_id) references games(ID) on delete cascade,
     foreign key (user_id) references users(User_ID) on delete cascade);
 
+alter table whitelist
+    add column if not exists type enum('defender', 'attacker', 'flex', 'choice') default 'choice' not null;
+
 alter table games
     add column if not exists invite_only bool default false,
     add column if not exists may_choose_role bool default true;

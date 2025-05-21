@@ -23,6 +23,7 @@ import java.util.List;
 
 import jakarta.inject.Inject;
 
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 
@@ -38,6 +39,12 @@ public class WhitelistRepository {
     public void addToWhitelist(int gameId, int playerId) {
         @Language("SQL") String query = "INSERT INTO whitelist (game_id, user_id) VALUES (?, ?)";
         queryRunner.update(query, gameId, playerId);
+    }
+
+    public void addToWhitelist(int gameId, int playerId, WhitelistType type) {
+
+        @Language("SQL") String query = "INSERT INTO whitelist (game_id, user_id, type) VALUES (?, ?, ?)";
+        queryRunner.update(query, gameId, playerId, getDBEnum(type));
     }
 
     public void removeFromWhitelist(int gameId, int playerId) {
@@ -72,5 +79,36 @@ public class WhitelistRepository {
             }
             return playerNames;
         }, gameId);
+    }
+
+    public List<String> getWhiteListedPlayerNames(int gameId, WhitelistType type) {
+        @Language("SQL") String query = "SELECT Username FROM " +
+                "whitelist JOIN users ON whitelist.user_id = users.User_ID" +
+                " WHERE game_id = ? AND type = ?";
+        return queryRunner.query(query, rs -> {
+            List<String> playerNames = new java.util.ArrayList<>();
+            while (rs.next()) {
+                playerNames.add(rs.getString("Username"));
+            }
+            return playerNames;
+        }, gameId, getDBEnum(type));
+    }
+
+    private String getDBEnum(WhitelistType type) {
+        switch (type) {
+            case FLEX -> {
+                return "flex";
+            }
+            case CHOICE -> {
+                return "choice";
+            }
+            case ATTACKER -> {
+                return "attacker";
+            }
+            case DEFENDER -> {
+                return "defender";
+            }
+            default -> throw new IllegalArgumentException("Unknown enum type: " + type);
+        }
     }
 }

@@ -50,6 +50,7 @@
     int gameId = game.getId();
 
     Role role = null;
+    boolean mayChooseRole = true;
     String selectionManagerUrl = null;
     int duration = -1;
     long startTime = -1;
@@ -65,6 +66,7 @@
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.BATTLEGROUND_SELECTION);
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
+        mayChooseRole = ((MultiplayerGame) game).isMayChooseRoles();
 
         if (game.getState() == GameState.ACTIVE) {
             startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
@@ -261,7 +263,7 @@
                 Remove from whitelist
             </button>
         </form-->
-        <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>"/>
+        <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>" mayChooseRole="<%=String.valueOf(mayChooseRole)%>"/>
         <a href="#" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
             OPEN MODAL HREF
         </a>

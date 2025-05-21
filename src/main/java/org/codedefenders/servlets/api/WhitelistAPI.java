@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.servlets.util.Redirect;
@@ -84,11 +85,21 @@ public class WhitelistAPI extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid player ID: " + e.getMessage());
                 return;
             }
-            for (int userId : addIds) {
-                whitelistRepo.addToWhitelist(gameId, userId);
-            }
-            for (int userId : removeIds) {
-                whitelistRepo.removeFromWhitelist(gameId, userId);
+            if (!params.containsKey("type")) {
+                for (int userId : addIds) {
+                    whitelistRepo.addToWhitelist(gameId, userId);
+                }
+                for (int userId : removeIds) {
+                    whitelistRepo.removeFromWhitelist(gameId, userId);
+                }
+            } else {
+                WhitelistType type = WhitelistType.fromString(params.get("type")[0]);
+                for (int userId : addIds) {
+                    whitelistRepo.addToWhitelist(gameId, userId, type);
+                }
+                for (int userId : removeIds) {
+                    whitelistRepo.removeFromWhitelist(gameId, userId);
+                }
             }
             resp.setStatus(HttpServletResponse.SC_OK);
         } catch (NumberFormatException e) {
@@ -106,7 +117,13 @@ public class WhitelistAPI extends HttpServlet {
             return;
         }
         int gameId = Integer.parseInt(params.get("gameId")[0]);
-        List<String> userNames = whitelistRepo.getWhiteListedPlayerNames(gameId);
+        List<String> userNames;
+        if (!params.containsKey("type")) {
+            userNames = whitelistRepo.getWhiteListedPlayerNames(gameId);
+        } else {
+            userNames = whitelistRepo.getWhiteListedPlayerNames(gameId,
+                    WhitelistType.fromString(params.get("type")[0]));
+        }
         Gson gson = new Gson();
         String json = gson.toJson(userNames);
         resp.setContentType("application/json");
