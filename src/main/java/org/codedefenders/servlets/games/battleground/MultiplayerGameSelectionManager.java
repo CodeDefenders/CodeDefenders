@@ -214,6 +214,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         boolean success = gameService.createGame(newGame, withMutants, withTests, creatorRole);
 
+        logger.info("Created game with success: {}", success);
         if (!success) {
             Redirect.redirectBack(request, response);
             return;

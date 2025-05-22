@@ -44,6 +44,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
@@ -53,6 +54,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -74,6 +76,7 @@ public class MultiplayerGameService extends AbstractGameService {
     private final NotificationService notificationService;
     private final MultiplayerGameRepository multiplayerGameRepo;
     private final TestSmellRepository testSmellRepo;
+    private final WhitelistRepository whitelistRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -83,7 +86,8 @@ public class MultiplayerGameService extends AbstractGameService {
                                   GameRepository gameRepo,
                                   MultiplayerGameRepository multiplayerGameRepo,
                                   PlayerRepository playerRepo,
-                                  TestSmellRepository testSmellRepo) {
+                                  TestSmellRepository testSmellRepo,
+                                  WhitelistRepository whitelistRepo) {
         super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
@@ -92,6 +96,7 @@ public class MultiplayerGameService extends AbstractGameService {
         this.notificationService = notificationService;
         this.multiplayerGameRepo = multiplayerGameRepo;
         this.testSmellRepo = testSmellRepo;
+        this.whitelistRepo = whitelistRepo;
     }
 
     @Override
@@ -168,6 +173,10 @@ public class MultiplayerGameService extends AbstractGameService {
 
         int newGameId = multiplayerGameRepo.storeMultiplayerGame(game);
         game.setId(newGameId);
+
+        if (game.isInviteOnly()) {
+            whitelistRepo.addToWhitelist(newGameId, login.getUserId(), WhitelistType.CHOICE);
+        }
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
                 EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));

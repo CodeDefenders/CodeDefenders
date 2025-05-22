@@ -361,7 +361,7 @@ public class MultiplayerGameRepository {
                                                     INNER JOIN players p ON ig.ID = p.Game_ID
                                            WHERE p.User_ID = u.User_ID
                                              AND p.Active = TRUE)
-                          AND ((NOT g.invite_only) OR w.game_id is not null)
+                          AND ((NOT g.invite_only) OR w.game_id = g.ID)
                 """;
 
         return queryRunner.query(query,

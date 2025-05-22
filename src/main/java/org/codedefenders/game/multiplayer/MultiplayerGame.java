@@ -38,6 +38,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -45,6 +46,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -353,6 +355,20 @@ public class MultiplayerGame extends AbstractGame {
 
     @Override
     public boolean addPlayer(int userId, Role role) {
+        if (!mayChooseRoles && inviteOnly) {
+            WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+            WhitelistType whitelistType = whitelistRepo.getWhitelistType(id, userId);
+            if (whitelistType != null) {
+                if (whitelistType == WhitelistType.FLEX || (whitelistType == WhitelistType.CHOICE && role == null)) {
+                    role = attackers.size() > defenders.size() ? Role.DEFENDER : Role.ATTACKER;
+                } else if (whitelistType == WhitelistType.ATTACKER) {
+                    role = Role.ATTACKER;
+                } else if (whitelistType == WhitelistType.DEFENDER) {
+                    role = Role.DEFENDER;
+                }
+                //If whitelist type is choice and role is set, keep role untouched.
+            }
+        }
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
 
@@ -393,7 +409,8 @@ public class MultiplayerGame extends AbstractGame {
     private boolean canJoinGame(int userId) {
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
         WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
-        if (inviteOnly && !whitelistRepo.isWhitelisted(id, userId)) {
+        if (userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID
+                && inviteOnly && !whitelistRepo.isWhitelisted(id, userId)) {
             return false;
         }
         return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
@@ -676,8 +693,8 @@ public class MultiplayerGame extends AbstractGame {
      * TODO: Is synchronization correct?
      */
     public synchronized Role joinWithInvite(int userId, String wantedRole) throws IllegalArgumentException {
-        Role role;
-        if (mayChooseRoles && wantedRole != null) {
+        Role role; //TODO Enum für Rolle benutzen?
+        if (mayChooseRoles && wantedRole != null && !wantedRole.equalsIgnoreCase("flex")) {
             if (wantedRole.equalsIgnoreCase("attacker")) {
                 role = Role.ATTACKER;
             } else if (wantedRole.equalsIgnoreCase("defender")) {

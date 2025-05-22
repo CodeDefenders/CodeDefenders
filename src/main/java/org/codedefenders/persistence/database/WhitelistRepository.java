@@ -94,6 +94,28 @@ public class WhitelistRepository {
         }, gameId, getDBEnum(type));
     }
 
+    public WhitelistType getWhitelistType(int gameId, int playerId) {
+        @Language("SQL") String query = "SELECT type FROM whitelist WHERE game_id = ? AND user_id = ?";
+        return queryRunner.query(query, rs -> {
+            if (rs.next()) {
+                return WhitelistType.fromString(rs.getString("type"));
+            }
+            return null;
+        }, gameId, playerId);
+    }
+
+    public WhitelistType getWhitelistType(int gameId, String username) {
+        @Language("SQL") String query = "SELECT type FROM whitelist JOIN users " +
+                "ON whitelist.user_id = users.User_ID " +
+                "WHERE game_id = ? AND Username = ?";
+        return queryRunner.query(query, rs -> {
+            if (rs.next()) {
+                return WhitelistType.fromString(rs.getString("type"));
+            }
+            return null;
+        }, gameId, username);
+    }
+
     private String getDBEnum(WhitelistType type) {
         switch (type) {
             case FLEX -> {

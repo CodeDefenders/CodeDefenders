@@ -28,6 +28,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
