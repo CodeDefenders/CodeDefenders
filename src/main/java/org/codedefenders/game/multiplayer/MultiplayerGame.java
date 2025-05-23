@@ -20,8 +20,10 @@ package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -38,6 +40,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
@@ -87,6 +90,8 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean mayChooseRoles = true;
 
+    private Set<WhitelistElement> whitelist = new HashSet<>();
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -114,6 +119,7 @@ public class MultiplayerGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+        private Set<WhitelistElement> whitelist = new HashSet<>(); //TODO Iwie in AbstractGame packen?
 
         private int automaticMutantEquivalenceThreshold = 0;
 
@@ -235,6 +241,11 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder whitelist(Set<WhitelistElement> whitelist) {
+            this.whitelist = whitelist;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
@@ -268,6 +279,7 @@ public class MultiplayerGame extends AbstractGame {
         this.inviteOnly = builder.inviteOnly;
         this.mayChooseRoles = builder.mayChooseRoles;
         this.inviteId = builder.inviteId;
+        this.whitelist = builder.whitelist;
     }
 
     public int getGameDurationMinutes() {
@@ -333,6 +345,10 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean isMayChooseRoles() {
         return mayChooseRoles;
+    }
+
+    public Set<WhitelistElement> getWhitelist() {
+        return whitelist;
     }
 
     public List<Player> getDefenderPlayers() {

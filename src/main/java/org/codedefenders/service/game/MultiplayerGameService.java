@@ -44,6 +44,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.impl.NotificationService;
@@ -57,6 +58,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,6 +179,14 @@ public class MultiplayerGameService extends AbstractGameService {
         if (game.isInviteOnly()) {
             whitelistRepo.addToWhitelist(newGameId, login.getUserId(), WhitelistType.CHOICE);
         }
+
+        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        for (WhitelistElement w : game.getWhitelist()) {
+            int userId = userRepo.getUserByName(w.getUsername()).orElseThrow().getId();
+            whitelistRepo.addToWhitelist(newGameId, userId, w.getType());
+        }
+        //TODO: Einladungen anzeigen (sonst ist whitelist für alle Spiele ohne inviteOnly sinnlos)
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
                 EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));

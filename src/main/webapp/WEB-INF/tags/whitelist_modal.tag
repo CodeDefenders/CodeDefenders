@@ -27,11 +27,14 @@
 <%@ attribute name="htmlId" required="true" %>
 <%@ attribute name="gameId" required="false" %>
 <%@ attribute name="mayChooseRole" required="true" %>
+<%@ attribute name="liveGame" required="true" %>
+<!--true, if the game already exists, false, if it is being created-->
 
 <div>
     <t:modal title="Modify whitelist" id="${htmlId}"
              modalDialogClasses="modal-lg">
         <jsp:attribute name="content">
+            <div id="whitelist-inputs" type="hidden"></div>
             <div class="card" id="whitelist-modal-card">
                 <div class="card-header">
                     <label for="searchInput">Search: </label>
@@ -40,17 +43,23 @@
                     <input type="text" id="searchInput" class="form-control" placeholder="Invite users">
                     <div id="autocompleteList" class="list-group"></div>
                 </div>
+                <c:choose>
+                    <c:when test="${liveGame}">
+                        <div class="card-header">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Current whitelist:</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-2" id="already-whitelisted"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </c:when>
+                </c:choose>
                 <div class="card">
                     <div class="card-header">
-                        <h6>Current whitelist:</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-2" id="already-whitelisted"></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h6>Invited users:</h6>
+                        <h6>Users to invite:</h6>
                     </div>
                     <div class="card-body">
                         <div class="d-flex flex-wrap gap-2" id="invited"></div>
@@ -59,20 +68,35 @@
             </div>
         </jsp:attribute>
         <jsp:attribute name="footer">
-            <button type="button" class="btn btn-primary disabled" id="update-button">Update whitelist</button>
+            <c:choose>
+                <c:when test="${liveGame}">
+                    <button type="button" class="btn btn-primary disabled" id="update-button">Update whitelist</button>
+                </c:when>
+            </c:choose>
         </jsp:attribute>
     </t:modal>
 
     <script type="module">
         const gameId = "${gameId}";
         const mayChooseRole = ${mayChooseRole};
+        const liveGame = ${liveGame};
         const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-        const suggestions = await InfoApi.getAllUserNames();
+        const suggestions = await InfoApi.getAllUserNames(); //TODO Change to only valid users
         const input = document.getElementById("searchInput");
         const list = document.getElementById("autocompleteList");
         const invitedArea = document.getElementById("invited");
-        const alreadyWhitelistedArea = document.getElementById("already-whitelisted");
-        const updateButton = document.getElementById("update-button")
+
+
+        let updateButton;
+        let alreadyWhitelistedArea;
+        if (liveGame) {
+            updateButton = document.getElementById("update-button");
+            alreadyWhitelistedArea = document.getElementById("already-whitelisted");
+        } else {
+            updateButton = null;
+            alreadyWhitelistedArea = null;
+        }
+        const inputContainer = document.getElementById("whitelist-inputs");
 
         const choiceToAddUsers = [];
         const attackerToAddUsers = [];
@@ -87,8 +111,17 @@
         const toRemoveUsers = [];
 
 
-        displayAlreadyInvitedUsers();
+        if (liveGame) {
+            displayAlreadyInvitedUsers();
+        }
 
+        /**
+         * Remove a user that has already been invited from the whitelist. The change will only be applied
+         * after clicking the update button.
+         * @param userBadge The graphical badge element in the alreadyWhitelistedArea.
+         * @param userButton The button element in the userBadge. //TODO Remove this parameter?
+         * @param user The username. //TODO Remove this parameter?
+         */
         function removeSingleUser(userBadge, userButton, user) {
             toRemoveUsers.push(user);
             const undoButton = document.createElement("button");
@@ -123,6 +156,10 @@
             enableOrDisableUpdateButton();
         }
 
+        /**
+         * Displays the already invited users in the alreadyWhitelistedArea. The users are fetched from the server.
+         * The function is called when the modal is opened with liveGame=true and when the update button is clicked.
+         */
         async function displayAlreadyInvitedUsers() {
             clearArray(choiceAlreadyWhitelistedUsers);
             clearArray(attackerAlreadyWhitelistedUsers);
@@ -193,9 +230,12 @@
         }
 
 
+        /**
+         * Adds a user to the whitelist. The change will only be applied after the update button is clicked.
+         * @param user Name of the user to add.
+         * @param type The type of whitelist to add the user to. (attacker, defender, flex, choice)
+         */
         function addUserToWhitelist(user, type) {
-            //TODO Check for duplicates? EIgentlich unnötig
-
             let background;
             let toAddUsers;
 
@@ -220,6 +260,14 @@
             }
 
             toAddUsers.push(user);
+            if (!liveGame) {
+                const inputElement = document.createElement("input");
+                inputElement.type = "hidden";
+                inputElement.name = "whitelist-" + type + "-" + toAddUsers.length;
+                inputElement.id = "whitelist-input-" + user;
+                inputElement.value = user;
+                inputContainer.appendChild(inputElement);
+            }
             const userBadge = document.createElement("div");
             userBadge.classList.add("badge", background, "rounded-pill", "d-flex", "align-items-center", "m-1");
             userBadge.textContent = user;
@@ -233,6 +281,12 @@
                     toAddUsers.splice(index, 1);
                 }
                 userBadge.remove();
+                if (!liveGame) {
+                    const inputElement = document.getElementById("whitelist-input-" + user);
+                    if (inputElement) {
+                        inputElement.remove();
+                    }
+                }
                 enableOrDisableUpdateButton();
             });
 
@@ -241,6 +295,7 @@
             enableOrDisableUpdateButton();
         }
 
+        //TODO Funktion woanders definieren
         input.addEventListener("input", function () {
             const value = this.value.trim().toLowerCase();
             list.innerHTML = "";
@@ -282,7 +337,7 @@
                 flexInvite.type = "button";
                 flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
                 flexInvite.addEventListener("click", () => {
-                    addUserToWhitelist(match, "flex");
+                    addUserToWhitelist(match, mayChooseRole ? "choice" : "flex");
                     item.remove();
                     list.innerHTML = "";
                     input.value = "";
@@ -307,20 +362,26 @@
             });
         });
 
-        function userAlreadyAdded(user) { //TODO Das muss doch schöner gehen
-            if (mayChooseRole) {
-                return choiceAlreadyWhitelistedUsers.includes(user) || choiceToAddUsers.includes(user);
-            } else {
-                return attackerAlreadyWhitelistedUsers.includes(user)
-                        || defenderAlreadyWhitelistedUsers.includes(user)
-                        || flexAlreadyWhitelistedUsers.includes(user)
-                        || choiceAlreadyWhitelistedUsers.includes(user)
-                        || attackerToAddUsers.includes(user)
-                        || defenderToAddUsers.includes(user)
-                        || flexToAddUsers.includes(user)
-                        || choiceToAddUsers.includes(user);
+        /**
+         * Check whether a user is already added to the whitelist. This includes users that are already whitelisted
+         * as well as users that are about to be added to the whitelist on the next update.
+         * @param user The username to check against.
+         * @returns {boolean} True, if the user is already added to the whitelist, false otherwise.
+         */
+        function userAlreadyAdded(user) {
+            const relevantArrays = [choiceToAddUsers];
+            if (liveGame) {
+                relevantArrays.push(choiceAlreadyWhitelistedUsers);
             }
+            if (!mayChooseRole) {
+                relevantArrays.push(attackerToAddUsers, defenderToAddUsers, flexToAddUsers);
+                if (liveGame) {
+                    relevantArrays.push(attackerAlreadyWhitelistedUsers, defenderAlreadyWhitelistedUsers, flexAlreadyWhitelistedUsers);
+                }
+            }
+            return relevantArrays.some(list => list.includes(user));
         }
+
 
         document.addEventListener("click", function (e) {
             if (!e.target.closest("#searchInput")) { //TODO soll das so??
@@ -328,78 +389,80 @@
             }
         });
 
-        updateButton.addEventListener("click", async function () {
-            let params = new URLSearchParams();
-            let choiceResponse, attackerResponse, defenderResponse, flexResponse;
+        if (updateButton) { //Only when liveGame=true
+            updateButton.addEventListener("click", async function () {
+                let params = new URLSearchParams();
+                let choiceResponse, attackerResponse, defenderResponse, flexResponse;
 
-            toRemoveUsers.forEach(user => {
-                params.append("removeNames", user);
-            });
+                toRemoveUsers.forEach(user => {
+                    params.append("removeNames", user);
+                });
 
-            params.append("type", "choice");
-            choiceToAddUsers.forEach(user => {
-                params.append("addNames", user);
-            });
-            choiceResponse = await sendPostRequest(params);
-            console.log(choiceResponse.ok);
-            console.log(choiceResponse.text());
-
-            if (!mayChooseRole) {
-                params = new URLSearchParams();
-                params.append("type", "attacker");
-                attackerToAddUsers.forEach(user => {
+                params.append("type", "choice");
+                choiceToAddUsers.forEach(user => {
                     params.append("addNames", user);
                 });
-                attackerResponse = await sendPostRequest(params);
+                choiceResponse = await sendPostRequest(params);
+                console.log(choiceResponse.ok);
+                console.log(choiceResponse.text());
 
-                params = new URLSearchParams();
-                params.append("type", "defender");
-                defenderToAddUsers.forEach(user => {
-                    params.append("addNames", user);
-                });
-                defenderResponse = await sendPostRequest(params);
+                if (!mayChooseRole) {
+                    params = new URLSearchParams();
+                    params.append("type", "attacker");
+                    attackerToAddUsers.forEach(user => {
+                        params.append("addNames", user);
+                    });
+                    attackerResponse = await sendPostRequest(params);
 
-                params = new URLSearchParams()
-                params.append("type", "flex");
-                flexToAddUsers.forEach(user => {
-                    params.append("addNames", user);
-                });
-                flexResponse = await sendPostRequest(params);
-            }
-            let allOk;
-            if (!mayChooseRole) {
-                allOk = [choiceResponse, attackerResponse, defenderResponse, flexResponse].every(response => response.ok);
-            } else {
-                allOk = choiceResponse.ok;
-            }
+                    params = new URLSearchParams();
+                    params.append("type", "defender");
+                    defenderToAddUsers.forEach(user => {
+                        params.append("addNames", user);
+                    });
+                    defenderResponse = await sendPostRequest(params);
 
-
-            if (allOk) { // TODO Das geht doch schöner
-                clearArray(choiceToAddUsers);
-                clearArray(attackerToAddUsers);
-                clearArray(defenderToAddUsers);
-                clearArray(flexToAddUsers);
-                clearArray(toRemoveUsers);
-                invitedArea.innerHTML = "";
-                await displayAlreadyInvitedUsers();
-                //bootstrap.Modal.getInstance(document.getElementById("${htmlId}")).hide();
-                updateButton.classList.add("disabled");
-            } else {
-                let errorMessage;
-                if (!choiceResponse.ok) {
-                    errorMessage = choiceResponse.text;
-                } else if (!attackerResponse.ok) {
-                    errorMessage = attackerResponse.text();
-                } else if (!defenderResponse.ok) {
-                    errorMessage = defenderResponse.text();
-                } else if (!flexResponse.ok) {
-                    errorMessage = flexResponse.text();
+                    params = new URLSearchParams()
+                    params.append("type", "flex");
+                    flexToAddUsers.forEach(user => {
+                        params.append("addNames", user);
+                    });
+                    flexResponse = await sendPostRequest(params);
                 }
-                console.error("Error updating whitelist:", errorMessage);
-                alert("Error updating whitelist: " + errorMessage); //TODO Better error handling
-            }
+                let allOk;
+                if (!mayChooseRole) {
+                    allOk = [choiceResponse, attackerResponse, defenderResponse, flexResponse].every(response => response.ok);
+                } else {
+                    allOk = choiceResponse.ok;
+                }
 
-        });
+
+                if (allOk) { // TODO Das geht doch schöner
+                    clearArray(choiceToAddUsers);
+                    clearArray(attackerToAddUsers);
+                    clearArray(defenderToAddUsers);
+                    clearArray(flexToAddUsers);
+                    clearArray(toRemoveUsers);
+                    invitedArea.innerHTML = "";
+                    await displayAlreadyInvitedUsers();
+                    //bootstrap.Modal.getInstance(document.getElementById("${htmlId}")).hide();
+                    updateButton.classList.add("disabled");
+                } else {
+                    let errorMessage;
+                    if (!choiceResponse.ok) {
+                        errorMessage = choiceResponse.text;
+                    } else if (!attackerResponse.ok) {
+                        errorMessage = attackerResponse.text();
+                    } else if (!defenderResponse.ok) {
+                        errorMessage = defenderResponse.text();
+                    } else if (!flexResponse.ok) {
+                        errorMessage = flexResponse.text();
+                    }
+                    console.error("Error updating whitelist:", errorMessage);
+                    alert("Error updating whitelist: " + errorMessage); //TODO Better error handling
+                }
+
+            });
+        }
 
         function clearArray(array) {
             array.splice(0, array.length);
@@ -420,6 +483,7 @@
         }
 
         function enableOrDisableUpdateButton() {
+            if (!liveGame) return;
             if ([attackerToAddUsers, defenderToAddUsers, choiceToAddUsers, flexToAddUsers, toRemoveUsers].some(array => array.length > 0)) {
                 updateButton.classList.remove("disabled");
             } else {

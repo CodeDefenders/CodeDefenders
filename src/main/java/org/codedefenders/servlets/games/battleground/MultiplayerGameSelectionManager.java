@@ -21,8 +21,10 @@ package org.codedefenders.servlets.games.battleground;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.inject.Inject;
@@ -44,6 +46,8 @@ import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -195,6 +199,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
         Integer inviteId = getIntParameter(request, "inviteId").orElse(null);
 
+        Set<WhitelistElement> whitelist = getWhitelist(request, mayChooseRoles);
+
         MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
                 .chatEnabled(chatEnabled)
@@ -207,6 +213,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mayChooseRoles(mayChooseRoles)
                 .inviteOnly(inviteOnly)
                 .inviteId(inviteId)
+                .whitelist(whitelist)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
@@ -452,5 +459,25 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
         game.update();
         Redirect.redirectBack(request, response);
+    }
+
+    private Set<WhitelistElement> getWhitelist(HttpServletRequest req, boolean mayChooseRoles) {
+        int i = 1;
+        Set<WhitelistElement> whitelist = new HashSet<>();
+        String[] types = {"choice", "attacker", "defender", "flex"};
+        for (String type : types) {
+            while (true) { // TODO irgendwie ohne while(true)
+                String parameterName = "whitelist-" + type + "-" + i;
+                String value = getStringParameter(req, parameterName).orElse(null);
+                if (value != null) {
+                    whitelist.add(new WhitelistElement(value,
+                            mayChooseRoles ? WhitelistType.CHOICE : WhitelistType.fromString(type)));
+                    i++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return whitelist;
     }
 }

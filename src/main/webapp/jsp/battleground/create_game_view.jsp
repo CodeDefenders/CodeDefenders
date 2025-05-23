@@ -269,6 +269,11 @@
                             </div>
                         </div>
 
+                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true" liveGame="false"/> <!-- TODO mayChooseRole dynamisch machen -->
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                            OPEN MODAL HREF
+                        </a>
+
                         <div class="row mb-3"
                              title="Select the role the creator (you) will have in the game.">
                             <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
