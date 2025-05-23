@@ -38,16 +38,12 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.execution.KillMapService;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -58,7 +54,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -85,6 +80,7 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -105,7 +101,6 @@ import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
@@ -136,16 +131,6 @@ public class GameManagingUtils implements IGameManagingUtils {
             .help("How many mutants where marked as equivalent through automatic equivalence duel validation")
             .labelNames("gameType")
             .register();
-
-    private static final Histogram.Child isEquivalentMutantKillableValidation = Histogram.build()
-            .name("codedefenders_isEquivalentMutantKillableValidation_duration")
-            .help("How long the validation whether an as equivalent accepted mutant is killable took")
-            .unit("seconds")
-            // This can take rather long so add a 25.0 seconds bucket
-            .buckets(new double[]{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0, 25.0})
-            .labelNames("gameType")
-            .register()
-            .labels("multiplayer");
 
     @Inject
     private ClassCompilerService classCompiler;
@@ -187,13 +172,10 @@ public class GameManagingUtils implements IGameManagingUtils {
     private IMutationTester mutationTester;
 
     @Inject
-    private ITestCaseSelector regressionTestCaseSelector;
-
-    @Inject
     private UserService userService;
 
     @Inject
-    private KillMapService killMapService;
+    private GameService gameService;
 
     @Inject
     private EventDAO eventDAO;
@@ -661,7 +643,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 
         // Here we check if the accepted equivalence is "possibly" equivalent
-        boolean isMutantKillable = isMutantKillableByOtherTests(equivMutant);
+        boolean isMutantKillable = gameService.isMutantKillableByOtherTests(equivMutant);
 
         String notification = String.format("%s accepts that their mutant %d is equivalent",
                 user.getName(), equivMutant.getId());
@@ -846,7 +828,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             } else { // ASSUMED_YES
                 if (mutPending.getId() == equivMutant.getId()) {
                     // Here we check if the accepted equivalence is "possibly" equivalent
-                    isMutantKillable = isMutantKillableByOtherTests(mutPending);
+                    isMutantKillable = gameService.isMutantKillableByOtherTests(mutPending);
                     String notification = user.getName()
                             + " lost an equivalence duel. Mutant " + mutPending.getId()
                             + " is assumed equivalent.";
@@ -883,51 +865,6 @@ public class GameManagingUtils implements IGameManagingUtils {
                 killedOthers,
             isMutantKillable
         );
-    }
-
-    /**
-     * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
-     * which cover the mutant but belongs to other games and executes them against the mutant.
-     *
-     * @param mutantToValidate The mutant why try to find a killing test for
-     * @return whether the mutant is killable or not/cannot be validated
-     */
-    public boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {
-        int validationThreshold = AdminDAO.getSystemSetting(FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
-        if (validationThreshold <= 0) {
-            logger.debug("Validation of mutant {} skipped due to threshold being 0", mutantToValidate.getId());
-            return false;
-        }
-
-        try (Histogram.Timer ignored = isEquivalentMutantKillableValidation.startTimer()) {
-            // Get all the covering tests of this mutant which do not belong to this game
-            int classId = mutantToValidate.getClassId();
-            List<Test> tests = testRepo.getValidTestsForClass(classId);
-
-            // Remove tests which belong to the same game as the mutant
-            tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
-
-            List<Test> selectedTests = regressionTestCaseSelector.select(tests, validationThreshold);
-            logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
-
-            // At the moment this is purposely blocking.
-            // This is the dumbest, but safest way to deal with it while we design a better solution.
-            KillMap killmap = killMapService.forMutantValidation(selectedTests, mutantToValidate, classId);
-
-            if (killmap == null) {
-                // There was an error we cannot empirically prove the mutant was killable.
-                logger.warn("An error prevents validation of mutant {}", mutantToValidate);
-                return false;
-            } else {
-                for (KillMapEntry killMapEntry : killmap.getEntries()) {
-                    if (killMapEntry.status.equals(KillMapEntry.Status.KILL)
-                            || killMapEntry.status.equals(KillMapEntry.Status.ERROR)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
     }
 
     public enum CanUserClaimEquivalenceResult {

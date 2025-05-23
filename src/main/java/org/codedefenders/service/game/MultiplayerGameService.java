@@ -71,7 +71,6 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 public class MultiplayerGameService extends AbstractGameService {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameService.class);
 
-    private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final MessagesBean messages;
     private final CodeDefendersAuth login;
@@ -92,8 +91,7 @@ public class MultiplayerGameService extends AbstractGameService {
                                   TestSmellRepository testSmellRepo,
                                   WhitelistRepository whitelistRepo,
                                   UserRepository userRepo) {
-        super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
-        this.gameManagingUtils = gameManagingUtils;
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;

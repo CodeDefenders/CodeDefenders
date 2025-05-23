@@ -45,6 +45,9 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -56,8 +59,11 @@ public abstract class AbstractGameService implements IGameService {
     // @Inject
     // MutantDAO mutantDAO;
 
-    protected UserRepository userRepository;
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractGameService.class);
+
+    protected GameManagingUtils gameManagingUtils;
     protected UserService userService;
+    protected UserRepository userRepository;
     protected TestRepository testRepo;
     protected MutantRepository mutantRepo;
     protected GameRepository gameRepo;
@@ -65,9 +71,14 @@ public abstract class AbstractGameService implements IGameService {
     protected TestSmellRepository testSmellRepo;
 
     @Inject
-    public AbstractGameService(UserService userService, UserRepository userRepository,
+    private INotificationService notificationService;
+
+    @Inject
+    public AbstractGameService(GameManagingUtils gameManagingUtils, UserService userService,
+                               UserRepository userRepository,
                                TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
                                PlayerRepository playerRepo, TestSmellRepository testSmellRepo) {
+        this.gameManagingUtils = gameManagingUtils;
         this.userService = userService;
         this.userRepository = userRepository;
         this.testRepo = testRepo;
@@ -76,9 +87,6 @@ public abstract class AbstractGameService implements IGameService {
         this.playerRepo = playerRepo;
         this.testSmellRepo = testSmellRepo;
     }
-
-    @Inject
-    private INotificationService notificationService;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {

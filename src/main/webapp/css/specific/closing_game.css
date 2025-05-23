@@ -1,0 +1,46 @@
+html, body, .content {
+    height: 100%;
+    margin: 0;
+}
+
+.content {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+
+    /* Center page horizontally. */
+    margin: auto;
+    text-align: center;
+}
+
+/* Logo and h1. */
+.branding {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    text-decoration: none;
+    flex-direction: column;
+}
+
+/* Big text. */
+h1, h2, p {
+    color: #444;
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 80px;
+    margin: 2rem 0;
+}
+
+p {
+    font-size: 20px;
+}
