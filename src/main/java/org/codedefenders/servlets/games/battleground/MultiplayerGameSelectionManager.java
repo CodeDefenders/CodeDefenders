@@ -462,10 +462,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private Set<WhitelistElement> getWhitelist(HttpServletRequest req, boolean mayChooseRoles) {
-        int i = 1;
         Set<WhitelistElement> whitelist = new HashSet<>();
         String[] types = {"choice", "attacker", "defender", "flex"};
         for (String type : types) {
+            int i = 1;
             while (true) { // TODO irgendwie ohne while(true)
                 String parameterName = "whitelist-" + type + "-" + i;
                 String value = getStringParameter(req, parameterName).orElse(null);

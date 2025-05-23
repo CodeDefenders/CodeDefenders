@@ -79,6 +79,7 @@ public class MultiplayerGameService extends AbstractGameService {
     private final MultiplayerGameRepository multiplayerGameRepo;
     private final TestSmellRepository testSmellRepo;
     private final WhitelistRepository whitelistRepo;
+    private final UserRepository userRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -89,7 +90,8 @@ public class MultiplayerGameService extends AbstractGameService {
                                   MultiplayerGameRepository multiplayerGameRepo,
                                   PlayerRepository playerRepo,
                                   TestSmellRepository testSmellRepo,
-                                  WhitelistRepository whitelistRepo) {
+                                  WhitelistRepository whitelistRepo,
+                                  UserRepository userRepo) {
         super(userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
@@ -99,6 +101,7 @@ public class MultiplayerGameService extends AbstractGameService {
         this.multiplayerGameRepo = multiplayerGameRepo;
         this.testSmellRepo = testSmellRepo;
         this.whitelistRepo = whitelistRepo;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -180,8 +183,6 @@ public class MultiplayerGameService extends AbstractGameService {
             whitelistRepo.addToWhitelist(newGameId, login.getUserId(), WhitelistType.CHOICE);
         }
 
-        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
-        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
         for (WhitelistElement w : game.getWhitelist()) {
             int userId = userRepo.getUserByName(w.getUsername()).orElseThrow().getId();
             whitelistRepo.addToWhitelist(newGameId, userId, w.getType());

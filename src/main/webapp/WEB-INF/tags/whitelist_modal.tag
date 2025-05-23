@@ -78,23 +78,27 @@
 
     <script type="module">
         const gameId = "${gameId}";
-        const mayChooseRole = ${mayChooseRole};
         const liveGame = ${liveGame};
         const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
         const suggestions = await InfoApi.getAllUserNames(); //TODO Change to only valid users
         const input = document.getElementById("searchInput");
         const list = document.getElementById("autocompleteList");
         const invitedArea = document.getElementById("invited");
+        const mayChooseRoleConst = ${mayChooseRole};
 
 
         let updateButton;
         let alreadyWhitelistedArea;
+
+        let chooseRoleSwitch;
         if (liveGame) {
             updateButton = document.getElementById("update-button");
             alreadyWhitelistedArea = document.getElementById("already-whitelisted");
+            chooseRoleSwitch = null;
         } else {
             updateButton = null;
             alreadyWhitelistedArea = null;
+            chooseRoleSwitch = document.getElementById("choose-role-switch");
         }
         const inputContainer = document.getElementById("whitelist-inputs");
 
@@ -113,6 +117,14 @@
 
         if (liveGame) {
             displayAlreadyInvitedUsers();
+        }
+
+        function mayChooseRole() {
+            if (liveGame) {
+                return mayChooseRoleConst;
+            } else {
+                return chooseRoleSwitch.checked;
+            }
         }
 
         /**
@@ -165,7 +177,7 @@
             clearArray(attackerAlreadyWhitelistedUsers);
             clearArray(defenderAlreadyWhitelistedUsers);
             clearArray(flexAlreadyWhitelistedUsers);
-            if (mayChooseRole) {
+            if (mayChooseRole()) {
                 const choice = await InfoApi.getWhitelistedUserNames(gameId);
                 choice.forEach(user => choiceAlreadyWhitelistedUsers.push(user));
             } else {
@@ -184,7 +196,7 @@
 
             alreadyWhitelistedArea.innerHTML = "";
             displayUsers(choiceAlreadyWhitelistedUsers, "choice");
-            if (!mayChooseRole) {
+            if (!mayChooseRole()) {
                 displayUsers(attackerAlreadyWhitelistedUsers, "attacker");
                 displayUsers(defenderAlreadyWhitelistedUsers, "defender");
                 displayUsers(flexAlreadyWhitelistedUsers, "flex");
@@ -198,7 +210,7 @@
          */
         function displayUsers(users, type) {
             let background;
-            if (mayChooseRole) {
+            if (mayChooseRole()) {
                 background = "bg-secondary";
             } else {
                 if (type === "attacker") {
@@ -239,7 +251,7 @@
             let background;
             let toAddUsers;
 
-            if (mayChooseRole) {
+            if (mayChooseRole()) {
                 background = "bg-secondary";
                 toAddUsers = choiceToAddUsers;
             } else {
@@ -318,7 +330,7 @@
                     list.innerHTML = "";
                     input.value = "";
                 });*/
-                if (!mayChooseRole) {
+                if (!mayChooseRole()) {
                     const defenderInvite = document.createElement("button");
                     defenderInvite.textContent = "Invite as defender";
                     defenderInvite.type = "button";
@@ -337,14 +349,14 @@
                 flexInvite.type = "button";
                 flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
                 flexInvite.addEventListener("click", () => {
-                    addUserToWhitelist(match, mayChooseRole ? "choice" : "flex");
+                    addUserToWhitelist(match, mayChooseRole() ? "choice" : "flex");
                     item.remove();
                     list.innerHTML = "";
                     input.value = "";
                 });
                 item.appendChild(flexInvite);
 
-                if (!mayChooseRole) {
+                if (!mayChooseRole()) {
                     const attackerInvite = document.createElement("button");
                     attackerInvite.textContent = "Add as attacker";
                     //attackerInvite.type = "button";
@@ -373,11 +385,13 @@
             if (liveGame) {
                 relevantArrays.push(choiceAlreadyWhitelistedUsers);
             }
-            if (!mayChooseRole) {
+            if (!mayChooseRole() || !liveGame) {
+                //Check for other whitelists even if mayChooseRole is true when liveGame is false,
+                //because mayChooseRole can be switched while the game is being created
                 relevantArrays.push(attackerToAddUsers, defenderToAddUsers, flexToAddUsers);
-                if (liveGame) {
-                    relevantArrays.push(attackerAlreadyWhitelistedUsers, defenderAlreadyWhitelistedUsers, flexAlreadyWhitelistedUsers);
-                }
+            }
+            if (!mayChooseRole() && liveGame) {
+                relevantArrays.push(attackerAlreadyWhitelistedUsers, defenderAlreadyWhitelistedUsers, flexAlreadyWhitelistedUsers);
             }
             return relevantArrays.some(list => list.includes(user));
         }
@@ -388,6 +402,27 @@
                 list.innerHTML = "";
             }
         });
+
+        if (chooseRoleSwitch) {
+            chooseRoleSwitch.addEventListener("change", function () {
+                if (this.checked) {
+                    invitedArea.querySelectorAll('.badge').forEach(badge => {
+                        badge.classList.remove("bg-attacker", "bg-defender");
+                        badge.classList.add("bg-secondary");
+                    });
+                } else {
+                    invitedArea.querySelectorAll('.badge').forEach(badge => {
+                        if (attackerToAddUsers.includes(badge.textContent)) {
+                            badge.classList.remove("bg-secondary");
+                            badge.classList.add("bg-attacker");
+                        } else if (defenderToAddUsers.includes(badge.textContent)) {
+                            badge.classList.remove("bg-secondary");
+                            badge.classList.add("bg-defender");
+                        }
+                    });
+                }
+            });
+        }
 
         if (updateButton) { //Only when liveGame=true
             updateButton.addEventListener("click", async function () {
@@ -406,7 +441,7 @@
                 console.log(choiceResponse.ok);
                 console.log(choiceResponse.text());
 
-                if (!mayChooseRole) {
+                if (!mayChooseRole()) {
                     params = new URLSearchParams();
                     params.append("type", "attacker");
                     attackerToAddUsers.forEach(user => {
@@ -429,7 +464,7 @@
                     flexResponse = await sendPostRequest(params);
                 }
                 let allOk;
-                if (!mayChooseRole) {
+                if (!mayChooseRole()) {
                     allOk = [choiceResponse, attackerResponse, defenderResponse, flexResponse].every(response => response.ok);
                 } else {
                     allOk = choiceResponse.ok;
