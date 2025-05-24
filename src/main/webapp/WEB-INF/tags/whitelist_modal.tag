@@ -91,15 +91,21 @@
         let alreadyWhitelistedArea;
 
         let chooseRoleSwitch;
+        const whitelistModalOpener = document.getElementById("whitelist-modal-opener");
+
+        let currentUsers;
         if (liveGame) {
             updateButton = document.getElementById("update-button");
             alreadyWhitelistedArea = document.getElementById("already-whitelisted");
+            //currentUsers = await InfoApi.getUserNamesForGame(gameId);
             chooseRoleSwitch = null;
         } else {
             updateButton = null;
             alreadyWhitelistedArea = null;
+            currentUsers = null;
             chooseRoleSwitch = document.getElementById("choose-role-switch");
         }
+
         const inputContainer = document.getElementById("whitelist-inputs");
 
         const choiceToAddUsers = [];
@@ -377,13 +383,14 @@
         /**
          * Check whether a user is already added to the whitelist. This includes users that are already whitelisted
          * as well as users that are about to be added to the whitelist on the next update.
+         * It also includes all users that are currently part of the game, even if they are not whitelisted.
          * @param user The username to check against.
          * @returns {boolean} True, if the user is already added to the whitelist, false otherwise.
          */
         function userAlreadyAdded(user) {
             const relevantArrays = [choiceToAddUsers];
             if (liveGame) {
-                relevantArrays.push(choiceAlreadyWhitelistedUsers);
+                relevantArrays.push(choiceAlreadyWhitelistedUsers, currentUsers);
             }
             if (!mayChooseRole() || !liveGame) {
                 //Check for other whitelists even if mayChooseRole is true when liveGame is false,
@@ -396,6 +403,10 @@
             return relevantArrays.some(list => list.includes(user));
         }
 
+
+        function clearArray(array) {
+            array.splice(0, array.length);
+        }
 
         document.addEventListener("click", function (e) {
             if (!e.target.closest("#searchInput")) { //TODO soll das so??
@@ -421,6 +432,12 @@
                         }
                     });
                 }
+            });
+        }
+
+        if (liveGame) {
+            whitelistModalOpener.addEventListener("click", async function () {
+                currentUsers = await InfoApi.getUserNamesForGame(gameId);
             });
         }
 
@@ -497,10 +514,6 @@
                 }
 
             });
-        }
-
-        function clearArray(array) {
-            array.splice(0, array.length);
         }
 
         /**

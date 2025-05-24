@@ -264,7 +264,7 @@
             </button>
         </form-->
         <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>" mayChooseRole="<%=String.valueOf(mayChooseRole)%>" liveGame="true"/>
-        <a href="#" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+        <a href="#" id="whitelist-modal-opener" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
             OPEN MODAL HREF
         </a>
     </div>

@@ -288,4 +288,18 @@ public class GameRepository {
         int gameId = queryRunner.query(query, oneFromRS(rs -> rs.getInt("game_id")), inviteId).orElseThrow();
         return getGame(gameId);
     }
+
+    /**
+     *
+     */
+    public List<String> getUsernamesForGame(int gameId) {
+        @Language("SQL") String query = """
+                SELECT distinct Username FROM games, players, users
+                WHERE games.ID = ?
+                  AND players.Game_ID = games.ID
+                  AND players.User_ID = users.User_ID;
+        """;
+
+        return queryRunner.query(query, listFromRS(rs -> rs.getString("UserName")), gameId);
+    }
 }

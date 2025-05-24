@@ -100,6 +100,10 @@ class InfoApi {
     static async getWhitelistedUserNamesWithType(gameId, type) {
         return await InfoApi.fetchJSON(`${contextPath}api/whitelist?gameId=` + gameId + '&type=' + type);
     }
+
+    static async getUserNamesForGame(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/user?forGame=true&gameId=` + gameId);
+    }
 }
 
 

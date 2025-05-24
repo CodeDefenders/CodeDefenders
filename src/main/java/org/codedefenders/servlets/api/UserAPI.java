@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.api;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +43,26 @@ public class UserAPI extends HttpServlet {
 
     @Inject
     UserRepository userRepo;
+
+    @Inject
+    GameRepository gameRepo;
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) { //TODO parameter, um nur Namen zu kriegen
         //TODO dummy-user rausfiltern
-        List<String> simpleUsers = userRepo.getUsers().stream()
-                .map(UserEntity::getUsername)
-                .toList(); //TODO Effizienter zwischenspeichern?
+        List<String> simpleUsers;
+        Map<String, String[]> params = request.getParameterMap();
+        if (params.containsKey("forGame") && Boolean.parseBoolean(request.getParameter("forGame"))) {
+            if (!params.containsKey("gameId")) {
+                logger.error("forGame is true, but no gameId given");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            simpleUsers = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
+        } else {
+            simpleUsers = userRepo.getUsers().stream()
+                    .map(UserEntity::getUsername)
+                    .toList(); //TODO Effizienter zwischenspeichern?
+        }
         if (request.getAttribute("filter") != null && !request.getAttribute("filter").equals("")) {
             //TODO filtern
         } else {
