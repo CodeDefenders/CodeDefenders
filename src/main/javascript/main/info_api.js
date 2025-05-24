@@ -89,6 +89,10 @@ class InfoApi {
         return await InfoApi.fetchJSON(`${contextPath}api/invite-link`);
     }
 
+    static async getInviteLinkData(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/invite-link?gameId=` + gameId);
+    }
+
     static async getAllUserNames() {
         return await InfoApi.fetchJSON(`${contextPath}api/user`);
     }

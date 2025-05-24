@@ -269,10 +269,10 @@
                             </div>
                         </div>
 
-                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true" liveGame="false"/> <!-- TODO mayChooseRole dynamisch machen -->
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
-                            OPEN MODAL HREF
-                        </a>
+                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true" liveGame="false"/>
+                        <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                            Invite options
+                        </button>
 
                         <div class="row mb-3"
                              title="Select the role the creator (you) will have in the game.">
@@ -336,37 +336,7 @@
                                 <a href="${url.forPath(param.origin)}" id="cancel" class="btn btn-outline-primary">Cancel</a>
                             </c:otherwise>
                         </c:choose>
-
-
-                        <div title="Invite link" class="row mt-3">
-                            <input type="hidden" name="inviteId" id="invite-id" value=""/>
-                            <button type="button" id="copy-link-button"
-                                    class="btn-primary btn">Copy invite link
-                            </button>
-                            <script type="module">
-                                const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-                                const linkButton = document.getElementById('copy-link-button');
-                                linkButton.addEventListener('click', async () => {
-                                    const inviteIdInput = document.getElementById('invite-id');
-                                    if (inviteIdInput.value !== "") {
-                                        return;
-                                    }
-                                    const linkData = await InfoApi.getInviteLinkDataWithoutGameId();
-                                    inviteIdInput.value = linkData.inviteId;
-                                    //TODO show toast
-                                    navigator.clipboard.writeText(linkData.inviteLink)
-                                            .then(() => {
-                                                linkButton.innerText = "Copied!";
-                                                setTimeout(() => {
-                                                    linkButton.innerText = "Copy invite link";
-                                                }, 2000);
-                                            })
-                                            .catch(err => {
-                                                console.error('Failed to copy: ', err);
-                                            });
-                                });
-                            </script>
-                        </div>
+                        <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
                     </form>
 

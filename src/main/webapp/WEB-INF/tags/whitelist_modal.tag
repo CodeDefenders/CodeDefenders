@@ -68,6 +68,9 @@
             </div>
         </jsp:attribute>
         <jsp:attribute name="footer">
+            <button type="button" id="copy-link-button" class="btn-primary btn">
+                Copy invite link
+            </button>
             <c:choose>
                 <c:when test="${liveGame}">
                     <button type="button" class="btn btn-primary disabled" id="update-button">Update whitelist</button>
@@ -79,21 +82,23 @@
     <script type="module">
         const gameId = "${gameId}";
         const liveGame = ${liveGame};
+        const mayChooseRoleConst = ${mayChooseRole};
+
         const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
         const suggestions = await InfoApi.getAllUserNames(); //TODO Change to only valid users
+
         const input = document.getElementById("searchInput");
         const list = document.getElementById("autocompleteList");
         const invitedArea = document.getElementById("invited");
-        const mayChooseRoleConst = ${mayChooseRole};
-
+        const linkButton = document.getElementById('copy-link-button');
+        const whitelistModalOpener = document.getElementById("whitelist-modal-opener");
 
         let updateButton;
         let alreadyWhitelistedArea;
-
         let chooseRoleSwitch;
-        const whitelistModalOpener = document.getElementById("whitelist-modal-opener");
 
         let currentUsers;
+
         if (liveGame) {
             updateButton = document.getElementById("update-button");
             alreadyWhitelistedArea = document.getElementById("already-whitelisted");
@@ -435,11 +440,42 @@
             });
         }
 
+        async function copyLink(inviteLink) {
+            navigator.clipboard.writeText(inviteLink)
+                .then(() => {
+                    linkButton.innerText = "Copied!";
+                    setTimeout(() => {
+                        linkButton.innerText = "Copy invite link";
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+        }
+
         if (liveGame) {
             whitelistModalOpener.addEventListener("click", async function () {
                 currentUsers = await InfoApi.getUserNamesForGame(gameId);
             });
         }
+
+        linkButton.addEventListener('click', async () => {
+
+            let linkData;
+            if (liveGame) {
+                linkData = await InfoApi.getInviteLinkData(gameId);
+            } else {
+                const inviteIdInput = document.getElementById('invite-id');
+                if (inviteIdInput.value !== "") {
+                    return;
+                }
+                linkData = await InfoApi.getInviteLinkDataWithoutGameId();
+                inviteIdInput.value = linkData.inviteId;
+            }
+
+            //TODO show toast
+            copyLink(linkData.inviteLink)
+        });
 
         if (updateButton) { //Only when liveGame=true
             updateButton.addEventListener("click", async function () {
