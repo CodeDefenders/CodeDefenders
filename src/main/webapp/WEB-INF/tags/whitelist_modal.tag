@@ -1,4 +1,4 @@
-<%@ tag import="org.codedefenders.servlets.api.UserAPI" %><%--
+<%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -87,7 +87,7 @@
         const melee = ${type == "melee" ? "true" : "false"};
 
         const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-        const suggestions = await InfoApi.getAllUserNames(); //TODO Change to only valid users
+        const suggestions = await InfoApi.getAllUserNames();
 
         const input = document.getElementById("searchInput");
         const list = document.getElementById("autocompleteList");
@@ -99,17 +99,15 @@
         let alreadyWhitelistedArea;
         let chooseRoleSwitch;
 
-        let currentUsers;
+        const currentUsers = [];
 
         if (liveGame) {
             updateButton = document.getElementById("update-button");
             alreadyWhitelistedArea = document.getElementById("already-whitelisted");
-            //currentUsers = await InfoApi.getUserNamesForGame(gameId);
             chooseRoleSwitch = null;
         } else {
             updateButton = null;
             alreadyWhitelistedArea = null;
-            currentUsers = null;
             if (!melee) {
                 chooseRoleSwitch = document.getElementById("choose-role-switch");
             } else {
@@ -151,10 +149,11 @@
          * Remove a user that has already been invited from the whitelist. The change will only be applied
          * after clicking the update button.
          * @param userBadge The graphical badge element in the alreadyWhitelistedArea.
-         * @param userButton The button element in the userBadge. //TODO Remove this parameter?
-         * @param user The username. //TODO Remove this parameter?
          */
-        function removeSingleUser(userBadge, userButton, user) {
+        function removeSingleUser(userBadge) {
+            const userButton = userBadge.querySelector('button');
+            const user = userBadge.querySelector('span').textContent;
+
             toRemoveUsers.push(user);
             const undoButton = document.createElement("button");
             undoButton.classList.add("btn", "btn-close-white", "p-0", "ms-1");
@@ -197,6 +196,7 @@
             clearArray(attackerAlreadyWhitelistedUsers);
             clearArray(defenderAlreadyWhitelistedUsers);
             clearArray(flexAlreadyWhitelistedUsers);
+            clearArray(currentUsers);
             if (mayChooseRole()) {
                 const choice = await InfoApi.getWhitelistedUserNames(gameId);
                 choice.forEach(user => choiceAlreadyWhitelistedUsers.push(user));
@@ -205,12 +205,13 @@
                 const attacker = await InfoApi.getWhitelistedUserNamesWithType(gameId, "attacker");
                 const defender = await InfoApi.getWhitelistedUserNamesWithType(gameId, "defender");
                 const flex = await InfoApi.getWhitelistedUserNamesWithType(gameId, "flex");
-                //TODO Irgendwie ne Struktur für die Sachen herstellen, damit man das nicht alles einzeln machen muss?
+                const current = await InfoApi.getUserNamesForGame(gameId);
 
                 choice.forEach(user => choiceAlreadyWhitelistedUsers.push(user));
                 attacker.forEach(user => attackerAlreadyWhitelistedUsers.push(user));
                 defender.forEach(user => defenderAlreadyWhitelistedUsers.push(user));
                 flex.forEach(user => flexAlreadyWhitelistedUsers.push(user));
+                current.forEach(user => currentUsers.push(user));
             }
 
 
@@ -243,21 +244,23 @@
             }
 
             users.forEach(user => {
-                const userBadge = document.createElement("div");
-                userBadge.classList.add("badge", background, "rounded-pill", "d-flex", "align-items-center", "m-1");
-                const userBadgeNameElement = document.createElement("span");
-                userBadgeNameElement.textContent = user;
-                userBadge.append(userBadgeNameElement);
+                if (!currentUsers.includes(user)) {
+                    const userBadge = document.createElement("div");
+                    userBadge.classList.add("badge", background, "rounded-pill", "d-flex", "align-items-center", "m-1");
+                    const userBadgeNameElement = document.createElement("span");
+                    userBadgeNameElement.textContent = user;
+                    userBadge.append(userBadgeNameElement);
 
-                const userButton = document.createElement("button");
-                userButton.innerHTML = "<i class='fa fa-times m-0 p-0'></i>"; //TODO Ein kleines bisschen andere Größe als undo-Button
-                userButton.classList.add("btn", "btn-close-white", "p-0", "ms-1");
-                userButton.addEventListener("click", () => {
-                    removeSingleUser(userBadge, userButton, user);
-                });
+                    const userButton = document.createElement("button");
+                    userButton.innerHTML = "<i class='fa fa-times m-0 p-0'></i>";
+                    userButton.classList.add("btn", "btn-close-white", "p-0", "ms-1");
+                    userButton.addEventListener("click", () => {
+                        removeSingleUser(userBadge);
+                    });
 
-                userBadge.appendChild(userButton);
-                alreadyWhitelistedArea.appendChild(userBadge);
+                    userBadge.appendChild(userButton);
+                    alreadyWhitelistedArea.appendChild(userBadge);
+                }
             })
         }
 
@@ -327,7 +330,6 @@
             enableOrDisableUpdateButton();
         }
 
-        //TODO Funktion woanders definieren
         input.addEventListener("input", function () {
             const value = this.value.trim().toLowerCase();
             list.innerHTML = "";
@@ -343,13 +345,6 @@
                 name.textContent = match;
                 name.classList.add("flex-grow-1");
                 item.appendChild(name);
-                //item.type = "button";
-                /*item.addEventListener("click", function () {
-                    item.remove();
-                    addUserToWhitelist(match);
-                    list.innerHTML = "";
-                    input.value = "";
-                });*/
                 if (!mayChooseRole()) {
                     const defenderInvite = document.createElement("button");
                     defenderInvite.textContent = "Invite as defender";
@@ -379,7 +374,6 @@
                 if (!mayChooseRole()) {
                     const attackerInvite = document.createElement("button");
                     attackerInvite.textContent = "Add as attacker";
-                    //attackerInvite.type = "button";
                     attackerInvite.classList.add("btn", "btn-danger", "btn-sm");
                     attackerInvite.addEventListener("click", function () {
                         addUserToWhitelist(match, "attacker");
@@ -423,7 +417,7 @@
         }
 
         document.addEventListener("click", function (e) {
-            if (!e.target.closest("#searchInput")) { //TODO soll das so??
+            if (!e.target.closest("#searchInput")) {
                 list.innerHTML = "";
             }
         });
@@ -462,11 +456,11 @@
                 });
         }
 
-        if (liveGame) {
+        /*if (liveGame) {
             whitelistModalOpener.addEventListener("click", async function () {
                 currentUsers = await InfoApi.getUserNamesForGame(gameId);
             });
-        }
+        }*/
 
         linkButton.addEventListener('click', async () => {
 
@@ -530,7 +524,7 @@
                 }
 
 
-                if (allOk) { // TODO Das geht doch schöner
+                if (allOk) {
                     clearArray(choiceToAddUsers);
                     clearArray(attackerToAddUsers);
                     clearArray(defenderToAddUsers);
@@ -552,7 +546,6 @@
                         errorMessage = flexResponse.text();
                     }
                     console.error("Error updating whitelist:", errorMessage);
-                    alert("Error updating whitelist: " + errorMessage); //TODO Better error handling
                 }
 
             });

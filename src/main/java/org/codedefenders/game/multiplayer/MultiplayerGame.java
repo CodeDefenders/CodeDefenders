@@ -372,14 +372,13 @@ public class MultiplayerGame extends AbstractGame {
      */
     @Override
     public boolean addPlayer(int userId, Role role) {
-
         if (userId != creatorId && !mayChooseRoles || role == null) {
             WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
             WhitelistType whitelistType = whitelistRepo.getWhitelistType(id, userId);
             if (whitelistType == null
                     || whitelistType == WhitelistType.FLEX
                     || (whitelistType == WhitelistType.CHOICE) && role == null) {
-                role = attackers.size() > defenders.size() ? Role.DEFENDER : Role.ATTACKER;
+                role = getAttackerPlayers().size() > getDefenderPlayers().size() ? Role.DEFENDER : Role.ATTACKER;
             } else if (whitelistType == WhitelistType.ATTACKER) {
                 role = Role.ATTACKER;
             } else if (whitelistType == WhitelistType.DEFENDER) {
