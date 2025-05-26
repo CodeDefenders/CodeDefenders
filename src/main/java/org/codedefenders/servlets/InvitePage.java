@@ -135,7 +135,6 @@ public class InvitePage extends HttpServlet {
             }
             notificationService.post(event);
             logger.info("User {} joined game {} as {}", userId, gameId, role);
-            messages.add("You successfully joined the game as " + (role == Role.ATTACKER ? "an " : "a ") + role + ".");
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
             messages.add("You had already joined this game.");
