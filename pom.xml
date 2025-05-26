@@ -1056,6 +1056,11 @@
 			<artifactId>httpcore</artifactId>
 			<version>4.4.16</version>
 		</dependency>
+		<dependency>
+			<groupId>com.googlecode.gettext-commons</groupId>
+			<artifactId>gettext-commons</artifactId>
+			<version>0.9.8</version>
+		</dependency>
 		<!-- End Commons Libraries -->
 
 		<!-- Begin Client Side Dependencies -->
