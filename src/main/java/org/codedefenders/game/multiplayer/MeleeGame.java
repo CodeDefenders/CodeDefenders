@@ -19,9 +19,11 @@
 package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -38,6 +40,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -80,8 +83,6 @@ public class MeleeGame extends AbstractGame {
     private float lineCoverage;
     private float mutantCoverage;
     private float prize;
-
-    private boolean requiresValidation;
 
     private boolean chatEnabled;
 
@@ -133,6 +134,10 @@ public class MeleeGame extends AbstractGame {
         private int automaticMutantEquivalenceThreshold = 0;
 
         private Integer classroomId = null;
+
+        private boolean inviteOnly = false;
+        private Integer inviteId = -1;
+        private Set<WhitelistElement> whitelist = new HashSet<>();
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
@@ -230,6 +235,21 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
+        public Builder inviteOnly(boolean inviteOnly) {
+            this.inviteOnly = inviteOnly;
+            return this;
+        }
+
+        public Builder inviteId(Integer inviteId) {
+            this.inviteId = inviteId;
+            return this;
+        }
+
+        public Builder whitelist(Set<WhitelistElement> whitelist) {
+            this.whitelist = whitelist;
+            return this;
+        }
+
         public MeleeGame build() {
             return new MeleeGame(this);
         }
@@ -262,6 +282,10 @@ public class MeleeGame extends AbstractGame {
 
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
         this.classroomId = builder.classroomId;
+
+        this.inviteOnly = builder.inviteOnly;
+        this.inviteId = builder.inviteId;
+        this.whitelist = builder.whitelist;
     }
 
     public boolean hasSystemTests() {
@@ -341,11 +365,6 @@ public class MeleeGame extends AbstractGame {
 
         List<Player> players = gameRepo.getPlayersForGame(getId(), Role.PLAYER);
         return players;
-    }
-
-    protected boolean canJoinGame(int userId) {
-        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
-        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override

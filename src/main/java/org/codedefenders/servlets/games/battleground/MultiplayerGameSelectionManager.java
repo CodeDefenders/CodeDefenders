@@ -199,7 +199,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
         Integer inviteId = getIntParameter(request, "inviteId").orElse(null);
 
-        Set<WhitelistElement> whitelist = getWhitelist(request, mayChooseRoles);
+        Set<WhitelistElement> whitelist = ServletUtils.getWhitelist(request, mayChooseRoles);
 
         MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
@@ -466,25 +466,5 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
         game.update();
         Redirect.redirectBack(request, response);
-    }
-
-    private Set<WhitelistElement> getWhitelist(HttpServletRequest req, boolean mayChooseRoles) {
-        Set<WhitelistElement> whitelist = new HashSet<>();
-        String[] types = {"choice", "attacker", "defender", "flex"};
-        for (String type : types) {
-            int i = 1;
-            while (true) { // TODO irgendwie ohne while(true)
-                String parameterName = "whitelist-" + type + "-" + i;
-                String value = getStringParameter(req, parameterName).orElse(null);
-                if (value != null) {
-                    whitelist.add(new WhitelistElement(value,
-                            mayChooseRoles ? WhitelistType.CHOICE : WhitelistType.fromString(type)));
-                    i++;
-                } else {
-                    break;
-                }
-            }
-        }
-        return whitelist;
     }
 }

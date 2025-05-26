@@ -75,8 +75,6 @@ public class MultiplayerGame extends AbstractGame {
     private float mutantCoverage;
     private float prize;
 
-    private boolean requiresValidation;
-
     private boolean chatEnabled;
 
     private int gameDurationMinutes;
@@ -90,7 +88,6 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean mayChooseRoles = true;
 
-    private Set<WhitelistElement> whitelist = new HashSet<>();
 
     public static class Builder {
         // mandatory values
@@ -119,7 +116,7 @@ public class MultiplayerGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
-        private Set<WhitelistElement> whitelist = new HashSet<>(); //TODO Iwie in AbstractGame packen?
+        private Set<WhitelistElement> whitelist = new HashSet<>();
 
         private int automaticMutantEquivalenceThreshold = 0;
 
@@ -429,16 +426,6 @@ public class MultiplayerGame extends AbstractGame {
             return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
-    }
-
-    private boolean canJoinGame(int userId) {
-        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
-        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
-        if (userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID
-                && inviteOnly && !whitelistRepo.isWhitelisted(id, userId)) {
-            return false;
-        }
-        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override

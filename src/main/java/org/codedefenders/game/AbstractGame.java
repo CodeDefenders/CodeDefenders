@@ -18,8 +18,9 @@
  */
 package org.codedefenders.game;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.EventDAO;
@@ -29,11 +30,15 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +64,8 @@ public abstract class AbstractGame {
 
     protected boolean capturePlayersIntention = false;
 
+    protected boolean requiresValidation;
+
     protected List<Player> observers;
 
     protected List<Event> events;
@@ -68,6 +75,7 @@ public abstract class AbstractGame {
 
     protected boolean inviteOnly = false;
     protected Integer inviteId = null;
+    protected Set<WhitelistElement> whitelist = new HashSet<>();
     /**
      * Validation level used to check submitted mutants.
      */
@@ -245,5 +253,19 @@ public abstract class AbstractGame {
             observers = gameRepo.getPlayersForGame(getId(), Role.OBSERVER);
         }
         return observers;
+    }
+
+    protected boolean canJoinGame(int userId) {
+        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+        if (userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID
+                && inviteOnly && !whitelistRepo.isWhitelisted(id, userId)) {
+            return false;
+        }
+        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
+    }
+
+    public Set<WhitelistElement> getWhitelist() {
+        return whitelist;
     }
 }

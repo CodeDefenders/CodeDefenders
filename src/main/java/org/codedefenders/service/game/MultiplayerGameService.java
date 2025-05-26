@@ -77,8 +77,6 @@ public class MultiplayerGameService extends AbstractGameService {
     private final NotificationService notificationService;
     private final MultiplayerGameRepository multiplayerGameRepo;
     private final TestSmellRepository testSmellRepo;
-    private final WhitelistRepository whitelistRepo;
-    private final UserRepository userRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -89,17 +87,15 @@ public class MultiplayerGameService extends AbstractGameService {
                                   MultiplayerGameRepository multiplayerGameRepo,
                                   PlayerRepository playerRepo,
                                   TestSmellRepository testSmellRepo,
-                                  WhitelistRepository whitelistRepo,
-                                  UserRepository userRepo) {
-        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo);
+                                  WhitelistRepository whitelistRepo) {
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo,
+                whitelistRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.multiplayerGameRepo = multiplayerGameRepo;
         this.testSmellRepo = testSmellRepo;
-        this.whitelistRepo = whitelistRepo;
-        this.userRepo = userRepo;
     }
 
     @Override
@@ -182,7 +178,7 @@ public class MultiplayerGameService extends AbstractGameService {
         }
 
         for (WhitelistElement w : game.getWhitelist()) {
-            int userId = userRepo.getUserByName(w.getUsername()).orElseThrow().getId();
+            int userId = userRepository.getUserByName(w.getUsername()).orElseThrow().getId();
             whitelistRepo.addToWhitelist(newGameId, userId, w.getType());
         }
         //TODO: Einladungen anzeigen (sonst ist whitelist für alle Spiele ohne inviteOnly sinnlos)

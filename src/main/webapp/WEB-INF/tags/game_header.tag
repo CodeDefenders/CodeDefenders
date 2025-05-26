@@ -54,6 +54,7 @@
     String selectionManagerUrl = null;
     int duration = -1;
     long startTime = -1;
+    String type = game instanceof MeleeGame ? "melee" : "battleground";
     if (game instanceof MeleeGame) {
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
         role = ((MeleeGame) game).getRole(login.getUserId());
@@ -248,22 +249,8 @@
 
         <t:game_chat/>
 
-        <!--form method="post" action="${url.forPath(Paths.WHITELIST_API)}">
-            <input type="hidden" name="gameId" value="<%=gameId%>">
-            <input type="hidden" name="formType" value="add-to-whitelist">
-            <label>
-                <input type="text" name="user-id" value="">
-            </label>
-            <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap"
-                    id="btnAddWhitelist"  name="add">
-                Add to whitelist
-            </button>
-            <button type="submit" class="btn btn-sm btn-outline-secondary text-nowrap"
-                    id="btnRemoveWhitelist" name="remove">
-                Remove from whitelist
-            </button>
-        </form-->
-        <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>" mayChooseRole="<%=String.valueOf(mayChooseRole)%>" liveGame="true"/>
+        <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>"
+                           mayChooseRole="<%=String.valueOf(mayChooseRole)%>" liveGame="true" type="<%=type%>"/>
         <button class="btn btn-info" id="whitelist-modal-opener" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
             Invite options
         </button>

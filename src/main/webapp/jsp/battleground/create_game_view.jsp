@@ -269,10 +269,12 @@
                             </div>
                         </div>
 
-                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true" liveGame="false"/>
+                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true"
+                                           liveGame="false" type="batteground"/>
                         <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
                             Invite options
                         </button>
+                        <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
                         <div class="row mb-3"
                              title="Select the role the creator (you) will have in the game.">
@@ -336,7 +338,6 @@
                                 <a href="${url.forPath(param.origin)}" id="cancel" class="btn btn-outline-primary">Cancel</a>
                             </c:otherwise>
                         </c:choose>
-                        <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
                     </form>
 

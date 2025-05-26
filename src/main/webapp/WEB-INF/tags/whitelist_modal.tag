@@ -28,6 +28,7 @@
 <%@ attribute name="gameId" required="false" %>
 <%@ attribute name="mayChooseRole" required="true" %>
 <%@ attribute name="liveGame" required="true" %>
+<%@ attribute name="type" required="true" %>
 <!--true, if the game already exists, false, if it is being created-->
 
 <div>
@@ -83,6 +84,7 @@
         const gameId = "${gameId}";
         const liveGame = ${liveGame};
         const mayChooseRoleConst = ${mayChooseRole};
+        const melee = ${type == "melee" ? "true" : "false"};
 
         const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
         const suggestions = await InfoApi.getAllUserNames(); //TODO Change to only valid users
@@ -108,7 +110,11 @@
             updateButton = null;
             alreadyWhitelistedArea = null;
             currentUsers = null;
-            chooseRoleSwitch = document.getElementById("choose-role-switch");
+            if (!melee) {
+                chooseRoleSwitch = document.getElementById("choose-role-switch");
+            } else {
+                chooseRoleSwitch = null;
+            }
         }
 
         const inputContainer = document.getElementById("whitelist-inputs");
@@ -131,6 +137,9 @@
         }
 
         function mayChooseRole() {
+            if (melee) {
+                return true; //Because the creator cannot choose for the players
+            }
             if (liveGame) {
                 return mayChooseRoleConst;
             } else {
@@ -473,8 +482,7 @@
                 inviteIdInput.value = linkData.inviteId;
             }
 
-            //TODO show toast
-            copyLink(linkData.inviteLink)
+            await copyLink(linkData.inviteLink)
         });
 
         if (updateButton) { //Only when liveGame=true
