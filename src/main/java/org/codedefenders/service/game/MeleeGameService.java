@@ -234,6 +234,8 @@ public class MeleeGameService extends AbstractGameService {
                 .automaticMutantEquivalenceThreshold(game.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(game.getGameDurationMinutes())
                 .classroomId(game.getClassroomId().orElse(null))
+                .inviteOnly(game.isInviteOnly())
+                .whitelist(whitelistRepo.getWhitelist(game.getId()))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(game);

@@ -19,7 +19,10 @@
 package org.codedefenders.service.game;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -235,6 +238,18 @@ public class MultiplayerGameService extends AbstractGameService {
                 .automaticMutantEquivalenceThreshold(game.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(game.getGameDurationMinutes())
                 .classroomId(game.getClassroomId().orElse(null))
+                .mayChooseRoles(game.isMayChooseRoles())
+                .whitelist(whitelistRepo.getWhitelist(game.getId()).stream().map((w) -> {
+                    WhitelistType newType;
+                    if (w.getType() == WhitelistType.ATTACKER) {
+                        newType = WhitelistType.DEFENDER;
+                    } else if (w.getType() == WhitelistType.DEFENDER) {
+                        newType = WhitelistType.ATTACKER;
+                    } else {
+                        newType = w.getType();
+                    }
+                    return new WhitelistElement(w.getUsername(), newType);
+                }).collect(Collectors.toSet()))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(game);

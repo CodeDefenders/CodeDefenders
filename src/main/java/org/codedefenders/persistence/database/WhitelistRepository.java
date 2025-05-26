@@ -19,10 +19,13 @@
 package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.inject.Inject;
 
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.Constants;
@@ -122,6 +125,21 @@ public class WhitelistRepository {
             return null;
         }, gameId, username);
     }
+
+    public Set<WhitelistElement> getWhitelist(int gameId) {
+        @Language("SQL") String query = "SELECT Username, type FROM whitelist JOIN users on whitelist.user_id = users.User_ID WHERE game_id = ?";
+        return queryRunner.query(query, rs -> {
+            Set<WhitelistElement> whitelist = new HashSet<>();
+            while (rs.next()) {
+                String username = rs.getString("Username");
+                String typeStr = rs.getString("type");
+                WhitelistType type = WhitelistType.fromString(typeStr);
+                whitelist.add(new WhitelistElement(username, type));
+            }
+            return whitelist;
+        }, gameId);
+    }
+
 
     private String getDBEnum(WhitelistType type) {
         switch (type) {
