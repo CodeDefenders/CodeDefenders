@@ -36,6 +36,7 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.model.WhitelistType" %>
 
 <%
     // Games active for this user (Created or joined)
@@ -486,15 +487,21 @@
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
-                                        <input type="hidden" name="attacker" value=1>
+                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "flex" : "attacker"%>" value="1">
 
                                         <span class="text-nowrap">
                                             <%=attackers.size()%>
+                                            <% if (info.isMayChooseRoles()
+                                                    || info.getWhitelistType() == WhitelistType.ATTACKER
+                                                    || (info.getWhitelistType() == WhitelistType.FLEX
+                                                    && defenders.size() >= attackers.size())) {%>
                                             <button type="submit" id="<%="join-attacker-"+info.gameId()%>"
                                                     class="btn btn-sm btn-attacker ms-1"
                                                     value="Join as Attacker">
                                                 Join
                                             </button>
+                                            <% } %>
+
                                         </span>
                                     </form>
                                 </td>
@@ -504,15 +511,20 @@
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=gameId%>>
-                                        <input type="hidden" name="defender" value=1>
+                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "flex" : "defender"%>" value="1">
 
                                         <span class="text-nowrap">
                                             <%=defenders.size() %>
+                                            <% if (info.isMayChooseRoles()
+                                                    || info.getWhitelistType() == WhitelistType.DEFENDER
+                                                    || (info.getWhitelistType() == WhitelistType.FLEX
+                                                    && defenders.size() < attackers.size())) {%>
                                             <button type="submit" id="<%="join-defender-"+gameId%>"
                                                     class="btn btn-sm btn-defender ms-1"
                                                     value="Join as Defender">
                                                 Join
                                             </button>
+                                            <% } %>
                                         </span>
                                     </form>
                                 </td>

@@ -257,6 +257,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
         boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
+        boolean flexParamExists = ServletUtils.parameterThenOrOther(request, "flex", true, false);
         boolean observerParamExists = ServletUtils.parameterThenOrOther(request, "observer", true, false);
 
         // Create the event, publish if successfully joined
@@ -282,6 +283,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             } else {
                 logger.info("User {} failed to join game {} as an attacker.", login.getUserId(), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
+        } else if (flexParamExists) {
+            if (game.addPlayer(login.getUserId(), null)) {
+                logger.info("User {} joined game {} as a flexible player.", login.getUserId(), gameId);
+                notificationService.post(gje);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             }
         } else if (observerParamExists) {
             if (login.isAdmin() || isClassroomModeratorForGame(game)) {

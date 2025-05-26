@@ -25,6 +25,7 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.Constants;
 import org.intellij.lang.annotations.Language;
 
 public class WhitelistRepository {
@@ -95,6 +96,12 @@ public class WhitelistRepository {
     }
 
     public WhitelistType getWhitelistType(int gameId, int playerId) {
+        if (playerId == Constants.DUMMY_DEFENDER_USER_ID) {
+            return WhitelistType.DEFENDER; // Dummy defender always has defender role
+        } else if (playerId == Constants.DUMMY_ATTACKER_USER_ID) {
+            return WhitelistType.ATTACKER; // Dummy attacker always has attacker role
+        }
+
         @Language("SQL") String query = "SELECT type FROM whitelist WHERE game_id = ? AND user_id = ?";
         return queryRunner.query(query, rs -> {
             if (rs.next()) {

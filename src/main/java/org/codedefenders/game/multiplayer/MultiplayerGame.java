@@ -369,21 +369,30 @@ public class MultiplayerGame extends AbstractGame {
         return attackers;
     }
 
+    /**
+     * Adds a player to the game.
+     * @param userId The id of the player to add.
+     * @param role The requested role. If {@code null} or {@link WhitelistType#FLEX},
+     *            the player will be assigned to the side with fewer players.
+     *             If the user is the creator, the role will never be changed.
+     * @return {@code true} if the player was added successfully, {@code false} otherwise.
+     */
     @Override
     public boolean addPlayer(int userId, Role role) {
-        if (!mayChooseRoles && inviteOnly) {
+
+        if (userId != creatorId && !mayChooseRoles || role == null) {
             WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
             WhitelistType whitelistType = whitelistRepo.getWhitelistType(id, userId);
-            if (whitelistType != null) {
-                if (whitelistType == WhitelistType.FLEX || (whitelistType == WhitelistType.CHOICE && role == null)) {
-                    role = attackers.size() > defenders.size() ? Role.DEFENDER : Role.ATTACKER;
-                } else if (whitelistType == WhitelistType.ATTACKER) {
-                    role = Role.ATTACKER;
-                } else if (whitelistType == WhitelistType.DEFENDER) {
-                    role = Role.DEFENDER;
-                }
-                //If whitelist type is choice and role is set, keep role untouched.
+            if (whitelistType == null
+                    || whitelistType == WhitelistType.FLEX
+                    || (whitelistType == WhitelistType.CHOICE) && role == null) {
+                role = attackers.size() > defenders.size() ? Role.DEFENDER : Role.ATTACKER;
+            } else if (whitelistType == WhitelistType.ATTACKER) {
+                role = Role.ATTACKER;
+            } else if (whitelistType == WhitelistType.DEFENDER) {
+                role = Role.DEFENDER;
             }
+            //If whitelist type is choice and role is set, keep role untouched.
         }
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
@@ -654,6 +663,11 @@ public class MultiplayerGame extends AbstractGame {
             }
         }
         return false;
+    }
+
+    public WhitelistType getWhitelistTypeOfUser(int userId) {
+        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+        return whitelistRepo.getWhitelistType(id, userId);
     }
 
     public void notifyPlayers() {
