@@ -160,4 +160,6 @@ public class Constants {
             + "No worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
     public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
+
+    public static final String ILLEGAL_ACTION_MESSAGE = "Hey! You're not allowed to do that!";
 }

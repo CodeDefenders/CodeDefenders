@@ -29,11 +29,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.model.WhitelistType;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,15 +58,32 @@ public class WhitelistAPI extends HttpServlet {
     @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private CodeDefendersAuth login;
+
+    @Inject
+    private GameRepository gameRepo;
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             Map<String, String[]> params = req.getParameterMap();
             if (!params.containsKey("gameId")) {
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing gameId parameter");
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             int gameId = Integer.parseInt(params.get("gameId")[0]);
+
+            if (!login.isAdmin()) {
+                int creatorId = gameRepo.getGame(gameId).getCreatorId();
+                if (creatorId != login.getUserId()) {
+                    logger.warn("User {} tried to modify whitelist of game {} without being creator or admin.",
+                            login.getUserId(), gameId);
+                    messages.add(Constants.ILLEGAL_ACTION_MESSAGE);
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+            }
 
             String[] addIdParams = params.get("addIds");
             String[] addNameParams = params.get("addNames");
@@ -72,7 +92,7 @@ public class WhitelistAPI extends HttpServlet {
                 addIds = userIds(addIdParams, addNameParams);
             } catch (NumberFormatException e) {
                 logger.error("Failed to parse addIds", e);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid player ID: " + e.getMessage());
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             String[] removeIdParams = params.get("removeIds");
@@ -82,7 +102,7 @@ public class WhitelistAPI extends HttpServlet {
                 removeIds = userIds(removeIdParams, removeNameParams);
             } catch (NumberFormatException e) {
                 logger.error("Failed to parse removeIds", e);
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid player ID: " + e.getMessage());
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
             if (!params.containsKey("type")) {
