@@ -284,7 +284,6 @@ public class GameRepository {
                 FROM invitation_links
                 WHERE invitation_id = ?
         """;
-        //TODO This could be improved by using a join
         int gameId = queryRunner.query(query, oneFromRS(rs -> rs.getInt("game_id")), inviteId).orElseThrow();
         return getGame(gameId);
     }

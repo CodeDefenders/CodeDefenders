@@ -61,10 +61,11 @@ public class MultiplayerGameRepository {
 
     /**
      * Constructs a {@link MultiplayerGame} from a {@link ResultSet} entry.
+     * The whitelist is not included and has to be fetched via {@link WhitelistRepository#getWhitelist(int)}.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game, or {@code null} if the game is no multiplayer game.
-     *///TODO: Load whitelist? Yes or no?
+     */
     static MultiplayerGame multiplayerGameFromRS(ResultSet rs) throws SQLException {
         GameMode mode = GameMode.valueOf(rs.getString("Mode"));
         if (mode != GameMode.PARTY) {

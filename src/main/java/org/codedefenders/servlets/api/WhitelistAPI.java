@@ -151,7 +151,7 @@ public class WhitelistAPI extends HttpServlet {
         resp.getWriter().write(json);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.getWriter().flush();
-        resp.getWriter().close(); //TODO Notwendig? In GameClassAPI wird es nicht gemacht
+        resp.getWriter().close();
 
     }
 

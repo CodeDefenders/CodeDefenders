@@ -46,10 +46,10 @@ public class UserAPI extends HttpServlet {
 
     @Inject
     GameRepository gameRepo;
+
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) { //TODO parameter, um nur Namen zu kriegen
-        //TODO dummy-user rausfiltern
-        List<String> simpleUsers;
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+        List<String> userNames;
         Map<String, String[]> params = request.getParameterMap();
         if (params.containsKey("forGame") && Boolean.parseBoolean(request.getParameter("forGame"))) {
             if (!params.containsKey("gameId")) {
@@ -57,24 +57,21 @@ public class UserAPI extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            simpleUsers = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
+            userNames = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
         } else {
-            simpleUsers = userRepo.getUsers().stream()
+            userNames = userRepo.getUsers().stream()
                     .map(UserEntity::getUsername)
-                    .toList(); //TODO Effizienter zwischenspeichern?
+                    .toList();
         }
-        if (request.getAttribute("filter") != null && !request.getAttribute("filter").equals("")) {
-            //TODO filtern
-        } else {
-            Gson gson = new Gson();
-            String json = gson.toJson(simpleUsers);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            try {
-                response.getWriter().write(json);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+
+        Gson gson = new Gson();
+        String json = gson.toJson(userNames);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            response.getWriter().write(json);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -90,12 +90,21 @@ public class InvitePage extends HttpServlet {
         }
 
         String roleParameter = req.getParameter("role");
-        if (roleParameter != null && !roleParameter.equals("attacker") && !roleParameter.equals("defender")) {
-            logger.warn("Invalid role parameter in invite link: {}", roleParameter);
-            messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
-                    .alert();
-            resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-            return;
+        Role wantedRole;
+        if (roleParameter != null) {
+            if (roleParameter.equals("attacker")) {
+                wantedRole = Role.ATTACKER;
+            } else if (roleParameter.equals("defender")) {
+                wantedRole = Role.DEFENDER;
+            } else {
+                logger.warn("Invalid role parameter in invite link: {}", roleParameter);
+                messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
+                        .alert();
+                resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
+        } else {
+            wantedRole = null; // No role specified
         }
 
         if (game == null) {
@@ -123,7 +132,9 @@ public class InvitePage extends HttpServlet {
 
             Role role;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                role = multiplayerGame.joinWithInvite(userId, roleParameter);
+                synchronized (this) { //TODO Unsure if this synchronization is correct
+                    multiplayerGame.addPlayer(userId, wantedRole);
+                }
             } else if (game instanceof MeleeGame) {
                 role = Role.PLAYER;
                 game.addPlayer(userId, role);
@@ -134,7 +145,7 @@ public class InvitePage extends HttpServlet {
                 return;
             }
             notificationService.post(event);
-            logger.info("User {} joined game {} as {}", userId, gameId, role);
+            logger.info("User {} joined game {}.", userId, gameId);
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
             messages.add("You had already joined this game.");

@@ -344,10 +344,6 @@ public class MultiplayerGame extends AbstractGame {
         return mayChooseRoles;
     }
 
-    public Set<WhitelistElement> getWhitelist() {
-        return whitelist;
-    }
-
     public List<Player> getDefenderPlayers() {
         GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
 
@@ -369,7 +365,7 @@ public class MultiplayerGame extends AbstractGame {
     /**
      * Adds a player to the game.
      * @param userId The id of the player to add.
-     * @param role The requested role. If {@code null} or {@link WhitelistType#FLEX},
+     * @param role The requested role. If {@code null},
      *            the player will be assigned to the side with fewer players.
      *             If the user is the creator, the role will never be changed.
      * @return {@code true} if the player was added successfully, {@code false} otherwise.
@@ -700,30 +696,6 @@ public class MultiplayerGame extends AbstractGame {
             default:
                 // ignored
         }
-    }
-
-    /**
-     * Adds a player that wants to join via an invite link.
-     * If {@link MultiplayerGame:allowPlayersToChooseRole} is true, the {@code wantedRole} is used to determine
-     * the role of the player. It must be either "attacker" or "defender".
-     * Otherwise, the player will be added to the side with fewer players, defaulting to "Attacker" when evenly matched.
-     * TODO: Is synchronization correct?
-     */
-    public synchronized Role joinWithInvite(int userId, String wantedRole) throws IllegalArgumentException {
-        Role role; //TODO Enum für Rolle benutzen?
-        if (mayChooseRoles && wantedRole != null && !wantedRole.equalsIgnoreCase("flex")) {
-            if (wantedRole.equalsIgnoreCase("attacker")) {
-                role = Role.ATTACKER;
-            } else if (wantedRole.equalsIgnoreCase("defender")) {
-                role = Role.DEFENDER;
-            } else {
-                throw new IllegalArgumentException("Invalid role: " + wantedRole);
-            }
-        } else {
-            role = getAttackerPlayers().size() > getDefenderPlayers().size() ? Role.DEFENDER : Role.ATTACKER;
-        }
-        addPlayer(userId, role);
-        return role;
     }
 
     private boolean listContainsEvent(List<Event> events, EventType et) {

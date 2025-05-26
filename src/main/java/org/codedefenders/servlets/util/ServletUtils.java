@@ -188,7 +188,7 @@ public final class ServletUtils {
         String[] types = {"choice", "attacker", "defender", "flex"};
         for (String type : types) {
             int i = 1;
-            while (true) { // TODO irgendwie ohne while(true)
+            while (true) {
                 String parameterName = "whitelist-" + type + "-" + i;
                 String value = getStringParameter(req, parameterName).orElse(null);
                 if (value != null) {

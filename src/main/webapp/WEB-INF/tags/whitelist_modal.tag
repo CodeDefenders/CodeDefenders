@@ -499,8 +499,6 @@
                     params.append("addNames", user);
                 });
                 choiceResponse = await sendPostRequest(params);
-                console.log(choiceResponse.ok);
-                console.log(choiceResponse.text());
 
                 if (!mayChooseRole()) {
                     params = new URLSearchParams();
