@@ -39,6 +39,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -492,6 +493,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         GameManagingUtils.CreateBattlegroundMutantResult result;
+        //noinspection DuplicatedCode
         try {
             result = gameManagingUtils.createBattlegroundMutant(
                     game, login.getUserId(), mutantText.get());
@@ -500,6 +502,16 @@ public class MultiplayerGameManager extends HttpServlet {
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
                     game.getId(), game.getClassId(), login.getUserId(), mutantText);
             response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            return;
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                messages.add("Error submitting the mutant: data too long. Maybe you made too many changes?").alert();
+            } else {
+                messages.add("Database error while saving the mutant.");
+                logger.error("Database error while saving the mutant: {}", e.getMessage());
+            }
+            response.sendRedirect(
+                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
