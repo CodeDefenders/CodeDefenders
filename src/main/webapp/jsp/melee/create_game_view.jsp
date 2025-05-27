@@ -242,8 +242,9 @@
 
                         <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true"
                                            liveGame="false" type="melee"/>
-                        <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
-                            Invite options
+                        <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                            <i class="fa fa-paper-plane"></i>
+                            Invitations
                         </button>
                         <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
