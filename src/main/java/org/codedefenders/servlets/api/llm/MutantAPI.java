@@ -109,9 +109,14 @@ public class MutantAPI extends APIServlet {
             return;
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
-                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
-                        new Common.ErrorResponseDTO(
-                                "Error submitting the mutant: data too long. Maybe you made too many changes?"));
+                writeResponse(response, HttpServletResponse.SC_OK,
+                        new SubmitMutantResponseDTO(
+                                false,
+                                List.of("Error submitting the mutant: data too long. Maybe you made too many changes?"),
+                                null,
+                                MutantRejectReason.DATA_TOO_LONG
+                        )
+                );
             } else {
                 writeResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                         new Common.ErrorResponseDTO("Database error while saving the mutant."));
@@ -175,6 +180,7 @@ public class MutantAPI extends APIServlet {
             VALIDATION_FAILED,
             DUPLICATE_MUTANT_FOUND,
             COMPILATION_FAILED,
+            DATA_TOO_LONG,
         }
     }
 }
