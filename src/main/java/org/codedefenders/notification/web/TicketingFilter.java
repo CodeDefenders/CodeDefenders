@@ -74,16 +74,14 @@ public class TicketingFilter implements Filter {
                 chain.doFilter(request, response);
             }
         } else {
-            if (true) {
-                if (login.isLoggedIn()) {
-                    /*
-                     * This is a valid HTTP request from LoginFilter, we decorate it with a new ticket.
-                     */
-                    String ticket = ticketingService.generateTicketForOwner(login.getUserId());
-                    request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
-                    logger.debug("Registering ticket " + ticket + " for user " + login.getUserId()
-                            + " from " + httpReq.getRequestURI());
-                }
+            if (login.isLoggedIn()) {
+                /*
+                 * This is a valid HTTP request from LoginFilter, we decorate it with a new ticket.
+                 */
+                String ticket = ticketingService.generateTicketForOwner(login.getUserId());
+                request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
+                logger.debug("Registering ticket " + ticket + " for user " + login.getUserId()
+                        + " from " + httpReq.getRequestURI());
             }
             chain.doFilter(request, response);
         }
