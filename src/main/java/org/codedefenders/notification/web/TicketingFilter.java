@@ -74,7 +74,7 @@ public class TicketingFilter implements Filter {
                 chain.doFilter(request, response);
             }
         } else {
-            if (requiresTicket(httpReq)) {
+            if (true) {
                 if (login.isLoggedIn()) {
                     /*
                      * This is a valid HTTP request from LoginFilter, we decorate it with a new ticket.

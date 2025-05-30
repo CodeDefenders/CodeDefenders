@@ -274,6 +274,8 @@
             let background;
             let toAddUsers;
 
+            setInviteId();
+
             if (mayChooseRole()) {
                 background = "bg-secondary";
                 toAddUsers = choiceToAddUsers;
@@ -468,16 +470,23 @@
             if (liveGame) {
                 linkData = await InfoApi.getInviteLinkData(gameId);
             } else {
-                const inviteIdInput = document.getElementById('invite-id');
-                if (inviteIdInput.value !== "") {
-                    return;
-                }
-                linkData = await InfoApi.getInviteLinkDataWithoutGameId();
-                inviteIdInput.value = linkData.inviteId;
+                await setInviteId();
             }
 
             await copyLink(linkData.inviteLink)
         });
+
+        /**
+         * If no inviteId is set for the current game, it will be set by this function.
+         */
+        async function setInviteId() {
+            const inviteIdInput = document.getElementById('invite-id');
+            if (inviteIdInput.value !== "") {
+                return;
+            }
+            const linkData = await InfoApi.getInviteLinkDataWithoutGameId();
+            inviteIdInput.value = linkData.inviteId;
+        }
 
         if (updateButton) { //Only when liveGame=true
             updateButton.addEventListener("click", async function () {

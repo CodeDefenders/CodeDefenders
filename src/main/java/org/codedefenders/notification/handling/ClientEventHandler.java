@@ -31,6 +31,7 @@ import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
 import org.codedefenders.notification.events.client.registration.AchievementRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
+import org.codedefenders.notification.events.client.registration.InviteRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
@@ -180,5 +181,9 @@ public class ClientEventHandler {
 
     public void visit(AchievementRegistrationEvent achievementRegistrationEvent) {
         serverEventHandlerContainer.handleRegistrationEvent(achievementRegistrationEvent);
+    }
+
+    public void visit(InviteRegistrationEvent event) {
+        serverEventHandlerContainer.handleRegistrationEvent(event);
     }
 }

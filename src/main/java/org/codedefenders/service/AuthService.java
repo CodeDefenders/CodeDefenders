@@ -59,6 +59,15 @@ public class AuthService implements CodeDefendersAuth {
     }
 
     @Override
+    public int getUserIdOrMinusOne() {
+        if (isLoggedIn()) {
+            return getUserId();
+        } else {
+            return -1;
+        }
+    }
+
+    @Override
     public SimpleUser getSimpleUser() {
         return userService.getSimpleUserById(getUserId()).orElse(null);
     }

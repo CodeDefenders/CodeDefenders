@@ -18,13 +18,25 @@
  */
 import {Toast} from 'bootstrap';
 class ShowToasts {
-    static showToast({colorClass = 'bg-primary', title = '', secondary = '', body = ''}) {
+    static showToast({colorClass = 'bg-primary', title = '', secondary = '', body = '', extraElements = [], timeout = true}) {
         const toastElem = document.createElement('div');
         toastElem.classList.add('toast', 'bg-white');
         toastElem.role = 'alert';
         const toastBody = document.createElement('div');
         toastBody.classList.add('toast-body', 'me-auto');
         toastBody.innerText = body;
+        if (extraElements.length > 0) {
+            const extraContainer = document.createElement('div');
+            extraContainer.classList.add('d-flex', 'flex-row', 'justify-content-between');
+            extraElements.forEach(element => {
+                if (element instanceof HTMLElement) {
+                    extraContainer.appendChild(element);
+                } else {
+                    console.warn('Extra element is not an HTMLElement:', element);
+                }
+            });
+            toastBody.appendChild(extraContainer);
+        }
 
         const closeButton = document.createElement('button');
         closeButton.type = 'button';
@@ -69,9 +81,11 @@ class ShowToasts {
         document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
 
-        toastElem.addEventListener('hidden.bs.toast', () => {
-            setTimeout(() => toastElem.remove(), 1000);
-        });
+        if (timeout) {
+            toastElem.addEventListener('hidden.bs.toast', () => {
+                setTimeout(() => toastElem.remove(), 1000);
+            });
+        }
     }
 }
 

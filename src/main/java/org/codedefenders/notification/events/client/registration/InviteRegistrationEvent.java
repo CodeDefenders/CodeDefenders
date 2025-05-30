@@ -16,22 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.auth;
+package org.codedefenders.notification.events.client.registration;
 
-import org.codedefenders.dto.SimpleUser;
-import org.codedefenders.dto.User;
+import org.codedefenders.notification.handling.ClientEventHandler;
 
-public interface CodeDefendersAuth {
+public class InviteRegistrationEvent extends RegistrationEvent {
 
-    boolean isLoggedIn();
-
-    boolean isAdmin();
-
-    int getUserId();
-
-    int getUserIdOrMinusOne();//TODO: Horrible name
-
-    SimpleUser getSimpleUser();
-
-    User getUser();
+    @Override
+    public void accept(ClientEventHandler visitor) {
+        visitor.visit(this);
+    }
 }
