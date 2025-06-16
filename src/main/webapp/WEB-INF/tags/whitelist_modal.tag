@@ -364,7 +364,7 @@
                 }
 
                 const flexInvite = document.createElement("button");
-                flexInvite.textContent = "Open invite";
+                flexInvite.textContent = melee || mayChooseRole() ? "Invite" : "Balance teams";
                 flexInvite.type = "button";
                 flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
                 flexInvite.addEventListener("click", () => {
