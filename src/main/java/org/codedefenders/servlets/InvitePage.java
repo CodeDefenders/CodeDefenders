@@ -110,7 +110,7 @@ public class InvitePage extends HttpServlet {
         if (game == null) {
             logger.warn("User {} tried to join game {}, but the game does not exist.", login.getUserId(),
                     req.getParameter("gameId"));
-            messages.add("The game you were invited to does no longer exist.").alert();
+            messages.add("The game you were invited to no longer exists, or it has not been created yet.").alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }

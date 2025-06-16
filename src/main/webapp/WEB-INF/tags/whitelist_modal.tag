@@ -470,7 +470,7 @@
             if (liveGame) {
                 linkData = await InfoApi.getInviteLinkData(gameId);
             } else {
-                await setInviteId();
+                linkData = await setInviteId();
             }
 
             await copyLink(linkData.inviteLink)
@@ -486,6 +486,7 @@
             }
             const linkData = await InfoApi.getInviteLinkDataWithoutGameId();
             inviteIdInput.value = linkData.inviteId;
+            return linkData;
         }
 
         if (updateButton) { //Only when liveGame=true
