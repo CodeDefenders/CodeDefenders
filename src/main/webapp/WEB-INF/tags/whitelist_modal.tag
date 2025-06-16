@@ -27,12 +27,12 @@
 <%@ attribute name="htmlId" required="true" %>
 <%@ attribute name="gameId" required="false" %>
 <%@ attribute name="mayChooseRole" required="true" %>
+<!--true, if the game already exists, false, if it is being created-->
 <%@ attribute name="liveGame" required="true" %>
 <%@ attribute name="type" required="true" %>
-<!--true, if the game already exists, false, if it is being created-->
 
 <div>
-    <t:modal title="Modify whitelist" id="${htmlId}"
+    <t:modal title="Invite players" id="${htmlId}"
              modalDialogClasses="modal-lg">
         <jsp:attribute name="content">
             <div id="whitelist-inputs" type="hidden"></div>
@@ -44,29 +44,28 @@
                     <input type="text" id="searchInput" class="form-control" placeholder="Invite users">
                     <div id="autocompleteList" class="list-group"></div>
                 </div>
-                <c:choose>
-                    <c:when test="${liveGame}">
-                        <div class="card-header">
-                            <div class="card">
-                                <div class="card-header">
-                                    <h6>Current whitelist:</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex flex-wrap gap-2" id="already-whitelisted"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </c:when>
-                </c:choose>
-                <div class="card">
-                    <div class="card-header">
-                        <h6>Users to invite:</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-2" id="invited"></div>
-                    </div>
+            </div>
+            <div class="card mt-2 mb-2">
+                <div class="card-header">
+                    <h6>Users to invite:</h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2" id="invited"></div>
                 </div>
             </div>
+            <c:choose>
+                <c:when test="${liveGame}">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>Already invited users:</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2" id="already-whitelisted"></div>
+                        </div>
+                    </div>
+                </c:when>
+            </c:choose>
+
         </jsp:attribute>
         <jsp:attribute name="footer">
             <button type="button" id="copy-link-button" class="btn-primary btn">
@@ -74,7 +73,7 @@
             </button>
             <c:choose>
                 <c:when test="${liveGame}">
-                    <button type="button" class="btn btn-primary disabled" id="update-button">Update whitelist</button>
+                    <button type="button" class="btn btn-primary disabled" id="update-button">Save changes</button>
                 </c:when>
             </c:choose>
         </jsp:attribute>
@@ -289,7 +288,7 @@
                     background = "bg-defender";
                     toAddUsers = defenderToAddUsers;
                 } else {
-                    background = "bg-info";
+                    background = "bg-secondary";
                     if (type === "flex") {
                         toAddUsers = flexToAddUsers;
                     } else {
@@ -364,7 +363,10 @@
                 }
 
                 const flexInvite = document.createElement("button");
-                flexInvite.textContent = melee || mayChooseRole() ? "Invite" : "Balance teams";
+                flexInvite.textContent = mayChooseRole() ? "Invite" : "Balance teams";
+                if (!mayChooseRole()) {
+                    flexInvite.title = "Player will join the team with fewer players.";
+                }
                 flexInvite.type = "button";
                 flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
                 flexInvite.addEventListener("click", () => {
@@ -449,15 +451,15 @@
 
         async function copyLink(inviteLink) {
             navigator.clipboard.writeText(inviteLink)
-                .then(() => {
-                    linkButton.innerText = "Copied!";
-                    setTimeout(() => {
-                        linkButton.innerText = "Copy invite link";
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy: ', err);
-                });
+                    .then(() => {
+                        linkButton.innerText = "Copied!";
+                        setTimeout(() => {
+                            linkButton.innerText = "Copy invite link";
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
         }
 
         /*if (liveGame) {
