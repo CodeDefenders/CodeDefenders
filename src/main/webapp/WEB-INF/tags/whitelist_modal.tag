@@ -131,7 +131,7 @@
 
 
         if (liveGame) {
-            displayAlreadyInvitedUsers();
+            await displayAlreadyInvitedUsers();
         }
 
         function mayChooseRole() {
@@ -199,7 +199,9 @@
             clearArray(currentUsers);
             if (mayChooseRole()) {
                 const choice = await InfoApi.getWhitelistedUserNames(gameId);
+                const current = await InfoApi.getUserNamesForGame(gameId);
                 choice.forEach(user => choiceAlreadyWhitelistedUsers.push(user));
+                current.forEach(user => currentUsers.push(user));
             } else {
                 const choice = await InfoApi.getWhitelistedUserNamesWithType(gameId, "choice");
                 const attacker = await InfoApi.getWhitelistedUserNamesWithType(gameId, "attacker");
@@ -478,8 +480,13 @@
 
         /**
          * If no inviteId is set for the current game, it will be set by this function.
+         * This only works for games that haven't been created yet.
          */
         async function setInviteId() {
+            if (liveGame) {
+                return;
+            }
+
             const inviteIdInput = document.getElementById('invite-id');
             if (inviteIdInput.value !== "") {
                 return;
