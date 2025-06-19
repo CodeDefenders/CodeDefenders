@@ -23,6 +23,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%@ attribute name="htmlId" required="true" %>
 <%@ attribute name="gameId" required="false" %>
@@ -129,6 +130,8 @@
         const toRemoveUsers = [];
 
         let linkData;
+
+        const thisUserName = "${auth.simpleUser.name}";
 
 
         if (liveGame) {
@@ -400,10 +403,16 @@
          * Check whether a user is already added to the whitelist. This includes users that are already whitelisted
          * as well as users that are about to be added to the whitelist on the next update.
          * It also includes all users that are currently part of the game, even if they are not whitelisted.
+         * It also always includes the creator of the game, even if the game is not live yet.
          * @param user The username to check against.
          * @returns {boolean} True, if the user is already added to the whitelist, false otherwise.
          */
         function userAlreadyAdded(user) {
+            if (!liveGame) {
+                if (thisUserName === user) {
+                    return true;
+                }
+            }
             const relevantArrays = [choiceToAddUsers];
             if (liveGame) {
                 relevantArrays.push(choiceAlreadyWhitelistedUsers, currentUsers);
