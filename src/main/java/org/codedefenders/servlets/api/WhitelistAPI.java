@@ -31,7 +31,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.WhitelistType;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
@@ -64,6 +66,9 @@ public class WhitelistAPI extends HttpServlet {
     @Inject
     private GameRepository gameRepo;
 
+    @Inject
+    private NotificationService notificationService;
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -73,9 +78,10 @@ public class WhitelistAPI extends HttpServlet {
                 return;
             }
             int gameId = Integer.parseInt(params.get("gameId")[0]);
+            AbstractGame game = gameRepo.getGame(gameId);
 
             if (!login.isAdmin()) {
-                int creatorId = gameRepo.getGame(gameId).getCreatorId();
+                int creatorId = game.getCreatorId();
                 if (creatorId != login.getUserId()) {
                     logger.warn("User {} tried to modify whitelist of game {} without being creator or admin.",
                             login.getUserId(), gameId);
@@ -84,7 +90,9 @@ public class WhitelistAPI extends HttpServlet {
                     return;
                 }
             }
-
+            if (game.getInviteId() == null) {
+                game.setInviteId(gameRepo.storeInvitationLink(gameId));
+            }
             String[] addIdParams = params.get("addIds");
             String[] addNameParams = params.get("addNames");
             int[] addIds;
@@ -108,6 +116,7 @@ public class WhitelistAPI extends HttpServlet {
             if (!params.containsKey("type")) {
                 for (int userId : addIds) {
                     whitelistRepo.addToWhitelist(gameId, userId);
+                    notificationService.sendInviteNotification(game, userId, WhitelistType.CHOICE);
                 }
                 for (int userId : removeIds) {
                     whitelistRepo.removeFromWhitelist(gameId, userId);
@@ -116,6 +125,7 @@ public class WhitelistAPI extends HttpServlet {
                 WhitelistType type = WhitelistType.fromString(params.get("type")[0]);
                 for (int userId : addIds) {
                     whitelistRepo.addToWhitelist(gameId, userId, type);
+                    notificationService.sendInviteNotification(game, userId, type);
                 }
                 for (int userId : removeIds) {
                     whitelistRepo.removeFromWhitelist(gameId, userId);

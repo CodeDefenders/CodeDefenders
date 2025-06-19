@@ -21,7 +21,12 @@ package org.codedefenders.notification.impl;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.invite.InviteEvent;
+import org.codedefenders.util.Paths;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,5 +72,30 @@ public class NotificationService implements INotificationService {
     @Override
     public void unregister(Object eventHandler) {
         eventBus.unregister(eventHandler);
+    }
+
+    /**
+     * Send an invitation event for a player to a specific game, so that they can see a pop-up to accept.
+     * @param game The game the player is invited to. May be melee or battlegrounds.
+     * @param userId The id of the invited user.
+     * @param type If {@code game} is a battlegrounds game and {@link MultiplayerGame#isMayChooseRoles()} is
+     *             {@code false}, this is the role selected for the player, otherwise the value is ignored and may be
+     *             {@code null}.
+     */
+    public void sendInviteNotification(AbstractGame game, int userId, WhitelistType type) {
+        InviteEvent event = new InviteEvent();
+        event.setInviteLink(Paths.INVITE + "?inviteId=" + game.getInviteId());
+        event.setUserId(userId);
+        event.setClassName(game.getClass().getSimpleName());
+        if (game instanceof MultiplayerGame) {
+
+            event.setMayChooseRole(((MultiplayerGame)game).isMayChooseRoles());
+            if (!((MultiplayerGame)game).isMayChooseRoles()) {
+                event.setRole(type);
+            }
+        }
+        logger.info("About to send invite for game {} to user {}",
+                game.getId(), userId);
+        post(event);
     }
 }

@@ -136,7 +136,7 @@ public class MeleeGame extends AbstractGame {
         private Integer classroomId = null;
 
         private boolean inviteOnly = false;
-        private Integer inviteId = -1;
+        private Integer inviteId = null;
         private Set<WhitelistElement> whitelist = new HashSet<>();
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {

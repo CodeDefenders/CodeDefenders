@@ -22,6 +22,11 @@ class ShowToasts {
         const toastElem = document.createElement('div');
         toastElem.classList.add('toast', 'bg-white');
         toastElem.role = 'alert';
+
+        if (!timeout) {
+            toastElem.setAttribute('data-bs-autohide', 'false');
+        }
+
         const toastBody = document.createElement('div');
         toastBody.classList.add('toast-body', 'me-auto');
         toastBody.innerText = body;
@@ -80,12 +85,10 @@ class ShowToasts {
 
         document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
-
-        if (timeout) {
-            toastElem.addEventListener('hidden.bs.toast', () => {
-                setTimeout(() => toastElem.remove(), 1000);
-            });
-        }
+        
+        toastElem.addEventListener('hidden.bs.toast', () => {
+            setTimeout(() => toastElem.remove(), 1000);
+        });
     }
 }
 

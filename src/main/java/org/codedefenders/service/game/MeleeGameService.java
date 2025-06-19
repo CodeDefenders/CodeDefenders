@@ -177,8 +177,8 @@ public class MeleeGameService extends AbstractGameService {
             int userId = userRepository.getUserByName(w.getUsername()).orElseThrow().getId();
             // Always use default type CHOICE in melee
             whitelistRepo.addToWhitelist(newGameId, userId, WhitelistType.CHOICE);
+            notificationService.sendInviteNotification(game, userId, WhitelistType.CHOICE);
         }
-        //TODO: Einladungen anzeigen (sonst ist whitelist für alle Spiele ohne inviteOnly sinnlos)
 
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,

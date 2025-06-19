@@ -185,19 +185,8 @@ public class MultiplayerGameService extends AbstractGameService {
         for (WhitelistElement w : game.getWhitelist()) {
             int userId = userRepository.getUserByName(w.getUsername()).orElseThrow().getId();
             whitelistRepo.addToWhitelist(newGameId, userId, w.getType());
-            InviteEvent event = new InviteEvent();
-            event.setInviteLink(Paths.INVITE + "?inviteId=" + game.getInviteId());
-            event.setUserId(userId);
-            event.setClassName(game.getClass().getSimpleName());
-            event.setMayChooseRole(game.isMayChooseRoles());
-            if (!game.isMayChooseRoles()) {
-                event.setRole(w.getType());
-            }
-            logger.info("About to send invite for game {} to user {}",
-                    newGameId, userId);
-            notificationService.post(event);
+            notificationService.sendInviteNotification(game, userId, w.getType());
         }
-        //TODO: Einladungen anzeigen (sonst ist whitelist für alle Spiele ohne inviteOnly sinnlos)
 
 
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",

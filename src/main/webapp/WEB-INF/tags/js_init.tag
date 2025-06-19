@@ -63,7 +63,7 @@
                 const flexButton = document.createElement('a');
                 flexButton.classList.add('btn', 'btn-secondary');
                 flexButton.textContent = 'Any role';
-                flexButton.href = event.inviteLink + '&role=flex';
+                flexButton.href = event.inviteLink;
 
                 const attackerButton = document.createElement('a');
                 attackerButton.classList.add('btn', 'btn-attacker');
@@ -73,8 +73,23 @@
                 extraElements = [defenderButton, flexButton, attackerButton];
             } else {
                 const joinButton = document.createElement('a');
-                joinButton.classList.add('btn', 'btn-primary');
-                joinButton.textContent = event.role.toLowerCase();
+                joinButton.classList.add('btn');
+                switch (event.role) {
+                    case "DEFENDER":
+                        joinButton.textContent = "Defender";
+                        joinButton.classList.add("btn-defender");
+                        break;
+                    case "ATTACKER":
+                        joinButton.textContent = "Attacker";
+                        joinButton.classList.add("btn-attacker");
+                        break;
+                    case "FLEX":
+                        joinButton.textContent = "Any role";
+                        joinButton.classList.add("btn-secondary");
+                    case null:
+                        joinButton.textContent = "Player";
+                        joinButton.classList.add("btn-player");
+                }
                 joinButton.href = event.inviteLink;
                 extraElements = [joinButton];
             }
