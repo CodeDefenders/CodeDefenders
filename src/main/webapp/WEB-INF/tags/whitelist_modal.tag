@@ -128,6 +128,8 @@
 
         const toRemoveUsers = [];
 
+        let linkData;
+
 
         if (liveGame) {
             await displayAlreadyInvitedUsers();
@@ -470,7 +472,6 @@
 
         linkButton.addEventListener('click', async () => {
 
-            let linkData;
             if (liveGame) {
                 linkData = await InfoApi.getInviteLinkData(gameId);
             } else {
@@ -491,9 +492,9 @@
 
             const inviteIdInput = document.getElementById('invite-id');
             if (inviteIdInput.value !== "") {
-                return;
+                return linkData;
             }
-            const linkData = await InfoApi.getInviteLinkDataWithoutGameId();
+            linkData = await InfoApi.getInviteLinkDataWithoutGameId();
             inviteIdInput.value = linkData.inviteId;
             return linkData;
         }
