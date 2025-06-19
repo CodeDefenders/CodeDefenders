@@ -74,7 +74,7 @@
             } else {
                 const joinButton = document.createElement('a');
                 joinButton.classList.add('btn', 'btn-primary');
-                joinButton.textContent = 'Any role';
+                joinButton.textContent = event.role.toLowerCase();
                 joinButton.href = event.inviteLink;
                 extraElements = [joinButton];
             }

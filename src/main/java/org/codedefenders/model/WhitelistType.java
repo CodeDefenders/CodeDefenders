@@ -45,6 +45,7 @@ public enum WhitelistType {
     CHOICE;
 
     public static WhitelistType fromString(String string) {
+        string = string.toLowerCase();
         switch (string) {
             case "defender" -> {
                 return DEFENDER;

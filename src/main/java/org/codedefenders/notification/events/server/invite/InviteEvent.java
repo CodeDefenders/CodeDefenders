@@ -18,6 +18,7 @@
  */
 package org.codedefenders.notification.events.server.invite;
 
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.ServerEvent;
 
 import com.google.gson.annotations.Expose;
@@ -37,6 +38,9 @@ public class InviteEvent extends ServerEvent {
 
     @Expose
     private String className;
+
+    @Expose
+    private String role;
 
     public int getUserId() {
         return userId;
@@ -68,5 +72,13 @@ public class InviteEvent extends ServerEvent {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public WhitelistType getRole() {
+        return WhitelistType.fromString(role);
+    }
+
+    public void setRole(WhitelistType role) {
+        this.role = role.name();
     }
 }

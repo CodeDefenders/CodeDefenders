@@ -190,6 +190,9 @@ public class MultiplayerGameService extends AbstractGameService {
             event.setUserId(userId);
             event.setClassName(game.getClass().getSimpleName());
             event.setMayChooseRole(game.isMayChooseRoles());
+            if (!game.isMayChooseRoles()) {
+                event.setRole(w.getType());
+            }
             logger.info("About to send invite for game {} to user {}",
                     newGameId, userId);
             notificationService.post(event);

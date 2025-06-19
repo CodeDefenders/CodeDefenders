@@ -487,7 +487,7 @@
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
-                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "flex" : "attacker"%>" value="1">
+                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "attacker" : "flex"%>" value="1">
 
                                         <span class="text-nowrap">
                                             <%=attackers.size()%>
@@ -511,7 +511,7 @@
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=gameId%>>
-                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "flex" : "defender"%>" value="1">
+                                        <input type="hidden" name="<%= info.isMayChooseRoles() ? "defender" : "flex"%>" value="1">
 
                                         <span class="text-nowrap">
                                             <%=defenders.size() %>
