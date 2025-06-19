@@ -257,8 +257,9 @@
 
                         <div class="row mb-3"
                              title="Allows only whitelisted players to join the game.">
-                            <label class="col-4 col-form-label" id="invite-only-label" for="invite-only-switch">Invite
-                                only</label>
+                            <a class="col-4 col-form-label" type="button" id="whitelist-modal-opener" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                                Invite players
+                            </a>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="invite-only-switch"
@@ -271,10 +272,6 @@
 
                         <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true"
                                            liveGame="false" type="batteground"/>
-                        <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
-                            <i class="fa fa-paper-plane"></i>
-                            Invitations
-                        </button>
                         <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
                         <div class="row mb-3"
