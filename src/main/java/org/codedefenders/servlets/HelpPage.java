@@ -28,17 +28,23 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.page.PageInfoBean;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
+import static org.xnap.commons.i18n.I18nFactory.FALLBACK;
 
 @WebServlet("/help")
 public class HelpPage extends HttpServlet {
 
     @Inject
     PageInfoBean pageInfo;
+    final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(HelpPage.class);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        pageInfo.setPageTitle("Help");
+        I18n i18n = I18nFactory.getI18n(getClass(), req.getLocale(), FALLBACK);
+        pageInfo.setPageTitle(i18n.tr("Help"));
+        logger.info(i18n.tr("Help"));
 
         req.getRequestDispatcher("/jsp/help.jsp").forward(req, resp);
     }

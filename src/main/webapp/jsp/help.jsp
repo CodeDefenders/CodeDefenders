@@ -21,17 +21,21 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
+<fmt:setBundle basename="org.codedefenders.i18n.Messages" var="bundle"/>
+
 <c:set var="title" value="Help"/>
 
 <p:main_page title="${title}">
     <div class="container" id="help-main-div">
-        <h1>${title}</h1>
+        <h1><fmt:message key="Help" bundle="${bundle}"/></h1>
         <p>Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code.</p>
         <h2>Defenders</h2>
         <p>At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a &#34;Defend!&#34; button which submits the test.</p>
