@@ -333,9 +333,10 @@ public class MultiplayerGame extends AbstractGame {
         EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
 
-        if (state == GameState.FINISHED) {
+        if (state == GameState.FINISHED && role != Role.OBSERVER) {
             return false;
         }
+
         if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
