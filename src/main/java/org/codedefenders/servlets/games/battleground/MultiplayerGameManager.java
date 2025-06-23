@@ -166,19 +166,30 @@ public class MultiplayerGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        int gameId = game.getId();
+
+        final int gameId = game.getId();
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
 
         int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
-            logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
-            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-            return;
+            if (login.isAdmin() && isGameClosed) {
+                logger.info("User {} is not part of the closed game {}, but is an admin. Adding as observer.",
+                        login.getUserId(), gameId);
+                game.addPlayer(login.getUserId(), Role.OBSERVER);
+                playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+            } else {
+                logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
         }
 
+        final int playerIdFinal = playerId;
         // check is there is a pending equivalence duel for the user.
         game.getMutantsMarkedEquivalentPending()
                 .stream()
-                .filter(m -> m.getPlayerId() == playerId)
+                .filter(m -> m.getPlayerId() == playerIdFinal)
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
@@ -191,10 +202,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 });
 
         request.setAttribute("game", game);
-        request.setAttribute("playerId", playerId);
+        request.setAttribute("playerId", playerIdFinal);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
         final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
                 ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.BATTLEGROUND_DETAILS_VIEW_JSP)
