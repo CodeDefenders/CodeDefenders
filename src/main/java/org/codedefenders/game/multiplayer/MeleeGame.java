@@ -368,6 +368,11 @@ public class MeleeGame extends AbstractGame {
             return false;
         }
 
+        // Do not add events for observer joining after the game is already over
+        if (state == GameState.FINISHED) {
+            return true;
+        }
+
         // TODO: move notifications outside of data objects.
         Optional<UserEntity> u = userRepo.getUserById(userId);
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());

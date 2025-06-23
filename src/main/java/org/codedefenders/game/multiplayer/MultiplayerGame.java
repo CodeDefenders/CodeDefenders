@@ -340,6 +340,12 @@ public class MultiplayerGame extends AbstractGame {
         if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
+
+        // Do not add events for observer joining after the game is already over
+        if (state == GameState.FINISHED) {
+            return true;
+        }
+
         Optional<UserEntity> u = userRepo.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
