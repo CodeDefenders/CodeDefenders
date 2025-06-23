@@ -176,8 +176,13 @@ public class MultiplayerGameManager extends HttpServlet {
             if (login.isAdmin() && isGameClosed) {
                 logger.info("User {} is not part of the closed game {}, but is an admin. Adding as observer.",
                         login.getUserId(), gameId);
-                game.addPlayer(login.getUserId(), Role.OBSERVER);
-                playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+                if (game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+                } else {
+                    logger.error("Failed to add user {} as observer for game {}.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
             } else {
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));

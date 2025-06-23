@@ -216,7 +216,11 @@ public class MeleeGameManager extends HttpServlet {
             if (login.isAdmin() && isGameClosed) {
                 logger.info("User {} is not part of closed game {}, but is an admin. Adding as observer.",
                         login.getUserId(), gameId);
-                game.addPlayer(login.getUserId(), Role.OBSERVER);
+                if (!game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    logger.error("Failed to add user {} as observer for game {}.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
             } else {
                 logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
