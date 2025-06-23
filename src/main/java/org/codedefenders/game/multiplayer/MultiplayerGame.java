@@ -341,8 +341,8 @@ public class MultiplayerGame extends AbstractGame {
             return false;
         }
 
-        // Do not add events for observer joining after the game is already over
-        if (state == GameState.FINISHED) {
+        // Do not add events for observers joining
+        if (role == Role.OBSERVER) {
             return true;
         }
 
