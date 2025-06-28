@@ -110,6 +110,8 @@ public class Configuration {
     protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
+    protected String openaiApiKey;
+    protected String openaiChatgptModel;
 
     @Deprecated
     protected String authAdminRole;
@@ -478,5 +480,15 @@ public class Configuration {
      */
     protected String resolveAttributeName(String camelCaseName) {
         return camelCaseName;
+    }
+
+    //TODO
+    public String getOpenaiApiKey() {
+        return null;
+    }
+
+    //TODO
+    public String getOpenaiChatgptModel() {
+        return null;
     }
 }
