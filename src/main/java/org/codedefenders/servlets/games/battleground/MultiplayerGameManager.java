@@ -172,7 +172,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
 
         int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
-        if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
+        if (playerId == -1) {
             if (login.isAdmin() && isGameClosed) {
                 logger.info("User {} is not part of the closed game {}, but is an admin. Adding as observer.",
                         login.getUserId(), gameId);

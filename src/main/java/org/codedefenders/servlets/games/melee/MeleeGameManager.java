@@ -212,7 +212,7 @@ public class MeleeGameManager extends HttpServlet {
         final boolean isGameClosed = game.getState() == GameState.FINISHED
                 || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
 
-        if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
+        if (!game.hasUserJoined(userId)) {
             if (login.isAdmin() && isGameClosed) {
                 logger.info("User {} is not part of closed game {}, but is an admin. Adding as observer.",
                         login.getUserId(), gameId);
@@ -229,8 +229,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         final int playerId = playerRepo.getPlayerIdForUserAndGame(userId, gameId);
-
-        if (game.getCreatorId() != userId && playerId == -1) {
+        if (playerId == -1) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", userId, gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
