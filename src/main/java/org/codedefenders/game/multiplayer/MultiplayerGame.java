@@ -333,12 +333,19 @@ public class MultiplayerGame extends AbstractGame {
         EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
 
-        if (state == GameState.FINISHED) {
+        if (state == GameState.FINISHED && role != Role.OBSERVER) {
             return false;
         }
+
         if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
         }
+
+        // Do not add events for observers joining
+        if (role == Role.OBSERVER) {
+            return true;
+        }
+
         Optional<UserEntity> u = userRepo.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());

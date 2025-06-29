@@ -54,6 +54,8 @@ public class MeleeGame extends AbstractGame {
      * protected GameMode mode; protected ArrayList<Event> events; protected
      * List<Mutant> mutants; protected List<Test> tests;
      */
+
+    // TODO: unused
     private List<Player> players;
 
     // TODO Does it make sense to have injection inside data objects ?
@@ -338,7 +340,7 @@ public class MeleeGame extends AbstractGame {
      */
     public List<Player> getPlayers() {
         GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
-
+        // TODO: use & set cache instead (see MultiplayerGame.java)?
         List<Player> players = gameRepo.getPlayersForGame(getId(), Role.PLAYER);
         return players;
     }
@@ -358,12 +360,17 @@ public class MeleeGame extends AbstractGame {
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
         EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
 
-        if (state == GameState.FINISHED) {
+        if (state == GameState.FINISHED && role != Role.OBSERVER) {
             return false;
         }
 
         if (!gameRepo.addPlayerToGame(id, userId, role)) {
             return false;
+        }
+
+        // Do not add events for observers joining
+        if (role == Role.OBSERVER) {
+            return true;
         }
 
         // TODO: move notifications outside of data objects.

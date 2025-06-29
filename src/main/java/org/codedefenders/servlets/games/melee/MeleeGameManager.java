@@ -207,18 +207,29 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        int gameId = game.getId();
-        int userId = login.getUserId();
+        final int gameId = game.getId();
+        final int userId = login.getUserId();
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
 
-        if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
-            logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
-            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-            return;
+        if (!game.hasUserJoined(userId)) {
+            if (login.isAdmin() && isGameClosed) {
+                logger.info("User {} is not part of closed game {}, but is an admin. Adding as observer.",
+                        login.getUserId(), gameId);
+                if (!game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    logger.error("Failed to add user {} as observer for game {}.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
+            } else {
+                logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
         }
 
         final int playerId = playerRepo.getPlayerIdForUserAndGame(userId, gameId);
-
-        if (game.getCreatorId() != userId && playerId == -1) {
+        if (playerId == -1) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", userId, gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
@@ -259,8 +270,6 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
         final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
                 ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.MELEE_DETAILS_VIEW_JSP)
