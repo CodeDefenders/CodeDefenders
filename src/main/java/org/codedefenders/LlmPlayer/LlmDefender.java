@@ -1,44 +1,121 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.LlmPlayer;
 
+import java.io.IOException;
+
+import jakarta.enterprise.context.control.RequestContextController;
+import jakarta.enterprise.inject.se.SeContainer;
+import jakarta.enterprise.inject.se.SeContainerInitializer;
+
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.llm.GPTException;
-import org.codedefenders.llm.GPTRequestDispatcher;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
 
+//TODO Melee-games
 public class LlmDefender extends Player {
-    AbstractGame game;
+    private static final Logger logger = LoggerFactory.getLogger(LlmDefender.class);
 
-    GPTRequestDispatcher dispatcher = CDIUtil.getBeanFromCDI(GPTRequestDispatcher.class);
+    MultiplayerGame game;
+
     GameService gameService = CDIUtil.getBeanFromCDI(GameService.class);
-    GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
+    MultiplayerGameRepository gameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
+    LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
+    //GameManagingUtils gameManagingUtils = CDIUtil.getBeanFromCDI(GameManagingUtils.class);
 
+    GameClass cut;
     String src;
     String systemPrompt;
+    GameType gameType;
+    int secondsBetweenTests = 10; //TODO irgendwo einstellen
+    AIDefenderThread t;
 
-    public LlmDefender(int id, int gameId, int points, boolean active) {
-        super(id,null, gameId, points, Role.DEFENDER, active);
-        game = gameRepo.getGame(gameId);
+    public LlmDefender(int id, UserEntity user, int gameId, int points, boolean active) {
+        super(id, user, gameId, points, Role.DEFENDER, active);
 
-        src = game.getCUT().getSourceCode();
+        game = gameRepo.getMultiplayerGame(gameId);
+
+        cut = game.getCUT();
+        src = cut.getSourceCode();
         //TODO add dependencies
 
-        systemPrompt = "Write a short test for the following java code. Use only one assertion. "
-                + "Output nothing but the test.";
+        systemPrompt = "Write a test for the following Java code using a maximum of 2 assertions. " +
+                "Write only the content of the test method, without including the header or the method declaration. " +
+                "Ensure that no method declarations are present in your response. Use JUnit 4."; //TODO different testing libraries
+        //systemPrompt = "Write exactly \"assertEquals(21, Constants.foo();\"";
 
     }
 
-    public void writeTest() {
+    public void startRunning() {
+        logger.info("About to start AI defender thread.");
+        if (t != null && t.isAlive()) {
+            t.interrupt();
+            logger.warn("An AI Defender thread was interrupted by starting a new Thread.");
+        }
+        t = new AIDefenderThread();
+        new AIDefenderThread().start();
+    }
+
+    private void writeTest() {
+        String result = llmService.getResponse(src, systemPrompt);
+        String formattedResult = result.replace("```java", "").replace("```", "");
+        String testTemplate = cut.getTestTemplate();
+        String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
+        logger.info("AI defender generated test: {}", testSrc);
+
         try {
-            String test = dispatcher.sendChatCompletionRequestWithContext(List.of(systemPrompt, src), List.of());
-        } catch (GPTException e) {
-            throw new RuntimeException(e); //TODO anders handeln
+            llmService.createBattlegroundTest(game, getUser().getId(), testSrc);
+            //gameManagingUtils.createBattlegroundTest(multiplayerGame, getUser().getId(), testSrc);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private class AIDefenderThread extends Thread {
+        @Override
+        public void run() {
+            logger.info("Starting AiDefenderThread");
+            while (gameRepo.isGameActive(game.getId())) {
+                try {
+                    writeTest();
+                    sleep((long) secondsBetweenTests * 1000);
+                } catch (InterruptedException e) {
+                    logger.warn("AiDefenderThread interrupted");
+                    break;
+                }
+            }
         }
     }
 }

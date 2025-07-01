@@ -60,6 +60,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.util.Constants.AI_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
@@ -175,6 +176,9 @@ public class MultiplayerGameService extends AbstractGameService {
             return false;
         }
         if (!game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
+            return false;
+        }
+        if (!game.addPlayer(AI_DEFENDER_USER_ID, Role.DEFENDER)) {
             return false;
         }
 

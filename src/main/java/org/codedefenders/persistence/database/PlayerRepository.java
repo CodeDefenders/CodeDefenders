@@ -23,6 +23,7 @@ import java.sql.SQLException;
 
 import jakarta.inject.Inject;
 
+import org.codedefenders.LlmPlayer.LlmDefender;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
@@ -30,6 +31,7 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +92,13 @@ public class PlayerRepository {
 
         final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact,
                 keyMap, keepPreviousTest);
-
-        return new Player(id, user, gameId, points, role, active);
+        if (userId == Constants.AI_DEFENDER_USER_ID) {
+            return new LlmDefender(id, user, gameId, points, active);
+        } else if (userId == Constants.AI_ATTACKER_USER_ID || userId == Constants.AI_PLAYER_USER_ID) {
+            throw new RuntimeException("Not implemented.");
+        } else {
+            return new Player(id, user, gameId, points, role, active);
+        }
     }
 
     /**

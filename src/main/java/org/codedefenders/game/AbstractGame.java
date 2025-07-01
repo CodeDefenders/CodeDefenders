@@ -229,4 +229,6 @@ public abstract class AbstractGame {
         }
         return observers;
     }
+
+    public abstract void startLlmPlayers();
 }

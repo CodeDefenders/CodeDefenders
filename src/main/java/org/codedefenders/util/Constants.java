@@ -44,6 +44,9 @@ public class Constants {
     public static final int DUMMY_CREATOR_USER_ID = -1;
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
+    public static final int AI_ATTACKER_USER_ID = 5;
+    public static final int AI_DEFENDER_USER_ID = 6;
+    public static final int AI_PLAYER_USER_ID = 7;
 
     // classes, dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_MUTANTS_DIR = "mutants";
@@ -160,4 +163,7 @@ public class Constants {
             + "No worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
     public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
+
+    //Template components
+    public static final String TEST_TEMPLATE_PLACEHOLDER = "// test here!";
 }

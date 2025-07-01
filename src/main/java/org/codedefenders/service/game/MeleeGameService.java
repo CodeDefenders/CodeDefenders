@@ -54,6 +54,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -73,6 +74,9 @@ public class MeleeGameService extends AbstractGameService {
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MeleeGameRepository meleeGameRepo;
+
+    @Inject
+    LlmService llmService;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,

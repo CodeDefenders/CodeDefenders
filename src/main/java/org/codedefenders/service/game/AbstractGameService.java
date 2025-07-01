@@ -287,7 +287,7 @@ public abstract class AbstractGameService implements IGameService {
         if (game.getState() == GameState.CREATED) {
             game.setState(GameState.ACTIVE);
             boolean updated = game.update();
-
+            game.startLlmPlayers();
             if (updated) {
                 gameRepo.storeStartTime(game.getId());
 

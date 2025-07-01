@@ -472,6 +472,14 @@ public class Configuration {
         }
     }
 
+    public String getOpenaiApiKey() {
+        return openaiApiKey;
+    }
+
+    public String getOpenaiChatgptModel() {
+        return openaiChatgptModel;
+    }
+
     /**
      * This transforms an attribute name from camelCase to the format in which its actually looked up.
      *
@@ -480,15 +488,5 @@ public class Configuration {
      */
     protected String resolveAttributeName(String camelCaseName) {
         return camelCaseName;
-    }
-
-    //TODO
-    public String getOpenaiApiKey() {
-        return null;
-    }
-
-    //TODO
-    public String getOpenaiChatgptModel() {
-        return null;
     }
 }
