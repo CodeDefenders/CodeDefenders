@@ -23,6 +23,7 @@ import java.io.IOException;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.enterprise.inject.se.SeContainer;
 import jakarta.enterprise.inject.se.SeContainerInitializer;
+import jakarta.enterprise.inject.spi.CDI;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -50,20 +51,23 @@ public class LlmDefender extends Player {
 
     MultiplayerGame game;
 
-    GameService gameService = CDIUtil.getBeanFromCDI(GameService.class);
     MultiplayerGameRepository gameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
     LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
-    //GameManagingUtils gameManagingUtils = CDIUtil.getBeanFromCDI(GameManagingUtils.class);
 
     GameClass cut;
     String src;
     String systemPrompt;
-    GameType gameType;
     int secondsBetweenTests = 10; //TODO irgendwo einstellen
     AIDefenderThread t;
 
+    private final RequestContextController requestContextController;
+    private final GameManagingUtils gameManagingUtils;
+
     public LlmDefender(int id, UserEntity user, int gameId, int points, boolean active) {
         super(id, user, gameId, points, Role.DEFENDER, active);
+
+        requestContextController = CDI.current().select(RequestContextController.class).get();
+        gameManagingUtils = CDI.current().select(GameManagingUtils.class).get();
 
         game = gameRepo.getMultiplayerGame(gameId);
 
@@ -71,11 +75,10 @@ public class LlmDefender extends Player {
         src = cut.getSourceCode();
         //TODO add dependencies
 
-        systemPrompt = "Write a test for the following Java code using a maximum of 2 assertions. " +
-                "Write only the content of the test method, without including the header or the method declaration. " +
-                "Ensure that no method declarations are present in your response. Use JUnit 4."; //TODO different testing libraries
-        //systemPrompt = "Write exactly \"assertEquals(21, Constants.foo();\"";
-
+        systemPrompt = """
+                Write a test for the following Java code using a maximum of 2 assertions.
+                Write only the content of the test method, without including formatting, comments,
+                the header or the method declaration. Use JUnit 4.""";//TODO different testing libraries
     }
 
     public void startRunning() {
@@ -95,11 +98,13 @@ public class LlmDefender extends Player {
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
         logger.info("AI defender generated test: {}", testSrc);
 
+        requestContextController.activate();
         try {
-            llmService.createBattlegroundTest(game, getUser().getId(), testSrc);
-            //gameManagingUtils.createBattlegroundTest(multiplayerGame, getUser().getId(), testSrc);
+            gameManagingUtils.createBattlegroundTest(game, getUser().getId(), testSrc);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            requestContextController.deactivate();
         }
     }
 
