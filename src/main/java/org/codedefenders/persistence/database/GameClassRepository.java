@@ -317,7 +317,8 @@ public class GameClassRepository {
         @Language("SQL") String query = """
                 SELECT
                    Dependency_ID,
-                   JavaFile
+                   JavaFile,
+                   Class_ID
                 FROM dependencies WHERE Class_ID = ?;
         """;
         return queryRunner.query(query,
