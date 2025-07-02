@@ -19,25 +19,18 @@
 package org.codedefenders.LlmPlayer;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.enterprise.context.control.RequestContextController;
-import jakarta.enterprise.inject.se.SeContainer;
-import jakarta.enterprise.inject.se.SeContainerInitializer;
 import jakarta.enterprise.inject.spi.CDI;
 
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.service.LlmService;
-import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -55,7 +48,8 @@ public class LlmDefender extends Player {
     LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
 
     GameClass cut;
-    String src;
+    String cutSrc;
+    List<String> dependencyCode;
     String systemPrompt;
     int secondsBetweenTests = 10; //TODO irgendwo einstellen
     AIDefenderThread t;
@@ -72,11 +66,13 @@ public class LlmDefender extends Player {
         game = gameRepo.getMultiplayerGame(gameId);
 
         cut = game.getCUT();
-        src = cut.getSourceCode();
-        //TODO add dependencies
+        cutSrc = cut.getSourceCode();
+
+        dependencyCode = cut.getDependencyCode();
 
         systemPrompt = """
-                Write a test for the following Java code using a maximum of 2 assertions.
+                Write a test for the first class of the following Java code using a maximum of 2 assertions.
+                The other classes are dependencies of the first class, you don't need to test them.
                 Write only the content of the test method, without including formatting, comments,
                 the header or the method declaration. Use JUnit 4.""";//TODO different testing libraries
     }
@@ -92,8 +88,14 @@ public class LlmDefender extends Player {
     }
 
     private void writeTest() {
-        String result = llmService.getResponse(src, systemPrompt);
+        StringBuilder input = new StringBuilder(cutSrc);
+        for (String d : dependencyCode) {
+            input.append(d);
+        }
+
+        String result = llmService.getResponse(input.toString(), systemPrompt);
         String formattedResult = result.replace("```java", "").replace("```", "");
+        //TODO Remove method declaration/brackets (some models will create them even when asked not to)
         String testTemplate = cut.getTestTemplate();
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
         logger.info("AI defender generated test: {}", testSrc);
