@@ -17,11 +17,30 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Toast} from 'bootstrap';
+
 class ShowToasts {
-    static showToast({colorClass = 'bg-primary', title = '', secondary = '', body = ''}) {
+    static showToast({
+                         colorClass = 'bg-primary',
+                         title = '',
+                         secondary = '',
+                         body = '',
+                         link = '',
+                         icon = ''
+                     }) {
+
+
         const toastElem = document.createElement('div');
         toastElem.classList.add('toast', 'bg-white');
         toastElem.role = 'alert';
+
+        let linkElement;
+        if (link !== '') {
+            linkElement = document.createElement('a');
+            linkElement.classList.add('text-decoration-none', 'text-reset', 'd-block');
+            linkElement.setAttribute('href', link);
+            linkElement.appendChild(toastElem)
+        }
+
         const toastBody = document.createElement('div');
         toastBody.classList.add('toast-body', 'me-auto');
         toastBody.innerText = body;
@@ -56,7 +75,6 @@ class ShowToasts {
             toastElem.appendChild(toastBody);
 
         } else {
-            console.log('No title or secondary text provided');
             const intermediate = document.createElement('div');
             intermediate.classList.add("d-flex", "align-items-center", "justify-content-around");
             closeButton.classList.add('me-2');
@@ -66,11 +84,12 @@ class ShowToasts {
             toastElem.appendChild(intermediate);
         }
 
-        document.getElementById('toasts').appendChild(toastElem);
+        const topLevelToastElem = link === '' ? toastElem : linkElement;
+        document.getElementById('toasts').appendChild(topLevelToastElem);
         new Toast(toastElem).show();
 
         toastElem.addEventListener('hidden.bs.toast', () => {
-            setTimeout(() => toastElem.remove(), 1000);
+            setTimeout(() => topLevelToastElem.remove(), 1000);
         });
     }
 }
