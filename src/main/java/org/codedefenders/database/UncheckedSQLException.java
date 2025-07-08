@@ -24,15 +24,29 @@ import java.sql.SQLException;
  * Wraps around a {@link SQLException} to make handling the exception optional.
  */
 public class UncheckedSQLException extends RuntimeException {
+    private final int errorCode;
+
     public UncheckedSQLException(String message) {
         super(message);
+        errorCode = 0;
     }
 
     public UncheckedSQLException(SQLException e) {
         super(e);
+        errorCode = e.getErrorCode();
     }
 
     public UncheckedSQLException(String message, SQLException e) {
         super(message, e);
+        errorCode = e.getErrorCode();
+    }
+
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    public boolean isDataTooLong() {
+        // MySQL / MariaDB error code for ER_DATA_TOO_LONG
+        return getErrorCode() == 1406;
     }
 }

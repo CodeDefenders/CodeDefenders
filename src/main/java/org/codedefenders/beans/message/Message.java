@@ -108,6 +108,11 @@ public class Message implements Serializable {
 
     /* Builder-style setter methods. */
 
+    /**
+     * Marks the message as an alert, meaning it will not be displayed as a toast notification and fade out after a few seconds.
+     *
+     * @return This message instance, for method chaining.
+     */
     public Message alert() {
         this.alert = true;
         return this;

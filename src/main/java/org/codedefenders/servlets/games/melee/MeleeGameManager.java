@@ -44,6 +44,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -655,9 +656,24 @@ public class MeleeGameManager extends HttpServlet {
 
         // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
         // then we get the PLAYER_ID when we get id of the mutants' creator?
-        Mutant newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
-                // TODO Should we use a different directory structure for MELEE GAMES?
-                MODE_BATTLEGROUND_DIR);
+
+        Mutant newMutant;
+        //noinspection DuplicatedCode
+        try {
+            newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
+                    // TODO Should we use a different directory structure for MELEE GAMES?
+                    MODE_BATTLEGROUND_DIR);
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                messages.add("Error submitting the mutant: data too long. Maybe you made too many changes?").alert();
+            } else {
+                messages.add("Database error while saving the mutant.");
+                logger.error("Database error while saving the mutant: {}", e.getMessage());
+            }
+            response.sendRedirect(
+                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            return;
+        }
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             previousSubmission.setMutantCode(mutantText);
