@@ -306,7 +306,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        messages.add("Game " + gameId + " left");
+        messages.add("You left game " + gameId);
         eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
