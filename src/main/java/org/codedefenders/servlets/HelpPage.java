@@ -32,6 +32,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import static org.xnap.commons.i18n.I18nFactory.FALLBACK;
+import static org.xnap.commons.i18n.I18nFactory.READ_PROPERTIES;
 
 @WebServlet("/help")
 public class HelpPage extends HttpServlet {
@@ -42,10 +43,10 @@ public class HelpPage extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        I18n i18n = I18nFactory.getI18n(getClass(), req.getLocale(), FALLBACK);
+        I18n i18n = I18nFactory.getI18n(getClass(), req.getLocale(), FALLBACK | READ_PROPERTIES);
         pageInfo.setPageTitle(i18n.tr("Help"));
         logger.info(i18n.tr("Help"));
-
+        req.setAttribute("i18n", i18n);
         req.getRequestDispatcher("/jsp/help.jsp").forward(req, resp);
     }
 }

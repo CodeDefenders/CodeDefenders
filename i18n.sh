@@ -2,7 +2,7 @@
 # tested with 0.23.1 (from 2025-05-29)
 
 # step 1: create keys.pot file by extracting all strings that should be translated
-find src -iname "*.java" | xargs xgettext -k -ktrc -ktr -kmarktr -ktrn:1,2 -kfmt\:message:1 -o po/keys.pot --from-code=utf-8
+xgettext-regex src -f i18n.tr -o po/keys.pot
 # step 2: use PoEdit to create .po files containing the translations for all languages
 # step 3: create the Messages_language.class resource bundle files using the .po files
 msgfmt --java2 -d target/classes -r org.codedefenders.i18n.Messages -l de po/de.po
