@@ -37,6 +37,8 @@ import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
  * This class configures Shiro.
  *
  * @author gambi
+ * @see https://shiro.apache.org/web.html
+ * @see https://shiro.apache.org/reference.html
  */
 @ApplicationScoped
 public class ShiroConfig {
