@@ -38,7 +38,6 @@ import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
@@ -52,9 +51,6 @@ public class InvitePage extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
-
-    @Inject
-    private GameProducer gameProducer;
 
     @Inject
     private PlayerRepository playerRepo;
@@ -78,7 +74,9 @@ public class InvitePage extends HttpServlet {
 
         String inviteId = req.getParameter("inviteId");
         if (inviteId == null) {
-            game = gameProducer.getGame();
+            logger.warn("No invite ID in invite link.");
+            messages.add("Your link is malformed, you could not join the game.").alert();
+            return;
         } else {
             try {
                 game = gameRepository.getGameForInviteId(Integer.parseInt(inviteId));
