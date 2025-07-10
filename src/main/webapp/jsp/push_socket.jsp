@@ -37,7 +37,7 @@
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
     let ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
-    const userId = '${login.userIdCareful}';
+    const userId = '${login.userId}';
     if (userId !== '-1') {
         if (ticket === '') {
             ticket = userId;

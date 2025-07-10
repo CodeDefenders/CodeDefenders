@@ -28,19 +28,9 @@ public interface CodeDefendersAuth {
     boolean isAdmin();
 
     /**
-     * Returns the user ID of the current user.
-     * <p>
-     * <b>WARNING: Should never be used on pages a logged-out user may visit, it will lead to an 500 error,
-     * even if the return value is never actually used.</b>
-     * Use {@link CodeDefendersAuth#getUserIdCareful() instead.}
+     * Returns the user ID of the current user, or -1 if the user is not logged in.
      */
     int getUserId();
-
-    /**
-     * Returns the userID if the currently logged-in user, or -1 if he is not logged in. In contrast to
-     * {@link CodeDefendersAuth#getUserId()}, it will not produce an error when the user is not logged in.
-     */
-    int getUserIdCareful();
 
     SimpleUser getSimpleUser();
 
