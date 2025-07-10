@@ -27,6 +27,7 @@ import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.invite.InviteEvent;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,9 @@ import com.google.gson.Gson;
 public class NotificationService implements INotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
     private static final int NUM_THREADS = 8;
+
+    @Inject
+    URLUtils urlUtils;
 
     /**
      * @implNote executor is shutdown by {@link ExecutorServiceProvider#shutdown()}
@@ -84,7 +88,7 @@ public class NotificationService implements INotificationService {
      */
     public void sendInviteNotification(AbstractGame game, int userId, WhitelistType type) {
         InviteEvent event = new InviteEvent();
-        event.setInviteLink(Paths.INVITE + "?inviteId=" + game.getInviteId());
+        event.setInviteLink(urlUtils.forPath(Paths.INVITE) + "?inviteId=" + game.getInviteId());
         event.setUserId(userId);
         event.setClassName(game.getClass().getSimpleName());
         if (game instanceof MultiplayerGame) {
