@@ -48,7 +48,7 @@
 
         if ('${login.loggedIn}') {
             socket.subscribe('registration.InviteRegistrationEvent', {
-                userId: '${login.userIdOrMinusOne}'
+                userId: '${login.userIdCareful}'
             });
         }
 

@@ -53,13 +53,19 @@ public class AuthService implements CodeDefendersAuth {
         return SecurityUtils.getSubject().isPermitted(AdminPermission.name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getUserId() {
         return SecurityUtils.getSubject().getPrincipals().oneByType(CodeDefendersRealm.LocalUserId.class).getUserId();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int getUserIdOrMinusOne() {
+    public int getUserIdCareful() {
         if (isLoggedIn()) {
             return getUserId();
         } else {
