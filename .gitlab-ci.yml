@@ -253,22 +253,10 @@ merged-test-coverage:
   artifacts:
     paths:
       - target/site/jacoco/jacoco.xml
-
-# See: https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#java-and-kotlin-examples
-visualize-coverage:
-  image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
-  stage: visualize
-  needs:
-    - merged-test-coverage
-  cache: [ ]
-  script:
-    # convert report from jacoco to cobertura, using relative project path
-    - python /opt/cover2cover.py target/site/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
-  artifacts:
     reports:
       coverage_report:
-        coverage_format: cobertura
-        path: target/site/cobertura.xml
+        coverage_format: jacoco
+        path: target/site/jacoco/jacoco.xml
 
 
 ###
