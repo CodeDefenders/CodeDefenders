@@ -348,9 +348,9 @@ public class MeleeGameRepository {
                     (SELECT creators.Username
                        FROM view_valid_users creators
                        WHERE g.Creator_ID = creators.User_ID) AS creatorName
-                FROM view_melee_games AS g,
-                    view_valid_users u
-                    LEFT JOIN whitelist w ON u.User_ID = w.user_ID
+                FROM view_melee_games AS g
+                    JOIN view_valid_users u
+                    LEFT JOIN whitelist w ON u.User_ID = w.user_ID AND g.ID = w.game_id
                 WHERE u.User_ID = ?
                   AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
                   AND g.Creator_ID != u.User_ID
@@ -360,7 +360,7 @@ public class MeleeGameRepository {
                     INNER JOIN players p ON ig.ID = p.Game_ID
                     WHERE p.User_ID = u.User_ID
                     AND p.Active = TRUE)
-                AND ((NOT g.invite_only) OR w.game_id = g.ID)
+                AND ((NOT g.invite_only) OR w.type IS NOT NULL)
                 ;
         """;
 
