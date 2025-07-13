@@ -73,9 +73,10 @@ public class WhitelistRepository {
     }
 
     public List<String> getWhiteListedPlayerNames(int gameId) {
-        @Language("SQL") String query = "SELECT Username FROM " +
-                "whitelist JOIN users ON whitelist.user_id = users.User_ID" +
-                " WHERE game_id = ?";
+        @Language("SQL") String query = """
+                SELECT Username FROM
+                whitelist JOIN users ON whitelist.user_id = users.User_ID
+                 WHERE game_id = ?""";
         return queryRunner.query(query, rs -> {
             List<String> playerNames = new java.util.ArrayList<>();
             while (rs.next()) {
@@ -86,9 +87,10 @@ public class WhitelistRepository {
     }
 
     public List<String> getWhiteListedPlayerNames(int gameId, WhitelistType type) {
-        @Language("SQL") String query = "SELECT Username FROM " +
-                "whitelist JOIN users ON whitelist.user_id = users.User_ID" +
-                " WHERE game_id = ? AND type = ?";
+        @Language("SQL") String query = """
+                SELECT Username FROM
+                whitelist JOIN users ON whitelist.user_id = users.User_ID
+                 WHERE game_id = ? AND type = ?""";
         return queryRunner.query(query, rs -> {
             List<String> playerNames = new java.util.ArrayList<>();
             while (rs.next()) {
@@ -115,9 +117,10 @@ public class WhitelistRepository {
     }
 
     public WhitelistType getWhitelistType(int gameId, String username) {
-        @Language("SQL") String query = "SELECT type FROM whitelist JOIN users " +
-                "ON whitelist.user_id = users.User_ID " +
-                "WHERE game_id = ? AND Username = ?";
+        @Language("SQL") String query = """
+                SELECT type FROM whitelist JOIN users
+                ON whitelist.user_id = users.User_ID
+                WHERE game_id = ? AND Username = ?""";
         return queryRunner.query(query, rs -> {
             if (rs.next()) {
                 return WhitelistType.fromString(rs.getString("type"));
@@ -127,7 +130,10 @@ public class WhitelistRepository {
     }
 
     public Set<WhitelistElement> getWhitelist(int gameId) {
-        @Language("SQL") String query = "SELECT Username, type FROM whitelist JOIN users on whitelist.user_id = users.User_ID WHERE game_id = ?";
+        @Language("SQL") String query =
+                """
+                        SELECT Username, type FROM whitelist
+                        JOIN users on whitelist.user_id = users.User_ID WHERE game_id = ?""";
         return queryRunner.query(query, rs -> {
             Set<WhitelistElement> whitelist = new HashSet<>();
             while (rs.next()) {
