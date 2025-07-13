@@ -44,22 +44,8 @@ public enum WhitelistType {
      */
     CHOICE;
 
+
     public static WhitelistType fromString(String string) {
-        string = string.toLowerCase();
-        switch (string) {
-            case "defender" -> {
-                return DEFENDER;
-            }
-            case "attacker" -> {
-                return ATTACKER;
-            }
-            case "flex" -> {
-                return FLEX;
-            }
-            case "choice" -> {
-                return CHOICE;
-            }
-            default -> throw new IllegalArgumentException("Unknown whitelist type: " + string);
-        }
+        return valueOf(string.toUpperCase().trim());
     }
 }
