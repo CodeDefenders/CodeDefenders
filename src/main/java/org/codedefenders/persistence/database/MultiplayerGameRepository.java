@@ -243,8 +243,9 @@ public class MultiplayerGameRepository {
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
 
         if (game.getInviteId() != null) {
-            @Language("SQL") String query2 = "UPDATE invitation_links SET game_id = ? WHERE invitation_id = ?;";
-            queryRunner.update(query2, gameId, game.getInviteId());
+            @Language("SQL") String query2 =
+                    "UPDATE invitation_links SET game_id = ? WHERE invitation_id = ? AND creator_id = ?;";
+            queryRunner.update(query2, gameId, game.getInviteId(), creatorId);
         }
         return gameId;
 

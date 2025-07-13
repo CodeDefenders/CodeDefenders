@@ -91,7 +91,7 @@ public class WhitelistAPI extends HttpServlet {
                 }
             }
             if (game.getInviteId() == null) {
-                game.setInviteId(gameRepo.storeInvitationLink(gameId));
+                game.setInviteId(gameRepo.storeInvitationLink(gameId, login.getUserId()));
             }
             String[] addIdParams = params.get("addIds");
             String[] addNameParams = params.get("addNames");

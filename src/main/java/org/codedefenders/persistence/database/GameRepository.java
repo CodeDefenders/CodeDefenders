@@ -261,15 +261,17 @@ public class GameRepository {
      * Stores a new invitation link id. If the game is null, the link id is stored without a game,
      * the game will have to be added later.
      * @param gameId The id of the game to store the link for, or null if that game is not yet created.
+     * @param creatorId The id of the game creator. This is used to prevent the hijacking of an uncreated game's
+     *                  invitation link by another user.
      * @return The generated ID of the invitation link.
      */
-    public int storeInvitationLink(Integer gameId) {
+    public int storeInvitationLink(Integer gameId, int creatorId) {
         @Language("SQL") String query = """
-                INSERT INTO invitation_links (game_id)
-                VALUES (?)
+                INSERT INTO invitation_links (game_id, creator_id)
+                VALUES (?, ?)
         """;
 
-        return queryRunner.insert(query, generatedKeyFromRS(), gameId).orElseThrow();
+        return queryRunner.insert(query, generatedKeyFromRS(), gameId, creatorId).orElseThrow();
     }
 
     /**

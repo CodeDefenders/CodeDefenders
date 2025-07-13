@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.util.URLUtils;
 
@@ -41,6 +42,8 @@ public class InviteLinkAPI extends HttpServlet {
     private GameRepository gameRepository;
     @Inject
     private URLUtils urlUtils;
+    @Inject
+    private CodeDefendersAuth login;
 
 
     @Override
@@ -54,7 +57,7 @@ public class InviteLinkAPI extends HttpServlet {
                 return;
             }
         }
-        int inviteId = gameRepository.storeInvitationLink(gameId);
+        int inviteId = gameRepository.storeInvitationLink(gameId, login.getUserId());
         String inviteLink = urlUtils.getAbsoluteURLForPath("invite?inviteId=" + inviteId);
 
         JsonObject root = new JsonObject();
