@@ -250,12 +250,15 @@
         <t:game_chat/>
 
         <% if (game.getCreatorId() == login.getUserId() || role == Role.OBSERVER) {%>
+        <div>
             <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>"
                                mayChooseRole="<%=String.valueOf(mayChooseRole)%>" liveGame="true" type="<%=type%>"/>
-            <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+            <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button"
+                    data-bs-toggle="modal" data-bs-target="#whitelist-modal">
                 <i class="fa fa-paper-plane"></i>
                 Invitations
             </button>
+        </div>
         <% } %>
     </div>
 </div>
