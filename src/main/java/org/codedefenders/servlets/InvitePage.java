@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
 @WebServlet({Paths.INVITE})
 public class InvitePage extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(InvitePage.class);
@@ -69,7 +68,7 @@ public class InvitePage extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        logger.info("Invite page requested");
+        logger.debug("Invite page requested");
         AbstractGame game;
 
         String inviteId = req.getParameter("inviteId");
@@ -130,9 +129,7 @@ public class InvitePage extends HttpServlet {
 
             Role role;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                synchronized (this) { //TODO Unsure if this synchronization is correct
-                    multiplayerGame.addPlayer(userId, wantedRole);
-                }
+                multiplayerGame.addPlayer(userId, wantedRole);
             } else if (game instanceof MeleeGame) {
                 role = Role.PLAYER;
                 game.addPlayer(userId, role);
