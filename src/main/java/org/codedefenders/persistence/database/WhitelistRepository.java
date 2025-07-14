@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.util.Constants;
 import org.intellij.lang.annotations.Language;
 
@@ -63,13 +64,8 @@ public class WhitelistRepository {
 
     public List<Integer> getWhiteListedPlayerIds(int gameId) {
         @Language("SQL") String query = "SELECT user_id FROM whitelist WHERE game_id = ?";
-        return queryRunner.query(query, rs -> {
-            List<Integer> playerIds = new java.util.ArrayList<>();
-            while (rs.next()) {
-                playerIds.add(rs.getInt("user_id"));
-            }
-            return playerIds;
-        }, gameId);
+        return queryRunner.query(query, ResultSetUtils.listFromRS(
+                rs -> rs.getInt("user_id")), gameId);
     }
 
     public List<String> getWhiteListedPlayerNames(int gameId) {
@@ -77,13 +73,9 @@ public class WhitelistRepository {
                 SELECT Username FROM
                 whitelist JOIN users ON whitelist.user_id = users.User_ID
                  WHERE game_id = ?""";
-        return queryRunner.query(query, rs -> {
-            List<String> playerNames = new java.util.ArrayList<>();
-            while (rs.next()) {
-                playerNames.add(rs.getString("Username"));
-            }
-            return playerNames;
-        }, gameId);
+        return queryRunner.query(query, ResultSetUtils.listFromRS(
+                rs -> rs.getString("Username")),
+                gameId);
     }
 
     public List<String> getWhiteListedPlayerNames(int gameId, WhitelistType type) {
@@ -91,13 +83,9 @@ public class WhitelistRepository {
                 SELECT Username FROM
                 whitelist JOIN users ON whitelist.user_id = users.User_ID
                  WHERE game_id = ? AND type = ?""";
-        return queryRunner.query(query, rs -> {
-            List<String> playerNames = new java.util.ArrayList<>();
-            while (rs.next()) {
-                playerNames.add(rs.getString("Username"));
-            }
-            return playerNames;
-        }, gameId, getDBEnum(type));
+        return queryRunner.query(query, ResultSetUtils.listFromRS(
+                rs -> rs.getString("Username")),
+                gameId, getDBEnum(type));
     }
 
     public WhitelistType getWhitelistType(int gameId, int playerId) {
@@ -114,19 +102,6 @@ public class WhitelistRepository {
             }
             return null;
         }, gameId, playerId);
-    }
-
-    public WhitelistType getWhitelistType(int gameId, String username) {
-        @Language("SQL") String query = """
-                SELECT type FROM whitelist JOIN users
-                ON whitelist.user_id = users.User_ID
-                WHERE game_id = ? AND Username = ?""";
-        return queryRunner.query(query, rs -> {
-            if (rs.next()) {
-                return WhitelistType.fromString(rs.getString("type"));
-            }
-            return null;
-        }, gameId, username);
     }
 
     public Set<WhitelistElement> getWhitelist(int gameId) {
