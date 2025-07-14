@@ -43,7 +43,7 @@
                 </div>
                 <div class="card-body">
                     <input type="text" id="searchInput" class="form-control" placeholder="Invite users">
-                    <div id="autocompleteList" class="list-group"></div>
+                    <div id="autocompleteList" class="list-group overflow-auto" style="max-height: 50vh"></div>
                 </div>
             </div>
             <div class="card mt-2 mb-2">
