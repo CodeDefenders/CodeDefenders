@@ -22,6 +22,9 @@ package org.codedefenders.model;
  * This enum represents the role a user is whitelisted for. Games can be created so that users cannot choose their
  * own role, in this case the game creator can whitelist users for a specific role. In games where users can choose
  * their role this enum is ignored.
+ * <p>
+ * Note: The names of these enum values are equal to the names used in the DB. Be careful before changing the names of
+ * these values.
  */
 public enum WhitelistType {
     /**

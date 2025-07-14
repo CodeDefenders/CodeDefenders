@@ -75,7 +75,7 @@ public class InviteEvent extends ServerEvent {
     }
 
     public WhitelistType getRole() {
-        return WhitelistType.fromString(role);
+        return WhitelistType.valueOf(role);
     }
 
     public void setRole(WhitelistType role) {

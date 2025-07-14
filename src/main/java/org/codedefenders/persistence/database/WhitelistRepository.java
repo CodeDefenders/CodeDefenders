@@ -49,7 +49,7 @@ public class WhitelistRepository {
     public void addToWhitelist(int gameId, int playerId, WhitelistType type) {
 
         @Language("SQL") String query = "INSERT INTO whitelist (game_id, user_id, type) VALUES (?, ?, ?)";
-        queryRunner.update(query, gameId, playerId, getDBEnum(type));
+        queryRunner.update(query, gameId, playerId, type.name());
     }
 
     public void removeFromWhitelist(int gameId, int playerId) {
@@ -85,7 +85,7 @@ public class WhitelistRepository {
                  WHERE game_id = ? AND type = ?""";
         return queryRunner.query(query, ResultSetUtils.listFromRS(
                 rs -> rs.getString("Username")),
-                gameId, getDBEnum(type));
+                gameId, type.name());
     }
 
     public WhitelistType getWhitelistType(int gameId, int playerId) {
@@ -98,7 +98,7 @@ public class WhitelistRepository {
         @Language("SQL") String query = "SELECT type FROM whitelist WHERE game_id = ? AND user_id = ?";
         return queryRunner.query(query, rs -> {
             if (rs.next()) {
-                return WhitelistType.fromString(rs.getString("type"));
+                return WhitelistType.valueOf(rs.getString("type"));
             }
             return null;
         }, gameId, playerId);
@@ -114,29 +114,10 @@ public class WhitelistRepository {
             while (rs.next()) {
                 String username = rs.getString("Username");
                 String typeStr = rs.getString("type");
-                WhitelistType type = WhitelistType.fromString(typeStr);
+                WhitelistType type = WhitelistType.valueOf(typeStr);
                 whitelist.add(new WhitelistElement(username, type));
             }
             return whitelist;
         }, gameId);
-    }
-
-
-    private String getDBEnum(WhitelistType type) {
-        switch (type) {
-            case FLEX -> {
-                return "flex";
-            }
-            case CHOICE -> {
-                return "choice";
-            }
-            case ATTACKER -> {
-                return "attacker";
-            }
-            case DEFENDER -> {
-                return "defender";
-            }
-            default -> throw new IllegalArgumentException("Unknown enum type: " + type);
-        }
     }
 }
