@@ -494,11 +494,10 @@
                                             <% if (info.isMayChooseRoles()
                                                     || info.getWhitelistType() == WhitelistType.ATTACKER
                                                     || (info.getWhitelistType() == WhitelistType.FLEX
-                                                    && defenders.size() >= attackers.size())) {%>
+                                            )) {%>
                                             <button type="submit" id="<%="join-attacker-"+info.gameId()%>"
-                                                    class="btn btn-sm btn-attacker ms-1"
-                                                    value="Join as Attacker">
-                                                Join
+                                                    class="btn btn-sm <%= info.getWhitelistType() == WhitelistType.FLEX ? "btn-player" : "btn-attacker"%> ms-1">
+                                                Join <%= info.getWhitelistType() == WhitelistType.FLEX ? "the game" : "as Attacker"%>
                                             </button>
                                             <% } %>
 
@@ -517,12 +516,10 @@
                                             <%=defenders.size() %>
                                             <% if (info.isMayChooseRoles()
                                                     || info.getWhitelistType() == WhitelistType.DEFENDER
-                                                    || (info.getWhitelistType() == WhitelistType.FLEX
-                                                    && defenders.size() < attackers.size())) {%>
+                                                    || (info.getWhitelistType() == WhitelistType.FLEX)) {%>
                                             <button type="submit" id="<%="join-defender-"+gameId%>"
-                                                    class="btn btn-sm btn-defender ms-1"
-                                                    value="Join as Defender">
-                                                Join
+                                                    class="btn btn-sm <%= info.getWhitelistType() == WhitelistType.FLEX ? "btn-player" : "btn-defender"%> ms-1">
+                                                Join <%= info.getWhitelistType() == WhitelistType.FLEX ? "the game" : "as Defender"%>
                                             </button>
                                             <% } %>
                                         </span>
