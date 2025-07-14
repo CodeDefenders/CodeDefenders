@@ -36,14 +36,10 @@
     const baseWsUri = '${url.getAbsoluteURLForPath("/")}'
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
-    let ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
+    const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
     const userId = '${login.userId}';
     if (userId !== '-1') {
-        if (ticket === '') {
-            ticket = userId;
-        }
         const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
-
 
         const pushSocket = new PushSocket(wsUri);
         objects.register('pushSocket', pushSocket);
