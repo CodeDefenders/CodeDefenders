@@ -338,13 +338,17 @@
             enableOrDisableUpdateButton();
         }
 
-        input.addEventListener("input", function () {
+        ['input', 'focus'].forEach(function (e) {input.addEventListener(e, function () {
             const value = this.value.trim().toLowerCase();
             list.innerHTML = "";
-            if (!value) return;
+            let matches;
+            if (!value) {
+                matches = suggestions.filter(item => !userAlreadyAdded(item));
+            } else {
+                matches = suggestions.filter(item => item.toLowerCase().startsWith(value)
+                        && !userAlreadyAdded(item));
+            }
 
-            const matches = suggestions.filter(item => item.toLowerCase().startsWith(value)
-                    && !userAlreadyAdded(item));
             matches.forEach(match => {
                 const item = document.createElement("div");
                 item.classList.add("list-group-item", "d-flex", "flex-row", "gap-2");
@@ -397,6 +401,7 @@
 
                 list.appendChild(item);
             });
+        })
         });
 
         /**

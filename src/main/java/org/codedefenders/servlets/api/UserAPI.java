@@ -59,7 +59,7 @@ public class UserAPI extends HttpServlet {
             }
             userNames = gameRepo.getUsernamesForGame(Integer.parseInt(request.getParameter("gameId")));
         } else {
-            userNames = userRepo.getUsers().stream()
+            userNames = userRepo.getRealUsers().stream()
                     .map(UserEntity::getUsername)
                     .toList();
         }
