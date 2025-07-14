@@ -105,11 +105,15 @@ public class InvitePage extends HttpServlet {
         }
 
         if (game == null) {
-            logger.warn("User {} tried to join game {}, but the game does not exist.", login.getUserId(),
-                    req.getParameter("gameId"));
+            logger.warn("User {} tried to join game with invite link {}, but the game does not exist.",
+                    login.getUserId(), req.getParameter("inviteId"));
             messages.add("The game you were invited to no longer exists, or it has not been created yet.").alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
+        }
+        if (game.isFinished()) {
+            logger.warn("User {} tried to join game {}, but it is already finished.", login.getUserId(), game.getId());
+            messages.add("The game you were invited to has already finished!").alert();
         }
         int gameId = game.getId();
         int userId = login.getUserId();
