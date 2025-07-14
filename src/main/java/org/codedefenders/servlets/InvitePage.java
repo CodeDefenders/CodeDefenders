@@ -37,6 +37,7 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -65,6 +66,9 @@ public class InvitePage extends HttpServlet {
 
     @Inject
     private INotificationService notificationService;
+
+    @Inject
+    private WhitelistRepository whitelistRepo;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -131,20 +135,36 @@ public class InvitePage extends HttpServlet {
             event.setGameId(gameId);
             event.setUserName(login.getSimpleUser().getName());
 
-            Role role;
+            boolean success;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                multiplayerGame.addPlayer(userId, wantedRole);
+                success = multiplayerGame.addPlayer(userId, wantedRole);
             } else if (game instanceof MeleeGame) {
-                role = Role.PLAYER;
-                game.addPlayer(userId, role);
+                success = game.addPlayer(userId, Role.PLAYER);
             } else {
                 logger.warn("User {} tried to join puzzle game {}.", userId, gameId);
                 messages.add("You cannot join puzzle games with an invite link.").alert();
                 resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
-            notificationService.post(event);
-            logger.info("User {} joined game {}.", userId, gameId);
+            if (success) {
+                notificationService.post(event);
+                logger.info("User {} joined game {}.", userId, gameId);
+            } else {
+                if (game.isInviteOnly() && !whitelistRepo.isWhitelisted(gameId, userId)) {
+                    logger.info("User {} tried to join the game {} he was not whitelisted for" +
+                            " with in invite link.", userId, gameId);
+                    messages.add("You could not join the game because you have not been added to the whitelist.")
+                            .alert();
+                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                } else {
+                    logger.warn("User {} tried to join game {}, but was rejected for an unknown reason.",
+                            userId, gameId);
+                    messages.add("You could not join the game.").alert();
+                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
+            }
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
             messages.add("You had already joined this game.");
