@@ -744,7 +744,7 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-dbcp</artifactId>
 			<version>${tomcat.version}</version>
-			<scope>provided</scope>
+			<!-- <scope>provided</scope> -->
 		</dependency>
 		<!-- Tag libs -->
 		<dependency>
