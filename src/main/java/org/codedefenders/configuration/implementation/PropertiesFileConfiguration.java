@@ -25,6 +25,8 @@ import java.util.Properties;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.Alternative;
+import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -40,16 +42,19 @@ import com.google.common.base.CaseFormat;
  *
  * @author degenhart
  */
-@Priority(20)
-@Alternative
 @Singleton
+@ConfigurationSource
 class PropertiesFileConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
 
     private final Properties properties;
 
     @Inject
-    PropertiesFileConfiguration(@SuppressWarnings("CdiInjectionPointsInspection") List<ConfigFileResolver> configFileResolvers) {
+    PropertiesFileConfiguration(@Default Instance<ConfigFileResolver> configFileResolvers) {
+        this(configFileResolvers.stream().toList());
+    }
+
+    PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
         super();
         properties = new Properties();
         readProperties(configFileResolvers, "codedefenders.properties");

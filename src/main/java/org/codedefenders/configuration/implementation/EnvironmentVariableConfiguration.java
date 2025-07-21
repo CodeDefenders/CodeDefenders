@@ -33,9 +33,8 @@ import com.google.common.base.CaseFormat;
  *
  * @author degenhart
  */
-@Priority(50)
-@Alternative
 @Singleton
+@ConfigurationSource
 class EnvironmentVariableConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
 

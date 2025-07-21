@@ -24,6 +24,8 @@ import java.util.List;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.inject.Alternative;
+import jakarta.enterprise.inject.Default;
+import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -36,8 +38,6 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
-@Priority(100)
-@Alternative
 @Singleton
 class TieredConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(TieredConfiguration.class);
@@ -45,9 +45,13 @@ class TieredConfiguration extends BaseConfiguration {
     private final List<BaseConfiguration> configurations;
 
     @Inject
-    TieredConfiguration(@SuppressWarnings("CdiInjectionPointsInspection") List<BaseConfiguration> configurations) {
+    TieredConfiguration(@ConfigurationSource Instance<BaseConfiguration> configs) {
+        this(configs.stream().toList());
+    }
+
+    TieredConfiguration(List<BaseConfiguration> configs) {
         super();
-        this.configurations = configurations;
+        this.configurations = configs;
     }
 
     @Override

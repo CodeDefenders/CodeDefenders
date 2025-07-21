@@ -20,6 +20,7 @@ package org.codedefenders.configuration.configfileresolver;
 
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -27,6 +28,7 @@ import javax.naming.NamingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 class ContextConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ContextConfigFileResolver.class);
 

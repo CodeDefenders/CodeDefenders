@@ -28,7 +28,6 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,10 +39,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import jakarta.enterprise.inject.Alternative;
-import jakarta.inject.Singleton;
+import jakarta.enterprise.inject.Vetoed;
 
 import org.codedefenders.util.JavaVersionUtils;
 import org.slf4j.Logger;
@@ -77,8 +74,7 @@ import com.google.common.net.InternetDomainName;
  *
  * @author degenhart
  */
-@Alternative
-@Singleton
+@Vetoed
 public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 

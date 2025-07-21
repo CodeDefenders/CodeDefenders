@@ -21,6 +21,8 @@ package org.codedefenders.configuration.configfileresolver;
 import java.io.Reader;
 import java.io.StringReader;
 
+import jakarta.inject.Singleton;
+
 /**
  * The StubConfigFileResolver is used for testing the
  * {@link org.codedefenders.configuration.implementation.PropertiesFileConfiguration}.
@@ -29,6 +31,7 @@ import java.io.StringReader;
  *
  * @author degenhart
  */
+@Singleton
 public class StubConfigFileResolver extends ConfigFileResolver {
     private String configFileContent;
 
