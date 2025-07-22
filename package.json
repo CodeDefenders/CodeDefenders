@@ -30,7 +30,8 @@
         "@rollup/plugin-replace": "^4.0.0",
         "file-changed": "^1.4.1",
         "rollup": "^2.70.1",
+        "rollup-plugin-cleaner": "^1.0.0",
         "rollup-plugin-terser": "^7.0.2",
-        "rollup-plugin-cleaner": "^1.0.0"
+        "xgettext-regex": "^0.3.0"
     }
 }
