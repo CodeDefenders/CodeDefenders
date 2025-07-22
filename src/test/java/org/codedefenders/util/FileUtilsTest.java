@@ -410,4 +410,28 @@ public class FileUtilsTest {
         assertFalse(Files.exists(tree3));
         assertFalse(Files.exists(subDir3));
     }
+
+    @Test
+    public void testNextFreeName() throws IOException {
+        Path root = Files.createTempDirectory("codedefenders-testdir-");
+        Path subDir1 = root.resolve("subDir");
+        Path subDir2 = root.resolve("subDir_02");
+
+        Files.createDirectories(subDir1);
+        Files.createDirectories(subDir2);
+
+        assertEquals(FileUtils.nextFreePath(root, "subDir"), root.resolve("subDir_03"));
+    }
+
+    @Test
+    public void testNextFreeNameSkipsOne() throws IOException {
+        Path root = Files.createTempDirectory("codedefenders-testdir-");
+        Path subDir1 = root.resolve("subDir");
+        Path subDir2 = root.resolve("subDir_03");
+
+        Files.createDirectories(subDir1);
+        Files.createDirectories(subDir2);
+
+        assertEquals(FileUtils.nextFreePath(root, "subDir"), root.resolve("subDir_04"));
+    }
 }
