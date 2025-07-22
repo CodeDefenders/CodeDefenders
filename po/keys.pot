@@ -4,13 +4,369 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:39
-msgid "This is a test headline"
-msgstr "This is a test headline"
-
-#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/servlets/HelpPage.java:47
 msgid "Help"
 msgstr "Help"
 
-#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/servlets/HelpPage.java:48
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:40
+msgid "Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code."
+msgstr "Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:41
+msgid "Defenders"
+msgstr "Defenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:42
+msgid "At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a \"Defend!\" button which submits the test."
+msgstr "At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a \"Defend!\" button which submits the test."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:44
+msgid "Below these panels are two more panels, which show existing mutants and tests. In the mutants panel, mutants can be claimed as being equivalent (which is covered at the end of this page). Existing mutants can also be seen by the icon present in the margin of the CUT panel."
+msgstr "Below these panels are two more panels, which show existing mutants and tests. In the mutants panel, mutants can be claimed as being equivalent (which is covered at the end of this page). Existing mutants can also be seen by the icon present in the margin of the CUT panel."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:46
+msgid "We're going to submit a test to kill an alive mutant. Tests don't necessarily have to target alive mutants, and can simply be made to kill possible future mutants."
+msgstr "We're going to submit a test to kill an alive mutant. Tests don't necessarily have to target alive mutants, and can simply be made to kill possible future mutants."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:51
+msgid "If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a function call."
+msgstr "If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a function call."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:53
+msgid "After re-submitting the test, we see that it compiled successfully and killed the mutant."
+msgstr "After re-submitting the test, we see that it compiled successfully and killed the mutant."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:58
+msgid "The actual changes made in killed mutants can be viewed by clicking the \"View Diff\" button on the killed tab of the mutants panel."
+msgstr "The actual changes made in killed mutants can be viewed by clicking the \"View Diff\" button on the killed tab of the mutants panel."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:64
+msgid "Attackers"
+msgstr "Attackers"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:65
+msgid "The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage."
+msgstr "The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:67
+msgid "Similarly to tests, mutants are limited by rules, which come in three strictness levels:"
+msgstr "Similarly to tests, mutants are limited by rules, which come in three strictness levels:"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:71
+msgid "Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed."
+msgstr "Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:76
+msgid "After submitting our mutant by pressing the \"Attack!\" button, we see that it survived two existing tests. Similarly to submitting a test, an error will be displayed if the mutated class did not compile."
+msgstr "After submitting our mutant by pressing the \"Attack!\" button, we see that it survived two existing tests. Similarly to submitting a test, an error will be displayed if the mutated class did not compile."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:79
+msgid "Equivalents"
+msgstr "Equivalents"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:81
+msgid "It is possible to create a mutant which is identical in functionality to the CUT, so no test can pass on the CUT and fail on the mutated class."
+msgstr "It is possible to create a mutant which is identical in functionality to the CUT, so no test can pass on the CUT and fail on the mutated class."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:82
+msgid "For example, the following functions are identical in behaviour, they are equivalent:"
+msgstr "For example, the following functions are identical in behaviour, they are equivalent:"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:87
+msgid "If a Defender believes that an Attacker\'s mutant is equivalent, they can click the \"Claim Equivalent\" button on the mutant."
+msgstr "If a Defender believes that an Attacker\'s mutant is equivalent, they can click the \"Claim Equivalent\" button on the mutant."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:89
+msgid "After this, the Attacker will see that their mutant was marked as equivalent. If the mutant is equivalent, they should accept it as equivalent."
+msgstr "After this, the Attacker will see that their mutant was marked as equivalent. If the mutant is equivalent, they should accept it as equivalent."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:90
+msgid "However, if the mutant isn't equivalent, the Attacker can prove that it isn't by writing a test which kills it."
+msgstr "However, if the mutant isn't equivalent, the Attacker can prove that it isn't by writing a test which kills it."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:93
+msgid "Scoring System"
+msgstr "Scoring System"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:94
+msgid "Mutants"
+msgstr "Mutants"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:95
+msgid "For every test a mutant passes where the test executes the mutated line, the mutant gains a point."
+msgstr "For every test a mutant passes where the test executes the mutated line, the mutant gains a point."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:96
+msgid "Mutants also gain one point for being created and surviving."
+msgstr "Mutants also gain one point for being created and surviving."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:97
+msgid "Tests"
+msgstr "Tests"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:98
+msgid "For every mutant a test kills, the test gains points equal to the score of the mutant."
+msgstr "For every mutant a test kills, the test gains points equal to the score of the mutant."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:99
+msgid "A test gains a point for killing a previously untouched mutant."
+msgstr "A test gains a point for killing a previously untouched mutant."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:100
+msgid "A test is also given an additional point for killing a newly created mutant."
+msgstr "A test is also given an additional point for killing a newly created mutant."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:101
+msgid "Equivalences"
+msgstr "Equivalences"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:102
+msgid "If an Attacker proves a mutant is not equivalent, they keep the mutant\'s points and gain an additional point."
+msgstr "If an Attacker proves a mutant is not equivalent, they keep the mutant\'s points and gain an additional point."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:103
+msgid "If the Attacker accepts the mutant is equivalent, or the game expires, they lose the points of that mutant, and the Defender who claimed that it is equivalent gains a point."
+msgstr "If the Attacker accepts the mutant is equivalent, or the game expires, they lose the points of that mutant, and the Defender who claimed that it is equivalent gains a point."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:105
+msgid "Code Editor Keyboard Shortcuts"
+msgstr "Code Editor Keyboard Shortcuts"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:110
+msgid "Action"
+msgstr "Action"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:111
+msgid "Key"
+msgstr "Key"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:112
+msgid "Key (Mac)"
+msgstr "Key (Mac)"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:117
+msgid "Autocomplete"
+msgstr "Autocomplete"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:118
+msgid "Ctrl + Space"
+msgstr "Ctrl + Space"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:119
+msgid "Cmd + Space"
+msgstr "Cmd + Space"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:122
+msgid "Search"
+msgstr "Search"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:123
+msgid "Ctrl + F"
+msgstr "Ctrl + F"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:124
+msgid "Cmd + F"
+msgstr "Cmd + F"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:127
+msgid "Find Next"
+msgstr "Find Next"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:128
+msgid "Ctrl + G"
+msgstr "Ctrl + G"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:129
+msgid "Cmd + G"
+msgstr "Cmd + G"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:132
+msgid "Find Previous"
+msgstr "Find Previous"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:133
+msgid "Ctrl + Shift + G"
+msgstr "Ctrl + Shift + G"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:134
+msgid "Cmd + Shift + G"
+msgstr "Cmd + Shift + G"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:137
+msgid "Search and Replace"
+msgstr "Search and Replace"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:138
+msgid "Ctrl + Shift + F"
+msgstr "Ctrl + Shift + F"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:139
+msgid "Cmd + Shift + F"
+msgstr "Cmd + Shift + F"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:142
+msgid "Search and Replace All"
+msgstr "Search and Replace All"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:143
+msgid "Ctrl + Shift + R"
+msgstr "Ctrl + Shift + R"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:144
+msgid "Cmd + Shift + R"
+msgstr "Cmd + Shift + R"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:147
+msgid "Jump to Line"
+msgstr "Jump to Line"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:148
+msgid "Alt + R"
+msgstr "Alt + R"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:149
+msgid "Alt + R"
+msgstr "Alt + R"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:41
+msgid "Welcome to Code Defenders"
+msgstr "Welcome to Code Defenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:46
+msgid "Code Defenders Logo"
+msgstr "Code Defenders Logo"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:49
+msgid "Code Defenders:"
+msgstr "Code Defenders:"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:50
+msgid "A Mutation Testing Game"
+msgstr "A Mutation Testing Game"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:57
+msgid "Log in or Sign up"
+msgstr "Log in or Sign up"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:63
+msgid "Active Battleground Games"
+msgstr "Active Battleground Games"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:68
+msgid "Creator"
+msgstr "Creator"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:69
+msgid "Class"
+msgstr "Class"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:70
+msgid "Attackers"
+msgstr "Attackers"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:71
+msgid "Defenders"
+msgstr "Defenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:72
+msgid "Level"
+msgstr "Level"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:80
+msgid "There are currently no open games."
+msgstr "There are currently no open games."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:103
+msgid "Active Melee Games"
+msgstr "Active Melee Games"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:108
+msgid "Creator"
+msgstr "Creator"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:109
+msgid "Class"
+msgstr "Class"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:110
+msgid "Players"
+msgstr "Players"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:111
+msgid "Level"
+msgstr "Level"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:119
+msgid "There are currently no open games."
+msgstr "There are currently no open games."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:142
+msgid "Research"
+msgstr "Research"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:37
+msgid "About CodeDefenders"
+msgstr "About CodeDefenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:40
+msgid "Contact Us"
+msgstr "Contact Us"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:43
+msgid "Help"
+msgstr "Help"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:46
+msgid "Imprint and Privacy Policy"
+msgstr "Imprint and Privacy Policy"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:45
+msgid "Code Defenders"
+msgstr "Code Defenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:60
+msgid "Multiplayer"
+msgstr "Multiplayer"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:63
+msgid "Games"
+msgstr "Games"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:64
+msgid "Classrooms"
+msgstr "Classrooms"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:65
+msgid "History"
+msgstr "History"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:66
+msgid "Leaderboard"
+msgstr "Leaderboard"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:74
+msgid "Admin"
+msgstr "Admin"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:87
+msgid "Profile"
+msgstr "Profile"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:88
+msgid "Account"
+msgstr "Account"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:89
+msgid "Help"
+msgstr "Help"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:90
+msgid "Logout"
+msgstr "Logout"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:103
+msgid "Login"
+msgstr "Login"
+
+#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/servlets/HelpPage.java:43
 msgid "Help"
 msgstr "Help"

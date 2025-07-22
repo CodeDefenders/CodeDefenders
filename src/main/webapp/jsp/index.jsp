@@ -38,38 +38,38 @@
     pageContext.setAttribute("gameCreatorNames", gameCreatorNames);
 %>
 
-<p:main_page title="Welcome to Code Defenders">
+<p:main_page title="${i18n.tr('Welcome to Code Defenders')}">
     <%-- Vertically align content if enough space is available. --%>
     <div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
 
         <div class="d-flex align-items-center gap-3 mb-3">
-            <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
+            <img src="${url.forPath("/images/logo.png")}" alt="${i18n.tr('Code Defenders Logo')}" width="58">
                 <%-- Make the header break nicely on smaller screens. --%>
             <h1 class="d-lg-block d-flex flex-column">
-                <span>Code Defenders: </span>
-                <span>A Mutation Testing Game</span>
+                <span>${i18n.tr('Code Defenders:')}</span>
+                <span>${i18n.tr('A Mutation Testing Game')}</span>
             </h1>
         </div>
 
         <a href="${url.forPath(Paths.LOGIN)}"
            class="btn btn-lg btn-primary btn-highlight"
            style="margin-bottom: 5rem;">
-            Log in or Sign up
+                ${i18n.tr('Log in or Sign up')}
         </a>
 
         <div class="row g-4">
             <div class="col-xxl-6 col-12">
                 <div class="p-5 bg-light rounded-3">
-                    <h2 class="mb-3">Active Battleground Games</h2>
+                    <h2 class="mb-3">${i18n.tr('Active Battleground Games')}</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Creator</th>
-                                <th>Class</th>
-                                <th>Attackers</th>
-                                <th>Defenders</th>
-                                <th>Level</th>
+                                <th>${i18n.tr('Creator')}</th>
+                                <th>${i18n.tr('Class')}</th>
+                                <th>${i18n.tr('Attackers')}</th>
+                                <th>${i18n.tr('Defenders')}</th>
+                                <th>${i18n.tr('Level')}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -77,7 +77,7 @@
                                 <c:when test="${empty openMultiplayerGames}">
                                     <tr>
                                         <td colspan="100" class="text-center">
-                                            There are currently no open games.
+                                                ${i18n.tr('There are currently no open games.')}
                                         </td>
                                     </tr>
                                 </c:when>
@@ -100,15 +100,15 @@
 
 
                 <div class="p-5 bg-light rounded-3">
-                    <h2 class="mb-3">Active Melee Games</h2>
+                    <h2 class="mb-3">${i18n.tr('Active Melee Games')}</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Creator</th>
-                                <th>Class</th>
-                                <th>Players</th>
-                                <th>Level</th>
+                                <th>${i18n.tr('Creator')}</th>
+                                <th>${i18n.tr('Class')}</th>
+                                <th>${i18n.tr('Players')}</th>
+                                <th>${i18n.tr('Level')}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -116,7 +116,7 @@
                                 <c:when test="${empty openMeleeGames}">
                                     <tr>
                                         <td colspan="100" class="text-center">
-                                            There are currently no open games.
+                                                ${i18n.tr('There are currently no open games.')}
                                         </td>
                                     </tr>
                                 </c:when>
@@ -139,7 +139,7 @@
 
             <div class="col-xxl-6 col-12">
                 <div class="p-5 bg-light rounded-3">
-                    <h2 class="mb-3">Research</h2>
+                    <h2 class="mb-3">${i18n.tr('Research')}</h2>
                     <%@ include file="/jsp/research.jsp" %>
                 </div>
             </div>
