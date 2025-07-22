@@ -291,8 +291,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can start the game.");
+        if (game == null || !game.hasUserJoined(login.getUserId())) {
+            messages.add("You cannot leave a game you are not part of.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -306,7 +306,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        messages.add("Game " + gameId + " left");
+        messages.add("You left game " + gameId);
         eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
