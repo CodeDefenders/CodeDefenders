@@ -28,6 +28,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%
     List<MultiplayerGame> openMultiplayerGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
@@ -88,7 +89,7 @@
                                             <td><span>${game.CUT.alias}</span></td>
                                             <td>${game.attackerPlayers.size()}</td>
                                             <td>${game.defenderPlayers.size()}</td>
-                                            <td>${game.level.formattedString}</td>
+                                            <td>${i18n.tr(game.level.formattedString)}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:otherwise>
@@ -126,7 +127,7 @@
                                             <td>${gameCreatorNames[game.id]}</td>
                                             <td><span>${game.CUT.alias}</span></td>
                                             <td>${game.players.size()}</td>
-                                            <td>${game.level.formattedString}</td>
+                                            <td>${i18n.tr(game.level.formattedString)}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:otherwise>

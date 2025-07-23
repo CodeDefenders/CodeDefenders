@@ -13,8 +13,8 @@ msgstr ""
 "X-Generator: Poedit 3.6\n"
 
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:39
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:43
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:89
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:45
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:98
 #: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/servlets/HelpPage.java:43
 msgid "Help"
 msgstr "Hilfe"
@@ -30,7 +30,7 @@ msgstr ""
 "Tests schreiben, um diese Änderungen am Code abzufangen (zu töten)."
 
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:41
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:71
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:72
 msgid "Defenders"
 msgstr "Verteidiger"
 
@@ -85,7 +85,7 @@ msgid ""
 msgstr ""
 
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:64
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:70
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:71
 msgid "Attackers"
 msgstr "Angreifer"
 
@@ -300,71 +300,71 @@ msgstr ""
 msgid "Alt + R"
 msgstr ""
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:41
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:42
 msgid "Welcome to Code Defenders"
 msgstr "Willkommen bei CodeDefenders"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:46
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:47
 msgid "Code Defenders Logo"
 msgstr "CodeDefenders Logo"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:49
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:50
 msgid "Code Defenders:"
 msgstr "CodeDefenders:"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:50
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:51
 msgid "A Mutation Testing Game"
 msgstr "Ein Mutation-Testing Spiel"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:57
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:58
 msgid "Log in or Sign up"
 msgstr "Anmelden oder Regisitrieren"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:63
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:64
 msgid "Active Battleground Games"
 msgstr "Laufende Gruppenspiele"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:68
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:108
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:69
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:109
 msgid "Creator"
 msgstr "Ersteller"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:69
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:109
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:70
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:110
 msgid "Class"
 msgstr "Klasse"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:72
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:111
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:73
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:112
 msgid "Level"
 msgstr "Level"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:80
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:119
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:81
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:120
 msgid "There are currently no open games."
 msgstr "Es gibt aktuell keine laufenden Spiele."
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:103
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:104
 msgid "Active Melee Games"
 msgstr "Laufende Konfrontationspiele"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:110
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:111
 msgid "Players"
 msgstr "Spieler"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:142
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:143
 msgid "Research"
 msgstr "Forschung"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:37
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:38
 msgid "About CodeDefenders"
 msgstr "Über CodeDefenders"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:40
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:42
 msgid "Contact Us"
 msgstr "Kontakt"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:46
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:49
 msgid "Imprint and Privacy Policy"
 msgstr "Impressum und Datenschutz"
 
@@ -376,38 +376,50 @@ msgstr "CodeDefenders"
 msgid "Multiplayer"
 msgstr "Mehrspieler"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:63
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:64
 msgid "Games"
 msgstr "Spiele"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:64
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:66
 msgid "Classrooms"
 msgstr "Raum"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:65
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:69
 msgid "History"
 msgstr "Historie"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:66
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:71
 msgid "Leaderboard"
 msgstr "Bestenliste"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:74
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:80
 msgid "Admin"
 msgstr "Admin"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:87
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:94
 msgid "Profile"
 msgstr "Profil"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:88
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:96
 msgid "Account"
 msgstr "Konto"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:90
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:100
 msgid "Logout"
 msgstr "Abmelden"
 
-#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:103
+#: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:113
 msgid "Login"
 msgstr "Anmelden"
+
+#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/game/GameLevel.java:27
+msgid "Easy"
+msgstr "Einfach"
+
+#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/game/GameLevel.java:28
+msgid "Medium"
+msgstr "Mittel"
+
+#: /home/timlg07/CodeDefenders/src/main/java/org/codedefenders/game/GameLevel.java:29
+msgid "Hard"
+msgstr "Schwer"
