@@ -121,6 +121,8 @@ public class InvitePage extends HttpServlet {
         if (game.isFinished()) {
             logger.warn("User {} tried to join game {}, but it is already finished.", login.getUserId(), game.getId());
             messages.add("The game you were invited to has already finished!").alert();
+            resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            return;
         }
         int gameId = game.getId();
         int userId = login.getUserId();
