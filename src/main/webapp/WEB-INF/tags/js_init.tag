@@ -63,7 +63,7 @@
                 const flexButton = document.createElement('a');
                 flexButton.classList.add('btn', 'btn-secondary');
                 flexButton.textContent = 'Any role';
-                flexButton.href = event.inviteLink;
+                flexButton.href = event.inviteLink + '&role=flex';
 
                 const attackerButton = document.createElement('a');
                 attackerButton.classList.add('btn', 'btn-attacker');

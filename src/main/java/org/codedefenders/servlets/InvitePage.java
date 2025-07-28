@@ -21,6 +21,7 @@ package org.codedefenders.servlets;
 import java.io.IOException;
 
 import jakarta.inject.Inject;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,12 +34,14 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
@@ -71,7 +74,7 @@ public class InvitePage extends HttpServlet {
     private WhitelistRepository whitelistRepo;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         logger.debug("Invite page requested");
         AbstractGame game;
 
@@ -91,21 +94,21 @@ public class InvitePage extends HttpServlet {
         }
 
         String roleParameter = req.getParameter("role");
-        Role wantedRole;
+        Role wantedRole = null;
+        boolean flexIsDesired = false;
         if (roleParameter != null) {
-            if (roleParameter.equals("attacker")) {
-                wantedRole = Role.ATTACKER;
-            } else if (roleParameter.equals("defender")) {
-                wantedRole = Role.DEFENDER;
-            } else {
-                logger.warn("Invalid role parameter in invite link: {}", roleParameter);
-                messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
-                        .alert();
-                resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-                return;
+            switch (roleParameter) {
+                case "attacker" -> wantedRole = Role.ATTACKER;
+                case "defender" -> wantedRole = Role.DEFENDER;
+                case "flex" -> flexIsDesired = true;
+                default -> {
+                    logger.warn("Invalid role parameter in invite link: {}", roleParameter);
+                    messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
+                            .alert();
+                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
             }
-        } else {
-            wantedRole = null; // No role specified
         }
 
         if (game == null) {
@@ -128,6 +131,17 @@ public class InvitePage extends HttpServlet {
             if (!AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) {
                 logger.warn("User {} tried to join game {}, but game joining is disabled.", userId, gameId);
                 messages.add("Joining games is disabled.").alert();
+            }
+
+            if (!flexIsDesired
+                    && game instanceof MultiplayerGame multiplayerGame
+                    && wantedRole == null
+                    && (whitelistRepo.getWhitelistType(gameId, playerId) == WhitelistType.CHOICE
+                    || (!game.isInviteOnly() && multiplayerGame.isMayChooseRoles()))) {
+                req.setAttribute("game", game);
+                req.setAttribute("inviteId", inviteId);
+                req.getRequestDispatcher(Constants.BATTLEGROUND_ROLE_SELECTION).forward(req, resp);
+                return;
             }
 
             GameJoinedEvent event = new GameJoinedEvent();
@@ -155,15 +169,13 @@ public class InvitePage extends HttpServlet {
                             " with in invite link.", userId, gameId);
                     messages.add("You could not join the game because you have not been added to the whitelist.")
                             .alert();
-                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-                    return;
                 } else {
                     logger.warn("User {} tried to join game {}, but was rejected for an unknown reason.",
                             userId, gameId);
                     messages.add("You could not join the game.").alert();
-                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-                    return;
                 }
+                resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
             }
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
