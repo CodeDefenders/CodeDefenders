@@ -21,7 +21,6 @@ package org.codedefenders.servlets.games.battleground;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
