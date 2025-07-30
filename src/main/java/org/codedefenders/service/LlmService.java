@@ -18,17 +18,14 @@
  */
 package org.codedefenders.service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.model.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +45,17 @@ public class LlmService {
     Configuration config;
     ChatModel model;
 
+    /*
+        The player ids of all llm players whose threads are supposed to be active. If they are not on
+        this list, their thread will terminate after the current iteration.
+     */
+    private final Set<Integer> activeLlmPlayers;
+
 
     @Inject
     public LlmService(Configuration config) {
         this.config = config;
+        activeLlmPlayers = new HashSet<>();
 
         if (config.isLlmOpenAI()) {
             this.model = OpenAiChatModel.builder()
@@ -79,5 +83,17 @@ public class LlmService {
         String responseText = response.aiMessage().text();
         logger.info("LLM responded with {}", responseText);
         return responseText;
+    }
+
+    public boolean isThreadActive(Player player) {
+        return activeLlmPlayers.contains(player.getId());
+    }
+
+    public void setPlayerActive(Player p, boolean active) {
+        if (active) {
+            activeLlmPlayers.add(p.getId());
+        } else {
+            activeLlmPlayers.remove(p.getId());
+        }
     }
 }

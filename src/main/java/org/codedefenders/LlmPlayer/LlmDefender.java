@@ -20,6 +20,7 @@ package org.codedefenders.LlmPlayer;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.enterprise.inject.spi.CDI;
@@ -53,7 +54,6 @@ public class LlmDefender extends Player {
     List<String> dependencyCode;
     String systemPrompt;
     int secondsBetweenTests = 10; //TODO irgendwo einstellen
-    AIDefenderThread t;
 
     private final RequestContextController requestContextController;
     private final GameManagingUtils gameManagingUtils;
@@ -79,20 +79,18 @@ public class LlmDefender extends Player {
     }
 
     public void startRunning() {
-        logger.info("About to start AI defender thread.");
-        if (t != null && t.isAlive()) {
-            t.interrupt();
-            logger.warn("An AI Defender thread was interrupted by starting a new Thread.");
+        if (!llmService.isThreadActive(this)) {
+            llmService.setPlayerActive(this, true);
+            new AIDefenderThread().start();
+            logger.info("Started a new llm defender thread for player {}.", getId());
+        } else {
+            logger.warn("Trying to start an llm defender thread for player {}, but a thread was already registed.",
+                    getId());
         }
-        t = new AIDefenderThread();
-        t.start();
     }
 
     public void stopRunning() { //TODO currently not working
-        logger.info("About to stop AI defender thread.");
-        if (t != null) {
-            t.interrupt();
-        }
+        llmService.setPlayerActive(this, false);
     }
 
     private void writeTest() {
@@ -110,8 +108,8 @@ public class LlmDefender extends Player {
 
         requestContextController.activate();
         try {
-                game = gameRepo.getMultiplayerGame(game.getId());
-                gameManagingUtils.createBattlegroundTest(game, getUser().getId(), testSrc);
+            game = gameRepo.getMultiplayerGame(game.getId());
+            gameManagingUtils.createBattlegroundTest(game, getUser().getId(), testSrc);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -123,7 +121,7 @@ public class LlmDefender extends Player {
         @Override
         public void run() {
             logger.info("Starting AiDefenderThread");
-            while (gameRepo.isGameActive(game.getId())) {
+            while (llmService.isThreadActive(LlmDefender.this) && gameRepo.isGameActive(game.getId())) {
                 try {
                     writeTest();
                     sleep((long) secondsBetweenTests * 1000);
