@@ -34,6 +34,7 @@ import org.codedefenders.service.LlmService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public class LlmDefender extends Player {
         dependencyCode = cut.getDependencyCode();
 
         systemPrompt = """
-                Write a test for the first class of the following Java code using a maximum of 2 assertions.
+                Write a single test for the first class of the following Java code using a maximum of 2 assertions.
                 The other classes are dependencies of the first class, you don't need to test them.
                 Write only the content of the test method, without including formatting, comments,
                 the header or the method declaration. Use JUnit 4.""";//TODO different testing libraries
@@ -84,7 +85,14 @@ public class LlmDefender extends Player {
             logger.warn("An AI Defender thread was interrupted by starting a new Thread.");
         }
         t = new AIDefenderThread();
-        new AIDefenderThread().start();
+        t.start();
+    }
+
+    public void stopRunning() { //TODO currently not working
+        logger.info("About to stop AI defender thread.");
+        if (t != null) {
+            t.interrupt();
+        }
     }
 
     private void writeTest() {
@@ -94,15 +102,16 @@ public class LlmDefender extends Player {
         }
 
         String result = llmService.getResponse(input.toString(), systemPrompt);
-        String formattedResult = result.replace("```java", "").replace("```", "");
-        //TODO Remove method declaration/brackets (some models will create them even when asked not to)
+        String formattedResult = result.replace("```java", "").replace("```", "");//TODO in Utils-Methode
+        formattedResult = LlmUtils.extractTestContentFromReply(formattedResult);
         String testTemplate = cut.getTestTemplate();
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
         logger.info("AI defender generated test: {}", testSrc);
 
         requestContextController.activate();
         try {
-            gameManagingUtils.createBattlegroundTest(game, getUser().getId(), testSrc);
+                game = gameRepo.getMultiplayerGame(game.getId());
+                gameManagingUtils.createBattlegroundTest(game, getUser().getId(), testSrc);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {

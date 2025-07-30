@@ -498,4 +498,9 @@ public class MeleeGame extends AbstractGame {
     public void startLlmPlayers() {
         //TODO
     }
+
+    @Override
+    public void stopLlmPlayers() {
+        //TODO
+    }
 }

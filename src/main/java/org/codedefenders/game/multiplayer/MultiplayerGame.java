@@ -692,4 +692,15 @@ public class MultiplayerGame extends AbstractGame {
         //TODO attackers
     }
 
+    @Override
+    public void stopLlmPlayers() {
+        for (Player p : getDefenderPlayers()) {
+            if (p instanceof LlmDefender llmDefender) {
+                llmDefender.stopRunning();
+                break;
+            }
+        }
+        //TODO attackers
+    }
+
 }

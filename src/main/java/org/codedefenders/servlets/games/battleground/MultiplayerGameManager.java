@@ -50,6 +50,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -251,10 +252,43 @@ public class MultiplayerGameManager extends HttpServlet {
                 claimEquivalent(request, response, gameId, game);
                 return;
             }
+            case "activateLlmDefender": {
+                addLlmPlayer(game, Role.DEFENDER);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+                return;
+            }
+            case "stopLlmDefender": {
+                game.stopLlmPlayers();
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+                return;
+            }
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
         }
+    }
+
+    void addLlmPlayer(MultiplayerGame game, Role role) {
+        List<Player> players;
+        int aiPlayerId;
+        if (role == Role.DEFENDER) {
+            aiPlayerId = Constants.AI_DEFENDER_USER_ID;
+            players = game.getDefenderPlayers();
+        } else {
+            logger.error("Not implemented yet.");
+            return;
+        }
+        boolean alreadyAdded = false;
+        for (Player p : players) {
+            if (p.getUser().getId() == aiPlayerId) {
+                alreadyAdded = true;
+                break;
+            }
+        }
+        if (!alreadyAdded) {
+            game.addPlayer(aiPlayerId, role);
+        }
+        game.startLlmPlayers();
     }
 
     void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
@@ -573,7 +607,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
 
@@ -670,7 +705,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
         Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");

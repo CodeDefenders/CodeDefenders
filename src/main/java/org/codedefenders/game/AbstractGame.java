@@ -231,4 +231,6 @@ public abstract class AbstractGame {
     }
 
     public abstract void startLlmPlayers();
+
+    public abstract void stopLlmPlayers();
 }

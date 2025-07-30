@@ -511,7 +511,7 @@ public class MultiplayerGameRepository {
     }
 
     /**
-     * Returns true, if the game exists and is active, returns false otherwise.
+     * Returns true if the game exists and is active, returns false otherwise.
      */
     public boolean isGameActive(int gameId) {
         String query = "SELECT ID FROM games where " +

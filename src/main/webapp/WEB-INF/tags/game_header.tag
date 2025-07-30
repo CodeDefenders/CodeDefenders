@@ -141,6 +141,19 @@
                 </t:modal>
             </form>
         </div>
+
+        <!-- TODO alles in ein modal oder so packen -->
+        <form id="activateLlmDefender" action="<%=Paths.BATTLEGROUND_GAME%>" method="post">
+            <input type="hidden" name="formType" value="activateLlmDefender">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+            <button type="submit" class="btn btn-dark">Activate LLM Defender</button>
+        </form>
+
+        <form id="stopLlmDefender" action="<%=Paths.BATTLEGROUND_GAME%>" method="post">
+            <input type="hidden" name="formType" value="stopLlmDefender">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+            <button type="submit" class="btn btn-outline-dark">Stop LLM Defender</button>
+        </form>
         <%
             }
 

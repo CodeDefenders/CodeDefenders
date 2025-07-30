@@ -18,6 +18,13 @@
  */
 package org.codedefenders.service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -30,6 +37,7 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
+import dev.langchain4j.model.ollama.OllamaChatModel;
 import dev.langchain4j.model.openai.OpenAiChatModel;
 
 @ApplicationScoped
@@ -44,10 +52,18 @@ public class LlmService {
     @Inject
     public LlmService(Configuration config) {
         this.config = config;
-        this.model = OpenAiChatModel.builder()
-                .apiKey(config.getOpenaiApiKey())
-                .modelName(config.getOpenaiChatgptModel())
-                .build();
+
+        if (config.isLlmOpenAI()) {
+            this.model = OpenAiChatModel.builder()
+                    .apiKey(config.getOpenaiApiKey())
+                    .modelName(config.getOpenaiChatgptModel())
+                    .build();
+        } else if (config.isLlmLocal()) {
+            this.model = OllamaChatModel.builder()
+                    .baseUrl("http://127.0.0.1:11434")
+                    .modelName("gemma3n:e2b")
+                    .build();
+        }
     }
 
 

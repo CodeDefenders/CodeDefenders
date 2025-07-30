@@ -110,8 +110,10 @@ public class Configuration {
     protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
+    protected String llmType;
     protected String openaiApiKey;
     protected String openaiChatgptModel;
+    protected String llmLocalServer;
 
     @Deprecated
     protected String authAdminRole;
@@ -470,6 +472,22 @@ public class Configuration {
                     .filter(name -> !name.isEmpty())
                     .toList();
         }
+    }
+
+    public boolean isLlmEnabled() {
+        return llmType != null && !llmType.equals("NONE");
+    }
+
+    public boolean isLlmOpenAI() {
+        return "OPENAI".equals(llmType);
+    }
+
+    public boolean isLlmLocal() {
+        return "LOCAL".equals(llmType);
+    }
+
+    public String getLlmLocalServer() {
+        return llmLocalServer;
     }
 
     public String getOpenaiApiKey() {
