@@ -66,7 +66,7 @@ WHERE `ID` >= 100;
 
 CREATE OR REPLACE VIEW `view_valid_users` AS
 SELECT * FROM `users`
-WHERE `User_ID` >= 5
+WHERE `User_ID` >= 10
   AND Active = 1;
 
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
