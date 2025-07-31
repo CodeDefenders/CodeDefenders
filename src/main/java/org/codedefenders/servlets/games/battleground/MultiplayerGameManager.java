@@ -57,6 +57,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -158,6 +159,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private GameService gameService;
 
+    @Inject
+    private LlmService llmService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -252,31 +256,45 @@ public class MultiplayerGameManager extends HttpServlet {
                 claimEquivalent(request, response, gameId, game);
                 return;
             }
-            case "activateLlmDefender": {
-                addLlmPlayer(game, Role.DEFENDER);
-                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
+            case "toggleLlmPlayers": {
+                toggleLlmPlayers(game, request, response);
+
                 return;
             }
-            case "stopLlmDefender": {
-                game.stopLlmPlayers();
-                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
-                return;
-            }
+
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
         }
     }
 
-    void addLlmPlayer(MultiplayerGame game, Role role) {
+    void toggleLlmPlayers(MultiplayerGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (!login.isAdmin() && login.getUserId() != game.getCreatorId()) {
+            messages.add("You are not allowed to change the LLM players!").alert();
+            logger.warn("User {} tried to change the llm players on game {}.", login.getUserId(), game.getId());
+        } else {
+            boolean defenderActive = req.getParameter("llmDefender") != null;
+            boolean attackerActive = req.getParameter("llmAttacker") != null;
+
+            llmService.setPlayerActive(game, Role.DEFENDER, defenderActive);
+            llmService.setPlayerActive(game, Role.ATTACKER, attackerActive);
+
+
+        }
+        resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+    }
+
+    private void addLlmPlayer(MultiplayerGame game, Role role) {
         List<Player> players;
         int aiPlayerId;
         if (role == Role.DEFENDER) {
             aiPlayerId = Constants.AI_DEFENDER_USER_ID;
             players = game.getDefenderPlayers();
+        } else if (role == Role.ATTACKER) {
+            aiPlayerId = Constants.AI_ATTACKER_USER_ID;
+            players = game.getAttackerPlayers();
         } else {
-            logger.error("Not implemented yet.");
-            return;
+            throw new IllegalArgumentException("Cannot start LLM players for this role: " + role);
         }
         boolean alreadyAdded = false;
         for (Player p : players) {
@@ -288,7 +306,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if (!alreadyAdded) {
             game.addPlayer(aiPlayerId, role);
         }
-        game.startLlmPlayers();
+        game.addLlmPlayer(role);
     }
 
     void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {

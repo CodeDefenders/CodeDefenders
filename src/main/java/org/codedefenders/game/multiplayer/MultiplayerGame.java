@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.LlmPlayer.LlmDefender;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
@@ -44,6 +43,7 @@ import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -682,25 +682,18 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     @Override
-    public void startLlmPlayers() {
-        for (Player p : getDefenderPlayers()) {
-            if (p instanceof LlmDefender llmDefender) {
-                llmDefender.startRunning();
-                break;
-            }
+    public void addLlmPlayer(Role role) {
+        int llmId;
+        if (role == Role.ATTACKER) {
+            llmId = Constants.AI_ATTACKER_USER_ID;
+        } else if (role == Role.DEFENDER) {
+            llmId = Constants.AI_DEFENDER_USER_ID;
+        } else {
+            throw new IllegalArgumentException("Cannot add LLM players for this role: " + role);
         }
-        //TODO attackers
-    }
-
-    @Override
-    public void stopLlmPlayers() {
-        for (Player p : getDefenderPlayers()) {
-            if (p instanceof LlmDefender llmDefender) {
-                llmDefender.stopRunning();
-                break;
-            }
+        if (!addPlayer(llmId, role)) {
+            throw new RuntimeException("Couldn't add llm player with role " + role + " to game " + id);
         }
-        //TODO attackers
     }
 
 }

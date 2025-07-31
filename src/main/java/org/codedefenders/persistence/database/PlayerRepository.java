@@ -23,7 +23,6 @@ import java.sql.SQLException;
 
 import jakarta.inject.Inject;
 
-import org.codedefenders.LlmPlayer.LlmDefender;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
@@ -31,7 +30,6 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.util.Constants;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,13 +90,7 @@ public class PlayerRepository {
 
         final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact,
                 keyMap, keepPreviousTest);
-        if (userId == Constants.AI_DEFENDER_USER_ID) {
-            return new LlmDefender(id, user, gameId, points, active);
-        } else if (userId == Constants.AI_ATTACKER_USER_ID || userId == Constants.AI_PLAYER_USER_ID) {
-            throw new RuntimeException("Not implemented.");
-        } else {
-            return new Player(id, user, gameId, points, role, active);
-        }
+        return new Player(id, user, gameId, points, role, active);
     }
 
     /**
@@ -106,11 +98,11 @@ public class PlayerRepository {
      */
     public int getPlayerIdForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
-                SELECT players.ID
-                FROM players
-                WHERE User_ID = ?
-                  AND Game_ID = ?
-        """;
+                        SELECT players.ID
+                        FROM players
+                        WHERE User_ID = ?
+                          AND Game_ID = ?
+                """;
 
         // TODO: Return optional here
         var playerId = queryRunner.query(query,
@@ -126,10 +118,10 @@ public class PlayerRepository {
      */
     public Player getPlayer(int playerId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE ID = ?;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE ID = ?;
+                """;
 
         var player = queryRunner.query(query,
                 oneFromRS(PlayerRepository::playerWithUserFromRS),
@@ -143,12 +135,12 @@ public class PlayerRepository {
      */
     public Player getPlayerForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE Game_ID = ?
-                  AND User_ID = ?
-                  AND Active = TRUE;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE Game_ID = ?
+                          AND User_ID = ?
+                          AND Active = TRUE;
+                """;
 
         var player = queryRunner.query(query,
                 oneFromRS(PlayerRepository::playerWithUserFromRS),
@@ -194,12 +186,12 @@ public class PlayerRepository {
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
         @Language("SQL") String query = """
-                SELECT *
-                FROM players
-                WHERE players.Active = TRUE
-                  AND players.User_ID = ?
-                  AND players.Game_ID = ?
-        """;
+                        SELECT *
+                        FROM players
+                        WHERE players.Active = TRUE
+                          AND players.User_ID = ?
+                          AND players.Game_ID = ?
+                """;
 
         return queryRunner.query(query,
                 oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),

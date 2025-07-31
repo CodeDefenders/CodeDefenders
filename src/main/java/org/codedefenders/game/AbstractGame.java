@@ -230,7 +230,6 @@ public abstract class AbstractGame {
         return observers;
     }
 
-    public abstract void startLlmPlayers();
+    public abstract void addLlmPlayer(Role role);
 
-    public abstract void stopLlmPlayers();
 }

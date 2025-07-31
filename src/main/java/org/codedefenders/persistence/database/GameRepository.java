@@ -18,6 +18,7 @@
  */
 package org.codedefenders.persistence.database;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -255,5 +256,14 @@ public class GameRepository {
 
         int updatedRows = queryRunner.update(query, gameId);
         return updatedRows > 0;
+    }
+
+    /**
+     * Returns true if the game exists and is active, returns false otherwise.
+     */
+    public boolean isGameActive(int gameId) {
+        String query = "SELECT ID FROM games where " +
+                "games.ID = ? AND games.State = 'ACTIVE' LIMIT 1";
+        return queryRunner.query(query, ResultSet::isBeforeFirst, gameId);
     }
 }

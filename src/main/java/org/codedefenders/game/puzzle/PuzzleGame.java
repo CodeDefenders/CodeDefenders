@@ -279,12 +279,8 @@ public class PuzzleGame extends AbstractGame {
     }
 
     @Override
-    public void startLlmPlayers() {
+    public void addLlmPlayer(Role role) {
         //Do nothing
     }
 
-    @Override
-    public void stopLlmPlayers() {
-        //Do nothing
-    }
 }

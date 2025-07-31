@@ -51,7 +51,7 @@ public class LeaderboardRepository {
               IFNULL(DScore,0) AS DScore,
               IFNULL(NKilled,0) AS NKilled,
               IFNULL(AScore,0)+IFNULL(DScore,0)+IFNULL(EScore,0) AS TotalScore
-            FROM view_valid_users U
+            FROM view_real_users U
             LEFT JOIN (
                 SELECT PA.user_id, count(M.Mutant_ID) AS NMutants, sum(M.Points) AS AScore
                 FROM players PA

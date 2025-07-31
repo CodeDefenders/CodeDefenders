@@ -31,6 +31,7 @@ public class LlmUtils {
      * aren't going to compile anyway.
      */
     public static String extractTestContentFromReply(String reply) {
+        reply = reply.replace("```java", "").replace("```", "");
         reply = reply.replaceAll("(?m)^\\s*", "");
         reply = removeLinesThatContainWords(reply, "void", "public", "private");
         reply = removeLinesThatStartWith(reply, "import");
