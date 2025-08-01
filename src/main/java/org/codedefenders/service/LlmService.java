@@ -34,6 +34,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
@@ -59,12 +60,17 @@ public class LlmService {
                     The other classes are dependencies of the first class, you don't need to test them.
                     Write only the content of the test method, without including formatting, comments,
                     the header or the method declaration. Use JUnit 4.
-                    """.stripIndent().trim();
+                    """.trim().stripIndent();
+
+    private static final String ATTACKER_SYSTEM_PROMPT =
+            """
+                    Change the following java code in a small but significant way.
+                    Only change existing methods and fields.
+                    Write nothing but the mutated java code.""".trim().stripIndent();
 
     Configuration config;
     GameRepository gameRepository;
     GameManagingUtils gameManagingUtils;
-    RequestContextController requestContextController;
 
     ChatModel model;
 
@@ -87,7 +93,6 @@ public class LlmService {
         this.config = config;
         this.gameRepository = gameRepository;
         this.gameManagingUtils = gameManagingUtils;
-        this.requestContextController = requestContextController;
 
         activeLlmPlayers = new HashMap<>();
         activeLlmDefenders = new HashMap<>();
@@ -102,6 +107,7 @@ public class LlmService {
             this.model = OllamaChatModel.builder()
                     .baseUrl("http://127.0.0.1:11434")
                     .modelName("gemma3n:e2b")
+                    .temperature(0.9)
                     .build();
         }
     }
@@ -147,7 +153,10 @@ public class LlmService {
     public void setPlayerActive(AbstractGame game, Role role, boolean active) {
         Map<Integer, Boolean> m = getCorrectMap(role);
         boolean alreadyPresent = m.containsKey(game.getId());
-        m.put(game.getId(), active);
+
+        if (active || alreadyPresent) { //Never put a new 'false' value, it wouldn't be deleted
+            m.put(game.getId(), active);
+        }
 
         if (active && !alreadyPresent) {
             game.addPlayer(getCorrectUserId(role), role);
@@ -172,20 +181,45 @@ public class LlmService {
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
         logger.info("AI defender generated test: {}", testSrc);
         return testSrc;
-
-
     }
 
-    private void submitTest(AbstractGame game, Role role, String testSrc) {
-        int userId = getCorrectUserId(role);
+    private void submitTest(AbstractGame game, String testSrc) {
+        RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
         try {
             if (game instanceof MultiplayerGame multiplayerGame) {
-                gameManagingUtils.createBattlegroundTest(multiplayerGame, userId, testSrc);
+                gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
             } else {//TODO
                 throw new NotImplementedException("TODO");
             }
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            requestContextController.deactivate();
+        }
+    }
+
+    private String generateMutant(AbstractGame game) {
+        StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
+        for (String d : game.getCUT().getDependencyCode()) {
+            input.append(d);
+        }
+        String result = getResponse(input.toString(), ATTACKER_SYSTEM_PROMPT);
+        String formattedResult = result.replace("```java", "").replace("```", "");
+        logger.info("LLM attacker generated test: {}", formattedResult);
+        return formattedResult;
+    }
+
+    private void submitMutant(AbstractGame game, String mutantSrc) {
+        RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
+        requestContextController.activate();
+        try {
+            if (game instanceof MultiplayerGame multiplayerGame) {
+                gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
+            } else {//TODO
+                throw new NotImplementedException("TODO");
+            }
+        } catch (IOException | GameManagingUtils.MutantCreationException e) {
             throw new RuntimeException(e);
         } finally {
             requestContextController.deactivate();
@@ -204,15 +238,17 @@ public class LlmService {
 
         @Override
         public void run() {
-            logger.info("Starting LlmPlayerThread");
+            logger.info("Starting LlmPlayerThread for game {} with role {}", game.getId(), role);
             while (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
                 try {
                     if (role == Role.DEFENDER) {
                         String testSrc = generateTest(game);
                         game = gameRepository.getGame(game.getId());
-                        submitTest(game, role, testSrc);
+                        submitTest(game, testSrc);
                     } else if (role == Role.ATTACKER) {
-                        //TODO
+                        String mutantSrc = generateMutant(game);
+                        game = gameRepository.getGame(game.getId());
+                        submitMutant(game, mutantSrc);
                     } else if (role == Role.PLAYER) {
                         //TODO
                     } else throw new IllegalArgumentException("No support for this role: " + role);
