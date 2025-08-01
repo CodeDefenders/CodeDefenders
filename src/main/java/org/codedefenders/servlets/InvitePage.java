@@ -85,10 +85,21 @@ public class InvitePage extends HttpServlet {
             return;
         } else {
             try {
-                game = gameRepository.getGameForInviteId(Integer.parseInt(inviteId));
+                var opt = gameRepository.getGameForInviteId(Integer.parseInt(inviteId));
+                if (opt.isPresent()) {
+                    game = opt.get();
+                } else {
+                    logger.warn("User {} tried to join game with invite id {}, but no such game exists.",
+                            login.getUserId(), inviteId);
+                    messages.add("The game you are trying to join doesn't exist. " +
+                            "Your invite link might have been malformed.").alert();
+                    resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
             } catch (NumberFormatException e) {
                 logger.warn("Invalid invite ID: {}", inviteId);
                 messages.add("Your link is malformed, you could not join the game.").alert();
+                resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
         }

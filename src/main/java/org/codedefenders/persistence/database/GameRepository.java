@@ -280,14 +280,15 @@ public class GameRepository {
      * @param inviteId The invitation link ID.
      * @return The game ID or null if no game found.
      */
-    public AbstractGame getGameForInviteId(int inviteId) {
+    public Optional<AbstractGame> getGameForInviteId(int inviteId) {
         @Language("SQL") String query = """
                 SELECT game_id
                 FROM invitation_links
                 WHERE invitation_id = ?
         """;
-        int gameId = queryRunner.query(query, oneFromRS(rs -> rs.getInt("game_id")), inviteId).orElseThrow();
-        return getGame(gameId);
+        Optional<Integer> gameId = queryRunner.query(query, oneFromRS(
+                rs -> rs.getInt("game_id")), inviteId);
+        return gameId.map(this::getGame);
     }
 
     /**
