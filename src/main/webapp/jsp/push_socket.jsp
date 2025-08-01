@@ -37,7 +37,7 @@
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
     const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
-    const userId = '${login.userId}';
+    const userId = '${login.loggedIn ? login.userId : -1}';
     if (userId !== '-1') {
         const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
 

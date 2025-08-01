@@ -61,13 +61,7 @@ public class AuthService implements CodeDefendersAuth {
      */
     @Override
     public int getUserId() {
-        try {
-            return SecurityUtils.getSubject().getPrincipals().oneByType(CodeDefendersRealm.LocalUserId.class).getUserId();
-        } catch (NullPointerException e) {
-            //This happens when the user is not logged in and should usually not be a reason for concern.
-            logger.debug(e.toString());
-            return -1;
-        }
+        return SecurityUtils.getSubject().getPrincipals().oneByType(CodeDefendersRealm.LocalUserId.class).getUserId();
     }
 
     @Override

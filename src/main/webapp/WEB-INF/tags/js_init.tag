@@ -46,9 +46,10 @@
 
     (async function () {
 
-        if ('${login.loggedIn}') {
+        const userId = ${login.loggedIn ? login.userId : -1};
+        if (userId >= 0) {
             socket.subscribe('registration.InviteRegistrationEvent', {
-                userId: '${login.userId}'
+                userId: userId
             });
         }
 

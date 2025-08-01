@@ -28,7 +28,8 @@ public interface CodeDefendersAuth {
     boolean isAdmin();
 
     /**
-     * Returns the user ID of the current user, or -1 if the user is not logged in.
+     * @return The userID of the current user
+     * @throws NullPointerException If the user is not logged in
      */
     int getUserId();
 
