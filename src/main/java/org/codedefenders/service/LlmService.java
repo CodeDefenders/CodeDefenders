@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
+import dev.langchain4j.exception.TimeoutException;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.ollama.OllamaChatModel;
@@ -64,9 +65,11 @@ public class LlmService {
 
     private static final String ATTACKER_SYSTEM_PROMPT =
             """
-                    Change the following java code in a small but significant way.
+                    Change the first class of the following java code in a significant way.
+                    The behaviour of the program should change.
                     Only change existing methods and fields.
-                    Write nothing but the mutated java code.""".trim().stripIndent();
+                    Write nothing but the changed java code of the first class.
+                    Make sure to introduce at least one change.""".trim().stripIndent();
 
     Configuration config;
     GameRepository gameRepository;
@@ -201,11 +204,24 @@ public class LlmService {
 
     private String generateMutant(AbstractGame game) {
         StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
+        String firstDependencyName = null;//TODO Gibt's hierfür bessere Möglichkeiten? Gefahr,
+                                            // wenn CUT und Dependency gleichen Namen haben?
         for (String d : game.getCUT().getDependencyCode()) {
-            input.append(d);
+            input.append(System.lineSeparator()).append(d);
+            if (firstDependencyName == null) {
+                firstDependencyName = game.getCUT().getDependencyNames().get(0);
+            }
         }
         String result = getResponse(input.toString(), ATTACKER_SYSTEM_PROMPT);
         String formattedResult = result.replace("```java", "").replace("```", "");
+        if (firstDependencyName != null) {
+            int classDeclaration = formattedResult.indexOf("class " + firstDependencyName);
+            if (classDeclaration > 0) {
+                formattedResult = formattedResult.substring(0, classDeclaration);
+                int lastNewline = formattedResult.lastIndexOf(System.lineSeparator());
+                formattedResult = formattedResult.substring(0, lastNewline);
+            }
+        }
         logger.info("LLM attacker generated test: {}", formattedResult);
         return formattedResult;
     }
@@ -255,6 +271,10 @@ public class LlmService {
                     sleep((long) secondsBetweenTests * 1000);
                 } catch (InterruptedException e) {
                     logger.warn("AiPlayerThread interrupted");
+                    break;
+                } catch (TimeoutException e) {
+                    logger.error("AiPlayerThread for game {} with role {} timed out after.",
+                            game.getId(), role);
                     break;
                 }
             }
