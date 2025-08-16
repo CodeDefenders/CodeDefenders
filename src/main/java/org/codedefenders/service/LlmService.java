@@ -19,8 +19,12 @@
 package org.codedefenders.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.SortedSet;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
@@ -28,11 +32,18 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameAccordionMapping;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -74,6 +85,8 @@ public class LlmService {
     Configuration config;
     GameRepository gameRepository;
     GameManagingUtils gameManagingUtils;
+    GameService gameService;
+    MutantRepository mutantRepository;
 
     ChatModel model;
 
@@ -90,12 +103,17 @@ public class LlmService {
 
 
     @Inject
-    public LlmService(Configuration config, GameRepository gameRepository,
+    public LlmService(Configuration config,
+                      GameRepository gameRepository,
+                      MutantRepository mutantRepository,
                       GameManagingUtils gameManagingUtils,
-                      RequestContextController requestContextController) {
+                      RequestContextController requestContextController,
+                      GameService gameService) {
         this.config = config;
         this.gameRepository = gameRepository;
         this.gameManagingUtils = gameManagingUtils;
+        this.gameService = gameService;
+        this.mutantRepository = mutantRepository;
 
         activeLlmPlayers = new HashMap<>();
         activeLlmDefenders = new HashMap<>();
@@ -172,13 +190,21 @@ public class LlmService {
         getCorrectMap(role).remove(game.getId());
     }
 
-    private String generateTest(AbstractGame game) {
+    private String generateTest(AbstractGame game, SimpleUser user) {
         StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
         for (String d : game.getCUT().getDependencyCode()) {
             input.append(d);
         }
 
-        String result = getResponse(input.toString(), DEFENDER_SYSTEM_PROMPT);
+        String systemPromptAddition = "";
+        Optional<MethodDescription> methodDescription = getRandomMethodWithLivingMutant(game, user);
+
+
+        if (methodDescription.isPresent()) { //TODO Mutants outside of methods
+            systemPromptAddition = "\nFocus on the method " + methodDescription.get().getDescription();
+        }
+
+        String result = getResponse(input.toString(), DEFENDER_SYSTEM_PROMPT + systemPromptAddition);
         String formattedResult = LlmUtils.extractTestContentFromReply(result);
         String testTemplate = game.getCUT().getTestTemplate();
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
@@ -202,16 +228,17 @@ public class LlmService {
         }
     }
 
-    private String generateMutant(AbstractGame game) {
+    private String generateMutant(AbstractGame game, SimpleUser user) {
         StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
         String firstDependencyName = null;//TODO Gibt's hierfür bessere Möglichkeiten? Gefahr,
-                                            // wenn CUT und Dependency gleichen Namen haben?
+        // wenn CUT und Dependency gleichen Namen haben?
         for (String d : game.getCUT().getDependencyCode()) {
             input.append(System.lineSeparator()).append(d);
             if (firstDependencyName == null) {
                 firstDependencyName = game.getCUT().getDependencyNames().get(0);
             }
         }
+
         String result = getResponse(input.toString(), ATTACKER_SYSTEM_PROMPT);
         String formattedResult = result.replace("```java", "").replace("```", "");
         if (firstDependencyName != null) {
@@ -242,14 +269,52 @@ public class LlmService {
         }
     }
 
+    /**
+     * Returns a list of all methods that contain a living mutant that haven't been created by the user.
+     * If one method contains several living mutants, it occurs several times in the list.
+     */
+    private List<MethodDescription> getMethodsWithLivingMutants(AbstractGame game, SimpleUser user) {
+        List<MutantDTO> mutants = gameService.getMutants(user, game);
+        List<MethodDescription> methods = game.getCUT().getMethodDescriptions();
+        GameAccordionMapping mapping = GameAccordionMapping.computeForMutants(methods, mutants);
+        HashMap<MethodDescription, SortedSet<Integer>> map = mapping.elementsPerMethod;
+        List<MethodDescription> listOfPossibilities = new ArrayList<>();
+        for (MethodDescription m : map.keySet()) {
+            for (Integer mutantId : map.get(m)) {
+                Mutant mutant = mutantRepository.getMutantById(mutantId);
+                if (mutant.isAlive() && mutant.getCreatorId() != user.getId()) {
+                    listOfPossibilities.add(m);
+                }
+            }
+        }
+        return listOfPossibilities;
+    }
+
+    private Optional<MethodDescription> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user) {
+        List<MethodDescription> methods = getMethodsWithLivingMutants(game, user);
+        if (!methods.isEmpty()) {
+            return Optional.of(methods.get((int) (Math.random() * methods.size())));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     class LlmPlayerThread extends Thread {
         private static final int secondsBetweenTests = 10;//TODO Veränderbar machen
         private AbstractGame game;
         private final Role role;
+        private final SimpleUser user;
 
         LlmPlayerThread(AbstractGame game, Role role) {
             this.game = game;
             this.role = role;
+            int userId = switch (role) {
+                case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
+                case DEFENDER -> Constants.AI_DEFENDER_USER_ID;
+                case PLAYER -> Constants.AI_PLAYER_USER_ID;
+                default -> throw new IllegalArgumentException("No such role allowed for LLM: " + role);
+            };
+            this.user = new SimpleUser(userId, "PLACEHOLDER");
         }
 
         @Override
@@ -258,11 +323,11 @@ public class LlmService {
             while (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
                 try {
                     if (role == Role.DEFENDER) {
-                        String testSrc = generateTest(game);
+                        String testSrc = generateTest(game, user);
                         game = gameRepository.getGame(game.getId());
                         submitTest(game, testSrc);
                     } else if (role == Role.ATTACKER) {
-                        String mutantSrc = generateMutant(game);
+                        String mutantSrc = generateMutant(game, user);
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
                     } else if (role == Role.PLAYER) {
