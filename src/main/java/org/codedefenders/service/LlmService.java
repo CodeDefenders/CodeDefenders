@@ -124,7 +124,7 @@ public class LlmService {
                     .apiKey(config.getOpenaiApiKey())
                     .modelName(config.getOpenaiChatgptModel())
                     .build();
-        } else if (config.isLlmLocal()) {
+        } else if (config.isLlmOllama()) {
             this.model = OllamaChatModel.builder()
                     .baseUrl("http://127.0.0.1:11434")
                     .modelName("gemma3n:e2b")

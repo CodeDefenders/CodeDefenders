@@ -37,6 +37,7 @@ import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.dependencies.MavenDependencyResolver;
 import org.codedefenders.game.GameStoppedEventHandlerContainer;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
 import org.codedefenders.util.FileUtils;
@@ -75,6 +76,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private DependencyProvider dependencyProvider;
+
+    @Inject
+    private LLMRepository llmRepository;
 
 
     /**
@@ -122,6 +126,7 @@ public class SystemStartStop implements ServletContextListener {
             logger.error("Could not install dependencies.", e);
             throw new RuntimeException(e);
         }
+        llmRepository.addNewModels();
     }
 
     /**

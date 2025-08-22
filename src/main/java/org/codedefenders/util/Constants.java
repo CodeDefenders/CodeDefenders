@@ -103,6 +103,7 @@ public class Constants {
     public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
     public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
     public static final String ADMIN_ANALYTICS_KILLMAPS_JSP = "/jsp/admin_analytics_killmaps.jsp";
+    public static final String ADMIN_LLM_JSP = "/jsp/admin_llm.jsp";
 
     // Messages
     public static final String WINNER_MESSAGE = "You won!";

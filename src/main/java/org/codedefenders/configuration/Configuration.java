@@ -28,7 +28,6 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -40,7 +39,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Singleton;
@@ -110,10 +108,14 @@ public class Configuration {
     protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
-    protected String llmType;
-    protected String openaiApiKey;
-    protected String openaiChatgptModel;
-    protected String llmLocalServer;
+    protected String llmTypes;
+    protected List<String> _llmTypes;
+    protected String llmOpenaiApiKey;
+    protected String llmOpenaiModels;
+    protected List<String> _llmOpenaiModels;
+    protected String llmOllamaServer;
+    protected String llmOllamaModels;
+    protected List<String> _llmOllamaModels;
 
     @Deprecated
     protected String authAdminRole;
@@ -243,6 +245,21 @@ public class Configuration {
                 } catch (ClassNotFoundException e) {
                     validationErrors.add("Could not load the MySQL driver");
                 }
+            }
+
+            if (_llmTypes == null) {
+                _llmTypes = Arrays.stream(llmTypes.split(";")).toList();
+                for (String type : _llmTypes) {
+                    if (!type.equals("OLLAMA") && !type.equals("OPENAI")) {
+                        validationErrors.add("Unknown LLM type: " + type);
+                    }
+                }
+            }
+            if (_llmOpenaiModels == null) {
+                _llmOpenaiModels = Arrays.stream(llmOpenaiModels.split(";")).toList();
+            }
+            if (_llmOllamaModels == null) {
+                _llmOllamaModels = Arrays.stream(llmOllamaModels.split(";")).toList();
             }
 
             if (JavaVersionUtils.getJavaMajorVersion() < 17) {
@@ -475,27 +492,35 @@ public class Configuration {
     }
 
     public boolean isLlmEnabled() {
-        return llmType != null && !llmType.equals("NONE");
+        return llmTypes != null && !llmTypes.isEmpty();
+    }
+
+    public List<String> getLlmOpenaiModels() {
+        return _llmOpenaiModels;
+    }
+
+    public List<String> getLlmOllamaModels() {
+        return _llmOllamaModels;
     }
 
     public boolean isLlmOpenAI() {
-        return "OPENAI".equals(llmType);
+        return _llmTypes.contains("OPENAI");
     }
 
-    public boolean isLlmLocal() {
-        return "LOCAL".equals(llmType);
+    public boolean isLlmOllama() {
+        return _llmTypes.contains("OLLAMA");
     }
 
     public String getLlmLocalServer() {
-        return llmLocalServer;
+        return llmOllamaServer;
     }
 
     public String getOpenaiApiKey() {
-        return openaiApiKey;
+        return llmOpenaiApiKey;
     }
 
     public String getOpenaiChatgptModel() {
-        return openaiChatgptModel;
+        return _llmOpenaiModels.get(0);
     }
 
     /**

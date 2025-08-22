@@ -1,0 +1,207 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.codedefenders.model;
+
+import java.util.Optional;
+
+import com.google.gson.annotations.Expose;
+
+/**
+ * Information about a specific Large Language Model that can be used by an LLM Defender or an LLM Attacker.
+ * Prompts can be customized for each model, if not specified they inherit the default values as defined in
+ * the static fields of this class.
+ */
+public class LLModel {
+    @Expose
+    private final String name;
+    @Expose
+    private final LLMType type;
+    @Expose
+    private boolean active;
+
+    /**
+     * The standard attack prompt. The code of the CuT is supplied as the user message for attacker prompts.
+     */
+    @Expose
+    private String attackerPrompt;
+    /**
+     * If true, dependency code will be part of the user message.
+     *
+     */
+    @Expose
+    private boolean attackerDependencies = true;
+    /**
+     * This String replaces the normal prompt if there are any dependency classes (and if
+     * {@link LLModel#attackerDependencies} is true).
+     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
+     */
+    @Expose
+    private String attackerDependencyPrompt;
+
+    /**
+     * If true, the prompt may be replaced with a special prompt that guides the llm to write a mutant for a
+     * specific method, for example because there are only few mutants in this method right now.
+     */
+    @Expose
+    private boolean attackerMethodFocus = true;
+
+    /**
+     * This String format replaces the normal or dependency prompt to focus on a specific method.
+     * This should only be used with {@link String#format(String, Object...)} with the method name
+     * as the single argument.
+     */
+    @Expose
+    private String attackerMethodFocusPrompt;
+
+    /**
+     * The standard defender prompt. The code of the CuT is supplied as the user message.
+     */
+    @Expose
+    private String defenderPrompt;
+
+    /**
+     * If true, dependency code will be part of the user message for defender prompts.
+     */
+    @Expose
+    private boolean defenderDependencies = true;
+
+    /**
+     * This String replaces the normal defender if there are any dependency classes (and if
+     * {@link LLModel#attackerDependencies} is true).
+     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
+     */
+    @Expose
+    private String defenderDependencyPrompt;
+
+    /**
+     * If true, the prompt may be replaced with a special prompt that guides the llm to write a test for a
+     * specific method, for example because there are unkilled mutants in this method.
+     */
+    @Expose
+    private boolean defenderMethodFocus = true;
+
+    /**
+     * This String format replaces the normal or dependency prompt to focus on a specific method.
+     * This should only be used with {@link String#format(String, Object...)} with the method name
+     * as the single argument.
+     */
+    @Expose
+    private String defenderMethodFocusPrompt;
+
+    public LLModel(String name, LLMType type) {
+        this.name = name;
+        this.type = type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public LLMType getType() {
+        return type;
+    }
+
+    public Optional<String> getAttackerPrompt() {
+        return Optional.ofNullable(attackerPrompt);
+    }
+
+    public void setAttackerPrompt(String attackerPrompt) {
+        this.attackerPrompt = attackerPrompt;
+    }
+
+    public boolean isAttackerDependencies() {
+        return attackerDependencies;
+    }
+
+    public void setAttackerDependencies(boolean attackerDependencies) {
+        this.attackerDependencies = attackerDependencies;
+    }
+
+    public Optional<String> getAttackerDependencyPrompt() {
+        return Optional.ofNullable(attackerDependencyPrompt);
+    }
+
+    public void setAttackerDependencyPrompt(String attackerDependencyPrompt) {
+        this.attackerDependencyPrompt = attackerDependencyPrompt;
+    }
+
+    public boolean isAttackerMethodFocus() {
+        return attackerMethodFocus;
+    }
+
+    public void setAttackerMethodFocus(boolean attackerMethodFocus) {
+        this.attackerMethodFocus = attackerMethodFocus;
+    }
+
+    public Optional<String> getAttackerMethodFocusPrompt() {
+        return Optional.ofNullable(attackerMethodFocusPrompt);
+    }
+
+    public void setAttackerMethodFocusPrompt(String attackerMethodFocusPrompt) {
+        this.attackerMethodFocusPrompt = attackerMethodFocusPrompt;
+    }
+
+    public Optional<String> getDefenderPrompt() {
+        return Optional.ofNullable(defenderPrompt);
+    }
+
+    public void setDefenderPrompt(String defenderPrompt) {
+        this.defenderPrompt = defenderPrompt;
+    }
+
+    public boolean isDefenderDependencies() {
+        return defenderDependencies;
+    }
+
+    public void setDefenderDependencies(boolean defenderDependencies) {
+        this.defenderDependencies = defenderDependencies;
+    }
+
+    public Optional<String> getDefenderDependencyPrompt() {
+        return Optional.ofNullable(defenderDependencyPrompt);
+    }
+
+    public void setDefenderDependencyPrompt(String defenderDependencyPrompt) {
+        this.defenderDependencyPrompt = defenderDependencyPrompt;
+    }
+
+    public boolean isDefenderMethodFocus() {
+        return defenderMethodFocus;
+    }
+
+    public void setDefenderMethodFocus(boolean defenderMethodFocus) {
+        this.defenderMethodFocus = defenderMethodFocus;
+    }
+
+    public Optional<String> getDefenderMethodFocusPrompt() {
+        return Optional.ofNullable(defenderMethodFocusPrompt);
+    }
+
+    public void setDefenderMethodFocusPrompt(String defenderMethodFocusPrompt) {
+        this.defenderMethodFocusPrompt = defenderMethodFocusPrompt;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+}
