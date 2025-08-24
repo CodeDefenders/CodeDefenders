@@ -247,7 +247,7 @@ public class Configuration {
                 }
             }
 
-            if (_llmTypes == null) {
+            if (_llmTypes == null && llmTypes != null) {
                 _llmTypes = Arrays.stream(llmTypes.split(";")).toList();
                 for (String type : _llmTypes) {
                     if (!type.equals("OLLAMA") && !type.equals("OPENAI")) {
@@ -255,10 +255,10 @@ public class Configuration {
                     }
                 }
             }
-            if (_llmOpenaiModels == null) {
+            if (_llmOpenaiModels == null && llmOpenaiModels != null) {
                 _llmOpenaiModels = Arrays.stream(llmOpenaiModels.split(";")).toList();
             }
-            if (_llmOllamaModels == null) {
+            if (_llmOllamaModels == null && llmOllamaModels != null) {
                 _llmOllamaModels = Arrays.stream(llmOllamaModels.split(";")).toList();
             }
 
