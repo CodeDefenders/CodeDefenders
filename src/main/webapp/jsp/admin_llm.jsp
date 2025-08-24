@@ -29,12 +29,39 @@
 <%
     @SuppressWarnings("unchecked")
     List<LLModel> models = (List<LLModel>) request.getAttribute("models");
+    LLModel defaultModel = (LLModel) request.getAttribute("defaultModel");
+    pageContext.setAttribute("defaultModel", defaultModel);
     pageContext.setAttribute("models", models);
 %>
 
 <p:main_page title="LLM Management">
     <div class="container">
         <t:admin_navigation activePage="adminLlm"/>
+
+        <div>
+            <t:llm_prompt_modal type="${defaultModel.type.name()}" name="${defaultModel.name}"
+                                attackerPrompt="${defaultModel.attackerPrompt.orElse(\"\")}"
+                                attackerDeps="${defaultModel.attackerDependencies}"
+                                attackerDepsPrompt="${defaultModel.attackerDependencyPrompt.orElse(\"\")}"
+                                attackerFocus="${defaultModel.attackerMethodFocus}"
+                                attackerFocusPrompt="${defaultModel.attackerMethodFocusPrompt.orElse(\"\")}"
+                                defenderPrompt="${defaultModel.defenderPrompt.orElse(\"\")}"
+                                defenderDeps="${defaultModel.defenderDependencies}"
+                                defenderDepsPrompt="${defaultModel.defenderDependencyPrompt.orElse(\"\")}"
+                                defenderFocus="${defaultModel.defenderMethodFocus}"
+                                defenderFocusPrompt="${defaultModel.defenderMethodFocusPrompt.orElse(\"\")}"
+
+                                htmlId="default-modal"/>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#default-modal">
+                Edit default prompts
+            </button>
+
+            <form action="${url.forPath("api/llm")}?formType=resetDefault" method="post">
+                <button type="submit" class="btn btn-outline-dark">
+                    Reset default prompts to default values
+                </button>
+            </form>
+        </div>
 
         <h2>Available Large Language Models:</h2>
         <table id="models" class="table table-v-align-middle table-striped">

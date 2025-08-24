@@ -34,9 +34,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.model.LLMType;
 import org.codedefenders.model.LLModel;
 import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,9 @@ public class LlmApi extends HttpServlet {
 
     @Inject
     LLMRepository llmRepo;
+
+    @Inject
+    URLUtils url;
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // TODO: Authentication
@@ -122,7 +127,15 @@ public class LlmApi extends HttpServlet {
                             model.getName(), model.getType());
                 }
             }
-            case "updatePrompts" -> llmRepo.updatePrompts(model);
+            case "updatePrompts" -> {
+                llmRepo.updatePrompts(model);
+                Redirect.redirectBack(req, resp);
+                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM));
+            }
+            case "resetDefault" -> {
+                llmRepo.resetDefaultModel();
+                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM));
+            }
             default -> logger.error("Unknown formType: {}", action);
         }
 

@@ -47,6 +47,7 @@ public class AdminLLM extends HttpServlet {
         List<LLModel> models = llmRepo.getAllModels();
 
         request.setAttribute("models", models);
+        request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());
         request.getRequestDispatcher(Constants.ADMIN_LLM_JSP).forward(request, response);
     }
 
