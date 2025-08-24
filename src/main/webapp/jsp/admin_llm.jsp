@@ -1,4 +1,5 @@
-<%--
+<%@ page import="org.codedefenders.model.LLModel" %>
+<%@ page import="java.util.List" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -22,18 +23,20 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="settingsRepository" type="org.codedefenders.persistence.database.SettingsRepository"--%>
 
-<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
-
+<%
+    @SuppressWarnings("unchecked")
+    List<LLModel> models = (List<LLModel>) request.getAttribute("models");
+    pageContext.setAttribute("models", models);
+%>
 
 <p:main_page title="LLM Management">
     <div class="container">
         <t:admin_navigation activePage="adminLlm"/>
 
-        <h2>Active LLM Defenders:</h2>
+        <h2>Available Large Language Models:</h2>
         <table id="models" class="table table-v-align-middle table-striped">
             <thead>
             <tr>
@@ -43,6 +46,39 @@
             </tr>
             </thead>
             <tbody id="modelBody">
+            <c:forEach var="model" items="${models}">
+                <c:set var="type" value="${model.type.name()}"/>
+                <c:set var="identifier"
+                       value="prompt-modal-${type.replace('.', '-').replace(':', '-')}-${model.name.replace('.', '-').replace(':', '-')}"/>
+                <tr id="model-row-${identifier}">
+
+                    <td id="model-type-${identifier}">${model.type}</td>
+                    <td>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#${identifier}" id="model-name-${identifier}">
+                                ${model.name}
+                        </a>
+                        <t:llm_prompt_modal type="${type}" name="${model.name}"
+                                            attackerPrompt="${model.attackerPrompt.orElse(\"\")}"
+                                            attackerDeps="${model.attackerDependencies}"
+                                            attackerDepsPrompt="${model.attackerDependencyPrompt.orElse(\"\")}"
+                                            attackerFocus="${model.attackerMethodFocus}"
+                                            attackerFocusPrompt="${model.attackerMethodFocusPrompt.orElse(\"\")}"
+                                            defenderPrompt="${model.defenderPrompt.orElse(\"\")}"
+                                            defenderDeps="${model.defenderDependencies}"
+                                            defenderDepsPrompt="${model.defenderDependencyPrompt.orElse(\"\")}"
+                                            defenderFocus="${model.defenderMethodFocus}"
+                                            defenderFocusPrompt="${model.defenderMethodFocusPrompt.orElse(\"\")}"
+
+                                            htmlId="${identifier}"/>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" class="form-check-input" ${model.active ? "checked" : ""}
+                                   id="active-button-${identifier}"/>
+                        </label>
+                    </td>
+                </tr>
+            </c:forEach>
             </tbody>
         </table>
 
@@ -71,64 +107,27 @@
         </table>
 
         <script type="module">
-            const allModels = await fetchJSON("${url.forPath("api/llm")}?action=getall");
-            const modelBody = document.getElementById("modelBody");
-            allModels.forEach((model, index) => {
-                const row = document.createElement("tr");
-                dataToRow(row, model.type);
-                dataToRow(row, model.name);
-                //dataToRow(form, model.active);
 
-                const activeTd = document.createElement("td");
-                const activeButton = document.createElement("input");
-                activeButton.setAttribute("type", "checkbox");
-                activeButton.classList.add("form-check-input");
-                activeButton.checked = model.active;
-                activeButton.addEventListener("click", x => {
-                    console.log("checked: " +activeButton.checked);
-                    fetch("${url.forPath("api/llm")}", {
+            const rows = document.querySelectorAll("[id^='model-row-']");
+            rows.forEach(r => {
+                const name = r.querySelector("[id^='model-name']").textContent.trim();
+                const type = r.querySelector("[id^='model-type']").textContent.trim();
+                const button = r.querySelector("[id^='active-button-']");
+
+                button.addEventListener("click", () => {
+                    fetch("${url.forPath("api/llm")}?formType=setActive", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            action: "setActive",
-                            type: model.type,
-                            name: model.name,
-                            active: activeButton.checked
+                            type: type,
+                            name: name,
+                            active: button.checked
                         })
                     })
                 });
-
-                activeTd.appendChild(activeButton);
-                row.appendChild(activeTd);
-                modelBody.appendChild(row);
-            })
-
-            function dataToRow(row, data) {
-                const td = document.createElement("td");
-                td.textContent = data;
-                row.appendChild(td);
-            }
-
-            /**
-             * Fetches an object from a given JSON API.
-             * @async
-             * @param {string} url The URL to fetch from.
-             * @returns {Promise<object>} A promise containing the response.
-             */
-            async function fetchJSON(url) {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                if (!response.ok) {
-                    return Promise.reject();
-                }
-                return await response.json();
-            }
+            });
         </script>
     </div>
 </p:main_page>

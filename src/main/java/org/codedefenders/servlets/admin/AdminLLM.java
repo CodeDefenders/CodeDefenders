@@ -19,13 +19,17 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.List;
 
+import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.model.LLModel;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -35,8 +39,14 @@ import org.slf4j.LoggerFactory;
 public class AdminLLM extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminLLM.class);
 
+    @Inject
+    LLMRepository llmRepo;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        List<LLModel> models = llmRepo.getAllModels();
+
+        request.setAttribute("models", models);
         request.getRequestDispatcher(Constants.ADMIN_LLM_JSP).forward(request, response);
     }
 

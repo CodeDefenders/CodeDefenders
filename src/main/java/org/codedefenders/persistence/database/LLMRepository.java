@@ -184,6 +184,41 @@ public class LLMRepository {
                 model.isActive(), model.getName(), model.getType().name());
     }
 
+    /**
+     * Only change the prompts of an existing model. Throws an exception if that model doesn't exist, keeps
+     * 'active' datum unchanged.
+     * @param model The model, identified by type and name, containing the new prompts.
+     */
+    public void updatePrompts(LLModel model) {
+        @Language("SQL")
+        String sql = """
+                    update llm_models set
+                    defender_prompt = ?,
+                    defender_dependencies = ?,
+                    defender_dependencies_prompt = ?,
+                    defender_method_focus = ?,
+                    defender_method_focus_prompt = ?,
+                    attacker_prompt = ?,
+                    attacker_dependencies = ?,
+                    attacker_dependencies_prompt = ?,
+                    attacker_method_focus = ?,
+                    attacker_method_focus_prompt = ?
+                    WHERE model_name = ? AND type = ?;
+                    """;
+        int updated = queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
+                model.isDefenderDependencies(), model.getDefenderDependencyPrompt().orElse(null),
+                model.isDefenderMethodFocus(), model.getDefenderMethodFocusPrompt().orElse(null),
+                model.getAttackerPrompt().orElse(null),
+                model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
+                model.isAttackerMethodFocus(), model.getAttackerMethodFocusPrompt().orElse(null),
+                model.getName(), model.getType().name());
+        if (updated == 0) {
+            logger.error("Trying to update non-existing model: {} {}", model.getType(), model.getName());
+            throw new IllegalArgumentException("Trying to update non-existing model: "
+                    + model.getType() + ", " +  model.getName());
+        }
+    }
+
     public void setActive(String name, LLMType type, boolean active) {
         @Language("SQL")
         String sql = "UPDATE llm_models SET active = ? WHERE model_name = ? and type = ?";
@@ -206,14 +241,23 @@ public class LLMRepository {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE type != ?;";
 
-        return queryRunner.query(sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
+        List<LLModel> modelsInDB =  queryRunner.query(
+                sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
+
+        return modelsInDB.stream().filter(this::modelIsInConfig).toList();
     }
 
     public List<LLModel> getAllModelsOfType(LLMType type) {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE type = ?;";
 
-        return queryRunner.query(sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), type.name());
+        return queryRunner.query(sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), type.name())
+                .stream().filter(this::modelIsInConfig).toList();
+    }
+
+    private boolean modelIsInConfig(LLModel m) {
+        return m.getType() == LLMType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
+                || m.getType() == LLMType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
     }
 
     private static LLModel fromRS(ResultSet rs) throws SQLException {

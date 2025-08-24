@@ -108,26 +108,22 @@ public class LlmApi extends HttpServlet {
 
     }
 
-    private static class PostObject {
-        String action;
-        String type;
-        String name;
-        boolean active;
-    }
-
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         Gson gson = new Gson();
-        PostObject po = gson.fromJson(req.getReader(), PostObject.class);
-        LLMType type = LLMType.valueOf(po.type);
-        switch (po.action) {
+        LLModel model = gson.fromJson(req.getReader(), LLModel.class);
+        String action = ServletUtils.formType(req);
+        switch (action) {
             case "setActive" -> {
-                if (po.type != null && po.name != null) {
-                    llmRepo.setActive(po.name, type, po.active);
+                if (model.getType() != null && model.getName() != null) {
+                    llmRepo.setActive(model.getName(), model.getType(), model.isActive());
                 } else {
-                    logger.error("Name ({}) or type ({}) is missing for setActive-action", po.name, type);
+                    logger.error("Name ({}) or type ({}) is missing for setActive-action",
+                            model.getName(), model.getType());
                 }
             }
+            case "updatePrompts" -> llmRepo.updatePrompts(model);
+            default -> logger.error("Unknown formType: {}", action);
         }
 
 
