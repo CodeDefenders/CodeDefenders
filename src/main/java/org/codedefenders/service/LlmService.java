@@ -41,7 +41,10 @@ import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.LLMType;
+import org.codedefenders.model.LLModel;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -66,40 +69,24 @@ public class LlmService {
 
     private static final Logger logger = LoggerFactory.getLogger(LlmService.class);
 
-    private static final String DEFENDER_SYSTEM_PROMPT =
-            """
-                    Write a single test for the first class of the following Java code using a maximum of 2 assertions.
-                    The other classes are dependencies of the first class, you don't need to test them.
-                    Write only the content of the test method, without including formatting, comments,
-                    the header or the method declaration. Use JUnit 4.
-                    """.trim().stripIndent();
-
-    private static final String ATTACKER_SYSTEM_PROMPT =
-            """
-                    Change the first class of the following java code in a significant way.
-                    The behaviour of the program should change.
-                    Only change existing methods and fields.
-                    Write nothing but the changed java code of the first class.
-                    Make sure to introduce at least one change.""".trim().stripIndent();
-
     Configuration config;
     GameRepository gameRepository;
     GameManagingUtils gameManagingUtils;
     GameService gameService;
     MutantRepository mutantRepository;
+    LLMRepository llmRepo;
 
-    ChatModel model;
+    Map<String, ChatModel> openaiModels = new HashMap<>();
+    Map<String, ChatModel> ollamaModels = new HashMap<>();
 
     /*
-        Maps game ids to a boolean that determines whether the game should have an active llm thread of the respective
-        sort.
-        If true, a thread is currently running and will continue to run.
-        If false, a thread is still running, but will finish after the current iteration (and remove the key-value pair)
-        If not present, a thread is not running at all.
+        Maps game ids to the models that should be used by their LLM players.
+        If the key is present but the value is null, a thread is still running, but will finish after the current
+            iteration (and remove the key-value pair)
+        If the key is not present, no thread is running at all.
      */
-    private final Map<Integer, Boolean> activeLlmPlayers;
-    private final Map<Integer, Boolean> activeLlmDefenders;
-    private final Map<Integer, Boolean> activeLlmAttackers;
+    private final Map<Integer, LLModel> activeLlmDefenders;
+    private final Map<Integer, LLModel> activeLlmAttackers;
 
 
     @Inject
@@ -108,33 +95,38 @@ public class LlmService {
                       MutantRepository mutantRepository,
                       GameManagingUtils gameManagingUtils,
                       RequestContextController requestContextController,
-                      GameService gameService) {
+                      GameService gameService,
+                      LLMRepository llmRepo) {
         this.config = config;
         this.gameRepository = gameRepository;
         this.gameManagingUtils = gameManagingUtils;
         this.gameService = gameService;
         this.mutantRepository = mutantRepository;
+        this.llmRepo = llmRepo;
 
-        activeLlmPlayers = new HashMap<>();
         activeLlmDefenders = new HashMap<>();
         activeLlmAttackers = new HashMap<>();
 
-        if (config.isLlmOpenAI()) {
-            this.model = OpenAiChatModel.builder()
-                    .apiKey(config.getOpenaiApiKey())
-                    .modelName(config.getOpenaiChatgptModel())
-                    .build();
-        } else if (config.isLlmOllama()) {
-            this.model = OllamaChatModel.builder()
-                    .baseUrl("http://127.0.0.1:11434")
-                    .modelName("gemma3n:e2b")
-                    .temperature(0.9)
-                    .build();
+        List<LLModel> models = llmRepo.getAllModels();
+        for (LLModel m : models) {
+            if (m.getType() == LLMType.OPENAI) {
+                openaiModels.put(m.getName(), OpenAiChatModel.builder()
+                        .apiKey(config.getOpenaiApiKey())
+                        .modelName(m.getName())
+                        .build());
+            }
+            if (m.getType() == LLMType.OLLAMA) {
+                ollamaModels.put(m.getName(), OllamaChatModel.builder()
+                        .baseUrl(config.getLlmLocalServer())
+                        .modelName(m.getName())
+                        .temperature(0.9)
+                        .build());
+            }
         }
     }
 
 
-    public String getResponse(String userMessage, String... systemMessages) {
+    public String getResponse(LLModel model, String userMessage, String... systemMessages) {
         logger.info("Send message: \n {} to LLM with system messages:\n{}", userMessage,
                 String.join("\n", systemMessages));
         ChatMessage[] chatMessages = new ChatMessage[systemMessages.length + 1];
@@ -142,17 +134,27 @@ public class LlmService {
             chatMessages[i] = SystemMessage.from(systemMessages[i]);
         }
         chatMessages[chatMessages.length - 1] = UserMessage.from(userMessage);
-        ChatResponse response = model.chat(chatMessages);
-        String responseText = response.aiMessage().text();
-        logger.info("LLM responded with {}", responseText);
-        return responseText;
+
+        Map<String, ChatModel> chatMap = switch (model.getType()) {
+            case OPENAI -> openaiModels;
+            case OLLAMA -> ollamaModels;
+            default -> throw new IllegalArgumentException("Unsupported model type: " + model.getType());
+        };
+        ChatModel chatModel = chatMap.get(model.getName());
+        if (chatModel != null) {
+            ChatResponse response = chatModel.chat(chatMessages);
+            String responseText = response.aiMessage().text();
+            logger.info("LLM responded with {}", responseText);
+            return responseText;
+        } else {
+            throw new IllegalArgumentException("No model with this name in ChatModelMap: " + model.getName());
+        }
     }
 
-    private Map<Integer, Boolean> getCorrectMap(Role r) {
+    private Map<Integer, LLModel> getCorrectMap(Role r) {
         return switch (r) {
             case ATTACKER -> activeLlmAttackers;
             case DEFENDER -> activeLlmDefenders;
-            case PLAYER -> activeLlmPlayers;
             default -> throw new IllegalArgumentException("Illegal role: " + r);
         };
     }
@@ -167,22 +169,27 @@ public class LlmService {
     }
 
     public boolean isLlmPlayerActive(AbstractGame game, Role role) {
-        return getCorrectMap(role).containsKey(game.getId())
-                && getCorrectMap(role).get(game.getId());
+        return getModelForGame(game, role) != null;
     }
 
-    public void setPlayerActive(AbstractGame game, Role role, boolean active) {
-        Map<Integer, Boolean> m = getCorrectMap(role);
+    public LLModel getModelForGame(AbstractGame game, Role role) {
+        return getCorrectMap(role).get(game.getId());
+    }
+
+    public void setPlayerModel(AbstractGame game, Role role, LLModel model) {
+        Map<Integer, LLModel> m = getCorrectMap(role);
         boolean alreadyPresent = m.containsKey(game.getId());
 
-        if (active || alreadyPresent) { //Never put a new 'false' value, it wouldn't be deleted
-            m.put(game.getId(), active);
+        if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
+            m.put(game.getId(), model);
         }
 
-        if (active && !alreadyPresent) {
+        if (model != null && !alreadyPresent) {
             game.addPlayer(getCorrectUserId(role), role);
             new LlmPlayerThread(game, role).start();
         }
+
+        //TODO model==null && alreadyPresent???
 
     }
 
@@ -191,20 +198,35 @@ public class LlmService {
     }
 
     private String generateTest(AbstractGame game, SimpleUser user) {
-        StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
-        for (String d : game.getCUT().getDependencyCode()) {
-            input.append(d);
+        LLModel model = activeLlmDefenders.get(game.getId());
+        if (model == null) {
+            return null;
+        }
+        model = llmRepo.getModelFromName(model.getName(), model.getType(), true).orElseThrow();
+        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
+        String systemMessage = model.getDefenderPrompt().orElse(defaultModel.getDefenderPrompt().orElseThrow());
+
+        StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
+        if (model.isDefenderDependencies()) {
+            List<String> dependencyCode = game.getCUT().getDependencyCode();
+            if (!dependencyCode.isEmpty()) {
+                systemMessage = model.getDefenderDependencyPrompt().
+                        orElse(defaultModel.getDefenderDependencyPrompt().orElseThrow());
+                for (String d : game.getCUT().getDependencyCode()) {
+                    userMessage.append(d);
+                }
+            }
         }
 
-        String systemPromptAddition = "";
-        Optional<MethodDescription> methodDescription = getRandomMethodWithLivingMutant(game, user);
-
-
-        if (methodDescription.isPresent()) { //TODO Mutants outside of methods
-            systemPromptAddition = "\nFocus on the method " + methodDescription.get().getDescription();
+        if (model.isDefenderMethodFocus()) {
+            Optional<MethodDescription> methodDescription = getRandomMethodWithLivingMutant(game, user);
+            if (methodDescription.isPresent()) { //TODO Mutants outside of methods
+                systemMessage = String.format(model.getDefenderMethodFocusPrompt().
+                        orElse(defaultModel.getDefenderMethodFocusPrompt().orElseThrow()), methodDescription.get());
+            }
         }
 
-        String result = getResponse(input.toString(), DEFENDER_SYSTEM_PROMPT + systemPromptAddition);
+        String result = getResponse(model, userMessage.toString(), systemMessage);
         String formattedResult = LlmUtils.extractTestContentFromReply(result);
         String testTemplate = game.getCUT().getTestTemplate();
         String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
@@ -229,17 +251,35 @@ public class LlmService {
     }
 
     private String generateMutant(AbstractGame game, SimpleUser user) {
-        StringBuilder input = new StringBuilder(game.getCUT().getSourceCode());
+        StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
+
+        LLModel model = activeLlmAttackers.get(game.getId());
+        if (model == null) {
+            return null;
+        }
+        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
+        model = llmRepo.getModelFromName(model.getName(), model.getType(), true).orElseThrow();
+        String systemMessage = model.getAttackerPrompt().orElse(defaultModel.getAttackerPrompt().orElseThrow());
+
         String firstDependencyName = null;//TODO Gibt's hierfür bessere Möglichkeiten? Gefahr,
-        // wenn CUT und Dependency gleichen Namen haben?
-        for (String d : game.getCUT().getDependencyCode()) {
-            input.append(System.lineSeparator()).append(d);
-            if (firstDependencyName == null) {
-                firstDependencyName = game.getCUT().getDependencyNames().get(0);
+        if (model.isAttackerDependencies()) {
+            // wenn CUT und Dependency gleichen Namen haben?
+            List<String> dependencies = game.getCUT().getDependencyCode();
+            if (!dependencies.isEmpty()) {
+                systemMessage = model.getAttackerDependencyPrompt().
+                        orElse(defaultModel.getAttackerDependencyPrompt().orElseThrow());
+                for (String d : game.getCUT().getDependencyCode()) {
+                    userMessage.append(System.lineSeparator()).append(d);
+                    if (firstDependencyName == null) {
+                        firstDependencyName = game.getCUT().getDependencyNames().get(0);
+                    }
+                }
             }
         }
 
-        String result = getResponse(input.toString(), ATTACKER_SYSTEM_PROMPT);
+        //TODO Method Focus
+
+        String result = getResponse(model, userMessage.toString(), systemMessage);
         String formattedResult = result.replace("```java", "").replace("```", "");
         if (firstDependencyName != null) {
             int classDeclaration = formattedResult.indexOf("class " + firstDependencyName);

@@ -82,7 +82,7 @@ public class LlmApi extends HttpServlet {
                 }
                 case "get" -> {
                     if (name.isPresent() && type.isPresent()) {
-                        Optional<LLModel> model = llmRepo.getModelFromName(name.get(), type.get());
+                        Optional<LLModel> model = llmRepo.getModelFromName(name.get(), type.get(), false);
                         if (model.isPresent()) {
                             returnJson = gson.toJson(model.get());
                         } else {

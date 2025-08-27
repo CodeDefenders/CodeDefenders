@@ -118,7 +118,7 @@ public class LLModel {
     }
 
     public Optional<String> getAttackerPrompt() {
-        return Optional.ofNullable(attackerPrompt);
+        return ofNullOrEmpty(attackerPrompt);
     }
 
     public void setAttackerPrompt(String attackerPrompt) {
@@ -134,7 +134,7 @@ public class LLModel {
     }
 
     public Optional<String> getAttackerDependencyPrompt() {
-        return Optional.ofNullable(attackerDependencyPrompt);
+        return ofNullOrEmpty(attackerDependencyPrompt);
     }
 
     public void setAttackerDependencyPrompt(String attackerDependencyPrompt) {
@@ -150,7 +150,7 @@ public class LLModel {
     }
 
     public Optional<String> getAttackerMethodFocusPrompt() {
-        return Optional.ofNullable(attackerMethodFocusPrompt);
+        return ofNullOrEmpty(attackerMethodFocusPrompt);
     }
 
     public void setAttackerMethodFocusPrompt(String attackerMethodFocusPrompt) {
@@ -158,7 +158,7 @@ public class LLModel {
     }
 
     public Optional<String> getDefenderPrompt() {
-        return Optional.ofNullable(defenderPrompt);
+        return ofNullOrEmpty(defenderPrompt);
     }
 
     public void setDefenderPrompt(String defenderPrompt) {
@@ -174,7 +174,7 @@ public class LLModel {
     }
 
     public Optional<String> getDefenderDependencyPrompt() {
-        return Optional.ofNullable(defenderDependencyPrompt);
+        return ofNullOrEmpty(defenderDependencyPrompt);
     }
 
     public void setDefenderDependencyPrompt(String defenderDependencyPrompt) {
@@ -190,7 +190,7 @@ public class LLModel {
     }
 
     public Optional<String> getDefenderMethodFocusPrompt() {
-        return Optional.ofNullable(defenderMethodFocusPrompt);
+        return ofNullOrEmpty(defenderMethodFocusPrompt);
     }
 
     public void setDefenderMethodFocusPrompt(String defenderMethodFocusPrompt) {
@@ -203,5 +203,20 @@ public class LLModel {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    private Optional<String> ofNullOrEmpty(String s) {
+        if (s != null && !s.trim().isEmpty()) {
+            return Optional.of(s);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof LLModel m) {
+            return m.type == type && (m.getName() == null && name == null || m.getName().equals(name));
+        } else return false;
     }
 }

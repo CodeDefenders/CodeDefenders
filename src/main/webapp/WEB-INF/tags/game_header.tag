@@ -20,6 +20,7 @@
 --%>
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 <%@ tag import="org.codedefenders.util.CDIUtil" %>
@@ -33,6 +34,7 @@
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.service.LlmService" %>
+<%@ tag import="org.codedefenders.persistence.database.LLMRepository" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
@@ -49,6 +51,7 @@
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
+    LLMRepository llmRepo = CDIUtil.getBeanFromCDI(LLMRepository.class);
     int gameId = game.getId();
 
     Role role = null;
@@ -146,24 +149,37 @@
 
         <!-- TODO Melee-Games -->
         <% if (game instanceof MultiplayerGame) {
-            request.setAttribute("defenderActive", llmService.isLlmPlayerActive(game, Role.DEFENDER));
-            request.setAttribute("attackerActive", llmService.isLlmPlayerActive(game, Role.ATTACKER));%>
-        <form id="toggleLlmPlayers" action="${url.forPath("/multiplayergame")}" method="post">
+            request.setAttribute("defenderModel", llmService.getModelForGame(game, Role.DEFENDER));
+            request.setAttribute("attackerModel", llmService.getModelForGame(game, Role.ATTACKER));
+            request.setAttribute("activeModels", llmRepo.getActiveModels());
+        %>
+        <form id="setLlmPlayer" action="${url.forPath("/multiplayergame")}" method="post">
             <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
                     data-bs-toggle="modal" data-bs-target="#llm-modal">
                 Manage LLM players
             </button>
-            <input type="hidden" name="formType" value="toggleLlmPlayers">
+            <input type="hidden" name="formType" value="setLlmPlayer">
             <input type="hidden" name="gameId" value="${gameProducer.game.id}">
             <t:modal title="Manage LLM players" id="llm-modal">
                 <jsp:attribute name="content">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="defenderChecked" name="llmDefender" ${defenderActive ? "checked" : ""}>
-                        <label class="form-check-label" for="defenderChecked">Active LLM Defender</label>
+                    <div class="mb-3">
+                        <label for="defenderSelect" class="form-label">Choose defender model</label>
+                        <select class="form-select" id="defenderSelect" name="defenderModel">
+                            <option ${defenderModel == null ? "selected" : ""} value="NONE">Don't use an LLM defender</option>
+                            <c:forEach items="${activeModels}" var="model">
+                                <option ${defenderModel.equals(model) ? "selected" : ""} value="${model.type}|${model.name}">${model.type}: ${model.name}</option>
+                            </c:forEach>
+                        </select>
                     </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="attackerChecked" name="llmAttacker" ${attackerActive ? "checked" : ""}>
-                        <label class="form-check-label" for="attackerChecked">Active LLM Attacker</label>
+
+                    <div class="mb-3">
+                        <label for="attackerSelect" class="form-label">Choose attacker model</label>
+                        <select class="form-select" id="attackerSelect" name="attackerModel">
+                            <option ${attackerModel == null ? "selected" : ""} value="NONE">Don't use an LLM defender</option>
+                            <c:forEach items="${activeModels}" var="model">
+                                <option ${attackerModel.equals(model) ? "selected" : ""} value="${model.type}|${model.name}">${model.type}: ${model.name}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                 </jsp:attribute>
                 <jsp:attribute name="footer">

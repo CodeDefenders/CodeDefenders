@@ -50,9 +50,12 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.LLMType;
+import org.codedefenders.model.LLModel;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -162,6 +165,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private LlmService llmService;
 
+    @Inject
+    private LLMRepository llmRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -256,8 +262,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 claimEquivalent(request, response, gameId, game);
                 return;
             }
-            case "toggleLlmPlayers": {
-                toggleLlmPlayers(game, request, response);
+            case "setLlmPlayer": {
+                setLlmPlayers(game, request, response);
 
                 return;
             }
@@ -268,20 +274,51 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
-    void toggleLlmPlayers(MultiplayerGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    void setLlmPlayers(MultiplayerGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         if (!login.isAdmin() && login.getUserId() != game.getCreatorId()) {
             messages.add("You are not allowed to change the LLM players!").alert();
             logger.warn("User {} tried to change the llm players on game {}.", login.getUserId(), game.getId());
         } else {
-            boolean defenderActive = req.getParameter("llmDefender") != null;
-            boolean attackerActive = req.getParameter("llmAttacker") != null;
-
-            llmService.setPlayerActive(game, Role.DEFENDER, defenderActive);
-            llmService.setPlayerActive(game, Role.ATTACKER, attackerActive);
-
-
+            Optional<String> defenderFormValue = ServletUtils.getStringParameter(req, "defenderModel");
+            Optional<String> attackerFormValue = ServletUtils.getStringParameter(req, "attackerModel");
+            try {
+                defenderFormValue.ifPresent(s ->
+                        llmService.setPlayerModel(game, Role.DEFENDER, getLLModelFromSingleValue(s)));
+                attackerFormValue.ifPresent(s ->
+                        llmService.setPlayerModel(game, Role.ATTACKER, getLLModelFromSingleValue(s)));
+            } catch (IllegalArgumentException e) {
+                logger.error(e.getMessage());
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
         }
         resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+    }
+
+    private LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException {
+        if (s.equals("NONE")) {
+            return null;
+        } else {
+            String[] split = s.split("\\|");
+            if (split.length != 2) {
+                logger.error("Malformed defender form value: {}", s);
+                throw new IllegalArgumentException("Malformed defender form value: " + s);
+            }
+            try {
+                LLMType type = LLMType.valueOf(split[0]);
+                String name = split[1];
+                return llmRepo.getModelFromName(name, type, true).orElseGet(
+                        () -> {
+                            logger.error("User {} tried to set an LLM defender's model to {}:{}, but it doesn't" +
+                                    " exist or isn't active.", login.getUserId(), type, name);
+                            messages.add("The model you selected is not active. Try refreshing the page").alert();
+                            return null;
+                        });
+            } catch (IllegalArgumentException e) {
+                logger.error("Unknown LLM type with type {} and name {}", split[0], split[1]);
+                throw new IllegalArgumentException("Unknown LLM type", e);
+            }
+        }
     }
 
     private void addLlmPlayer(MultiplayerGame game, Role role) {

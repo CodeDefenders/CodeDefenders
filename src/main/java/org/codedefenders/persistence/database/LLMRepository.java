@@ -231,16 +231,30 @@ public class LLMRepository {
         return queryRunner.query(sql, ResultSetUtils.oneFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
     }
 
-    public Optional<LLModel> getModelFromName(String name, LLMType type) {
+    public Optional<LLModel> getModelFromName(String name, LLMType type, boolean mustBeActive) {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE model_name = ? AND type = ?;";
-        return queryRunner.query(sql, ResultSetUtils.oneFromRS(LLMRepository::fromRS), name, type.name());
+        Optional<LLModel> result = queryRunner.query(sql, ResultSetUtils.oneFromRS(LLMRepository::fromRS), name, type.name());
+        if (!mustBeActive || result.isPresent() && result.get().isActive()) {
+            return result;
+        } else {
+            return Optional.empty();
+        }
     }
 
     public List<LLModel> getAllModels() {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE type != ?;";
 
+        List<LLModel> modelsInDB =  queryRunner.query(
+                sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
+
+        return modelsInDB.stream().filter(this::modelIsInConfig).toList();
+    }
+
+    public List<LLModel> getActiveModels() {
+        @Language("SQL")
+                String sql = "SELECT * FROM llm_models WHERE type != ? AND active = true";
         List<LLModel> modelsInDB =  queryRunner.query(
                 sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
 
