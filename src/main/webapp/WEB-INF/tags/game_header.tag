@@ -35,6 +35,8 @@
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.service.LlmService" %>
 <%@ tag import="org.codedefenders.persistence.database.LLMRepository" %>
+<%@ tag import="org.codedefenders.model.LLModel" %>
+<%@ tag import="java.util.List" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
@@ -52,6 +54,9 @@
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
     LLMRepository llmRepo = CDIUtil.getBeanFromCDI(LLMRepository.class);
+
+    List<LLModel> models = llmRepo.getActiveModels();
+    request.setAttribute("activeModels", models);
     int gameId = game.getId();
 
     Role role = null;
@@ -148,10 +153,9 @@
         </div>
 
         <!-- TODO Melee-Games -->
-        <% if (game instanceof MultiplayerGame) {
+        <% if (game instanceof MultiplayerGame && !models.isEmpty()) {
             request.setAttribute("defenderModel", llmService.getModelForGame(game, Role.DEFENDER));
             request.setAttribute("attackerModel", llmService.getModelForGame(game, Role.ATTACKER));
-            request.setAttribute("activeModels", llmRepo.getActiveModels());
         %>
         <form id="setLlmPlayer" action="${url.forPath("/multiplayergame")}" method="post">
             <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
