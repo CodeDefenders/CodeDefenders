@@ -263,7 +263,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             case "setLlmPlayer": {
-                setLlmPlayers(game, request, response);
+                gameManagingUtils.setLlmPlayers(game, request, response);
 
                 return;
             }
@@ -274,77 +274,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
-    void setLlmPlayers(MultiplayerGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if (!login.isAdmin() && login.getUserId() != game.getCreatorId()) {
-            messages.add("You are not allowed to change the LLM players!").alert();
-            logger.warn("User {} tried to change the llm players on game {}.", login.getUserId(), game.getId());
-        } else {
-            Optional<String> defenderFormValue = ServletUtils.getStringParameter(req, "defenderModel");
-            Optional<String> attackerFormValue = ServletUtils.getStringParameter(req, "attackerModel");
-            try {
-                defenderFormValue.ifPresent(s ->
-                        llmService.setPlayerModel(game, Role.DEFENDER, getLLModelFromSingleValue(s)));
-                attackerFormValue.ifPresent(s ->
-                        llmService.setPlayerModel(game, Role.ATTACKER, getLLModelFromSingleValue(s)));
-            } catch (IllegalArgumentException e) {
-                logger.error(e.getMessage());
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-        }
-        resp.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
-    }
 
-    private LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException {
-        if (s.equals("NONE")) {
-            return null;
-        } else {
-            String[] split = s.split("\\|");
-            if (split.length != 2) {
-                logger.error("Malformed defender form value: {}", s);
-                throw new IllegalArgumentException("Malformed defender form value: " + s);
-            }
-            try {
-                LLMType type = LLMType.valueOf(split[0]);
-                String name = split[1];
-                return llmRepo.getModelFromName(name, type, true).orElseGet(
-                        () -> {
-                            logger.error("User {} tried to set an LLM defender's model to {}:{}, but it doesn't" +
-                                    " exist or isn't active.", login.getUserId(), type, name);
-                            messages.add("The model you selected is not active. Try refreshing the page").alert();
-                            return null;
-                        });
-            } catch (IllegalArgumentException e) {
-                logger.error("Unknown LLM type with type {} and name {}", split[0], split[1]);
-                throw new IllegalArgumentException("Unknown LLM type", e);
-            }
-        }
-    }
-
-    private void addLlmPlayer(MultiplayerGame game, Role role) {
-        List<Player> players;
-        int aiPlayerId;
-        if (role == Role.DEFENDER) {
-            aiPlayerId = Constants.AI_DEFENDER_USER_ID;
-            players = game.getDefenderPlayers();
-        } else if (role == Role.ATTACKER) {
-            aiPlayerId = Constants.AI_ATTACKER_USER_ID;
-            players = game.getAttackerPlayers();
-        } else {
-            throw new IllegalArgumentException("Cannot start LLM players for this role: " + role);
-        }
-        boolean alreadyAdded = false;
-        for (Player p : players) {
-            if (p.getUser().getId() == aiPlayerId) {
-                alreadyAdded = true;
-                break;
-            }
-        }
-        if (!alreadyAdded) {
-            game.addPlayer(aiPlayerId, role);
-        }
-        game.addLlmPlayer(role);
-    }
 
     void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();

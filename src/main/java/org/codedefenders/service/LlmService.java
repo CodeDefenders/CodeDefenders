@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.SortedSet;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -40,6 +41,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.LLMType;
 import org.codedefenders.model.LLModel;
@@ -84,6 +86,9 @@ public class LlmService {
         If the key is present but the value is null, a thread is still running, but will finish after the current
             iteration (and remove the key-value pair)
         If the key is not present, no thread is running at all.
+
+        For melee games, attacking and defending can be done using different models, or one side can be disabled.
+        The melee player is considered active as long as not both these maps map the game id to null.
      */
     private final Map<Integer, LLModel> activeLlmDefenders;
     private final Map<Integer, LLModel> activeLlmAttackers;
@@ -169,7 +174,23 @@ public class LlmService {
     }
 
     public boolean isLlmPlayerActive(AbstractGame game, Role role) {
-        return getModelForGame(game, role) != null;
+        if (role == Role.PLAYER) {
+            return getModelForGame(game, Role.DEFENDER) != null || getModelForGame(game, Role.ATTACKER) != null;
+        } else {
+            return getModelForGame(game, role) != null;
+        }
+    }
+
+    /**
+     * This only checks if values for this game and role have been added, they might be zero.
+     * This way it can be avoided to add multiple threads for melee players.
+     */
+    public boolean isLlmPlayerPresent(AbstractGame game, Role role) {
+        if (game instanceof MultiplayerGame) {
+            return getCorrectMap(role).containsKey(game.getId());
+        } else {
+            return activeLlmDefenders.containsKey(game.getId()) || activeLlmAttackers.containsKey(game.getId());
+        }
     }
 
     public LLModel getModelForGame(AbstractGame game, Role role) {
@@ -178,23 +199,29 @@ public class LlmService {
 
     public void setPlayerModel(AbstractGame game, Role role, LLModel model) {
         Map<Integer, LLModel> m = getCorrectMap(role);
-        boolean alreadyPresent = m.containsKey(game.getId());
+        boolean alreadyPresent = isLlmPlayerPresent(game, role);//m.containsKey(game.getId());
 
         if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
             m.put(game.getId(), model);
         }
 
         if (model != null && !alreadyPresent) {
+            if (game instanceof MeleeGame) {
+                role = Role.PLAYER;
+            }
+
             game.addPlayer(getCorrectUserId(role), role);
             new LlmPlayerThread(game, role).start();
         }
-
-        //TODO model==null && alreadyPresent???
-
     }
 
     public void finishThread(AbstractGame game, Role role) {
-        getCorrectMap(role).remove(game.getId());
+        if (role == Role.PLAYER) {
+            activeLlmAttackers.remove(game.getId());
+            activeLlmDefenders.remove(game.getId());
+        } else {
+            getCorrectMap(role).remove(game.getId());
+        }
     }
 
     private String generateTest(AbstractGame game, SimpleUser user) {
@@ -241,7 +268,7 @@ public class LlmService {
             if (game instanceof MultiplayerGame multiplayerGame) {
                 gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
             } else {//TODO
-                throw new NotImplementedException("TODO");
+                gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -299,8 +326,10 @@ public class LlmService {
         try {
             if (game instanceof MultiplayerGame multiplayerGame) {
                 gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
-            } else {//TODO
-                throw new NotImplementedException("TODO");
+            } else if (game instanceof MeleeGame meleeGame){
+                gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
+            } else {
+                throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
         } catch (IOException | GameManagingUtils.MutantCreationException e) {
             throw new RuntimeException(e);
@@ -344,6 +373,7 @@ public class LlmService {
         private AbstractGame game;
         private final Role role;
         private final SimpleUser user;
+        private final Random random;
 
         LlmPlayerThread(AbstractGame game, Role role) {
             this.game = game;
@@ -355,6 +385,8 @@ public class LlmService {
                 default -> throw new IllegalArgumentException("No such role allowed for LLM: " + role);
             };
             this.user = new SimpleUser(userId, "PLACEHOLDER");
+
+            random = new Random();
         }
 
         @Override
@@ -364,14 +396,29 @@ public class LlmService {
                 try {
                     if (role == Role.DEFENDER) {
                         String testSrc = generateTest(game, user);
-                        game = gameRepository.getGame(game.getId());
+                        game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                         submitTest(game, testSrc);
                     } else if (role == Role.ATTACKER) {
                         String mutantSrc = generateMutant(game, user);
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
                     } else if (role == Role.PLAYER) {
-                        //TODO
+                        boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
+                        boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
+                        if (!attackAvailable && !defendAvailable) {
+                            break;
+                        }
+                        boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
+
+                        if (attack) {
+                            String mutantSrc = generateMutant(game, user);
+                            game = gameRepository.getGame(game.getId());
+                            submitMutant(game, mutantSrc);
+                        } else {
+                            String testSrc = generateTest(game, user);
+                            game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
+                            submitTest(game, testSrc);
+                        }
                     } else throw new IllegalArgumentException("No support for this role: " + role);
                     sleep((long) secondsBetweenTests * 1000);
                 } catch (InterruptedException e) {

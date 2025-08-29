@@ -36,7 +36,13 @@ import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -57,6 +63,8 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.LLMType;
+import org.codedefenders.model.LLModel;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
@@ -74,13 +82,16 @@ import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -105,6 +116,10 @@ import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -179,6 +194,21 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private LLMRepository llmRepo;
+
+    @Inject
+    private LlmService llmService;
+
+    @Inject
+    private MessagesBean messages;
+
+    @Inject
+    private CodeDefendersAuth login;
+
+    @Inject
+    private URLUtils url;
 
     /**
      * {@inheritDoc}
@@ -400,6 +430,91 @@ public class GameManagingUtils implements IGameManagingUtils {
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
 
+    public CreateBattlegroundMutantResult createMeleeMutant(MeleeGame game, int userId, String mutantText) throws MutantCreationException, IOException {
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(game.getId());
+        mse.setUserId(login.getUserId());
+        notificationService.post(mse);
+
+        // Do the validation even before creating the mutant
+        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
+        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
+                mutantText, codeValidatorLevel);
+        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(game.getId());
+        mve.setUserId(login.getUserId());
+        mve.setSuccess(validationSuccess);
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
+            // Mutant is either the same as the CUT or it contains invalid code
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationMessage, null);
+        }
+
+        Mutant existingMutant = existingMutant(game.getId(), mutantText);
+        boolean duplicateCheckSuccess = existingMutant == null; // || existingMutant.getPlayerId() != playerId;
+        // TODO: Why allow duplicate mutants from different creators?
+        // Currently not possible because of database constraint
+        // See also: Issue #675
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(game.getId());
+        mdce.setUserId(login.getUserId());
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
+            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
+                    TargetExecution.Target.COMPILE_MUTANT);
+            String compilationError = null;
+            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
+                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
+               compilationError = existingMutantTarget.message;
+            }
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.DUPLICATE_MUTANT_FOUND, null, compilationError);
+        }
+
+        // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
+        // then we get the PLAYER_ID when we get id of the mutants' creator?
+        Mutant newMutant = createMutant(game.getId(), game.getClassId(), mutantText, userId,
+                // TODO Should we use a different directory structure for MELEE GAMES?
+                MODE_BATTLEGROUND_DIR);
+        if (newMutant == null) {
+            throw new MutantCreationException();
+        }
+        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
+                TargetExecution.Target.COMPILE_MUTANT);
+        String errorMessage = (compileMutantTarget != null
+                && compileMutantTarget.message != null
+                && !compileMutantTarget.message.isEmpty())
+                ? compileMutantTarget.message : null;
+        if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.COMPILATION_FAILED, null, errorMessage);
+        }
+
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
+        final String notificationMsg = user.map(SimpleUser::getName)
+                .orElse("User with the id " + userId) + " created a mutant.";
+        // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
+        Event notif = new Event(-1, game.getId(), userId, notificationMsg, EventType.PLAYER_MUTANT_CREATED,
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
+        eventDAO.insert(notif);
+
+        String mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(game.getId());
+        mte.setUserId(login.getUserId());
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
+
+        return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -520,7 +635,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
     }
 
-    public CreateBattlegroundTestResult createBattlegroundTest(MultiplayerGame game, int userId, String code)
+    public CreateBattlegroundTestResult createBattlegroundTest(AbstractGame game, int userId, String code)
             throws IOException {
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(game.getId());
@@ -576,7 +691,14 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
 
-        String mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
+        String mutationTesterMessage;
+        if (game instanceof MultiplayerGame multiplayerGame) {
+            mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
+        } else if (game instanceof MeleeGame meleeGame) {
+            mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
+        } else {
+            throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
+        }
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -1146,5 +1268,52 @@ public class GameManagingUtils implements IGameManagingUtils {
             }
         }
         return Optional.empty();
+    }
+
+    public void setLlmPlayers(AbstractGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (!login.isAdmin() && login.getUserId() != game.getCreatorId()) {
+            messages.add("You are not allowed to change the LLM players!").alert();
+            logger.warn("User {} tried to change the llm players on game {}.", login.getUserId(), game.getId());
+        } else {
+            Optional<String> defenderFormValue = ServletUtils.getStringParameter(req, "defenderModel");
+            Optional<String> attackerFormValue = ServletUtils.getStringParameter(req, "attackerModel");
+            try {
+                defenderFormValue.ifPresent(s ->
+                        llmService.setPlayerModel(game, Role.DEFENDER, getLLModelFromSingleValue(s)));
+                attackerFormValue.ifPresent(s ->
+                        llmService.setPlayerModel(game, Role.ATTACKER, getLLModelFromSingleValue(s)));
+            } catch (IllegalArgumentException e) {
+                logger.error(e.getMessage());
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+        }
+        resp.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+    }
+
+    private LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException {
+        if (s.equals("NONE")) {
+            return null;
+        } else {
+            String[] split = s.split("\\|");
+            if (split.length != 2) {
+                logger.error("Malformed defender form value: {}", s);
+                throw new IllegalArgumentException("Malformed defender form value: " + s);
+            }
+            try {
+                LLMType type = LLMType.valueOf(split[0]);
+                String name = split[1];
+                return llmRepo.getModelFromName(name, type, true).orElseGet(
+                        () -> {
+                            logger.error("User {} tried to set an LLM defender's model to {}:{}, but it doesn't" +
+                                    " exist or isn't active.", login.getUserId(), type, name);
+                            messages.add("The model you selected is not active. Try refreshing the page").alert();
+                            return null;
+                        });
+            } catch (IllegalArgumentException e) {
+                logger.error("Unknown LLM type with type {} and name {}", split[0], split[1]);
+                throw new IllegalArgumentException("Unknown LLM type", e);
+            }
+        }
     }
 }
