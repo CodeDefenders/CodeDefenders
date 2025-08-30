@@ -159,7 +159,6 @@
             </form>
         </div>
 
-        <!-- TODO Melee-Games -->
         <% if (!(game instanceof PuzzleGame) && !models.isEmpty()) {
         %>
         <form id="setLlmPlayer" action="${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}" method="post">

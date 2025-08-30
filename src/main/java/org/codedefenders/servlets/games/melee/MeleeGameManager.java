@@ -337,20 +337,22 @@ public class MeleeGameManager extends HttpServlet {
             }
             case "setLlmPlayer": {
                 try {
-                    ServletUtils.getStringParameter(request, "defenderModel").ifPresent(s ->
-                            llmService.setPlayerModel(game, Role.DEFENDER,
-                                    gameManagingUtils.getLLModelFromSingleValue(s)));
-                    ServletUtils.getStringParameter(request, "attackerModel").ifPresent(s ->
-                            llmService.setPlayerModel(game, Role.ATTACKER,
-                                    gameManagingUtils.getLLModelFromSingleValue(s)));
-                    response.sendRedirect(url.forPath(Paths.MELEE_GAME + "?gameId=" + game.getId()));
-                    return;
-                } catch (IllegalArgumentException e) {
+
                     if (checkForPrivileges(game, request, response)) {
-                        messages.add("Something went wrong, sorry!");
-                        logger.error(e.getMessage());
-                        Redirect.redirectBack(request, response);
+                        ServletUtils.getStringParameter(request, "defenderModel").ifPresent(s ->
+                                llmService.setPlayerModel(game, Role.DEFENDER,
+                                        gameManagingUtils.getLLModelFromSingleValue(s)));
+                        ServletUtils.getStringParameter(request, "attackerModel").ifPresent(s ->
+                                llmService.setPlayerModel(game, Role.ATTACKER,
+                                        gameManagingUtils.getLLModelFromSingleValue(s)));
+                        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+                        return;
                     }
+                } catch (IllegalArgumentException e) {
+                    messages.add("Something went wrong, sorry!");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                    return;
                 }
             }
             default:
