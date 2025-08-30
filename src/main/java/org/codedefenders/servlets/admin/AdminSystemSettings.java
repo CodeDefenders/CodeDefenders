@@ -227,7 +227,15 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The email address to use for teacher account applications.";
             }
-        };
+        },
+        LLM_INTERVAL_SECONDS {
+            @Override
+            public String toString() {
+                return "The default number of seconds between actions of an AI player. Can be adjusted for " +
+                        "individual games.";
+            }
+        }
+        ;
 
         public String getReadableName() {
             return Arrays.stream(this.name().split("_"))

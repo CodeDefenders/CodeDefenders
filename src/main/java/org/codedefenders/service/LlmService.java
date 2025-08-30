@@ -35,6 +35,7 @@ import jakarta.inject.Named;
 import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -49,6 +50,7 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -78,8 +80,12 @@ public class LlmService {
     MutantRepository mutantRepository;
     LLMRepository llmRepo;
 
+    //Maps model name to ChatModel
     Map<String, ChatModel> openaiModels = new HashMap<>();
     Map<String, ChatModel> ollamaModels = new HashMap<>();
+
+    //Maps game id to interval in seconds for game-specific intervals
+    private final Map<Integer, Integer> llmActionInterval = new HashMap<>();
 
     /*
         Maps game ids to the models that should be used by their LLM players.
@@ -178,6 +184,20 @@ public class LlmService {
             return getModelForGame(game, Role.DEFENDER) != null || getModelForGame(game, Role.ATTACKER) != null;
         } else {
             return getModelForGame(game, role) != null;
+        }
+    }
+
+    /**
+     * Returns the minimum number of seconds between two actions of the same llm thread.
+     * Returns the game-specific time, if it exists, otherwise returns the default time.
+     */
+    public int getLlmActionInterval(AbstractGame game) {
+        Integer result = llmActionInterval.get(game.getId());
+        if (result == null) {
+            return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
+                    .getIntValue();
+        } else {
+            return result;
         }
     }
 
@@ -326,7 +346,7 @@ public class LlmService {
         try {
             if (game instanceof MultiplayerGame multiplayerGame) {
                 gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
-            } else if (game instanceof MeleeGame meleeGame){
+            } else if (game instanceof MeleeGame meleeGame) {
                 gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
             } else {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
@@ -369,7 +389,6 @@ public class LlmService {
     }
 
     class LlmPlayerThread extends Thread {
-        private static final int secondsBetweenTests = 10;//TODO Veränderbar machen
         private AbstractGame game;
         private final Role role;
         private final SimpleUser user;
@@ -392,6 +411,7 @@ public class LlmService {
         @Override
         public void run() {
             logger.info("Starting LlmPlayerThread for game {} with role {}", game.getId(), role);
+            long startingTime = 0;
             while (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
                 try {
                     if (role == Role.DEFENDER) {
@@ -419,8 +439,14 @@ public class LlmService {
                             game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                             submitTest(game, testSrc);
                         }
-                    } else throw new IllegalArgumentException("No support for this role: " + role);
-                    sleep((long) secondsBetweenTests * 1000);
+                    } else {
+                        throw new IllegalArgumentException("No support for this role: " + role);
+                    }
+                    long timeToWait = startingTime - System.currentTimeMillis();
+                    if (timeToWait > 0) {
+                        sleep(timeToWait);
+                    }
+                    startingTime = getLlmActionInterval(game) * 1000L + System.currentTimeMillis();
                 } catch (InterruptedException e) {
                     logger.warn("AiPlayerThread interrupted");
                     break;
