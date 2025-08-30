@@ -50,6 +50,7 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -59,10 +60,12 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -92,33 +95,35 @@ public class GameManagingUtilsTest {
 
     @WeldSetup
     public WeldInitiator weld = WeldInitiator
-                .from(GameManagingUtils.class,
-                        GameManagingUtilsTest.class,
-                        TestSmellDetectorProducer.class,
-                        NotificationService.class,
-                        ExecutorServiceProvider.class,
-                        MetricsRegistry.class,
-                        Configuration.class,
-                        TestRepository.class,
-                        MutantRepository.class,
-                        GameRepository.class,
-                        MeleeGameRepository.class,
-                        MultiplayerGameRepository.class,
-                        PuzzleRepository.class,
-                        PlayerRepository.class,
-                        GameClassRepository.class,
-                        IMutationTester.class,
-                        MutationTester.class,
-                        ParallelMutationTester.class,
-                        ITestCaseSelector.class,
-                        KillCountTestCaseSelector.class,
-                        PrioritizedTestCaseSelector.class,
-                        KillMapService.class,
-                        UserRepository.class)
-                .inject(this)
-                .activate(RequestScoped.class)
-                .activate(ApplicationScoped.class)
-                .build();// ofTestPackage();
+            .from(GameManagingUtils.class,
+                    GameManagingUtilsTest.class,
+                    TestSmellDetectorProducer.class,
+                    NotificationService.class,
+                    ExecutorServiceProvider.class,
+                    MetricsRegistry.class,
+                    Configuration.class,
+                    TestRepository.class,
+                    MutantRepository.class,
+                    GameRepository.class,
+                    MeleeGameRepository.class,
+                    MultiplayerGameRepository.class,
+                    PuzzleRepository.class,
+                    PlayerRepository.class,
+                    GameClassRepository.class,
+                    IMutationTester.class,
+                    MutationTester.class,
+                    ParallelMutationTester.class,
+                    ITestCaseSelector.class,
+                    KillCountTestCaseSelector.class,
+                    PrioritizedTestCaseSelector.class,
+                    KillMapService.class,
+                    UserRepository.class,
+                    LlmService.class,
+                    LLMRepository.class)
+            .inject(this)
+            .activate(RequestScoped.class)
+            .activate(ApplicationScoped.class)
+            .build();// ofTestPackage();
 
     /*
      * TODO At the moment I cannot find a better way to initialize TestSmellsDAO

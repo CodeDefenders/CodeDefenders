@@ -47,6 +47,7 @@ import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -62,10 +63,6 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -76,6 +73,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -86,8 +84,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,6 +188,9 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private PlayerRepository playerRepo;
+
+    @Inject
+    private LlmService llmService;
 
     @Inject
     GameService gameService;
@@ -337,12 +336,38 @@ public class MeleeGameManager extends HttpServlet {
                 return;
             }
             case "setLlmPlayer": {
-                gameManagingUtils.setLlmPlayers(game, request, response);
-                return;
+                try {
+                    ServletUtils.getStringParameter(request, "defenderModel").ifPresent(s ->
+                            llmService.setPlayerModel(game, Role.DEFENDER,
+                                    gameManagingUtils.getLLModelFromSingleValue(s)));
+                    ServletUtils.getStringParameter(request, "attackerModel").ifPresent(s ->
+                            llmService.setPlayerModel(game, Role.ATTACKER,
+                                    gameManagingUtils.getLLModelFromSingleValue(s)));
+                    response.sendRedirect(url.forPath(Paths.MELEE_GAME + "?gameId=" + game.getId()));
+                    return;
+                } catch (IllegalArgumentException e) {
+                    if (checkForPrivileges(game, request, response)) {
+                        messages.add("Something went wrong, sorry!");
+                        logger.error(e.getMessage());
+                        Redirect.redirectBack(request, response);
+                    }
+                }
             }
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
+        }
+
+    }
+
+    private boolean checkForPrivileges(AbstractGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (login.isAdmin() || login.getUserId() == game.getCreatorId()) {
+            return true;
+        } else {
+            logger.warn("User {} tried to do something he's not allowed to do with game {}.",
+                    login.getUserId(), game.getId());
+            Redirect.redirectBack(req, resp);
+            return false;
         }
     }
 

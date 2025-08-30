@@ -40,6 +40,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -50,9 +51,6 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.LLMType;
-import org.codedefenders.model.LLModel;
-import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.LLMRepository;
@@ -165,9 +163,6 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private LlmService llmService;
 
-    @Inject
-    private LLMRepository llmRepo;
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -263,9 +258,23 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             case "setLlmPlayer": {
-                gameManagingUtils.setLlmPlayers(game, request, response);
-
-                return;
+                try {
+                    if (checkForPrivileges(game, request, response)) {
+                        ServletUtils.getStringParameter(request, "defenderModel").ifPresent(s ->
+                                llmService.setPlayerModel(game, Role.DEFENDER,
+                                        gameManagingUtils.getLLModelFromSingleValue(s)));
+                        ServletUtils.getStringParameter(request, "attackerModel").ifPresent(s ->
+                                llmService.setPlayerModel(game, Role.ATTACKER,
+                                        gameManagingUtils.getLLModelFromSingleValue(s)));
+                        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME + "?gameId=" + game.getId()));
+                    }
+                    return;
+                } catch (IllegalArgumentException e) {
+                    messages.add("Something went wrong, sorry!");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
             }
 
             default:
@@ -274,6 +283,16 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
+    private boolean checkForPrivileges(AbstractGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (login.isAdmin() || login.getUserId() == game.getCreatorId()) {
+            return true;
+        } else {
+            logger.warn("User {} tried to do something he's not allowed to do with game {}.",
+                    login.getUserId(), game.getId());
+            Redirect.redirectBack(req, resp);
+            return false;
+        }
+    }
 
 
     void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
