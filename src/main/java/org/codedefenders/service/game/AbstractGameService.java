@@ -44,6 +44,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,7 @@ public abstract class AbstractGameService implements IGameService {
     protected GameRepository gameRepo;
     protected PlayerRepository playerRepo;
     protected TestSmellRepository testSmellRepo;
+    protected WhitelistRepository whitelistRepo;
 
     @Inject
     private INotificationService notificationService;
@@ -77,7 +79,8 @@ public abstract class AbstractGameService implements IGameService {
     public AbstractGameService(GameManagingUtils gameManagingUtils, UserService userService,
                                UserRepository userRepository,
                                TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
-                               PlayerRepository playerRepo, TestSmellRepository testSmellRepo) {
+                               PlayerRepository playerRepo, TestSmellRepository testSmellRepo,
+                               WhitelistRepository whitelistRepo) {
         this.gameManagingUtils = gameManagingUtils;
         this.userService = userService;
         this.userRepository = userRepository;
@@ -86,6 +89,7 @@ public abstract class AbstractGameService implements IGameService {
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
         this.testSmellRepo = testSmellRepo;
+        this.whitelistRepo = whitelistRepo;
     }
 
     @Override

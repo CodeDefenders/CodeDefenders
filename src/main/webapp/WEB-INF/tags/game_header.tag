@@ -50,9 +50,11 @@
     int gameId = game.getId();
 
     Role role = null;
+    boolean mayChooseRole = true;
     String selectionManagerUrl = null;
     int duration = -1;
     long startTime = -1;
+    String type = game instanceof MeleeGame ? "melee" : "battleground";
     if (game instanceof MeleeGame) {
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
         role = ((MeleeGame) game).getRole(login.getUserId());
@@ -65,6 +67,7 @@
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.BATTLEGROUND_SELECTION);
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
+        mayChooseRole = ((MultiplayerGame) game).isMayChooseRoles();
 
         if (game.getState() == GameState.ACTIVE) {
             startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
@@ -245,5 +248,17 @@
         <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
 
         <t:game_chat/>
+
+        <% if (game.getCreatorId() == login.getUserId() || role == Role.OBSERVER) {%>
+        <div>
+            <t:whitelist_modal htmlId="whitelist-modal" gameId="<%=String.valueOf(gameId)%>"
+                               mayChooseRole="<%=String.valueOf(mayChooseRole)%>" liveGame="true" type="<%=type%>"/>
+            <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button"
+                    data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                <i class="fa fa-paper-plane"></i>
+                Invitations
+            </button>
+        </div>
+        <% } %>
     </div>
 </div>

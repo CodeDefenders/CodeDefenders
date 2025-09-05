@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.inject.Inject;
@@ -44,6 +45,8 @@ import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -191,6 +194,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
+        boolean mayChooseRoles = parameterThenOrOther(request, "mayChooseRoles", true, false);
+        boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
+        Integer inviteId = getIntParameter(request, "inviteId").orElse(null);
+
+        Set<WhitelistElement> whitelist = ServletUtils.getWhitelist(request, mayChooseRoles);
 
         MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
@@ -201,6 +209,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .gameDurationMinutes(duration)
+                .mayChooseRoles(mayChooseRoles)
+                .inviteOnly(inviteOnly)
+                .inviteId(inviteId)
+                .whitelist(whitelist)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
@@ -208,6 +220,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         boolean success = gameService.createGame(newGame, withMutants, withTests, creatorRole);
 
+        logger.info("Created game with success: {}", success);
         if (!success) {
             Redirect.redirectBack(request, response);
             return;
@@ -243,6 +256,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
         boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
+        boolean flexParamExists = ServletUtils.parameterThenOrOther(request, "flex", true, false);
         boolean observerParamExists = ServletUtils.parameterThenOrOther(request, "observer", true, false);
 
         // Create the event, publish if successfully joined
@@ -268,6 +282,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             } else {
                 logger.info("User {} failed to join game {} as an attacker.", login.getUserId(), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            }
+        } else if (flexParamExists) {
+            if (game.addPlayer(login.getUserId(), null)) {
+                logger.info("User {} joined game {} as a flexible player.", login.getUserId(), gameId);
+                notificationService.post(gje);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             }
         } else if (observerParamExists) {
             if (login.isAdmin() || isClassroomModeratorForGame(game)) {

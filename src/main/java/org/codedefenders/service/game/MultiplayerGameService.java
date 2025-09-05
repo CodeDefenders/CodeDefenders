@@ -19,7 +19,10 @@
 package org.codedefenders.service.game;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -44,7 +47,10 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
+import org.codedefenders.notification.events.server.invite.InviteEvent;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
@@ -53,9 +59,12 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +81,7 @@ public class MultiplayerGameService extends AbstractGameService {
     private final CodeDefendersAuth login;
     private final NotificationService notificationService;
     private final MultiplayerGameRepository multiplayerGameRepo;
+    private final TestSmellRepository testSmellRepo;
 
     @Inject
     public MultiplayerGameService(UserService userService, UserRepository userRepository,
@@ -81,14 +91,16 @@ public class MultiplayerGameService extends AbstractGameService {
                                   GameRepository gameRepo,
                                   MultiplayerGameRepository multiplayerGameRepo,
                                   PlayerRepository playerRepo,
-                                  TestSmellRepository testSmellRepo) {
-        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo,
-                testSmellRepo);
+                                  TestSmellRepository testSmellRepo,
+                                  WhitelistRepository whitelistRepo) {
+        super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo, testSmellRepo,
+                whitelistRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
         this.notificationService = notificationService;
         this.multiplayerGameRepo = multiplayerGameRepo;
+        this.testSmellRepo = testSmellRepo;
     }
 
     @Override
@@ -166,6 +178,17 @@ public class MultiplayerGameService extends AbstractGameService {
         int newGameId = multiplayerGameRepo.storeMultiplayerGame(game);
         game.setId(newGameId);
 
+        if (game.isInviteOnly()) {
+            whitelistRepo.addToWhitelist(newGameId, login.getUserId(), WhitelistType.CHOICE);
+        }
+
+        for (WhitelistElement w : game.getWhitelist()) {
+            int userId = userRepository.getUserByName(w.getUsername()).orElseThrow().getId();
+            whitelistRepo.addToWhitelist(newGameId, userId, w.getType());
+            notificationService.sendInviteNotification(game, userId, w.getType());
+        }
+
+
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
                 EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(event);
@@ -218,6 +241,18 @@ public class MultiplayerGameService extends AbstractGameService {
                 .automaticMutantEquivalenceThreshold(game.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(game.getGameDurationMinutes())
                 .classroomId(game.getClassroomId().orElse(null))
+                .mayChooseRoles(game.isMayChooseRoles())
+                .whitelist(whitelistRepo.getWhitelist(game.getId()).stream().map((w) -> {
+                    WhitelistType newType;
+                    if (w.getType() == WhitelistType.ATTACKER) {
+                        newType = WhitelistType.DEFENDER;
+                    } else if (w.getType() == WhitelistType.DEFENDER) {
+                        newType = WhitelistType.ATTACKER;
+                    } else {
+                        newType = w.getType();
+                    }
+                    return new WhitelistElement(w.getUsername(), newType);
+                }).collect(Collectors.toSet()))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(game);

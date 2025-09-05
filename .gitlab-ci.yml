@@ -96,6 +96,8 @@ build:
   script:
     - mvn $MAVEN_ARGS -DskipCheckstyle -DskipTests package
     - printf 'artifact_size_bytes{artifact="codedefenders.war"} %d\n' "$(stat --printf="%s" target/codedefenders.war)" >> metrics.txt
+    - rm -r target/codedefenders/WEB-INF/lib
+
   artifacts:
     paths:
       - target/
