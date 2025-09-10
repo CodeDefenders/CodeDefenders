@@ -27,7 +27,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
-import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.database.DatabaseExtension;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;

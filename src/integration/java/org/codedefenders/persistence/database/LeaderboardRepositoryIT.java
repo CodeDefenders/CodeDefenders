@@ -21,7 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.SQLException;
 
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.database.DatabaseExtension;
 import org.codedefenders.util.tags.DatabaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

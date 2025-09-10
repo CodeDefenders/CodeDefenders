@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.util;
+package org.codedefenders.util.database;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 /**
- * Injects QueryRunner, Connection and, ConnectionFactory parameters.
+ * Injects {@link QueryRunner}, {@link Connection} and, {@link ConnectionFactory} parameters.
  *
  * <p> If used with the default configuration, the injected database objects connect
  * to the DB specified in "src/integration/resources/database.properties".

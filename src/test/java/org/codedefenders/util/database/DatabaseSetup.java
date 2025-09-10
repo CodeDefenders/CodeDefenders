@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.util;
+package org.codedefenders.util.database;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
