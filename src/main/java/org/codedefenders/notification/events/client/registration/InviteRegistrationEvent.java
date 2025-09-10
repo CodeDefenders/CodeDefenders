@@ -16,23 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.servlets.games.battleground;
+package org.codedefenders.notification.events.client.registration;
 
-import java.io.IOException;
+import org.codedefenders.notification.handling.ClientEventHandler;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.codedefenders.util.Paths;
-
-@WebServlet(Paths.BATTLEGROUND_CREATE)
-public class MultiplayerGameCreationManager extends HttpServlet {
+public class InviteRegistrationEvent extends RegistrationEvent {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/battleground/create_game_view.jsp").forward(req, resp);
+    public void accept(ClientEventHandler visitor) {
+        visitor.visit(this);
     }
 }

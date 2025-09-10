@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameClassRepository;
@@ -106,6 +107,21 @@ public class MutantAPI extends APIServlet {
             writeResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     new Common.ErrorResponseDTO("Server error while creating the mutant."));
             return;
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                writeResponse(response, HttpServletResponse.SC_OK,
+                        new SubmitMutantResponseDTO(
+                                false,
+                                List.of("Error submitting the mutant: data too long. Maybe you made too many changes?"),
+                                null,
+                                MutantRejectReason.DATA_TOO_LONG
+                        )
+                );
+            } else {
+                writeResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        new Common.ErrorResponseDTO("Database error while saving the mutant."));
+            }
+            return;
         }
 
         var messages = new ArrayList<String>();
@@ -164,6 +180,7 @@ public class MutantAPI extends APIServlet {
             VALIDATION_FAILED,
             DUPLICATE_MUTANT_FOUND,
             COMPILATION_FAILED,
+            DATA_TOO_LONG,
         }
     }
 }

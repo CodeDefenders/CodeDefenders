@@ -245,6 +245,15 @@ public class UserRepository {
         return queryRunner.query(query, listFromRS(UserRepository::userFromRS));
     }
 
+    /**
+     * Retrieve a list of all normal from the database, excluding system users.
+     */
+    @Nonnull
+    public List<UserEntity> getRealUsers() {
+        @Language("SQL") String query = "SELECT * FROM  users WHERE User_ID >= 100;";
+        return queryRunner.query(query, listFromRS(UserRepository::userFromRS));
+    }
+
     @Nonnull
     public List<UserEntity> getAssignedUsers() {
         @Language("SQL") String query = """

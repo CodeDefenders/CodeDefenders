@@ -82,6 +82,7 @@ public class MeleeGameRepository {
         boolean requiresValidation = rs.getBoolean("RequiresValidation");
         float lineCoverage = rs.getFloat("Coverage_Goal");
         float mutantCoverage = rs.getFloat("Mutant_Goal");
+        boolean inviteOnly = rs.getBoolean("invite_only");
 
         // These are read but never used. We always set them to 0
         int defenderValue = rs.getInt("Defender_Value");
@@ -112,6 +113,7 @@ public class MeleeGameRepository {
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .classroomId(classroomId)
+                .inviteOnly(inviteOnly)
                 .build();
     }
 
@@ -188,6 +190,7 @@ public class MeleeGameRepository {
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
         Integer classroomId = game.getClassroomId().orElse(null);
+        boolean inviteOnly = game.isInviteOnly();
 
         @Language("SQL") String query = """
                 INSERT INTO games (
@@ -207,12 +210,13 @@ public class MeleeGameRepository {
                     CapturePlayersIntention,
                     EquivalenceThreshold,
                     Game_Duration_Minutes,
-                    Classroom_ID
+                    Classroom_ID,
+                    invite_only
                 )
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
         """;
 
-        return queryRunner.insert(query,
+        int gameId = queryRunner.insert(query,
                 generatedKeyFromRS(),
                 classId,
                 level.name(),
@@ -230,8 +234,16 @@ public class MeleeGameRepository {
                 capturePlayersIntention,
                 automaticMutantEquivalenceThreshold,
                 gameDurationMinutes,
-                classroomId
+                classroomId,
+                inviteOnly
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
+
+        if (game.getInviteId() != null) {
+            @Language("SQL") String query2 =
+                    "UPDATE invitation_links SET game_id = ? WHERE invitation_id = ? AND creator_id = ?;";
+            queryRunner.update(query2, gameId, game.getInviteId(), creatorId);
+        }
+        return gameId;
     }
 
     /**
@@ -336,8 +348,9 @@ public class MeleeGameRepository {
                     (SELECT creators.Username
                        FROM view_valid_users creators
                        WHERE g.Creator_ID = creators.User_ID) AS creatorName
-                FROM view_melee_games AS g,
-                    view_valid_users u
+                FROM view_melee_games AS g
+                    JOIN view_valid_users u
+                    LEFT JOIN whitelist w ON u.User_ID = w.user_ID AND g.ID = w.game_id
                 WHERE u.User_ID = ?
                   AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
                   AND g.Creator_ID != u.User_ID
@@ -347,6 +360,7 @@ public class MeleeGameRepository {
                     INNER JOIN players p ON ig.ID = p.Game_ID
                     WHERE p.User_ID = u.User_ID
                     AND p.Active = TRUE)
+                AND ((NOT g.invite_only) OR w.type IS NOT NULL)
                 ;
         """;
 

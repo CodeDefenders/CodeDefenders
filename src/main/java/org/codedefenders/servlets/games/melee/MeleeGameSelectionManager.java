@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.inject.Inject;
@@ -47,6 +48,7 @@ import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -192,6 +194,10 @@ public class MeleeGameSelectionManager extends HttpServlet {
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
+        boolean inviteOnly = parameterThenOrOther(request, "inviteOnly", true, false);
+        Integer inviteId = getIntParameter(request, "inviteId").orElse(null);
+
+        Set<WhitelistElement> whitelist = ServletUtils.getWhitelist(request, true);
 
         MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level)
@@ -202,6 +208,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .gameDurationMinutes(duration)
+                .inviteOnly(inviteOnly)
+                .inviteId(inviteId)
+                .whitelist(whitelist)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
@@ -291,8 +300,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getMeleeGame();
 
-        if (game.getCreatorId() != login.getUserId()) {
-            messages.add("Only the game's creator can start the game.");
+        if (game == null || !game.hasUserJoined(login.getUserId())) {
+            messages.add("You cannot leave a game you are not part of.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -306,7 +315,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        messages.add("Game " + gameId + " left");
+        messages.add("You left game " + gameId);
         eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;

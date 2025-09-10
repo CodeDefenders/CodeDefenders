@@ -227,6 +227,25 @@
                         </div>
 
                         <div class="row mb-3"
+                             title="Allows only whitelisted players to join the game.">
+                            <a class="col-4 col-form-label" id="whitelist-modal-opener" type="button" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
+                                Invite players
+                            </a>
+                            <div class="col-8 d-flex align-items-center">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="invite-only-switch"
+                                           name="inviteOnly">
+                                    <label class="form-check-label" for="invite-only-switch">Allow only whitelisted
+                                        players to join</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <t:whitelist_modal htmlId="whitelist-modal" gameId="-1" mayChooseRole="true"
+                                           liveGame="false" type="melee"/>
+                        <input type="hidden" name="inviteId" id="invite-id" value=""/>
+
+                        <div class="row mb-3"
                              title="Select the role the creator (you) will have in the game.">
                             <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
                             <div class="col-8">

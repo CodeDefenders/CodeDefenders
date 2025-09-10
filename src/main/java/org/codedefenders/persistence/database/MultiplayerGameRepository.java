@@ -61,6 +61,7 @@ public class MultiplayerGameRepository {
 
     /**
      * Constructs a {@link MultiplayerGame} from a {@link ResultSet} entry.
+     * The whitelist is not included and has to be fetched via {@link WhitelistRepository#getWhitelist(int)}.
      *
      * @param rs The {@link ResultSet}.
      * @return The constructed battleground game, or {@code null} if the game is no multiplayer game.
@@ -90,6 +91,8 @@ public class MultiplayerGameRepository {
         int gameDuration = rs.getInt("Game_Duration_Minutes");
         long startTime = rs.getLong("Timestamp_Start");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
+        boolean inviteOnly = rs.getBoolean("invite_only");
+        boolean mayChooseRole = rs.getBoolean("may_choose_role");
 
         Integer classroomId = rs.getInt("Classroom_ID");
         if (rs.wasNull()) {
@@ -113,6 +116,8 @@ public class MultiplayerGameRepository {
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .classroomId(classroomId)
+                .mayChooseRoles(mayChooseRole)
+                .inviteOnly(inviteOnly)
                 .build();
     }
 
@@ -186,31 +191,35 @@ public class MultiplayerGameRepository {
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
         Integer classroomId = game.getClassroomId().orElse(null);
+        boolean inviteOnly = game.isInviteOnly();
+        boolean mayChooseRoles = game.isMayChooseRoles();
 
         @Language("SQL") String query = """
-                INSERT INTO games (
-                    Class_ID,
-                    Level,
-                    Prize,
-                    Defender_Value,
-                    Attacker_Value,
-                    Coverage_Goal,
-                    Mutant_Goal,
-                    Creator_ID,
-                    State,
-                    Mode,
-                    MaxAssertionsPerTest,
-                    ChatEnabled,
-                    MutantValidator,
-                    CapturePlayersIntention,
-                    EquivalenceThreshold,
-                    Game_Duration_Minutes,
-                    Classroom_ID
-                )
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-        """;
+                        INSERT INTO games (
+                            Class_ID,
+                            Level,
+                            Prize,
+                            Defender_Value,
+                            Attacker_Value,
+                            Coverage_Goal,
+                            Mutant_Goal,
+                            Creator_ID,
+                            State,
+                            Mode,
+                            MaxAssertionsPerTest,
+                            ChatEnabled,
+                            MutantValidator,
+                            CapturePlayersIntention,
+                            EquivalenceThreshold,
+                            Game_Duration_Minutes,
+                            Classroom_ID,
+                            invite_only,
+                            may_choose_role
+                        )
+                        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+                """;
 
-        return queryRunner.insert(query,
+        int gameId = queryRunner.insert(query,
                 generatedKeyFromRS(),
                 classId,
                 level.name(),
@@ -228,8 +237,18 @@ public class MultiplayerGameRepository {
                 capturePlayersIntention,
                 automaticMutantEquivalenceThreshold,
                 gameDurationMinutes,
-                classroomId
+                classroomId,
+                inviteOnly,
+                mayChooseRoles
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store game."));
+
+        if (game.getInviteId() != null) {
+            @Language("SQL") String query2 =
+                    "UPDATE invitation_links SET game_id = ? WHERE invitation_id = ? AND creator_id = ?;";
+            queryRunner.update(query2, gameId, game.getInviteId(), creatorId);
+        }
+        return gameId;
+
     }
 
     /**
@@ -253,18 +272,18 @@ public class MultiplayerGameRepository {
         GameState state = game.getState();
 
         @Language("SQL") String query = """
-                UPDATE games
-                SET Class_ID = ?,
-                    Level = ?,
-                    Prize = ?,
-                    Defender_Value = ?,
-                    Attacker_Value = ?,
-                    Coverage_Goal = ?,
-                    Mutant_Goal = ?,
-                    State = ?,
-                    Game_Duration_Minutes = ?
-                WHERE ID = ?
-        """;
+                        UPDATE games
+                        SET Class_ID = ?,
+                            Level = ?,
+                            Prize = ?,
+                            Defender_Value = ?,
+                            Attacker_Value = ?,
+                            Coverage_Goal = ?,
+                            Mutant_Goal = ?,
+                            State = ?,
+                            Game_Duration_Minutes = ?
+                        WHERE ID = ?
+                """;
 
         int updatedRows = queryRunner.update(query,
                 classId,
@@ -290,10 +309,10 @@ public class MultiplayerGameRepository {
      */
     public MultiplayerGame getMultiplayerGame(int gameId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_battleground_games
-                WHERE ID = ?;
-        """;
+                        SELECT *
+                        FROM view_battleground_games
+                        WHERE ID = ?;
+                """;
 
         return queryRunner.query(query,
                 oneFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -308,10 +327,10 @@ public class MultiplayerGameRepository {
      */
     public List<MultiplayerGame> getAvailableMultiplayerGames() {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_battleground_games
-                WHERE State != ?;
-        """;
+                        SELECT *
+                        FROM view_battleground_games
+                        WHERE State != ?;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -327,23 +346,25 @@ public class MultiplayerGameRepository {
      */
     public List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
-                SELECT DISTINCT g.*,
-                    u.User_ID AS `userId`,
-                    (SELECT creators.Username
-                       FROM view_valid_users creators
-                       WHERE g.Creator_ID = creators.User_ID) AS creatorName
-                FROM view_battleground_games AS g,
-                    view_valid_users u
-                WHERE u.User_ID = ?
-                  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
-                  AND g.Creator_ID != u.User_ID
-                  AND g.Classroom_ID IS NULL
-                  AND g.ID NOT IN (SELECT ig.ID
-                    FROM games ig
-                    INNER JOIN players p ON ig.ID = p.Game_ID
-                    WHERE p.User_ID = u.User_ID
-                    AND p.Active = TRUE);
-        """;
+                        SELECT DISTINCT g.*,
+                                        u.User_ID AS `userId`,
+                                        (SELECT creators.Username
+                                         FROM view_valid_users creators
+                                         WHERE g.Creator_ID = creators.User_ID) AS creatorName
+                        FROM view_battleground_games AS g
+                             JOIN view_valid_users u
+                             LEFT JOIN whitelist w ON u.User_ID=w.user_id AND w.game_id=g.ID
+                        WHERE u.User_ID = ?
+                          AND (g.State = 'CREATED' OR g.State = 'ACTIVE')
+                          AND g.Creator_ID != u.User_ID
+                          AND g.Classroom_ID IS NULL
+                          AND g.ID NOT IN (SELECT ig.ID
+                                           FROM games ig
+                                                    INNER JOIN players p ON ig.ID = p.Game_ID
+                                           WHERE p.User_ID = u.User_ID
+                                             AND p.Active = TRUE)
+                          AND ((NOT g.invite_only) OR w.type IS NOT NULL)
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::openGameInfoFromRS),
@@ -360,23 +381,23 @@ public class MultiplayerGameRepository {
      */
     public List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
         @Language("SQL") final String query = """
-                SELECT g.*,
-                       cu.User_ID                 as userId,
-                       IFNULL(p.Role, 'OBSERVER') as playerRole,
-                       vu.Username                as creatorName
-                FROM view_battleground_games g
-                         INNER JOIN view_valid_users vu
-                                    ON g.Creator_ID = vu.User_ID
-                         INNER JOIN view_valid_users cu
-                                    ON cu.User_ID = ?
-                         LEFT JOIN players p
-                                   ON cu.User_ID = p.User_ID
-                                       AND g.ID = p.Game_ID
-                WHERE (g.State = 'CREATED' or g.State = 'ACTIVE')
-                  AND (cu.User_ID = g.Creator_ID
-                    OR (cu.User_ID = p.User_ID AND p.Active = TRUE))
-                GROUP BY g.ID;
-        """;
+                        SELECT g.*,
+                               cu.User_ID                 as userId,
+                               IFNULL(p.Role, 'OBSERVER') as playerRole,
+                               vu.Username                as creatorName
+                        FROM view_battleground_games g
+                                 INNER JOIN view_valid_users vu
+                                            ON g.Creator_ID = vu.User_ID
+                                 INNER JOIN view_valid_users cu
+                                            ON cu.User_ID = ?
+                                 LEFT JOIN players p
+                                           ON cu.User_ID = p.User_ID
+                                               AND g.ID = p.Game_ID
+                        WHERE (g.State = 'CREATED' or g.State = 'ACTIVE')
+                          AND (cu.User_ID = g.Creator_ID
+                            OR (cu.User_ID = p.User_ID AND p.Active = TRUE))
+                        GROUP BY g.ID;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::activeGameInfoFromRS),
@@ -393,12 +414,12 @@ public class MultiplayerGameRepository {
      */
     public List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
         @Language("SQL") String query = """
-                SELECT DISTINCT m.*
-                FROM view_battleground_games AS m
-                LEFT JOIN players AS p
-                  ON p.Game_ID = m.ID
-                WHERE (p.User_ID = ?);
-        """;
+                        SELECT DISTINCT m.*
+                        FROM view_battleground_games AS m
+                        LEFT JOIN players AS p
+                          ON p.Game_ID = m.ID
+                        WHERE (p.User_ID = ?);
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -415,23 +436,23 @@ public class MultiplayerGameRepository {
      */
     public List<UserMultiplayerGameInfo> getFinishedMultiplayerGamesForUser(int userId) {
         @Language("SQL") final String query = """
-                SELECT g.*,
-                       cu.User_ID                 as userId,
-                       IFNULL(p.Role, 'OBSERVER') as playerRole,
-                       vu.Username                as creatorName
-                FROM view_battleground_games g
-                         INNER JOIN view_valid_users vu
-                                    ON g.Creator_ID = vu.User_ID
-                         INNER JOIN view_valid_users cu
-                                    ON cu.User_ID = ?
-                         LEFT JOIN players p
-                                   ON cu.User_ID = p.User_ID
-                                       AND g.ID = p.Game_ID
-                WHERE (g.State = 'FINISHED'
-                    AND (cu.User_ID = g.Creator_ID
-                        OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))
-                GROUP BY g.ID;
-        """;
+                        SELECT g.*,
+                               cu.User_ID                 as userId,
+                               IFNULL(p.Role, 'OBSERVER') as playerRole,
+                               vu.Username                as creatorName
+                        FROM view_battleground_games g
+                                 INNER JOIN view_valid_users vu
+                                            ON g.Creator_ID = vu.User_ID
+                                 INNER JOIN view_valid_users cu
+                                            ON cu.User_ID = ?
+                                 LEFT JOIN players p
+                                           ON cu.User_ID = p.User_ID
+                                               AND g.ID = p.Game_ID
+                        WHERE (g.State = 'FINISHED'
+                            AND (cu.User_ID = g.Creator_ID
+                                OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))
+                        GROUP BY g.ID;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::finishedGameInfoFromRS),
@@ -448,12 +469,12 @@ public class MultiplayerGameRepository {
      */
     public List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int creatorId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_battleground_games
-                WHERE (State = ?
-                    OR State = ?)
-                  AND Creator_ID = ?;
-        """;
+                        SELECT *
+                        FROM view_battleground_games
+                        WHERE (State = ?
+                            OR State = ?)
+                          AND Creator_ID = ?;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -472,11 +493,11 @@ public class MultiplayerGameRepository {
     public List<MultiplayerGame> getExpiredGames() {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_battleground_games
-                WHERE State = ?
-                  AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();
-        """;
+                        SELECT *
+                        FROM view_battleground_games
+                        WHERE State = ?
+                          AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -486,9 +507,9 @@ public class MultiplayerGameRepository {
 
     public List<MultiplayerGame> getClassroomGames(int classroomId) {
         @Language("SQL") String query = """
-                SELECT * FROM view_battleground_games as games
-                WHERE games.Classroom_ID = ?;
-        """;
+                        SELECT * FROM view_battleground_games as games
+                        WHERE games.Classroom_ID = ?;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),
@@ -498,10 +519,10 @@ public class MultiplayerGameRepository {
 
     public List<MultiplayerGame> getAvailableClassroomGames(int classroomId) {
         @Language("SQL") String query = """
-                SELECT * FROM view_battleground_games as games
-                WHERE games.Classroom_ID = ?
-                AND games.State != ?;
-        """;
+                        SELECT * FROM view_battleground_games as games
+                        WHERE games.Classroom_ID = ?
+                        AND games.State != ?;
+                """;
 
         return queryRunner.query(query,
                 listFromRS(MultiplayerGameRepository::multiplayerGameFromRS),

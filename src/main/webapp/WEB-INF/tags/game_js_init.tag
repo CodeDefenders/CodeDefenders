@@ -31,10 +31,6 @@
     Currently the WebSocket and achievement notifications.
 --%>
 
-
-<%-- Push notifications using WebSocket --%>
-<jsp:include page="/jsp/push_socket.jsp"/>
-
 <%-- Recieve events from the server --%>
 <script type="module">
     import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';

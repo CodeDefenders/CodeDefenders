@@ -20,20 +20,20 @@ package org.codedefenders.notification.handling.server;
 
 import java.util.Objects;
 
-import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
+import org.codedefenders.notification.events.server.invite.InviteEvent;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 
-public class AchievementEventHandler implements ServerEventHandler {
-    private static final Logger logger = LoggerFactory.getLogger(AchievementEventHandler.class);
+public class InviteEventHandler implements ServerEventHandler {
+    private static final Logger logger = LoggerFactory.getLogger(InviteEventHandler.class);
 
     private final PushSocket socket;
     private final int userId;
 
-    public AchievementEventHandler(PushSocket socket, int userId) {
+    public InviteEventHandler(PushSocket socket, int userId) {
         this.socket = socket;
         this.userId = userId;
     }
@@ -43,8 +43,7 @@ public class AchievementEventHandler implements ServerEventHandler {
     }
 
     @Subscribe
-    public void sendAchievementUnlockedEvent(AchievementUnlockedEvent event) {
-        logger.info("Received achievementUnlockedEvent: {}", event);
+    public void sendInviteEvent(InviteEvent event) {
         if (event.getUserId() == this.userId) {
             socket.sendEvent(event);
         }
@@ -58,7 +57,7 @@ public class AchievementEventHandler implements ServerEventHandler {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AchievementEventHandler that = (AchievementEventHandler) o;
+        InviteEventHandler that = (InviteEventHandler) o;
         return userId == that.userId;
     }
 
@@ -66,4 +65,5 @@ public class AchievementEventHandler implements ServerEventHandler {
     public int hashCode() {
         return Objects.hash(userId);
     }
+
 }

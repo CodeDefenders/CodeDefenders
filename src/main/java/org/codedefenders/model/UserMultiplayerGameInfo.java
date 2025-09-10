@@ -39,6 +39,9 @@ public class UserMultiplayerGameInfo extends GameInfo {
 
     public MultiplayerGame game;
 
+    private WhitelistType whitelistType = WhitelistType.CHOICE;
+    private boolean mayChooseRoles = true;
+
     /**
      * Use {@link #forOpen(int, MultiplayerGame, String) forActive()},
      * {@link #forActive(int, MultiplayerGame, Role, String) forOpen()} and
@@ -65,6 +68,13 @@ public class UserMultiplayerGameInfo extends GameInfo {
         info.userId = userId;
         info.game = game;
         info.creatorName = creatorName;
+        info.mayChooseRoles = game.isMayChooseRoles();
+        if (!info.mayChooseRoles) {
+            info.whitelistType = game.getWhitelistTypeOfUser(userId);
+            if (info.whitelistType == null) {
+                info.whitelistType = WhitelistType.FLEX; // Default to flex if not set
+            }
+        }
 
         return info;
     }
@@ -93,6 +103,14 @@ public class UserMultiplayerGameInfo extends GameInfo {
 
     public Map<Integer, PlayerScore> getTestScores() {
         return game.getTestScores();
+    }
+
+    public boolean isMayChooseRoles() {
+        return mayChooseRoles;
+    }
+
+    public WhitelistType getWhitelistType() {
+        return whitelistType;
     }
 
     @Override

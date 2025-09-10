@@ -39,6 +39,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
@@ -172,19 +173,35 @@ public class MultiplayerGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        int gameId = game.getId();
+
+        final int gameId = game.getId();
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
 
         int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
-        if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
-            logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
-            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-            return;
+        if (playerId == -1) {
+            if (login.isAdmin() && isGameClosed) {
+                logger.info("User {} is not part of the closed game {}, but is an admin. Adding as observer.",
+                        login.getUserId(), gameId);
+                if (game.addPlayer(login.getUserId(), Role.OBSERVER)) {
+                    playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
+                } else {
+                    logger.error("Failed to add user {} as observer for game {}.", login.getUserId(), gameId);
+                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                    return;
+                }
+            } else {
+                logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+                return;
+            }
         }
 
+        final int playerIdFinal = playerId;
         // check is there is a pending equivalence duel for the user.
         game.getMutantsMarkedEquivalentPending()
                 .stream()
-                .filter(m -> m.getPlayerId() == playerId)
+                .filter(m -> m.getPlayerId() == playerIdFinal)
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = mutantRepo.getEquivalentDefenderId(mutant);
@@ -197,10 +214,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 });
 
         request.setAttribute("game", game);
-        request.setAttribute("playerId", playerId);
+        request.setAttribute("playerId", playerIdFinal);
 
-        final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || (game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId));
         final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
                 ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.BATTLEGROUND_DETAILS_VIEW_JSP)
@@ -516,6 +531,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         GameManagingUtils.CreateBattlegroundMutantResult result;
+        //noinspection DuplicatedCode
         try {
             result = gameManagingUtils.createBattlegroundMutant(
                     game, login.getUserId(), mutantText.get());
@@ -524,6 +540,16 @@ public class MultiplayerGameManager extends HttpServlet {
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
                     game.getId(), game.getClassId(), login.getUserId(), mutantText);
             response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            return;
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                messages.add("Error submitting the mutant: data too long. Maybe you made too many changes?").alert();
+            } else {
+                messages.add("Database error while saving the mutant.");
+                logger.error("Database error while saving the mutant: {}", e.getMessage());
+            }
+            response.sendRedirect(
+                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 

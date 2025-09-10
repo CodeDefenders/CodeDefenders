@@ -18,11 +18,16 @@
  */
 package org.codedefenders.servlets.util;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.
@@ -173,5 +178,28 @@ public final class ServletUtils {
      */
     public static <T> T parameterThenOrOther(HttpServletRequest request, String parameter, T then, T other) {
         return Optional.ofNullable(request.getParameter(parameter)).map(s -> then).orElse(other);
+    }
+
+    /**
+     * Extract whitelist elements from the request form.
+     */
+    public static Set<WhitelistElement> getWhitelist(HttpServletRequest req, boolean mayChooseRoles) {
+        Set<WhitelistElement> whitelist = new HashSet<>();
+        String[] types = {"choice", "attacker", "defender", "flex"};
+        for (String type : types) {
+            int i = 1;
+            while (true) {
+                String parameterName = "whitelist-" + type + "-" + i;
+                String value = getStringParameter(req, parameterName).orElse(null);
+                if (value != null) {
+                    whitelist.add(new WhitelistElement(value,
+                            mayChooseRoles ? WhitelistType.CHOICE : WhitelistType.fromString(type)));
+                    i++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return whitelist;
     }
 }

@@ -84,6 +84,30 @@ class InfoApi {
             editor.setValue("Could not fetch test.\nPlease try again later.");
         }
     }
+
+    static async getInviteLinkDataWithoutGameId() {
+        return await InfoApi.fetchJSON(`${contextPath}api/invite-link`);
+    }
+
+    static async getInviteLinkData(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/invite-link?gameId=` + gameId);
+    }
+
+    static async getAllUserNames() {
+        return await InfoApi.fetchJSON(`${contextPath}api/user`);
+    }
+
+    static async getWhitelistedUserNames(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/whitelist?gameId=` + gameId);
+    }
+
+    static async getWhitelistedUserNamesWithType(gameId, type) {
+        return await InfoApi.fetchJSON(`${contextPath}api/whitelist?gameId=` + gameId + '&type=' + type);
+    }
+
+    static async getUserNamesForGame(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/user?forGame=true&gameId=` + gameId);
+    }
 }
 
 

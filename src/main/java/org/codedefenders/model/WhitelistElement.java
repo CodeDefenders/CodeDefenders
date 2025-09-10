@@ -16,23 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.servlets.games.battleground;
+package org.codedefenders.model;
 
-import java.io.IOException;
+public class WhitelistElement {
+    private final String username;
+    private final WhitelistType type;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+    public WhitelistElement(String username, WhitelistType type) {
+        this.username = username;
+        this.type = type;
+    }
 
-import org.codedefenders.util.Paths;
+    public String getUsername() {
+        return username;
+    }
 
-@WebServlet(Paths.BATTLEGROUND_CREATE)
-public class MultiplayerGameCreationManager extends HttpServlet {
-
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/battleground/create_game_view.jsp").forward(req, resp);
+    public WhitelistType getType() {
+        return type;
     }
 }
