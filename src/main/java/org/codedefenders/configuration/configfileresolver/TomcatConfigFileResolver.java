@@ -49,4 +49,9 @@ class TomcatConfigFileResolver extends ConfigFileResolver {
         }
         return getConfigFileImpl(folder.getAbsolutePath(), filename);
     }
+
+    @Override
+    public int getPriority() {
+        return 20;
+    }
 }

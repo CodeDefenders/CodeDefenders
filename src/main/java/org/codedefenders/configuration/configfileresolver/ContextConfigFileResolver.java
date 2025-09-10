@@ -43,4 +43,9 @@ class ContextConfigFileResolver extends ConfigFileResolver {
         }
         return getConfigFileImpl(filePath, filename);
     }
+
+    @Override
+    public int getPriority() {
+        return 90;
+    }
 }

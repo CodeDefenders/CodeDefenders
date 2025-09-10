@@ -16,22 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration.source;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import java.util.Optional;
 
-import jakarta.inject.Qualifier;
+public interface ConfigurationSource {
+    /** Resolves the config attribute with the given name. */
+    Optional<String> resolveAttribute(String camelCaseName);
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@Qualifier
-@Target({TYPE, METHOD, PARAMETER, FIELD})
-@Retention(RUNTIME)
-public @interface ConfigurationSource {
+    /** Returns the priority of the source. Higher numbers mean higher priority. */
+    default int getPriority() {
+        return 0;
+    }
 }

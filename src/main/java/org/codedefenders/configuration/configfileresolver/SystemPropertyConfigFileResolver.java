@@ -44,4 +44,9 @@ class SystemPropertyConfigFileResolver extends ConfigFileResolver {
             return getConfigFileImpl(sysProp, filename);
         }
     }
+
+    @Override
+    public int getPriority() {
+        return 70;
+    }
 }

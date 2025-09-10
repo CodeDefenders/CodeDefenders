@@ -46,4 +46,9 @@ class ClasspathConfigFileResolver extends ConfigFileResolver {
 
         return new InputStreamReader(inputStream);
     }
+
+    @Override
+    public int getPriority() {
+        return 10;
+    }
 }

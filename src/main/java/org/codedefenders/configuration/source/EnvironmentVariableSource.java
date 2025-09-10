@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration.source;
 
-import jakarta.annotation.Priority;
-import jakarta.enterprise.inject.Alternative;
+import java.util.Optional;
+
 import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -34,22 +34,22 @@ import com.google.common.base.CaseFormat;
  * @author degenhart
  */
 @Singleton
-@ConfigurationSource
-class EnvironmentVariableConfiguration extends BaseConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
+public class EnvironmentVariableSource implements ConfigurationSource {
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableSource.class);
 
-    @Override
-    protected String resolveAttributeName(String camelCaseName) {
+    public String resolveAttributeName(String camelCaseName) {
         return "CODEDEFENDERS_" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
     }
 
-    protected String getenv(String name) {
-        return System.getenv(name);
+    @Override
+    public Optional<String> resolveAttribute(String camelCaseName) {
+        return Optional.ofNullable(
+            System.getenv(resolveAttributeName(camelCaseName)));
     }
 
     @Override
-    protected String resolveAttribute(String camelCaseName) {
-        return getenv(resolveAttributeName(camelCaseName));
+    public int getPriority() {
+        return 50;
     }
 }
 

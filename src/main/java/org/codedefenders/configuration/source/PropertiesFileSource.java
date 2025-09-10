@@ -16,15 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration.source;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 
-import jakarta.annotation.Priority;
-import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Default;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
@@ -43,31 +43,31 @@ import com.google.common.base.CaseFormat;
  * @author degenhart
  */
 @Singleton
-@ConfigurationSource
-class PropertiesFileConfiguration extends BaseConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
+public class PropertiesFileSource implements ConfigurationSource {
+    private static final Logger logger = LoggerFactory.getLogger(PropertiesFileSource.class);
 
     private final Properties properties;
 
     @Inject
-    PropertiesFileConfiguration(@Default Instance<ConfigFileResolver> configFileResolvers) {
-        this(configFileResolvers.stream().toList());
+    PropertiesFileSource(@Default Instance<ConfigFileResolver> configFileResolvers) {
+        this(configFileResolvers.stream()
+            .sorted(Comparator.comparing(ConfigFileResolver::getPriority))
+            .toList());
     }
 
-    PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
+    public PropertiesFileSource(List<ConfigFileResolver> configFileResolvers) {
         super();
         properties = new Properties();
         readProperties(configFileResolvers, "codedefenders.properties");
     }
 
-    @Override
-    protected String resolveAttributeName(String camelCaseName) {
+    public String resolveAttributeName(String camelCaseName) {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
     }
 
     @Override
-    protected String resolveAttribute(String camelCaseName) {
-        return properties.getProperty(resolveAttributeName(camelCaseName));
+    public Optional<String> resolveAttribute(String camelCaseName) {
+        return Optional.ofNullable(properties.getProperty(resolveAttributeName(camelCaseName)));
     }
 
     private void readProperties(List<ConfigFileResolver> loaders, String configFileName) {
@@ -87,5 +87,10 @@ class PropertiesFileConfiguration extends BaseConfiguration {
         if (noFileFound) {
             logger.info("No properties files found");
         }
+    }
+
+    @Override
+    public int getPriority() {
+        return 30;
     }
 }

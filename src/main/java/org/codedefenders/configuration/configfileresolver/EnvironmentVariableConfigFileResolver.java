@@ -44,5 +44,10 @@ class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
             return getConfigFileImpl(envVar, filename);
         }
     }
+
+    @Override
+    public int getPriority() {
+        return 50;
+    }
 }
 

@@ -43,4 +43,9 @@ public class StubConfigFileResolver extends ConfigFileResolver {
     public void setConfigFileContent(String configFileContent) {
         this.configFileContent = configFileContent;
     }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
 }
