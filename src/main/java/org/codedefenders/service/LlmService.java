@@ -26,13 +26,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.SortedSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import jakarta.annotation.PreDestroy;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
@@ -72,6 +76,9 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 public class LlmService {
 
     private static final Logger logger = LoggerFactory.getLogger(LlmService.class);
+
+    private final ExecutorService llmExecutor;
+    private final ScheduledExecutorService organizerExecutor;
 
     Configuration config;
     GameRepository gameRepository;
@@ -117,6 +124,9 @@ public class LlmService {
 
         activeLlmDefenders = new HashMap<>();
         activeLlmAttackers = new HashMap<>();
+
+        organizerExecutor = Executors.newSingleThreadScheduledExecutor();
+        llmExecutor = Executors.newCachedThreadPool();
 
         List<LLModel> models = llmRepo.getAllModels();
         for (LLModel m : models) {
@@ -231,7 +241,9 @@ public class LlmService {
             }
 
             game.addPlayer(getCorrectUserId(role), role);
-            new LlmPlayerThread(game, role).start();
+            final Role finalRole = role;
+
+            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole, new Random())));
         }
     }
 
@@ -297,6 +309,12 @@ public class LlmService {
         }
     }
 
+    @PreDestroy
+    public void preDestroy() {
+        organizerExecutor.shutdownNow();
+        llmExecutor.shutdownNow();
+    }
+
     private String generateMutant(AbstractGame game, SimpleUser user) {
         StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
 
@@ -356,8 +374,7 @@ public class LlmService {
         } catch (GameManagingUtils.MutantCreationException e) {
             logger.warn("Could not submit mutant. Reason: {} \nFull mutant text:\n{}",
                     e.getDetailedReason().orElse("Unknown"), mutantSrc);
-        }
-        finally {
+        } finally {
             requestContextController.deactivate();
         }
     }
@@ -392,76 +409,58 @@ public class LlmService {
         }
     }
 
-    class LlmPlayerThread extends Thread {
-        private AbstractGame game;
-        private final Role role;
-        private final SimpleUser user;
-        private final Random random;
+    public void runLlmAction(AbstractGame game, final Role role, final Random random) {
 
-        LlmPlayerThread(AbstractGame game, Role role) {
-            this.game = game;
-            this.role = role;
-            int userId = switch (role) {
-                case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
-                case DEFENDER -> Constants.AI_DEFENDER_USER_ID;
-                case PLAYER -> Constants.AI_PLAYER_USER_ID;
-                default -> throw new IllegalArgumentException("No such role allowed for LLM: " + role);
-            };
-            this.user = new SimpleUser(userId, "PLACEHOLDER");
+        int userId = switch (role) {
+            case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
+            case DEFENDER -> Constants.AI_DEFENDER_USER_ID;
+            case PLAYER -> Constants.AI_PLAYER_USER_ID;
+            default -> throw new IllegalArgumentException("No such role allowed for LLM: " + role);
+        };
+        final SimpleUser user = new SimpleUser(userId, "PLACEHOLDER");
 
-            random = new Random();
-        }
+        logger.info("Starting LlmPlayerThread for game {} with role {}", game.getId(), role);
+        long timeToStartNextThread = getLlmActionInterval(game) * 1000L + System.currentTimeMillis();
+        if (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
+            try {
+                if (role == Role.DEFENDER) {
+                    String testSrc = generateTest(game, user);
+                    game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
+                    submitTest(game, testSrc);
+                } else if (role == Role.ATTACKER) {
+                    String mutantSrc = generateMutant(game, user);
+                    game = gameRepository.getGame(game.getId());
+                    submitMutant(game, mutantSrc);
+                } else {
+                    boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
+                    boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
+                    if (!attackAvailable && !defendAvailable) {
+                        finishThread(game, role);
+                        return;
+                    }
+                    boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
 
-        @Override
-        public void run() {
-            logger.info("Starting LlmPlayerThread for game {} with role {}", game.getId(), role);
-            long startingTime = 0;
-            while (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
-                try {
-                    if (role == Role.DEFENDER) {
-                        String testSrc = generateTest(game, user);
-                        game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
-                        submitTest(game, testSrc);
-                    } else if (role == Role.ATTACKER) {
+                    if (attack) {
                         String mutantSrc = generateMutant(game, user);
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
-                    } else if (role == Role.PLAYER) {
-                        boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
-                        boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
-                        if (!attackAvailable && !defendAvailable) {
-                            break;
-                        }
-                        boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
-
-                        if (attack) {
-                            String mutantSrc = generateMutant(game, user);
-                            game = gameRepository.getGame(game.getId());
-                            submitMutant(game, mutantSrc);
-                        } else {
-                            String testSrc = generateTest(game, user);
-                            game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
-                            submitTest(game, testSrc);
-                        }
                     } else {
-                        throw new IllegalArgumentException("No support for this role: " + role);
+                        String testSrc = generateTest(game, user);
+                        game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
+                        submitTest(game, testSrc);
                     }
-                    long timeToWait = startingTime - System.currentTimeMillis();
-                    if (timeToWait > 0) {
-                        sleep(timeToWait);
-                    }
-                    startingTime = getLlmActionInterval(game) * 1000L + System.currentTimeMillis();
-                } catch (InterruptedException e) {
-                    logger.warn("AiPlayerThread interrupted");
-                    break;
-                } catch (TimeoutException e) {
-                    logger.error("AiPlayerThread for game {} with role {} timed out after.",
-                            game.getId(), role);
-                    break;
                 }
+                long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+                final AbstractGame finalGame = game;
+
+                organizerExecutor.schedule(() -> llmExecutor.execute(() -> runLlmAction(finalGame, role, random)),
+                        timeToWait, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                logger.error("AiPlayerThread for game {} with role {} timed out.",
+                        game.getId(), role);
             }
+        } else {
             finishThread(game, role);
         }
-
     }
 }
