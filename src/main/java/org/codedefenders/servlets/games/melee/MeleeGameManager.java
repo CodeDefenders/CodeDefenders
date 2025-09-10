@@ -591,7 +591,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
-                              int playerId) throws IOException {
+            int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -624,134 +624,57 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        MutantSubmittedEvent mse = new MutantSubmittedEvent();
-        mse.setGameId(game.getId());
-        mse.setUserId(login.getUserId());
-        notificationService.post(mse);
-
-        // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
-                mutantText, codeValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-
-        MutantValidatedEvent mve = new MutantValidatedEvent();
-        mve.setGameId(game.getId());
-        mve.setUserId(login.getUserId());
-        mve.setSuccess(validationSuccess);
-        notificationService.post(mve);
-
-        if (!validationSuccess) {
-            // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get());
+        GameManagingUtils.CreateBattlegroundMutantResult result;
+        try {
+            result = gameManagingUtils.createMeleeMutant(game, login.getUserId(), mutantText);
+        } catch (GameManagingUtils.MutantCreationException e) {
+            messages.add(MUTANT_CREATION_ERROR_MESSAGE + "\n" + e.getDetailedReason().orElse(""));
+            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}," +
+                            "detailedReason: {}",
+                    game.getId(), game.getClassId(), login.getUserId(), mutantText, e.getDetailedReason().orElse("None"));
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
-
-        Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
-        boolean duplicateCheckSuccess = existingMutant == null; // || existingMutant.getPlayerId() != playerId;
-        // TODO: Why allow duplicate mutants from different creators?
-        // Currently not possible because of database constraint
-        // See also: Issue #675
-
-        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
-        mdce.setGameId(game.getId());
-        mdce.setUserId(login.getUserId());
-        mdce.setSuccess(duplicateCheckSuccess);
-        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
-        notificationService.post(mdce);
-
-        if (!duplicateCheckSuccess) {
-            messages.add(MUTANT_DUPLICATED_MESSAGE);
-            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
-                    TargetExecution.Target.COMPILE_MUTANT);
-            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
-                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                // We escape the content of the message for new tests since user can embed there
-                // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
-                // Extract the line numbers of the errors
-                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
-                // Store them in the session so they can be picked up later
-                previousSubmission.setErrorLines(errorLines);
-                // We introduce our decoration
-                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false);
-            }
+        if (result.isSuccess()) {
+            // Clean the mutated code only if mutant is accepted
+            previousSubmission.clear();
+            messages.add(MUTANT_COMPILED_MESSAGE, TITLE_SUCCESS);
+            result.mutationTesterMessage().ifPresent(messages::add);
+            logger.info("Successfully created mutant {} ", result.mutant().orElseThrow().getId());
+        } else {
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-            return;
-        }
-
-        // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
-        // then we get the PLAYER_ID when we get id of the mutants' creator?
-        Mutant newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
-                // TODO Should we use a different directory structure for MELEE GAMES?
-                MODE_BATTLEGROUND_DIR);
-        if (newMutant == null) {
-            messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            previousSubmission.setMutantCode(mutantText);
-            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", game.getId(),
-                    game.getClassId(), user.getId(), mutantText);
-            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-            return;
-        }
-        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
-                TargetExecution.Target.COMPILE_MUTANT);
-        if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-            // There's a ton of defensive programming here...
-            if (compileMutantTarget != null && compileMutantTarget.message != null
-                    && !compileMutantTarget.message.isEmpty()) {
-                // We escape the content of the message for new tests since user can embed there
-                // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml4(compileMutantTarget.message);
-                // Extract the line numbers of the errors
-                List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileMutantTarget.message);
-                // Store them in the session so they can be picked up later
-                previousSubmission.setErrorLines(errorLines);
-                // We introduce our decoration
-                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false);
-
+            switch (result.failureReason().orElseThrow()) {
+                case VALIDATION_FAILED -> {
+                    // Mutant is either the same as the CUT or it contains invalid code
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
+                }
+                case DUPLICATE_MUTANT_FOUND -> {
+                    messages.add(MUTANT_DUPLICATED_MESSAGE);
+                    result.compilationError().ifPresent(this::handleCompilationError);
+                }
+                case COMPILATION_FAILED -> {
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
+                    result.compilationError().ifPresent(this::handleCompilationError);
+                }
             }
-            previousSubmission.setMutantCode(mutantText);
+        }
+
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-            return;
-        }
-
-        messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = user.getName() + " created a mutant.";
-        // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
-        Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.PLAYER_MUTANT_CREATED,
-                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
-        eventDAO.insert(notif);
-
-        messages.add(mutationTester.runAllTestsOnMeleeMutant(game, newMutant));
-        game.update();
-
-        MutantTestedEvent mte = new MutantTestedEvent();
-        mte.setGameId(game.getId());
-        mte.setUserId(login.getUserId());
-        mte.setMutantId(newMutant.getId());
-        notificationService.post(mte);
-
-        if (game.isCapturePlayersIntention()) {
-            AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
-            // This parameter is required !
-            if (intention == null) {
-                messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
-                previousSubmission.setMutantCode(mutantText);
-                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-                return;
-            }
-            collectAttackerIntentions(newMutant, intention);
-        }
-        // Clean the mutated code only if mutant is accepted
-        previousSubmission.clear();
-        logger.info("Successfully created mutant {} ", newMutant.getId());
-        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
+
+    private void handleCompilationError(String errorMessage) {
+        // We escape the content of the message for new tests since user can embed there anything
+        String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
+        // Extract the line numbers of the errors
+        List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
+        // Store them in the session so they can be picked up later
+        previousSubmission.setErrorLines(errorLines);
+        // We introduce our decoration
+        String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+
+        messages.add(decorate).escape(false).alert();
+    }
+
 
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
@@ -1056,8 +979,8 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
-                                 int gameId, MeleeGame game,
-                                 int playerId) throws IOException {
+            int gameId, MeleeGame game,
+            int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add("You cannot claim mutants as equivalent in this game anymore.");

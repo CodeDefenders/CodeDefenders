@@ -351,9 +351,13 @@ public class LlmService {
             } else {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
-        } catch (IOException | GameManagingUtils.MutantCreationException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
+        } catch (GameManagingUtils.MutantCreationException e) {
+            logger.warn("Could not submit mutant. Reason: {} \nFull mutant text:\n{}",
+                    e.getDetailedReason().orElse("Unknown"), mutantSrc);
+        }
+        finally {
             requestContextController.deactivate();
         }
     }

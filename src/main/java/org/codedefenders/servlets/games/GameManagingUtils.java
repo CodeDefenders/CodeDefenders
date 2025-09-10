@@ -41,6 +41,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -314,6 +315,18 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public static class MutantCreationException extends Exception {
+        private String detailedReason;
+        public MutantCreationException() {
+            super();
+        }
+
+        public MutantCreationException(String detailedReason) {
+            this.detailedReason = detailedReason;
+        }
+
+        public Optional<String> getDetailedReason() {
+            return Optional.ofNullable(detailedReason);
+        }
     }
 
     public CreateBattlegroundMutantResult createBattlegroundMutant(MultiplayerGame game, int userId, String code)
@@ -460,11 +473,26 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
         // then we get the PLAYER_ID when we get id of the mutants' creator?
-        Mutant newMutant = createMutant(game.getId(), game.getClassId(), mutantText, userId,
-                // TODO Should we use a different directory structure for MELEE GAMES?
-                MODE_BATTLEGROUND_DIR);
-        if (newMutant == null) {
-            throw new MutantCreationException();
+
+        Mutant newMutant;
+        //noinspection DuplicatedCode
+        try {
+            newMutant = createMutant(game.getId(), game.getClassId(), mutantText, userId,
+                    // TODO Should we use a different directory structure for MELEE GAMES?
+                    MODE_BATTLEGROUND_DIR);
+            if (newMutant == null) {
+                throw new MutantCreationException();
+            }
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                throw new MutantCreationException("Error submitting the mutant: data too long. " +
+                        "Maybe you made too many changes?");
+            } else {
+                logger.error("Database error while saving the mutant: {}", e.getMessage());
+                throw new MutantCreationException("Database error while saving the mutant.");
+            }
+
+
         }
         TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
                 TargetExecution.Target.COMPILE_MUTANT);
