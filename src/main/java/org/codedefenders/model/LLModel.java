@@ -219,4 +219,23 @@ public class LLModel {
             return m.type == type && (m.getName() == null && name == null || m.getName().equals(name));
         } else return false;
     }
+
+    /**
+     * Loads all values except name and type from the other model.
+     */
+    public void copyValues(LLModel other) {
+        active = other.active;
+
+        attackerPrompt = other.attackerPrompt;
+        attackerDependencies = other.attackerDependencies;
+        attackerDependencyPrompt = other.attackerDependencyPrompt;
+        attackerMethodFocus = other.attackerMethodFocus;
+        attackerMethodFocusPrompt = other.attackerMethodFocusPrompt;
+
+        defenderPrompt = other.defenderPrompt;
+        defenderDependencies = other.defenderDependencies;
+        defenderDependencyPrompt = other.defenderDependencyPrompt;
+        defenderMethodFocus = other.defenderMethodFocus;
+        defenderMethodFocusPrompt = other.defenderMethodFocusPrompt;
+    }
 }

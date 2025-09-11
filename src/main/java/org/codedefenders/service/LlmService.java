@@ -21,6 +21,7 @@ package org.codedefenders.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -247,21 +248,28 @@ public class LlmService {
         }
     }
 
-    public void finishThread(AbstractGame game, Role role) {
+    public void finishPlayer(AbstractGame game, Role role) {
+        finishPlayer(game.getId(), role);
+    }
+
+    public void finishPlayer(int gameId, Role role) {
         if (role == Role.PLAYER) {
-            activeLlmAttackers.remove(game.getId());
-            activeLlmDefenders.remove(game.getId());
+            activeLlmAttackers.remove(gameId);
+            activeLlmDefenders.remove(gameId);
         } else {
-            getCorrectMap(role).remove(game.getId());
+            getCorrectMap(role).remove(gameId);
         }
     }
 
-    private String generateTest(AbstractGame game, SimpleUser user) {
-        LLModel model = activeLlmDefenders.get(game.getId());
+    private String generateTest(AbstractGame game, SimpleUser user) throws NoSuchModelException {
+        final LLModel model = activeLlmDefenders.get(game.getId());
         if (model == null) {
             return null;
         }
-        model = llmRepo.getModelFromName(model.getName(), model.getType(), true).orElseThrow();
+        llmRepo.loadModel(model);
+        if (!model.isActive()) {
+            throw new NoSuchModelException(model.getType(), model.getName());
+        }
         LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
         String systemMessage = model.getDefenderPrompt().orElse(defaultModel.getDefenderPrompt().orElseThrow());
 
@@ -315,7 +323,7 @@ public class LlmService {
         llmExecutor.shutdownNow();
     }
 
-    private String generateMutant(AbstractGame game, SimpleUser user) {
+    private String generateMutant(AbstractGame game, SimpleUser user) throws NoSuchModelException {
         StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
 
         LLModel model = activeLlmAttackers.get(game.getId());
@@ -323,7 +331,10 @@ public class LlmService {
             return null;
         }
         LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
-        model = llmRepo.getModelFromName(model.getName(), model.getType(), true).orElseThrow();
+        llmRepo.loadModel(model);
+        if (!model.isActive()) {
+            throw new NoSuchModelException(model.getType(), model.getName());
+        }
         String systemMessage = model.getAttackerPrompt().orElse(defaultModel.getAttackerPrompt().orElseThrow());
 
         String firstDependencyName = null;//TODO Gibt's hierfür bessere Möglichkeiten? Gefahr,
@@ -354,7 +365,7 @@ public class LlmService {
                 formattedResult = formattedResult.substring(0, lastNewline);
             }
         }
-        logger.info("LLM attacker generated test: {}", formattedResult);
+        logger.info("LLM attacker generated mutant: {}", formattedResult);
         return formattedResult;
     }
 
@@ -400,6 +411,21 @@ public class LlmService {
         return listOfPossibilities;
     }
 
+    /**
+     * Stop all llm players with that model.
+     */
+    public void closeModel(LLModel model) {
+        closeModel(model, Role.ATTACKER);
+        closeModel(model, Role.DEFENDER);
+    }
+
+    private void closeModel(LLModel model, Role role) {
+        new HashSet<>(getCorrectMap(role).entrySet()).stream()
+                .filter(entry -> model.equals(entry.getValue()))
+                .mapToInt(Map.Entry::getKey)
+                .forEach(gameId -> finishPlayer(gameId, role));
+    }
+
     private Optional<MethodDescription> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user) {
         List<MethodDescription> methods = getMethodsWithLivingMutants(game, user);
         if (!methods.isEmpty()) {
@@ -435,7 +461,7 @@ public class LlmService {
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
                     if (!attackAvailable && !defendAvailable) {
-                        finishThread(game, role);
+                        finishPlayer(game, role);
                         return;
                     }
                     boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
@@ -458,9 +484,22 @@ public class LlmService {
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
                         game.getId(), role);
+            } catch (NoSuchModelException e) {
+                logger.error("The model is no longer active, llm player thread has been aborted.");
             }
         } else {
-            finishThread(game, role);
+            finishPlayer(game, role);
+        }
+    }
+
+    public static class NoSuchModelException extends Exception {
+        LLMType type;
+        String name;
+
+        public NoSuchModelException(LLMType type, String name) {
+            super("No such model: type: " + type + ", name: " + name);
+            this.type = type;
+            this.name = name;
         }
     }
 }

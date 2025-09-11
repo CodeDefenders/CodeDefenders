@@ -1288,9 +1288,10 @@ public class GameManagingUtils implements IGameManagingUtils {
      * Returns a model that includes type and name from a single String in the format of 'TYPE|name',
      * for example {@code OPENAI|gpt-4.0}. The model has to exist and be active.
      * @throws IllegalArgumentException Thrown if the String doesn't follow this format, if there is no such type
-     * defined, or if there is no such active model in the database.
+     * defined
+     * @throws LlmService.NoSuchModelException If there is no such active model in the database.
      */
-    public LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException {
+    public LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, LlmService.NoSuchModelException {
         if (s.equals("NONE")) {
             return null;
         } else {
@@ -1299,18 +1300,10 @@ public class GameManagingUtils implements IGameManagingUtils {
                 logger.error("Malformed defender form value: {}", s);
                 throw new IllegalArgumentException("Malformed defender form value: " + s);
             }
-            try {
                 LLMType type = LLMType.valueOf(split[0]);
                 String name = split[1];
                 return llmRepo.getModelFromName(name, type, true).orElseThrow(
-                        () -> new IllegalArgumentException("Tried to set an LLM " +
-                                "defender's model to " + type +":" + name + ", but it doesn't" +
-                                " exist or isn't active."));
-            } catch (IllegalArgumentException e) {
-                logger.error("Unknown LLM type with type {} and name {}", split[0], split[1]);
-                throw new IllegalArgumentException("Unknown LLM type with type " + split[0]  + " and name "
-                        + split[1], e);
-            }
+                        () -> new LlmService.NoSuchModelException(type, name));
         }
     }
 }

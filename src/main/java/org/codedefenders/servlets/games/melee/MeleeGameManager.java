@@ -346,12 +346,16 @@ public class MeleeGameManager extends HttpServlet {
                 try {
 
                     if (checkForPrivileges(game, request, response)) {
-                        ServletUtils.getStringParameter(request, "defenderModel").ifPresent(s ->
+                        var defenderParam = ServletUtils.getStringParameter(request, "defenderModel");
+                        if(defenderParam.isPresent()) {
                                 llmService.setPlayerModel(game, Role.DEFENDER,
-                                        gameManagingUtils.getLLModelFromSingleValue(s)));
-                        ServletUtils.getStringParameter(request, "attackerModel").ifPresent(s ->
-                                llmService.setPlayerModel(game, Role.ATTACKER,
-                                        gameManagingUtils.getLLModelFromSingleValue(s)));
+                                        gameManagingUtils.getLLModelFromSingleValue(defenderParam.get()));
+                        }
+                        var attackerParam = ServletUtils.getStringParameter(request, "attackerModel");
+                        if(attackerParam.isPresent()) {
+                            llmService.setPlayerModel(game, Role.ATTACKER,
+                                    gameManagingUtils.getLLModelFromSingleValue(attackerParam.get()));
+                        }
                         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                         return;
                     }
@@ -360,6 +364,10 @@ public class MeleeGameManager extends HttpServlet {
                     logger.error(e.getMessage());
                     Redirect.redirectBack(request, response);
                     return;
+                } catch (LlmService.NoSuchModelException e) {
+                    messages.add("The selected model is no longer active.");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
                 }
             }
             default:

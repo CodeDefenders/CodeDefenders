@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -34,6 +35,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.model.LLMType;
 import org.codedefenders.model.LLModel;
 import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.service.LlmService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -59,6 +61,9 @@ public class LlmApi extends HttpServlet {
 
     @Inject
     URLUtils url;
+
+    @Inject
+    private LlmService llmService;
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // TODO: Authentication
@@ -122,6 +127,9 @@ public class LlmApi extends HttpServlet {
             case "setActive" -> {
                 if (model.getType() != null && model.getName() != null) {
                     llmRepo.setActive(model.getName(), model.getType(), model.isActive());
+                    if (!model.isActive()) {
+                        llmService.closeModel(model);
+                    }
                 } else {
                     logger.error("Name ({}) or type ({}) is missing for setActive-action",
                             model.getName(), model.getType());

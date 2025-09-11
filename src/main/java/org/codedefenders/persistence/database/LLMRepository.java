@@ -31,6 +31,7 @@ import org.codedefenders.model.LLMType;
 import org.codedefenders.model.LLModel;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
+import org.codedefenders.service.LlmService;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,7 +133,7 @@ public class LLMRepository {
         defaultModel.setDefenderDependencyPrompt(DEFAULT_DEFENDER_DEPS_PROMPT);
         defaultModel.setDefenderMethodFocusPrompt(DEFAULT_DEFENDER_FOCUS_PROMPT);
 
-        updateModel(defaultModel);
+        saveModel(defaultModel);
 
     }
 
@@ -140,7 +141,7 @@ public class LLMRepository {
      * Saves the values of the model in the database. If the model already exists, update its values,
      * if it doesn't exist, create a new entry.
      */
-    public void updateModel(LLModel model) {
+    public void saveModel(LLModel model) {
         boolean alreadyExists =
                 queryRunner.query("SELECT model_name FROM llm_models WHERE model_name = ? AND type = ?",
                         ResultSet::isBeforeFirst, model.getName(), model.getType().name());
@@ -223,6 +224,19 @@ public class LLMRepository {
         @Language("SQL")
         String sql = "UPDATE llm_models SET active = ? WHERE model_name = ? and type = ?";
         queryRunner.update(sql, active, name, type.name());
+    }
+
+    /**
+     * Update the values of an existing {@link LLModel}. It is identified by type and name, all other values are filled
+     * up from DB.
+     * @throws org.codedefenders.service.LlmService.NoSuchModelException If there is no model with this type and name
+     * in the database.
+     */
+    public void loadModel(LLModel model) throws LlmService.NoSuchModelException {
+        LLModel fromDB = getModelFromName(model.getName(), model.getType(), false).orElseThrow(
+                () -> new LlmService.NoSuchModelException(model.getType(), model.getName())
+        );
+        model.copyValues(fromDB);
     }
 
     public Optional<LLModel> getDefaultModel() {
