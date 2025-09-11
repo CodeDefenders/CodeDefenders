@@ -109,30 +109,6 @@
             </tbody>
         </table>
 
-        <h2>Active LLM Defenders:</h2>
-        <table id="defenderTable" class="table table-v-align-middle table-striped">
-            <thead>
-            <tr>
-                <th>GameID</th>
-                <th>Class</th>
-                <th>Creator</th>
-                <th>#Players</th>
-                <th>Model</th>
-                <th>Control</th>
-            </tr>
-            </thead>
-            <tbody id="defenderBody">
-            <tr>
-                <td>123</td>
-                <td>Helloword</td>
-                <td>Peter</td>
-                <td>5</td>
-                <td>openai:gpt4.0</td>
-                <td>2 buttons</td>
-            </tr>
-            </tbody>
-        </table>
-
         <script type="module">
 
             const rows = document.querySelectorAll("[id^='model-row-']");

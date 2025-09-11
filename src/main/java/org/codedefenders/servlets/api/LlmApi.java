@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.game.Role;
 import org.codedefenders.model.LLMType;
 import org.codedefenders.model.LLModel;
 import org.codedefenders.persistence.database.LLMRepository;
@@ -65,6 +66,19 @@ public class LlmApi extends HttpServlet {
     @Inject
     private LlmService llmService;
 
+    /**
+     * Send back information about LLMs or LLM players. Supported actions:
+     * <p>
+     * - getall -> Send back a list of all Large Language Models. If the "mustBeActive" parameter is present,
+     * only active models are sent back.
+     * </p>
+     * <p>
+     * - get -> Send back a single LLM identified by type and name
+     * </p>
+     * <p>
+     *     - getForGame -> Send back a single LLM that is active for the supplied game and role
+     * </p>
+     */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // TODO: Authentication
 
@@ -80,7 +94,8 @@ public class LlmApi extends HttpServlet {
             Gson gson = new Gson();
             switch (action.get()) {
                 case "getall" -> {
-                    List<LLModel> models = llmRepo.getAllModels();
+                    boolean mustBeActive = req.getParameter("mustBeActive") != null;
+                    List<LLModel> models = llmRepo.getAllModels(mustBeActive);
                     Type typeOfSrc = new TypeToken<List<LLModel>>() {
                     }.getType();
                     returnJson = gson.toJson(models, typeOfSrc);
@@ -98,6 +113,22 @@ public class LlmApi extends HttpServlet {
 
                     } else {
                         logger.error("Missing name ({}) or type ({}) for get-action", name, type);
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        return;
+                    }
+                }
+                case "getForGame" -> {
+                    Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
+                    Optional<Integer> gameId = ServletUtils.gameId(req);
+                    if (gameId.isPresent() && role.isPresent()) {
+                        Optional<LLModel> model = llmService.getModelForGame(gameId.get(), role.get());
+                        if (model.isPresent()) {
+                            returnJson = gson.toJson(model.get());
+                        } else {
+                            returnJson = gson.toJson(null);
+                        }
+                    } else {
+                        logger.error("gameId ({}) or role ({}) are missing.", gameId, role);
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         return;
                     }

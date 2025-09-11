@@ -257,18 +257,13 @@ public class LLMRepository {
     }
 
     public List<LLModel> getAllModels() {
-        @Language("SQL")
-        String sql = "SELECT * FROM llm_models WHERE type != ?;";
-
-        List<LLModel> modelsInDB =  queryRunner.query(
-                sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
-
-        return modelsInDB.stream().filter(this::modelIsInConfig).toList();
+        return getAllModels(false);
     }
 
-    public List<LLModel> getActiveModels() {
+    public List<LLModel> getAllModels(boolean mustBeActive) {
         @Language("SQL")
-                String sql = "SELECT * FROM llm_models WHERE type != ? AND active = true";
+        String sql = "SELECT * FROM llm_models WHERE type != ? " + (mustBeActive ? "AND active = true;" : ";");
+
         List<LLModel> modelsInDB =  queryRunner.query(
                 sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
 

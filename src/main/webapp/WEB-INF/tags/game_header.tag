@@ -55,16 +55,13 @@
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     request.setAttribute("gameType", game instanceof PuzzleGame ? "puzzle"
             : game instanceof MultiplayerGame ? "multiplayer" : "melee");
-
-
-    LlmService llmService = CDIUtil.getBeanFromCDI(LlmService.class);
-    LLMRepository llmRepo = CDIUtil.getBeanFromCDI(LLMRepository.class);
-    List<LLModel> models = llmRepo.getActiveModels();
-    request.setAttribute("activeModels", models);
-    request.setAttribute("defenderModel", llmService.getModelForGame(game, Role.DEFENDER));
-    request.setAttribute("attackerModel", llmService.getModelForGame(game, Role.ATTACKER));
-
     int gameId = game.getId();
+    request.setAttribute("gameId", gameId);
+
+
+    LLMRepository llmRepo = CDIUtil.getBeanFromCDI(LLMRepository.class);
+    List<LLModel> models = llmRepo.getAllModels(true);
+
 
     Role role = null;
     boolean mayChooseRole = true;
@@ -164,39 +161,17 @@
 
         <% if (!(game instanceof PuzzleGame) && !models.isEmpty()) {
         %>
+        <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
+                data-bs-toggle="modal" data-bs-target="#llm-modal">
+            Manage LLM players
+        </button>
         <form id="setLlmPlayer" action="${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}" method="post">
-            <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
-                    data-bs-toggle="modal" data-bs-target="#llm-modal">
-                Manage LLM players
-            </button>
+
             <input type="hidden" name="formType" value="setLlmPlayer">
             <input type="hidden" name="gameId" value="${gameProducer.game.id}">
-            <t:modal title="Manage LLM players" id="llm-modal">
-                <jsp:attribute name="content">
-                    <div class="mb-3">
-                        <label for="defenderSelect" class="form-label">Choose defender model</label>
-                        <select class="form-select" id="defenderSelect" name="defenderModel">
-                            <option ${defenderModel == null ? "selected" : ""} value="NONE">Don't use an LLM defender</option>
-                            <c:forEach items="${activeModels}" var="model">
-                                <option ${defenderModel.equals(model) ? "selected" : ""} value="${model.type}|${model.name}">${model.type}: ${model.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
+            <t:llm_select_modal htmlId="llm-modal"  gameId="${gameId}" gameType="${gameType}">
 
-                    <div class="mb-3">
-                        <label for="attackerSelect" class="form-label">Choose attacker model</label>
-                        <select class="form-select" id="attackerSelect" name="attackerModel">
-                            <option ${attackerModel == null ? "selected" : ""} value="NONE">Don't use an LLM defender</option>
-                            <c:forEach items="${activeModels}" var="model">
-                                <option ${attackerModel.equals(model) ? "selected" : ""} value="${model.type}|${model.name}">${model.type}: ${model.name}</option>
-                            </c:forEach>
-                        </select>
-                    </div>
-                </jsp:attribute>
-                <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-primary">Confirm</button>
-                </jsp:attribute>
-            </t:modal>
+            </t:llm_select_modal>
         </form>
 
         <%

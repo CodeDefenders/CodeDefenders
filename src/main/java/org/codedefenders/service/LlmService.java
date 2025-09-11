@@ -192,9 +192,9 @@ public class LlmService {
 
     public boolean isLlmPlayerActive(AbstractGame game, Role role) {
         if (role == Role.PLAYER) {
-            return getModelForGame(game, Role.DEFENDER) != null || getModelForGame(game, Role.ATTACKER) != null;
+            return getModelForGame(game, Role.DEFENDER).isPresent() || getModelForGame(game, Role.ATTACKER).isPresent();
         } else {
-            return getModelForGame(game, role) != null;
+            return getModelForGame(game, role).isPresent();
         }
     }
 
@@ -224,8 +224,15 @@ public class LlmService {
         }
     }
 
-    public LLModel getModelForGame(AbstractGame game, Role role) {
-        return getCorrectMap(role).get(game.getId());
+    /**
+     * Returns the model currently active for a specific game, or an empty Optional if there is no active model.
+     */
+    public Optional<LLModel> getModelForGame(AbstractGame game, Role role) {
+        return getModelForGame(game.getId(), role);
+    }
+
+    public Optional<LLModel> getModelForGame(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectMap(role).get(gameId));
     }
 
     public void setPlayerModel(AbstractGame game, Role role, LLModel model) {
