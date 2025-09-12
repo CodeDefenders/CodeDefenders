@@ -60,6 +60,7 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.LlmUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +81,8 @@ public class LlmService {
 
     private final ExecutorService llmExecutor;
     private final ScheduledExecutorService organizerExecutor;
+
+    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "The code outside of methods";
 
     Configuration config;
     GameRepository gameRepository;
@@ -293,7 +296,7 @@ public class LlmService {
         }
 
         if (model.isDefenderMethodFocus()) {
-            Optional<MethodDescription> methodDescription = getRandomMethodWithLivingMutant(game, user);
+            Optional<String> methodDescription = getRandomMethodWithLivingMutant(game, user);
             if (methodDescription.isPresent()) { //TODO Mutants outside of methods
                 systemMessage = String.format(model.getDefenderMethodFocusPrompt().
                         orElse(defaultModel.getDefenderMethodFocusPrompt().orElseThrow()), methodDescription.get());
@@ -314,7 +317,7 @@ public class LlmService {
         try {
             if (game instanceof MultiplayerGame multiplayerGame) {
                 gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
-            } else {//TODO
+            } else {//TODO Ergibt das Sinn? Ist aber eh alles komisch mit battleground und melee
                 gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
             }
         } catch (IOException e) {
@@ -398,30 +401,36 @@ public class LlmService {
     }
 
     /**
-     * Returns a list of all methods that contain a living mutant that haven't been created by the user.
+     * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
+     * living mutant that haven't been created by the user.
      * If one method contains several living mutants, it occurs several times in the list.
+     * If a mutant exists outside a method, the String is {@link LlmService#OUTSIDE_OF_METHOD_DESCRIPTION}.
      */
-    private List<MethodDescription> getMethodsWithLivingMutants(AbstractGame game, SimpleUser user) {
+    private List<String> getMethodsWithLivingMutants(AbstractGame game, SimpleUser user) {
         List<MutantDTO> mutants = gameService.getMutants(user, game);
         List<MethodDescription> methods = game.getCUT().getMethodDescriptions();
         GameAccordionMapping mapping = GameAccordionMapping.computeForMutants(methods, mutants);
         HashMap<MethodDescription, SortedSet<Integer>> map = mapping.elementsPerMethod;
-        List<MethodDescription> listOfPossibilities = new ArrayList<>();
+        List<String> listOfPossibilities = new ArrayList<>();
         for (MethodDescription m : map.keySet()) {
             for (Integer mutantId : map.get(m)) {
                 Mutant mutant = mutantRepository.getMutantById(mutantId);
                 if (mutant.isAlive() && mutant.getCreatorId() != user.getId()) {
-                    listOfPossibilities.add(m);
+                    listOfPossibilities.add(m.getDescription());
                 }
             }
         }
+        mapping.elementsOutsideMethods.stream().
+                map(mutantId -> mutantRepository.getMutantById(mutantId))
+                .filter(mutant -> mutant.isAlive() && mutant.getCreatorId() != user.getId())
+                .forEach(mutant -> listOfPossibilities.add(OUTSIDE_OF_METHOD_DESCRIPTION));
         return listOfPossibilities;
     }
 
     /**
      * Stop all llm players with that model.
      */
-    public void closeModel(LLModel model) {
+    public void closeModel(@NotNull LLModel model) {
         closeModel(model, Role.ATTACKER);
         closeModel(model, Role.DEFENDER);
     }
@@ -433,8 +442,12 @@ public class LlmService {
                 .forEach(gameId -> finishPlayer(gameId, role));
     }
 
-    private Optional<MethodDescription> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user) {
-        List<MethodDescription> methods = getMethodsWithLivingMutants(game, user);
+    /**
+     * Returns a random method that contains a living mutant that hasn't been created by the user. The more living
+     * mutants there are in a method, the more likely it is to be selected.
+     */
+    private Optional<String> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user) {
+        List<String> methods = getMethodsWithLivingMutants(game, user);
         if (!methods.isEmpty()) {
             return Optional.of(methods.get((int) (Math.random() * methods.size())));
         } else {
@@ -442,6 +455,12 @@ public class LlmService {
         }
     }
 
+    /**
+     * This is supposed to run in a separate thread created by {@link LlmService#llmExecutor}.
+     * It only runs for a single action, i.e. one mutant or one test, and then schedules another execution of itself
+     * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
+     * the model has been deactivated, it terminates itself.
+     */
     public void runLlmAction(AbstractGame game, final Role role, final Random random) {
 
         int userId = switch (role) {

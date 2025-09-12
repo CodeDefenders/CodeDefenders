@@ -159,6 +159,7 @@
                                     <i class="fa fa-repeat"></i>
                                 </button>
                                 <button class="btn btn-sm btn-dark" data-bs-toggle="modal" type="button"
+                                        title="Manage LLM players"
                                         data-bs-target="#llm-modal-<%=gid%>"><i class="fa fa-industry"></i></button>
                                 <t:llm_select_modal gameId="<%=String.valueOf(gid)%>" gameType="multiplayer" htmlId="<%=\"llm-modal-\" + gid%>">
 
@@ -401,6 +402,7 @@
                                     <i class="fa fa-repeat"></i>
                                 </button>
                                 <button class="btn btn-sm btn-dark" data-bs-toggle="modal" type="button"
+                                        title="Manage LLM players"
                                         data-bs-target="#llm-modal-<%=gid%>"><i class="fa fa-industry"></i></button>
                                 <t:llm_select_modal gameId="<%=String.valueOf(gid)%>" gameType="melee" htmlId="<%=\"llm-modal-\" + gid%>">
 
