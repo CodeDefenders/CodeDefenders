@@ -297,23 +297,28 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         int gameId = game.getId();
+        final String action = ServletUtils.formType(request);
 
         if (!game.hasUserJoined(login.getUserId())) {
-            logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
-            Redirect.redirectBack(request, response);
-            return;
+            if (!action.equals("setLlmPlayer") || !login.isAdmin()) {
+                logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
+                Redirect.redirectBack(request, response);
+                return;
+            }
         }
 
-        final String action = ServletUtils.formType(request);
+
         final Optional<SimpleUser> user = userService.getSimpleUserById(login.getUserId());
 
         final int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 || user.isEmpty()) {
-            // Something odd with the registration - TODO
-            logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
-            Redirect.redirectBack(request, response);
-            return;
+            if (!action.equals("setLlmPlayer") || !login.isAdmin()) {
+                // Something odd with the registration - TODO
+                logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
+                Redirect.redirectBack(request, response);
+                return;
+            }
         }
 
         switch (action) {

@@ -76,7 +76,7 @@ public class LlmApi extends HttpServlet {
      * - get -> Send back a single LLM identified by type and name
      * </p>
      * <p>
-     *     - getForGame -> Send back a single LLM that is active for the supplied game and role
+     *     - getLlmForGame -> Send back a single LLM that is active for the supplied game and role
      * </p>
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -117,7 +117,7 @@ public class LlmApi extends HttpServlet {
                         return;
                     }
                 }
-                case "getForGame" -> {
+                case "getLlmForGame" -> {
                     Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
                     Optional<Integer> gameId = ServletUtils.gameId(req);
                     if (gameId.isPresent() && role.isPresent()) {
@@ -140,7 +140,6 @@ public class LlmApi extends HttpServlet {
                 }
             }
 
-            logger.info(returnJson);//TODO Entfernen!
             resp.setContentType("application/json");
             PrintWriter out = resp.getWriter();
             out.print(returnJson);

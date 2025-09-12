@@ -165,14 +165,9 @@
                 data-bs-toggle="modal" data-bs-target="#llm-modal">
             Manage LLM players
         </button>
-        <form id="setLlmPlayer" action="${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}" method="post">
+        <t:llm_select_modal htmlId="llm-modal" gameId="${gameId}" gameType="${gameType}">
 
-            <input type="hidden" name="formType" value="setLlmPlayer">
-            <input type="hidden" name="gameId" value="${gameProducer.game.id}">
-            <t:llm_select_modal htmlId="llm-modal"  gameId="${gameId}" gameType="${gameType}">
-
-            </t:llm_select_modal>
-        </form>
+        </t:llm_select_modal>
 
         <%
                 }

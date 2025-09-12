@@ -110,7 +110,7 @@ class InfoApi {
     }
 
     static async getLlmForGame(gameId, role) {
-        return await InfoApi.fetchJSON(`${contextPath}api/llm?action=getForGame&gameId=` + gameId + "&role=" + role);
+        return await InfoApi.fetchJSON(`${contextPath}api/llm?action=getLlmForGame&gameId=` + gameId + "&role=" + role);
     }
 
     static async getActiveLlms() {

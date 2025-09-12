@@ -31,36 +31,31 @@
 <%@ attribute name="htmlId" required="true" %>
 
 <div>
-    <form id="setLlmPlayer" action="${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}"
-          method="post">
 
-        <input type="hidden" name="formType" value="setLlmPlayer">
-        <input type="hidden" name="gameId" value="${gameId}">
         <t:modal title="Manage LLM players" id="${htmlId}">
                 <jsp:attribute name="content">
-                    <div id="loading-div" class="loading loading-bg-gray loading-height-200">
+                    <div id="${htmlId}-loading-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3">
-                            <label for="defenderSelect" class="form-label">Choose defender model</label>
-                            <select class="form-select" id="defenderSelect" name="defenderModel">
-                                <option id="no-defender" value="NONE">Don't use an LLM defender
+                            <label for="${htmlId}-defenderSelect" class="form-label">Choose defender model</label>
+                            <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
+                                <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
                                 </option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="attackerSelect" class="form-label">Choose attacker model</label>
-                            <select class="form-select" id="attackerSelect" name="attackerModel">
-                                <option id="no-attacker" value="NONE">Don't use an LLM attacker
+                            <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker model</label>
+                            <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
+                                <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
                                 </option>
                             </select>
                         </div>
                     </div>
                 </jsp:attribute>
             <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-primary">Confirm</button>
+                    <button type="button" id ="${htmlId}-submit-button" class="btn btn-primary">Confirm</button>
                 </jsp:attribute>
         </t:modal>
-    </form>
 
     <script>
 
@@ -88,18 +83,35 @@
         (async function () {
             const {InfoApi} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
             const modal = document.getElementById("${htmlId}")
-            const loadingDiv = document.getElementById("loading-div");
-            const defenderSelect = document.getElementById("defenderSelect");
-            const attackerSelect = document.getElementById("attackerSelect");
+            const loadingDiv = document.getElementById("${htmlId}-loading-div");
+            const defenderSelect = document.getElementById("${htmlId}-defenderSelect");
+            const attackerSelect = document.getElementById("${htmlId}-attackerSelect");
+            const submitButton = document.getElementById("${htmlId}-submit-button");
+            submitButton.addEventListener('click', async function () {
+                const params = new URLSearchParams();
+                params.append("formType", "setLlmPlayer");
+                params.append("gameId", "${gameId}");
+                params.append("defenderModel", defenderSelect.value);
+                params.append("attackerModel", attackerSelect.value);
+                await fetch("${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: params.toString()
+                });
+                location.reload();
+            })
+
 
             modal.addEventListener('shown.bs.modal', async function () {
                 const defenderModel = await InfoApi.getLlmForGame(${gameId}, "DEFENDER");
                 const attackerModel = await InfoApi.getLlmForGame(${gameId}, "ATTACKER");
                 const activeModels = await InfoApi.getActiveLlms();
 
-                const noDefenderOption = document.getElementById("no-defender");
+                const noDefenderOption = document.getElementById("${htmlId}-no-defender");
                 noDefenderOption.selected = defenderModel == null;
-                const noAttackerOption = document.getElementById("no-attacker");
+                const noAttackerOption = document.getElementById("${htmlId}-no-attacker");
                 noAttackerOption.selected = attackerModel == null;
 
                 addOptions(defenderSelect, activeModels, defenderModel);
