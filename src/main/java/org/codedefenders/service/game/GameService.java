@@ -68,7 +68,7 @@ public class GameService implements IGameService {
             .help("How long the validation whether an as equivalent accepted mutant is killable took")
             .unit("seconds")
             // This can take rather long so add a 25.0-second bucket
-            .buckets(new double[] {0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0,
+            .buckets(new double[]{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0,
                     25.0})
             .labelNames("gameType")
             .register()
@@ -402,5 +402,26 @@ public class GameService implements IGameService {
             gse.setGameId(gameId);
             notificationService.post(gse);
         });
+    }
+
+    public boolean isLineCovered(AbstractGame game, SimpleUser perspectiveUser, int lineNumber) {
+        for (TestDTO test : getTests(perspectiveUser, game)) {
+            if (test.getCreator() != perspectiveUser && test.getLinesCovered().contains(lineNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isAnyLineCovered(AbstractGame game, SimpleUser perspectiveUser, List<Integer> lineNumbers) {
+        for (TestDTO test : getTests(perspectiveUser, game)) {
+            if (test.getCreator() != perspectiveUser)
+                for (int lineNumber : lineNumbers) {
+                    if (test.getLinesCovered().contains(lineNumber)) {
+                        return true;
+                    }
+                }
+        }
+        return false;
     }
 }

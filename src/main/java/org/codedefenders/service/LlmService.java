@@ -83,7 +83,7 @@ public class LlmService {
     private final ScheduledExecutorService organizerExecutor;
 
     private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)";
-    private static final int EQUIVALENT_POINT_RESTRICTION = 10; //TODO Als system setting??
+    private static final int EQUIVALENT_POINT_RESTRICTION = 0; //TODO Als system setting??
 
     Configuration config;
     GameRepository gameRepository;
@@ -410,12 +410,8 @@ public class LlmService {
             requestContextController.activate();
             try {
                 logger.info("Claiming equivalence on mutant {}", potentialEquivalent.get());
-                if (game instanceof MultiplayerGame) {
-                    gameManagingUtils.claimBattlegroundEquivalence((MultiplayerGame) game, user.getId(),
-                            potentialEquivalent.get().getLines());
-                } else {
-                    //TODO
-                }
+                gameManagingUtils.claimBattlegroundEquivalence(game, user.getId(),
+                        potentialEquivalent.get().getLines());
             } finally {
                 requestContextController.deactivate();
             }
@@ -525,7 +521,7 @@ public class LlmService {
                     game = gameRepository.getGame(game.getId());
                     submitMutant(game, mutantSrc);
                 } else {
-                    //TODO equivalence
+                    claimEquivalent(user, game, random);
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
                     if (!attackAvailable && !defendAvailable) {

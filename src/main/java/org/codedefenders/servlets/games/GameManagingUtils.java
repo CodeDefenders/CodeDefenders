@@ -1031,7 +1031,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     ) {
     }
 
-    public ClaimEquivalentResult claimBattlegroundEquivalence(MultiplayerGame game, int userId, List<Integer> mutantLines) {
+    public ClaimEquivalentResult claimBattlegroundEquivalence(AbstractGame game, int userId, List<Integer> mutantLines) {
         var user = userService.getSimpleUserById(userId).orElseThrow();
         int playerId = playerRepo.getPlayerIdForUserAndGame(userId, game.getId());
 
@@ -1039,7 +1039,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         List<String> messages = new ArrayList<>();
 
         mutantLines = mutantLines.stream()
-                .filter(game::isLineCovered)
+                .filter(l ->  gameService.isLineCovered(game, user, l))
                 .toList();
 
         if (mutantLines.isEmpty()) {
