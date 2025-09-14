@@ -82,7 +82,8 @@ public class LlmService {
     private final ExecutorService llmExecutor;
     private final ScheduledExecutorService organizerExecutor;
 
-    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "The code outside of methods";
+    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)";
+    private static final int EQUIVALENT_POINT_RESTRICTION = 10; //TODO Als system setting??
 
     Configuration config;
     GameRepository gameRepository;
@@ -116,7 +117,6 @@ public class LlmService {
                       GameRepository gameRepository,
                       MutantRepository mutantRepository,
                       GameManagingUtils gameManagingUtils,
-                      RequestContextController requestContextController,
                       GameService gameService,
                       LLMRepository llmRepo) {
         this.config = config;
@@ -271,7 +271,7 @@ public class LlmService {
         }
     }
 
-    private String generateTest(AbstractGame game, SimpleUser user) throws NoSuchModelException {
+    private String generateTest(AbstractGame game, SimpleUser user, Random random) throws NoSuchModelException {
         final LLModel model = activeLlmDefenders.get(game.getId());
         if (model == null) {
             return null;
@@ -296,8 +296,8 @@ public class LlmService {
         }
 
         if (model.isDefenderMethodFocus()) {
-            Optional<String> methodDescription = getRandomMethodWithLivingMutant(game, user);
-            if (methodDescription.isPresent()) { //TODO Mutants outside of methods
+            Optional<String> methodDescription = getRandomMethodWithLivingMutant(game, user, random);
+            if (methodDescription.isPresent()) {
                 systemMessage = String.format(model.getDefenderMethodFocusPrompt().
                         orElse(defaultModel.getDefenderMethodFocusPrompt().orElseThrow()), methodDescription.get());
             }
@@ -401,6 +401,46 @@ public class LlmService {
     }
 
     /**
+     * Try to claim a random potentially equivalent mutant as equivalent, or do nothing if no such mutant is available.
+     */
+    private void claimEquivalent(SimpleUser user, AbstractGame game, Random random) {
+        Optional<MutantDTO> potentialEquivalent = getRandomPossiblyEquivalentMutant(game, user, random);
+        if (potentialEquivalent.isPresent()) {
+            RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
+            requestContextController.activate();
+            try {
+                logger.info("Claiming equivalence on mutant {}", potentialEquivalent.get());
+                if (game instanceof MultiplayerGame) {
+                    gameManagingUtils.claimBattlegroundEquivalence((MultiplayerGame) game, user.getId(),
+                            potentialEquivalent.get().getLines());
+                } else {
+                    //TODO
+                }
+            } finally {
+                requestContextController.deactivate();
+            }
+        }
+    }
+
+    /**
+     * Return one random mutant from the set of all mutants that can be marked as equivalent by the user
+     * and have acquired at least {@link LlmService#EQUIVALENT_POINT_RESTRICTION} points.
+     * Returns an empty Optional if there is no mutant that can be marked as equivalent.
+     */
+    private Optional<MutantDTO> getRandomPossiblyEquivalentMutant(AbstractGame game, SimpleUser user, Random random) {
+        List<MutantDTO> candidates = gameService.getMutants(user, game).stream()
+                .filter(MutantDTO::isCanMarkEquivalent)
+                .filter(m -> m.getPoints() >= EQUIVALENT_POINT_RESTRICTION)
+                .filter(m -> !m.getCreator().equals(user))
+                .toList();
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(candidates.get(random.nextInt(candidates.size())));
+        }
+    }
+
+    /**
      * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
      * living mutant that haven't been created by the user.
      * If one method contains several living mutants, it occurs several times in the list.
@@ -446,10 +486,10 @@ public class LlmService {
      * Returns a random method that contains a living mutant that hasn't been created by the user. The more living
      * mutants there are in a method, the more likely it is to be selected.
      */
-    private Optional<String> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user) {
+    private Optional<String> getRandomMethodWithLivingMutant(AbstractGame game, SimpleUser user, Random random) {
         List<String> methods = getMethodsWithLivingMutants(game, user);
         if (!methods.isEmpty()) {
-            return Optional.of(methods.get((int) (Math.random() * methods.size())));
+            return Optional.of(methods.get(random.nextInt(methods.size())));
         } else {
             return Optional.empty();
         }
@@ -476,7 +516,8 @@ public class LlmService {
         if (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
             try {
                 if (role == Role.DEFENDER) {
-                    String testSrc = generateTest(game, user);
+                    claimEquivalent(user, game, random);
+                    String testSrc = generateTest(game, user, random);
                     game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                     submitTest(game, testSrc);
                 } else if (role == Role.ATTACKER) {
@@ -484,6 +525,7 @@ public class LlmService {
                     game = gameRepository.getGame(game.getId());
                     submitMutant(game, mutantSrc);
                 } else {
+                    //TODO equivalence
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
                     if (!attackAvailable && !defendAvailable) {
@@ -497,7 +539,7 @@ public class LlmService {
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
                     } else {
-                        String testSrc = generateTest(game, user);
+                        String testSrc = generateTest(game, user, random);
                         game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                         submitTest(game, testSrc);
                     }
