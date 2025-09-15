@@ -492,6 +492,16 @@ public class LlmService {
     }
 
     /**
+     * Check if there are any open equivalent duels that the user has to react to (as a player or attacker).
+     */
+    private boolean hasOpenEquivalentDuel(SimpleUser user, AbstractGame game) {
+        return !gameService.getMutants(user, game).stream()
+                .filter(m -> m.getState() == Mutant.State.FLAGGED)
+                .filter(m -> m.getCreator().equals(user))
+                .toList().isEmpty();
+    }
+
+    /**
      * This is supposed to run in a separate thread created by {@link LlmService#llmExecutor}.
      * It only runs for a single action, i.e. one mutant or one test, and then schedules another execution of itself
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
@@ -517,6 +527,10 @@ public class LlmService {
                     game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                     submitTest(game, testSrc);
                 } else if (role == Role.ATTACKER) {
+                    while(hasOpenEquivalentDuel(user, game)) {
+                        logger.info("LLM attacker in game {} has an open equivalent duel.", game.getId());
+                        break;//TODO
+                    }
                     String mutantSrc = generateMutant(game, user);
                     game = gameRepository.getGame(game.getId());
                     submitMutant(game, mutantSrc);
