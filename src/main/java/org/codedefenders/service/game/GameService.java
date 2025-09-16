@@ -406,20 +406,8 @@ public class GameService implements IGameService {
 
     public boolean isLineCovered(AbstractGame game, SimpleUser perspectiveUser, int lineNumber) {
         for (TestDTO test : getTests(perspectiveUser, game)) {
-            if (test.getCreator() != perspectiveUser && test.getLinesCovered().contains(lineNumber)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isAnyLineCovered(AbstractGame game, SimpleUser perspectiveUser, List<Integer> lineNumbers) {
-        for (TestDTO test : getTests(perspectiveUser, game)) {
-            if (test.getCreator() != perspectiveUser)
-                for (int lineNumber : lineNumbers) {
-                    if (test.getLinesCovered().contains(lineNumber)) {
-                        return true;
-                    }
+                if (test.getLinesCovered().contains(lineNumber)) {
+                    return true;
                 }
         }
         return false;

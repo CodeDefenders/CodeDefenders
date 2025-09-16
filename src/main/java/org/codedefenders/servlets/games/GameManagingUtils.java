@@ -1038,17 +1038,20 @@ public class GameManagingUtils implements IGameManagingUtils {
         List<Mutant> mutantsAlive = game.getAliveMutants();
         List<String> messages = new ArrayList<>();
 
-        mutantLines = mutantLines.stream()
-                .filter(l ->  gameService.isLineCovered(game, user, l))
-                .toList();
+        List<Integer> coveredLines = new ArrayList<>();
+        for (Integer line : mutantLines) {
+            if (gameService.isLineCovered(game, user, line)) {
+                coveredLines.add(line);
+            }
+        }
 
-        if (mutantLines.isEmpty()) {
+        if (coveredLines.isEmpty()) {
             messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
             return new ClaimEquivalentResult(List.of(), messages);
         }
 
         List<Mutant> claimedMutants = new ArrayList<>();
-        for (int line : mutantLines) {
+        for (int line : coveredLines) {
             mutantsAlive.stream()
                     .filter(m -> m.getLines().contains(line))
                     .filter(m -> m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
