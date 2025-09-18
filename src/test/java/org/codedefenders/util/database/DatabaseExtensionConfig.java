@@ -170,10 +170,14 @@ public class DatabaseExtensionConfig {
     }
 
     public String getUrl() {
-        if (this.url == null) {
+        if (url == null) {
             url = String.format("jdbc:mysql://%s:%s/%s", getHost(), getPort(), getName());
         }
-        return Objects.requireNonNull(url);
+        if (url.startsWith("jdbc:mysql://")) {
+            return url;
+        } else {
+            return "jdbc:mysql://" + url;
+        }
     }
 
     public Optional<SQLCallback> getPreMigrationCallback() {
