@@ -41,13 +41,21 @@ import org.junit.jupiter.api.extension.ExtensionContext;
  *    {@code @ExtendWith}({MockitoExtension.class, WeldExtension.class})
  *    public class Test {
  *        {@code @Mock @Produces @Alternative} UserRepository userRepo;
+ *        {@code @Produces} ConfigurationSource config = new ConfigurationSourceBuilder().
+ *            .withProperty("dataDir", "/tmp");
  *
  *        {@code @Produces @Alternative}
- *        public Configuration config() {
- *            return new Configuration(...);
+ *        public PlayerRepository playerRepo() {
+ *            return new PlayerRepository(...);
  *        }
  *    }
  * </pre>
+ *
+ * <p> Configuration sources are excluded from bean discovery. Use
+ * {@link org.codedefenders.util.config.ConfigurationSourceBuilder} for setting config values.
+ *
+ * <p>This extension inherits from {@link WeldJunit5AutoExtension}.
+ * See https://github.com/weld/weld-testing/blob/master/junit6/README.md#weldjunit5autoextension for documentation.
  */
 public class WeldExtension extends WeldJunit5AutoExtension implements Extension {
     @Override
