@@ -44,6 +44,7 @@ import jakarta.enterprise.inject.se.SeContainer;
 import jakarta.enterprise.inject.se.SeContainerInitializer;
 import jakarta.inject.Singleton;
 
+import org.codedefenders.configuration.source.ConfigurationSource;
 import org.jboss.weld.environment.se.Weld;
 
 /** Helps with initializing Weld in absence of Tomcat. */
@@ -169,20 +170,19 @@ public class WeldInit {
     /**
      * Initializes a Weld SE container and adds all Code Defenders bean classes to it.
      * @param alternatives Classes containing bean alternatives to enable.
+     * @param includeConfig Whether to include {@link ConfigurationSource} beans in the scanning.
      */
-    public static SeContainer initWeld(Class<?>[] alternatives) {
+    public static SeContainer initWeld(Class<?>[] alternatives, boolean includeConfig) {
         SeContainerInitializer init = Weld.newInstance();
-        Class<?>[] beanClasses = scanBeans("org.codedefenders").toArray(Class<?>[]::new);
+        Class<?>[] beanClasses = scanBeans("org.codedefenders")
+            .stream()
+            .filter(clazz -> includeConfig || !ConfigurationSource.class.isAssignableFrom(clazz))
+            .toArray(Class<?>[]::new);
         init.disableDiscovery();
         init.addBeanClasses(beanClasses);
         if (alternatives != null) {
             init.selectAlternatives(alternatives);
         }
         return init.initialize();
-    }
-
-    /** @see WeldInit#initWeld() */
-    public static SeContainer initWeld() {
-        return initWeld(null);
     }
 }

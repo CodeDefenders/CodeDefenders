@@ -23,6 +23,7 @@ import java.util.Set;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.spi.Extension;
 
+import org.codedefenders.configuration.source.ConfigurationSource;
 import org.codedefenders.misc.WeldInit;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.junit5.WeldInitiator;
@@ -56,6 +57,10 @@ public class WeldExtension extends WeldJunit5AutoExtension implements Extension 
         if (WeldInit.containsAnnotation(context.getRequiredTestClass(), Set.of(Alternative.class), false)) {
             weld.addAlternative(context.getRequiredTestClass());
         }
-        weld.addBeanClasses(WeldInit.scanBeans("org.codedefenders").toArray(Class<?>[]::new));
+        var beanClasses = WeldInit.scanBeans("org.codedefenders")
+            .stream()
+            .filter(clazz -> !ConfigurationSource.class.isAssignableFrom(clazz))
+            .toArray(Class<?>[]::new);
+        weld.addBeanClasses(beanClasses);
     }
 }
