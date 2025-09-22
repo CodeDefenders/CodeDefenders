@@ -66,6 +66,13 @@ public class LLMRepository {
                     other classes.
                     Make sure to introduce at least one change.""".trim().stripIndent();
 
+    private static final String DEFAULT_RESOLVE_EQUIVALENT_PROMPT =
+            """
+                    You will see the code of a java class and then a git diff of a change. Write a test using
+                    JUnit 4 that succeeds on the old version, but fails after the diff is applied.
+                    Write nothing but the java code, without any formatting.
+                    """.trim().stripIndent();
+
     private static final String DEFAULT_DEFENDER_DEPS_PROMPT =
             """
                     Write a single test for the first class of the following Java code using a maximum of 2 assertions.
@@ -129,6 +136,7 @@ public class LLMRepository {
         defaultModel.setAttackerPrompt(DEFAULT_ATTACKER_PROMPT);
         defaultModel.setAttackerDependencyPrompt(DEFAULT_ATTACKER_DEPS_PROMPT);
         defaultModel.setAttackerMethodFocusPrompt(DEFAULT_ATTACKER_FOCUS_PROMPT);
+        defaultModel.setResolveEquivalencePrompt(DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
         defaultModel.setDefenderPrompt(DEFAULT_DEFENDER_PROMPT);
         defaultModel.setDefenderDependencyPrompt(DEFAULT_DEFENDER_DEPS_PROMPT);
         defaultModel.setDefenderMethodFocusPrompt(DEFAULT_DEFENDER_FOCUS_PROMPT);
@@ -161,6 +169,7 @@ public class LLMRepository {
                     attacker_dependencies_prompt = ?,
                     attacker_method_focus = ?,
                     attacker_method_focus_prompt = ?,
+                    attacker_resolve_equivalence_prompt = ?,
                     active = ?
                     WHERE model_name = ? AND type = ?;
                     """;
@@ -173,8 +182,9 @@ public class LLMRepository {
                                            attacker_prompt,
                                            attacker_dependencies, attacker_dependencies_prompt,
                                            attacker_method_focus, attacker_method_focus_prompt,
+                                           attacker_resolve_equivalence_prompt,
                                            active, model_name, type)
-                    values (?,?,?,?,?,?,?,?,?,?,?,?,?)""";
+                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""";
         }
         queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
                 model.isDefenderDependencies(), model.getDefenderDependencyPrompt().orElse(null),
@@ -182,6 +192,7 @@ public class LLMRepository {
                 model.getAttackerPrompt().orElse(null),
                 model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
                 model.isAttackerMethodFocus(), model.getAttackerMethodFocusPrompt().orElse(null),
+                model.getResolveEquivalencePrompt().orElse(null),
                 model.isActive(), model.getName(), model.getType().name());
     }
 
@@ -203,7 +214,8 @@ public class LLMRepository {
                     attacker_dependencies = ?,
                     attacker_dependencies_prompt = ?,
                     attacker_method_focus = ?,
-                    attacker_method_focus_prompt = ?
+                    attacker_method_focus_prompt = ?,
+                    attacker_resolve_equivalence_prompt = ?
                     WHERE model_name = ? AND type = ?;
                     """;
         int updated = queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
@@ -212,6 +224,7 @@ public class LLMRepository {
                 model.getAttackerPrompt().orElse(null),
                 model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
                 model.isAttackerMethodFocus(), model.getAttackerMethodFocusPrompt().orElse(null),
+                model.getResolveEquivalencePrompt().orElse(null),
                 model.getName(), model.getType().name());
         if (updated == 0) {
             logger.error("Trying to update non-existing model: {} {}", model.getType(), model.getName());
@@ -300,6 +313,7 @@ public class LLMRepository {
         result.setAttackerDependencyPrompt(rs.getString("attacker_dependencies_prompt"));
         result.setAttackerMethodFocus(rs.getBoolean("attacker_method_focus"));
         result.setAttackerMethodFocusPrompt(rs.getString("attacker_method_focus_prompt"));
+        result.setResolveEquivalencePrompt(rs.getString("attacker_resolve_equivalence_prompt"));
 
         return result;
     }

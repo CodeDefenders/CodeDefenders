@@ -271,6 +271,11 @@ public class LlmService {
         }
     }
 
+    private String testTemplateFromResponse(String response, AbstractGame game) {
+        response = LlmUtils.extractTestContentFromReply(response);
+        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, response);
+    }
+
     private String generateTest(AbstractGame game, SimpleUser user, Random random) throws NoSuchModelException {
         final LLModel model = activeLlmDefenders.get(game.getId());
         if (model == null) {
@@ -303,10 +308,8 @@ public class LlmService {
             }
         }
 
-        String result = getResponse(model, userMessage.toString(), systemMessage);
-        String formattedResult = LlmUtils.extractTestContentFromReply(result);
-        String testTemplate = game.getCUT().getTestTemplate();
-        String testSrc = testTemplate.replace(Constants.TEST_TEMPLATE_PLACEHOLDER, formattedResult);
+        String response = getResponse(model, userMessage.toString(), systemMessage);
+        String testSrc = testTemplateFromResponse(response, game);
         logger.info("AI defender generated test: {}", testSrc);
         return testSrc;
     }
@@ -333,7 +336,7 @@ public class LlmService {
         llmExecutor.shutdownNow();
     }
 
-    private String generateMutant(AbstractGame game, SimpleUser user) throws NoSuchModelException {
+    private String generateMutant(AbstractGame game) throws NoSuchModelException {
         StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
 
         LLModel model = activeLlmAttackers.get(game.getId());
@@ -395,6 +398,40 @@ public class LlmService {
         } catch (GameManagingUtils.MutantCreationException e) {
             logger.warn("Could not submit mutant. Reason: {} \nFull mutant text:\n{}",
                     e.getDetailedReason().orElse("Unknown"), mutantSrc);
+        } finally {
+            requestContextController.deactivate();
+        }
+    }
+
+    /**
+     * Generate a test that should kill a mutant that was flagged as equivalent. Waits until the generation by the
+     * llm is complete.
+     */
+    private String generateEquivalenceTest(AbstractGame game, MutantDTO flagged) throws NoSuchModelException {
+        LLModel model = activeLlmAttackers.get(game.getId());
+        llmRepo.loadModel(model);
+        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
+
+        String systemMessage = model.getResolveEquivalencePrompt()
+                .orElse(defaultModel.getResolveEquivalencePrompt().orElseThrow());
+
+        String userMessage = game.getCUT().getSourceCode() + "\n" + flagged.getPatchString();
+        String response = getResponse(model, userMessage, systemMessage);
+        return testTemplateFromResponse(response, game);
+    }
+
+    private void submitEquivalenceTest(AbstractGame game, String testSource, MutantDTO equivalentMutantDTO, int userId) {
+        RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
+        requestContextController.activate();
+        Mutant equivalentMutant = mutantRepository.getMutantById(equivalentMutantDTO.getId());
+        try {
+            if (game instanceof MultiplayerGame multiplayerGame) {
+                gameManagingUtils.rejectBattlegroundEquivalence(multiplayerGame, userId, equivalentMutant, testSource);
+            } else {
+                //TODO melee
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             requestContextController.deactivate();
         }
@@ -495,10 +532,7 @@ public class LlmService {
      * Check if there are any open equivalent duels that the user has to react to (as a player or attacker).
      */
     private boolean hasOpenEquivalentDuel(SimpleUser user, AbstractGame game) {
-        return !gameService.getMutants(user, game).stream()
-                .filter(m -> m.getState() == Mutant.State.FLAGGED)
-                .filter(m -> m.getCreator().equals(user))
-                .toList().isEmpty();
+        return !gameService.getFlaggedMutants(user, game).isEmpty();
     }
 
     /**
@@ -531,7 +565,13 @@ public class LlmService {
                         logger.info("LLM attacker in game {} has an open equivalent duel.", game.getId());
                         break;//TODO
                     }
-                    String mutantSrc = generateMutant(game, user);
+                    for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
+                        String killingTestSource = generateEquivalenceTest(game, flagged);
+                        logger.info("LLM attacker submitted the following test in an equivalence duel: " +
+                                "\n{}", killingTestSource);
+                        submitEquivalenceTest(game, killingTestSource, flagged, userId);
+                    }
+                    String mutantSrc = generateMutant(game);
                     game = gameRepository.getGame(game.getId());
                     submitMutant(game, mutantSrc);
                 } else {
@@ -545,7 +585,7 @@ public class LlmService {
                     boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
 
                     if (attack) {
-                        String mutantSrc = generateMutant(game, user);
+                        String mutantSrc = generateMutant(game);
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
                     } else {

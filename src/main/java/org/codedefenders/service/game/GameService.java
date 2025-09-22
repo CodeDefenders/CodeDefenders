@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service.game;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -141,6 +142,16 @@ public class GameService implements IGameService {
         } else {
             return null;
         }
+    }
+
+    public List<MutantDTO> getFlaggedMutants(SimpleUser user, AbstractGame game) {
+        List<MutantDTO> results = new ArrayList<>();
+        for (MutantDTO m : getMutants(user, game)) {
+            if (m.getState() == Mutant.State.FLAGGED && m.getCreator().equals(user)) {
+                results.add(m);
+            }
+        }
+        return results;
     }
 
     @Override

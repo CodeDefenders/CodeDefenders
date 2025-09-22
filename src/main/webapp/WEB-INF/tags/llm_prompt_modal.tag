@@ -33,6 +33,7 @@
 <%@ attribute name="attackerDepsPrompt" required="true" %>
 <%@ attribute name="attackerFocus" required="true" %>
 <%@ attribute name="attackerFocusPrompt" required="true" %>
+<%@ attribute name="resolveEquivalencePrompt" required="true" %>
 <%@ attribute name="defenderPrompt" required="true" %>
 <%@ attribute name="defenderDeps" required="true" %>
 <%@ attribute name="defenderDepsPrompt" required="true" %>
@@ -166,6 +167,13 @@
                                               name="attackerMethodFocusPrompt"
                                         ${attackerFocus.equals("false") ? "disabled" : ""}>${attackerFocusPrompt}</textarea>
                                 </div>
+                                <div class="col-12">
+                                    <label for="resolve-equivalence-prompt-${htmlId}" class="form-label">
+                                        Resolve equivalence prompt
+                                    </label>
+                                    <textarea class="form-control" rows="5" id="resolve-equivalence-prompt-${htmlId}"
+                                              name="resolveEquivalencePrompt">${resolveEquivalencePrompt}</textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -196,6 +204,7 @@
                 const attackerDepsPrompt = modal.querySelector("#attacker-deps-prompt-${htmlId}").value.trim();
                 const attackerFocus = modal.querySelector("#attacker-focus-${htmlId}").checked;
                 const attackerFocusPrompt = modal.querySelector("#attacker-focus-prompt-${htmlId}").value.trim();
+                const resolveEquivalencePrompt = modal.querySelector("#resolve-equivalence-prompt-${htmlId}").value.trim();
 
                 fetch("${url.forPath("api/llm")}?formType=updatePrompts", {
                     method: "POST",
@@ -215,7 +224,8 @@
                         attackerDependencies: attackerDeps,
                         attackerDependencyPrompt: attackerDepsPrompt,
                         attackerMethodFocus: attackerFocus,
-                        attackerMethodFocusPrompt: attackerFocusPrompt
+                        attackerMethodFocusPrompt: attackerFocusPrompt,
+                        resolveEquivalencePrompt: resolveEquivalencePrompt
                     })
                 });
             });

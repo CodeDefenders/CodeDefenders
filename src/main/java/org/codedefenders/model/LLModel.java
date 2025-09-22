@@ -70,6 +70,13 @@ public class LLModel {
     private String attackerMethodFocusPrompt;
 
     /**
+     * This prompt is used to generate a test to kill a suspected mutant. The user message consists of the CuT,
+     * the dependencies if {@link LLModel#attackerDependencies} is true, and the diff of the suspected mutant.
+     */
+    @Expose
+    private String resolveEquivalencePrompt;
+
+    /**
      * The standard defender prompt. The code of the CuT is supplied as the user message.
      */
     @Expose
@@ -155,6 +162,14 @@ public class LLModel {
 
     public void setAttackerMethodFocusPrompt(String attackerMethodFocusPrompt) {
         this.attackerMethodFocusPrompt = attackerMethodFocusPrompt;
+    }
+
+    public Optional<String> getResolveEquivalencePrompt() {
+        return ofNullOrEmpty(resolveEquivalencePrompt);
+    }
+
+    public void setResolveEquivalencePrompt(String resolveEquivalencePrompt) {
+        this.resolveEquivalencePrompt = resolveEquivalencePrompt;
     }
 
     public Optional<String> getDefenderPrompt() {
