@@ -306,6 +306,10 @@ public class AchievementService {
     }
 
     private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
+        if (userId <= 10) {
+            logger.info("System user with id {} got achievement {}. How nice for them.", userId, achievementId);
+            return;
+        }
         Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
         synchronized (notificationQueue) {
             notificationQueue.computeIfAbsent(userId, k -> new LinkedList<>()).add(achievement);
