@@ -30,6 +30,7 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.codedefenders.servlets.auth.AnonFilter;
 import org.codedefenders.servlets.auth.BasicHttpAuthFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.codedefenders.util.Paths;
@@ -59,7 +60,7 @@ public class ShiroConfig {
     @Singleton
     public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc,
                                                       BasicHttpAuthFilter authcBasic,
-                                                      AnonymousFilter anon) {
+                                                      AnonFilter anon) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
