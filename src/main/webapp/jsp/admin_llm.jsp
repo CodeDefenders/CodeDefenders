@@ -38,78 +38,89 @@
     <div class="container">
         <t:admin_navigation activePage="adminLlm"/>
 
-        <div>
-            <t:llm_prompt_modal type="${defaultModel.type.name()}" name="${defaultModel.name}"
-                                attackerPrompt="${defaultModel.attackerPrompt.orElse(\"\")}"
-                                attackerDeps="${defaultModel.attackerDependencies}"
-                                attackerDepsPrompt="${defaultModel.attackerDependencyPrompt.orElse(\"\")}"
-                                attackerFocus="${defaultModel.attackerMethodFocus}"
-                                attackerFocusPrompt="${defaultModel.attackerMethodFocusPrompt.orElse(\"\")}"
-                                resolveEquivalencePrompt="${defaultModel.resolveEquivalencePrompt.orElse(\"\")}"
-                                defenderPrompt="${defaultModel.defenderPrompt.orElse(\"\")}"
-                                defenderDeps="${defaultModel.defenderDependencies}"
-                                defenderDepsPrompt="${defaultModel.defenderDependencyPrompt.orElse(\"\")}"
-                                defenderFocus="${defaultModel.defenderMethodFocus}"
-                                defenderFocusPrompt="${defaultModel.defenderMethodFocusPrompt.orElse(\"\")}"
+        <div class="card m-2">
+            <div class="card-body">
+                <h4 class="card-title">Default prompts</h4>
+                <t:llm_prompt_modal type="${defaultModel.type.name()}" name="${defaultModel.name}"
+                                    attackerPrompt="${defaultModel.attackerPrompt.orElse(\"\")}"
+                                    attackerDeps="${defaultModel.attackerDependencies}"
+                                    attackerDepsPrompt="${defaultModel.attackerDependencyPrompt.orElse(\"\")}"
+                                    attackerFocus="${defaultModel.attackerMethodFocus}"
+                                    attackerFocusPrompt="${defaultModel.attackerMethodFocusPrompt.orElse(\"\")}"
+                                    resolveEquivalencePrompt="${defaultModel.resolveEquivalencePrompt.orElse(\"\")}"
+                                    defenderPrompt="${defaultModel.defenderPrompt.orElse(\"\")}"
+                                    defenderDeps="${defaultModel.defenderDependencies}"
+                                    defenderDepsPrompt="${defaultModel.defenderDependencyPrompt.orElse(\"\")}"
+                                    defenderFocus="${defaultModel.defenderMethodFocus}"
+                                    defenderFocusPrompt="${defaultModel.defenderMethodFocusPrompt.orElse(\"\")}"
 
-                                htmlId="default-modal"/>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#default-modal">
-                Edit default prompts
-            </button>
+                                    htmlId="default-modal"/>
+                <div class="d-flex gap-4">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#default-modal">
+                        Edit
+                    </button>
 
-            <form action="${url.forPath("api/llm")}?formType=resetDefault" method="post">
-                <button type="submit" class="btn btn-outline-dark">
-                    Reset default prompts to default values
-                </button>
-            </form>
+                    <form action="${url.forPath("api/llm")}?formType=resetDefault" method="post">
+                        <button type="submit" class="btn btn-outline-dark">
+                            Reset
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <h2>Available Large Language Models:</h2>
-        <table id="models" class="table table-v-align-middle table-striped">
-            <thead>
-            <tr>
-                <th>Provider</th>
-                <th>Name</th>
-                <th>Active</th>
-            </tr>
-            </thead>
-            <tbody id="modelBody">
-            <c:forEach var="model" items="${models}">
-                <c:set var="type" value="${model.type.name()}"/>
-                <c:set var="identifier"
-                       value="prompt-modal-${type.replace('.', '-').replace(':', '-')}-${model.name.replace('.', '-').replace(':', '-')}"/>
-                <tr id="model-row-${identifier}">
+        <div class="card m-2">
+            <div class="card-body">
+                <h4 class="card-title">Available Large Language Models:</h4>
+                <table id="models" class="table table-v-align-middle table-striped">
+                    <thead>
+                    <tr>
+                        <th>Provider</th>
+                        <th>Name</th>
+                        <th>Active</th>
+                    </tr>
+                    </thead>
+                    <tbody id="modelBody">
+                    <c:forEach var="model" items="${models}">
+                        <c:set var="type" value="${model.type.name()}"/>
+                        <c:set var="identifier"
+                               value="prompt-modal-${type.replace('.', '-').replace(':', '-')}-${model.name.replace('.', '-').replace(':', '-')}"/>
+                        <tr id="model-row-${identifier}">
 
-                    <td id="model-type-${identifier}">${model.type}</td>
-                    <td>
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#${identifier}" id="model-name-${identifier}">
-                                ${model.name}
-                        </a>
-                        <t:llm_prompt_modal type="${type}" name="${model.name}"
-                                            attackerPrompt="${model.attackerPrompt.orElse(\"\")}"
-                                            attackerDeps="${model.attackerDependencies}"
-                                            attackerDepsPrompt="${model.attackerDependencyPrompt.orElse(\"\")}"
-                                            attackerFocus="${model.attackerMethodFocus}"
-                                            attackerFocusPrompt="${model.attackerMethodFocusPrompt.orElse(\"\")}"
-                                            resolveEquivalencePrompt="${model.resolveEquivalencePrompt.orElse(\"\")}"
-                                            defenderPrompt="${model.defenderPrompt.orElse(\"\")}"
-                                            defenderDeps="${model.defenderDependencies}"
-                                            defenderDepsPrompt="${model.defenderDependencyPrompt.orElse(\"\")}"
-                                            defenderFocus="${model.defenderMethodFocus}"
-                                            defenderFocusPrompt="${model.defenderMethodFocusPrompt.orElse(\"\")}"
+                            <td id="model-type-${identifier}">${model.type}</td>
+                            <td>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#${identifier}"
+                                   id="model-name-${identifier}">
+                                        ${model.name}
+                                </a>
+                                <t:llm_prompt_modal type="${type}" name="${model.name}"
+                                                    attackerPrompt="${model.attackerPrompt.orElse(\"\")}"
+                                                    attackerDeps="${model.attackerDependencies}"
+                                                    attackerDepsPrompt="${model.attackerDependencyPrompt.orElse(\"\")}"
+                                                    attackerFocus="${model.attackerMethodFocus}"
+                                                    attackerFocusPrompt="${model.attackerMethodFocusPrompt.orElse(\"\")}"
+                                                    resolveEquivalencePrompt="${model.resolveEquivalencePrompt.orElse(\"\")}"
+                                                    defenderPrompt="${model.defenderPrompt.orElse(\"\")}"
+                                                    defenderDeps="${model.defenderDependencies}"
+                                                    defenderDepsPrompt="${model.defenderDependencyPrompt.orElse(\"\")}"
+                                                    defenderFocus="${model.defenderMethodFocus}"
+                                                    defenderFocusPrompt="${model.defenderMethodFocusPrompt.orElse(\"\")}"
 
-                                            htmlId="${identifier}"/>
-                    </td>
-                    <td>
-                        <label>
-                            <input type="checkbox" class="form-check-input" ${model.active ? "checked" : ""}
-                                   id="active-button-${identifier}"/>
-                        </label>
-                    </td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+                                                    htmlId="${identifier}"/>
+                            </td>
+                            <td>
+                                <label>
+                                    <input type="checkbox" class="form-check-input" ${model.active ? "checked" : ""}
+                                           id="active-button-${identifier}"/>
+                                </label>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <script type="module">
 
