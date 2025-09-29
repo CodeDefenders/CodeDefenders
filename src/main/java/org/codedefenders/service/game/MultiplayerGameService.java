@@ -201,9 +201,6 @@ public class MultiplayerGameService extends AbstractGameService {
         if (!game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
             return false;
         }
-        if (!game.addPlayer(AI_DEFENDER_USER_ID, Role.DEFENDER)) {
-            return false;
-        }
 
         // Add selected role to game (creator can participate as attacker/defender or just observe)
         if (!game.addPlayer(login.getUserId(), creatorRole)) {
