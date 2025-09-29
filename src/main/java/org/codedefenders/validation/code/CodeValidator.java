@@ -125,9 +125,15 @@ public class CodeValidator {
         }
     }
 
-    // This validation pipeline should use the Chain-of-Responsibility design pattern
     public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
-            CodeValidatorLevel level) {
+                                                             CodeValidatorLevel level) {
+        return validateMutantGetMessage(originalCode, mutatedCode, level, false);
+    }
+
+    // This validation pipeline should use the Chain-of-Responsibility design pattern
+    //TODO a better way to exclude comment rules
+    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
+            CodeValidatorLevel level, boolean ignoreComments) {
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
         if (originalParseResult.isEmpty() || mutatedParseResult.isEmpty()) {
@@ -186,7 +192,7 @@ public class CodeValidator {
         List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
         assert (originalLines.size() == changedLines.size());
 
-        if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
+        if (!ignoreComments && level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_COMMENT;
         }
 
@@ -215,7 +221,7 @@ public class CodeValidator {
             if (d.operation != DiffMatchPatch.Operation.EQUAL) {
                 hasChanges = true;
                 if (d.operation == DiffMatchPatch.Operation.INSERT) {
-                    ValidationMessage insertionValidityMessage = validInsertion(d.text, level);
+                    ValidationMessage insertionValidityMessage = validInsertion(d.text, level, ignoreComments);
                     if (insertionValidityMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
                         return insertionValidityMessage;
                     }
@@ -522,7 +528,7 @@ public class CodeValidator {
         return !cutFieldNames.equals(mutantFieldNames);
     }
 
-    private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
+    private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level, boolean ignoreComments) {
         String stmtString = String.format("{ %s }", diff);
 
         Optional<BlockStmt> parseResult = JavaParserUtils.parse(
@@ -545,7 +551,7 @@ public class CodeValidator {
             return ValidationMessage.MUTANT_VALIDATION_CALLS;
         }
 
-        if (level != CodeValidatorLevel.RELAXED && containsAny(diff2, COMMENT_TOKENS)) {
+        if (!ignoreComments && level != CodeValidatorLevel.RELAXED && containsAny(diff2, COMMENT_TOKENS)) {
             return ValidationMessage.MUTANT_VALIDATION_COMMENT;
         }
 

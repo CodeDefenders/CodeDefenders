@@ -339,7 +339,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage =
-                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel,
+                        userId <= 10);
         boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -433,7 +434,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
-                mutantText, codeValidatorLevel);
+                mutantText, codeValidatorLevel, userId <= 10);
         boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -874,7 +875,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public RejectBattlegroundEquivalenceResult rejectBattlegroundEquivalence(
-            MultiplayerGame game, int userId, Mutant equivMutant, String code) throws IOException {
+            AbstractGame game, int userId, Mutant equivMutant, String code) throws IOException {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 

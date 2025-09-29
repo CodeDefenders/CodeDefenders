@@ -386,12 +386,18 @@ public class LlmService {
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
         try {
+            GameManagingUtils.CreateBattlegroundMutantResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
+                result = gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
             } else if (game instanceof MeleeGame meleeGame) {
-                gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
+                result = gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
             } else {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
+            }
+            if (result.isSuccess()) {
+                logger.info("LLM successfully submitted mutant.");
+            } else {
+                logger.info("LLM couldn't submit mutant: {}", result.validationErrorMessage().orElse(null));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -425,11 +431,7 @@ public class LlmService {
         requestContextController.activate();
         Mutant equivalentMutant = mutantRepository.getMutantById(equivalentMutantDTO.getId());
         try {
-            if (game instanceof MultiplayerGame multiplayerGame) {
-                gameManagingUtils.rejectBattlegroundEquivalence(multiplayerGame, userId, equivalentMutant, testSource);
-            } else {
-                //TODO melee
-            }
+            gameManagingUtils.rejectBattlegroundEquivalence(game, userId, equivalentMutant, testSource);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -560,38 +562,37 @@ public class LlmService {
                     String testSrc = generateTest(game, user, random);
                     game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
                     submitTest(game, testSrc);
-                } else if (role == Role.ATTACKER) {
-                    while(hasOpenEquivalentDuel(user, game)) {
-                        logger.info("LLM attacker in game {} has an open equivalent duel.", game.getId());
-                        break;//TODO
-                    }
+                } else {
                     for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
                         String killingTestSource = generateEquivalenceTest(game, flagged);
-                        logger.info("LLM attacker submitted the following test in an equivalence duel: " +
-                                "\n{}", killingTestSource);
+                        logger.info("LLM player with role {} in game {}" +
+                                " submitted the following test in an equivalence duel: " +
+                                "\n{}", role, game.getId(), killingTestSource);
                         submitEquivalenceTest(game, killingTestSource, flagged, userId);
                     }
-                    String mutantSrc = generateMutant(game);
-                    game = gameRepository.getGame(game.getId());
-                    submitMutant(game, mutantSrc);
-                } else {
-                    claimEquivalent(user, game, random);
-                    boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
-                    boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
-                    if (!attackAvailable && !defendAvailable) {
-                        finishPlayer(game, role);
-                        return;
-                    }
-                    boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
-
-                    if (attack) {
+                    if (role == Role.ATTACKER) {
                         String mutantSrc = generateMutant(game);
                         game = gameRepository.getGame(game.getId());
                         submitMutant(game, mutantSrc);
                     } else {
-                        String testSrc = generateTest(game, user, random);
-                        game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
-                        submitTest(game, testSrc);
+                        claimEquivalent(user, game, random);
+                        boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
+                        boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
+                        if (!attackAvailable && !defendAvailable) {
+                            finishPlayer(game, role);
+                            return;
+                        }
+                        boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
+
+                        if (attack) {
+                            String mutantSrc = generateMutant(game);
+                            game = gameRepository.getGame(game.getId());
+                            submitMutant(game, mutantSrc);
+                        } else {
+                            String testSrc = generateTest(game, user, random);
+                            game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
+                            submitTest(game, testSrc);
+                        }
                     }
                 }
                 long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
