@@ -32,32 +32,57 @@
 
 <div>
 
-        <t:modal title="Manage LLM players" id="${htmlId}">
+    <t:modal title="Manage LLM players" id="${htmlId}">
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3">
                             <label for="${htmlId}-defenderSelect" class="form-label">Choose defender model</label>
-                            <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
-                                <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
-                                </option>
-                            </select>
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
+                                    <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
+                                    </option>
+                                </select>
+                                <div>
+                                    <i id="${htmlId}-defender-error-icon" class="fa fa-exclamation-triangle fa-2x"
+                                       hidden="hidden"></i>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker model</label>
-                            <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
-                                <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
-                                </option>
-                            </select>
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
+                                    <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
+                                    </option>
+                                </select>
+                                <div>
+                                    <i id="${htmlId}-attacker-error-icon" class="fa fa-exclamation-triangle fa-2x"
+                                       hidden="hidden"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </jsp:attribute>
-            <jsp:attribute name="footer">
-                    <button type="button" id ="${htmlId}-submit-button" class="btn btn-primary">Confirm</button>
+        <jsp:attribute name="footer">
+                    <button type="button" id="${htmlId}-submit-button" class="btn btn-primary">Confirm</button>
                 </jsp:attribute>
-        </t:modal>
+    </t:modal>
 
     <script>
+
+        async function getError(role) {
+            const response = await fetch("${url.forPath("api/llm")}?action=error&gameId=" + ${gameId} + "&role=" + role, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'text/plain'
+                }
+            });
+            if (!response.ok) {
+                return Promise.reject();
+            }
+            return await response.text();
+        }
 
         function removeOptions(selectElement) {
             for (let i = selectElement.children.length - 1; i >= 0; i--) {
@@ -108,6 +133,8 @@
                 const defenderModel = await InfoApi.getLlmForGame(${gameId}, "DEFENDER");
                 const attackerModel = await InfoApi.getLlmForGame(${gameId}, "ATTACKER");
                 const activeModels = await InfoApi.getActiveLlms();
+                const defenderError = await getError("DEFENDER");
+                const attackerError = await getError("ATTACKER");
 
                 const noDefenderOption = document.getElementById("${htmlId}-no-defender");
                 noDefenderOption.selected = defenderModel == null;
@@ -116,6 +143,18 @@
 
                 addOptions(defenderSelect, activeModels, defenderModel);
                 addOptions(attackerSelect, activeModels, attackerModel);
+
+                if (defenderError.length > 0) {
+                    const defenderErrorIcon = document.getElementById("${htmlId}-defender-error-icon");
+                    defenderErrorIcon.removeAttribute("hidden");
+                    defenderErrorIcon.parentElement.title = defenderError;
+                }
+                if (attackerError.length > 0) {
+                    const attackerErrorItem = document.getElementById("${htmlId}-attacker-error-icon");
+                    attackerErrorItem.removeAttribute("hidden");
+                    attackerErrorItem.parentElement.title = attackerError;
+                }
+
                 loadingDiv.classList.remove("loading")
             });
 

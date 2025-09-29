@@ -19,6 +19,7 @@
 package org.codedefenders.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,9 +97,6 @@ public class LlmService {
     Map<String, ChatModel> openaiModels = new HashMap<>();
     Map<String, ChatModel> ollamaModels = new HashMap<>();
 
-    //Maps game id to interval in seconds for game-specific intervals
-    private final Map<Integer, Integer> llmActionInterval = new HashMap<>();
-
     /*
         Maps game ids to the models that should be used by their LLM players.
         If the key is present but the value is null, a thread is still running, but will finish after the current
@@ -111,6 +109,11 @@ public class LlmService {
     private final Map<Integer, LLModel> activeLlmDefenders;
     private final Map<Integer, LLModel> activeLlmAttackers;
 
+    /*
+     * Maps game ids to the last error message of failed llm actions.
+     */
+    private final Map<Integer, String> defenderErrorMessages;
+    private final Map<Integer, String> attackerErrorMessages;
 
     @Inject
     public LlmService(Configuration config,
@@ -128,6 +131,9 @@ public class LlmService {
 
         activeLlmDefenders = new HashMap<>();
         activeLlmAttackers = new HashMap<>();
+
+        defenderErrorMessages = new HashMap<>();
+        attackerErrorMessages = new HashMap<>();
 
         organizerExecutor = Executors.newSingleThreadScheduledExecutor();
         llmExecutor = Executors.newCachedThreadPool();
@@ -184,6 +190,14 @@ public class LlmService {
         };
     }
 
+    private Map<Integer, String> getCorrectErrorMap(Role r) {
+        return switch (r) {
+            case ATTACKER -> attackerErrorMessages;
+            case DEFENDER -> defenderErrorMessages;
+            default -> throw new IllegalArgumentException("Illegal role: " + r);
+        };
+    }
+
     private int getCorrectUserId(Role r) {
         return switch (r) {
             case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
@@ -203,16 +217,10 @@ public class LlmService {
 
     /**
      * Returns the minimum number of seconds between two actions of the same llm thread.
-     * Returns the game-specific time, if it exists, otherwise returns the default time.
      */
     public int getLlmActionInterval(AbstractGame game) {
-        Integer result = llmActionInterval.get(game.getId());
-        if (result == null) {
-            return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
-                    .getIntValue();
-        } else {
-            return result;
-        }
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
+                .getIntValue();
     }
 
     /**
@@ -530,6 +538,15 @@ public class LlmService {
         }
     }
 
+    private void addErrorMessage(AbstractGame game, Role role, Exception e) {
+        String timestamp = LocalDateTime.now().toString();
+        getCorrectErrorMap(role).put(game.getId(), timestamp + ": " + e.getMessage());
+    }
+
+    public Optional<String> getErrorMessage(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectErrorMap(role).get(gameId));
+    }
+
     /**
      * Check if there are any open equivalent duels that the user has to react to (as a player or attacker).
      */
@@ -595,16 +612,28 @@ public class LlmService {
                         }
                     }
                 }
+            } catch (TimeoutException e) {
+                logger.error("AiPlayerThread for game {} with role {} timed out.",
+                        game.getId(), role);
+                addErrorMessage(game, role, e);
+            } catch (NoSuchModelException e) {
+                logger.error("The model is no longer active, llm player thread will be aborted.");
+                addErrorMessage(game, role, e);
+                finishPlayer(game, role);
+            } catch (Exception e) {
+                logger.error("""
+                                LLM player thread in game {} and role {} threw an exception:
+                                {}
+                                The thread will be terminated.""",
+                        game.getId(), role, e.getMessage());
+                addErrorMessage(game, role, e);
+                finishPlayer(game, role);
+            } finally {
                 long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
                 final AbstractGame finalGame = game;
 
                 organizerExecutor.schedule(() -> llmExecutor.execute(() -> runLlmAction(finalGame, role, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
-            } catch (TimeoutException e) {
-                logger.error("AiPlayerThread for game {} with role {} timed out.",
-                        game.getId(), role);
-            } catch (NoSuchModelException e) {
-                logger.error("The model is no longer active, llm player thread has been aborted.");
             }
         } else {
             finishPlayer(game, role);

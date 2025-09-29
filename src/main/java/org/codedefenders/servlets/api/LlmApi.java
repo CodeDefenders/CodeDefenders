@@ -78,6 +78,10 @@ public class LlmApi extends HttpServlet {
      * <p>
      *     - getLlmForGame -> Send back a single LLM that is active for the supplied game and role
      * </p>
+     * <p>
+     *     - error -> Send back the last error message produced by the llm player specified by gameId and role, or an
+     *     empty string if there is no error message.
+     * </p>
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // TODO: Authentication
@@ -128,10 +132,26 @@ public class LlmApi extends HttpServlet {
                             returnJson = gson.toJson(null);
                         }
                     } else {
-                        logger.error("gameId ({}) or role ({}) are missing.", gameId, role);
+                        logger.error("gameId ({}) or role ({}) are missing while trying to get an llm for a game.",
+                                gameId, role);
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         return;
                     }
+                }
+                case "error" -> {
+                    Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
+                    Optional<Integer> gameId = ServletUtils.gameId(req);
+                    if (gameId.isPresent() && role.isPresent()) {
+                        resp.setContentType("text/plain");
+                        PrintWriter out = resp.getWriter();
+                        out.print(llmService.getErrorMessage(gameId.get(), role.get()).orElse(""));
+                        out.flush();
+                    } else {
+                        logger.error("gameId ({}) or role ({}) are missing while trying to get an error message.",
+                                gameId, role);
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    }
+                    return;
                 }
                 default -> {
                     logger.error("Unknown action: {} with type {} and name {}", action, type, name);
