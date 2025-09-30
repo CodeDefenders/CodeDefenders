@@ -63,6 +63,7 @@ import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit5.WeldInitiator;
 import org.jboss.weld.junit5.WeldJunit5Extension;
@@ -114,7 +115,8 @@ public class GameManagingUtilsTest {
                         KillCountTestCaseSelector.class,
                         PrioritizedTestCaseSelector.class,
                         KillMapService.class,
-                        UserRepository.class)
+                        UserRepository.class,
+                        URLUtils.class)
                 .inject(this)
                 .activate(RequestScoped.class)
                 .activate(ApplicationScoped.class)

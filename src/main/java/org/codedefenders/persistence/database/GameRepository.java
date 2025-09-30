@@ -256,4 +256,52 @@ public class GameRepository {
         int updatedRows = queryRunner.update(query, gameId);
         return updatedRows > 0;
     }
+
+    /**
+     * Stores a new invitation link id. If the game is null, the link id is stored without a game,
+     * the game will have to be added later.
+     * @param gameId The id of the game to store the link for, or null if that game is not yet created.
+     * @param creatorId The id of the game creator. This is used to prevent the hijacking of an uncreated game's
+     *                  invitation link by another user.
+     * @return The generated ID of the invitation link.
+     */
+    public int storeInvitationLink(Integer gameId, int creatorId) {
+        @Language("SQL") String query = """
+                INSERT INTO invitation_links (game_id, creator_id)
+                VALUES (?, ?)
+        """;
+
+        return queryRunner.insert(query, generatedKeyFromRS(), gameId, creatorId).orElseThrow();
+    }
+
+    /**
+     * Retrieves the game for a given invitation link ID.
+     *
+     * @param inviteId The invitation link ID.
+     * @return The game ID or null if no game found.
+     */
+    public Optional<AbstractGame> getGameForInviteId(int inviteId) {
+        @Language("SQL") String query = """
+                SELECT game_id
+                FROM invitation_links
+                WHERE invitation_id = ?
+        """;
+        Optional<Integer> gameId = queryRunner.query(query, oneFromRS(
+                rs -> rs.getInt("game_id")), inviteId);
+        return gameId.map(this::getGame);
+    }
+
+    /**
+     *
+     */
+    public List<String> getUsernamesForGame(int gameId) {
+        @Language("SQL") String query = """
+                SELECT distinct Username FROM games, players, users
+                WHERE games.ID = ?
+                  AND players.Game_ID = games.ID
+                  AND players.User_ID = users.User_ID;
+        """;
+
+        return queryRunner.query(query, listFromRS(rs -> rs.getString("UserName")), gameId);
+    }
 }

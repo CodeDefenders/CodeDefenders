@@ -20,8 +20,10 @@ package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -38,12 +40,16 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -69,8 +75,6 @@ public class MultiplayerGame extends AbstractGame {
     private float mutantCoverage;
     private float prize;
 
-    private boolean requiresValidation;
-
     private boolean chatEnabled;
 
     private int gameDurationMinutes;
@@ -81,6 +85,9 @@ public class MultiplayerGame extends AbstractGame {
     private int automaticMutantEquivalenceThreshold = 0;
 
     private Integer classroomId;
+
+    private boolean mayChooseRoles = true;
+
 
     public static class Builder {
         // mandatory values
@@ -95,6 +102,9 @@ public class MultiplayerGame extends AbstractGame {
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
+        private boolean mayChooseRoles = true;
+        private boolean inviteOnly = false;
+        private Integer inviteId = null;
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
@@ -106,6 +116,7 @@ public class MultiplayerGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+        private Set<WhitelistElement> whitelist = new HashSet<>();
 
         private int automaticMutantEquivalenceThreshold = 0;
 
@@ -212,6 +223,26 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder mayChooseRoles(boolean mayChooseRoles) {
+            this.mayChooseRoles = mayChooseRoles;
+            return this;
+        }
+
+        public Builder inviteOnly(boolean inviteOnly) {
+            this.inviteOnly = inviteOnly;
+            return this;
+        }
+
+        public Builder inviteId(Integer inviteId) {
+            this.inviteId = inviteId;
+            return this;
+        }
+
+        public Builder whitelist(Set<WhitelistElement> whitelist) {
+            this.whitelist = whitelist;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
@@ -242,6 +273,10 @@ public class MultiplayerGame extends AbstractGame {
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
         this.classroomId = builder.classroomId;
+        this.inviteOnly = builder.inviteOnly;
+        this.mayChooseRoles = builder.mayChooseRoles;
+        this.inviteId = builder.inviteId;
+        this.whitelist = builder.whitelist;
     }
 
     public int getGameDurationMinutes() {
@@ -305,6 +340,10 @@ public class MultiplayerGame extends AbstractGame {
         }
     }
 
+    public boolean isMayChooseRoles() {
+        return mayChooseRoles;
+    }
+
     public List<Player> getDefenderPlayers() {
         GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
 
@@ -323,8 +362,30 @@ public class MultiplayerGame extends AbstractGame {
         return attackers;
     }
 
+    /**
+     * Adds a player to the game.
+     * @param userId The id of the player to add.
+     * @param role The requested role. If {@code null},
+     *            the player will be assigned to the side with fewer players.
+     *             If the user is the creator, the role will never be changed.
+     * @return {@code true} if the player was added successfully, {@code false} otherwise.
+     */
     @Override
     public boolean addPlayer(int userId, Role role) {
+        if (userId != creatorId && !mayChooseRoles || role == null) {
+            WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+            WhitelistType whitelistType = whitelistRepo.getWhitelistType(id, userId);
+            if (whitelistType == null
+                    || whitelistType == WhitelistType.FLEX
+                    || (whitelistType == WhitelistType.CHOICE) && role == null) {
+                role = getAttackerPlayers().size() > getDefenderPlayers().size() ? Role.DEFENDER : Role.ATTACKER;
+            } else if (whitelistType == WhitelistType.ATTACKER) {
+                role = Role.ATTACKER;
+            } else if (whitelistType == WhitelistType.DEFENDER) {
+                role = Role.DEFENDER;
+            }
+            //If whitelist type is choice and role is set, keep role untouched.
+        }
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
 
@@ -367,11 +428,6 @@ public class MultiplayerGame extends AbstractGame {
             return gameRepo.removeUserFromGame(id, userId);
         }
         return false;
-    }
-
-    private boolean canJoinGame(int userId) {
-        UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
-        return !requiresValidation || userRepo.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override
@@ -596,6 +652,11 @@ public class MultiplayerGame extends AbstractGame {
             }
         }
         return false;
+    }
+
+    public WhitelistType getWhitelistTypeOfUser(int userId) {
+        WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
+        return whitelistRepo.getWhitelistType(id, userId);
     }
 
     public void notifyPlayers() {

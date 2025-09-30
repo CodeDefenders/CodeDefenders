@@ -45,6 +45,8 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.WhitelistElement;
+import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
@@ -54,6 +56,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -80,9 +83,9 @@ public class MeleeGameService extends AbstractGameService {
                             CodeDefendersAuth login, NotificationService notificationService,
                             TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
                             MeleeGameRepository meleeGameRepo, PlayerRepository playerRepo,
-                            TestSmellRepository testSmellRepo) {
+                            TestSmellRepository testSmellRepo, WhitelistRepository whitelistRepo) {
         super(gameManagingUtils, userService, userRepository, testRepo, mutantRepo, gameRepo, playerRepo,
-                testSmellRepo);
+                testSmellRepo, whitelistRepo);
         this.eventDAO = eventDAO;
         this.messages = messages;
         this.login = login;
@@ -166,6 +169,18 @@ public class MeleeGameService extends AbstractGameService {
         int newGameId = meleeGameRepo.storeMeleeGame(game);
         game.setId(newGameId);
 
+        if (game.isInviteOnly()) {
+            whitelistRepo.addToWhitelist(newGameId, login.getUserId(), WhitelistType.CHOICE);
+        }
+
+        for (WhitelistElement w : game.getWhitelist()) {
+            int userId = userRepository.getUserByName(w.getUsername()).orElseThrow().getId();
+            // Always use default type CHOICE in melee
+            whitelistRepo.addToWhitelist(newGameId, userId, WhitelistType.CHOICE);
+            notificationService.sendInviteNotification(game, userId, WhitelistType.CHOICE);
+        }
+
+
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(event);
@@ -219,6 +234,8 @@ public class MeleeGameService extends AbstractGameService {
                 .automaticMutantEquivalenceThreshold(game.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(game.getGameDurationMinutes())
                 .classroomId(game.getClassroomId().orElse(null))
+                .inviteOnly(game.isInviteOnly())
+                .whitelist(whitelistRepo.getWhitelist(game.getId()))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(game);

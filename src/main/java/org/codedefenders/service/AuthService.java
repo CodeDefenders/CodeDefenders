@@ -28,10 +28,13 @@ import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.auth.permissions.AdminPermission;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named("auth")
 @ApplicationScoped
 public class AuthService implements CodeDefendersAuth {
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final CodeDefendersRealm codeDefendersRealm;
 
@@ -53,6 +56,9 @@ public class AuthService implements CodeDefendersAuth {
         return SecurityUtils.getSubject().isPermitted(AdminPermission.name);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getUserId() {
         return SecurityUtils.getSubject().getPrincipals().oneByType(CodeDefendersRealm.LocalUserId.class).getUserId();

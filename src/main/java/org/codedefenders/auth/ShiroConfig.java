@@ -22,6 +22,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Singleton;
 
+import org.apache.shiro.web.filter.authc.AnonymousFilter;
 import org.apache.shiro.web.filter.authc.LogoutFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
@@ -29,13 +30,17 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.codedefenders.servlets.auth.AnonFilter;
 import org.codedefenders.servlets.auth.BasicHttpAuthFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
+import org.codedefenders.util.Paths;
 
 /**
  * This class configures Shiro.
  *
  * @author gambi
+ * @see https://shiro.apache.org/web.html
+ * @see https://shiro.apache.org/reference.html
  */
 @ApplicationScoped
 public class ShiroConfig {
@@ -54,7 +59,8 @@ public class ShiroConfig {
     @Produces
     @Singleton
     public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc,
-                                                      BasicHttpAuthFilter basicAuthc) {
+                                                      BasicHttpAuthFilter authcBasic,
+                                                      AnonFilter anon) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
@@ -66,7 +72,8 @@ public class ShiroConfig {
         FilterChainManager fcMan = new DefaultFilterChainManager();
         fcMan.addFilter("logout", logout);
         fcMan.addFilter("authc", authc);
-        fcMan.addFilter("basicAuthc", basicAuthc);
+        fcMan.addFilter("authcBasic", authcBasic);
+        fcMan.addFilter("anon", anon);
         // Additional 'default' filter e.g. `roles[…]` are also available
 
 
@@ -139,8 +146,9 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_CLASS = "/api/class";
         // org.codedefenders.util.Paths.API_TEST = "/api/test";
         // org.codedefenders.util.Paths.API_MUTANT = "/api/mutant";
+        fcMan.createChain("/api/messages", "anon");
         fcMan.createChain("/api/**", "authc");
-        fcMan.createChain("/llm-api/**", "basicAuthc");
+        fcMan.createChain("/llm-api/**", "authcBasic");
 
         // Admin URLS. This does not necessary require authentication as we handle that
         // using tomcat. But for completeness, we force it now.
@@ -172,6 +180,8 @@ public class ShiroConfig {
 
         fcMan.createChain("/classroom/**", "authc");
         fcMan.createChain("/classrooms", "authc");
+
+        fcMan.createChain(Paths.INVITE, "authc");
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(fcMan);

@@ -33,16 +33,15 @@
 <script type="module">
     import {objects, PushSocket} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
-
     const baseWsUri = '${url.getAbsoluteURLForPath("/")}'
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
     const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
-    const userId = '${login.userId}';
-    const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
+    const userId = '${login.loggedIn ? login.userId : -1}';
+    if (userId !== '-1') {
+        const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
 
-    const pushSocket = new PushSocket(wsUri);
-
-
-    objects.register('pushSocket', pushSocket);
+        const pushSocket = new PushSocket(wsUri);
+        objects.register('pushSocket', pushSocket);
+    }
 </script>
