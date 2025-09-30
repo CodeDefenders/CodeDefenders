@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,7 +38,6 @@ import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.service.LlmService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
@@ -84,16 +82,10 @@ public class LlmApi extends HttpServlet {
      * </p>
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // TODO: Authentication
-
         Optional<String> action = ServletUtils.getStringParameter(req, "action");
         Optional<LLMType> type = ServletUtils.getEnumParameter(req, LLMType.class, "type");
         Optional<String> name = ServletUtils.getStringParameter(req, "name");
-        if (action.isEmpty()) {
-            logger.error("No action argument provided.");
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        } else {
+        if (action.isPresent()) {
             String returnJson;
             Gson gson = new Gson();
             switch (action.get()) {
@@ -164,6 +156,9 @@ public class LlmApi extends HttpServlet {
             PrintWriter out = resp.getWriter();
             out.print(returnJson);
             out.flush();
+        } else {
+            logger.error("No action argument provided.");
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
 
     }

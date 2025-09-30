@@ -255,9 +255,6 @@ public abstract class AbstractGame {
         return observers;
     }
 
-    public abstract void addLlmPlayer(Role role);
-
-
     protected boolean canJoinGame(int userId) {
         UserRepository userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
         WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);

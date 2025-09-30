@@ -81,13 +81,6 @@ public class LLMRepository {
                     the header or the method declaration. Use JUnit 4.
                     """.trim().stripIndent();
 
-    private static final String DEFAULT_ATTACKER_FOCUS_PROMPT =
-            """
-                    Change the the method %s of the following java code in a significant way.
-                    The behaviour of the program should change.
-                    Write the changed code of the entire first class, but not anything else.
-                    Make sure to introduce at least one change.""".trim().stripIndent();
-
     private static final String DEFAULT_DEFENDER_FOCUS_PROMPT =
             """
                     Write a single test for the method %s of the following Java code using a maximum of 2 assertions.
@@ -135,7 +128,6 @@ public class LLMRepository {
         LLModel defaultModel = new LLModel(DEFAULT_MODEL_NAME, LLMType.DEFAULT);
         defaultModel.setAttackerPrompt(DEFAULT_ATTACKER_PROMPT);
         defaultModel.setAttackerDependencyPrompt(DEFAULT_ATTACKER_DEPS_PROMPT);
-        defaultModel.setAttackerMethodFocusPrompt(DEFAULT_ATTACKER_FOCUS_PROMPT);
         defaultModel.setResolveEquivalencePrompt(DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
         defaultModel.setDefenderPrompt(DEFAULT_DEFENDER_PROMPT);
         defaultModel.setDefenderDependencyPrompt(DEFAULT_DEFENDER_DEPS_PROMPT);
@@ -167,8 +159,6 @@ public class LLMRepository {
                     attacker_prompt = ?,
                     attacker_dependencies = ?,
                     attacker_dependencies_prompt = ?,
-                    attacker_method_focus = ?,
-                    attacker_method_focus_prompt = ?,
                     attacker_resolve_equivalence_prompt = ?,
                     active = ?
                     WHERE model_name = ? AND type = ?;
@@ -181,17 +171,15 @@ public class LLMRepository {
                                            defender_method_focus, defender_method_focus_prompt,
                                            attacker_prompt,
                                            attacker_dependencies, attacker_dependencies_prompt,
-                                           attacker_method_focus, attacker_method_focus_prompt,
                                            attacker_resolve_equivalence_prompt,
                                            active, model_name, type)
-                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""";
+                    values (?,?,?,?,?,?,?,?,?,?,?,?)""";
         }
         queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
                 model.isDefenderDependencies(), model.getDefenderDependencyPrompt().orElse(null),
                 model.isDefenderMethodFocus(), model.getDefenderMethodFocusPrompt().orElse(null),
                 model.getAttackerPrompt().orElse(null),
                 model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
-                model.isAttackerMethodFocus(), model.getAttackerMethodFocusPrompt().orElse(null),
                 model.getResolveEquivalencePrompt().orElse(null),
                 model.isActive(), model.getName(), model.getType().name());
     }
@@ -213,8 +201,6 @@ public class LLMRepository {
                     attacker_prompt = ?,
                     attacker_dependencies = ?,
                     attacker_dependencies_prompt = ?,
-                    attacker_method_focus = ?,
-                    attacker_method_focus_prompt = ?,
                     attacker_resolve_equivalence_prompt = ?
                     WHERE model_name = ? AND type = ?;
                     """;
@@ -223,7 +209,6 @@ public class LLMRepository {
                 model.isDefenderMethodFocus(), model.getDefenderMethodFocusPrompt().orElse(null),
                 model.getAttackerPrompt().orElse(null),
                 model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
-                model.isAttackerMethodFocus(), model.getAttackerMethodFocusPrompt().orElse(null),
                 model.getResolveEquivalencePrompt().orElse(null),
                 model.getName(), model.getType().name());
         if (updated == 0) {
@@ -283,14 +268,6 @@ public class LLMRepository {
         return modelsInDB.stream().filter(this::modelIsInConfig).toList();
     }
 
-    public List<LLModel> getAllModelsOfType(LLMType type) {
-        @Language("SQL")
-        String sql = "SELECT * FROM llm_models WHERE type = ?;";
-
-        return queryRunner.query(sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), type.name())
-                .stream().filter(this::modelIsInConfig).toList();
-    }
-
     private boolean modelIsInConfig(LLModel m) {
         return m.getType() == LLMType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
                 || m.getType() == LLMType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
@@ -311,8 +288,6 @@ public class LLMRepository {
         result.setAttackerPrompt(rs.getString("attacker_prompt"));
         result.setAttackerDependencies(rs.getBoolean("attacker_dependencies"));
         result.setAttackerDependencyPrompt(rs.getString("attacker_dependencies_prompt"));
-        result.setAttackerMethodFocus(rs.getBoolean("attacker_method_focus"));
-        result.setAttackerMethodFocusPrompt(rs.getString("attacker_method_focus_prompt"));
         result.setResolveEquivalencePrompt(rs.getString("attacker_resolve_equivalence_prompt"));
 
         return result;

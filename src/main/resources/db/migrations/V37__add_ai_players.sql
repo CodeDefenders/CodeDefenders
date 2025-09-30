@@ -18,8 +18,6 @@ create table if not exists `llm_models` (
                                             attacker_prompt varchar(1000),
                                             attacker_dependencies bool,
                                             attacker_dependencies_prompt varchar(1000),
-                                            attacker_method_focus bool,
-                                            attacker_method_focus_prompt varchar(1000),
                                             attacker_resolve_equivalence_prompt varchar(1000),
 
                                             active bool,

@@ -31,8 +31,6 @@
 <%@ attribute name="attackerPrompt" required="true" %>
 <%@ attribute name="attackerDeps" required="true" %>
 <%@ attribute name="attackerDepsPrompt" required="true" %>
-<%@ attribute name="attackerFocus" required="true" %>
-<%@ attribute name="attackerFocusPrompt" required="true" %>
 <%@ attribute name="resolveEquivalencePrompt" required="true" %>
 <%@ attribute name="defenderPrompt" required="true" %>
 <%@ attribute name="defenderDeps" required="true" %>
@@ -152,22 +150,6 @@
                                 </div>
 
                                 <div class="col-12">
-                                    <div class="form-check form-switch"
-                                         title="Use prompts to focus on special methods">
-                                        <input class="form-check-input" type="checkbox" id="attacker-focus-${htmlId}"
-                                               name="attackerMethodFocus" ${attackerFocus.equals("true") ? "checked" : ""}>
-                                        <label class="form-check-label" for="attacker-focus-${htmlId}">Use prompts to
-                                            focus
-                                            on special methods</label>
-                                    </div>
-                                    <label for="attacker-focus-prompt-${htmlId}" class="form-label">
-                                        Focus prompt
-                                    </label>
-                                    <textarea class="form-control" rows="5" id="attacker-focus-prompt-${htmlId}"
-                                              name="attackerMethodFocusPrompt"
-                                        ${attackerFocus.equals("false") ? "disabled" : ""}>${attackerFocusPrompt}</textarea>
-                                </div>
-                                <div class="col-12">
                                     <label for="resolve-equivalence-prompt-${htmlId}" class="form-label">
                                         Resolve equivalence prompt
                                     </label>
@@ -202,8 +184,6 @@
                 const attackerPrompt = modal.querySelector("#attacker-standard-${htmlId}").value.trim();
                 const attackerDeps = modal.querySelector("#attacker-deps-${htmlId}").checked;
                 const attackerDepsPrompt = modal.querySelector("#attacker-deps-prompt-${htmlId}").value.trim();
-                const attackerFocus = modal.querySelector("#attacker-focus-${htmlId}").checked;
-                const attackerFocusPrompt = modal.querySelector("#attacker-focus-prompt-${htmlId}").value.trim();
                 const resolveEquivalencePrompt = modal.querySelector("#resolve-equivalence-prompt-${htmlId}").value.trim();
 
                 fetch("${url.forPath("api/llm")}?formType=updatePrompts", {
@@ -223,8 +203,6 @@
                         attackerPrompt: attackerPrompt,
                         attackerDependencies: attackerDeps,
                         attackerDependencyPrompt: attackerDepsPrompt,
-                        attackerMethodFocus: attackerFocus,
-                        attackerMethodFocusPrompt: attackerFocusPrompt,
                         resolveEquivalencePrompt: resolveEquivalencePrompt
                     })
                 });
@@ -246,12 +224,6 @@
             const attackerDepsPrompt = modal.querySelector("#attacker-deps-prompt-${htmlId}");
             attackerDepsButton.addEventListener("click", () => {
                 attackerDepsPrompt.disabled = !attackerDepsButton.checked;
-            });
-
-            const attackerFocusButton = modal.querySelector("#attacker-focus-${htmlId}");
-            const attackerFocusPrompt = modal.querySelector("#attacker-focus-prompt-${htmlId}");
-            attackerFocusButton.addEventListener("click", () => {
-                attackerFocusPrompt.disabled = !attackerFocusButton.checked;
             });
         })();
     </script>

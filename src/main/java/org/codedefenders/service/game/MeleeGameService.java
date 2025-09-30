@@ -79,9 +79,6 @@ public class MeleeGameService extends AbstractGameService {
     private final MeleeGameRepository meleeGameRepo;
 
     @Inject
-    LlmService llmService;
-
-    @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository,
                             GameManagingUtils gameManagingUtils, EventDAO eventDAO, MessagesBean messages,
                             CodeDefendersAuth login, NotificationService notificationService,

@@ -55,21 +55,6 @@ public class LLModel {
     private String attackerDependencyPrompt;
 
     /**
-     * If true, the prompt may be replaced with a special prompt that guides the llm to write a mutant for a
-     * specific method, for example because there are only few mutants in this method right now.
-     */
-    @Expose
-    private boolean attackerMethodFocus = true;
-
-    /**
-     * This String format replaces the normal or dependency prompt to focus on a specific method.
-     * This should only be used with {@link String#format(String, Object...)} with the method name
-     * as the single argument.
-     */
-    @Expose
-    private String attackerMethodFocusPrompt;
-
-    /**
      * This prompt is used to generate a test to kill a suspected mutant. The user message consists of the CuT,
      * the dependencies if {@link LLModel#attackerDependencies} is true, and the diff of the suspected mutant.
      */
@@ -146,22 +131,6 @@ public class LLModel {
 
     public void setAttackerDependencyPrompt(String attackerDependencyPrompt) {
         this.attackerDependencyPrompt = attackerDependencyPrompt;
-    }
-
-    public boolean isAttackerMethodFocus() {
-        return attackerMethodFocus;
-    }
-
-    public void setAttackerMethodFocus(boolean attackerMethodFocus) {
-        this.attackerMethodFocus = attackerMethodFocus;
-    }
-
-    public Optional<String> getAttackerMethodFocusPrompt() {
-        return ofNullOrEmpty(attackerMethodFocusPrompt);
-    }
-
-    public void setAttackerMethodFocusPrompt(String attackerMethodFocusPrompt) {
-        this.attackerMethodFocusPrompt = attackerMethodFocusPrompt;
     }
 
     public Optional<String> getResolveEquivalencePrompt() {
@@ -244,8 +213,6 @@ public class LLModel {
         attackerPrompt = other.attackerPrompt;
         attackerDependencies = other.attackerDependencies;
         attackerDependencyPrompt = other.attackerDependencyPrompt;
-        attackerMethodFocus = other.attackerMethodFocus;
-        attackerMethodFocusPrompt = other.attackerMethodFocusPrompt;
 
         defenderPrompt = other.defenderPrompt;
         defenderDependencies = other.defenderDependencies;

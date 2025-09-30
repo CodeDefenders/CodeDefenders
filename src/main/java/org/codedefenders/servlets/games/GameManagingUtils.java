@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.configuration.Configuration;
@@ -87,6 +88,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -1308,6 +1310,19 @@ public class GameManagingUtils implements IGameManagingUtils {
                 String name = split[1];
                 return llmRepo.getModelFromName(name, type, true).orElseThrow(
                         () -> new LlmService.NoSuchModelException(type, name));
+        }
+    }
+
+    public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws LlmService.NoSuchModelException {
+        var defenderParam = ServletUtils.getStringParameter(request, "defenderModel");
+        if(defenderParam.isPresent()) {
+            llmService.setPlayerModel(game, Role.DEFENDER,
+                    getLLModelFromSingleValue(defenderParam.get()));
+        }
+        var attackerParam = ServletUtils.getStringParameter(request, "attackerModel");
+        if (attackerParam.isPresent()) {
+            llmService.setPlayerModel(game, Role.ATTACKER,
+                    getLLModelFromSingleValue(attackerParam.get()));
         }
     }
 }

@@ -277,10 +277,4 @@ public class PuzzleGame extends AbstractGame {
     public boolean isChatEnabled() {
         return false;
     }
-
-    @Override
-    public void addLlmPlayer(Role role) {
-        //Do nothing
-    }
-
 }

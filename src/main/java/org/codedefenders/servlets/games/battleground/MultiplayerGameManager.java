@@ -275,16 +275,7 @@ public class MultiplayerGameManager extends HttpServlet {
             case "setLlmPlayer": {
                 try {
                     if (checkForPrivileges(game, request, response)) {
-                        var defenderParam = ServletUtils.getStringParameter(request, "defenderModel");
-                        if(defenderParam.isPresent()) {
-                                llmService.setPlayerModel(game, Role.DEFENDER,
-                                        gameManagingUtils.getLLModelFromSingleValue(defenderParam.get()));
-                        }
-                        var attackerParam = ServletUtils.getStringParameter(request, "attackerModel");
-                        if (attackerParam.isPresent()) {
-                            llmService.setPlayerModel(game, Role.ATTACKER,
-                                    gameManagingUtils.getLLModelFromSingleValue(attackerParam.get()));
-                        }
+                        gameManagingUtils.setLlmPlayer(game, request);
                         response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME + "?gameId=" + game.getId()));
                     }
                     return;

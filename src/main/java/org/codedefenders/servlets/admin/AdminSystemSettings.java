@@ -231,8 +231,7 @@ public class AdminSystemSettings extends HttpServlet {
         LLM_INTERVAL_SECONDS {
             @Override
             public String toString() {
-                return "The default number of seconds between actions of an AI player. Can be adjusted for " +
-                        "individual games.";
+                return "The default number of seconds between actions of an AI player.";
             }
         }
         ;

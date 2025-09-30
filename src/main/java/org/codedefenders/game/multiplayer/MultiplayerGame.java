@@ -747,20 +747,4 @@ public class MultiplayerGame extends AbstractGame {
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
     }
-
-    @Override
-    public void addLlmPlayer(Role role) {
-        int llmId;
-        if (role == Role.ATTACKER) {
-            llmId = Constants.AI_ATTACKER_USER_ID;
-        } else if (role == Role.DEFENDER) {
-            llmId = Constants.AI_DEFENDER_USER_ID;
-        } else {
-            throw new IllegalArgumentException("Cannot add LLM players for this role: " + role);
-        }
-        if (!addPlayer(llmId, role)) {
-            throw new RuntimeException("Couldn't add llm player with role " + role + " to game " + id);
-        }
-    }
-
 }
