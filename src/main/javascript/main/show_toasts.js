@@ -27,7 +27,8 @@ class ShowToasts {
                          link = '',
                          icon = '',
                          extraElements = [],
-                         timeout = true
+                         timeout = true,
+                         longTimeout = false
                      }) {
 
         console.log("Showing a toast");
@@ -46,11 +47,24 @@ class ShowToasts {
 
         if (!timeout) {
             toastElem.setAttribute('data-bs-autohide', 'false');
+        } else if (longTimeout) {
+            toastElem.setAttribute("data-bs-delay", "8000");
         }
 
         const toastBody = document.createElement('div');
-        toastBody.classList.add('toast-body', 'me-auto');
-        toastBody.innerText = body;
+        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-row', 'justify-content-between');
+
+        if (icon !== '') {
+            const iconElement = document.createElement("img");
+            iconElement.classList.add("me-2", "w-25");
+            iconElement.src = icon;
+            toastBody.appendChild(iconElement);
+        }
+
+        const bodySpan = document.createElement("span");
+        bodySpan.innerText = body;
+        toastBody.appendChild(bodySpan);
+
         if (extraElements.length > 0) {
             const extraContainer = document.createElement('div');
             extraContainer.classList.add('d-flex', 'flex-row', 'justify-content-between');
