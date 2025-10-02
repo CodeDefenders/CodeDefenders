@@ -109,7 +109,8 @@ dependency-tree:
 
 # Show report of Java dependencies
 dependency-report:
-    mvn dependency:analyze-report && which xdg-open 2>/dev/null && xdg-open target/reports/dependency-analysis.html || true
+    mvn dependency:analyze-report
+    which xdg-open 2>/dev/null && { find target -name dependency-analysis.html | xargs xdg-open; } || true
 
 # Run docker-compose
 [working-directory: "docker"]
