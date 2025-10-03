@@ -66,7 +66,6 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
-import com.github.javaparser.ast.visitor.NoCommentEqualsVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
 /**
@@ -87,17 +86,17 @@ public class CodeValidator {
     public static final int DEFAULT_NB_ASSERTIONS = 2;
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
-    public static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
-    private static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
-    private static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
-    private static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+    static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
+    static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+    static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
+    static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
     // This is package protected to enable TestCodeVisitor to check for prohibited call as well
     static final String[] PROHIBITED_CALLS = {
             "Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
             "java.net", "java.nio", "java.sql", "random(", "randomUUID("
     };
-    private static final String[] COMMENT_TOKENS = {"//", "/*"};
-    private static final String TERNARY_OP_REGEX = ".*\\?.*:.*";
+    static final String[] COMMENT_TOKENS = {"//", "/*"};
+    static final String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
     public static String getMD5FromFile(String filePath) {
         try {
@@ -125,85 +124,58 @@ public class CodeValidator {
         }
     }
 
+    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
+                                                             CodeValidatorLevel level) {
+        MutantValidationRuleSet ruleSet = switch (level) {
+            case RELAXED -> DefaultRuleSets.relaxed;
+            case MODERATE -> DefaultRuleSets.moderate;
+            case STRICT -> DefaultRuleSets.strict;
+        };
+        return validateMutantGetMessage(originalCode, mutatedCode, ruleSet);
+    }
+
     // This validation pipeline should use the Chain-of-Responsibility design pattern
     public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
-            CodeValidatorLevel level) {
+            MutantValidationRuleSet ruleSet) {
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
         if (originalParseResult.isEmpty() || mutatedParseResult.isEmpty()) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+            return ValidationMessage.MUTANT_VALIDATION_SUCCESS; //TODO ERLAUBT!!
         }
         CompilationUnit originalCU = originalParseResult.get();
         CompilationUnit mutatedCU = mutatedParseResult.get();
-
-        if (NoCommentEqualsVisitor.equals(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }
-
-        // if only string literals were changed
-        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-        }
-
-        // Check if package was modified
-        if (containsChangesToPackageDeclarations(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
-        }
-
-        // Check a class signature was modified
-        if (containsChangesToClassDeclarations(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
-        }
-
-        // Check if new members were added
-        if (mutantAddsOrRenamesMethodOrField(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED;
-        }
-
-        // If the mutants contains changes to method signatures, mark it as not valid
-        if (level == CodeValidatorLevel.STRICT && mutantChangesMethodSignatures(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
-        }
-        if (level == CodeValidatorLevel.STRICT && mutantChangesFieldNames(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_FIELD_NAME;
-        }
-
-        if (level == CodeValidatorLevel.STRICT && mutantChangesImportStatements(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT;
-        }
-
-        if (level == CodeValidatorLevel.STRICT && containsInstanceOfChanges(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
-        }
-
-        // Use AST to check for equivalence of CUT
-        if (originalCU.equals(mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }
 
         // line-level diff
         List<List<String>> originalLines = getOriginalLines(originalCode, mutatedCode);
         List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
         assert (originalLines.size() == changedLines.size());
 
-        if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
-            return ValidationMessage.MUTANT_VALIDATION_COMMENT;
+        // if only string literals were changed TODO ERLAUBT!!!
+        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
+            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
-        // rudimentary word-level matching as dmp works on character level
-        List<DiffMatchPatch.Diff> wordChanges = tokenDiff(originalCode, mutatedCode);
-        if (level == CodeValidatorLevel.STRICT && containsProhibitedModifierChanges(wordChanges)) {
-            return ValidationMessage.MUTANT_VALIDATION_MODIFIER;
+        for (MutantComparisonRule<CompilationUnit> rule : ruleSet.getCompilationUnitRules()) {
+            if (rule.fails(originalCU, mutatedCU)) {
+                return rule.getMessage();
+            }
         }
 
-        if (level != CodeValidatorLevel.RELAXED && ternaryAdded(originalLines, changedLines)) {
-            return ValidationMessage.MUTANT_VALIDATION_OPERATORS;
+        for (MutantComparisonRule<String> rule : ruleSet.getCodeRules()) {
+            if (rule.fails(originalCode, mutatedCode)) {
+                return rule.getMessage();
+            }
         }
 
-        if (level != CodeValidatorLevel.RELAXED && logicalOpAdded(originalLines, changedLines)) {
-            return ValidationMessage.MUTANT_VALIDATION_LOGIC;
+        for (MutantComparisonRule<List<List<String>>> rule : ruleSet.getLinediffRules()) {
+            if (rule.fails(originalLines, changedLines)) {
+                return rule.getMessage();
+            }
         }
 
+
+
+        //TODO Bleibt!!
         // Runs character-level diff match patch between the two Strings to see if there are any differences.
         DiffMatchPatch dmp = new DiffMatchPatch();
         final String text1 = originalCode.trim().replace("\n", "").replace("\r", "");
@@ -215,7 +187,7 @@ public class CodeValidator {
             if (d.operation != DiffMatchPatch.Operation.EQUAL) {
                 hasChanges = true;
                 if (d.operation == DiffMatchPatch.Operation.INSERT) {
-                    ValidationMessage insertionValidityMessage = validInsertion(d.text, level);
+                    ValidationMessage insertionValidityMessage = validInsertion(d.text, ruleSet);
                     if (insertionValidityMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
                         return insertionValidityMessage;
                     }
@@ -232,7 +204,7 @@ public class CodeValidator {
     /**
      * Check if the mutation introduce a change to the package declaration of the mutant.
      */
-    private static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         return !originalCU.getPackageDeclaration().equals(mutatedCU.getPackageDeclaration());
     }
 
@@ -252,7 +224,7 @@ public class CodeValidator {
     /**
      * Check if the mutation introduce a change to a class declaration in the mutant.
      */
-    private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
         for (TypeDeclaration<?> type : originalCU.getTypes()) {
             originalTypes.putAll(extractTypeDeclaration(type));
@@ -269,7 +241,7 @@ public class CodeValidator {
     /**
      * Check if the mutation introduce a change to an instanceof condition.
      */
-    private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
         final List<ReferenceType> instanceOfInsideMutated = new ArrayList<>();
         final AtomicBoolean analyzingMutant = new AtomicBoolean(false);
@@ -305,7 +277,7 @@ public class CodeValidator {
         return !instanceOfInsideMutated.equals(instanceOfInsideOriginal);
     }
 
-    private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         // We assume getAllContainedComments() preserves the order of comments
         Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[]{});
         Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[]{});
@@ -372,8 +344,9 @@ public class CodeValidator {
         return tokens;
     }
 
-    private static boolean containsProhibitedModifierChanges(List<DiffMatchPatch.Diff> changes) {
-        return changes.stream()
+    static boolean containsProhibitedModifierChanges(String originalCode, String mutatedCode) {
+        List<DiffMatchPatch.Diff> wordChanges = tokenDiff(originalCode, mutatedCode);
+        return wordChanges.stream()
                 .anyMatch(diff -> Arrays.stream(PROHIBITED_MODIFIER_CHANGES)
                         .anyMatch(operator -> diff.text.contains(operator))
                 );
@@ -456,7 +429,7 @@ public class CodeValidator {
         return fieldNames;
     }
 
-    private static boolean mutantChangesMethodSignatures(final CompilationUnit orig, final CompilationUnit muta) {
+    static boolean mutantChangesMethodSignatures(final CompilationUnit orig, final CompilationUnit muta) {
         // Parse original and extract method signatures -> Set of string
         Set<String> cutMethodSignatures = new HashSet<>();
         Set<String> mutantMethodSignatures = new HashSet<>();
@@ -472,7 +445,7 @@ public class CodeValidator {
         return !cutMethodSignatures.equals(mutantMethodSignatures);
     }
 
-    private static boolean mutantChangesImportStatements(final CompilationUnit orig, final CompilationUnit muta) {
+    static boolean mutantChangesImportStatements(final CompilationUnit orig, final CompilationUnit muta) {
         // Parse original and extract method signatures -> Set of string
 
         Set<String> cutImportStatements = new HashSet<>(extractImportStatements(orig));
@@ -481,7 +454,7 @@ public class CodeValidator {
         return !cutImportStatements.equals(mutantImportStatements);
     }
 
-    private static boolean mutantAddsOrRenamesMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
+    static boolean mutantAddsOrRenamesMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();
         Set<String> cutMethodSignatures = new HashSet<>();
@@ -506,7 +479,7 @@ public class CodeValidator {
         return !cutMethodSignatures.containsAll(mutantMethodSignatures) || !cutFieldNames.containsAll(mutantFieldNames);
     }
 
-    private static boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
+    static boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
         // Parse original and extract method signatures -> Set of string
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();
@@ -522,14 +495,15 @@ public class CodeValidator {
         return !cutFieldNames.equals(mutantFieldNames);
     }
 
-    private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
+    private static ValidationMessage validInsertion(String diff,
+                                                    MutantValidationRuleSet ruleSet) {
         String stmtString = String.format("{ %s }", diff);
 
         Optional<BlockStmt> parseResult = JavaParserUtils.parse(
                 stmtString, JavaParserUtils.defaultParser()::parseBlock);
         if (parseResult.isPresent()) {
             // TODO Should this called always and not only for checking if there's validInsertion ?
-            MutationVisitor visitor = new MutationVisitor(level);
+            MutationVisitor visitor = new MutationVisitor(ruleSet);
             visitor.visit(parseResult.get(), null);
             if (!visitor.isValid()) {
                 return visitor.getMessage();
@@ -541,27 +515,16 @@ public class CodeValidator {
         // remove whitespaces
         String diff2 = diff.replaceAll("\\s+", "");
 
-        if (level != CodeValidatorLevel.RELAXED && containsAny(diff2, PROHIBITED_CONTROL_STRUCTURES)) {
-            return ValidationMessage.MUTANT_VALIDATION_CALLS;
-        }
-
-        if (level != CodeValidatorLevel.RELAXED && containsAny(diff2, COMMENT_TOKENS)) {
-            return ValidationMessage.MUTANT_VALIDATION_COMMENT;
-        }
-
-        if (containsAny(diff2, PROHIBITED_CALLS)) {
-            return ValidationMessage.MUTANT_VALIDATION_OPERATORS;
-        }
-
-        // If bitshifts are used
-        if (level == CodeValidatorLevel.STRICT && containsAny(diff2, PROHIBITED_BITWISE_OPERATORS)) {
-            return ValidationMessage.MUTANT_VALIDATION_OPERATORS;
+        for (MutantInsertionRule rule : ruleSet.getInsertionRules()) {
+            if (rule.fails(diff2)) {
+                return rule.getMessage();
+            }
         }
 
         return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
     }
 
-    private static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
+    static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
         final Pattern pattern = Pattern.compile(TERNARY_OP_REGEX);
 
         Iterator<List<String>> it1 = orig.iterator();
@@ -577,7 +540,7 @@ public class CodeValidator {
         return false;
     }
 
-    private static boolean logicalOpAdded(List<List<String>> orig, List<List<String>> muta) {
+    static boolean logicalOpAdded(List<List<String>> orig, List<List<String>> muta) {
         Iterator<List<String>> it1 = orig.iterator();
         Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
@@ -590,11 +553,11 @@ public class CodeValidator {
         return false;
     }
 
-    private static boolean containsAny(String str, String[] tokens) {
+    static boolean containsAny(String str, String[] tokens) {
         return Arrays.stream(tokens).anyMatch(str::contains);
     }
 
-    private static List<AbstractDelta<String>> getDeltas(String original, String changed) {
+    static List<AbstractDelta<String>> getDeltas(String original, String changed) {
         List<String> originalLines = Arrays
                 .stream(original.split("\n"))
                 .map(String::trim)
@@ -607,7 +570,7 @@ public class CodeValidator {
         return DiffUtils.diff(originalLines, changedLines).getDeltas();
     }
 
-    private static List<List<String>> getChangedLines(String original, String changed) {
+    static List<List<String>> getChangedLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
                 .map(AbstractDelta::getTarget)
@@ -615,7 +578,7 @@ public class CodeValidator {
                 .collect(Collectors.toList());
     }
 
-    private static List<List<String>> getOriginalLines(String original, String changed) {
+    static List<List<String>> getOriginalLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
                 .map(AbstractDelta::getSource)

@@ -40,6 +40,8 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+import static org.codedefenders.validation.code.MutantValidationRules.*;
+
 /**
  * This class checks mutant code and checks whether the code is valid or not.
  *
@@ -62,13 +64,14 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 class MutationVisitor extends VoidVisitorAdapter<Void> {
     private static final Logger logger = LoggerFactory.getLogger(MutationVisitor.class);
 
-    private final CodeValidatorLevel level;
+    //private final CodeValidatorLevel level;
+    private final MutantValidationRuleSet ruleSet;
 
     private boolean isValid = true;
     private ValidationMessage message;
 
-    MutationVisitor(CodeValidatorLevel level) {
-        this.level = level;
+    MutationVisitor(MutantValidationRuleSet ruleSet) {
+        this.ruleSet = ruleSet;
     }
 
     public boolean isValid() {
@@ -85,6 +88,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
+        if (!ruleSet.contains(classDeclarations)) {
+            return;
+        }
         this.message = ValidationMessage.MUTATION_CLASS_DECLARATION;
         isValid = false;
     }
@@ -95,6 +101,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(decl, args);
+        if (!ruleSet.contains(classDeclarations)) {
+            return;
+        }
         this.message = ValidationMessage.MUTATION_CLASS_DECLARATION;
         isValid = false;
     }
@@ -135,6 +144,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
+        if (!ruleSet.contains(prohibitedCalls)) {
+            return;
+        }
         if (stmt.getNameAsString().equals("System")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_USE;
             isValid = false;
@@ -147,7 +159,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_FOR_EACH_STATEMENT;
@@ -160,7 +172,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_IF_STATEMENT;
@@ -173,7 +185,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_FOR_STATEMENT;
@@ -186,7 +198,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_WHILE_STATEMENT;
@@ -199,7 +211,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_DO_STATEMENT;
@@ -212,7 +224,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_SWITCH_STATEMENT;
@@ -225,7 +237,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(expr, args);
-        if (level.equals(CodeValidatorLevel.RELAXED)) {
+        if (!ruleSet.contains(prohibitedControlStructures)) {
             return;
         }
         this.message = ValidationMessage.MUTATION_SWITCH_STATEMENT;
@@ -238,6 +250,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
+        if (!ruleSet.contains(prohibitedCalls)) {
+            return;
+        }
         if (stmt.getNameAsString().startsWith("System.")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_CALL;
             isValid = false;
@@ -250,6 +265,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
+        if (!ruleSet.contains(prohibitedCalls)) {
+            return;
+        }
         if (stmt.getInitializer().isPresent()
                 && JavaParserUtils.unparse(stmt.getInitializer().get()).startsWith("System.")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
