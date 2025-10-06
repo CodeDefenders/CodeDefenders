@@ -95,9 +95,17 @@ public class MutantValidationRuleSet {
         } else throw new RuntimeException("Rules of this type are not supported: " + rule);
     }
 
+    public Set<MutantRule> getAllRules() {
+        Set<MutantRule> result = new HashSet<>(compilationUnitRules);
+        result.addAll(codeRules);
+        result.addAll(linediffRules);
+        result.addAll(insertionRules);
+        return Set.copyOf(result);
+    }
+
     public Set<String> getGeneralDescriptions() {
         Set<String> descriptions = new HashSet<>();
-        for (MutantRule rule : compilationUnitRules) {
+        for (MutantRule rule : getAllRules()) {
             descriptions.add(rule.getGeneralDescription());
         }
         return descriptions;

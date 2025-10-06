@@ -18,9 +18,21 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ tag pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="defaultRuleSets" type="org.codedefenders.validation.code.DefaultRuleSets"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 
 <h3>Mutation rules</h3>
+<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.relaxed}"/>
+<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.moderate}"/>
+<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.strict}"/>
+
+________________________________REMOVE <!--TODO remove -->
+
 <b>Relaxed</b> <br>
 <ul>
     <li>No calls to <i>System.*</i>,<i>Random.*</i></li>

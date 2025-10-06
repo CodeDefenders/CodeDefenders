@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,11 +127,8 @@ public class CodeValidator {
 
     public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
                                                              CodeValidatorLevel level) {
-        MutantValidationRuleSet ruleSet = switch (level) {
-            case RELAXED -> DefaultRuleSets.relaxed;
-            case MODERATE -> DefaultRuleSets.moderate;
-            case STRICT -> DefaultRuleSets.strict;
-        };
+        DefaultRuleSets defaultRuleSets = CDIUtil.getBeanFromCDI(DefaultRuleSets.class);
+        MutantValidationRuleSet ruleSet = defaultRuleSets.getRuleSetFromEnum(level);
         return validateMutantGetMessage(originalCode, mutatedCode, ruleSet);
     }
 
