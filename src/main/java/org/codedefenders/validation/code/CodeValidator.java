@@ -150,15 +150,17 @@ public class CodeValidator {
         List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
         assert (originalLines.size() == changedLines.size());
 
-        // if only string literals were changed TODO ERLAUBT!!!
-        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-        }
+
 
         for (MutantComparisonRule<CompilationUnit> rule : ruleSet.getCompilationUnitRules()) {
             if (rule.fails(originalCU, mutatedCU)) {
                 return rule.getMessage();
             }
+        }
+
+        // if only string literals were changed TODO ERLAUBT!!!
+        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
+            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
         for (MutantComparisonRule<String> rule : ruleSet.getCodeRules()) {

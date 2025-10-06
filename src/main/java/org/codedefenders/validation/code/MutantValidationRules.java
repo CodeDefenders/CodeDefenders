@@ -119,7 +119,7 @@ public class MutantValidationRules {
             "Adding new control structures is not allowed",
             "These control structures are not allowed: " + Arrays.toString(CodeValidator.PROHIBITED_CONTROL_STRUCTURES),
             CodeValidator.PROHIBITED_CONTROL_STRUCTURES,
-            ValidationMessage.MUTANT_VALIDATION_OPERATORS
+            ValidationMessage.MUTANT_VALIDATION_CALLS
     );
 
     public static MutantInsertionRule commentTokens = new MutantInsertionRule(

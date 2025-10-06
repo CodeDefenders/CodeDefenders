@@ -396,8 +396,8 @@ public class CodeValidatorTest {
                     testCase("packageSignature/changedPackage", RELAXED, MUTANT_VALIDATION_PACKAGE_SIGNATURE),
 
                     // MUTANT_VALIDATION_OPERATORS
-                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_VALIDATION_OPERATORS),
-                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_VALIDATION_OPERATORS),
+                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_VALIDATION_CALLS),
+                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_VALIDATION_CALLS),
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
@@ -430,6 +430,10 @@ public class CodeValidatorTest {
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, CodeValidatorLevel codeValidatorLevel,
             Iterable<ValidationMessage> expectedValidationMessages) {
+
+        if (mutant.equals("systemCalls/addedCallToJavaUtilRandom_nextInt")) {
+            System.out.println("hi");
+        }
         String original = loadMutantOriginal(mutant);
         String mutated = loadMutantMutated(mutant);
 
