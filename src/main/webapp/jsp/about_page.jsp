@@ -21,7 +21,9 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<c:set var="title" value="About Code Defenders"/>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<c:set var="title" value="${i18n.tr('About Code Defenders')}"/>
 
 <p:main_page title="${title}">
     <div class="container">
@@ -29,85 +31,88 @@
         <h2 class="mb-4">${title}</h2>
 
         <c:if test="${aboutPage.version != null || aboutPage.gitCommitHash != null}">
-            <h3>Version</h3>
+            <h3>${i18n.tr('Version')}</h3>
             <div class="bg-light rounded-3 p-3 mb-3">
                 <c:if test="${aboutPage.version != null}">
                     <p class="mb-0">
-                        This is Code Defenders version ${aboutPage.version}.
+                            ${i18n.tr('This is Code Defenders version {0}.', aboutPage.version)}
                     </p>
                 </c:if>
                 <c:if test="${aboutPage.gitCommitHash != null}">
                     <p class="mb-0">
                         <c:choose>
                             <c:when test="${aboutPage.version == null}">
-                                This is Code Defenders running on git commit ${aboutPage.gitCommitHash}.
+                                ${i18n.tr('This is Code Defenders running on git commit {0}.', aboutPage.gitCommitHash)}
                             </c:when>
                             <c:otherwise>
-                                The git commit hash is ${aboutPage.gitCommitHash}.
+                                ${i18n.tr('The git commit hash is {0}.', aboutPage.gitCommitHash)}
                             </c:otherwise>
                         </c:choose>
                     </p>
                     <c:if test="${aboutPage.dirty}">
                         <p class="mb-0">
-                            The version is dirty, i.e., the working directory contains uncommitted changes.
+                                ${i18n.tr('The version is dirty, i.e., the working directory contains uncommitted changes.')}
                         </p>
                     </c:if>
                 </c:if>
             </div>
         </c:if>
 
-        <h3 class="mt-4 mb-3">Source Code</h3>
+        <h3 class="mt-4 mb-3">${i18n.tr('Source Code')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <p class="mb-0">
-                CodeDefenders is developed and maintained at the
-                <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software
-                    Engineering&nbspII</a>
-                at the University of Passau and the
-                <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
+                    ${i18n.tr('CodeDefenders is developed and maintained at the')}
+                <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">${i18n.tr('Chair of Software Engineering II')}</a>
+                    ${i18n.tr('at the University of Passau and the')}
+                <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">${i18n.tr('University of Leicester')}</a>.
             </p>
             <p class="mb-0">
-                Code Defenders is an open source project.
-                See the
+                    ${i18n.tr('Code Defenders is an open source project.')}
+                    ${i18n.tr('See the')}
                 <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a>
-                project page.
+                    ${i18n.tr('project page.')}
             </p>
         </div>
 
-        <h3 class="mt-4 mb-3">Contributors</h3>
+        <h3 class="mt-4 mb-3">${i18n.tr('Contributors')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul>
                 <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser
-                    (University of Passau)</a></li>
-                <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (University of Leicester)</a></li>
+                    (${i18n.tr('University of Passau')})</a></li>
+                <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (${i18n.tr('University of Leicester')})</a>
+                </li>
             </ul>
             <ul class="mb-0">
-                <li>Ben Clegg (The University of Sheffield)</li>
-                <li>Alexander Degenhart (University of Passau)</li>
-                <li>Sabina Galdobin (University of Passau)</li>
+                <li>Ben Clegg (${i18n.tr('The University of Sheffield')})</li>
+                <li>Alexander Degenhart (${i18n.tr('University of Passau')})</li>
+                <li>Sabina Galdobin (${i18n.tr('University of Passau')})</li>
                 <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi
-                    (University of Passau)</a></li>
-                <li>Marvin Kreis (University of Passau)</li>
-                <li>Kassian K&ouml;ck (University of Passau)</li>
-                <li>Rob Sharp (The University of Sheffield)</li>
-                <li>Lorenz Wendlinger (University of Passau)</li>
-                <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
-                <li>Thomas White (The University of Sheffield)</li>
+                    (${i18n.tr('University of Passau')})</a></li>
+                <li>Marvin Kreis (${i18n.tr('University of Passau')})</li>
+                <li><a href="https://tim-greller.de">Tim Greller</a> (${i18n.tr('University of Passau')})</li>
+                <li>Aaron Prott (${i18n.tr('University of Passau')})</li>
+                <li>Kassian K&ouml;ck (${i18n.tr('University of Passau')})</li>
+                <li>Rob Sharp (${i18n.tr('The University of Sheffield')})</li>
+                <li>Lorenz Wendlinger (${i18n.tr('University of Passau')})</li>
+                <li><a href="https://github.com/werli">Phil Werli</a> (${i18n.tr('University of Passau')})</li>
+                <li>Thomas White (${i18n.tr('The University of Sheffield')})</li>
             </ul>
         </div>
 
-        <h3 class="mt-4 mb-3">Supporters</h3>
+        <h3 class="mt-4 mb-3">${i18n.tr('Supporters')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul class="mb-0">
-                <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in
-                    Software Engineering Courses through Gamification)
+                <li><a href="https://impress-project.eu/">IMPRESS Project</a>
+                    (${i18n.tr('Improving Engagement of Students in Software Engineering Courses through Gamification')})
                 </li>
-                <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a>
+                <li><a href="https://www.sheffield.ac.uk/sure">SURE
+                    (${i18n.tr('Sheffield Undergraduate Research Experience')})</a>
                 </li>
-                <li><a href="http://royalsociety.org/">Royal Society (Grant RG160969)</a></li>
+                <li><a href="http://royalsociety.org/">Royal Society</a> (${i18n.tr('Grant RG160969')})</li>
             </ul>
         </div>
 
-        <h3 class="mt-4 mb-3">Research</h3>
+        <h3 class="mt-4 mb-3">${i18n.tr('Research')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <div class="ps-3">
                 <jsp:include page="research.jsp"/>

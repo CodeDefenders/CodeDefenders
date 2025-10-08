@@ -12,6 +12,103 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:26
+msgid "About Code Defenders"
+msgstr "Über CodeDefenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:34
+msgid "Version"
+msgstr "Version"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:54
+msgid ""
+"The version is dirty, i.e., the working directory contains uncommitted "
+"changes."
+msgstr ""
+"Die Version ist schmutzig, d.h. das Arbeitsverzeichnis enthält unübertragene "
+"Änderungen."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:61
+msgid "Source Code"
+msgstr "Quellcode"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:64
+msgid "CodeDefenders is developed and maintained at the"
+msgstr "CodeDefenders wird betrieben und entwickelt vom"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:65
+msgid "Chair of Software Engineering II"
+msgstr "Lehrstuhl für Software Engineering II"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:66
+msgid "at the University of Passau and the"
+msgstr "an der Universität Passau und der"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:67
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:82
+msgid "University of Leicester"
+msgstr "Universität Leicester"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:70
+msgid "Code Defenders is an open source project."
+msgstr "CodeDefenders ist ein Open Source Projekt."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:71
+msgid "See the"
+msgstr "Gehe zur"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:73
+msgid "project page."
+msgstr "Projektseite."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:77
+msgid "Contributors"
+msgstr "Mitwirkende"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:81
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:86
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:87
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:89
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:90
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:91
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:92
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:93
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:95
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:96
+msgid "University of Passau"
+msgstr "Universität Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:85
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:94
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:97
+msgid "The University of Sheffield"
+msgstr "Universität Sheffield"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:101
+msgid "Supporters"
+msgstr "Unterstützer"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:104
+msgid ""
+"Improving Engagement of Students in Software Engineering Courses through "
+"Gamification"
+msgstr ""
+"Verbesserung des Engagements von Studierenden in Software-Engineering-Kursen "
+"durch Gamification"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:106
+msgid "Sheffield Undergraduate Research Experience"
+msgstr "Sheffield Undergraduate Research Experience"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:108
+msgid "Grant RG160969"
+msgstr ""
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:112
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:143
+msgid "Research"
+msgstr "Forschung"
+
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:39
 #: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:45
 #: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/navbar.tag:98
@@ -351,10 +448,6 @@ msgstr "Laufende Konfrontationspiele"
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:111
 msgid "Players"
 msgstr "Spieler"
-
-#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/index.jsp:143
-msgid "Research"
-msgstr "Forschung"
 
 #: /home/timlg07/CodeDefenders/src/main/webapp/WEB-INF/tags/footer.tag:38
 msgid "About CodeDefenders"

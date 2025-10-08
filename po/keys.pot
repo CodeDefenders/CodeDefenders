@@ -3,6 +3,130 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:26
+msgid "About Code Defenders"
+msgstr "About Code Defenders"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:34
+msgid "Version"
+msgstr "Version"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:54
+msgid "The version is dirty, i.e., the working directory contains uncommitted changes."
+msgstr "The version is dirty, i.e., the working directory contains uncommitted changes."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:61
+msgid "Source Code"
+msgstr "Source Code"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:64
+msgid "CodeDefenders is developed and maintained at the"
+msgstr "CodeDefenders is developed and maintained at the"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:65
+msgid "Chair of Software Engineering II"
+msgstr "Chair of Software Engineering II"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:66
+msgid "at the University of Passau and the"
+msgstr "at the University of Passau and the"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:67
+msgid "University of Leicester"
+msgstr "University of Leicester"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:70
+msgid "Code Defenders is an open source project."
+msgstr "Code Defenders is an open source project."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:71
+msgid "See the"
+msgstr "See the"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:73
+msgid "project page."
+msgstr "project page."
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:77
+msgid "Contributors"
+msgstr "Contributors"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:81
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:82
+msgid "University of Leicester"
+msgstr "University of Leicester"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:85
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:86
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:87
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:89
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:90
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:91
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:92
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:93
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:94
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:95
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:96
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:97
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:101
+msgid "Supporters"
+msgstr "Supporters"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:104
+msgid "Improving Engagement of Students in Software Engineering Courses through Gamification"
+msgstr "Improving Engagement of Students in Software Engineering Courses through Gamification"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:106
+msgid "Sheffield Undergraduate Research Experience"
+msgstr "Sheffield Undergraduate Research Experience"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:108
+msgid "Grant RG160969"
+msgstr "Grant RG160969"
+
+#: /home/timlg07/CodeDefenders/src/main/webapp/jsp/about_page.jsp:112
+msgid "Research"
+msgstr "Research"
+
 #: /home/timlg07/CodeDefenders/src/main/webapp/jsp/help.jsp:39
 msgid "Help"
 msgstr "Help"
