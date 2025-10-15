@@ -54,7 +54,6 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
-import org.codedefenders.persistence.database.LLMRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;

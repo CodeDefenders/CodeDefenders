@@ -50,7 +50,7 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -119,7 +119,7 @@ public class GameManagingUtilsTest {
                         KillMapService.class,
                         UserRepository.class,
                         LlmService.class,
-                        LLMRepository.class,
+                        LlmRepository.class,
                         URLUtils.class)
                 .inject(this)
                 .activate(RequestScoped.class)

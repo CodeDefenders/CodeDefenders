@@ -28,8 +28,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.codedefenders.model.LLModel;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -40,11 +40,11 @@ public class AdminLLM extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminLLM.class);
 
     @Inject
-    LLMRepository llmRepo;
+    LlmRepository llmRepo;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        List<LLModel> models = llmRepo.getAllModels();
+        List<LlModel> models = llmRepo.getAllModels();
 
         request.setAttribute("models", models);
         request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());

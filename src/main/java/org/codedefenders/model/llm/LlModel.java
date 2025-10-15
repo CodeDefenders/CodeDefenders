@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model;
+package org.codedefenders.model.llm;
 
 import java.util.Optional;
 
@@ -24,14 +24,15 @@ import com.google.gson.annotations.Expose;
 
 /**
  * Information about a specific Large Language Model that can be used by an LLM Defender or an LLM Attacker.
- * Prompts can be customized for each model, if not specified they inherit the default values as defined in
- * the static fields of this class.
+ * Prompts can be customized for each model, if not specified they inherit the values of the default model, which is
+ * obtained by {@link org.codedefenders.persistence.database.LlmRepository#getDefaultModel()}
+ * TODO: This could be made easier by using a {@code Map<PromptType, String>} or something similar
  */
-public class LLModel {
+public class LlModel {
     @Expose
     private final String name;
     @Expose
-    private final LLMType type;
+    private final LlmType type;
     @Expose
     private boolean active;
 
@@ -48,7 +49,7 @@ public class LLModel {
     private boolean attackerDependencies = true;
     /**
      * This String replaces the normal prompt if there are any dependency classes (and if
-     * {@link LLModel#attackerDependencies} is true).
+     * {@link LlModel#attackerDependencies} is true).
      * The code of the dependencies will be appended to the code of the CuT as part of the user message.
      */
     @Expose
@@ -56,7 +57,7 @@ public class LLModel {
 
     /**
      * This prompt is used to generate a test to kill a suspected mutant. The user message consists of the CuT,
-     * the dependencies if {@link LLModel#attackerDependencies} is true, and the diff of the suspected mutant.
+     * the dependencies if {@link LlModel#attackerDependencies} is true, and the diff of the suspected mutant.
      */
     @Expose
     private String resolveEquivalencePrompt;
@@ -75,7 +76,7 @@ public class LLModel {
 
     /**
      * This String replaces the normal defender if there are any dependency classes (and if
-     * {@link LLModel#attackerDependencies} is true).
+     * {@link LlModel#attackerDependencies} is true).
      * The code of the dependencies will be appended to the code of the CuT as part of the user message.
      */
     @Expose
@@ -96,7 +97,7 @@ public class LLModel {
     @Expose
     private String defenderMethodFocusPrompt;
 
-    public LLModel(String name, LLMType type) {
+    public LlModel(String name, LlmType type) {
         this.name = name;
         this.type = type;
     }
@@ -105,7 +106,7 @@ public class LLModel {
         return name;
     }
 
-    public LLMType getType() {
+    public LlmType getType() {
         return type;
     }
 
@@ -199,7 +200,7 @@ public class LLModel {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof LLModel m) {
+        if (o instanceof LlModel m) {
             return m.type == type && (m.getName() == null && name == null || m.getName().equals(name));
         } else return false;
     }
@@ -207,7 +208,7 @@ public class LLModel {
     /**
      * Loads all values except name and type from the other model.
      */
-    public void copyValues(LLModel other) {
+    public void copyValues(LlModel other) {
         active = other.active;
 
         attackerPrompt = other.attackerPrompt;
@@ -219,5 +220,16 @@ public class LLModel {
         defenderDependencyPrompt = other.defenderDependencyPrompt;
         defenderMethodFocus = other.defenderMethodFocus;
         defenderMethodFocusPrompt = other.defenderMethodFocusPrompt;
+    }
+
+    public Optional<String> getPrompt(PromptType type) {
+        return Optional.ofNullable(switch (type) {
+            case DEFEND_DEFAULT -> defenderPrompt;
+            case DEFEND_DEPENDENCIES -> defenderDependencyPrompt;
+            case DEFEND_FOCUS -> defenderMethodFocusPrompt;
+            case ATTACK_DEFAULT -> attackerPrompt;
+            case ATTACK_DEPENDENCIES -> attackerDependencyPrompt;
+            case ATTACK_EQUIVALENCE -> resolveEquivalencePrompt;
+        });
     }
 }

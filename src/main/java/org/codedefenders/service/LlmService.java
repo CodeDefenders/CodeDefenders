@@ -50,10 +50,12 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.LLMType;
-import org.codedefenders.model.LLModel;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.GameRepository;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -66,8 +68,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.exception.TimeoutException;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -84,14 +84,14 @@ public class LlmService {
     private final ScheduledExecutorService organizerExecutor;
 
     private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)";
-    private static final int EQUIVALENT_POINT_RESTRICTION = 0; //TODO Als system setting??
+    private static final int EQUIVALENT_POINT_RESTRICTION = 10; //TODO Als system setting??
 
     Configuration config;
     GameRepository gameRepository;
     GameManagingUtils gameManagingUtils;
     GameService gameService;
     MutantRepository mutantRepository;
-    LLMRepository llmRepo;
+    LlmRepository llmRepo;
 
     //Maps model name to ChatModel
     Map<String, ChatModel> openaiModels = new HashMap<>();
@@ -106,8 +106,8 @@ public class LlmService {
         For melee games, attacking and defending can be done using different models, or one side can be disabled.
         The melee player is considered active as long as not both these maps map the game id to null.
      */
-    private final Map<Integer, LLModel> activeLlmDefenders;
-    private final Map<Integer, LLModel> activeLlmAttackers;
+    private final Map<Integer, LlModel> activeLlmDefenders;
+    private final Map<Integer, LlModel> activeLlmAttackers;
 
     /*
      * Maps game ids to the last error message of failed llm actions.
@@ -121,7 +121,7 @@ public class LlmService {
                       MutantRepository mutantRepository,
                       GameManagingUtils gameManagingUtils,
                       GameService gameService,
-                      LLMRepository llmRepo) {
+                      LlmRepository llmRepo) {
         this.config = config;
         this.gameRepository = gameRepository;
         this.gameManagingUtils = gameManagingUtils;
@@ -138,15 +138,15 @@ public class LlmService {
         organizerExecutor = Executors.newSingleThreadScheduledExecutor();
         llmExecutor = Executors.newCachedThreadPool();
 
-        List<LLModel> models = llmRepo.getAllModels();
-        for (LLModel m : models) {
-            if (m.getType() == LLMType.OPENAI) {
+        List<LlModel> models = llmRepo.getAllModels();
+        for (LlModel m : models) {
+            if (m.getType() == LlmType.OPENAI) {
                 openaiModels.put(m.getName(), OpenAiChatModel.builder()
                         .apiKey(config.getOpenaiApiKey())
                         .modelName(m.getName())
                         .build());
             }
-            if (m.getType() == LLMType.OLLAMA) {
+            if (m.getType() == LlmType.OLLAMA) {
                 ollamaModels.put(m.getName(), OllamaChatModel.builder()
                         .baseUrl(config.getLlmLocalServer())
                         .modelName(m.getName())
@@ -157,14 +157,9 @@ public class LlmService {
     }
 
 
-    public String getResponse(LLModel model, String userMessage, String... systemMessages) {
-        logger.info("Send message: \n {} to LLM with system messages:\n{}", userMessage,
-                String.join("\n", systemMessages));
-        ChatMessage[] chatMessages = new ChatMessage[systemMessages.length + 1];
-        for (int i = 0; i < systemMessages.length; i++) {
-            chatMessages[i] = SystemMessage.from(systemMessages[i]);
-        }
-        chatMessages[chatMessages.length - 1] = UserMessage.from(userMessage);
+    public String getResponse(LlModel model, LlmConversation conversation) {
+        logger.info("Sending conversation \n{}\n to model {}.", conversation, model);
+        ChatMessage[] chatMessages = conversation.toArray();
 
         Map<String, ChatModel> chatMap = switch (model.getType()) {
             case OPENAI -> openaiModels;
@@ -174,6 +169,7 @@ public class LlmService {
         ChatModel chatModel = chatMap.get(model.getName());
         if (chatModel != null) {
             ChatResponse response = chatModel.chat(chatMessages);
+            conversation.addAiMessage(response.aiMessage());
             String responseText = response.aiMessage().text();
             logger.info("LLM responded with {}", responseText);
             return responseText;
@@ -182,7 +178,7 @@ public class LlmService {
         }
     }
 
-    private Map<Integer, LLModel> getCorrectMap(Role r) {
+    private Map<Integer, LlModel> getCorrectMap(Role r) {
         return switch (r) {
             case ATTACKER -> activeLlmAttackers;
             case DEFENDER -> activeLlmDefenders;
@@ -218,7 +214,7 @@ public class LlmService {
     /**
      * Returns the minimum number of seconds between two actions of the same llm thread.
      */
-    public int getLlmActionInterval(AbstractGame game) {
+    public int getLlmActionInterval() {
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
                 .getIntValue();
     }
@@ -238,16 +234,16 @@ public class LlmService {
     /**
      * Returns the model currently active for a specific game, or an empty Optional if there is no active model.
      */
-    public Optional<LLModel> getModelForGame(AbstractGame game, Role role) {
+    public Optional<LlModel> getModelForGame(AbstractGame game, Role role) {
         return getModelForGame(game.getId(), role);
     }
 
-    public Optional<LLModel> getModelForGame(int gameId, Role role) {
+    public Optional<LlModel> getModelForGame(int gameId, Role role) {
         return Optional.ofNullable(getCorrectMap(role).get(gameId));
     }
 
-    public void setPlayerModel(AbstractGame game, Role role, LLModel model) {
-        Map<Integer, LLModel> m = getCorrectMap(role);
+    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
+        Map<Integer, LlModel> m = getCorrectMap(role);
         boolean alreadyPresent = isLlmPlayerPresent(game, role);//m.containsKey(game.getId());
 
         if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
@@ -262,7 +258,8 @@ public class LlmService {
             game.addPlayer(getCorrectUserId(role), role);
             final Role finalRole = role;
 
-            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole, new Random())));
+            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
+                    new LlmConversation(), new Random())));
         }
     }
 
@@ -284,52 +281,128 @@ public class LlmService {
         return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, response);
     }
 
-    private String generateTest(AbstractGame game, SimpleUser user, Random random) throws NoSuchModelException {
-        final LLModel model = activeLlmDefenders.get(game.getId());
+    private PromptType getCorrectDefendPromptType(LlModel model, AbstractGame game, SimpleUser user) {
+        if (model.isDefenderMethodFocus() && hasLivingMutants(game, user)) {
+            return PromptType.DEFEND_FOCUS;
+        }
+        if (model.isDefenderDependencies() && !game.getCUT().getDependencyNames().isEmpty()) {
+            return PromptType.DEFEND_DEPENDENCIES;
+        }
+        return PromptType.DEFEND_DEFAULT;
+    }
+
+    private PromptType getCorrectAttackPromptType(LlModel model, AbstractGame game) {
+        if (model.isAttackerDependencies() && !game.getCUT().getDependencyNames().isEmpty()) {
+            return PromptType.ATTACK_DEPENDENCIES;
+        } else {
+            return PromptType.ATTACK_DEFAULT;
+        }
+    }
+
+    /**
+     * Returns the model's system prompt of this type, or the default prompt of this type if the model has no prompt
+     * of its own. The model is updated before.
+     */
+    private String getSystemPrompt(LlModel model, PromptType type) throws NoSuchModelException {
+        llmRepo.loadModel(model);
+        Optional<String> specificPrompt = model.getPrompt(type);
+        if (specificPrompt.isPresent()) {
+            return specificPrompt.get();
+        } else {
+            LlModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
+            return defaultModel.getPrompt(type).orElseThrow();
+        }
+    }
+
+    /**
+     * Adds the source code of the CuT as the user message. If the prompt specifies that dependencies have to be
+     * included, the source code of the dependencies is included as well.
+     */
+    private void addUserMessage(AbstractGame game, LlmConversation conversation) {
+        if (conversation.getCurrentType() == PromptType.DEFEND_DEPENDENCIES
+                || conversation.getCurrentType() == PromptType.ATTACK_DEPENDENCIES) {
+            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + String.join("\n", game.getCUT().getDependencyCode()));
+        } else {
+            conversation.addUserMessage(game.getCUT().getSourceCode());
+        }
+
+    }
+
+    private String generateTest(AbstractGame game, SimpleUser user, LlmConversation conversation, Random random)
+            throws NoSuchModelException {
+        final LlModel model = activeLlmDefenders.get(game.getId());
         if (model == null) {
             return null;
         }
-        llmRepo.loadModel(model);
         if (!model.isActive()) {
             throw new NoSuchModelException(model.getType(), model.getName());
         }
-        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
-        String systemMessage = model.getDefenderPrompt().orElse(defaultModel.getDefenderPrompt().orElseThrow());
 
-        StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
-        if (model.isDefenderDependencies()) {
-            List<String> dependencyCode = game.getCUT().getDependencyCode();
-            if (!dependencyCode.isEmpty()) {
-                systemMessage = model.getDefenderDependencyPrompt().
-                        orElse(defaultModel.getDefenderDependencyPrompt().orElseThrow());
-                for (String d : game.getCUT().getDependencyCode()) {
-                    userMessage.append(d);
-                }
+        PromptType promptType = getCorrectDefendPromptType(model, game, user);
+        conversation.setCurrentType(promptType);
+        if (conversation.isEmpty()) {
+            String systemMessage = getSystemPrompt(model, promptType);
+            if (promptType == PromptType.DEFEND_FOCUS) {
+                systemMessage = String.format(systemMessage, getRandomMethodWithLivingMutant(game, user, random));
             }
+            conversation.addSystemMessage(systemMessage);
+
+            addUserMessage(game, conversation);
         }
 
-        if (model.isDefenderMethodFocus()) {
-            Optional<String> methodDescription = getRandomMethodWithLivingMutant(game, user, random);
-            if (methodDescription.isPresent()) {
-                systemMessage = String.format(model.getDefenderMethodFocusPrompt().
-                        orElse(defaultModel.getDefenderMethodFocusPrompt().orElseThrow()), methodDescription.get());
-            }
-        }
-
-        String response = getResponse(model, userMessage.toString(), systemMessage);
+        String response = getResponse(model, conversation);
         String testSrc = testTemplateFromResponse(response, game);
         logger.info("AI defender generated test: {}", testSrc);
         return testSrc;
     }
 
-    private void submitTest(AbstractGame game, String testSrc) {
+    /**
+     * This method submits the generated test code to the game. It should only be called from inside an LLM action,
+     * after the test code has been generated and the game has been refreshed.
+     *
+     * @param game         The game to which the test is submitted.
+     * @param testSrc      The formatted test code. All formatting heuristics should have already been performed.
+     * @param conversation An existing conversation. Its {@link LlmConversation#getCurrentType()} must have already
+     *                     been set by the generating method. If the submission is successful, the current conversation
+     *                     will be cleared, if not, the conversation will be appended with additional messages
+     *                     explaining the failure reasons.
+     */
+    private void submitTest(AbstractGame game, String testSrc, LlmConversation conversation) {
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
+        switch (conversation.getCurrentType()) {
+            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS -> {
+            }
+            default -> throw new RuntimeException("Conversation during test submission may not be of type " +
+                    conversation.getCurrentType());
+        }
         try {
+            GameManagingUtils.CreateBattlegroundTestResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
-            } else {//TODO Ergibt das Sinn? Ist aber eh alles komisch mit battleground und melee
-                gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
+                result = gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
+            } else {
+                result = gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
+            }
+            if (result.isSuccess()) {
+                conversation.clear();
+            } else {
+                StringBuilder correction = new StringBuilder();
+                switch (result.failureReason().orElseThrow()) {
+                    case VALIDATION_FAILED -> {
+                        correction.append("Your test has violated these rules: \n");
+                        result.validationErrorMessages().orElseThrow().forEach(
+                                correction::append
+                        );
+
+                    }
+                    case COMPILATION_FAILED ->
+                            correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
+                    case TEST_DID_NOT_PASS_ON_CUT ->
+                            correction.append("Your test did not pass on the original code for the following reason: ")
+                                    .append(result.testCutError().orElseThrow());
+                }
+                correction.append("\nFix these problems.");
+                conversation.addSystemMessage(correction.toString());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -344,53 +417,23 @@ public class LlmService {
         llmExecutor.shutdownNow();
     }
 
-    private String generateMutant(AbstractGame game) throws NoSuchModelException {
-        StringBuilder userMessage = new StringBuilder(game.getCUT().getSourceCode());
+    private String generateMutant(AbstractGame game, LlmConversation conversation) throws NoSuchModelException {
+        LlModel model = activeLlmAttackers.get(game.getId());
 
-        LLModel model = activeLlmAttackers.get(game.getId());
-        if (model == null) {
-            return null;
-        }
-        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
-        llmRepo.loadModel(model);
-        if (!model.isActive()) {
-            throw new NoSuchModelException(model.getType(), model.getName());
-        }
-        String systemMessage = model.getAttackerPrompt().orElse(defaultModel.getAttackerPrompt().orElseThrow());
-
-        String firstDependencyName = null;//TODO Gibt's hierfür bessere Möglichkeiten? Gefahr,
-        if (model.isAttackerDependencies()) {
-            // wenn CUT und Dependency gleichen Namen haben?
-            List<String> dependencies = game.getCUT().getDependencyCode();
-            if (!dependencies.isEmpty()) {
-                systemMessage = model.getAttackerDependencyPrompt().
-                        orElse(defaultModel.getAttackerDependencyPrompt().orElseThrow());
-                for (String d : game.getCUT().getDependencyCode()) {
-                    userMessage.append(System.lineSeparator()).append(d);
-                    if (firstDependencyName == null) {
-                        firstDependencyName = game.getCUT().getDependencyNames().get(0);
-                    }
-                }
-            }
+        PromptType promptType = getCorrectAttackPromptType(model, game);
+        conversation.setCurrentType(promptType);
+        if (conversation.isEmpty()) {
+            conversation.addSystemMessage(getSystemPrompt(model, promptType));
+            addUserMessage(game, conversation);
         }
 
-        //TODO Method Focus
-
-        String result = getResponse(model, userMessage.toString(), systemMessage);
-        String formattedResult = result.replace("```java", "").replace("```", "");
-        if (firstDependencyName != null) {
-            int classDeclaration = formattedResult.indexOf("class " + firstDependencyName);
-            if (classDeclaration > 0) {
-                formattedResult = formattedResult.substring(0, classDeclaration);
-                int lastNewline = formattedResult.lastIndexOf(System.lineSeparator());
-                formattedResult = formattedResult.substring(0, lastNewline);
-            }
-        }
+        String result = getResponse(model, conversation);
+        String formattedResult = LlmUtils.extractMutantFromReply(result, true, game);
         logger.info("LLM attacker generated mutant: {}", formattedResult);
         return formattedResult;
     }
 
-    private void submitMutant(AbstractGame game, String mutantSrc) {
+    private void submitMutant(AbstractGame game, String mutantSrc, LlmConversation conversation) {
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
         try {
@@ -403,9 +446,18 @@ public class LlmService {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
             if (result.isSuccess()) {
+                conversation.clear();
                 logger.info("LLM successfully submitted mutant.");
+
             } else {
-                logger.info("LLM couldn't submit mutant: {}", result.validationErrorMessage().orElse(null));
+                conversation.addSystemMessage(
+                        switch (result.failureReason().orElseThrow()) {
+                            case VALIDATION_FAILED -> "Your mutant has violated the following rule: \n"
+                                    + result.validationErrorMessage().orElseThrow();
+                            case DUPLICATE_MUTANT_FOUND -> "Your mutant already exists. Create another one.";
+                            case COMPILATION_FAILED -> "Your mutant failed to compile. Compilation error: "
+                                    + result.compilationError().orElseThrow();
+                        } + "\n Fix this.");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -421,25 +473,55 @@ public class LlmService {
      * Generate a test that should kill a mutant that was flagged as equivalent. Waits until the generation by the
      * llm is complete.
      */
-    private String generateEquivalenceTest(AbstractGame game, MutantDTO flagged) throws NoSuchModelException {
-        LLModel model = activeLlmAttackers.get(game.getId());
-        llmRepo.loadModel(model);
-        LLModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
+    private String generateEquivalenceTest(AbstractGame game, MutantDTO flagged, LlmConversation conversation)
+            throws NoSuchModelException {
+        LlModel model = activeLlmAttackers.get(game.getId());
 
-        String systemMessage = model.getResolveEquivalencePrompt()
-                .orElse(defaultModel.getResolveEquivalencePrompt().orElseThrow());
-
-        String userMessage = game.getCUT().getSourceCode() + "\n" + flagged.getPatchString();
-        String response = getResponse(model, userMessage, systemMessage);
+        if (conversation.isEmpty()) {
+            conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE));
+            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString());
+        }
+        String response = getResponse(model, conversation);
         return testTemplateFromResponse(response, game);
     }
 
-    private void submitEquivalenceTest(AbstractGame game, String testSource, MutantDTO equivalentMutantDTO, int userId) {
+    private void submitEquivalenceTest(AbstractGame game, String testSource, MutantDTO equivalentMutantDTO, int userId,
+                                       LlmConversation conversation) {
+        if (conversation.getCurrentType() != PromptType.ATTACK_EQUIVALENCE) {
+            logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getCurrentType());
+            throw new RuntimeException("Conversation may not be of type " + conversation.getCurrentType()
+                    + " in submitEquivalenceTest");
+        }
+
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
         Mutant equivalentMutant = mutantRepository.getMutantById(equivalentMutantDTO.getId());
         try {
-            gameManagingUtils.rejectBattlegroundEquivalence(game, userId, equivalentMutant, testSource);
+            GameManagingUtils.RejectBattlegroundEquivalenceResult result =
+                    gameManagingUtils.rejectBattlegroundEquivalence(game, userId, equivalentMutant, testSource);
+
+            if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
+                conversation.clear();
+            } else {
+                StringBuilder correction = new StringBuilder();
+                switch (result.failureReason().orElseThrow()) {
+                    case VALIDATION_FAILED -> {
+                        correction.append("Your test has violated these rules: \n");
+                        result.validationErrorMessages().orElseThrow().forEach(
+                                correction::append
+                        );
+
+                    }
+                    case COMPILATION_FAILED ->
+                            correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
+                    case TEST_DID_NOT_PASS_ON_CUT ->
+                            correction.append("Your test did not pass on the original code for the following reason: ")
+                                    .append(result.testCutError().orElseThrow());
+                }
+                correction.append("\nFix these problems.");
+                conversation.addSystemMessage(correction.toString());
+            }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -511,14 +593,22 @@ public class LlmService {
     }
 
     /**
+     * Returns if the game has living mutants that are not created by the user.
+     */
+    private boolean hasLivingMutants(AbstractGame game, SimpleUser user) {
+        return gameService.getMutants(user, game).stream().anyMatch(
+                mutantDTO -> mutantDTO.getState() == Mutant.State.ALIVE);
+    }
+
+    /**
      * Stop all llm players with that model.
      */
-    public void closeModel(@NotNull LLModel model) {
+    public void closeModel(@NotNull LlModel model) {
         closeModel(model, Role.ATTACKER);
         closeModel(model, Role.DEFENDER);
     }
 
-    private void closeModel(LLModel model, Role role) {
+    private void closeModel(LlModel model, Role role) {
         new HashSet<>(getCorrectMap(role).entrySet()).stream()
                 .filter(entry -> model.equals(entry.getValue()))
                 .mapToInt(Map.Entry::getKey)
@@ -548,19 +638,13 @@ public class LlmService {
     }
 
     /**
-     * Check if there are any open equivalent duels that the user has to react to (as a player or attacker).
-     */
-    private boolean hasOpenEquivalentDuel(SimpleUser user, AbstractGame game) {
-        return !gameService.getFlaggedMutants(user, game).isEmpty();
-    }
-
-    /**
      * This is supposed to run in a separate thread created by {@link LlmService#llmExecutor}.
      * It only runs for a single action, i.e. one mutant or one test, and then schedules another execution of itself
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
      */
-    public void runLlmAction(AbstractGame game, final Role role, final Random random) {
+    public void runLlmAction(AbstractGame game, final Role role, final LlmConversation conversation,
+                             final Random random) {
 
         int userId = switch (role) {
             case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
@@ -571,26 +655,26 @@ public class LlmService {
         final SimpleUser user = new SimpleUser(userId, "PLACEHOLDER");
 
         logger.info("Starting LlmPlayerThread for game {} with role {}", game.getId(), role);
-        long timeToStartNextThread = getLlmActionInterval(game) * 1000L + System.currentTimeMillis();
+        long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
         if (isLlmPlayerActive(game, role) && gameRepository.isGameActive(game.getId())) {
             try {
                 if (role == Role.DEFENDER) {
                     claimEquivalent(user, game, random);
-                    String testSrc = generateTest(game, user, random);
+                    String testSrc = generateTest(game, user, conversation, random);
                     game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
-                    submitTest(game, testSrc);
+                    submitTest(game, testSrc, conversation);
                 } else {
                     for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
-                        String killingTestSource = generateEquivalenceTest(game, flagged);
+                        String killingTestSource = generateEquivalenceTest(game, flagged, conversation);
                         logger.info("LLM player with role {} in game {}" +
                                 " submitted the following test in an equivalence duel: " +
                                 "\n{}", role, game.getId(), killingTestSource);
-                        submitEquivalenceTest(game, killingTestSource, flagged, userId);
+                        submitEquivalenceTest(game, killingTestSource, flagged, userId, conversation);
                     }
                     if (role == Role.ATTACKER) {
-                        String mutantSrc = generateMutant(game);
+                        String mutantSrc = generateMutant(game, conversation);
                         game = gameRepository.getGame(game.getId());
-                        submitMutant(game, mutantSrc);
+                        submitMutant(game, mutantSrc, conversation);
                     } else {
                         claimEquivalent(user, game, random);
                         boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
@@ -601,14 +685,14 @@ public class LlmService {
                         }
                         boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
 
-                        if (attack) {
-                            String mutantSrc = generateMutant(game);
+                        if (attack) { //TODO mistakes for mutants
+                            String mutantSrc = generateMutant(game, conversation);
                             game = gameRepository.getGame(game.getId());
-                            submitMutant(game, mutantSrc);
+                            submitMutant(game, mutantSrc, conversation);
                         } else {
-                            String testSrc = generateTest(game, user, random);
+                            String testSrc = generateTest(game, user, conversation, random);
                             game = gameRepository.getGame(game.getId()); //Refresh game data before submitting
-                            submitTest(game, testSrc);
+                            submitTest(game, testSrc, conversation);
                         }
                     }
                 }
@@ -631,8 +715,10 @@ public class LlmService {
             } finally {
                 long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
                 final AbstractGame finalGame = game;
+                conversation.resetCurrentType();
 
-                organizerExecutor.schedule(() -> llmExecutor.execute(() -> runLlmAction(finalGame, role, random)),
+                organizerExecutor.schedule(() -> llmExecutor.execute(
+                                () -> runLlmAction(finalGame, role, conversation, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
             }
         } else {
@@ -641,10 +727,10 @@ public class LlmService {
     }
 
     public static class NoSuchModelException extends Exception {
-        LLMType type;
+        LlmType type;
         String name;
 
-        public NoSuchModelException(LLMType type, String name) {
+        public NoSuchModelException(LlmType type, String name) {
             super("No such model: type: " + type + ", name: " + name);
             this.type = type;
             this.name = name;

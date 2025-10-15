@@ -32,9 +32,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.Role;
-import org.codedefenders.model.LLMType;
-import org.codedefenders.model.LLModel;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.service.LlmService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -56,7 +56,7 @@ public class LlmApi extends HttpServlet {
     Logger logger = LoggerFactory.getLogger(LlmApi.class);
 
     @Inject
-    LLMRepository llmRepo;
+    LlmRepository llmRepo;
 
     @Inject
     URLUtils url;
@@ -83,7 +83,7 @@ public class LlmApi extends HttpServlet {
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Optional<String> action = ServletUtils.getStringParameter(req, "action");
-        Optional<LLMType> type = ServletUtils.getEnumParameter(req, LLMType.class, "type");
+        Optional<LlmType> type = ServletUtils.getEnumParameter(req, LlmType.class, "type");
         Optional<String> name = ServletUtils.getStringParameter(req, "name");
         if (action.isPresent()) {
             String returnJson;
@@ -91,14 +91,14 @@ public class LlmApi extends HttpServlet {
             switch (action.get()) {
                 case "getall" -> {
                     boolean mustBeActive = req.getParameter("mustBeActive") != null;
-                    List<LLModel> models = llmRepo.getAllModels(mustBeActive);
-                    Type typeOfSrc = new TypeToken<List<LLModel>>() {
+                    List<LlModel> models = llmRepo.getAllModels(mustBeActive);
+                    Type typeOfSrc = new TypeToken<List<LlModel>>() {
                     }.getType();
                     returnJson = gson.toJson(models, typeOfSrc);
                 }
                 case "get" -> {
                     if (name.isPresent() && type.isPresent()) {
-                        Optional<LLModel> model = llmRepo.getModelFromName(name.get(), type.get(), false);
+                        Optional<LlModel> model = llmRepo.getModelFromName(name.get(), type.get(), false);
                         if (model.isPresent()) {
                             returnJson = gson.toJson(model.get());
                         } else {
@@ -117,7 +117,7 @@ public class LlmApi extends HttpServlet {
                     Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
                     Optional<Integer> gameId = ServletUtils.gameId(req);
                     if (gameId.isPresent() && role.isPresent()) {
-                        Optional<LLModel> model = llmService.getModelForGame(gameId.get(), role.get());
+                        Optional<LlModel> model = llmService.getModelForGame(gameId.get(), role.get());
                         if (model.isPresent()) {
                             returnJson = gson.toJson(model.get());
                         } else {
@@ -166,7 +166,7 @@ public class LlmApi extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         Gson gson = new Gson();
-        LLModel model = gson.fromJson(req.getReader(), LLModel.class);
+        LlModel model = gson.fromJson(req.getReader(), LlModel.class);
         String action = ServletUtils.formType(req);
         switch (action) {
             case "setActive" -> {

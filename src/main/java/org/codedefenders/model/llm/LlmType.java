@@ -16,9 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model;
+package org.codedefenders.model.llm;
 
-public enum LLMType {
+public enum LlmType {
     OPENAI,
     OLLAMA,
     DEFAULT //Only used as a reference to default values, never as an actual model

@@ -60,9 +60,9 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.LLMType;
-import org.codedefenders.model.LLModel;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
@@ -79,7 +79,7 @@ import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -189,7 +189,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private EventDAO eventDAO;
 
     @Inject
-    private LLMRepository llmRepo;
+    private LlmRepository llmRepo;
 
     @Inject
     private LlmService llmService;
@@ -283,7 +283,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         return CanUserSubmitMutantResult.YES;
     }
 
-    public record CreateBattlegroundMutantResult(
+    public record CreateBattlegroundMutantResult (
             boolean isSuccess,
             // on success
             Optional<Mutant> mutant,
@@ -1297,7 +1297,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      * defined
      * @throws LlmService.NoSuchModelException If there is no such active model in the database.
      */
-    public LLModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, LlmService.NoSuchModelException {
+    public LlModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, LlmService.NoSuchModelException {
         if (s.equals("NONE")) {
             return null;
         } else {
@@ -1306,7 +1306,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 logger.error("Malformed defender form value: {}", s);
                 throw new IllegalArgumentException("Malformed defender form value: " + s);
             }
-                LLMType type = LLMType.valueOf(split[0]);
+                LlmType type = LlmType.valueOf(split[0]);
                 String name = split[1];
                 return llmRepo.getModelFromName(name, type, true).orElseThrow(
                         () -> new LlmService.NoSuchModelException(type, name));

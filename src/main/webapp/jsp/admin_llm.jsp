@@ -1,4 +1,4 @@
-<%@ page import="org.codedefenders.model.LLModel" %>
+<%@ page import="org.codedefenders.model.llm.LlModel" %>
 <%@ page import="java.util.List" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
@@ -28,8 +28,8 @@
 
 <%
     @SuppressWarnings("unchecked")
-    List<LLModel> models = (List<LLModel>) request.getAttribute("models");
-    LLModel defaultModel = (LLModel) request.getAttribute("defaultModel");
+    List<LlModel> models = (List<LlModel>) request.getAttribute("models");
+    LlModel defaultModel = (LlModel) request.getAttribute("defaultModel");
     pageContext.setAttribute("defaultModel", defaultModel);
     pageContext.setAttribute("models", models);
 %>

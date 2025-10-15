@@ -18,6 +18,12 @@
  */
 package org.codedefenders.util;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.codedefenders.game.AbstractGame;
+
 /**
  * Utility class for static methods that can be used for llm players.
  */
@@ -39,6 +45,42 @@ public class LlmUtils {
         reply = removeSuperfluousClosingBrackets(reply);
         reply = reply.replaceAll("(?m)^\\s*" + System.lineSeparator(), "");
         return reply;
+    }
+
+    public static String extractMutantFromReply(String reply, boolean removeDependencies, AbstractGame game) {
+        String firstDependencyName = null;
+        if (removeDependencies) {
+            List<String> depNames = game.getCUT().getDependencyNames();
+            firstDependencyName = depNames.isEmpty() ? null : depNames.get(0);
+        }
+
+        return extractMutantFromReply(reply, firstDependencyName);
+    }
+
+    static String extractMutantFromReply(String reply, String firstDependencyName) {
+        String formattedResult = reply.replace("```java\n", "")
+                .replace("```java", "")
+                .replace("```\n", "")
+                .replace("\n```", "")
+                .replace("```", "");
+        if (firstDependencyName != null) {
+            int classDeclaration = indexOfDependencyDeclaration(formattedResult, firstDependencyName);
+            if (classDeclaration > 0) {
+                formattedResult = formattedResult.substring(0, classDeclaration);
+            }
+        }
+        return formattedResult;
+    }
+
+    private static int indexOfDependencyDeclaration(String code, String dependencyName) {
+        String regex = "\\n.*((class)|(enum)|(interface)|(record))\\s+" + dependencyName;
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(code);
+        if (m.find()) {
+            return m.start();
+        } else {
+            return -1;
+        }
     }
 
     private static String removeLinesThatContainWords(String text, String... words) {

@@ -27,8 +27,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.model.LLMType;
-import org.codedefenders.model.LLModel;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.service.LlmService;
@@ -37,8 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
-public class LLMRepository {
-    private static final Logger logger = LoggerFactory.getLogger(LLMRepository.class);
+public class LlmRepository {
+    private static final Logger logger = LoggerFactory.getLogger(LlmRepository.class);
 
     private static final String DEFAULT_MODEL_NAME = "DEFAULT_MODEL";
 
@@ -125,7 +125,7 @@ public class LLMRepository {
     }
 
     public void resetDefaultModel() {
-        LLModel defaultModel = new LLModel(DEFAULT_MODEL_NAME, LLMType.DEFAULT);
+        LlModel defaultModel = new LlModel(DEFAULT_MODEL_NAME, LlmType.DEFAULT);
         defaultModel.setAttackerPrompt(DEFAULT_ATTACKER_PROMPT);
         defaultModel.setAttackerDependencyPrompt(DEFAULT_ATTACKER_DEPS_PROMPT);
         defaultModel.setResolveEquivalencePrompt(DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
@@ -141,7 +141,7 @@ public class LLMRepository {
      * Saves the values of the model in the database. If the model already exists, update its values,
      * if it doesn't exist, create a new entry.
      */
-    public void saveModel(LLModel model) {
+    public void saveModel(LlModel model) {
         boolean alreadyExists =
                 queryRunner.query("SELECT model_name FROM llm_models WHERE model_name = ? AND type = ?",
                         ResultSet::isBeforeFirst, model.getName(), model.getType().name());
@@ -189,7 +189,7 @@ public class LLMRepository {
      * 'active' datum unchanged.
      * @param model The model, identified by type and name, containing the new prompts.
      */
-    public void updatePrompts(LLModel model) {
+    public void updatePrompts(LlModel model) {
         @Language("SQL")
         String sql = """
                     update llm_models set
@@ -218,35 +218,35 @@ public class LLMRepository {
         }
     }
 
-    public void setActive(String name, LLMType type, boolean active) {
+    public void setActive(String name, LlmType type, boolean active) {
         @Language("SQL")
         String sql = "UPDATE llm_models SET active = ? WHERE model_name = ? and type = ?";
         queryRunner.update(sql, active, name, type.name());
     }
 
     /**
-     * Update the values of an existing {@link LLModel}. It is identified by type and name, all other values are filled
+     * Update the values of an existing {@link LlModel}. It is identified by type and name, all other values are filled
      * up from DB.
      * @throws org.codedefenders.service.LlmService.NoSuchModelException If there is no model with this type and name
      * in the database.
      */
-    public void loadModel(LLModel model) throws LlmService.NoSuchModelException {
-        LLModel fromDB = getModelFromName(model.getName(), model.getType(), false).orElseThrow(
+    public void loadModel(LlModel model) throws LlmService.NoSuchModelException {
+        LlModel fromDB = getModelFromName(model.getName(), model.getType(), false).orElseThrow(
                 () -> new LlmService.NoSuchModelException(model.getType(), model.getName())
         );
         model.copyValues(fromDB);
     }
 
-    public Optional<LLModel> getDefaultModel() {
+    public Optional<LlModel> getDefaultModel() {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE type = ? LIMIT 1;";
-        return queryRunner.query(sql, ResultSetUtils.oneFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
+        return queryRunner.query(sql, ResultSetUtils.oneFromRS(LlmRepository::fromRS), LlmType.DEFAULT.name());
     }
 
-    public Optional<LLModel> getModelFromName(String name, LLMType type, boolean mustBeActive) {
+    public Optional<LlModel> getModelFromName(String name, LlmType type, boolean mustBeActive) {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE model_name = ? AND type = ?;";
-        Optional<LLModel> result = queryRunner.query(sql, ResultSetUtils.oneFromRS(LLMRepository::fromRS), name, type.name());
+        Optional<LlModel> result = queryRunner.query(sql, ResultSetUtils.oneFromRS(LlmRepository::fromRS), name, type.name());
         if (!mustBeActive || result.isPresent() && result.get().isActive()) {
             return result;
         } else {
@@ -254,29 +254,29 @@ public class LLMRepository {
         }
     }
 
-    public List<LLModel> getAllModels() {
+    public List<LlModel> getAllModels() {
         return getAllModels(false);
     }
 
-    public List<LLModel> getAllModels(boolean mustBeActive) {
+    public List<LlModel> getAllModels(boolean mustBeActive) {
         @Language("SQL")
         String sql = "SELECT * FROM llm_models WHERE type != ? " + (mustBeActive ? "AND active = true;" : ";");
 
-        List<LLModel> modelsInDB =  queryRunner.query(
-                sql, ResultSetUtils.listFromRS(LLMRepository::fromRS), LLMType.DEFAULT.name());
+        List<LlModel> modelsInDB =  queryRunner.query(
+                sql, ResultSetUtils.listFromRS(LlmRepository::fromRS), LlmType.DEFAULT.name());
 
         return modelsInDB.stream().filter(this::modelIsInConfig).toList();
     }
 
-    private boolean modelIsInConfig(LLModel m) {
-        return m.getType() == LLMType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
-                || m.getType() == LLMType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
+    private boolean modelIsInConfig(LlModel m) {
+        return m.getType() == LlmType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
+                || m.getType() == LlmType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
     }
 
-    private static LLModel fromRS(ResultSet rs) throws SQLException {
+    private static LlModel fromRS(ResultSet rs) throws SQLException {
         String name = rs.getString("model_name");
-        LLMType type = LLMType.valueOf(rs.getString("type"));
-        LLModel result = new LLModel(name, type);
+        LlmType type = LlmType.valueOf(rs.getString("type"));
+        LlModel result = new LlModel(name, type);
         result.setActive(rs.getBoolean("active"));
 
         result.setDefenderPrompt(rs.getString("defender_prompt"));

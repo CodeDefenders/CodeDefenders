@@ -37,7 +37,7 @@ import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.dependencies.MavenDependencyResolver;
 import org.codedefenders.game.GameStoppedEventHandlerContainer;
 import org.codedefenders.instrumentation.MetricsRegistry;
-import org.codedefenders.persistence.database.LLMRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
 import org.codedefenders.util.FileUtils;
@@ -78,7 +78,7 @@ public class SystemStartStop implements ServletContextListener {
     private DependencyProvider dependencyProvider;
 
     @Inject
-    private LLMRepository llmRepository;
+    private LlmRepository llmRepository;
 
 
     /**

@@ -18,7 +18,11 @@
  */
 package org.codedefenders.util;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,5 +52,90 @@ class LlmUtilsTest {
                 assertEquals(21, new Constants().foo());
                 """.stripIndent();
         assertEquals(expectedTestContent, LlmUtils.extractTestContentFromReply(reply));
+    }
+
+    @ParameterizedTest
+    @MethodSource("mutantSource")
+    public void extractMutantContentFromReplyTest(String reply) {
+        String expected = """
+                public class MultipleClasses {
+                    int foo() {
+                        return 1;
+                    }
+                }
+                """.stripIndent().strip();
+        assertEquals(expected, LlmUtils.extractMutantFromReply(reply.stripIndent().strip(), "Bar"));
+    }
+
+
+    private static Stream<String> mutantSource() {
+        return Stream.of("""
+                        ```java
+                        public class MultipleClasses {
+                            int foo() {
+                                return 1;
+                            }
+                        }
+                        class Bar {
+                            int bar() {
+                                return 2;
+                            }
+                        }
+                        ```
+
+                        """,
+                """
+                         ```java
+                        public class MultipleClasses {
+                            int foo() {
+                                return 1;
+                            }
+                        }
+                        public class Bar {
+                            int bar() {
+                                return 2;
+                            }
+                        }
+                        ```
+                        """,
+                """
+                         ```java
+                        public class MultipleClasses {
+                            int foo() {
+                                return 1;
+                            }
+                        }
+                        public interface Bar {
+                            int bar() {
+                                return 2;
+                            }
+                        }
+                        ```
+                        """,
+                """
+
+                         ```java
+                        public class MultipleClasses {
+                            int foo() {
+                                return 1;
+                            }
+                        }
+                        public class
+                        Bar {
+                            int bar() {
+                                return 2;
+                            }
+                        }
+                        ```
+                        """,
+                """
+                         ```java
+                        public class MultipleClasses {
+                            int foo() {
+                                return 1;
+                            }
+                        }
+                        ```
+                        """);
     }
 }

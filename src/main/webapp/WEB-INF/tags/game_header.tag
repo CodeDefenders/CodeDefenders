@@ -34,8 +34,8 @@
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.service.LlmService" %>
-<%@ tag import="org.codedefenders.persistence.database.LLMRepository" %>
-<%@ tag import="org.codedefenders.model.LLModel" %>
+<%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
+<%@ tag import="org.codedefenders.model.llm.LlModel" %>
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.game.puzzle.PuzzleGame" %>
 
@@ -59,8 +59,8 @@
     request.setAttribute("gameId", gameId);
 
 
-    LLMRepository llmRepo = CDIUtil.getBeanFromCDI(LLMRepository.class);
-    List<LLModel> models = llmRepo.getAllModels(true);
+    LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
+    List<LlModel> models = llmRepo.getAllModels(true);
 
 
     Role role = null;
