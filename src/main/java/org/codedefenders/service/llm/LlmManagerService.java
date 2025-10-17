@@ -276,9 +276,14 @@ public class LlmManagerService {
             LlmMutantService mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
             LlmTestService testService = CDIUtil.getBeanFromCDI(LlmTestService.class);
 
-            equivalenceService.init(game, user, model, conversation, random);
-            mutantService.init(game, user, model, conversation, random);
-            testService.init(game, user, model, conversation, random);
+            int normalNumberOfTries = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.LLM_NORMAL_PROMPT_NUMBER_OF_TRIES).getIntValue();
+            int equivalenceNumberOfTries = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES).getIntValue();
+
+            equivalenceService.init(game, user, model, conversation, random, equivalenceNumberOfTries);
+            mutantService.init(game, user, model, conversation, random, normalNumberOfTries);
+            testService.init(game, user, model, conversation, random, normalNumberOfTries);
             if (role == Role.DEFENDER) {
                 testService.createTest();
             } else {

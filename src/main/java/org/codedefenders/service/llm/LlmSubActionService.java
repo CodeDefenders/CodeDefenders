@@ -63,17 +63,26 @@ abstract class LlmSubActionService {
     protected LlmConversation conversation;
     protected SimpleUser user;
     protected Random random;
+    protected int numberOfRepairAttempts;
 
-    protected void init(AbstractGame game, SimpleUser user, LlModel model, LlmConversation conversation, Random random) {
+    protected void init(AbstractGame game, SimpleUser user, LlModel model, LlmConversation conversation,
+                        Random random, int numberOfRepairAttempts) {
         this.game = game;
         this.user = user;
         this.model = model;
         this.conversation = conversation;
         this.random = random;
+        this.numberOfRepairAttempts = numberOfRepairAttempts;
     }
 
     protected void updateGame() {
         game = gameRepository.getGame(game.getId());
+    }
+
+    protected void resetConversationAfterTooManyTries() {
+        if (conversation.numberOfTries() > numberOfRepairAttempts) {
+            conversation.clear();
+        }
     }
 
     /**

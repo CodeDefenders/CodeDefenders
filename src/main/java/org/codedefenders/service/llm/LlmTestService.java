@@ -65,6 +65,7 @@ class LlmTestService extends LlmSubActionService {
 
         PromptType promptType = getCorrectDefendPromptType();
         conversation.setCurrentType(promptType);
+        resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             String systemMessage = getSystemPrompt(model, promptType);
             if (promptType == PromptType.DEFEND_FOCUS) {

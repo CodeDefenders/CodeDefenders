@@ -33,10 +33,15 @@ import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * For attackers and melee llm players, this service creates and submits the tests to resolve equivalence duels for
+ * all flagged mutants. In order to not bog the LLM player down too much, this is the only place where many prompt
+ * can be sent to the LLM without waiting for the normal cooldown. The LLM always tries to resolve the duel. If the
+ * test does not validate or compile, there will be {@link LlmEquivalenceService#numberOfRepairAttempts} attempts
+ * to get a better result from the LLM, after that the mutant is accepted as equivalent.
+ */
 @RequestScoped
 class LlmEquivalenceService extends LlmSubActionService {
-    private static final boolean SUPPORT_PROMPT_CORRECTION = false; //TODO Anpassbar machen?
-
     Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
 
     @Inject
@@ -58,7 +63,7 @@ class LlmEquivalenceService extends LlmSubActionService {
                         "\n{}", game.getId(), killingTestSource);
                 updateGame();
                 submitEquivalenceTest(killingTestSource, flagged);
-            } while (!conversation.isEmpty() && conversation.numberOfTries() < 0 && SUPPORT_PROMPT_CORRECTION);//TODO numberOfTries ändern - ganze Conversation refactoren
+            } while (!conversation.isEmpty());
 
             conversation.resetCurrentType();
         }
@@ -72,10 +77,6 @@ class LlmEquivalenceService extends LlmSubActionService {
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE));
             conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString());
-        } else {
-            if (!SUPPORT_PROMPT_CORRECTION) {
-                throw new RuntimeException("We do not support prompt correction for equivalence duels at the moment.");
-            }
         }
         String response = promptService.getResponse(model, conversation);
         return LlmUtils.testTemplateFromResponse(response, game);
@@ -96,7 +97,7 @@ class LlmEquivalenceService extends LlmSubActionService {
             if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
                 conversation.clear();
             } else {
-                if (SUPPORT_PROMPT_CORRECTION) {
+                if (conversation.numberOfTries() <= numberOfRepairAttempts) {
                     StringBuilder correction = new StringBuilder();
                     switch (result.failureReason().orElseThrow()) {
                         case VALIDATION_FAILED -> {

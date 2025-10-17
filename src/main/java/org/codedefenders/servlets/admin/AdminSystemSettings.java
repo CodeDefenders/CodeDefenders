@@ -233,6 +233,18 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The default number of seconds between actions of an AI player.";
             }
+        },
+        LLM_NORMAL_PROMPT_NUMBER_OF_TRIES {
+            @Override
+            public String toString() {
+                return "The number of attempts the LLM player will make to fix an invalid mutant or test it created.";
+            }
+        },
+        LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES {
+            @Override
+            public String toString() {
+                return "The number of attempts the LLM player will make to fix an invalid equivalence duel test.";
+            }
         }
         ;
 

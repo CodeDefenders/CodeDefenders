@@ -22,10 +22,8 @@ import java.io.IOException;
 
 import jakarta.enterprise.context.RequestScoped;
 
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -49,6 +47,7 @@ class LlmMutantService extends LlmSubActionService {
     private String generateMutant() {
         PromptType promptType = getCorrectAttackPromptType();
         conversation.setCurrentType(promptType);
+        resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, promptType));
             addUserMessage();
