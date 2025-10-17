@@ -85,9 +85,10 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.llm.LlmManagerService;
+import org.codedefenders.service.llm.NoSuchModelException;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -192,7 +193,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private LlmRepository llmRepo;
 
     @Inject
-    private LlmService llmService;
+    private LlmManagerService llmService;
 
     /**
      * {@inheritDoc}
@@ -774,7 +775,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public AcceptBattlegroundEquivalenceResult acceptBattlegroundEquivalence(
-            MultiplayerGame game, int userId, Mutant equivMutant) {
+            AbstractGame game, int userId, Mutant equivMutant) {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 
@@ -1295,9 +1296,9 @@ public class GameManagingUtils implements IGameManagingUtils {
      * for example {@code OPENAI|gpt-4.0}. The model has to exist and be active.
      * @throws IllegalArgumentException Thrown if the String doesn't follow this format, if there is no such type
      * defined
-     * @throws LlmService.NoSuchModelException If there is no such active model in the database.
+     * @throws NoSuchModelException If there is no such active model in the database.
      */
-    public LlModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, LlmService.NoSuchModelException {
+    public LlModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, NoSuchModelException {
         if (s.equals("NONE")) {
             return null;
         } else {
@@ -1309,11 +1310,11 @@ public class GameManagingUtils implements IGameManagingUtils {
                 LlmType type = LlmType.valueOf(split[0]);
                 String name = split[1];
                 return llmRepo.getModelFromName(name, type, true).orElseThrow(
-                        () -> new LlmService.NoSuchModelException(type, name));
+                        () -> new NoSuchModelException(type, name));
         }
     }
 
-    public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws LlmService.NoSuchModelException {
+    public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
         var defenderParam = ServletUtils.getStringParameter(request, "defenderModel");
         if(defenderParam.isPresent()) {
             llmService.setPlayerModel(game, Role.DEFENDER,

@@ -31,7 +31,7 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
-import org.codedefenders.service.LlmService;
+import org.codedefenders.service.llm.NoSuchModelException;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,12 +227,12 @@ public class LlmRepository {
     /**
      * Update the values of an existing {@link LlModel}. It is identified by type and name, all other values are filled
      * up from DB.
-     * @throws org.codedefenders.service.LlmService.NoSuchModelException If there is no model with this type and name
+     * @throws org.codedefenders.service.llm.NoSuchModelException If there is no model with this type and name
      * in the database.
      */
-    public void loadModel(LlModel model) throws LlmService.NoSuchModelException {
+    public void loadModel(LlModel model) throws NoSuchModelException {
         LlModel fromDB = getModelFromName(model.getName(), model.getType(), false).orElseThrow(
-                () -> new LlmService.NoSuchModelException(model.getType(), model.getName())
+                () -> new NoSuchModelException(model.getType(), model.getName())
         );
         model.copyValues(fromDB);
     }

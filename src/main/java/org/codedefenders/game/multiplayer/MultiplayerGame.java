@@ -48,9 +48,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
-import org.codedefenders.service.LlmService;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;

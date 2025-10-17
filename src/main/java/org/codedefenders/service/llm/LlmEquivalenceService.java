@@ -1,0 +1,129 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.codedefenders.service.llm;
+
+import java.io.IOException;
+
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+
+import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.LlmUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@RequestScoped
+class LlmEquivalenceService extends LlmSubActionService {
+    private static final boolean SUPPORT_PROMPT_CORRECTION = false; //TODO Anpassbar machen?
+
+    Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
+
+    @Inject
+    LlmPromptService promptService;
+
+    @Inject
+    GameService gameService;
+
+    @Inject
+    MutantRepository mutantRepository;
+
+    void runEquivalenceTests() {
+        for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
+            do {
+                conversation.setCurrentType(PromptType.ATTACK_EQUIVALENCE);
+                String killingTestSource = generateEquivalenceTest(flagged);
+                logger.info("LLM player with in game {}" +
+                        " submitted the following test in an equivalence duel: " +
+                        "\n{}", game.getId(), killingTestSource);
+                updateGame();
+                submitEquivalenceTest(killingTestSource, flagged);
+            } while (!conversation.isEmpty() && conversation.numberOfTries() < 0 && SUPPORT_PROMPT_CORRECTION);//TODO numberOfTries ändern - ganze Conversation refactoren
+
+            conversation.resetCurrentType();
+        }
+    }
+
+    /**
+     * Generate a test that should kill a mutant that was flagged as equivalent. Waits until the generation by the
+     * llm is complete.
+     */
+    private String generateEquivalenceTest(MutantDTO flagged) {
+        if (conversation.isEmpty()) {
+            conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE));
+            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString());
+        } else {
+            if (!SUPPORT_PROMPT_CORRECTION) {
+                throw new RuntimeException("We do not support prompt correction for equivalence duels at the moment.");
+            }
+        }
+        String response = promptService.getResponse(model, conversation);
+        return LlmUtils.testTemplateFromResponse(response, game);
+    }
+
+    private void submitEquivalenceTest(String testSource, MutantDTO equivalentMutantDTO) {
+        if (conversation.getCurrentType() != PromptType.ATTACK_EQUIVALENCE) {
+            logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getCurrentType());
+            throw new RuntimeException("Conversation may not be of type " + conversation.getCurrentType()
+                    + " in submitEquivalenceTest");
+        }
+
+        Mutant equivalentMutant = mutantRepository.getMutantById(equivalentMutantDTO.getId());
+        try {
+            GameManagingUtils.RejectBattlegroundEquivalenceResult result =
+                    gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
+
+            if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
+                conversation.clear();
+            } else {
+                if (SUPPORT_PROMPT_CORRECTION) {
+                    StringBuilder correction = new StringBuilder();
+                    switch (result.failureReason().orElseThrow()) {
+                        case VALIDATION_FAILED -> {
+                            correction.append("Your test has violated these rules: \n");
+                            result.validationErrorMessages().orElseThrow().forEach(
+                                    correction::append
+                            );
+
+                        }
+                        case COMPILATION_FAILED ->
+                                correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
+                        case TEST_DID_NOT_PASS_ON_CUT ->
+                                correction.append("Your test did not pass on the original code for the following reason: ")
+                                        .append(result.testCutError().orElseThrow());
+                    }
+                    correction.append("\nFix these problems.");
+                    conversation.addSystemMessage(correction.toString());
+                } else {
+                    gameManagingUtils.acceptBattlegroundEquivalence(game, user.getId(), equivalentMutant);
+                    conversation.clear();
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+}

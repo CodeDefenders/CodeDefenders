@@ -58,9 +58,9 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.llm.NoSuchModelException;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -159,9 +159,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameService gameService;
-
-    @Inject
-    private LlmService llmService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -283,7 +280,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     logger.error(e.getMessage());
                     Redirect.redirectBack(request, response);
                     return;
-                } catch (LlmService.NoSuchModelException e) {
+                } catch (NoSuchModelException e) {
                     messages.add("The selected model is no longer active.");
                     logger.error(e.getMessage());
                     Redirect.redirectBack(request, response);

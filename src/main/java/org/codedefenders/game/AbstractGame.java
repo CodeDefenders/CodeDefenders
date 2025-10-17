@@ -268,4 +268,16 @@ public abstract class AbstractGame {
     public Set<WhitelistElement> getWhitelist() {
         return whitelist;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other instanceof AbstractGame otherGame) {
+            return otherGame.id == id;
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(id);
+    }
 }

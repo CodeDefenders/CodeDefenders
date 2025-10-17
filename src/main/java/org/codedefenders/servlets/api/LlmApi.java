@@ -31,11 +31,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
-import org.codedefenders.service.LlmService;
+import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -47,8 +49,8 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 /**
- * This class should provide details and interactions with the Large Language Models uses by
- * {@link org.codedefenders.service.LlmService}, integrated to normal games. It is not affiliated with the
+ * This class should provide details and interactions with the Large Language Models uses by the
+ * {@link org.codedefenders.service.llm} package, integrated to normal games. It is not affiliated with the
  * {@link org.codedefenders.servlets.api.llm} package.
  */
 @WebServlet(Paths.API_LLM)
@@ -59,10 +61,13 @@ public class LlmApi extends HttpServlet {
     LlmRepository llmRepo;
 
     @Inject
+    GameRepository gameRepository;
+
+    @Inject
     URLUtils url;
 
     @Inject
-    private LlmService llmService;
+    private LlmManagerService llmService;
 
     /**
      * Send back information about LLMs or LLM players. Supported actions:
@@ -74,11 +79,11 @@ public class LlmApi extends HttpServlet {
      * - get -> Send back a single LLM identified by type and name
      * </p>
      * <p>
-     *     - getLlmForGame -> Send back a single LLM that is active for the supplied game and role
+     * - getLlmForGame -> Send back a single LLM that is active for the supplied game and role
      * </p>
      * <p>
-     *     - error -> Send back the last error message produced by the llm player specified by gameId and role, or an
-     *     empty string if there is no error message.
+     * - error -> Send back the last error message produced by the llm player specified by gameId and role, or an
+     * empty string if there is no error message.
      * </p>
      */
     public void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -117,7 +122,8 @@ public class LlmApi extends HttpServlet {
                     Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
                     Optional<Integer> gameId = ServletUtils.gameId(req);
                     if (gameId.isPresent() && role.isPresent()) {
-                        Optional<LlModel> model = llmService.getModelForGame(gameId.get(), role.get());
+                        AbstractGame game = gameRepository.getGame(gameId.get());
+                        Optional<LlModel> model = llmService.getModelForGame(game, role.get());
                         if (model.isPresent()) {
                             returnJson = gson.toJson(model.get());
                         } else {
@@ -136,7 +142,8 @@ public class LlmApi extends HttpServlet {
                     if (gameId.isPresent() && role.isPresent()) {
                         resp.setContentType("text/plain");
                         PrintWriter out = resp.getWriter();
-                        out.print(llmService.getErrorMessage(gameId.get(), role.get()).orElse(""));
+                        AbstractGame game = gameRepository.getGame(gameId.get());
+                        out.print(llmService.getErrorMessage(game, role.get()).orElse(""));
                         out.flush();
                     } else {
                         logger.error("gameId ({}) or role ({}) are missing while trying to get an error message.",
@@ -163,8 +170,21 @@ public class LlmApi extends HttpServlet {
 
     }
 
+    /**
+     * Change aspects of a single Large Language Model that is included as a JSON object in the post request.
+     * <p>
+     * Supported actions (formTypes):
+     * <p>
+     * - setActive -> The model identified by type and name is set as active or inactive, depending on the attribute
+     * in the JSON object. Other fields, such as prompts, are ignored.
+     * <p>
+     * - updatePrompts -> The prompts of the model are adjusted according to the attributes in the JSON object.
+     * The 'active' attribute is ignored.
+     * <p>
+     * - resetDefault -> The default model is reset to the hardcoded default prompts. The JSON object is completely
+     * ignored.
+     */
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
         Gson gson = new Gson();
         LlModel model = gson.fromJson(req.getReader(), LlModel.class);
         String action = ServletUtils.formType(req);

@@ -19,10 +19,14 @@
 package org.codedefenders.util;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.persistence.database.LlmRepository;
 
 /**
  * Utility class for static methods that can be used for llm players.
@@ -70,6 +74,11 @@ public class LlmUtils {
             }
         }
         return formattedResult;
+    }
+
+    public static String testTemplateFromResponse(String response, AbstractGame game) {
+        response = LlmUtils.extractTestContentFromReply(response);
+        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, response);
     }
 
     private static int indexOfDependencyDeclaration(String code, String dependencyName) {

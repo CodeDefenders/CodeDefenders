@@ -60,9 +60,9 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.transaction.TransactionManager;
 import org.codedefenders.util.URLUtils;
@@ -118,7 +118,7 @@ public class GameManagingUtilsTest {
                         PrioritizedTestCaseSelector.class,
                         KillMapService.class,
                         UserRepository.class,
-                        LlmService.class,
+                        LlmManagerService.class,
                         LlmRepository.class,
                         URLUtils.class)
                 .inject(this)

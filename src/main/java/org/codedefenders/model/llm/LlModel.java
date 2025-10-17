@@ -205,6 +205,11 @@ public class LlModel {
         } else return false;
     }
 
+    @Override
+    public int hashCode() {
+        return type.hashCode() ^ (name != null ? name.hashCode() : 0);
+    }
+
     /**
      * Loads all values except name and type from the other model.
      */

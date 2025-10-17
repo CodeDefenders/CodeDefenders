@@ -44,7 +44,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -64,10 +63,6 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -78,9 +73,9 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.LlmService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.llm.NoSuchModelException;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -89,8 +84,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,9 +188,6 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private PlayerRepository playerRepo;
-
-    @Inject
-    private LlmService llmService;
 
     @Inject
     GameService gameService;
@@ -360,7 +350,7 @@ public class MeleeGameManager extends HttpServlet {
                     logger.error(e.getMessage());
                     Redirect.redirectBack(request, response);
                     return;
-                } catch (LlmService.NoSuchModelException e) {
+                } catch (NoSuchModelException e) {
                     messages.add("The selected model is no longer active.");
                     logger.error(e.getMessage());
                     Redirect.redirectBack(request, response);

@@ -33,7 +33,6 @@
 <%@ tag import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ tag import="org.codedefenders.service.LlmService" %>
 <%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
 <%@ tag import="org.codedefenders.model.llm.LlModel" %>
 <%@ tag import="java.util.List" %>
