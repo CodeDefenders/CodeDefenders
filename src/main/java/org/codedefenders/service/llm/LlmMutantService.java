@@ -36,14 +36,6 @@ class LlmMutantService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmMutantService.class);
 
     @Override
-    protected void run() {
-        super.run();
-        if (game instanceof MeleeGame) {
-            claimEquivalent();
-        }
-    }
-
-    @Override
     protected String generate() {
         PromptType promptType = getCorrectAttackPromptType();
         conversation.setCurrentType(promptType);
