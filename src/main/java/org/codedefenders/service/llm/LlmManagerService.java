@@ -115,7 +115,7 @@ public class LlmManagerService {
 
     private Map<AbstractGame, String> getCorrectErrorMap(Role r) {
         return switch (r) {
-            case ATTACKER -> attackerErrorMessages;
+            case ATTACKER, PLAYER -> attackerErrorMessages;
             case DEFENDER -> defenderErrorMessages;
             default -> throw new IllegalArgumentException("Illegal role: " + r);
         };
@@ -270,7 +270,8 @@ public class LlmManagerService {
         requestContextController.activate();
 
         try {
-            LlModel model = getModelForGame(game, role).orElseThrow();
+            LlModel attackModel = getModelForGame(game, Role.ATTACKER).orElseThrow();
+            LlModel defendModel = getModelForGame(game, Role.DEFENDER).orElseThrow();
 
             LlmEquivalenceService equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.class);
             LlmMutantService mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
@@ -281,9 +282,9 @@ public class LlmManagerService {
             int equivalenceNumberOfTries = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES).getIntValue();
 
-            equivalenceService.init(game, user, model, conversation, random, equivalenceNumberOfTries);
-            mutantService.init(game, user, model, conversation, random, normalNumberOfTries);
-            testService.init(game, user, model, conversation, random, normalNumberOfTries);
+            equivalenceService.init(game, user, attackModel, conversation, random, equivalenceNumberOfTries);
+            mutantService.init(game, user, attackModel, conversation, random, normalNumberOfTries);
+            testService.init(game, user, defendModel, conversation, random, normalNumberOfTries);
             if (role == Role.DEFENDER) {
                 testService.createTest();
             } else {

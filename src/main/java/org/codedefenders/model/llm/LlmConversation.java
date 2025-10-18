@@ -66,10 +66,6 @@ public class LlmConversation {
         currentMessages().add(SystemMessage.from(content));
     }
 
-    /*public void addSystemMessages(Collection<String> content) {
-        content.forEach(this::addSystemMessage);
-    }*/
-
     public void addUserMessage(String content) {
         currentMessages().add(UserMessage.from(content));
     }
