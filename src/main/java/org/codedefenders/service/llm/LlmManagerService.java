@@ -208,7 +208,7 @@ public class LlmManagerService {
 
     private void addErrorMessage(AbstractGame game, Role role, Exception e) {
         String timestamp = LocalDateTime.now().toString();
-        getCorrectErrorMap(role).put(game, timestamp + ": " + e.getMessage());
+        getCorrectErrorMap(role).put(game, timestamp + ": " + e.toString());
     }
 
     public Optional<String> getErrorMessage(AbstractGame game, Role role) {
@@ -254,7 +254,7 @@ public class LlmManagerService {
                                 LLM player thread in game {} and role {} threw an exception:
                                 {}
                                 The thread will be terminated.""",
-                        game.getId(), role, e.getMessage());
+                        game.getId(), role, e.toString());
                 addErrorMessage(game, role, e);
                 finishPlayer(game, role);
             }
@@ -270,27 +270,33 @@ public class LlmManagerService {
         requestContextController.activate();
 
         try {
-            LlModel attackModel = getModelForGame(game, Role.ATTACKER).orElseThrow();
-            LlModel defendModel = getModelForGame(game, Role.DEFENDER).orElseThrow();
-
-            LlmEquivalenceService equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.class);
-            LlmMutantService mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
-            LlmTestService testService = CDIUtil.getBeanFromCDI(LlmTestService.class);
-
             int normalNumberOfTries = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.LLM_NORMAL_PROMPT_NUMBER_OF_TRIES).getIntValue();
             int equivalenceNumberOfTries = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES).getIntValue();
 
+            LlmEquivalenceService equivalenceService;
+            LlmMutantService mutantService;
+            LlmTestService testService;
+
+            Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
+            Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
+
+            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.class);
+            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
+            testService = CDIUtil.getBeanFromCDI(LlmTestService.class);
+
             equivalenceService.init(game, user, attackModel, conversation, random, equivalenceNumberOfTries);
             mutantService.init(game, user, attackModel, conversation, random, normalNumberOfTries);
             testService.init(game, user, defendModel, conversation, random, normalNumberOfTries);
+
             if (role == Role.DEFENDER) {
-                testService.createTest();
+                testService.claimEquivalent();
+                testService.run();
             } else {
-                equivalenceService.runEquivalenceTests();
+                equivalenceService.run();
                 if (role == Role.ATTACKER) {
-                    mutantService.createMutant();
+                    mutantService.run();
                 } else {
                     boolean attackAvailable = activeLlmAttackers.get(game) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game) != null;
@@ -300,10 +306,11 @@ public class LlmManagerService {
                     }
                     boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
 
+                    mutantService.claimEquivalent();
                     if (attack) {
-                        mutantService.createMutant();
+                        mutantService.run();
                     } else {
-                        testService.createTest();
+                        testService.run();
                     }
                 }
             }

@@ -35,16 +35,16 @@ import org.slf4j.LoggerFactory;
 class LlmMutantService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmMutantService.class);
 
-    void createMutant() {
+    @Override
+    protected void run() {
+        super.run();
         if (game instanceof MeleeGame) {
             claimEquivalent();
         }
-        String mutant = generateMutant();
-        updateGame();
-        submitMutant(mutant);
     }
 
-    private String generateMutant() {
+    @Override
+    protected String generate() {
         PromptType promptType = getCorrectAttackPromptType();
         conversation.setCurrentType(promptType);
         resetConversationAfterTooManyTries();
@@ -59,7 +59,8 @@ class LlmMutantService extends LlmSubActionService {
         return formattedResult;
     }
 
-    private void submitMutant(String mutantSrc) {
+    @Override
+    protected void submit(String mutantSrc) {
         try {
             GameManagingUtils.CreateBattlegroundMutantResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {

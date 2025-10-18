@@ -21,6 +21,7 @@ package org.codedefenders.service.llm;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import jakarta.inject.Inject;
 
@@ -65,11 +66,32 @@ abstract class LlmSubActionService {
     protected Random random;
     protected int numberOfRepairAttempts;
 
-    protected void init(AbstractGame game, SimpleUser user, LlModel model, LlmConversation conversation,
+    protected boolean disabled = false;
+
+    protected void run() {
+        if (!disabled) {
+            String reply = generate();
+            updateGame();
+            submit(reply);
+        } else {
+            logger.warn("Running a disabled LlmSubActionService. This is probably not intended.");
+        }
+    }
+
+    protected abstract String generate();
+
+    protected abstract void submit(String reply);
+
+    protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversation conversation,
                         Random random, int numberOfRepairAttempts) {
-        this.game = game;
+        if (model.isPresent()) {
+            this.model = model.get();
+        } else {
+            disabled = true;
+            return;
+        }
         this.user = user;
-        this.model = model;
+        this.game = game;
         this.conversation = conversation;
         this.random = random;
         this.numberOfRepairAttempts = numberOfRepairAttempts;

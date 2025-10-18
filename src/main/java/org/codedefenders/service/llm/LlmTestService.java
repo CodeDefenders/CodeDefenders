@@ -54,14 +54,9 @@ class LlmTestService extends LlmSubActionService {
     @Inject
     MutantRepository mutantRepository;
 
-    void createTest() {
-        claimEquivalent();
-        String reply = generateTest();
-        updateGame();
-        submitTest(reply);
-    }
 
-    private String generateTest() {
+    @Override
+    protected String generate() {
 
         PromptType promptType = getCorrectDefendPromptType();
         conversation.setCurrentType(promptType);
@@ -88,7 +83,8 @@ class LlmTestService extends LlmSubActionService {
      *
      * @param testSrc      The formatted test code. All formatting heuristics should have already been performed.
      */
-    private void submitTest(String testSrc) {
+    @Override
+    protected void submit(String testSrc) {
         switch (conversation.getCurrentType()) {
             case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS -> {
             }

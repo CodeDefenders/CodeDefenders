@@ -53,16 +53,15 @@ class LlmEquivalenceService extends LlmSubActionService {
     @Inject
     MutantRepository mutantRepository;
 
-    void runEquivalenceTests() {
+    private MutantDTO flagged;
+
+    @Override
+    protected void run() {
         for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
+            this.flagged = flagged;
             do {
                 conversation.setCurrentType(PromptType.ATTACK_EQUIVALENCE);
-                String killingTestSource = generateEquivalenceTest(flagged);
-                logger.info("LLM player with in game {}" +
-                        " submitted the following test in an equivalence duel: " +
-                        "\n{}", game.getId(), killingTestSource);
-                updateGame();
-                submitEquivalenceTest(killingTestSource, flagged);
+                super.run();
             } while (!conversation.isEmpty());
 
             conversation.resetCurrentType();
@@ -73,7 +72,8 @@ class LlmEquivalenceService extends LlmSubActionService {
      * Generate a test that should kill a mutant that was flagged as equivalent. Waits until the generation by the
      * llm is complete.
      */
-    private String generateEquivalenceTest(MutantDTO flagged) {
+    @Override
+    protected String generate() {
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE));
             conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString());
@@ -82,14 +82,15 @@ class LlmEquivalenceService extends LlmSubActionService {
         return LlmUtils.testTemplateFromResponse(response, game);
     }
 
-    private void submitEquivalenceTest(String testSource, MutantDTO equivalentMutantDTO) {
+    @Override
+    protected void submit(String testSource) {
         if (conversation.getCurrentType() != PromptType.ATTACK_EQUIVALENCE) {
             logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getCurrentType());
             throw new RuntimeException("Conversation may not be of type " + conversation.getCurrentType()
                     + " in submitEquivalenceTest");
         }
 
-        Mutant equivalentMutant = mutantRepository.getMutantById(equivalentMutantDTO.getId());
+        Mutant equivalentMutant = mutantRepository.getMutantById(flagged.getId());
         try {
             GameManagingUtils.RejectBattlegroundEquivalenceResult result =
                     gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
