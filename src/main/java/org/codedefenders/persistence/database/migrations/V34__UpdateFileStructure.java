@@ -48,7 +48,7 @@ public class V34__UpdateFileStructure extends BaseJavaMigration {
     private final QueryRunner queryRunner = new QueryRunner();
 
     @Inject
-    public V34__UpdateFileStructure(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+    public V34__UpdateFileStructure(Configuration config) {
         String dataDirPath = config.getDataDir().toString();
         sourcesDir = config.getSourcesDir();
         if (!dataDirPath.endsWith("/")) {
