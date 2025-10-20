@@ -25,6 +25,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.codedefenders.configuration.source.ContextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,6 @@ class ContextConfigFileResolver extends ConfigFileResolver {
 
     @Override
     public int getPriority() {
-        return 90;
+        return ContextSource.PRIORITY;
     }
 }

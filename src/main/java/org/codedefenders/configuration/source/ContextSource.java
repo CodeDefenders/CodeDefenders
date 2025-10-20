@@ -38,6 +38,7 @@ import com.google.common.base.CaseFormat;
 @Singleton
 public class ContextSource implements ConfigurationSource {
     private static final Logger logger = LoggerFactory.getLogger(ContextSource.class);
+    public static int PRIORITY = 90;
 
     public String resolveAttributeName(String camelCaseName) {
         return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
@@ -59,6 +60,6 @@ public class ContextSource implements ConfigurationSource {
 
     @Override
     public int getPriority() {
-        return 90;
+        return PRIORITY;
     }
 }

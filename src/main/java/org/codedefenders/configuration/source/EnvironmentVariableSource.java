@@ -36,6 +36,7 @@ import com.google.common.base.CaseFormat;
 @Singleton
 public class EnvironmentVariableSource implements ConfigurationSource {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableSource.class);
+    public static final int PRIORITY = 50;
 
     public String resolveAttributeName(String camelCaseName) {
         return "CODEDEFENDERS_" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
@@ -49,7 +50,7 @@ public class EnvironmentVariableSource implements ConfigurationSource {
 
     @Override
     public int getPriority() {
-        return 50;
+        return PRIORITY;
     }
 }
 

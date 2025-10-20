@@ -22,6 +22,7 @@ import java.io.Reader;
 
 import jakarta.inject.Singleton;
 
+import org.codedefenders.configuration.source.EnvironmentVariableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
 
     @Override
     public int getPriority() {
-        return 50;
+        return EnvironmentVariableSource.PRIORITY;
     }
 }
 

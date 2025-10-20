@@ -22,6 +22,7 @@ import java.io.Reader;
 
 import jakarta.inject.Singleton;
 
+import org.codedefenders.configuration.source.SystemPropertySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +48,6 @@ class SystemPropertyConfigFileResolver extends ConfigFileResolver {
 
     @Override
     public int getPriority() {
-        return 70;
+        return SystemPropertySource.PRIORITY;
     }
 }
