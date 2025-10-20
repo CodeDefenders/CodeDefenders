@@ -25,11 +25,13 @@ import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import jakarta.annotation.Priority;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -49,9 +51,13 @@ import jakarta.interceptor.Interceptor;
 
 import org.codedefenders.configuration.source.ConfigurationSource;
 import org.jboss.weld.environment.se.Weld;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Helps with initializing Weld in absence of Tomcat. */
 public class WeldInit {
+    private static final Logger logger = LoggerFactory.getLogger(WeldInit.class);
+
     /** Annotations that mark a class, method or field as a bean producer. */
     private static final Set<Class<? extends Annotation>> beanAnnotations = new HashSet<>();
     static {
@@ -186,16 +192,27 @@ public class WeldInit {
      * @param includeConfig Whether to include {@link ConfigurationSource} beans in the scanning.
      */
     public static SeContainer initWeld(Class<?>[] alternatives, boolean includeConfig) {
+        var log = new StringJoiner("\n");
+        log.add("Initializing Weld with the following beans and alternatives:");
+
         SeContainerInitializer init = Weld.newInstance();
+        init.disableDiscovery();
+
+        // Add beans
         Class<?>[] beanClasses = scanBeans("org.codedefenders")
             .stream()
             .filter(clazz -> includeConfig || !ConfigurationSource.class.isAssignableFrom(clazz))
             .toArray(Class<?>[]::new);
-        init.disableDiscovery();
         init.addBeanClasses(beanClasses);
+        Arrays.stream(beanClasses).map(clazz -> "- bean: " + clazz.getName()).forEach(log::add);
+
+        // Add alternatives
         if (alternatives != null) {
             init.selectAlternatives(alternatives);
+            Arrays.stream(alternatives).map(clazz -> "- alternative: " + clazz.getName()).forEach(log::add);
         }
+
+        logger.debug(log.toString());
         return init.initialize();
     }
 }
