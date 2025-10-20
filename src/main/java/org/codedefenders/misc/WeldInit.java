@@ -73,6 +73,7 @@ public class WeldInit {
         beanAnnotations.add(Named.class);
     }
 
+    /** Checks if any annotations match. */
     private static boolean hasMatch(Annotation[] annotations, Set<Class<? extends Annotation>> searchedAnnotations) {
         for (var annotation : annotations) {
             if (searchedAnnotations.contains(annotation.annotationType())) {
@@ -82,7 +83,10 @@ public class WeldInit {
         return false;
     }
 
-    /** Checks if class is a bean or contains a bean producer. */
+    /**
+     * Checks if the given class, or any of its fields or methods contain a matching annotation.
+     * @param recursive Whether to include sub-classes in the search.
+     */
     public static boolean containsAnnotation(Class<?> clazz, Set<Class<? extends Annotation>> searchedAnnotations, boolean recursive) {
         if (hasMatch(clazz.getAnnotations(), searchedAnnotations)) {
             return true;
