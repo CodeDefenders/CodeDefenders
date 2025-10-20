@@ -117,7 +117,11 @@ public class WeldInit {
         return false;
     }
 
-    /** Scans the classpath for classes that are beans or contain bean producers. */
+    /**
+     * Scans package for classes that are beans or contain bean producers.
+     * Excludes test package classes.
+     * @param packageName The package to scan, e.g. "org.codedefenders".
+     */
     public static List<Class<?>> scanBeans(String packageName) {
         return scanClasspath(packageName).stream()
                 .filter(clazz -> containsAnnotation(clazz, beanAnnotations, true)).toList();
@@ -125,15 +129,23 @@ public class WeldInit {
 
     /**
      * Finds all classes in a package.
+     * Excludes test package classes.
      * @param packageName The package to scan, e.g. "org.codedefenders".
      */
     public static List<Class<?>> scanClasspath(String packageName) {
-        List<Class<?>> acc = new ArrayList<>();
-        scanClasspath(packageName, acc);
-        return acc;
+        Acc acc = new Acc(new ArrayList<>(), new HashSet<>());
+        scanPackage(packageName, acc);
+        return acc.classes;
     }
 
-    private static void scanClasspath(String packageName, List<Class<?>> acc) {
+    private record Acc(List<Class<?>> classes, Set<String> seenPackages) {}
+
+    private static void scanPackage(String packageName, Acc acc) {
+        // Prevent scanning package multiple times if multiple class file location exist.
+        if (!acc.seenPackages.add(packageName)) {
+            return;
+        }
+
         Enumeration<URL> resources;
         try {
             resources = WeldInit.class.getClassLoader()
@@ -141,21 +153,24 @@ public class WeldInit {
         } catch (IOException e) {
             throw new ClassDiscoveryException(e);
         }
+
+        // The package name is fixed here, but it can correspond to multiple class file locations.
+        // For example, "target/classes/org/codedefenders" and "target/test-classes/org/codedefenders".
         while (resources.hasMoreElements()) {
             var url = resources.nextElement();
-            // Filter out beans declared in test classes via the directory of their class files.
+            // Filter out test classes via their location.
             // This might break in the future, but will probably not be needed.
             if (url.toString().contains("test-classes")) {
                 continue;
             }
-            scanURL(url, packageName, acc);
+            scanDirectory(url, packageName, acc);
         }
     }
 
-    private static void scanURL(URL url, String packageName, List<Class<?>> acc) {
+    private static void scanDirectory(URL directory, String packageName, Acc acc) {
         InputStream stream;
         try {
-            stream = url.openStream();
+            stream = directory.openStream();
         } catch (IOException e) {
             throw new ClassDiscoveryException(e);
         }
@@ -163,18 +178,18 @@ public class WeldInit {
             return;
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        reader.lines().forEach(line -> {
-            if (line.endsWith(".class")) {
-                loadClass(line, packageName).ifPresent(acc::add);
+        reader.lines().forEach(filename -> {
+            if (filename.endsWith(".class")) {
+                loadClass(filename, packageName).ifPresent(acc.classes::add);
             } else {
-                scanClasspath(packageName + "." + line, acc);
+                scanPackage(packageName + "." + filename, acc);
             }
         });
     }
 
-    private static Optional<Class<?>> loadClass(String className, String packageName) {
+    private static Optional<Class<?>> loadClass(String filename, String packageName) {
         try {
-            return Optional.of(Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.'))));
+            return Optional.of(Class.forName(packageName + "." + filename.substring(0, filename.lastIndexOf('.'))));
         } catch (ClassNotFoundException e) {
             throw new ClassDiscoveryException(e);
         }
@@ -216,3 +231,4 @@ public class WeldInit {
         return init.initialize();
     }
 }
+
