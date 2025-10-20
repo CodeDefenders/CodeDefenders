@@ -39,10 +39,13 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.enterprise.inject.Alternative;
 import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Stereotype;
 import jakarta.enterprise.inject.Typed;
 import jakarta.enterprise.inject.se.SeContainer;
 import jakarta.enterprise.inject.se.SeContainerInitializer;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import jakarta.interceptor.Interceptor;
 
 import org.codedefenders.configuration.source.ConfigurationSource;
 import org.jboss.weld.environment.se.Weld;
@@ -52,16 +55,22 @@ public class WeldInit {
     /** Annotations that mark a class, method or field as a bean producer. */
     private static final Set<Class<? extends Annotation>> beanAnnotations = new HashSet<>();
     static {
-        beanAnnotations.add(Dependent.class);
+        // Jakarta's bean defining annotations
+        // See: https://jakarta.ee/specifications/cdi/4.0/jakarta-cdi-spec-4.0.html#bean_defining_annotations
+        beanAnnotations.add(ApplicationScoped.class);
         beanAnnotations.add(RequestScoped.class);
         beanAnnotations.add(SessionScoped.class);
-        beanAnnotations.add(ApplicationScoped.class);
         beanAnnotations.add(ConversationScoped.class);
+        beanAnnotations.add(Interceptor.class);
+        beanAnnotations.add(Stereotype.class);
+        beanAnnotations.add(Dependent.class);
+        // Additional bean annotations
         beanAnnotations.add(Singleton.class);
         beanAnnotations.add(Produces.class);
         beanAnnotations.add(Alternative.class);
         beanAnnotations.add(Priority.class);
         beanAnnotations.add(Typed.class);
+        beanAnnotations.add(Named.class);
     }
 
     private static boolean hasMatch(Annotation[] annotations, Set<Class<? extends Annotation>> searchedAnnotations) {
