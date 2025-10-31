@@ -111,12 +111,13 @@ abstract class LlmSubActionService {
      * Adds the source code of the CuT as the user message. If the prompt specifies that dependencies have to be
      * included, the source code of the dependencies is included as well.
      */
-    protected void addUserMessage() {
+    protected String getSourceCodeForUserMessage() {
         if (conversation.getCurrentType() == PromptType.DEFEND_DEPENDENCIES
                 || conversation.getCurrentType() == PromptType.ATTACK_DEPENDENCIES) {
-            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + String.join("\n", game.getCUT().getDependencyCode()));
+            return game.getCUT().getSourceCode() + "\n####\n"
+                    + String.join("\n####\n", game.getCUT().getDependencyCode());
         } else {
-            conversation.addUserMessage(game.getCUT().getSourceCode());
+            return game.getCUT().getSourceCode();
         }
     }
 

@@ -64,11 +64,14 @@ class LlmTestService extends LlmSubActionService {
         if (conversation.isEmpty()) {
             String systemMessage = getSystemPrompt(model, promptType);
             if (promptType == PromptType.DEFEND_FOCUS) {
-                systemMessage = String.format(systemMessage, getRandomMethodWithLivingMutant());
+                Optional<String> methodName = getRandomMethodWithLivingMutant();
+                if (methodName.isPresent()) {
+                    systemMessage = String.format(systemMessage, methodName);
+                }
             }
             conversation.addSystemMessage(systemMessage);
 
-            addUserMessage();
+            conversation.addUserMessage(getSourceCodeForUserMessage());
         }
 
         String response = promptService.getResponse(model, conversation);

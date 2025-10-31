@@ -19,9 +19,13 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 
+import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.PromptType;
@@ -42,7 +46,8 @@ class LlmMutantService extends LlmSubActionService {
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, promptType));
-            addUserMessage();
+            conversation.addUserMessage(getSourceCodeForUserMessage() + "\n####\n"
+                    + getExistingMutantDiffsMessage());
         }
 
         String result = promptService.getResponse(model, conversation);
@@ -88,5 +93,10 @@ class LlmMutantService extends LlmSubActionService {
         } else {
             return PromptType.ATTACK_DEFAULT;
         }
+    }
+
+    private String getExistingMutantDiffsMessage() {
+        return String.join("\n####\n",
+                gameService.getMutants(user, game).stream().map(MutantDTO::getPatchString).collect(Collectors.toSet()));
     }
 }

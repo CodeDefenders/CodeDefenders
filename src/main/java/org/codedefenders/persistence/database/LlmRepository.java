@@ -48,7 +48,10 @@ public class LlmRepository {
                     The behaviour of the program should change.
                     Only change existing methods and fields.
                     Write nothing but the changed java code.
-                    Make sure to introduce at least one change.""".trim().stripIndent();
+                    Make sure to introduce at least one change.
+
+                    You might see some diffs of mutants at the end of the user message.
+                    Those mutants already exist, create different ones.""".trim().stripIndent();
 
     private static final String DEFAULT_DEFENDER_PROMPT =
             """
@@ -64,7 +67,10 @@ public class LlmRepository {
                     Only change existing methods and fields.
                     Write nothing but the changed java code of the first class. don't change any
                     other classes.
-                    Make sure to introduce at least one change.""".trim().stripIndent();
+                    Make sure to introduce at least one change.
+
+                    You might see some diffs of mutants at the end of the user message.
+                    Those mutants already exist, create different ones.""".trim().stripIndent();
 
     private static final String DEFAULT_RESOLVE_EQUIVALENT_PROMPT =
             """
