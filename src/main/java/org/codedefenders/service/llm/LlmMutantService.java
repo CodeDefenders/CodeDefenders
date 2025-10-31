@@ -49,9 +49,7 @@ class LlmMutantService extends LlmSubActionService {
         }
 
         String result = promptService.getResponse(model, conversation);
-        String formattedResult = LlmUtils.extractMutantFromReply(result, true, game);
-        logger.info("LLM attacker generated mutant: {}", formattedResult);
-        return formattedResult;
+        return LlmUtils.extractMutantFromReply(result, true, game);
     }
 
     @Override

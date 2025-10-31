@@ -75,9 +75,7 @@ class LlmTestService extends LlmSubActionService {
         }
 
         String response = promptService.getResponse(model, conversation);
-        String testSrc = LlmUtils.testTemplateFromResponse(response, game);
-        logger.info("AI defender generated test: {}", testSrc);
-        return testSrc;
+        return LlmUtils.testTemplateFromResponse(response, game);
     }
 
     /**
@@ -102,6 +100,7 @@ class LlmTestService extends LlmSubActionService {
                 result = gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
             }
             if (result.isSuccess()) {
+                logger.info("LLM successfully submitted test.");
                 conversation.resetCurrent(true);
             } else {
                 StringBuilder correction = new StringBuilder();

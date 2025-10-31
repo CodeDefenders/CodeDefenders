@@ -210,6 +210,11 @@ public class LlModel {
         return type.hashCode() ^ (name != null ? name.hashCode() : 0);
     }
 
+    @Override
+    public String toString() {
+        return type + ":" + name;
+    }
+
     /**
      * Loads all values except name and type from the other model.
      */

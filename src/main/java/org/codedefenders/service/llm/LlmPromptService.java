@@ -26,6 +26,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
@@ -79,8 +80,13 @@ class LlmPromptService {
      * (usually after 3 Minutes).
      */
     String getResponse(LlModel model, LlmConversationBatch conversation) {
-        logger.info("Sending conversation \n{}\n to model {}.", conversation, model);
         ChatMessage[] chatMessages = conversation.currentConversation().toArray();
+
+        int inputLength = 0;
+        for (ChatMessageDTO msg : conversation.currentConversation().copyMessages()) {
+            inputLength += msg.getText().length();
+        }
+        logger.info("Sending conversation with {} characters to model {}", inputLength, model);
 
         Map<LlModel, ChatModel> chatMap = switch (model.getType()) {
             case OPENAI -> openaiModels;
@@ -92,7 +98,7 @@ class LlmPromptService {
             ChatResponse response = chatModel.chat(chatMessages);
             conversation.addAiMessage(response.aiMessage(), model);
             String responseText = response.aiMessage().text();
-            logger.info("LLM responded with {}", responseText);
+            logger.info("Model {} responded with {} characters", model, responseText.length());
             return responseText;
         } else {
             throw new IllegalArgumentException("No model with this name in ChatModelMap: " + model.getName());
