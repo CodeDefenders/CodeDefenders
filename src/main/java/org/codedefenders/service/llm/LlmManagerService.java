@@ -21,6 +21,7 @@ package org.codedefenders.service.llm;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -41,6 +42,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
@@ -84,7 +86,6 @@ public class LlmManagerService {
      */
     private final Map<AbstractGame, String> defenderErrorMessages = new HashMap<>();
     private final Map<AbstractGame, String> attackerErrorMessages = new HashMap<>();
-
 
     @Inject
     private GameRepository gameRepository;
@@ -178,7 +179,7 @@ public class LlmManagerService {
             final Role finalRole = role;
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversation(), new Random())));
+                    new LlmConversationBatch(), new Random())));
         }
     }
 
@@ -221,7 +222,7 @@ public class LlmManagerService {
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
      */
-    public void runLlmAction(AbstractGame game, final Role role, final LlmConversation conversation,
+    public void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
                              final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
@@ -264,7 +265,7 @@ public class LlmManagerService {
     }
 
     private void singleLlmAction(AbstractGame game, final SimpleUser user, final Role role,
-                                 final LlmConversation conversation,
+                                 final LlmConversationBatch conversation,
                                  final Random random) throws NoSuchModelException {
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();

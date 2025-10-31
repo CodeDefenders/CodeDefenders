@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 class LlmTestService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
 
-    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)"; //TODO Anpassbar machen?
+    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)"; //TODO Make this adjustable?
 
     @Inject
     GameService gameService;
@@ -59,19 +59,19 @@ class LlmTestService extends LlmSubActionService {
     protected String generate() {
 
         PromptType promptType = getCorrectDefendPromptType();
-        conversation.setCurrentType(promptType);
+        setConversationType(promptType);
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             String systemMessage = getSystemPrompt(model, promptType);
             if (promptType == PromptType.DEFEND_FOCUS) {
                 Optional<String> methodName = getRandomMethodWithLivingMutant();
                 if (methodName.isPresent()) {
-                    systemMessage = String.format(systemMessage, methodName);
+                    systemMessage = String.format(systemMessage, methodName.get());
                 }
             }
-            conversation.addSystemMessage(systemMessage);
+            conversation.addSystemMessage(systemMessage, model);
 
-            conversation.addUserMessage(getSourceCodeForUserMessage());
+            conversation.addUserMessage(getSourceCodeForUserMessage(), model);
         }
 
         String response = promptService.getResponse(model, conversation);
@@ -102,7 +102,7 @@ class LlmTestService extends LlmSubActionService {
                 result = gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
             }
             if (result.isSuccess()) {
-                conversation.clear();
+                conversation.resetCurrent(true);
             } else {
                 StringBuilder correction = new StringBuilder();
                 switch (result.failureReason().orElseThrow()) {
@@ -120,7 +120,7 @@ class LlmTestService extends LlmSubActionService {
                                     .append(result.testCutError().orElseThrow());
                 }
                 correction.append("\nFix these problems.");
-                conversation.addSystemMessage(correction.toString());
+                conversation.addSystemMessage(correction.toString(), model);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

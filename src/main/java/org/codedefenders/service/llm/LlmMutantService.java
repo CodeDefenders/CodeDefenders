@@ -19,13 +19,11 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.PromptType;
@@ -42,12 +40,12 @@ class LlmMutantService extends LlmSubActionService {
     @Override
     protected String generate() {
         PromptType promptType = getCorrectAttackPromptType();
-        conversation.setCurrentType(promptType);
+        setConversationType(promptType);
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(getSystemPrompt(model, promptType));
+            conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
             conversation.addUserMessage(getSourceCodeForUserMessage() + "\n####\n"
-                    + getExistingMutantDiffsMessage());
+                    + getExistingMutantDiffsMessage(), model);
         }
 
         String result = promptService.getResponse(model, conversation);
@@ -68,7 +66,7 @@ class LlmMutantService extends LlmSubActionService {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
             if (result.isSuccess()) {
-                conversation.clear();
+                conversation.resetCurrent(true);
                 logger.info("LLM successfully submitted mutant.");
 
             } else {
@@ -79,7 +77,7 @@ class LlmMutantService extends LlmSubActionService {
                             case DUPLICATE_MUTANT_FOUND -> "Your mutant already exists. Create another one.";
                             case COMPILATION_FAILED -> "Your mutant failed to compile. Compilation error: "
                                     + result.compilationError().orElseThrow();
-                        } + "\n Fix this.");
+                        } + "\n Fix this.", model);
             }
         } catch (IOException | GameManagingUtils.MutantCreationException e) {
             throw new RuntimeException(e);

@@ -27,7 +27,7 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.LlmRepository;
 import org.slf4j.Logger;
@@ -74,13 +74,13 @@ class LlmPromptService {
 
     /**
      * Queries the LLM specified by {@code model} with the prompts specified by {@code conversation}. The
-     * {@link LlmConversation#getCurrentType()} has to be specified prior to calling this method, or it will throw
+     * {@link LlmConversationBatch#getCurrentType()} has to be specified prior to calling this method, or it will throw
      * a {@link RuntimeException}. This method will block until the LLM has returned a result, or it has timed out
      * (usually after 3 Minutes).
      */
-    String getResponse(LlModel model, LlmConversation conversation) {
+    String getResponse(LlModel model, LlmConversationBatch conversation) {
         logger.info("Sending conversation \n{}\n to model {}.", conversation, model);
-        ChatMessage[] chatMessages = conversation.toArray();
+        ChatMessage[] chatMessages = conversation.currentConversation().toArray();
 
         Map<LlModel, ChatModel> chatMap = switch (model.getType()) {
             case OPENAI -> openaiModels;
@@ -90,7 +90,7 @@ class LlmPromptService {
         ChatModel chatModel = chatMap.get(model);
         if (chatModel != null) {
             ChatResponse response = chatModel.chat(chatMessages);
-            conversation.addAiMessage(response.aiMessage());
+            conversation.addAiMessage(response.aiMessage(), model);
             String responseText = response.aiMessage().text();
             logger.info("LLM responded with {}", responseText);
             return responseText;

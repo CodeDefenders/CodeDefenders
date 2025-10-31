@@ -60,7 +60,7 @@ class LlmEquivalenceService extends LlmSubActionService {
         for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
             this.flagged = flagged;
             do {
-                conversation.setCurrentType(PromptType.ATTACK_EQUIVALENCE);
+                setConversationType(PromptType.ATTACK_EQUIVALENCE);
                 super.run();
             } while (!conversation.isEmpty());
 
@@ -75,8 +75,8 @@ class LlmEquivalenceService extends LlmSubActionService {
     @Override
     protected String generate() {
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE));
-            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString());
+            conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
+            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString(), model);
         }
         String response = promptService.getResponse(model, conversation);
         return LlmUtils.testTemplateFromResponse(response, game);
@@ -96,9 +96,9 @@ class LlmEquivalenceService extends LlmSubActionService {
                     gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
 
             if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
-                conversation.clear();
+                conversation.resetCurrent(true);
             } else {
-                if (conversation.numberOfTries() <= numberOfRepairAttempts) {
+                if (conversation.currentConversation().numberOfTries() <= numberOfRepairAttempts) {
                     StringBuilder correction = new StringBuilder();
                     switch (result.failureReason().orElseThrow()) {
                         case VALIDATION_FAILED -> {
@@ -115,10 +115,10 @@ class LlmEquivalenceService extends LlmSubActionService {
                                         .append(result.testCutError().orElseThrow());
                     }
                     correction.append("\nFix these problems.");
-                    conversation.addSystemMessage(correction.toString());
+                    conversation.addSystemMessage(correction.toString(), model);
                 } else {
                     gameManagingUtils.acceptBattlegroundEquivalence(game, user.getId(), equivalentMutant);
-                    conversation.clear();
+                    conversation.resetCurrent(false);
                 }
             }
 

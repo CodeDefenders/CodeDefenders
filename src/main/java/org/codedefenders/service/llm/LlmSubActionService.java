@@ -21,7 +21,6 @@ package org.codedefenders.service.llm;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Supplier;
 
 import jakarta.inject.Inject;
 
@@ -29,7 +28,7 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
@@ -59,9 +58,12 @@ abstract class LlmSubActionService {
     @Inject
     protected GameService gameService;
 
+    @Inject
+    private LlmInspectionService inspectionService;
+
     protected LlModel model;
     protected AbstractGame game;
-    protected LlmConversation conversation;
+    protected LlmConversationBatch conversation;
     protected SimpleUser user;
     protected Random random;
     protected int numberOfRepairAttempts;
@@ -82,7 +84,7 @@ abstract class LlmSubActionService {
 
     protected abstract void submit(String reply);
 
-    protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversation conversation,
+    protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
                         Random random, int numberOfRepairAttempts) {
         if (model.isPresent()) {
             this.model = model.get();
@@ -102,9 +104,14 @@ abstract class LlmSubActionService {
     }
 
     protected void resetConversationAfterTooManyTries() {
-        if (conversation.numberOfTries() > numberOfRepairAttempts) {
-            conversation.clear();
+        if (conversation.currentConversation().numberOfTries() > numberOfRepairAttempts) {
+            conversation.resetCurrent(false);
         }
+    }
+
+    protected void setConversationType(PromptType type) {
+        conversation.setCurrentType(type);
+        inspectionService.addConversation(game, conversation.currentConversation());
     }
 
     /**

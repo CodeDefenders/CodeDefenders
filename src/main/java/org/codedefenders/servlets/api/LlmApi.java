@@ -33,10 +33,13 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
+import org.codedefenders.service.llm.LlmInspectionService;
 import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -59,6 +62,9 @@ public class LlmApi extends HttpServlet {
 
     @Inject
     LlmRepository llmRepo;
+
+    @Inject
+    LlmInspectionService inspectionService;
 
     @Inject
     GameRepository gameRepository;
@@ -136,6 +142,21 @@ public class LlmApi extends HttpServlet {
                         return;
                     }
                 }
+                case "getConversations" -> {
+                    Optional<Integer> gameId = ServletUtils.gameId(req);
+                    if (gameId.isPresent()) {
+                        AbstractGame game = gameRepository.getGame(gameId.get());
+                        List<LlmConversation> messages = inspectionService.getConversations(game);
+                        returnJson = inspectionService.toJson(messages);
+                        logger.info("RETURNJSON XXXXXXXXXXXXXXXXXXXXXXXXXXx" + returnJson);
+
+                    } else {
+                        logger.error("gameId is missing while trying to access conversations.");
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        return;
+                    }
+                }
+
                 case "error" -> {
                     Optional<Role> role = ServletUtils.getEnumParameter(req, Role.class, "role");
                     Optional<Integer> gameId = ServletUtils.gameId(req);

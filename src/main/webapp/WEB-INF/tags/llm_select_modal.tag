@@ -136,6 +136,9 @@
                 const defenderError = await getError("DEFENDER");
                 const attackerError = await getError("ATTACKER");
 
+                const conversations = await InfoApi.getLlmConversations(${gameId});
+                console.log(conversations);
+
                 const noDefenderOption = document.getElementById("${htmlId}-no-defender");
                 noDefenderOption.selected = defenderModel == null;
                 const noAttackerOption = document.getElementById("${htmlId}-no-attacker");

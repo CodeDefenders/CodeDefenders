@@ -18,114 +18,74 @@
  */
 package org.codedefenders.model.llm;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 
 /**
- * Contains mutable lists of {@link dev.langchain4j.data.message.ChatMessage}s, representing the back and forth
- * conversation between the client and the LLM. Every prompt type has its own associated conversation, in order to allow
- * for several conversations.
- * <p>
- * Within one LLM action, the prompt type of this conversation should be established in the beginning,
- * before querying the LLM, and remain unchanged thereafter. This prompt type is represented by
- * {@link LlmConversation#currentType}.
+ * This represents the prompts and responses of an LLM.
  */
 public class LlmConversation {
-    private final Map<PromptType, List<ChatMessage>> messageLists = new HashMap<>();
+    private final List<ChatMessageDTO> messages = new ArrayList<>();
+    private boolean active = true;
+    private boolean success = false;
+    private final PromptType type;
 
-    private PromptType currentType;
-
-    public LlmConversation() {
-        for (PromptType t : PromptType.values()) {
-            messageLists.put(t, new ArrayList<>());
-        }
+    public LlmConversation(PromptType type) {
+        this.type = type;
     }
 
-    private List<ChatMessage> currentMessages() {
-        if (currentType == null) {
-            throw new RuntimeException("currentType has not been set yet.");
-        }
-        return messageLists.get(currentType);
+    public boolean isEmpty() {
+        return messages.isEmpty();
     }
 
-    public void addAiMessage(AiMessage msg) {
-        if (currentMessages().isEmpty()) {
-            throw new IllegalStateException("AiMessage cannot be the first message in a conversation");
-        }
-        currentMessages().add(msg);
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void addSystemMessage(String content) {
-        currentMessages().add(SystemMessage.from(content));
+    public PromptType getType() {
+        return type;
     }
 
-    public void addUserMessage(String content) {
-        currentMessages().add(UserMessage.from(content));
+    public void add(ChatMessage message, LlModel model) {
+        messages.add(new ChatMessageDTO(message, LocalDateTime.now(), model));
     }
 
     public ChatMessage[] toArray() {
-        List<ChatMessage> messages = currentMessages();
         ChatMessage[] result = new ChatMessage[messages.size()];
         for (int i = 0; i < messages.size(); i++) {
-            result[i] = messages.get(i);
+            result[i] = messages.get(i).msg();
         }
         return result;
     }
 
-    public boolean isEmpty() {
-        return currentMessages().isEmpty();
+    public List<ChatMessageDTO> copyMessages() {
+        return List.copyOf(messages);
     }
 
-    public void clear() {
-        currentMessages().clear();
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("LlmConversation:{");
-        for (PromptType t : messageLists.keySet()) {
-            sb.append(t.name()).append(":{");
-            for (ChatMessage msg : messageLists.get(t)) {
-                sb.append("[").append(msg).append("]");
-            }
-            sb.append("}");
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Returns the number of responses the llm has already returned.
-     */
     public int numberOfTries() {
         int result = 0;
-        for (ChatMessage msg : currentMessages()) {
-            if (msg instanceof AiMessage) {
+        for (ChatMessageDTO dto : messages) {
+            if (dto.msg() instanceof AiMessage) {
                 result++;
             }
         }
         return result;
     }
 
-    public PromptType getCurrentType() {
-        return currentType;
+    public void finish(boolean success) {
+        this.success = success;
+        active = false;
     }
 
-    public void resetCurrentType() {
-        currentType = null;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setCurrentType(PromptType currentType) {
-        if (this.currentType != null) {
-            throw new RuntimeException("Current type has already been set. " +
-                    "It should only be reset at the end of an llm action");
-        }
-        this.currentType = currentType;
+    public String toString() {
+        return String.join("", messages.stream().map(m -> "[" + m + "]").toList());
     }
 }
