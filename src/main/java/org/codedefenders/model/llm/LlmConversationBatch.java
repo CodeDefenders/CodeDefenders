@@ -78,6 +78,7 @@ public class LlmConversationBatch {
         }
         currentConversation().finish(success);
         messageLists.remove(currentType);
+        currentType = null;
     }
 
     @Override

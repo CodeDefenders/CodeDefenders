@@ -148,7 +148,6 @@ public class LlmApi extends HttpServlet {
                         AbstractGame game = gameRepository.getGame(gameId.get());
                         List<LlmConversation> messages = inspectionService.getConversations(game);
                         returnJson = inspectionService.toJson(messages);
-                        logger.info("RETURNJSON XXXXXXXXXXXXXXXXXXXXXXXXXXx" + returnJson);
 
                     } else {
                         logger.error("gameId is missing while trying to access conversations.");

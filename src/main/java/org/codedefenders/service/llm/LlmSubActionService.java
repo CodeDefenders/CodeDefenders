@@ -104,8 +104,10 @@ abstract class LlmSubActionService {
     }
 
     protected void resetConversationAfterTooManyTries() {
+        PromptType tmp = conversation.currentConversation().getType();
         if (conversation.currentConversation().numberOfTries() > numberOfRepairAttempts) {
             conversation.resetCurrent(false);
+            conversation.setCurrentType(tmp);
         }
     }
 

@@ -65,14 +65,28 @@
                     </div>
                 </jsp:attribute>
         <jsp:attribute name="footer">
+            <button type="button" id="${htmlId}-open-conversation-modal-button" class="btn btn-outline-dark"
+                    data-bs-toggle="modal" data-bs-target="#${htmlId}-conversation-modal">
+                <i class="fa fa-comments"></i>See
+                conversations
+            </button>
                     <button type="button" id="${htmlId}-submit-button" class="btn btn-primary">Confirm</button>
+
+        </jsp:attribute>
+    </t:modal>
+    <t:modal title="LLM conversations" id="${htmlId}-conversation-modal">
+                <jsp:attribute name="content">
+                    <div id="${htmlId}-loading-cons-div" class="loading loading-bg-gray loading-height-200">
+                        <div class="mb-3" id="${htmlId}-conversation-panel">
+
+                        </div>
+                    </div>
                 </jsp:attribute>
     </t:modal>
-
     <script>
 
         async function getError(role) {
-            const response = await fetch("${url.forPath("api/llm")}?action=error&gameId=" + ${gameId} + "&role=" + role, {
+            const response = await fetch("${url.forPath("api/llm")}?action=error&gameId=" + ${gameId} +"&role=" + role, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'text/plain'
@@ -103,6 +117,68 @@
                 modelOption.value = m.type + "|" + m.name;
                 modelOption.textContent = m.type + ": " + m.name;
             });
+        }
+
+        function addConversations(conversations, conversationPanel) {
+
+            while (conversationPanel.hasChildNodes()) {
+                conversationPanel.removeChild(conversationPanel.firstChild);
+            }
+            conversations.forEach((c, index) => {
+                const conCard = document.createElement("div");
+                conCard.classList.add("card")
+                const header = document.createElement("div");
+                header.classList.add("card-header");
+                if (c.type.includes("DEFEND")) {
+                    header.classList.add("bg-defender")
+                } else {
+                    header.classList.add("bg-attacker");
+                }
+                conCard.appendChild(header);
+                const toggleButton = document.createElement("button");
+                toggleButton.classList.add("btn", "collapsed");
+                if (c.success) {
+                    toggleButton.classList.add("btn-success");
+                } else if (c.active) {
+                    toggleButton.classList.add("btn-secondary");
+                } else {
+                    toggleButton.classList.add("btn-danger");
+                }
+
+                toggleButton.setAttribute("data-bs-toggle", "collapse");
+                toggleButton.setAttribute("data-bs-target", "#${htmlId}-collapse-" + index);
+                toggleButton.textContent = c.type + ", active: " + c.active + ", successful:" + c.success;
+                header.appendChild(toggleButton);
+                const collapse = document.createElement("div");
+                collapse.id = "${htmlId}-collapse-" + index;
+                collapse.classList.add("collapse");
+                collapse.setAttribute("data-bs-parent", "#" + conversationPanel.id);
+                conCard.appendChild(collapse);
+                const body = document.createElement("div");
+                body.classList.add("card-body");
+                c.messages.forEach(dto => {
+                    const messageCard = document.createElement("div");
+                    messageCard.classList.add("card");
+                    const messageHeader = document.createElement("header");
+                    messageHeader.classList.add("card-header");
+                    if (dto.messageType === "AI") {
+                        messageHeader.textContent = dto.model + " (" + dto.timestamp + ")";
+                    } else {
+                        messageHeader.textContent = dto.messageType + " (" + dto.timestamp + ")";
+                    }
+                    messageCard.appendChild(messageHeader);
+
+                    const messageBody = document.createElement("div");
+                    messageBody.textContent = dto.message;
+                    messageCard.appendChild(messageBody);
+
+                    body.appendChild(messageCard);
+                })
+
+                collapse.appendChild(body);
+
+                conversationPanel.appendChild(conCard);
+            })
         }
 
         (async function () {
@@ -136,13 +212,18 @@
                 const defenderError = await getError("DEFENDER");
                 const attackerError = await getError("ATTACKER");
 
-                const conversations = await InfoApi.getLlmConversations(${gameId});
-                console.log(conversations);
-
+                //console.log(conversations);
                 const noDefenderOption = document.getElementById("${htmlId}-no-defender");
+
                 noDefenderOption.selected = defenderModel == null;
                 const noAttackerOption = document.getElementById("${htmlId}-no-attacker");
                 noAttackerOption.selected = attackerModel == null;
+
+                const conversations = await InfoApi.getLlmConversations(${gameId});
+                const conversationPanel = document.getElementById("${htmlId}-conversation-panel");
+                addConversations(conversations, conversationPanel);
+                document.getElementById("${htmlId}-loading-cons-div").classList.remove("loading")
+
 
                 addOptions(defenderSelect, activeModels, defenderModel);
                 addOptions(attackerSelect, activeModels, attackerModel);
