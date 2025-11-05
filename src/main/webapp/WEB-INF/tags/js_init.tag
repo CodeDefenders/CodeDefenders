@@ -111,7 +111,10 @@
     window.i18n = {
         data: {
             <c:forEach items="${i18nService.javascriptStrings}" var="s">
-            "${s}": "${i18n.tr(s)}",
+            <c:set var="translation" value="${i18n.tr(s)}" />
+            <c:if test="${s != translation}"> <%-- only add translation mapping if a translation exists --%>
+            "${s}": "${translation}",
+            </c:if>
             </c:forEach>
         },
         tr: (s, ...a) => {
