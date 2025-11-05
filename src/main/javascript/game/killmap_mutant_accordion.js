@@ -93,9 +93,9 @@ class KillMapMutantAccordion extends KillMapAccordion {
                     dom: 't',
                     language: {
                         emptyTable: category.id === 'all'
-                            ? 'No tests.'
-                            : "This mutant isn't covered by any tests",
-                        zeroRecords: 'No tests match the selected category and filter.'
+                            ? i18n.tr('No tests.')
+                            : i18n.tr("This mutant isn't covered by any tests"),
+                        zeroRecords: i18n.tr('No tests match the selected category and filter.')
                     },
                     createdRow: function (row, data, index) {
                         self._setupPopover(
@@ -186,18 +186,18 @@ class KillMapMutantAccordion extends KillMapAccordion {
 
     /** @private */
     _renderCoveredMutants(data) {
-        return `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> ${data.coveredMutantIds.length}</span>`;
+        return `<span class="ta-covered-link"><span class="ta-column-name">${i18n.tr("Covered")}:</span> ${data.coveredMutantIds.length}</span>`;
     }
 
     /** @private */
     _renderKilledMutants(data) {
-        return `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> ${data.killedMutantIds.length}</span>`;
+        return `<span class="ta-killed-link"><span class="ta-column-name">${i18n.tr("Killed")}:</span> ${data.killedMutantIds.length}</span>`;
     }
 
     /** @private */
     _renderViewButton(data) {
         return data.canView
-            ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>'
+            ? `<button class="ta-view-button btn btn-xs btn-primary">${i18n.tr("View")}</button>`
             : '';
     }
 
@@ -207,13 +207,13 @@ class KillMapMutantAccordion extends KillMapAccordion {
         let smellLevel;
         let smellColor;
         if (numSmells >= 3) {
-            smellLevel = 'Bad';
+            smellLevel = i18n.tr('Bad');
             smellColor = 'btn-danger';
         } else if (numSmells >= 1) {
-            smellLevel = 'Fishy';
+            smellLevel = i18n.tr('Fishy');
             smellColor = 'btn-warning';
         } else {
-            smellLevel = 'Good';
+            smellLevel = i18n.tr('Good');
             smellColor = 'btn-success';
         }
         return `<a class="ta-smells-link btn btn-xs ${smellColor}">${smellLevel}</a>`;
@@ -222,7 +222,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
     /** @private */
     _renderCoveredMutantsPopoverTitle(data) {
         return data.coveredMutantIds.length > 0
-            ? 'Covered Mutants'
+            ? i18n.tr('Covered Mutants')
             : '';
     }
 
@@ -230,13 +230,13 @@ class KillMapMutantAccordion extends KillMapAccordion {
     _renderCoveredMutantsPopoverBody(data) {
         return data.coveredMutantIds.length > 0
             ? data.coveredMutantIds.join(', ')
-            : 'No mutants are covered by this test.';
+            : i18n.tr('No mutants are covered by this test.');
     }
 
     /** @private */
     _renderKilledMutantsPopoverTitle(data) {
         return data.killedMutantIds.length > 0
-            ? 'Killed Mutants'
+            ? i18n.tr('Killed Mutants')
             : '';
     }
 
@@ -244,13 +244,13 @@ class KillMapMutantAccordion extends KillMapAccordion {
     _renderKilledMutantsPopoverBody(data) {
         return data.killedMutantIds.length > 0
             ? data.killedMutantIds.join(', ')
-            : 'No mutants were killed by this test.';
+            : i18n.tr('No mutants were killed by this test.');
     }
 
     /** @private */
     _renderSmellsPopoverTitle(data) {
         return data.smells.length > 0
-            ? 'Test Smells'
+            ? i18n.tr('Test Smells')
             : '';
     }
 
@@ -258,7 +258,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
     _renderSmellsPopoverBody(data) {
         return data.smells.length > 0
             ? data.smells.join('<br>')
-            : 'This test does not have any smells.'
+            : i18n.tr('This test does not have any smells.')
     }
 
 }

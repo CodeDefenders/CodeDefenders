@@ -124,10 +124,10 @@ class GameHighlighting {
     }
 
     static MutantNames = {
-        ALIVE: 'Alive Mutants',
-        KILLED: 'Killed Mutants',
-        FLAGGED: 'Flagged Mutants',
-        EQUIVALENT: 'Equivalent Mutants'
+        ALIVE: i18n.tr('Alive Mutants'),
+        KILLED: i18n.tr('Killed Mutants'),
+        FLAGGED: i18n.tr('Flagged Mutants'),
+        EQUIVALENT: i18n.tr('Equivalent Mutants')
     }
 
     static IconClasses = {
@@ -275,10 +275,10 @@ class GameHighlighting {
         const head =
                 `<thead>
                     <tr>
-                        <td>Creator</td>
+                        <td>${i18n.tr("Creator")}</td>
                         <td class="text-end">ID</td>
-                        <td class="text-end">Score</td>
-                        <td class="text-end">Changed Lines</td>
+                        <td class="text-end">${i18n.tr("Score")}</td>
+                        <td class="text-end">${i18n.tr("Changed Lines")}</td>
                     </tr>
                 </thead>`;
 
@@ -338,7 +338,7 @@ class GameHighlighting {
                     <input type="hidden" name="gameId" value="${this._gameId}">
                     <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
                         <div class="${GameHighlighting.IconClasses.FLAG.join(' ')}"></div>
-                        <span>Claim Equivalent</span>
+                        <span>${i18n.tr("Claim Equivalent")}</span>
                     </button>
                 </form>`;
     }
@@ -354,7 +354,7 @@ class GameHighlighting {
                 `<span class="d-inline-block w-100 mt-3" tabindex="0" title="Cover this mutant with a test to be able to claim it as equivalent.">
                     <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2" disabled>
                         <div class="${GameHighlighting.IconClasses.FLAG.join(' ')}"></div>
-                        <span>Claim Equivalent</span>
+                        <span>${i18n.tr("Claim Equivalent")}</span>
                     </button>
                 </span>`;
     }

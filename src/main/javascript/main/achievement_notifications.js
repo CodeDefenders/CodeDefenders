@@ -98,18 +98,18 @@ class AchievementNotifications {
         element.classList.add('achievement-notification');
         element.innerHTML = `
             <a href="${this._profilePath}" class="achievement-notification__link" target="_blank" rel="noopener" 
-                    title="Show all achievements on the profile page">
+                    title="${i18n.tr("Show all achievements on the profile page")}">
                 <div class="achievement-notification__icon">
                     <img src="${this._achievementIconPath}codedefenders_achievements_${achievement.achievementId}_lvl_${achievement.level}.png" 
                          alt="Icon ${achievement.name} (Level ${achievement.level})">
                 </div>
                 <div class="achievement-notification__text">
-                    <p class="achievement-notification__title">New Achievement Unlocked:<br>${achievement.name} (Level ${achievement.level})</p>
+                    <p class="achievement-notification__title">${i18n.tr("New Achievement Unlocked")}:<br>${achievement.name} (${i18n.tr("Level")} ${achievement.level})</p>
                     <!--p class="achievement-notification__description">${this._getDescription(achievement)}</p-->
                     <p class="achievement-notification__progress">${this._getProgressText(achievement)}</p>
                 </div>
             </a>
-            <button type="button" class="btn-close" aria-label="Close"></button>
+            <button type="button" class="btn-close" aria-label="${i18n.tr("Close")}></button>
         `;
         return element;
     }

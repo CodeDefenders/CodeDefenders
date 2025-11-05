@@ -54,7 +54,7 @@ class InfoApi {
             const classInfo = await InfoApi.getClassInfo(classId, false);
             editor.setValue(classInfo.source)
         } catch (e) {
-            editor.setValue("Could not fetch class.\nPlease try again later.");
+            editor.setValue(i18n.tr("Could not fetch class.\nPlease try again later."));
         }
     }
 
@@ -63,7 +63,7 @@ class InfoApi {
             const classInfo = await InfoApi.getClassInfo(classId, true);
             editor.setValue(classInfo.dependency_code[dependencyIndex])
         } catch (e) {
-            editor.setValue("Could not fetch dependency \n Please try again later.");
+            editor.setValue(i18n.tr("Could not fetch dependency.\nPlease try again later."));
         }
     }
 
@@ -72,7 +72,7 @@ class InfoApi {
             const mutantInfo = await InfoApi.getMutantInfo(mutantId);
             editor.setValue(mutantInfo.diff)
         } catch (e) {
-            editor.setValue("Could not fetch mutant.\nPlease try again later.");
+            editor.setValue(i18n.tr("Could not fetch mutant.\nPlease try again later."));
         }
     }
 
@@ -81,7 +81,7 @@ class InfoApi {
             const testInfo = await InfoApi.getTestInfo(testId);
             editor.setValue(testInfo.source)
         } catch (e) {
-            editor.setValue("Could not fetch test.\nPlease try again later.");
+            editor.setValue(i18n.tr("Could not fetch test.\nPlease try again later."));
         }
     }
 

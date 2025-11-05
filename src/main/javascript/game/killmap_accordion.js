@@ -342,29 +342,29 @@ class KillMapAccordion {
     _renderKillMapResult(data) {
         switch (data.killMapResult) {
             case 'KILL':
-                return '<span class="killMapImage killMapImageKill" aria-label="Kill"></span>';
+                return `<span class="killMapImage killMapImageKill" aria-label="${i18n.tr("Kill")}"></span>`;
             case 'NO_KILL':
-                return '<span class="killMapImage killMapImageNoKill" aria-label="No Kill"></span>';
+                return `<span class="killMapImage killMapImageNoKill" aria-label="${i18n.tr("No Kill")}"></span>`;
             case 'NO_COVERAGE':
-                return '<span class="killMapImage killMapImageNoCoverage" aria-label="No Coverage"></span>';
+                return `<span class="killMapImage killMapImageNoCoverage" aria-label="${i18n.tr("No Coverage")}"></span>`;
             case 'ERROR':
-                return '<span class="killMapImage killMapImageError" aria-label="Error"></span>';
+                return `<span class="killMapImage killMapImageError" aria-label="${i18n.tr("Error")}"></span>`;
             case 'UNKNOWN':
             default:
-                return '<span class="killMapImage killMapImageUnknown" aria-label="Unknown"></span>';
+                return `<span class="killMapImage killMapImageUnknown" aria-label="${i18n.tr("Unknown")}"></span>`;
         }
     }
 
     _renderKillMapImagePopoverTitle(data) {
         switch (data.killMapResult) {
             case 'KILL':
-                return 'Kill';
+                return i18n.tr('Kill');
             case 'NO_KILL':
-                return 'No kill';
+                return i18n.tr('No kill');
             case 'NO_COVERAGE':
-                return 'No coverage';
+                return i18n.tr('No coverage');
             case 'ERROR':
-                return 'Error';
+                return i18n.tr('Error');
             case 'UNKNOWN':
             default:
                 return '';
@@ -374,16 +374,16 @@ class KillMapAccordion {
     _renderKillMapImagePopoverBody(data) {
         switch (data.killMapResult) {
             case 'KILL':
-                return 'The mutant was killed by the test.';
+                return i18n.tr('The mutant was killed by the test.');
             case 'NO_KILL':
-                return 'The test covered the mutant, but did not kill it.';
+                return i18n.tr('The test covered the mutant, but did not kill it.');
             case 'NO_COVERAGE':
-                return 'The mutant was not covered by this test.';
+                return i18n.tr('The mutant was not covered by this test.');
             case 'ERROR':
-                return 'The execution resulted in an error, killing the mutant.';
+                return i18n.tr('The execution resulted in an error, killing the mutant.');
             case 'UNKNOWN':
             default:
-                return 'Unknown';
+                return i18n.tr('Unknown');
         }
     }
 
@@ -394,7 +394,7 @@ class KillMapAccordion {
 
     /** @protected */
     _renderPoints(data) {
-        return `<span class="ka-column-name">Points:</span> ${data.points}`;
+        return `<span class="ka-column-name">${i18n.tr("Points")}:</span> ${data.points}`;
     }
 
 }

@@ -267,7 +267,7 @@ class GameChat {
          * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_CONNECT () {
-            return {system: true, message: 'Connected to chat.'};
+            return {system: true, message: i18n.tr('Connected to chat.')};
         }
 
         /**
@@ -275,7 +275,7 @@ class GameChat {
          * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_DISCONNECT () {
-            return {system: true, message: 'Disconnected from chat.'};
+            return {system: true, message: i18n.tr('Disconnected from chat.')};
         }
 
         /**
@@ -283,7 +283,7 @@ class GameChat {
          * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_FAILED_LOAD () {
-            return {system: true, message: 'Could not load chat messages.'};
+            return {system: true, message: i18n.tr('Could not load chat messages.')};
         }
     }
 

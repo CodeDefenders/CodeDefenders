@@ -193,9 +193,9 @@ class MutantAccordion {
                 dom: 't',
                 language: {
                     emptyTable: category.id === 'all'
-                            ? 'No mutants.'
-                            : 'No mutants in this method.',
-                    zeroRecords: 'No mutants match the selected category.'
+                        ? i18n.tr('No mutants.')
+                        : i18n.tr('No mutants in this method.'),
+                    zeroRecords: i18n.tr('No mutants match the selected category.')
                 },
                 createdRow: function (row, data, index) {
                     /* Assign function to the "View" buttons. */
@@ -287,19 +287,19 @@ class MutantAccordion {
     /** @private */
     _renderId (data) {
         const killedByText = data.state === 'KILLED' && data.killedBy
-                ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
+            ? `<span class="ma-column-name mx-2">${i18n.tr("killed by")}</span>${data.killedBy.name}`
                 : '';
         const equivDuelResultText = data.state === 'EQUIVALENT' && data.killedByTestId >= 0
-            ? `<span class="ma-column-name mx-2">marked as equivalent</span>but is killable`
+            ? `<span class="ma-column-name mx-2">${i18n.tr("marked as equivalent")}</span>${i18n.tr("but is killable")}`
             : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
-            <span class="ma-column-name mx-2">by</span>${data.creator.name}
+            <span class="ma-column-name mx-2">${i18n.tr("by")}</span>${data.creator.name}
             ${killedByText}${equivDuelResultText}`;
     }
 
     /** @private */
     _renderPoints (data) {
-        return `<span class="ma-column-name">Points:</span> ${data.points}`;
+        return `<span class="ma-column-name">${i18n.tr("Points")}:</span> ${data.points}`;
     }
 
     /** @private */
@@ -324,7 +324,7 @@ class MutantAccordion {
     /** @private */
     _renderViewButton (data) {
         return data.canView
-                ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>'
+            ? `<button class="ma-view-button btn btn-primary btn-xs pull-right">${i18n.tr("View")}</button>`
                 : '';
     }
 
@@ -336,18 +336,18 @@ class MutantAccordion {
                     if (data.covered) {
                         return `
                             <form id="equiv" action="equivalence-duels" method="post"
-                            onsubmit="return confirm('This will mark all player-created mutants on line(s) ${data.lineString} as equivalent. Are you sure?');">
+                            onsubmit="return confirm(i18n.tr('This will mark all player-created mutants on line(s) {0} as equivalent. Are you sure?', data.lineString));">
                                 <input type="hidden" name="formType" value="claimEquivalent">
                                 <input type="hidden" name="equivLines" value="${data.lineString}">
                                 <input type="hidden" name="gameId" value="${this._gameId}">
-                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
+                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">${i18n.tr("Claim Equivalent")}</button>
                             </form>`;
                     } else {
                         // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
                         // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
                         return `
                             <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
-                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
+                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>${i18n.tr("Claim Equivalent")}</button>
                             </span>`;
                     }
                 } else {
@@ -359,11 +359,11 @@ class MutantAccordion {
                     return '';
                 } else {
                     return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
-                                    title="This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed."
-                            >View Example Killing Test</button>`;
+                                    title="${i18n.tr("This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed.")}"
+                            >${i18n.tr("View Example Killing Test")}</button>`;
                 }
             case "KILLED":
-                return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
+                return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">${i18n.tr("View Killing Test")}</button>`;
             default:
                 return '';
         }

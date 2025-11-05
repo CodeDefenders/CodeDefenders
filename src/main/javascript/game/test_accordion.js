@@ -100,7 +100,7 @@ class TestAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
+        modal.title.innerText = `${i18n.tr("Test")} ${test.id} (${i18n.tr("by")} ${test.creator.name})`;
         modal.body.innerHTML =
                 `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
@@ -126,7 +126,7 @@ class TestAccordion {
         if (this._cloneTo) {
             const cloneButton = document.createElement('button');
             cloneButton.classList.add('btn', 'btn-outline-primary');
-            cloneButton.innerText = 'Clone to editor';
+            cloneButton.innerText = i18n.tr('Clone to editor');
             cloneButton.addEventListener('click', () => {
                 this._cloneTest(editor.getValue());
                 modal.controls.hide(); // it feels weird (as if nothing happened) if the modals stays open after clicking the button
@@ -171,8 +171,8 @@ class TestAccordion {
                 dom: 't',
                 language: {
                     emptyTable: category.id === 'all'
-                            ? 'No tests.'
-                            : 'No tests cover this method.'
+                        ? i18n.tr('No tests.')
+                        : i18n.tr('No tests cover this method.')
                 },
                 createdRow: function (row, data, index) {
                     self._setupPopover(
@@ -221,23 +221,23 @@ class TestAccordion {
 
     /** @private */
     _renderPoints (data) {
-        return `<span class="ta-column-name">Points:</span> ${data.points}`;
+        return `<span class="ta-column-name">${i18n.tr("Points")}:</span> ${data.points}`;
     }
 
     /** @private */
     _renderCoveredMutants (data) {
-        return `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> ${data.coveredMutantIds.length}</span>`;
+        return `<span class="ta-covered-link"><span class="ta-column-name">${i18n.tr("Covered")}:</span> ${data.coveredMutantIds.length}</span>`;
     }
 
     /** @private */
     _renderKilledMutants (data) {
-        return `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> ${data.killedMutantIds.length}</span>`;
+        return `<span class="ta-killed-link"><span class="ta-column-name">${i18n.tr("Killed")}:</span> ${data.killedMutantIds.length}</span>`;
     }
 
     /** @private */
     _renderViewButton (data) {
         return data.canView
-                ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>'
+            ? `<button class="ta-view-button btn btn-xs btn-primary">${i18n.tr("View")}</button>`
                 : '';
     }
 
@@ -247,13 +247,13 @@ class TestAccordion {
         let smellLevel;
         let smellColor;
         if (numSmells >= 3) {
-            smellLevel = 'Bad';
+            smellLevel = i18n.tr('Bad');
             smellColor = 'btn-danger';
         } else if (numSmells >= 1) {
-            smellLevel = 'Fishy';
+            smellLevel = i18n.tr('Fishy');
             smellColor = 'btn-warning';
         } else {
-            smellLevel = 'Good';
+            smellLevel = i18n.tr('Good');
             smellColor = 'btn-success';
         }
         return `<a class="ta-smells-link btn btn-xs ${smellColor}">${smellLevel}</a>`;
@@ -262,7 +262,7 @@ class TestAccordion {
     /** @private */
     _renderCoveredMutantsPopoverTitle (data) {
         return data.coveredMutantIds.length > 0
-                ? 'Covered Mutants'
+            ? i18n.tr('Covered Mutants')
                 : '';
     }
 
@@ -270,13 +270,13 @@ class TestAccordion {
     _renderCoveredMutantsPopoverBody (data) {
         return data.coveredMutantIds.length > 0
                 ? data.coveredMutantIds.join(', ')
-                : 'No mutants are covered by this test.';
+            : i18n.tr('No mutants are covered by this test.');
     }
 
     /** @private */
     _renderKilledMutantsPopoverTitle (data) {
         return data.killedMutantIds.length > 0
-                ? 'Killed Mutants'
+            ? i18n.tr('Killed Mutants')
                 : '';
     }
 
@@ -284,13 +284,13 @@ class TestAccordion {
     _renderKilledMutantsPopoverBody (data) {
         return data.killedMutantIds.length > 0
                 ? data.killedMutantIds.join(', ')
-                : 'No mutants were killed by this test.';
+            : i18n.tr('No mutants were killed by this test.');
     }
 
     /** @private */
     _renderSmellsPopoverTitle (data) {
         return data.smells.length > 0
-                ? 'Test Smells'
+            ? i18n.tr('Test Smells')
                 : '';
     }
 
@@ -298,7 +298,7 @@ class TestAccordion {
     _renderSmellsPopoverBody (data) {
         return data.smells.length > 0
                 ? data.smells.join('<br>')
-                : 'This test does not have any smells.'
+            : i18n.tr('This test does not have any smells.')
     }
 
     /** @private */
