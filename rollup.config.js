@@ -6,6 +6,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
 import {terser} from 'rollup-plugin-terser';
 import replace from '@rollup/plugin-replace';
+import {i18nCollectPlugin} from './rollup.i18n.js';
 
 
 /* Constants.
@@ -38,7 +39,13 @@ const PLUGINS = [
         presets: ['@babel/preset-env']
     }),
     /* Minimize output. */
-    MINIMIZE_OUTPUT && terser()
+    MINIMIZE_OUTPUT && terser(),
+    /* Extract i18n strings into JSON grouped by folder names. */
+    i18nCollectPlugin({
+        roots: ['src/main/javascript'],
+        exts: new Set(['.js', '.mjs']),
+        output: 'src/main/resources/i18n.js.json'
+    })
 ];
 
 
