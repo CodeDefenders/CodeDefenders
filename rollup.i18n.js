@@ -13,32 +13,14 @@ function walk(dir) {
 }
 
 function extractI18nStrings(content) {
-  const results = [];
-  // inspired by: https://blog.stevenlevithan.com/archives/match-quoted-string
-  const re = /i18n\.tr\s*\(\s*((['"`])(?:\\.|(?!\2).)*\2)/g;
-  let m;
-  while ((m = re.exec(content)) !== null) {
-    const literal = m[1];
-    const quote = literal[0];
-    let text = literal.slice(1, -1);
+    const results = [];
+    // inspired by: https://blog.stevenlevithan.com/archives/match-quoted-string
+    const regExp = /i18n\.tr\s*\(\s*((['"`])(?:\\.|(?!\2).)*\2)/g;
+    let match;
+    while ((match = regExp.exec(content)) !== null) {
+        let text = match[1].slice(1, -1);
 
-    /*
-     * Alternative approach for unescaping:
-     * ```
-     * const unescapedString = eval('"' + text + '"');
-     * ```
-     * Causes warning: (!) Use of eval is strongly discouraged
-     */
-
-    // Unescape the enclosing quote type dynamically
-    text = text.replace(new RegExp('\\\\' + quote, 'g'), quote);
-
-    // Unescape common sequences and backslashes
-    text = text
-        .replace(/\\n/g, '\n')
-        .replace(/\\r/g, '\r')
-        .replace(/\\t/g, '\t')
-        .replace(/\\\\/g, '\\');
+    // no unescaping done, as it's inserted into JS code again later anyway.
 
     if (text.length) {
       results.push(text);
@@ -79,8 +61,7 @@ export function i18nCollectPlugin(options = {}) {
         }
       }
 
-      const o = {};
-      o.strings = Array.from(stringSet);
+      const o = {strings: Array.from(stringSet)};
       const json = JSON.stringify(o, null, 4);
       fs.writeFileSync(output, json, 'utf8');
     }
