@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
@@ -22,6 +23,8 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
 
 <%--
     Provides common JS initialization for all pages.
@@ -102,4 +105,15 @@
             });
         });
     })();
+</script>
+
+<script>
+    window.i18n = {
+        data: {
+            <c:forEach items="${i18nService.javascriptStrings}" var="s">
+            "${s}": "${i18n.tr(s)}",
+            </c:forEach>
+        },
+        tr: s => i18n.data.hasOwnProperty(s) ? i18n.data[s] : s,
+    };
 </script>
