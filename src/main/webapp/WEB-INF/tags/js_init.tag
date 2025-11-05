@@ -114,6 +114,12 @@
             "${s}": "${i18n.tr(s)}",
             </c:forEach>
         },
-        tr: s => i18n.data.hasOwnProperty(s) ? i18n.data[s] : s,
+        tr: (s, ...a) => {
+            let _s = i18n.data.hasOwnProperty(s) ? i18n.data[s] : s;
+            for (let i = 0, l = a.length; i < l; i++) {
+                _s = _s.replaceAll(`{\${i}}`, a[i]);
+            }
+            return _s;
+        }
     };
 </script>
