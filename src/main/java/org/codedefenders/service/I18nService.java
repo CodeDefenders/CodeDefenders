@@ -28,6 +28,7 @@ import java.util.Set;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,5 +75,19 @@ public class I18nService {
                 .forEach(string -> set.add(string.getAsString()));
 
         return set;
+    }
+
+    /**
+     * JS strings need to be unescaped before translation, then escaped again when printed into a JS script.
+     */
+    public String unescape(String string) {
+        return StringEscapeUtils.unescapeJson(string);
+    }
+
+    /**
+     * Escapes sequences, so that it can be printed as JS string.
+     */
+    public String escape(String string) {
+        return StringEscapeUtils.escapeJson(string);
     }
 }
