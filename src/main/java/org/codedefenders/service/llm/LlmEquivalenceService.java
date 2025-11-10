@@ -60,8 +60,13 @@ class LlmEquivalenceService extends LlmSubActionService {
         for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
             this.flagged = flagged;
             do {
-                setConversationType(PromptType.ATTACK_EQUIVALENCE);
+                if (conversation.getCurrentType() == null) {
+                    setConversationType(PromptType.ATTACK_EQUIVALENCE);
+                }
                 super.run();
+                if (conversation.getCurrentType() == null) {
+                    setConversationType(PromptType.ATTACK_EQUIVALENCE);
+                }
             } while (!conversation.isEmpty());
 
             conversation.resetCurrentType();
