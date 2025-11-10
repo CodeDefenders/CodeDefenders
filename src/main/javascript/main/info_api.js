@@ -119,7 +119,6 @@ class InfoApi {
 
     static async getLlmConversations(gameId) {
         const result = await InfoApi.fetchJSON(`${contextPath}api/llm?action=getConversations&gameId=` + gameId);
-        console.log("api: " + result);
         return result;
     }
 }

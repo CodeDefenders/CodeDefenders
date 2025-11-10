@@ -169,7 +169,7 @@
                     messageCard.appendChild(messageHeader);
 
                     const messageBody = document.createElement("div");
-                    messageBody.textContent = dto.message;
+                    messageBody.innerHTML = dto.message.replaceAll("\n", "<br>");
                     messageCard.appendChild(messageBody);
 
                     body.appendChild(messageCard);
@@ -220,6 +220,7 @@
                 noAttackerOption.selected = attackerModel == null;
 
                 const conversations = await InfoApi.getLlmConversations(${gameId});
+                console.log(conversations);
                 const conversationPanel = document.getElementById("${htmlId}-conversation-panel");
                 addConversations(conversations, conversationPanel);
                 document.getElementById("${htmlId}-loading-cons-div").classList.remove("loading")
