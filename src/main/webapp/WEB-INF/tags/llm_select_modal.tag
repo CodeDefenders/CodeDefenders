@@ -147,7 +147,7 @@
 
                 toggleButton.setAttribute("data-bs-toggle", "collapse");
                 toggleButton.setAttribute("data-bs-target", "#${htmlId}-collapse-" + index);
-                toggleButton.textContent = c.type + ", active: " + c.active + ", successful:" + c.success;
+                toggleButton.textContent = c.type + "(" + c.messages.filter(msg => msg.messageType === "AI").length + " tries)";
                 header.appendChild(toggleButton);
                 const collapse = document.createElement("div");
                 collapse.id = "${htmlId}-collapse-" + index;
