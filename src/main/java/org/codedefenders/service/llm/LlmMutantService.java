@@ -44,8 +44,11 @@ class LlmMutantService extends LlmSubActionService {
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
-            conversation.addUserMessage(getSourceCodeForUserMessage() + "\n####\n"
-                    + getExistingMutantDiffsMessage(), model);
+            String userMessage = getSourceCodeForUserMessage();
+            if (random.nextBoolean()) {
+                userMessage += "\n####\n" + getExistingMutantDiffsMessage();
+            }
+            conversation.addUserMessage(userMessage, model);
         }
 
         String result = promptService.getResponse(model, conversation);
