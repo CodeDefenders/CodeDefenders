@@ -42,6 +42,7 @@ import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 
 import static java.text.MessageFormat.format;
@@ -81,6 +82,9 @@ public class CreateGamesService {
 
     @Inject
     private GameClassRepository gameClassRepo;
+
+    @Inject
+    private LlmManagerService llmManagerService;
 
     /**
      * Maps user ID to their admin staged games list.
@@ -210,6 +214,14 @@ public class CreateGamesService {
             for (int userId : stagedGame.getPlayers()) {
                 game.addPlayer(userId, Role.PLAYER);
             }
+        }
+
+        //Add LLM players if configured to
+        if (gameSettings.getGameType() == MULTIPLAYER && gameSettings.getLlmDefender() != null) {
+            llmManagerService.setPlayerModel(game, Role.DEFENDER, gameSettings.getLlmDefender());
+        }
+        if (gameSettings.getLlmAttacker() != null) {
+            llmManagerService.setPlayerModel(game, Role.ATTACKER, gameSettings.getLlmAttacker());
         }
 
         /* Start game if configured to. */

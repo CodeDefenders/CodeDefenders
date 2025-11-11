@@ -259,6 +259,11 @@ public class LlmManagerService {
                 addErrorMessage(game, role, e);
                 finishPlayer(game, role);
             }
+        } else if (gameRepository.isGameCreated(game.getId())) {
+            long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+            organizerExecutor.schedule(() -> llmExecutor.execute(
+                            () -> runLlmAction(gameRepository.getGame(game.getId()), role, conversation, random)),
+                    timeToWait, TimeUnit.MILLISECONDS);
         } else {
             finishPlayer(game, role);
         }

@@ -268,6 +268,15 @@ public class GameRepository {
     }
 
     /**
+     *  Returns true if the game exists and is created, but not started yet
+     */
+    public boolean isGameCreated(int gameId) {
+        String query = "SELECT ID FROM games where " +
+                "games.ID = ? AND games.State = 'CREATED' LIMIT 1";
+        return queryRunner.query(query, ResultSet::isBeforeFirst, gameId);
+    }
+
+    /**
      * Stores a new invitation link id. If the game is null, the link id is stored without a game,
      * the game will have to be added later.
      * @param gameId The id of the game to store the link for, or null if that game is not yet created.

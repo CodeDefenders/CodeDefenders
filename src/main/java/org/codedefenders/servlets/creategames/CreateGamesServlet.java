@@ -47,9 +47,13 @@ import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
+import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.service.llm.NoSuchModelException;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,6 +171,22 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 ? getIntParameter(request, "classroomId").get()
                 : null;
 
+        GameManagingUtils gameManagingUtils = CDIUtil.getBeanFromCDI(GameManagingUtils.class);
+        var llmDefenderPara = getStringParameter(request, "defenderModel");
+        var llmAttackerPara = getStringParameter(request, "attackerModel");
+        LlModel llmDefender = null;
+        LlModel llmAttacker= null;
+        try {
+            if (llmDefenderPara.isPresent()) {
+                llmDefender = gameManagingUtils.getLLModelFromSingleValue(llmDefenderPara.get());
+            }
+            if (llmAttackerPara.isPresent()) {
+                llmAttacker = gameManagingUtils.getLLModelFromSingleValue(llmAttackerPara.get());
+            }
+        } catch (NoSuchModelException ignored) {
+
+        }
+
         return new GameSettings(
                 gameType,
                 classId,
@@ -181,7 +201,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 creatorRole,
                 gameDurationMinutes,
                 startGame,
-                classroomId);
+                classroomId,
+                llmDefender,
+                llmAttacker);
     }
 
     /**

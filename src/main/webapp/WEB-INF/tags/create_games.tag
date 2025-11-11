@@ -155,7 +155,8 @@
                             <div class="input-group mb-2">
                                 <select id="class-select" name="cut" class="form-control form-select">
                                     <% for (GameClass clazz : gameClassRepo.getAllPlayableClasses()) { %>
-                                    <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
+                                    <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%>
+                                    </option>
                                     <% } %>
                                 </select>
                                 <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
@@ -171,13 +172,17 @@
 
                             <div class="form-check form-switch"
                                  title="Include mutants uploaded together with the class.">
-                                <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
-                                <label class="form-check-label" for="predefined-mutants-switch">Include predefined mutants (if available)</label>
+                                <input class="form-check-input" type="checkbox" id="predefined-mutants-switch"
+                                       name="withMutants">
+                                <label class="form-check-label" for="predefined-mutants-switch">Include predefined
+                                    mutants (if available)</label>
                             </div>
 
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="predefined-tests-switch" name="withTests">
-                                <label class="form-check-label" for="predefined-tests-switch">Include predefined tests (if available)</label>
+                                <input class="form-check-input" type="checkbox" id="predefined-tests-switch"
+                                       name="withTests">
+                                <label class="form-check-label" for="predefined-tests-switch">Include predefined tests
+                                    (if available)</label>
                             </div>
                         </div>
 
@@ -216,10 +221,12 @@
                                 <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"
-                                           id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="mutantValidatorLevel"
+                                           id="mutant-validator-radio-<%=level.name().toLowerCase()%>"
+                                           name="mutantValidatorLevel"
                                            value="<%=level.name()%>"
                                         <%=level == CodeValidatorLevel.MODERATE ? "checked" : ""%>>
-                                    <label class="form-check-label" for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
+                                    <label class="form-check-label"
+                                           for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
                                         <%=level.getDisplayName()%>
                                     </label>
                                 </div>
@@ -232,7 +239,8 @@
                             <label class="form-label" id="max-assertions-label" for="max-assertions-input">
                                 Max. Assertions Per Test
                             </label>
-                            <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
+                            <input type="number" class="form-control" id="max-assertions-input"
+                                   name="maxAssertionsPerTest"
                                    value="<%=CodeValidator.DEFAULT_NB_ASSERTIONS%>" min="1" required>
                         </div>
 
@@ -244,7 +252,8 @@
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
-                            <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
+                            <input class="form-control" type="number" id="equiv-threshold-input"
+                                   name="automaticEquivalenceTrigger"
                                    value="0" min="0" required>
                         </div>
 
@@ -263,15 +272,18 @@
                         <div class="col-12"
                              title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
-                                <label class="form-check-label" for="capture-intentions-switch">Enable Capture Players' Intentions</label>
+                                <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
+                                       name="capturePlayersIntention">
+                                <label class="form-check-label" for="capture-intentions-switch">Enable Capture Players'
+                                    Intentions</label>
                             </div>
                         </div>
 
                         <div class="col-12"
                              title="Allows players to chat within their team and with the enemy team.">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled" checked>
+                                <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled"
+                                       checked>
                                 <label class="form-check-label" for="chat-switch">Game Chat</label>
                             </div>
                         </div>
@@ -279,9 +291,16 @@
                         <div class="col-12"
                              title="Automatically start games once they are created.">
                             <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="start-games-switch" name="startGames">
+                                <input class="form-check-input" type="checkbox" id="start-games-switch"
+                                       name="startGames">
                                 <label class="form-check-label" for="start-games-switch">Start Games</label>
                             </div>
+                        </div>
+
+                        <div class="col-12"
+                             title="Select the LLM defender for the games">
+                            <t:llm_select_button htmlId="llm_buttons"/>
+
                         </div>
 
                         <div class="col-12" title="The duration for how long the games will be open.">
@@ -306,7 +325,10 @@
                             </small>
 
                             <script type="module">
-                                import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                                import {
+                                    GameTimeValidator,
+                                    GameTime
+                                } from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                 const gameTimeValidator = new GameTimeValidator(
                                         Number(${maximumDuration}),
@@ -333,7 +355,8 @@
                 </div>
             </div>
 
-        </div> <%-- column --%>
+        </div>
+        <%-- column --%>
         <div class="col-md-6 col-12">
 
             <div class="card mb-4">
@@ -379,7 +402,8 @@
                                     <input type="radio" name="roleAssignmentMethod"
                                            class="form-check-input" id="roleAssignment-radio-opposite"
                                            value="<%=RoleAssignmentStrategy.Type.OPPOSITE%>">
-                                    <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite Role</label>
+                                    <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite
+                                        Role</label>
                                 </div>
                             </div>
                         </div>
@@ -399,13 +423,15 @@
                                            class="form-check-input" id="gameAssignmentMethod-radio-random"
                                            value="<%=GameAssignmentStrategy.Type.RANDOM%>"
                                            checked>
-                                    <label class="form-check-label" for="gameAssignmentMethod-radio-random">Random</label>
+                                    <label class="form-check-label"
+                                           for="gameAssignmentMethod-radio-random">Random</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="gameAssignmentMethod"
                                            class="form-check-input" id="gameAssignmentMethod-radio-score-descending"
                                            value="<%=GameAssignmentStrategy.Type.SCORE_DESCENDING%>">
-                                    <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">Score Descending</label>
+                                    <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">Score
+                                        Descending</label>
                                 </div>
                             </div>
                         </div>
@@ -413,19 +439,22 @@
                         <div class="col-12 multiplayer-specific"
                              title="Number of attackers per game.">
                             <label for="attackersPerGame" class="form-label">Attackers per Game</label>
-                            <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1" class="form-control">
+                            <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1"
+                                   class="form-control">
                         </div>
 
                         <div class="col-12 multiplayer-specific"
                              title="Number of defenders per game.">
                             <label for="defendersPerGame" class="form-label">Defenders per Game</label>
-                            <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control">
+                            <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1"
+                                   class="form-control">
                         </div>
 
                         <div class="col-12 melee-specific" hidden
                              title="Players per game.">
                             <label for="playersPerGame" class="form-label">Players per Game</label>
-                            <input type="number" value="6" id="playersPerGame" name="playersPerGame" min="1" class="form-control">
+                            <input type="number" value="6" id="playersPerGame" name="playersPerGame" min="1"
+                                   class="form-control">
                         </div>
 
                         <div class="col-12">
@@ -453,7 +482,8 @@
                         <div class="col-12"
                              title="Number of staged games to create.">
                             <label for="numGames" class="form-label">Number of Games</label>
-                            <input type="number" value="1" id="numGames" name="numGames" min="1" max="100" class="form-control">
+                            <input type="number" value="1" id="numGames" name="numGames" min="1" max="100"
+                                   class="form-control">
                         </div>
 
                         <div class="col-12">
@@ -467,8 +497,10 @@
                 </div>
             </div>
 
-        </div> <%-- column --%>
-    </div> <%-- row --%>
+        </div>
+        <%-- column --%>
+    </div>
+    <%-- row --%>
 </form>
 
 <t:modal id="levelExplanation" title="Level Explanation">
@@ -632,25 +664,25 @@
 
     // TODO: Generate these automatically with a bean?.
     const GameType = {
-        MULTIPLAYER:    {name: 'MULTIPLAYER',   display: 'Battleground'},
-        MELEE:          {name: 'MELEE',         display: 'Melee'}
+        MULTIPLAYER: {name: 'MULTIPLAYER', display: 'Battleground'},
+        MELEE: {name: 'MELEE', display: 'Melee'}
     };
     const CodeValidatorLevel = {
-        RELAXED:        {name: 'RELAXED',       display: 'Relaxed'},
-        MODERATE:       {name: 'MODERATE',      display: 'Moderate'},
-        STRICT:         {name: 'STRICT',        display: 'Strict'}
+        RELAXED: {name: 'RELAXED', display: 'Relaxed'},
+        MODERATE: {name: 'MODERATE', display: 'Moderate'},
+        STRICT: {name: 'STRICT', display: 'Strict'}
     };
     const GameLevel = {
-        HARD:           {name: 'HARD',          display: 'Hard'},
-        MEDIUM:         {name: 'MEDIUM',        display: 'Medium'},
-        EASY:           {name: 'EASY',          display: 'Easy'}
+        HARD: {name: 'HARD', display: 'Hard'},
+        MEDIUM: {name: 'MEDIUM', display: 'Medium'},
+        EASY: {name: 'EASY', display: 'Easy'}
     };
     const Role = {
-        ATTACKER:       {name: 'ATTACKER',      display: 'Attacker'},
-        DEFENDER:       {name: 'DEFENDER',      display: 'Defender'},
-        OBSERVER:       {name: 'OBSERVER',      display: 'Observer'},
-        PLAYER:         {name: 'PLAYER',        display: 'Player'},
-        NONE:           {name: 'NONE',          display: 'None'}
+        ATTACKER: {name: 'ATTACKER', display: 'Attacker'},
+        DEFENDER: {name: 'DEFENDER', display: 'Defender'},
+        OBSERVER: {name: 'OBSERVER', display: 'Observer'},
+        PLAYER: {name: 'PLAYER', display: 'Player'},
+        NONE: {name: 'NONE', display: 'None'}
     };
 
     /* Timezone and date format to format the last login date for users. */
@@ -674,14 +706,14 @@
 
     /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
     DataTable.ext.order['select-extension'] = function (settings, col) {
-        return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
             const tr = td.closest('tr');
             return tr.classList.contains('selected') ? '0' : '1';
         });
     };
 
     /* Search function added to DataTables to filter the users table. */
-    const searchFunction = function(settings, renderedData, index, data, counter) {
+    const searchFunction = function (settings, renderedData, index, data, counter) {
         /* Let this search function only affect the users table. */
         if (settings.nTable.id !== 'table-users') {
             return true;
@@ -701,7 +733,7 @@
     };
     DataTable.ext.search.push(searchFunction);
 
-    const renderClassroomRole = function(role, type, row, meta) {
+    const renderClassroomRole = function (role, type, row, meta) {
         switch (type) {
             case 'type':
                 return role;
@@ -1271,8 +1303,8 @@
                 type: 'html',
                 width: '65%',
                 title: kind == 'CLASSROOM'
-                    ? 'Players (Username, Classroom Role, Last Game Role, Total Score)'
-                    : 'Players (Username, Last Game Role, Total Score)'
+                        ? 'Players (Username, Classroom Role, Last Game Role, Total Score)'
+                        : 'Players (Username, Last Game Role, Total Score)'
             },
         ],
         select: {
@@ -1488,12 +1520,12 @@
                 title: 'Name'
             },
             kind !== 'CLASSROOM' ? null :
-                {
-                    data: 'classroomRole',
-                    type: 'string',
-                    title: 'Classroom Role',
-                    render: renderClassroomRole
-                },
+                    {
+                        data: 'classroomRole',
+                        type: 'string',
+                        title: 'Classroom Role',
+                        render: renderClassroomRole
+                    },
             {
                 data: 'lastRole',
                 render: renderUserLastRole,
@@ -1533,8 +1565,8 @@
             }
         },
         order: kind === 'CLASSROOM'
-            ? [[3, 'asc']]
-            : [[5, 'asc']],
+                ? [[3, 'asc']]
+                : [[5, 'asc']],
         scrollY: '600px',
         scrollCollapse: true,
         paging: false,
