@@ -95,7 +95,9 @@ public class CreateGamesService {
      * Maps user ID and classroom ID to its staged games list.
      */
     private final Map<UserIdClassroomId, StagedGameList> classroomStagedGames;
-    private record UserIdClassroomId(int userId, int classroomId){}
+
+    private record UserIdClassroomId(int userId, int classroomId) {
+    }
 
     public CreateGamesService() {
         adminStagedGames = new HashMap<>();
@@ -125,6 +127,7 @@ public class CreateGamesService {
 
     /**
      * Creates a stages game as a real game and adds its assigned users to it.
+     *
      * @param stagedGame The staged game to create.
      * @return {@code true} if the game was successfully created, {@code false} if not.
      */
@@ -217,7 +220,7 @@ public class CreateGamesService {
         }
 
         //Add LLM players if configured to
-        if (gameSettings.getGameType() == MULTIPLAYER && gameSettings.getLlmDefender() != null) {
+        if (gameSettings.getLlmDefender() != null) {
             llmManagerService.setPlayerModel(game, Role.DEFENDER, gameSettings.getLlmDefender());
         }
         if (gameSettings.getLlmAttacker() != null) {
