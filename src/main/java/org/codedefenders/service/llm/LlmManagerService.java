@@ -21,7 +21,6 @@ package org.codedefenders.service.llm;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -41,9 +40,9 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -89,6 +88,9 @@ public class LlmManagerService {
 
     @Inject
     private GameRepository gameRepository;
+
+    @Inject
+    private UserService userService;
 
     @Inject
     public LlmManagerService() {
@@ -175,11 +177,13 @@ public class LlmManagerService {
                 role = Role.PLAYER;
             }
 
-            game.addPlayer(getCorrectUserId(role), role);
+            int userId = getCorrectUserId(role);
+            SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
+            game.addPlayer(userId, role);
             final Role finalRole = role;
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversationBatch(), new Random())));
+                    new LlmConversationBatch(game, user), new Random())));
         }
     }
 

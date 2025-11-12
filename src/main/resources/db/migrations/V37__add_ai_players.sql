@@ -25,3 +25,37 @@ create table if not exists `llm_models` (
                                             active bool,
                                             UNIQUE (model_name, type)
 );
+
+create table if not exists `llm_conversations` (
+    Conversation_ID int(11) not null primary key auto_increment,
+    Strategy varchar(20) not null,
+    Type varchar(20) not null,
+    Game_ID int(11) not null,
+    User_ID int(11) not null,
+    Mutant_ID int(11),
+    Test_ID int(11),
+    Is_Active bool not null,
+    Is_Success bool not null,
+
+    foreign key (Game_ID) references games (ID),
+    foreign key (User_ID) references users (User_ID),
+    foreign key (Mutant_ID) references mutants(Mutant_ID),
+    foreign key (Test_ID) references tests(Test_id)
+);
+
+create table if not exists `llm_messages` (
+    Conversation_ID int(11) not null,
+    Index_in_conversation int(11) not null,
+    Message_type enum ('SYSTEM', 'USER', 'AI') not null,
+    Input_tokens int(11),
+    Output_tokens int(11),
+    timestamp timestamp not null,
+    Model_name varchar(50) not null,
+    Model_type enum ('OPENAI', 'OLLAMA', 'DEFAULT') not null,
+    Content text not null,
+
+
+    primary key (Conversation_ID, Index_in_conversation),
+    foreign key (Conversation_ID) references llm_conversations(Conversation_ID),
+    foreign key (Model_name, Model_type) references llm_models(model_name, type)
+)

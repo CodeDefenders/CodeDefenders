@@ -18,17 +18,19 @@
  */
 package org.codedefenders.service.llm;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.persistence.database.LlmConversationRepository;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -38,29 +40,15 @@ import com.google.gson.JsonSerializer;
 @ApplicationScoped
 public class LlmInspectionService {
 
-    /*
-        These lists are intended for human consumption, for analysis and curiosity, not for further interaction
-    */
-    private final Map<AbstractGame, List<LlmConversation>> conversations = new HashMap<>();
+    @Inject
+    LlmConversationRepository conversationRepository;
 
-    /**
-     * Adds a new conversation to the map, only if it doesn't exist already.
-     */
-    public void addConversation(AbstractGame game, LlmConversation con) {
-        conversations.putIfAbsent(game, new ArrayList<>());
-        List<LlmConversation> l = conversations.get(game);
-        if (!l.contains(con)) {
-            l.add(con);
-        }
-    }
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm:ss")
+            .withZone(ZoneId.systemDefault());
 
     public List<LlmConversation> getConversations(AbstractGame game) {
-        List<LlmConversation> result = conversations.get(game);
-        if (result == null) {
-            return List.of();
-        } else {
-            return List.copyOf(result);
-        }
+        return conversationRepository.getConversations(game);
     }
 
     public String toJson(List<LlmConversation> conversations) {
@@ -68,8 +56,13 @@ public class LlmInspectionService {
         gsonBuilder.registerTypeAdapter(ChatMessageDTO.class, (JsonSerializer<ChatMessageDTO>) (src, typeOfSrc, context) -> {
             JsonObject msgDtoObject = new JsonObject();
             msgDtoObject.addProperty("message", src.getText());
+            Timestamp stamp = src.time();
+            long millis = stamp.getTime();
+            Instant instant = Instant.ofEpochMilli(millis);
+            String format = dateTimeFormatter.format(instant);
+
             msgDtoObject.addProperty("timestamp",
-                    src.time().withNano(0).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    format);
             msgDtoObject.addProperty("model", src.target().getType() + ":" + src.target().getName());
             msgDtoObject.addProperty("messageType", src.msg().type().toString());
             return msgDtoObject;

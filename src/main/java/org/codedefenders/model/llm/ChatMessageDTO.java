@@ -18,6 +18,7 @@
  */
 package org.codedefenders.model.llm;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 import dev.langchain4j.data.message.AiMessage;
@@ -30,9 +31,15 @@ import dev.langchain4j.data.message.UserMessage;
  */
 public record ChatMessageDTO (
     ChatMessage msg,
-    LocalDateTime time,
-    LlModel target
+    Timestamp time,
+    LlModel target,
+    int inputTokens,
+    int outputTokens
     ){
+    public ChatMessageDTO(ChatMessage msg, Timestamp time, LlModel target) {
+        this(msg, time, target, 0, 0);
+    }
+
     public String getText() {
         if (msg instanceof UserMessage um) {
             return um.singleText();

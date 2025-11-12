@@ -28,9 +28,11 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -59,7 +61,7 @@ abstract class LlmSubActionService {
     protected GameService gameService;
 
     @Inject
-    private LlmInspectionService inspectionService;
+    protected LlmConversationRepository conversationRepository;
 
     protected LlModel model;
     protected AbstractGame game;
@@ -75,6 +77,11 @@ abstract class LlmSubActionService {
             String reply = generate();
             updateGame();
             submit(reply);
+
+            if (conversation.getCurrentType() != null) {
+                conversationRepository.saveConversation(conversation.currentConversation());
+            }
+
         } else {
             logger.warn("Running a disabled LlmSubActionService. This is probably not intended.");
         }
@@ -113,7 +120,6 @@ abstract class LlmSubActionService {
 
     protected void setConversationType(PromptType type) {
         conversation.setCurrentType(type);
-        inspectionService.addConversation(game, conversation.currentConversation());
     }
 
     /**

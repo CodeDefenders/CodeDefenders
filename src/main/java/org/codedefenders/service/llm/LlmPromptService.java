@@ -30,6 +30,7 @@ import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +54,12 @@ class LlmPromptService {
     private final Map<LlModel, ChatModel> openaiModels = new HashMap<>();
     private final Map<LlModel, ChatModel> ollamaModels = new HashMap<>();
 
+    LlmConversationRepository conversationRepository;
+
     @Inject
-    LlmPromptService(LlmRepository llmRepo, Configuration config) {
+    LlmPromptService(LlmRepository llmRepo, Configuration config, LlmConversationRepository conversationRepository) {
         List<LlModel> models = llmRepo.getAllModels();
+        this.conversationRepository = conversationRepository;
         for (LlModel m : models) { //TODO eigene Methode
             if (m.getType() == LlmType.OPENAI) {
                 openaiModels.put(m, OpenAiChatModel.builder()
@@ -95,8 +99,11 @@ class LlmPromptService {
         };
         ChatModel chatModel = chatMap.get(model);
         if (chatModel != null) {
+            conversationRepository.saveConversation(conversation.currentConversation());
             ChatResponse response = chatModel.chat(chatMessages);
-            conversation.addAiMessage(response.aiMessage(), model);
+            conversation.addAiMessage(response.aiMessage(), model,
+                    response.tokenUsage().inputTokenCount(), response.tokenUsage().outputTokenCount());
+            conversationRepository.saveConversation(conversation.currentConversation());
             String responseText = response.aiMessage().text();
             logger.info("Model {} responded with {} characters", model, responseText.length());
             return responseText;

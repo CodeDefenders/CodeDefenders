@@ -18,9 +18,15 @@
  */
 package org.codedefenders.model.llm;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.persistence.database.LlmConversationRepository;
+import org.codedefenders.util.CDIUtil;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -29,13 +35,26 @@ import dev.langchain4j.data.message.ChatMessage;
  * This represents the prompts and responses of an LLM.
  */
 public class LlmConversation {
+    private final String strategy;
+    private final AbstractGame game;
+    private final SimpleUser user;
     private final List<ChatMessageDTO> messages = new ArrayList<>();
-    private boolean active = true;
-    private boolean success = false;
+    private boolean active;
+    private boolean success;
     private final PromptType type;
+    private int id = -1;
+    private int testId;
+    private int mutantId;
 
-    public LlmConversation(PromptType type) {
+
+    public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, String strategy,
+                           boolean active, boolean success) {
         this.type = type;
+        this.game = game;
+        this.user = user;
+        this.strategy = strategy;
+        this.active = active;
+        this.success = success;
     }
 
     public boolean isEmpty() {
@@ -50,8 +69,16 @@ public class LlmConversation {
         return type;
     }
 
+    public void add(ChatMessageDTO dto) {
+        messages.add(dto);
+    }
+
+    public void add(ChatMessage message, LlModel model, int inputTokens, int outputTokens) {
+        add(new ChatMessageDTO(message, Timestamp.from(Instant.now()), model, inputTokens, outputTokens));
+    }
+
     public void add(ChatMessage message, LlModel model) {
-        messages.add(new ChatMessageDTO(message, LocalDateTime.now(), model));
+        add(message, model, 0, 0);
     }
 
     public ChatMessage[] toArray() {
@@ -79,6 +106,7 @@ public class LlmConversation {
     public void finish(boolean success) {
         this.success = success;
         active = false;
+        CDIUtil.getBeanFromCDI(LlmConversationRepository.class).saveConversation(this);
     }
 
     public boolean isActive() {
@@ -87,5 +115,41 @@ public class LlmConversation {
 
     public String toString() {
         return String.join("", messages.stream().map(m -> "[" + m + "]").toList());
+    }
+
+    public String getStrategy() {
+        return strategy;
+    }
+
+    public SimpleUser getUser() {
+        return user;
+    }
+
+    public AbstractGame getGame() {
+        return game;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getTestId() {
+        return testId;
+    }
+
+    public void setTestId(int testId) {
+        this.testId = testId;
+    }
+
+    public int getMutantId() {
+        return mutantId;
+    }
+
+    public void setMutantId(int mutantId) {
+        this.mutantId = mutantId;
     }
 }

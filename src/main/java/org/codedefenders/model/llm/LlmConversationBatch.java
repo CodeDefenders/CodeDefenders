@@ -18,8 +18,13 @@
  */
 package org.codedefenders.model.llm;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -37,8 +42,15 @@ import dev.langchain4j.data.message.UserMessage;
  */
 public class LlmConversationBatch {
     private final Map<PromptType, LlmConversation> messageLists = new HashMap<>();
+    private final AbstractGame game;
+    private final SimpleUser user;
 
     private PromptType currentType;
+
+    public LlmConversationBatch(AbstractGame game, SimpleUser user) {
+        this.game = game;
+        this.user = user;
+    }
 
     public LlmConversation currentConversation() {
         if (currentType == null) {
@@ -51,11 +63,11 @@ public class LlmConversationBatch {
         return result;
     }
 
-    public void addAiMessage(AiMessage msg, LlModel model) {
+    public void addAiMessage(AiMessage msg, LlModel model, int inputTokens, int outputTokens) {
         if (currentConversation().isEmpty()) {
             throw new IllegalStateException("AiMessage cannot be the first message in a conversation");
         }
-        currentConversation().add(msg, model);
+        currentConversation().add(msg, model, inputTokens, outputTokens);
     }
 
     public void addSystemMessage(String content, LlModel model) {
@@ -113,8 +125,12 @@ public class LlmConversationBatch {
         }
         this.currentType = currentType;
         if (!messageLists.containsKey(currentType)) {
-            LlmConversation con = new LlmConversation(currentType);
+            LlmConversation con = new LlmConversation(currentType, game, user, "ALPHA", true, false);
             messageLists.put(currentType, con);
         }
+    }
+
+    public Collection<LlmConversation> getConversations() {
+        return messageLists.values();
     }
 }
