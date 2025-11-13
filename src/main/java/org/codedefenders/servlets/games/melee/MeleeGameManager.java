@@ -570,6 +570,9 @@ public class MeleeGameManager extends HttpServlet {
         eventDAO.insert(notif);
 
         messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -962,6 +965,9 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(ttme);
 
             testRepo.updateTest(newTest);
+            if (!gameRepo.isGameActive(game.getId())) {
+                game.setState(GameState.FINISHED);
+            }
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
