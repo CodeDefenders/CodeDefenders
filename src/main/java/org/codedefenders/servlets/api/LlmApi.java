@@ -222,7 +222,7 @@ public class LlmApi extends HttpServlet {
             }
             case "updatePrompts" -> {
                 llmRepo.updatePrompts(model);
-                Redirect.redirectBack(req, resp);
+                //Redirect.redirectBack(req, resp);
                 resp.sendRedirect(url.forPath(Paths.ADMIN_LLM));
             }
             case "resetDefault" -> {
