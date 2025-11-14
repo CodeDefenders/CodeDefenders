@@ -212,7 +212,6 @@
                 const defenderError = await getError("DEFENDER");
                 const attackerError = await getError("ATTACKER");
 
-                //console.log(conversations);
                 const noDefenderOption = document.getElementById("${htmlId}-no-defender");
 
                 noDefenderOption.selected = defenderModel == null;
@@ -220,7 +219,6 @@
                 noAttackerOption.selected = attackerModel == null;
 
                 const conversations = await InfoApi.getLlmConversations(${gameId});
-                console.log(conversations);
                 const conversationPanel = document.getElementById("${htmlId}-conversation-panel");
                 addConversations(conversations, conversationPanel);
                 document.getElementById("${htmlId}-loading-cons-div").classList.remove("loading")

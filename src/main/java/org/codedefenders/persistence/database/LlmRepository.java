@@ -76,7 +76,9 @@ public class LlmRepository {
             """
                     You will see the code of a java class and then a git diff of a change. Write a test using
                     JUnit 4 that succeeds on the old version, but fails after the diff is applied.
-                    Write nothing but the java code, without any formatting.
+                    Use a maximum of 2 assertions.
+                     Write only the content of the test method, without including formatting, comments,
+                    the header or the method declaration. Use JUnit 4.
                     """.trim().stripIndent();
 
     private static final String DEFAULT_DEFENDER_DEPS_PROMPT =

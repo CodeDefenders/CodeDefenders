@@ -417,6 +417,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
         String mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -517,6 +520,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
         String mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -711,6 +717,9 @@ public class GameManagingUtils implements IGameManagingUtils {
             mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
         } else {
             throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
+        }
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
         }
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
@@ -995,6 +1004,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(ttme);
 
         testRepo.updateTest(newTest);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
         return RejectBattlegroundEquivalenceResult.testValid(
                 newTest,
