@@ -10,20 +10,23 @@ insert into settings values ('LLM_INTERVAL_SECONDS', 'INT_VALUE', NULL, 20, NULL
 create table if not exists `llm_models` (
                                             model_name varchar(50),
                                             type enum ('OPENAI', 'OLLAMA', 'DEFAULT'),
-
-                                            defender_prompt varchar(1000),
                                             defender_dependencies bool,
-                                            defender_dependencies_prompt varchar(1000),
                                             defender_method_focus bool,
-                                            defender_method_focus_prompt varchar(1000),
-
-                                            attacker_prompt varchar(1000),
                                             attacker_dependencies bool,
-                                            attacker_dependencies_prompt varchar(1000),
-                                            attacker_resolve_equivalence_prompt varchar(1000),
 
                                             active bool,
-                                            UNIQUE (model_name, type)
+                                            PRIMARY KEY (model_name, type)
+);
+
+create table if not exists `llm_prompts`(
+    model_name varchar(50),
+    model_type enum ('OPENAI', 'OLLAMA', 'DEFAULT'),
+    prompt_type varchar(50) not null,
+    prompt text,
+
+    foreign key (model_name, model_type) references llm_models(model_name, type),
+    unique (model_name, model_type, prompt_type)
+
 );
 
 create table if not exists `llm_conversations` (

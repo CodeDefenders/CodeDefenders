@@ -18,7 +18,10 @@
  */
 package org.codedefenders.model.llm;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.google.gson.annotations.Expose;
 
@@ -36,37 +39,13 @@ public class LlModel {
     @Expose
     private boolean active;
 
-    /**
-     * The standard attack prompt. The code of the CuT is supplied as the user message for attacker prompts.
-     */
-    @Expose
-    private String attackerPrompt;
+    private HashMap<PromptType, String> prompts = new HashMap<>();
     /**
      * If true, dependency code will be part of the user message.
      *
      */
     @Expose
     private boolean attackerDependencies = true;
-    /**
-     * This String replaces the normal prompt if there are any dependency classes (and if
-     * {@link LlModel#attackerDependencies} is true).
-     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
-     */
-    @Expose
-    private String attackerDependencyPrompt;
-
-    /**
-     * This prompt is used to generate a test to kill a suspected mutant. The user message consists of the CuT,
-     * the dependencies if {@link LlModel#attackerDependencies} is true, and the diff of the suspected mutant.
-     */
-    @Expose
-    private String resolveEquivalencePrompt;
-
-    /**
-     * The standard defender prompt. The code of the CuT is supplied as the user message.
-     */
-    @Expose
-    private String defenderPrompt;
 
     /**
      * If true, dependency code will be part of the user message for defender prompts.
@@ -75,27 +54,11 @@ public class LlModel {
     private boolean defenderDependencies = true;
 
     /**
-     * This String replaces the normal defender if there are any dependency classes (and if
-     * {@link LlModel#attackerDependencies} is true).
-     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
-     */
-    @Expose
-    private String defenderDependencyPrompt;
-
-    /**
      * If true, the prompt may be replaced with a special prompt that guides the llm to write a test for a
      * specific method, for example because there are unkilled mutants in this method.
      */
     @Expose
     private boolean defenderMethodFocus = true;
-
-    /**
-     * This String format replaces the normal or dependency prompt to focus on a specific method.
-     * This should only be used with {@link String#format(String, Object...)} with the method name
-     * as the single argument.
-     */
-    @Expose
-    private String defenderMethodFocusPrompt;
 
     public LlModel(String name, LlmType type) {
         this.name = name;
@@ -110,44 +73,12 @@ public class LlModel {
         return type;
     }
 
-    public Optional<String> getAttackerPrompt() {
-        return ofNullOrEmpty(attackerPrompt);
-    }
-
-    public void setAttackerPrompt(String attackerPrompt) {
-        this.attackerPrompt = attackerPrompt;
-    }
-
     public boolean isAttackerDependencies() {
         return attackerDependencies;
     }
 
     public void setAttackerDependencies(boolean attackerDependencies) {
         this.attackerDependencies = attackerDependencies;
-    }
-
-    public Optional<String> getAttackerDependencyPrompt() {
-        return ofNullOrEmpty(attackerDependencyPrompt);
-    }
-
-    public void setAttackerDependencyPrompt(String attackerDependencyPrompt) {
-        this.attackerDependencyPrompt = attackerDependencyPrompt;
-    }
-
-    public Optional<String> getResolveEquivalencePrompt() {
-        return ofNullOrEmpty(resolveEquivalencePrompt);
-    }
-
-    public void setResolveEquivalencePrompt(String resolveEquivalencePrompt) {
-        this.resolveEquivalencePrompt = resolveEquivalencePrompt;
-    }
-
-    public Optional<String> getDefenderPrompt() {
-        return ofNullOrEmpty(defenderPrompt);
-    }
-
-    public void setDefenderPrompt(String defenderPrompt) {
-        this.defenderPrompt = defenderPrompt;
     }
 
     public boolean isDefenderDependencies() {
@@ -158,28 +89,12 @@ public class LlModel {
         this.defenderDependencies = defenderDependencies;
     }
 
-    public Optional<String> getDefenderDependencyPrompt() {
-        return ofNullOrEmpty(defenderDependencyPrompt);
-    }
-
-    public void setDefenderDependencyPrompt(String defenderDependencyPrompt) {
-        this.defenderDependencyPrompt = defenderDependencyPrompt;
-    }
-
     public boolean isDefenderMethodFocus() {
         return defenderMethodFocus;
     }
 
     public void setDefenderMethodFocus(boolean defenderMethodFocus) {
         this.defenderMethodFocus = defenderMethodFocus;
-    }
-
-    public Optional<String> getDefenderMethodFocusPrompt() {
-        return ofNullOrEmpty(defenderMethodFocusPrompt);
-    }
-
-    public void setDefenderMethodFocusPrompt(String defenderMethodFocusPrompt) {
-        this.defenderMethodFocusPrompt = defenderMethodFocusPrompt;
     }
 
     public boolean isActive() {
@@ -220,26 +135,22 @@ public class LlModel {
      */
     public void copyValues(LlModel other) {
         active = other.active;
-
-        attackerPrompt = other.attackerPrompt;
         attackerDependencies = other.attackerDependencies;
-        attackerDependencyPrompt = other.attackerDependencyPrompt;
-
-        defenderPrompt = other.defenderPrompt;
         defenderDependencies = other.defenderDependencies;
-        defenderDependencyPrompt = other.defenderDependencyPrompt;
         defenderMethodFocus = other.defenderMethodFocus;
-        defenderMethodFocusPrompt = other.defenderMethodFocusPrompt;
+
+        prompts = new HashMap<>(other.prompts);
     }
 
     public Optional<String> getPrompt(PromptType type) {
-        return Optional.ofNullable(switch (type) {
-            case DEFEND_DEFAULT -> defenderPrompt;
-            case DEFEND_DEPENDENCIES -> defenderDependencyPrompt;
-            case DEFEND_FOCUS -> defenderMethodFocusPrompt;
-            case ATTACK_DEFAULT -> attackerPrompt;
-            case ATTACK_DEPENDENCIES -> attackerDependencyPrompt;
-            case ATTACK_EQUIVALENCE -> resolveEquivalencePrompt;
-        });
+        return Optional.ofNullable(prompts.get(type));
+    }
+
+    public void setPrompt(PromptType type, String prompt) {
+        prompts.put(type, prompt);
+    }
+
+    public Set<PromptType> getCustomPromptTypes() {
+        return prompts.keySet();
     }
 }

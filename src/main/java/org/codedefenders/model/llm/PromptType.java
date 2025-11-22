@@ -19,5 +19,35 @@
 package org.codedefenders.model.llm;
 
 public enum PromptType {
-    ATTACK_DEFAULT, ATTACK_DEPENDENCIES, ATTACK_EQUIVALENCE, DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS
+    /**
+     * The standard attack prompt. The code of the CuT is supplied as the user message for attacker prompts.
+     */
+    ATTACK_DEFAULT,
+    /**
+     * This String replaces the normal prompt if there are any dependency classes (and if
+     * {@link LlModel#isAttackerDependencies()} is true).
+     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
+     */
+    ATTACK_DEPENDENCIES,
+    /**
+     * This prompt is used to generate a test to kill a suspected mutant. The user message consists of the CuT,
+     * the dependencies if {@link LlModel#isAttackerDependencies()} is true, and the diff of the suspected mutant.
+     */
+    ATTACK_EQUIVALENCE,
+    /**
+     * The standard defender prompt. The code of the CuT is supplied as the user message.
+     */
+    DEFEND_DEFAULT,
+    /**
+     * This String replaces the normal defender if there are any dependency classes (and if
+     * {@link LlModel#isDefenderDependencies()} is true).
+     * The code of the dependencies will be appended to the code of the CuT as part of the user message.
+     */
+    DEFEND_DEPENDENCIES,
+    /**
+     * This String format replaces the normal or dependency prompt to focus on a specific method.
+     * This should only be used with {@link String#format(String, Object...)} with the method name
+     * as the single argument.
+     */
+    DEFEND_FOCUS
 }

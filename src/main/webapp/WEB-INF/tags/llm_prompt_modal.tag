@@ -195,15 +195,17 @@
                         type: "${type}",
                         name: "${name}",
                         active: true,
-                        defenderPrompt: defenderPrompt,
+                        prompts: {
+                            "ATTACK_DEFAULT": attackerPrompt,
+                            "ATTACK_DEPENDENCIES": attackerDepsPrompt,
+                            "ATTACK_EQUIVALENCE": resolveEquivalencePrompt,
+                            "DEFEND_DEFAULT": defenderPrompt,
+                            "DEFEND_DEPENDENCIES": defenderDepsPrompt,
+                            "DEFEND_FOCUS": defenderFocusPrompt
+                        },
                         defenderDependencies: defenderDeps,
-                        defenderDependencyPrompt: defenderDepsPrompt,
                         defenderMethodFocus: defenderFocus,
-                        defenderMethodFocusPrompt: defenderFocusPrompt,
-                        attackerPrompt: attackerPrompt,
                         attackerDependencies: attackerDeps,
-                        attackerDependencyPrompt: attackerDepsPrompt,
-                        resolveEquivalencePrompt: resolveEquivalencePrompt
                     })
                 });
             });

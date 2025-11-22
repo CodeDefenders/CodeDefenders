@@ -20,8 +20,11 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -29,8 +32,8 @@ import jakarta.inject.Inject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.service.llm.NoSuchModelException;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -134,12 +137,12 @@ public class LlmRepository {
 
     public void resetDefaultModel() {
         LlModel defaultModel = new LlModel(DEFAULT_MODEL_NAME, LlmType.DEFAULT);
-        defaultModel.setAttackerPrompt(DEFAULT_ATTACKER_PROMPT);
-        defaultModel.setAttackerDependencyPrompt(DEFAULT_ATTACKER_DEPS_PROMPT);
-        defaultModel.setResolveEquivalencePrompt(DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
-        defaultModel.setDefenderPrompt(DEFAULT_DEFENDER_PROMPT);
-        defaultModel.setDefenderDependencyPrompt(DEFAULT_DEFENDER_DEPS_PROMPT);
-        defaultModel.setDefenderMethodFocusPrompt(DEFAULT_DEFENDER_FOCUS_PROMPT);
+        defaultModel.setPrompt(PromptType.ATTACK_DEFAULT ,DEFAULT_ATTACKER_PROMPT);
+        defaultModel.setPrompt(PromptType.ATTACK_DEPENDENCIES, DEFAULT_ATTACKER_DEPS_PROMPT);
+        defaultModel.setPrompt(PromptType.ATTACK_EQUIVALENCE, DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
+        defaultModel.setPrompt(PromptType.DEFEND_DEFAULT, DEFAULT_DEFENDER_PROMPT);
+        defaultModel.setPrompt(PromptType.DEFEND_DEPENDENCIES, DEFAULT_DEFENDER_DEPS_PROMPT);
+        defaultModel.setPrompt(PromptType.DEFEND_FOCUS, DEFAULT_DEFENDER_FOCUS_PROMPT);
 
         saveModel(defaultModel);
 
@@ -159,71 +162,77 @@ public class LlmRepository {
         if (alreadyExists) {
             sql = """
                     update llm_models set
-                    defender_prompt = ?,
                     defender_dependencies = ?,
-                    defender_dependencies_prompt = ?,
                     defender_method_focus = ?,
-                    defender_method_focus_prompt = ?,
-                    attacker_prompt = ?,
                     attacker_dependencies = ?,
-                    attacker_dependencies_prompt = ?,
-                    attacker_resolve_equivalence_prompt = ?,
                     active = ?
                     WHERE model_name = ? AND type = ?;
                     """;
         } else {
             sql = """
                     insert into llm_models(
-                                           defender_prompt,
-                                           defender_dependencies, defender_dependencies_prompt,
-                                           defender_method_focus, defender_method_focus_prompt,
-                                           attacker_prompt,
-                                           attacker_dependencies, attacker_dependencies_prompt,
-                                           attacker_resolve_equivalence_prompt,
+                                           defender_dependencies,
+                                           defender_method_focus,
+                                           attacker_dependencies,
                                            active, model_name, type)
-                    values (?,?,?,?,?,?,?,?,?,?,?,?)""";
+                    values (?,?,?,?,?,?)""";
         }
-        queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
-                model.isDefenderDependencies(), model.getDefenderDependencyPrompt().orElse(null),
-                model.isDefenderMethodFocus(), model.getDefenderMethodFocusPrompt().orElse(null),
-                model.getAttackerPrompt().orElse(null),
-                model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
-                model.getResolveEquivalencePrompt().orElse(null),
+        queryRunner.update(sql,
+                model.isDefenderDependencies(),
+                model.isDefenderMethodFocus(),
+                model.isAttackerDependencies(),
                 model.isActive(), model.getName(), model.getType().name());
+
+        updatePrompts(model);
     }
 
     /**
-     * Only change the prompts of an existing model. Throws an exception if that model doesn't exist, keeps
-     * 'active' datum unchanged.
+     * Only changes the prompts and the prompt availabilities of an existing model.
+     * Throws an exception if that model doesn't exist.
+     * This also deletes prompts in the DB if they are not present in the model.
+     *
      * @param model The model, identified by type and name, containing the new prompts.
      */
     public void updatePrompts(LlModel model) {
+        Set<PromptType> promptTypes = model.getCustomPromptTypes();
+
         @Language("SQL")
-        String sql = """
-                    update llm_models set
-                    defender_prompt = ?,
-                    defender_dependencies = ?,
-                    defender_dependencies_prompt = ?,
-                    defender_method_focus = ?,
-                    defender_method_focus_prompt = ?,
-                    attacker_prompt = ?,
-                    attacker_dependencies = ?,
-                    attacker_dependencies_prompt = ?,
-                    attacker_resolve_equivalence_prompt = ?
-                    WHERE model_name = ? AND type = ?;
-                    """;
-        int updated = queryRunner.update(sql, model.getDefenderPrompt().orElse(null),
-                model.isDefenderDependencies(), model.getDefenderDependencyPrompt().orElse(null),
-                model.isDefenderMethodFocus(), model.getDefenderMethodFocusPrompt().orElse(null),
-                model.getAttackerPrompt().orElse(null),
-                model.isAttackerDependencies(), model.getAttackerDependencyPrompt().orElse(null),
-                model.getResolveEquivalencePrompt().orElse(null),
-                model.getName(), model.getType().name());
-        if (updated == 0) {
-            logger.error("Trying to update non-existing model: {} {}", model.getType(), model.getName());
-            throw new IllegalArgumentException("Trying to update non-existing model: "
-                    + model.getType() + ", " +  model.getName());
+        String updateSql = """
+        update llm_models set attacker_dependencies = ?, defender_dependencies = ?, defender_method_focus = ?
+        where type = ? and model_name = ?
+        """;
+        queryRunner.update(updateSql, model.isAttackerDependencies(), model.isDefenderDependencies(),
+                model.isDefenderMethodFocus(), model.getType().name(), model.getName());
+
+        @Language("SQL")
+        String insertSql = """
+                insert into llm_prompts(llm_prompts.model_name, llm_prompts.model_type, llm_prompts.prompt_type, prompt)
+                values %s on duplicate key update prompt = VALUES(prompt)""";
+        String placeholder = String.join(",", Collections.nCopies(promptTypes.size(), "(?,?,?,?)"));
+
+        insertSql = String.format(insertSql, placeholder);
+        List<String> insertArguments = new ArrayList<>();
+
+        for (PromptType t : promptTypes) {
+            insertArguments.addAll(List.of(model.getName(), model.getType().name(), t.name(),
+                    model.getPrompt(t).orElseThrow()));
         }
+
+        queryRunner.update(insertSql, insertArguments.toArray());
+
+        @Language("SQL")
+        String purgeSql = """
+                delete from llm_prompts where model_type = ? and model_name = ? and prompt_type not in (%s)
+                """;
+
+        String purgePlaceholder = String.join(",", Collections.nCopies(promptTypes.size(), "?"));
+        purgeSql = String.format(purgeSql, purgePlaceholder);
+
+        insertArguments = new ArrayList<>();
+        insertArguments.add(model.getType().name());
+        insertArguments.add(model.getName());
+        insertArguments.addAll(promptTypes.stream().map(PromptType::name).toList());
+        queryRunner.update(purgeSql, insertArguments.toArray());
     }
 
     public void setActive(String name, LlmType type, boolean active) {
@@ -235,8 +244,9 @@ public class LlmRepository {
     /**
      * Update the values of an existing {@link LlModel}. It is identified by type and name, all other values are filled
      * up from DB.
+     *
      * @throws org.codedefenders.service.llm.NoSuchModelException If there is no model with this type and name
-     * in the database.
+     *                                                            in the database.
      */
     public void loadModel(LlModel model) throws NoSuchModelException {
         LlModel fromDB = getModelFromName(model.getName(), model.getType(), false).orElseThrow(
@@ -247,19 +257,27 @@ public class LlmRepository {
 
     public Optional<LlModel> getDefaultModel() {
         @Language("SQL")
-        String sql = "SELECT * FROM llm_models WHERE type = ? LIMIT 1;";
-        return queryRunner.query(sql, ResultSetUtils.oneFromRS(LlmRepository::fromRS), LlmType.DEFAULT.name());
+        String sql = """
+        SELECT * FROM llm_models
+            LEFT JOIN llm_prompts ON
+                llm_models.model_name = llm_prompts.model_name
+                AND llm_models.type = llm_prompts.model_type
+            WHERE type = ?;
+        """;
+        return queryRunner.query(sql, LlmRepository::oneFromRs, LlmType.DEFAULT.name());
     }
 
     public Optional<LlModel> getModelFromName(String name, LlmType type, boolean mustBeActive) {
         @Language("SQL")
-        String sql = "SELECT * FROM llm_models WHERE model_name = ? AND type = ?;";
-        Optional<LlModel> result = queryRunner.query(sql, ResultSetUtils.oneFromRS(LlmRepository::fromRS), name, type.name());
-        if (!mustBeActive || result.isPresent() && result.get().isActive()) {
-            return result;
-        } else {
-            return Optional.empty();
-        }
+        String sql = """
+        SELECT * FROM llm_models
+                 LEFT JOIN llm_prompts ON
+                    llm_models.model_name = llm_prompts.model_name
+                    AND llm_models.type = llm_prompts.model_type
+                 WHERE llm_models.model_name = ? AND llm_models.type = ?
+        """
+                + (mustBeActive ? " AND active = true" : ";");
+        return queryRunner.query(sql, LlmRepository::oneFromRs, name, type.name());
     }
 
     public List<LlModel> getAllModels() {
@@ -268,10 +286,16 @@ public class LlmRepository {
 
     public List<LlModel> getAllModels(boolean mustBeActive) {
         @Language("SQL")
-        String sql = "SELECT * FROM llm_models WHERE type != ? " + (mustBeActive ? "AND active = true;" : ";");
+        String sql = """
+                SELECT * FROM llm_models
+                    LEFT JOIN llm_prompts
+                        ON llm_models.model_name = llm_prompts.model_name
+                        AND llm_models.type = llm_prompts.model_type
+                WHERE type != ?""" + (mustBeActive ? " AND active = true" : "")
+                + " ORDER BY llm_models.type, llm_models.model_name";
 
-        List<LlModel> modelsInDB =  queryRunner.query(
-                sql, ResultSetUtils.listFromRS(LlmRepository::fromRS), LlmType.DEFAULT.name());
+        List<LlModel> modelsInDB = queryRunner.query(
+                sql, LlmRepository::fromRS, LlmType.DEFAULT.name());
 
         return modelsInDB.stream().filter(this::modelIsInConfig).toList();
     }
@@ -281,22 +305,36 @@ public class LlmRepository {
                 || m.getType() == LlmType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
     }
 
-    private static LlModel fromRS(ResultSet rs) throws SQLException {
-        String name = rs.getString("model_name");
-        LlmType type = LlmType.valueOf(rs.getString("type"));
-        LlModel result = new LlModel(name, type);
-        result.setActive(rs.getBoolean("active"));
+    private static Optional<LlModel> oneFromRs(ResultSet rs) throws SQLException {
+        List<LlModel> results = fromRS(rs);
+        if (results.isEmpty()) {
+            return Optional.empty();
+        } else if (results.size() > 1) {
+            throw new RuntimeException("Found two results, when there should be only one.");
+        } else return Optional.of(results.get(0));
+    }
 
-        result.setDefenderPrompt(rs.getString("defender_prompt"));
-        result.setDefenderDependencies(rs.getBoolean("defender_dependencies"));
-        result.setDefenderDependencyPrompt(rs.getString("defender_dependencies_prompt"));
-        result.setDefenderMethodFocus(rs.getBoolean("defender_method_focus"));
-        result.setDefenderMethodFocusPrompt(rs.getString("defender_method_focus_prompt"));
+    private static List<LlModel> fromRS(ResultSet rs) throws SQLException {
+        List<LlModel> result = new ArrayList<>();
+        LlModel currentModel = null;
+        while (rs.next()) {
+            String name = rs.getString("llm_models.model_name");
+            LlmType type = LlmType.valueOf(rs.getString("llm_models.type"));
+            if (currentModel == null || !currentModel.getName().equals(name) || currentModel.getType() != type) {
+                currentModel = new LlModel(name, type);
+                result.add(currentModel);
+                currentModel.setDefenderDependencies(rs.getBoolean("defender_dependencies"));
+                currentModel.setDefenderMethodFocus(rs.getBoolean("defender_method_focus"));
+                currentModel.setAttackerDependencies(rs.getBoolean("attacker_dependencies"));
+                currentModel.setActive(rs.getBoolean("active"));
+            }
 
-        result.setAttackerPrompt(rs.getString("attacker_prompt"));
-        result.setAttackerDependencies(rs.getBoolean("attacker_dependencies"));
-        result.setAttackerDependencyPrompt(rs.getString("attacker_dependencies_prompt"));
-        result.setResolveEquivalencePrompt(rs.getString("attacker_resolve_equivalence_prompt"));
+            String promptType = rs.getString("llm_prompts.prompt_type");
+            String prompt = rs.getString("llm_prompts.prompt");
+            if (promptType != null && prompt != null) {
+                currentModel.setPrompt(PromptType.valueOf(promptType), prompt);
+            }
+        }
 
         return result;
     }
