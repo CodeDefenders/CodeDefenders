@@ -37,6 +37,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -59,19 +60,22 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     private final MessagesBean messages;
     private final UserService userService;
     private final URLUtils url;
+    private final UserRepository userRepository;
 
     @Inject
-    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils) {
+    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils,
+                                                 UserRepository userRepository) {
         super();
 
         this.messages = messages;
         this.userService = userService;
+        this.userRepository = userRepository;
         this.url = urlUtils;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
-        this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        this.setLoginUrl(Paths.LOGIN);
         // Go to game overview page after successful login
-        this.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        this.setSuccessUrl(Paths.GAMES_OVERVIEW);
     }
 
     /**
@@ -95,6 +99,20 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         if (token instanceof UsernamePasswordToken) { // Clear token to avoid possibility of later memory access
             ((UsernamePasswordToken) token).clear();
+        }
+
+        // save browser locale if user has no locale (first login)
+        var userOpt = userRepository.getUserById(userId);
+        if (userOpt.isPresent()) {
+            var user = userOpt.get();
+            if (user.getLocale() == null) {
+                var locale = request.getLocale();
+                user.setLocale(locale);
+                userRepository.update(user);
+                logger.info("Changed language of user '{}' to {}", user.getUsername(), locale.getLanguage());
+            }
+        } else {
+            logger.error("User not found.");
         }
 
         // Call the super method, as this is the one doing the redirect after a successful login.
