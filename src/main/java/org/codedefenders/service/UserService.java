@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -146,7 +147,7 @@ public class UserService {
     @Nonnull
     private User userFromUserEntity(@Nonnull UserEntity user) {
         return new User(user.getId(), user.getUsername(), user.isActive(), user.getEmail(), user.isValidated(),
-                user.getAllowContact(), user.getKeyMap(), user.getKeepPreviousTest());
+                user.getAllowContact(), user.getKeyMap(), user.getKeepPreviousTest(), user.getLocale());
     }
 
     @Nonnull
@@ -167,7 +168,7 @@ public class UserService {
      * may be required.
      */
     @Nonnull
-    public Optional<String> registerUser(String username, String password, String email) {
+    public Optional<String> registerUser(String username, String password, String email, Locale locale) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         String result = null;
@@ -191,7 +192,7 @@ public class UserService {
         } else if (userRepo.getUserByEmail(email).isPresent()) {
             result = "Could not create user. Email has already been used. You can reset your password.";
         } else {
-            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email);
+            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email, locale);
             if (userRepo.insert(newUser).isEmpty()) {
                 // TODO: How about some error handling?
                 result = "Could not create user.";

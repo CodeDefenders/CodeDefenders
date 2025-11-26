@@ -19,6 +19,7 @@
 package org.codedefenders.model;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -42,21 +43,22 @@ public class UserEntity implements Serializable {
     private boolean allowContact;
     private KeyMap keyMap;
     private boolean keepPreviousTest;
+    private Locale locale;
 
     public UserEntity(String username, String encodedPassword) {
-        this(username, encodedPassword, "");
+        this(username, encodedPassword, "", null);
     }
 
-    public UserEntity(String username, String encodedPassword, String email) {
-        this(0, username, encodedPassword, email);
+    public UserEntity(String username, String encodedPassword, String email, Locale locale) {
+        this(0, username, encodedPassword, email, locale);
     }
 
-    public UserEntity(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, false);
+    public UserEntity(int id, String username, String encodedPassword, String email, Locale locale) {
+        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, false, locale);
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
-                      boolean active, boolean allowContact, KeyMap keyMap, boolean keepPreviousTest) {
+                      boolean active, boolean allowContact, KeyMap keyMap, boolean keepPreviousTest, Locale locale) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -66,6 +68,7 @@ public class UserEntity implements Serializable {
         this.allowContact = allowContact;
         this.keyMap = keyMap;
         this.keepPreviousTest = keepPreviousTest;
+        this.locale = locale;
     }
 
     public boolean isValidated() {
@@ -135,6 +138,14 @@ public class UserEntity implements Serializable {
 
     public void setKeepPreviousTest(boolean keepPreviousTest) {
         this.keepPreviousTest = keepPreviousTest;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = locale;
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     @Override

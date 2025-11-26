@@ -20,6 +20,7 @@ package org.codedefenders.servlets.util;
 
 import java.io.IOException;
 
+import jakarta.inject.Inject;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,21 +28,21 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 
-import org.codedefenders.util.I18nUtils;
-import org.xnap.commons.i18n.I18n;
+import org.codedefenders.service.I18nService;
 
 @WebFilter("/*")
 public class I18nFilter implements Filter {
 
     private static final String i18nAttrName = "i18n";
+    @Inject
+    private I18nService i18nService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         if (request.getAttribute(i18nAttrName) == null) {
-            I18n i18n = I18nUtils.getI18n(request.getLocale());
-            request.setAttribute(i18nAttrName, i18n);
+            request.setAttribute(i18nAttrName, i18nService.getI18n(request));
         }
 
         chain.doFilter(request, response);

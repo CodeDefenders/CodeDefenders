@@ -21,6 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -96,9 +97,11 @@ public class UserRepository {
         boolean allowContact = rs.getBoolean("AllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
         boolean keepPreviousTest = rs.getBoolean("KeepPreviousTest");
+        String language = rs.getString("Language");
+        Locale locale = language != null && !language.isBlank() ? new Locale(language) : null;
 
         return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap,
-                keepPreviousTest);
+                keepPreviousTest, locale);
     }
 
     /**
@@ -119,8 +122,8 @@ public class UserRepository {
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
         @Language("SQL") String query = """
-                        INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap, KeepPreviousTest)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+                                INSERT INTO users (Username, Password, Email, Validated, Active, AllowContact, KeyMap, KeepPreviousTest, Language)
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner
@@ -132,7 +135,8 @@ public class UserRepository {
                         userEntity.isActive(),
                         userEntity.getAllowContact(),
                         userEntity.getKeyMap().name(),
-                        userEntity.getKeepPreviousTest());
+                        userEntity.getKeepPreviousTest(),
+                        Optional.ofNullable(userEntity.getLocale()).map(Locale::getLanguage).orElse(null));
     }
 
     /**
@@ -151,7 +155,8 @@ public class UserRepository {
                   Active = ?,
                   AllowContact = ?,
                           KeyMap = ?,
-                          KeepPreviousTest = ?
+                          KeepPreviousTest = ?,
+                          Language = ?
                 WHERE User_ID = ?;
         """;
 
@@ -164,6 +169,7 @@ public class UserRepository {
                 userEntity.getAllowContact(),
                 userEntity.getKeyMap().name(),
                 userEntity.getKeepPreviousTest(),
+                userEntity.getLocale().getLanguage(),
                 userEntity.getId()) == 1;
     }
 

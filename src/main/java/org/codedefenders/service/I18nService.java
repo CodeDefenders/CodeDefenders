@@ -34,6 +34,8 @@ import jakarta.inject.Named;
 import jakarta.servlet.ServletRequest;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.dto.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
@@ -57,6 +59,17 @@ public class I18nService {
     private static final Locale FALLBACK_LOCALE = Locale.US;
 
     private final Set<String> javascriptStrings = readI18nJsJson();
+
+    // inject
+    private final CodeDefendersAuth login;
+
+    @Inject
+    public I18nService(CodeDefendersAuth login) {
+        this.login = login;
+    }
+
+
+    // JS localize
 
     public Set<String> getJavascriptStrings() {
         return new HashSet<>(javascriptStrings);

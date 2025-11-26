@@ -295,7 +295,7 @@ public class AdminUserManagement extends HttpServlet {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email);
+        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email, null);
         final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {
