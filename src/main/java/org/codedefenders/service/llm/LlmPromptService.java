@@ -87,7 +87,7 @@ class LlmPromptService {
         ChatMessage[] chatMessages = conversation.currentConversation().toArray();
 
         int inputLength = 0;
-        for (ChatMessageDTO msg : conversation.currentConversation().copyMessages()) {
+        for (ChatMessageDTO msg : conversation.currentConversation().getMessages()) {
             inputLength += msg.getText().length();
         }
         logger.info("Sending conversation with {} characters to model {}", inputLength, model);

@@ -21,6 +21,7 @@ package org.codedefenders.model.llm;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.codedefenders.dto.SimpleUser;
@@ -89,9 +90,10 @@ public class LlmConversation {
         return result;
     }
 
-    public List<ChatMessageDTO> copyMessages() {
-        return List.copyOf(messages);
+    public List<ChatMessageDTO> getMessages() {
+        return Collections.unmodifiableList(messages);
     }
+
 
     public int numberOfTries() {
         int result = 0;

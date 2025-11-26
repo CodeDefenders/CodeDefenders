@@ -88,8 +88,8 @@ public class LlmConversationRepository {
             );
         }
 
-        for (int i = 0; i < conversation.copyMessages().size(); i++) {
-            ChatMessageDTO dto = conversation.copyMessages().get(i);
+        for (int i = 0; i < conversation.getMessages().size(); i++) {
+            ChatMessageDTO dto = conversation.getMessages().get(i);
             @Language("SQL")
             String messageSql = """
                     INSERT INTO llm_messages
