@@ -111,6 +111,15 @@ public class AdminSystemSettings extends HttpServlet {
                         Recommended: ~5000ms""".stripIndent();
             }
         },
+        SUPPORTED_LANGUAGES {
+            @Override
+            public String toString() {
+                return """
+                        Comma separated list of supported locales where full translations exist.
+                        The first locale in the list will be used by default.
+                        Language codes like en, de, fr are sufficient.""".stripIndent();
+            }
+        },
         SITE_NOTICE {
             @Override
             public String toString() {

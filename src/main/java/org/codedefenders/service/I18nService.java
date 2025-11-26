@@ -22,19 +22,31 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.ServletRequest;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import com.google.gson.JsonParser;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.function.Predicate.not;
+import static org.codedefenders.database.AdminDAO.getSystemSetting;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.SUPPORTED_LANGUAGES;
+import static org.xnap.commons.i18n.I18nFactory.FALLBACK;
+import static org.xnap.commons.i18n.I18nFactory.READ_PROPERTIES;
 
 
 @Named
@@ -42,6 +54,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class I18nService {
 
     private static final Logger logger = LoggerFactory.getLogger(I18nService.class);
+    private static final Locale FALLBACK_LOCALE = Locale.US;
 
     private final Set<String> javascriptStrings = readI18nJsJson();
 
@@ -89,5 +102,64 @@ public class I18nService {
      */
     public String escape(String string) {
         return StringEscapeUtils.escapeJson(string);
+    }
+
+
+    // determine/setting user locale
+
+    /**
+     * @return Array of locales set in the admin settings. Always contains at least one fallback locale.
+     */
+    public Locale[] getSupportedLocales() {
+        var supportedLanguageSetting = getSystemSetting(SUPPORTED_LANGUAGES).getStringValue();
+        var locales = Arrays.stream(supportedLanguageSetting.split("[,;]"))
+                .filter(not(String::isBlank)).map(Locale::new).toArray(Locale[]::new);
+        if (locales.length == 0) {
+            logger.warn("no locales set in the admin settings, falling back to English");
+            return new Locale[] {FALLBACK_LOCALE};
+        } else {
+            return locales;
+        }
+    }
+
+    public Locale getDefaultLocale() {
+        return getSupportedLocales()[0];
+    }
+
+    public Locale toSupportedLocale(String language) {
+        var supportedLocales = getSupportedLocales();
+        var locale = new Locale(language);
+        if (Arrays.asList(supportedLocales).contains(locale)) {
+            return locale;
+        } else {
+            return supportedLocales[0];
+        }
+    }
+
+
+    // supply i18n instance
+
+    public static I18n getI18n(Locale pLocale) {
+        return I18nFactory.getI18n(
+                I18nService.class,
+                pLocale == null ? Locale.getDefault() : pLocale,
+                FALLBACK | READ_PROPERTIES
+        );
+    }
+
+    /**
+     * Get the i18n instance for one of the supported locales.
+     * Considers user preference and browser locale, falls back to the default locale.
+     *
+     * @param request The request is used to determine the browser locale transmitted via the Accept-Language header.
+     * @return The i18n instance.
+     */
+    public I18n getI18n(ServletRequest request) {
+        var user = login.isLoggedIn() ? login.getUser() : null;
+        var lang = Optional.ofNullable(user)
+                .map(User::getLocale)
+                .orElseGet(request::getLocale)
+                .getLanguage();
+        return getI18n(toSupportedLocale(lang));
     }
 }
