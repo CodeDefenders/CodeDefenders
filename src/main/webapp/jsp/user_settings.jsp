@@ -19,10 +19,13 @@
 
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
@@ -38,6 +41,37 @@
 <p:main_page title="${title}">
     <div class="container form-width">
         <h1>${title}</h1>
+
+        <c:set var="supportedLocales" value="${i18nService.supportedLocales}"/>
+        <c:if test="${fn:length(supportedLocales) > 1}">
+            <section class="mt-5" aria-labelledby="language-settings">
+                <h2 class="mb-3" id="language-settings">${i18n.tr('Language Settings')}</h2>
+
+                <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post" class="row g-3 needs-validation">
+                    <input type="hidden" class="form-control" name="formType" value="updateLanguage">
+
+                    <div class="col-12">
+                        <div class="mb-2">
+                            <label for="language-switch">${i18n.tr("Select a language")}</label>
+                            <select id="language-switch" class="form-control" name="updatedLanguage">
+                                <c:forEach items="${supportedLocales}" var="l">
+                                    <option value="${l.language}"
+                                            <c:if test="${login.user.locale == l}">selected</c:if>>
+                                            ${l.displayLanguage}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button id="submitUpdateLanguage" type="submit" class="btn btn-primary">
+                                ${i18n.tr('Change Language')}
+                        </button>
+                    </div>
+                </form>
+            </section>
+        </c:if>
 
         <section class="mt-5" aria-labelledby="email-settings">
             <h2 class="mb-3" id="email-settings">Email Settings</h2>

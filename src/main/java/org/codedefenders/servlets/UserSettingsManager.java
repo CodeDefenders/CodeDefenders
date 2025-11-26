@@ -34,6 +34,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -60,6 +61,9 @@ public class UserSettingsManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private I18nService i18nService;
 
     @Inject
     private UserService userService;
@@ -135,6 +139,17 @@ public class UserSettingsManager extends HttpServlet {
                 }
                 response.sendRedirect(responsePath);
             }
+            case "updateLanguage" -> {
+                final Optional<String> language = ServletUtils.getStringParameter(request, "updatedLanguage");
+                final boolean success = updateLanguage(user, language);
+                if (success) {
+                    messages.add("Successfully updated language.");
+                } else {
+                    logger.info("Failed to update language for user {}.", login.getUserId());
+                    messages.add("Failed to update language. Please contact the page administrator");
+                }
+                response.sendRedirect(responsePath);
+            }
             case "changePassword" -> {
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
 
@@ -194,6 +209,14 @@ public class UserSettingsManager extends HttpServlet {
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
+        return userRepo.update(user);
+    }
+
+    private boolean updateLanguage(UserEntity user, Optional<String> language) {
+        var locale = language
+                .map(i18nService::toSupportedLocale)
+                .orElseGet(i18nService::getDefaultLocale);
+        user.setLocale(locale);
         return userRepo.update(user);
     }
 
