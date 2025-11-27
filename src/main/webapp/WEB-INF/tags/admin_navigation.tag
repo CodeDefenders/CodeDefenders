@@ -53,7 +53,7 @@
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link ${activePage.equals("adminLlm") ? 'active' : ''}" id="adminLlm" href="${url.forPath(Paths.ADMIN_LLM)}">LLM Settings</a>
+        <a class="nav-link ${activePage.equals("adminLlmConfig") ? 'active' : ''}" id="adminLlm" href="${url.forPath(Paths.ADMIN_LLM_CONFIG)}">LLM Settings</a>
     </li>
     <li class="nav-item">
         <a class="nav-link ${activePage.equals("adminSystemSettings") ? 'active' : ''}" id="adminSystemSettings" href="${url.forPath(Paths.ADMIN_SETTINGS)}">System Settings</a>

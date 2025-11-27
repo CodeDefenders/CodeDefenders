@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmType;
@@ -41,7 +40,6 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.service.llm.LlmInspectionService;
 import org.codedefenders.service.llm.LlmManagerService;
-import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -222,11 +220,11 @@ public class LlmApi extends HttpServlet {
             }
             case "updatePrompts" -> {
                 llmRepo.updatePrompts(model);
-                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM));
+                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
             case "resetDefault" -> {
                 llmRepo.resetDefaultModel();
-                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM));
+                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
             default -> logger.error("Unknown formType: {}", action);
         }

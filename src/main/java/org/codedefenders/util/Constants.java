@@ -18,11 +18,7 @@
  */
 package org.codedefenders.util;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.codedefenders.configuration.Configuration;
 
@@ -104,7 +100,7 @@ public class Constants {
     public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
     public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
     public static final String ADMIN_ANALYTICS_KILLMAPS_JSP = "/jsp/admin_analytics_killmaps.jsp";
-    public static final String ADMIN_LLM_JSP = "/jsp/admin_llm.jsp";
+    public static final String ADMIN_LLM_CONFIG_JSP = "/jsp/admin_llm_config.jsp";
 
     // Messages
     public static final String WINNER_MESSAGE = "You won!";

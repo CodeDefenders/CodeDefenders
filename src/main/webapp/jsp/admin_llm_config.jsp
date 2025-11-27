@@ -36,7 +36,7 @@
 
 <p:main_page title="LLM Management">
     <div class="container">
-        <t:admin_navigation activePage="adminLlm"/>
+        <t:admin_navigation activePage="adminLlmConfig"/>
 
         <div class="card m-2">
             <div class="card-body">

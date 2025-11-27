@@ -83,7 +83,7 @@ public class Paths {
     public static final String ADMIN_SETTINGS = "/admin/settings";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";
     public static final String ADMIN_CLASSROOMS = "/admin/classrooms";
-    public static final String ADMIN_LLM = "/admin/llm";
+    public static final String ADMIN_LLM_CONFIG = "/admin/llm-config";
 
     public static final String ADMIN_PUZZLE_OVERVIEW = "/admin/puzzles";
     public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
