@@ -135,24 +135,4 @@ class ShowToasts {
     }
 }
 
-/*
-<a class="text-decoration-none text-reset d-block" href="/profile">
-    <div class="toast bg-white fade show" role="alert" data-bs-autohide="false">
-        <div class="d-flex align-items-center">
-            <img src="/images/achievements/codedefenders_achievements_5_lvl_1.png" class="me-2 w-25">
-            <div>
-                <div class="toast-header">
-                    <strong class="toast-title me-auto">New Achievement Unlocked:<br>The First Mutant</strong>
-                    <small class="toast-secondary text-body-secondary">Level 1</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body me-auto d-flex flex-row justify-content-between">
-                    <span>1 of 10 mutants created to reach the next level</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</a>
- */
-
 export default ShowToasts;
