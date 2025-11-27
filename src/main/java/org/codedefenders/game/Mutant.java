@@ -355,15 +355,11 @@ public class Mutant implements Serializable {
             int sourcePos = delta.getSource().getPosition();
             int targetPos = delta.getTarget().getPosition();
 
-            boolean discardDelta = true;
             boolean updateDelta = false;
-
             for (int i = 0; i < Math.min(source.size(), target.size()); i++) {
-                var sourceLine =  source.get(i).replaceAll(unquotedWhitespaceRegex, "");
-                var targetLine =  target.get(i).replaceAll(unquotedWhitespaceRegex, "");
-                if (!sourceLine.equals(targetLine)) {
-                    discardDelta = false;
-                } else {
+                var sourceLine = source.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                var targetLine = target.get(i).replaceAll(unquotedWhitespaceRegex, "");
+                if (sourceLine.equals(targetLine)) {
                     updateDelta = true;
                     source.remove(i);
                     target.remove(i);
@@ -376,7 +372,7 @@ public class Mutant implements Serializable {
                 }
             }
 
-            if (discardDelta) {
+            if (source.isEmpty() && target.isEmpty()) {
                 // discard the whole chunk if it only consists of whitespace changes
                 patch.getDeltas().remove(delta);
             } else if (updateDelta) {
