@@ -21,7 +21,6 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +33,7 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.persistence.database.util.QueryUtils;
 import org.codedefenders.service.llm.NoSuchModelException;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -109,23 +109,15 @@ public class LlmRepository {
      * Add models from the config file to DB. Duplicates are ignored.
      */
     public void addNewModels() {
-        List<String> openaiModels = config.getLlmOpenaiModels();
-        List<String> ollamaModels = config.getLlmOllamaModels();
-        String[] modelNames = new String[openaiModels.size() + ollamaModels.size()];
-        for (int i = 0; i < openaiModels.size(); i++) {
-            modelNames[i] = openaiModels.get(i);
-        }
-        for (int i = 0; i < ollamaModels.size(); i++) {
-            modelNames[openaiModels.size() + i] = ollamaModels.get(i);
-        }
-
         @Language("SQL")
-        String sql = "INSERT IGNORE INTO llm_models(model_name, type) values "
-                + "(?, 'OPENAI'), ".repeat(openaiModels.size())
-                + "(?, 'OLLAMA'), ".repeat(ollamaModels.size());
-        sql = sql.substring(0, sql.length() - 2) + ";";
+        String sql = "INSERT IGNORE INTO llm_models(model_name, type) VALUES (?,?)";
+        Object[][] params = QueryUtils.extractBatchParams(config.getLlmOllamaModels(),
+                model -> model, model -> "OLLAMA");
+        queryRunner.batch(sql, params);
 
-        queryRunner.update(sql, (Object[]) modelNames);
+        params = QueryUtils.extractBatchParams(config.getLlmOpenaiModels(),
+                model -> model, model -> "OPENAI");
+        queryRunner.batch(sql, params);
 
         boolean defaultValuesExists =
                 queryRunner.query("SELECT model_name FROM llm_models WHERE model_name = ?",
@@ -137,7 +129,7 @@ public class LlmRepository {
 
     public void resetDefaultModel() {
         LlModel defaultModel = new LlModel(DEFAULT_MODEL_NAME, LlmType.DEFAULT);
-        defaultModel.setPrompt(PromptType.ATTACK_DEFAULT ,DEFAULT_ATTACKER_PROMPT);
+        defaultModel.setPrompt(PromptType.ATTACK_DEFAULT, DEFAULT_ATTACKER_PROMPT);
         defaultModel.setPrompt(PromptType.ATTACK_DEPENDENCIES, DEFAULT_ATTACKER_DEPS_PROMPT);
         defaultModel.setPrompt(PromptType.ATTACK_EQUIVALENCE, DEFAULT_RESOLVE_EQUIVALENT_PROMPT);
         defaultModel.setPrompt(PromptType.DEFEND_DEFAULT, DEFAULT_DEFENDER_PROMPT);
@@ -198,41 +190,35 @@ public class LlmRepository {
 
         @Language("SQL")
         String updateSql = """
-        update llm_models set attacker_dependencies = ?, defender_dependencies = ?, defender_method_focus = ?
-        where type = ? and model_name = ?
-        """;
+                update llm_models set attacker_dependencies = ?, defender_dependencies = ?, defender_method_focus = ?
+                where type = ? and model_name = ?
+                """;
         queryRunner.update(updateSql, model.isAttackerDependencies(), model.isDefenderDependencies(),
                 model.isDefenderMethodFocus(), model.getType().name(), model.getName());
 
         @Language("SQL")
         String insertSql = """
                 insert into llm_prompts(llm_prompts.model_name, llm_prompts.model_type, llm_prompts.prompt_type, prompt)
-                values %s on duplicate key update prompt = VALUES(prompt)""";
-        String placeholder = String.join(",", Collections.nCopies(promptTypes.size(), "(?,?,?,?)"));
+                values (?,?,?,?) on duplicate key update prompt = VALUES(prompt)""";
+        Object[][] insertArguments = QueryUtils.extractBatchParams(promptTypes,
+                p -> model.getName(),
+                p -> model.getType().name(),
+                Enum::name,
+                p -> model.getPrompt(p).orElseThrow());
 
-        insertSql = String.format(insertSql, placeholder);
-        List<String> insertArguments = new ArrayList<>();
-
-        for (PromptType t : promptTypes) {
-            insertArguments.addAll(List.of(model.getName(), model.getType().name(), t.name(),
-                    model.getPrompt(t).orElseThrow()));
-        }
-
-        queryRunner.update(insertSql, insertArguments.toArray());
+        queryRunner.batch(insertSql, insertArguments);
 
         @Language("SQL")
         String purgeSql = """
                 delete from llm_prompts where model_type = ? and model_name = ? and prompt_type not in (%s)
                 """;
+        purgeSql = String.format(purgeSql, QueryUtils.makePlaceholders(promptTypes.size()));
 
-        String purgePlaceholder = String.join(",", Collections.nCopies(promptTypes.size(), "?"));
-        purgeSql = String.format(purgeSql, purgePlaceholder);
-
-        insertArguments = new ArrayList<>();
-        insertArguments.add(model.getType().name());
-        insertArguments.add(model.getName());
-        insertArguments.addAll(promptTypes.stream().map(PromptType::name).toList());
-        queryRunner.update(purgeSql, insertArguments.toArray());
+        List<String> purgeArguments = new ArrayList<>();
+        purgeArguments.add(model.getType().name());
+        purgeArguments.add(model.getName());
+        purgeArguments.addAll(promptTypes.stream().map(PromptType::name).toList());
+        queryRunner.update(purgeSql, purgeArguments.toArray());
     }
 
     public void setActive(String name, LlmType type, boolean active) {
@@ -258,26 +244,26 @@ public class LlmRepository {
     public Optional<LlModel> getDefaultModel() {
         @Language("SQL")
         String sql = """
-        SELECT * FROM llm_models
-            LEFT JOIN llm_prompts ON
-                llm_models.model_name = llm_prompts.model_name
-                AND llm_models.type = llm_prompts.model_type
-            WHERE type = ?;
-        """;
-        return queryRunner.query(sql, LlmRepository::oneFromRs, LlmType.DEFAULT.name());
+                SELECT * FROM llm_models
+                    LEFT JOIN llm_prompts ON
+                        llm_models.model_name = llm_prompts.model_name
+                        AND llm_models.type = llm_prompts.model_type
+                    WHERE type = ?;
+                """;
+        return queryRunner.query(sql, LlmRepository::oneModelFromRs, LlmType.DEFAULT.name());
     }
 
     public Optional<LlModel> getModelFromName(String name, LlmType type, boolean mustBeActive) {
         @Language("SQL")
         String sql = """
-        SELECT * FROM llm_models
-                 LEFT JOIN llm_prompts ON
-                    llm_models.model_name = llm_prompts.model_name
-                    AND llm_models.type = llm_prompts.model_type
-                 WHERE llm_models.model_name = ? AND llm_models.type = ?
-        """
+                SELECT * FROM llm_models
+                         LEFT JOIN llm_prompts ON
+                            llm_models.model_name = llm_prompts.model_name
+                            AND llm_models.type = llm_prompts.model_type
+                         WHERE llm_models.model_name = ? AND llm_models.type = ?
+                """
                 + (mustBeActive ? " AND active = true" : ";");
-        return queryRunner.query(sql, LlmRepository::oneFromRs, name, type.name());
+        return queryRunner.query(sql, LlmRepository::oneModelFromRs, name, type.name());
     }
 
     public List<LlModel> getAllModels() {
@@ -305,7 +291,7 @@ public class LlmRepository {
                 || m.getType() == LlmType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
     }
 
-    private static Optional<LlModel> oneFromRs(ResultSet rs) throws SQLException {
+    private static Optional<LlModel> oneModelFromRs(ResultSet rs) throws SQLException {
         List<LlModel> results = fromRS(rs);
         if (results.isEmpty()) {
             return Optional.empty();

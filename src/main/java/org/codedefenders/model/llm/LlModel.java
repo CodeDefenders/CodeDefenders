@@ -105,14 +105,6 @@ public class LlModel {
         this.active = active;
     }
 
-    private Optional<String> ofNullOrEmpty(String s) {
-        if (s != null && !s.trim().isEmpty()) {
-            return Optional.of(s);
-        } else {
-            return Optional.empty();
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o instanceof LlModel m) {
