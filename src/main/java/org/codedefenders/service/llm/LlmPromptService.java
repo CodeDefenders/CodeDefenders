@@ -60,7 +60,7 @@ class LlmPromptService {
     LlmPromptService(LlmRepository llmRepo, Configuration config, LlmConversationRepository conversationRepository) {
         List<LlModel> models = llmRepo.getAllModels();
         this.conversationRepository = conversationRepository;
-        for (LlModel m : models) { //TODO eigene Methode
+        for (LlModel m : models) {
             if (m.getType() == LlmType.OPENAI) {
                 openaiModels.put(m, OpenAiChatModel.builder()
                         .apiKey(config.getOpenaiApiKey())
@@ -71,7 +71,6 @@ class LlmPromptService {
                 ollamaModels.put(m, OllamaChatModel.builder()
                         .baseUrl(config.getLlmLocalServer())
                         .modelName(m.getName())
-                        .temperature(0.9)
                         .build());
             }
         }

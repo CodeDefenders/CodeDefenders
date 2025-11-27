@@ -108,8 +108,6 @@ public class Configuration {
     protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
-    protected String llmTypes;
-    protected List<String> _llmTypes;
     protected String llmOpenaiApiKey;
     protected String llmOpenaiModels;
     protected List<String> _llmOpenaiModels;
@@ -194,7 +192,7 @@ public class Configuration {
                         javaExecutable.toPath());
                 if (antMajorJavaVersion.isEmpty()) {
                     validationErrors.add(String.format("%s: got an error while running the java executable '%s'. Please check the logs.",
-                                    resolveAttributeName("antJavaHome"), javaExecutable));
+                            resolveAttributeName("antJavaHome"), javaExecutable));
                 } else {
                     antJavaVersion = antMajorJavaVersion.get();
                     if (antMajorJavaVersion.get() < 17) {
@@ -247,19 +245,15 @@ public class Configuration {
                 }
             }
 
-            if (_llmTypes == null && llmTypes != null) {
-                _llmTypes = Arrays.stream(llmTypes.split(";")).toList();
-                for (String type : _llmTypes) {
-                    if (!type.equals("OLLAMA") && !type.equals("OPENAI")) {
-                        validationErrors.add("Unknown LLM type: " + type);
-                    }
-                }
-            }
-            if (_llmOpenaiModels == null && llmOpenaiModels != null) {
+            if (_llmOpenaiModels == null && llmOpenaiModels != null && !llmOpenaiModels.isEmpty()) {
                 _llmOpenaiModels = Arrays.stream(llmOpenaiModels.split(";")).toList();
+            } else {
+                _llmOpenaiModels = List.of();
             }
-            if (_llmOllamaModels == null && llmOllamaModels != null) {
+            if (_llmOllamaModels == null && llmOllamaModels != null && !llmOllamaModels.isEmpty()) {
                 _llmOllamaModels = Arrays.stream(llmOllamaModels.split(";")).toList();
+            } else {
+                _llmOllamaModels = List.of();
             }
 
             if (JavaVersionUtils.getJavaMajorVersion() < 17) {
@@ -491,10 +485,6 @@ public class Configuration {
         }
     }
 
-    public boolean isLlmEnabled() {
-        return llmTypes != null && !llmTypes.isEmpty();
-    }
-
     public List<String> getLlmOpenaiModels() {
         return _llmOpenaiModels;
     }
@@ -503,24 +493,12 @@ public class Configuration {
         return _llmOllamaModels;
     }
 
-    public boolean isLlmOpenAI() {
-        return _llmTypes.contains("OPENAI");
-    }
-
-    public boolean isLlmOllama() {
-        return _llmTypes.contains("OLLAMA");
-    }
-
     public String getLlmLocalServer() {
         return llmOllamaServer;
     }
 
     public String getOpenaiApiKey() {
         return llmOpenaiApiKey;
-    }
-
-    public String getOpenaiChatgptModel() {
-        return _llmOpenaiModels.get(0);
     }
 
     /**
