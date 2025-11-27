@@ -204,7 +204,7 @@ public class LlmRepository {
                 p -> model.getName(),
                 p -> model.getType().name(),
                 Enum::name,
-                p -> model.getPrompt(p).orElseThrow());
+                p -> model.getPrompt(p).orElse(""));
 
         queryRunner.batch(insertSql, insertArguments);
 

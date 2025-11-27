@@ -135,7 +135,10 @@ public class LlModel {
     }
 
     public Optional<String> getPrompt(PromptType type) {
-        return Optional.ofNullable(prompts.get(type));
+        String prompt = prompts.get(type);
+        if (prompt != null && !prompt.isEmpty()) {
+            return Optional.of(prompt);
+        } else return Optional.empty();
     }
 
     public void setPrompt(PromptType type, String prompt) {
