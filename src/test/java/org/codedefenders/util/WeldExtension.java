@@ -18,6 +18,7 @@
  */
 package org.codedefenders.util;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -71,14 +72,22 @@ public class WeldExtension extends WeldJunit5AutoExtension implements Extension 
         var log = new StringJoiner("\n");
         log.add("Initializing Weld with the following beans and alternatives:");
 
-        // Add test class as bean
-        weld.addBeanClass(context.getRequiredTestClass());
-        log.add("- bean: " + context.getRequiredTestClass());
-
-        // Add test class as alternative
-        if (WeldInit.containsAnnotation(context.getRequiredTestClass(), Set.of(Alternative.class), false)) {
-            weld.addAlternative(context.getRequiredTestClass());
-            log.add("- alternative: " + context.getRequiredTestClass());
+        // Add test class and sub-classes as beans and alternatives
+        var classes = new ArrayDeque<Class<?>>();
+        classes.offer(context.getRequiredTestClass());
+        while (!classes.isEmpty()) {
+            var clazz = classes.pop();
+            if (WeldInit.isBean(clazz)) {
+                weld.addBeanClass(clazz);
+                log.add("- bean: " + clazz);
+            }
+            if (WeldInit.isAlternative(clazz)) {
+                weld.addAlternative(clazz);
+                log.add("- alternative: " + clazz);
+            }
+            for (var subclass : clazz.getDeclaredClasses()) {
+                classes.offer(subclass);
+            }
         }
 
         // Add beans

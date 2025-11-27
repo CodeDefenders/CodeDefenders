@@ -91,9 +91,9 @@ public class WeldInit {
 
     /**
      * Checks if the given class, or any of its fields or methods contain a matching annotation.
-     * @param recursive Whether to include sub-classes in the search.
+     * @param recursive Whether to include inner classes in the search.
      */
-    public static boolean containsAnnotation(Class<?> clazz, Set<Class<? extends Annotation>> searchedAnnotations, boolean recursive) {
+    private static boolean containsAnnotation(Class<?> clazz, Set<Class<? extends Annotation>> searchedAnnotations, boolean recursive) {
         if (hasMatch(clazz.getAnnotations(), searchedAnnotations)) {
             return true;
         }
@@ -109,12 +109,22 @@ public class WeldInit {
         }
         if (recursive) {
             for (var innerClass : clazz.getDeclaredClasses()) {
-                if (containsAnnotation(innerClass, searchedAnnotations, recursive)) {
+                if (containsAnnotation(innerClass, searchedAnnotations, true)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    /** Checks if the given class, or any of its inner classes contains a bean. */
+    public static boolean isBean(Class<?> clazz) {
+        return containsAnnotation(clazz, beanAnnotations, true);
+    }
+
+    /** Checks if the given class is an alternative bean implementation Does not check inner classes. */
+    public static boolean isAlternative(Class<?> clazz) {
+        return containsAnnotation(clazz, Set.of(Alternative.class), false);
     }
 
     /**
@@ -124,7 +134,7 @@ public class WeldInit {
      */
     public static List<Class<?>> scanBeans(String packageName) {
         return scanClasspath(packageName).stream()
-                .filter(clazz -> containsAnnotation(clazz, beanAnnotations, true)).toList();
+                .filter(WeldInit::isBean).toList();
     }
 
     /**
