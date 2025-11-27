@@ -19,14 +19,13 @@
 package org.codedefenders.util;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.PromptType;
-import org.codedefenders.persistence.database.LlmRepository;
+
+import com.github.javaparser.ast.body.MethodDeclaration;
 
 /**
  * Utility class for static methods that can be used for llm players.
@@ -39,16 +38,31 @@ public class LlmUtils {
      * <p>
      * This doesn't have to be perfect, it only has to work in most cases, many llm generated tests
      * aren't going to compile anyway.
+     * <p>
+     * If the code is completely unparsable, the unmodified reply is returned. That way feedback can be added to the
+     * llm conversation.
      */
     public static String extractTestContentFromReply(String reply) {
         reply = reply.replace("```java", "").replace("```", "");
-        reply = reply.replaceAll("(?m)^\\s*", "");
-        reply = removeLinesThatContainWords(reply, "void", "public", "private");
-        reply = removeLinesThatStartWith(reply, "import");
-        reply = reply.replace("@Test", "");
-        reply = removeSuperfluousClosingBrackets(reply);
-        reply = reply.replaceAll("(?m)^\\s*" + System.lineSeparator(), "");
-        return reply;
+        var lines = reply.lines().toList();
+        var ast = JavaParserUtils.parse(reply);
+        if (ast.isPresent()) {
+            String methodContent = ast.get().findAll(MethodDeclaration.class).stream()
+                    .flatMap(method -> {
+                        var range = method.getRange().orElseThrow();
+                        return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                    })
+                    .collect(Collectors.joining("\n"));
+            if (!methodContent.isEmpty()) {
+                return methodContent;
+            } else {
+                //If no method definition is present, take the entire reply as is
+                return reply;
+            }
+        } else {
+            return reply;
+        }
+
     }
 
     public static String extractMutantFromReply(String reply, boolean removeDependencies, AbstractGame game) {
