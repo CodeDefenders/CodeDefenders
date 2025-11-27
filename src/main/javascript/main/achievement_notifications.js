@@ -54,7 +54,7 @@ class AchievementNotifications {
                 .replace('{1}', achievement.metricForNextLevel.toString());
 
         show_toasts.showToast({
-            colorClass: "bg-success",
+            colorClass: "",
             title: "New Achievement Unlocked:\n" + achievement.name,
             secondary: "Level " + achievement.level,
             body: progressText,

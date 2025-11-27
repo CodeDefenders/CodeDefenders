@@ -31,9 +31,8 @@ class ShowToasts {
                          longTimeout = false
                      }) {
 
-        console.log("Showing a toast");
         const toastElem = document.createElement('div');
-        toastElem.classList.add('toast', 'bg-white');
+        toastElem.classList.add('toast', 'bg-white', 'd-flex', 'align-items-center');
         toastElem.role = 'alert';
 
         let linkElement;
@@ -51,15 +50,16 @@ class ShowToasts {
             toastElem.setAttribute("data-bs-delay", "8000");
         }
 
-        const toastBody = document.createElement('div');
-        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-row', 'justify-content-between');
-
         if (icon !== '') {
             const iconElement = document.createElement("img");
             iconElement.classList.add("me-2", "w-25");
             iconElement.src = icon;
-            toastBody.appendChild(iconElement);
+            toastElem.appendChild(iconElement);
         }
+
+        const toastBody = document.createElement('div');
+        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-column', 'justify-content-between');
+
 
         const bodySpan = document.createElement("span");
         bodySpan.innerText = body;
@@ -84,14 +84,21 @@ class ShowToasts {
         closeButton.setAttribute('data-bs-dismiss', 'toast');
         closeButton.ariaLabel = 'Close';
 
-        const toastColor = document.createElement('div');
-        toastColor.classList.add('toast-color', 'p-2', 'ms-2', 'me-2', 'rounded-1', colorClass);
+        let toastColor;
+        if (colorClass !== '') {
+            toastColor = document.createElement('div');
+            toastColor.classList.add('toast-color', 'p-2', 'ms-2', 'me-2', 'rounded-1', colorClass);
+        }
 
+        const intermediate = document.createElement('div');
+        intermediate.classList.add('flex-fill');
         if (title !== '' || secondary !== '') {
             const toastHeader = document.createElement('div');
             toastHeader.classList.add('toast-header');
 
-            toastHeader.appendChild(toastColor);
+            if (toastColor) {
+                toastHeader.appendChild(toastColor);
+            }
 
             const toastTitle = document.createElement('strong');
             toastTitle.classList.add('toast-title', 'me-auto');
@@ -104,18 +111,19 @@ class ShowToasts {
             toastHeader.appendChild(toastSecondary);
 
             toastHeader.appendChild(closeButton);
-            toastElem.appendChild(toastHeader);
-            toastElem.appendChild(toastBody);
+            intermediate.appendChild(toastHeader);
+            intermediate.appendChild(toastBody);
 
         } else {
-            const intermediate = document.createElement('div');
             intermediate.classList.add("d-flex", "align-items-center", "justify-content-around");
             closeButton.classList.add('me-2');
-            intermediate.appendChild(toastColor);
+            if (toastColor) {
+                intermediate.appendChild(toastColor);
+            }
             intermediate.appendChild(toastBody);
             intermediate.appendChild(closeButton);
-            toastElem.appendChild(intermediate);
         }
+        toastElem.appendChild(intermediate);
 
         const topLevelToastElem = link === '' ? toastElem : linkElement;
         document.getElementById('toasts').appendChild(topLevelToastElem);
@@ -126,5 +134,25 @@ class ShowToasts {
         });
     }
 }
+
+/*
+<a class="text-decoration-none text-reset d-block" href="/profile">
+    <div class="toast bg-white fade show" role="alert" data-bs-autohide="false">
+        <div class="d-flex align-items-center">
+            <img src="/images/achievements/codedefenders_achievements_5_lvl_1.png" class="me-2 w-25">
+            <div>
+                <div class="toast-header">
+                    <strong class="toast-title me-auto">New Achievement Unlocked:<br>The First Mutant</strong>
+                    <small class="toast-secondary text-body-secondary">Level 1</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body me-auto d-flex flex-row justify-content-between">
+                    <span>1 of 10 mutants created to reach the next level</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</a>
+ */
 
 export default ShowToasts;
