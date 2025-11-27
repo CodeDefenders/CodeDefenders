@@ -25,12 +25,14 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
 
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 
 /**
  * Utility class for static methods that can be used for llm players.
  */
 public class LlmUtils {
+
     /**
      * Use heuristics to remove all lines from a reply that are not inside the test function.
      * This has to be used because some models will not respect the output format demanded by
@@ -44,9 +46,16 @@ public class LlmUtils {
      */
     public static String extractTestContentFromReply(String reply) {
         reply = reply.replace("```java", "").replace("```", "");
-        var lines = reply.lines().toList();
+        List<String> lines;
         var ast = JavaParserUtils.parse(reply);
-        if (ast.isPresent()) {
+        if (ast.isEmpty() || ast.get().getParsed() == Node.Parsedness.UNPARSABLE) {
+            String newToParse = "class Foo {\n" + reply + "\n}";
+            lines = newToParse.lines().toList();
+            ast = JavaParserUtils.parse(newToParse);
+        } else {
+            lines = reply.lines().toList();
+        }
+        if (ast.isPresent() && ast.get().getParsed() == Node.Parsedness.PARSED) {
             String methodContent = ast.get().findAll(MethodDeclaration.class).stream()
                     .flatMap(method -> {
                         var range = method.getRange().orElseThrow();
@@ -59,9 +68,7 @@ public class LlmUtils {
                 //If no method definition is present, take the entire reply as is
                 return reply;
             }
-        } else {
-            return reply;
-        }
+        } else return reply;
 
     }
 

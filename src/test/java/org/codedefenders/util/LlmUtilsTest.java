@@ -28,24 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LlmUtilsTest {
 
-    @Test
-    public void extractTestContentFromReplyTest() {
-        String reply = """
-                import static org.junit.whatever;
-                import static org.junit.Assert.assertEquals;
-                public class ConstantsTest {
-                    @Test
-                    public void answer_is_42() {
-                        int sure = 1;
-                        assertEquals(42, Constants.answer);
-                    }
-
-                    @Test
-                    public void foo_returns_21() {
-                        assertEquals(21, new Constants().foo());
-                    }
-                }
-                """;
+    @ParameterizedTest
+    @MethodSource("testSource")
+    public void extractTestContentFromReplyTest(String reply) {
         String expectedTestContent = """
                 int sure = 1;
                 assertEquals(42, Constants.answer);
@@ -66,6 +51,37 @@ class LlmUtilsTest {
         assertEquals(expected, LlmUtils.extractMutantFromReply(reply.stripIndent().strip(), "Bar"));
     }
 
+    private static Stream<String> testSource() {
+        return Stream.of("""
+                import static org.junit.whatever;
+                import static org.junit.Assert.assertEquals;
+                public class ConstantsTest {
+                    @Test
+                    public void answer_is_42() {
+                        int sure = 1;
+                        assertEquals(42, Constants.answer);
+                    }
+
+                    @Test
+                    public void foo_returns_21() {
+                        assertEquals(21, new Constants().foo());
+                    }
+                }
+                """,
+                """
+                int sure = 1;
+                assertEquals(42, Constants.answer);
+                assertEquals(21, new Constants().foo());""",
+                """
+                @Test
+                    public void answer_is_42() {
+                        int sure = 1;
+                        assertEquals(42, Constants.answer);
+                        assertEquals(21, new Constants().foo());
+                    }
+                """
+                );
+    }
 
     private static Stream<String> mutantSource() {
         return Stream.of("""
