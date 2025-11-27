@@ -290,7 +290,7 @@ public class MeleeGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
 
         if (!game.hasUserJoined(login.getUserId())) {
-            if (!action.equals("setLlmPlayer") || !login.isAdmin()) {
+            if (!login.isAdmin()) {
                 logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
                 Redirect.redirectBack(request, response);
                 return;

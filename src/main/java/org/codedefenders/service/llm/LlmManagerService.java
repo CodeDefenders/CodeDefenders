@@ -212,6 +212,7 @@ public class LlmManagerService {
     }
 
     private void addErrorMessage(AbstractGame game, Role role, Exception e) {
+        logger.error("LLM thread had an error: ", e);
         String timestamp = LocalDateTime.now().toString();
         getCorrectErrorMap(role).put(game.getId(), timestamp + ": " + e.toString());
     }
