@@ -19,19 +19,20 @@
 package org.codedefenders.util;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.PromptType;
-import org.codedefenders.persistence.database.LlmRepository;
+
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.MethodDeclaration;
 
 /**
  * Utility class for static methods that can be used for llm players.
  */
 public class LlmUtils {
+
     /**
      * Use heuristics to remove all lines from a reply that are not inside the test function.
      * This has to be used because some models will not respect the output format demanded by
@@ -39,16 +40,36 @@ public class LlmUtils {
      * <p>
      * This doesn't have to be perfect, it only has to work in most cases, many llm generated tests
      * aren't going to compile anyway.
+     * <p>
+     * If the code is completely unparsable, the unmodified reply is returned. That way feedback can be added to the
+     * llm conversation.
      */
     public static String extractTestContentFromReply(String reply) {
         reply = reply.replace("```java", "").replace("```", "");
-        reply = reply.replaceAll("(?m)^\\s*", "");
-        reply = removeLinesThatContainWords(reply, "void", "public", "private");
-        reply = removeLinesThatStartWith(reply, "import");
-        reply = reply.replace("@Test", "");
-        reply = removeSuperfluousClosingBrackets(reply);
-        reply = reply.replaceAll("(?m)^\\s*" + System.lineSeparator(), "");
-        return reply;
+        List<String> lines;
+        var ast = JavaParserUtils.parse(reply);
+        if (ast.isEmpty() || ast.get().getParsed() == Node.Parsedness.UNPARSABLE) {
+            String newToParse = "class Foo {\n" + reply + "\n}";
+            lines = newToParse.lines().toList();
+            ast = JavaParserUtils.parse(newToParse);
+        } else {
+            lines = reply.lines().toList();
+        }
+        if (ast.isPresent() && ast.get().getParsed() == Node.Parsedness.PARSED) {
+            String methodContent = ast.get().findAll(MethodDeclaration.class).stream()
+                    .flatMap(method -> {
+                        var range = method.getRange().orElseThrow();
+                        return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                    })
+                    .collect(Collectors.joining("\n"));
+            if (!methodContent.isEmpty()) {
+                return methodContent;
+            } else {
+                //If no method definition is present, take the entire reply as is
+                return reply;
+            }
+        } else return reply;
+
     }
 
     public static String extractMutantFromReply(String reply, boolean removeDependencies, AbstractGame game) {

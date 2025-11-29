@@ -27,18 +27,16 @@ import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 
 /**
- * Wraps {@link dev.langchain4j.data.message.ChatMessage}s with data about creation time and targeted {@link LlModel}
+ * Wraps {@link dev.langchain4j.data.message.ChatMessage}s with data about creation time, targeted {@link LlModel}
+ * and, for AI messages, input and output tokens.
  */
-public record ChatMessageDTO (
-    ChatMessage msg,
-    Timestamp time,
-    LlModel target,
-    int inputTokens,
-    int outputTokens
-    ){
-    public ChatMessageDTO(ChatMessage msg, Timestamp time, LlModel target) {
-        this(msg, time, target, 0, 0);
-    }
+public record ChatMessageDTO(
+        ChatMessage msg,
+        Timestamp time,
+        LlModel target,
+        int inputTokens,
+        int outputTokens
+) {
 
     public String getText() {
         if (msg instanceof UserMessage um) {

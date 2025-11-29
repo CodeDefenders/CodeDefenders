@@ -158,7 +158,7 @@
             </form>
         </div>
 
-        <% if (!(game instanceof PuzzleGame) && !models.isEmpty()) {
+        <% if (!models.isEmpty()) {
         %>
         <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
                 data-bs-toggle="modal" data-bs-target="#llm-modal">

@@ -36,21 +36,21 @@
 
 <p:main_page title="LLM Management">
     <div class="container">
-        <t:admin_navigation activePage="adminLlm"/>
+        <t:admin_navigation activePage="adminLlmConfig"/>
 
         <div class="card m-2">
             <div class="card-body">
                 <h4 class="card-title">Default prompts</h4>
                 <t:llm_prompt_modal type="${defaultModel.type.name()}" name="${defaultModel.name}"
-                                    attackerPrompt="${defaultModel.attackerPrompt.orElse(\"\")}"
+                                    attackerPrompt="${defaultModel.getPrompt('ATTACK_DEFAULT').orElse(\"\")}"
                                     attackerDeps="${defaultModel.attackerDependencies}"
-                                    attackerDepsPrompt="${defaultModel.attackerDependencyPrompt.orElse(\"\")}"
-                                    resolveEquivalencePrompt="${defaultModel.resolveEquivalencePrompt.orElse(\"\")}"
-                                    defenderPrompt="${defaultModel.defenderPrompt.orElse(\"\")}"
+                                    attackerDepsPrompt="${defaultModel.getPrompt('ATTACK_DEPENDENCIES').orElse(\"\")}"
+                                    resolveEquivalencePrompt="${defaultModel.getPrompt('ATTACK_EQUIVALENCE').orElse(\"\")}"
+                                    defenderPrompt="${defaultModel.getPrompt('DEFEND_DEFAULT').orElse(\"\")}"
                                     defenderDeps="${defaultModel.defenderDependencies}"
-                                    defenderDepsPrompt="${defaultModel.defenderDependencyPrompt.orElse(\"\")}"
+                                    defenderDepsPrompt="${defaultModel.getPrompt('DEFEND_DEPENDENCIES').orElse(\"\")}"
                                     defenderFocus="${defaultModel.defenderMethodFocus}"
-                                    defenderFocusPrompt="${defaultModel.defenderMethodFocusPrompt.orElse(\"\")}"
+                                    defenderFocusPrompt="${defaultModel.getPrompt('DEFEND_FOCUS').orElse(\"\")}"
 
                                     htmlId="default-modal"/>
                 <div class="d-flex gap-4">
@@ -93,15 +93,15 @@
                                         ${model.name}
                                 </a>
                                 <t:llm_prompt_modal type="${type}" name="${model.name}"
-                                                    attackerPrompt="${model.attackerPrompt.orElse(\"\")}"
+                                                    attackerPrompt="${model.getPrompt('ATTACK_DEFAULT').orElse(\"\")}"
                                                     attackerDeps="${model.attackerDependencies}"
-                                                    attackerDepsPrompt="${model.attackerDependencyPrompt.orElse(\"\")}"
-                                                    resolveEquivalencePrompt="${model.resolveEquivalencePrompt.orElse(\"\")}"
-                                                    defenderPrompt="${model.defenderPrompt.orElse(\"\")}"
+                                                    attackerDepsPrompt="${model.getPrompt('ATTACK_DEPENDENCIES').orElse(\"\")}"
+                                                    resolveEquivalencePrompt="${model.getPrompt('ATTACK_EQUIVALENCE').orElse(\"\")}"
+                                                    defenderPrompt="${model.getPrompt('DEFEND_DEFAULT').orElse(\"\")}"
                                                     defenderDeps="${model.defenderDependencies}"
-                                                    defenderDepsPrompt="${model.defenderDependencyPrompt.orElse(\"\")}"
+                                                    defenderDepsPrompt="${model.getPrompt('DEFEND_DEPENDENCIES').orElse(\"\")}"
                                                     defenderFocus="${model.defenderMethodFocus}"
-                                                    defenderFocusPrompt="${model.defenderMethodFocusPrompt.orElse(\"\")}"
+                                                    defenderFocusPrompt="${model.getPrompt('DEFEND_FOCUS').orElse(\"\")}"
 
                                                     htmlId="${identifier}"/>
                             </td>
@@ -119,7 +119,7 @@
         </div>
 
         <script type="module">
-
+            console.log("MODELS: ${models}");
             const rows = document.querySelectorAll("[id^='model-row-']");
             rows.forEach(r => {
                 const name = r.querySelector("[id^='model-name']").textContent.trim();

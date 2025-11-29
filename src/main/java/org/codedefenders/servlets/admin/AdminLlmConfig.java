@@ -35,9 +35,9 @@ import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@WebServlet(Paths.ADMIN_LLM)
-public class AdminLLM extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminLLM.class);
+@WebServlet(Paths.ADMIN_LLM_CONFIG)
+public class AdminLlmConfig extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminLlmConfig.class);
 
     @Inject
     LlmRepository llmRepo;
@@ -48,7 +48,7 @@ public class AdminLLM extends HttpServlet {
 
         request.setAttribute("models", models);
         request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());
-        request.getRequestDispatcher(Constants.ADMIN_LLM_JSP).forward(request, response);
+        request.getRequestDispatcher(Constants.ADMIN_LLM_CONFIG_JSP).forward(request, response);
     }
 
     @Override
