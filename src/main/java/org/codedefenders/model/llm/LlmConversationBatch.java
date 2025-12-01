@@ -133,4 +133,12 @@ public class LlmConversationBatch {
     public Collection<LlmConversation> getConversations() {
         return messageLists.values();
     }
+
+    public boolean lastMessageWasError() {
+        return currentConversation().lastMessageWasError();
+    }
+
+    public boolean hasSystemMessage() {
+        return currentConversation().hasSystemMessage();
+    }
 }

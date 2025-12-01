@@ -18,7 +18,9 @@
  */
 package org.codedefenders.util;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import org.codedefenders.game.AbstractGame;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
 
 /**
  * Utility class for static methods that can be used for llm players.
@@ -97,9 +100,38 @@ public class LlmUtils {
         return formattedResult;
     }
 
-    public static String testTemplateFromResponse(String response, AbstractGame game) {
-        response = LlmUtils.extractTestContentFromReply(response);
-        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, response);
+    public static String testTemplateFromReply(String reply, AbstractGame game) {
+        reply = LlmUtils.extractTestContentFromReply(reply);
+        return insertIntoTestTemplate(game, reply);
+    }
+
+    public static List<String> suiteOfTestTemplatesFromReply(String reply, AbstractGame game) {
+        List<String> testContents = multipleTestsFromReply(reply);
+        return testContents.stream().map(s -> insertIntoTestTemplate(game, s)).toList();
+    }
+
+    static List<String> multipleTestsFromReply(String reply) {
+        List<String> testContents = new ArrayList<>();
+
+        reply = reply.replace("```java", "").replace("```", "");
+        var ast = JavaParserUtils.parse(reply);
+        if (ast.isEmpty() || ast.get().getParsed() == Node.Parsedness.UNPARSABLE) {
+            return testContents;
+        } else {
+            List<MethodDeclaration> methods = ast.get().findAll(MethodDeclaration.class);
+            for (MethodDeclaration m : methods) {
+                Optional<BlockStmt> body = m.getBody();
+                if (body.isPresent()) {
+                    String lines = body.get().getStatements().stream().map(Node::toString).collect(Collectors.joining("\n"));
+                    testContents.add(lines);
+                }
+            }
+        }
+        return testContents;
+    }
+
+    private static String insertIntoTestTemplate(AbstractGame game, String toInsert) {
+        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, toInsert);
     }
 
     private static int indexOfDependencyDeclaration(String code, String dependencyName) {

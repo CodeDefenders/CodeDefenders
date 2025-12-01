@@ -31,6 +31,7 @@ import org.codedefenders.util.CDIUtil;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.SystemMessage;
 
 /**
  * This represents the prompts and responses of an LLM.
@@ -109,6 +110,18 @@ public class LlmConversation {
         this.success = success;
         active = false;
         CDIUtil.getBeanFromCDI(LlmConversationRepository.class).saveConversation(this);
+    }
+
+    public boolean lastMessageWasError() {
+        if (isEmpty()) {
+            return false;
+        } else {
+            return !(messages.get(messages.size() - 1).msg() instanceof AiMessage);
+        }
+    }
+
+    public boolean hasSystemMessage() {
+        return messages.stream().anyMatch(m -> m.msg() instanceof SystemMessage);
     }
 
     public boolean isActive() {

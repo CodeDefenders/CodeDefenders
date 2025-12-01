@@ -84,7 +84,7 @@ class LlmEquivalenceService extends LlmSubActionService {
             conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString(), model);
         }
         String response = promptService.getResponse(model, conversation);
-        return LlmUtils.testTemplateFromResponse(response, game);
+        return LlmUtils.testTemplateFromReply(response, game);
     }
 
     @Override

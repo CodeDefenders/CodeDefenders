@@ -34,6 +34,7 @@ import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -56,38 +57,62 @@ class LlmTestService extends LlmSubActionService {
 
 
     @Override
-    protected String generate() {
-
+    protected String generate() throws BadGenerationException {
         PromptType promptType = getCorrectDefendPromptType();
         setConversationType(promptType);
         resetConversationAfterTooManyTries();
-        if (conversation.isEmpty()) {
-            String systemMessage = getSystemPrompt(model, promptType);
-            if (promptType == PromptType.DEFEND_FOCUS) {
-                Optional<String> methodName = getRandomMethodWithLivingMutant();
-                if (methodName.isPresent()) {
-                    systemMessage = String.format(systemMessage, methodName.get());
-                }
-            }
-            conversation.addSystemMessage(systemMessage, model);
 
-            conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+        if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
+            if (conversation.currentConversation().getType() == PromptType.ONE_FROM_MANY) {
+                //conversation.addSystemMessage(fullTestSuiteStrategy.correctionPrompt, model);
+                String reply = promptService.getResponse(model, conversation);
+                return LlmUtils.testTemplateFromReply(reply, game);
+            } else {
+                if (fullTestSuiteStrategy.isEmpty()) {
+                    conversation.addSystemMessage(fullTestSuiteStrategy.fullSuitePrompt, model);
+                    conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+                    String reply = promptService.getResponse(model, conversation);
+                    LlmUtils.suiteOfTestTemplatesFromReply(reply, game).forEach(fullTestSuiteStrategy::addTest);
+                }
+                if (!fullTestSuiteStrategy.isEmpty()) {
+                    conversation.resetCurrent(true);
+                    conversation.setCurrentType(PromptType.ONE_FROM_MANY);
+                    return fullTestSuiteStrategy.getOneTest();
+                } else throw new BadGenerationException(); //TODO Exception werfen?? Direkt Conversation abbrechen, neu versuchen
+            }
+        } else {
+            if (!conversation.lastMessageWasError()) {
+                String systemMessage = getSystemPrompt(model, promptType);
+                if (promptType == PromptType.DEFEND_FOCUS) {
+                    Optional<String> methodName = getRandomMethodWithLivingMutant();
+                    if (methodName.isPresent()) {
+                        systemMessage = String.format(systemMessage, methodName.get());
+                    }
+                }
+                conversation.addSystemMessage(systemMessage, model);
+
+                conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+                String reply = promptService.getResponse(model, conversation);
+                return LlmUtils.testTemplateFromReply(reply, game);
+            } else {
+                String response = promptService.getResponse(model, conversation);
+                return LlmUtils.testTemplateFromReply(response, game);
+            }
         }
 
-        String response = promptService.getResponse(model, conversation);
-        return LlmUtils.testTemplateFromResponse(response, game);
+
     }
 
     /**
      * This method submits the generated test code to the game. It should only be called from inside an LLM action,
      * after the test code has been generated and the game has been refreshed.
      *
-     * @param testSrc      The formatted test code. All formatting heuristics should have already been performed.
+     * @param testSrc The formatted test code. All formatting heuristics should have already been performed.
      */
     @Override
     protected void submit(String testSrc) {
         switch (conversation.getCurrentType()) {
-            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS -> {
+            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, ONE_FROM_MANY -> {
             }
             default -> throw new RuntimeException("Conversation during test submission may not be of type " +
                     conversation.getCurrentType());
@@ -101,25 +126,38 @@ class LlmTestService extends LlmSubActionService {
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
-                conversation.resetCurrent(true);
-            } else {
-                StringBuilder correction = new StringBuilder();
-                switch (result.failureReason().orElseThrow()) {
-                    case VALIDATION_FAILED -> {
-                        correction.append("Your test has violated these rules: \n");
-                        result.validationErrorMessages().orElseThrow().forEach(
-                                correction::append
-                        );
-
+                if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
+                    if (fullTestSuiteStrategy.isEmpty()) {
+                        conversation.resetCurrent(true);
                     }
-                    case COMPILATION_FAILED ->
-                            correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
-                    case TEST_DID_NOT_PASS_ON_CUT ->
-                            correction.append("Your test did not pass on the original code for the following reason: ")
-                                    .append(result.testCutError().orElseThrow());
                 }
-                correction.append("\nFix these problems.");
-                conversation.addSystemMessage(correction.toString(), model);
+            } else {
+                if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
+                    if (conversation.hasSystemMessage()) {
+                        conversation.addSystemMessage(fullTestSuiteStrategy.correctionSystemPrompt, model);
+                    }
+                    String testContent = LlmUtils.extractTestContentFromReply(testSrc);
+                    String userMessage = fullTestSuiteStrategy.getCorrectionUserMessage(game, testContent, result);
+                    conversation.addUserMessage(userMessage, model);
+                } else {
+                    StringBuilder correction = new StringBuilder("This test could not be submitted: \n" + testSrc);
+                    switch (result.failureReason().orElseThrow()) {
+                        case VALIDATION_FAILED -> {
+                            correction.append("It has violated these rules: \n");
+                            result.validationErrorMessages().orElseThrow().forEach(
+                                    correction::append
+                            );
+
+                        }
+                        case COMPILATION_FAILED ->
+                                correction.append("It has failed to compile for this reason: ").append(result.compilationError());
+                        case TEST_DID_NOT_PASS_ON_CUT ->
+                                correction.append("It did not pass on the original code for the following reason: ")
+                                        .append(result.testCutError().orElseThrow());
+                    }
+                    correction.append("\nFix these problems.");
+                    conversation.addSystemMessage(correction.toString(), model);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -128,6 +166,10 @@ class LlmTestService extends LlmSubActionService {
 
 
     private PromptType getCorrectDefendPromptType() {
+        if (strategy instanceof FullTestSuiteStrategy) {
+            return PromptType.DEFEND_DEFAULT;
+        }
+
         if (model.isDefenderMethodFocus() && hasLivingMutants()) {
             return PromptType.DEFEND_FOCUS;
         }

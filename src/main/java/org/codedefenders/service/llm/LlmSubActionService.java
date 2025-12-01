@@ -31,6 +31,8 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
+import org.codedefenders.model.llm.strategy.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
@@ -69,14 +71,20 @@ abstract class LlmSubActionService {
     protected SimpleUser user;
     protected Random random;
     protected int numberOfRepairAttempts;
+    protected LlmStrategy strategy;
 
     protected boolean disabled = false;
 
     protected void run() {
         if (!disabled) {
+            try {
             String reply = generate();
+
             updateGame();
             submit(reply);
+            } catch (BadGenerationException e) {
+                conversation.resetCurrent(false);
+            }
 
             if (conversation.getCurrentType() != null) {
                 conversationRepository.saveConversation(conversation.currentConversation());
@@ -87,12 +95,12 @@ abstract class LlmSubActionService {
         }
     }
 
-    protected abstract String generate();
+    protected abstract String generate() throws BadGenerationException;
 
     protected abstract void submit(String reply);
 
     protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
-                        Random random, int numberOfRepairAttempts) {
+                        LlmStrategy strategy, Random random, int numberOfRepairAttempts) {
         if (model.isPresent()) {
             this.model = model.get();
         } else {
@@ -102,6 +110,7 @@ abstract class LlmSubActionService {
         this.user = user;
         this.game = game;
         this.conversation = conversation;
+        this.strategy = strategy;
         this.random = random;
         this.numberOfRepairAttempts = numberOfRepairAttempts;
     }
@@ -184,5 +193,9 @@ abstract class LlmSubActionService {
         } catch (NoSuchModelException e) {
             throw new RuntimeException("The model was deactivated:", e);
         }
+    }
+
+    static final class BadGenerationException extends Exception {
+
     }
 }
