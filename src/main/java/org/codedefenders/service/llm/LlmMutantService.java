@@ -67,7 +67,7 @@ class LlmMutantService extends LlmSubActionService {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
             if (result.isSuccess()) {
-                conversation.resetCurrent(true);
+                finishConversation(true);
                 logger.info("LLM successfully submitted mutant.");
 
             } else {

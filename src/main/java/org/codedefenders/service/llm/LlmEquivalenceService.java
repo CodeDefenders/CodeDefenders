@@ -60,16 +60,16 @@ class LlmEquivalenceService extends LlmSubActionService {
         for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
             this.flagged = flagged;
             do {
-                if (conversation.getCurrentType() == null) {
+                if (conversation == null) {
                     setConversationType(PromptType.ATTACK_EQUIVALENCE);
                 }
                 super.run();
-                if (conversation.getCurrentType() == null) {
+                if (conversation == null) {
                     setConversationType(PromptType.ATTACK_EQUIVALENCE);
                 }
             } while (!conversation.isEmpty());
 
-            conversation.resetCurrentType();
+            conversation = null;
         }
     }
 
@@ -89,9 +89,9 @@ class LlmEquivalenceService extends LlmSubActionService {
 
     @Override
     protected void submit(String testSource) {
-        if (conversation.getCurrentType() != PromptType.ATTACK_EQUIVALENCE) {
-            logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getCurrentType());
-            throw new RuntimeException("Conversation may not be of type " + conversation.getCurrentType()
+        if (conversation.getType() != PromptType.ATTACK_EQUIVALENCE) {
+            logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getType());
+            throw new RuntimeException("Conversation may not be of type " + conversation.getType()
                     + " in submitEquivalenceTest");
         }
 
@@ -101,9 +101,9 @@ class LlmEquivalenceService extends LlmSubActionService {
                     gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
 
             if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
-                conversation.resetCurrent(true);
+                finishConversation(true);
             } else {
-                if (conversation.currentConversation().numberOfTries() <= numberOfRepairAttempts) {
+                if (conversation.numberOfTries() <= numberOfRepairAttempts) {
                     StringBuilder correction = new StringBuilder();
                     switch (result.failureReason().orElseThrow()) {
                         case VALIDATION_FAILED -> {
@@ -123,7 +123,7 @@ class LlmEquivalenceService extends LlmSubActionService {
                     conversation.addSystemMessage(correction.toString(), model);
                 } else {
                     gameManagingUtils.acceptBattlegroundEquivalence(game, user.getId(), equivalentMutant);
-                    conversation.resetCurrent(false);
+                    finishConversation(false);
                 }
             }
 

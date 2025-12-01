@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.LlmConversationRepository;
@@ -77,16 +78,15 @@ class LlmPromptService {
     }
 
     /**
-     * Queries the LLM specified by {@code model} with the prompts specified by {@code conversation}. The
-     * {@link LlmConversationBatch#getCurrentType()} has to be specified prior to calling this method, or it will throw
-     * a {@link RuntimeException}. This method will block until the LLM has returned a result, or it has timed out
+     * Queries the LLM specified by {@code model} with the prompts specified by {@code conversation}.
+     * This method will block until the LLM has returned a result, or it has timed out
      * (usually after 3 Minutes).
      */
-    String getResponse(LlModel model, LlmConversationBatch conversation) {
-        ChatMessage[] chatMessages = conversation.currentConversation().toArray();
+    String getResponse(LlModel model, LlmConversation conversation) {
+        ChatMessage[] chatMessages = conversation.toArray();
 
         int inputLength = 0;
-        for (ChatMessageDTO msg : conversation.currentConversation().getMessages()) {
+        for (ChatMessageDTO msg : conversation.getMessages()) {
             inputLength += msg.getText().length();
         }
         logger.info("Sending conversation with {} characters to model {}", inputLength, model);
@@ -98,11 +98,11 @@ class LlmPromptService {
         };
         ChatModel chatModel = chatMap.get(model);
         if (chatModel != null) {
-            conversationRepository.saveConversation(conversation.currentConversation());
+            conversationRepository.saveConversation(conversation);
             ChatResponse response = chatModel.chat(chatMessages);
             conversation.addAiMessage(response.aiMessage(), model,
                     response.tokenUsage().inputTokenCount(), response.tokenUsage().outputTokenCount());
-            conversationRepository.saveConversation(conversation.currentConversation());
+            conversationRepository.saveConversation(conversation);
             String responseText = response.aiMessage().text();
             logger.info("Model {} responded with {} characters", model, responseText.length());
             return responseText;

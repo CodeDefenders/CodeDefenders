@@ -86,11 +86,11 @@ class LlmTestService extends LlmSubActionService {
      */
     @Override
     protected void submit(String testSrc) {
-        switch (conversation.getCurrentType()) {
+        switch (conversation.getType()) {
             case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS -> {
             }
             default -> throw new RuntimeException("Conversation during test submission may not be of type " +
-                    conversation.getCurrentType());
+                    conversation.getType());
         }
         try {
             GameManagingUtils.CreateBattlegroundTestResult result;
@@ -101,7 +101,7 @@ class LlmTestService extends LlmSubActionService {
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
-                conversation.resetCurrent(true);
+                finishConversation(true);
             } else {
                 StringBuilder correction = new StringBuilder();
                 switch (result.failureReason().orElseThrow()) {
