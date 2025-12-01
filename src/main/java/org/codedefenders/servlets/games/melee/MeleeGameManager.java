@@ -440,7 +440,9 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.addAll(validationMessages);
+            for (var error : validationMessages) {
+                messages.add(error).alert();
+            }
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -527,8 +529,8 @@ public class MeleeGameManager extends HttpServlet {
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-            messages.add(testOriginalTarget.message);
+            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
+            messages.add(testOriginalTarget.message).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -613,7 +615,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get());
+            messages.add(validationMessage.get()).alert();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -684,7 +686,7 @@ public class MeleeGameManager extends HttpServlet {
         TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
                 TargetExecution.Target.COMPILE_MUTANT);
         if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
             // There's a ton of defensive programming here...
             if (compileMutantTarget != null && compileMutantTarget.message != null
                     && !compileMutantTarget.message.isEmpty()) {
@@ -697,7 +699,7 @@ public class MeleeGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false);
+                messages.add(decorate).escape(false).alert();
 
             }
             previousSubmission.setMutantCode(mutantText);
@@ -863,19 +865,21 @@ public class MeleeGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
+            List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-            boolean validationSuccess = validationMessage.isEmpty();
+            boolean validationSuccess = validationMessages.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
             tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
-            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.addAll(validationMessage);
+                for (var error : validationMessages) {
+                    messages.add(error).alert();
+                }
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
