@@ -23,6 +23,7 @@ class ShowToasts {
                          colorClass = 'bg-primary',
                          title = '',
                          secondary = '',
+                         bodyTitle = '',
                          body = '',
                          link = '',
                          icon = '',
@@ -31,18 +32,14 @@ class ShowToasts {
                          longTimeout = false
                      }) {
 
-        const toastElem = document.createElement('div');
-        toastElem.classList.add('toast', 'bg-white', 'd-flex', 'align-items-center');
-        toastElem.role = 'alert';
-
-        let linkElement;
-        if (link !== '') {
-            linkElement = document.createElement('a');
-            linkElement.classList.add('text-decoration-none', 'text-reset', 'd-block');
-            linkElement.setAttribute('href', link);
-            linkElement.appendChild(toastElem)
+        if (extraElements.length > 0 && link !== '') {
+            console.log("show_toast.js WARNING: Combining extraElements and links is not allowed.");
+            return;
         }
 
+        const toastElem = document.createElement('div');
+        toastElem.classList.add('text-decoration-none', 'text-reset', 'toast', 'bg-white', 'd-flex');
+        toastElem.role = 'alert';
 
         if (!timeout) {
             toastElem.setAttribute('data-bs-autohide', 'false');
@@ -51,14 +48,36 @@ class ShowToasts {
         }
 
         if (icon !== '') {
+            const iconAnchor = document.createElement('a');
+            iconAnchor.classList.add('d-flex',
+                    'align-items-center',
+                    'align-self-stretch',
+                    'justify-content-center');
+            if (link !== '') {
+                iconAnchor.setAttribute('href', link);
+            }
+
             const iconElement = document.createElement("img");
-            iconElement.classList.add("me-2", "w-25");
+            iconElement.classList.add("me-2", "w-75");
             iconElement.src = icon;
-            toastElem.appendChild(iconElement);
+
+            iconAnchor.appendChild(iconElement);
+            toastElem.appendChild(iconAnchor);
         }
 
-        const toastBody = document.createElement('div');
-        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-column', 'justify-content-between');
+        const toastBody = document.createElement('a');
+        if (link !== '') {
+            toastBody.setAttribute('href', link);
+        }
+        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-column', 'justify-content-between',
+                'text-decoration-none', 'text-reset');
+
+
+        if (bodyTitle !== '') {
+            const bodyTitleHeading = document.createElement('h5');
+            bodyTitleHeading.innerHTML = '<b>' + bodyTitle + '</b>';
+            toastBody.appendChild(bodyTitleHeading);
+        }
 
 
         const bodySpan = document.createElement("span");
@@ -125,12 +144,11 @@ class ShowToasts {
         }
         toastElem.appendChild(intermediate);
 
-        const topLevelToastElem = link === '' ? toastElem : linkElement;
-        document.getElementById('toasts').appendChild(topLevelToastElem);
+        document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
 
         toastElem.addEventListener('hidden.bs.toast', () => {
-            setTimeout(() => topLevelToastElem.remove(), 1000);
+            setTimeout(() => toastElem.remove(), 1000);
         });
     }
 }

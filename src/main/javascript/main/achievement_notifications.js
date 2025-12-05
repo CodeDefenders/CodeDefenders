@@ -55,8 +55,9 @@ class AchievementNotifications {
 
         show_toasts.showToast({
             colorClass: "",
-            title: "New Achievement Unlocked:\n" + achievement.name,
-            secondary: "Level " + achievement.level,
+            title: "New Achievement Unlocked:",
+            //secondary: "Level " + achievement.level,
+            bodyTitle: achievement.name + " (Level " + achievement.level + ")",
             body: progressText,
             icon:  achievementPath + "codedefenders_achievements_" + achievement.achievementId
                     + "_lvl_" + achievement.level + ".png",
