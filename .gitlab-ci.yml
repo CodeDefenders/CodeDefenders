@@ -75,7 +75,7 @@ metrics:
   cache: [ ]
   script:
     - printf 'files_total{language="java"} %d\n' "$(find . -type f -name "*.java" | wc -l)" >> metrics.txt
-    - printf 'code_lines_total{language="java"} %d\n' "$(find . -type f -name "*.java" | xargs cat | wc -l)" >> metrics.txt
+    - printf 'code_lines_total{language="java"} %d\n' "$(find . -type f -name "*.java" -print0 | xargs -0 cat | wc -l)" >> metrics.txt
     - printf 'todo_occurrences_total %d\n' "$(grep -R -I --exclude-dir={.git,target} TODO . | wc -l)" >> metrics.txt
   artifacts:
     reports:
