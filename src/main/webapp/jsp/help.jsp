@@ -40,59 +40,76 @@
         <p>Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code.</p>
         <h2>Main page</h2>
         Here you can join open games. You can also create your own games!
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/games_overview.png")}" class="img-responsive border p-2"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/games_overview.png", i18n)}"
+                class="img-responsive border p-2"/></p>
         <h2>Defenders</h2>
         <p>At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a &#34;Defend&#34; button which submits the test.
         <br>On the CUT panel, we can see the coverage of existing tests (in green) and the location of existing mutants (the symbols at the side).</p>
-        <p><img style="margin-top:16px" src="${url.forPath("images/help/defender_overview.png")}" class="img-responsive border p-2"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("images/help/defender_overview.png", i18n)}"
+                class="img-responsive border p-2"/></p>
         <p>We&#39;re going to submit a test to kill a living mutant. Tests don&#39;t necessarily have to target alive mutants, and can simply be made to kill possible future mutants.</p>
         <p>As we can see above, there is a living mutant in the <code>getCurrentFloor()</code> method, and there is no test yet to cover it.</p>
         <div class="card p-4">
             <t:validator_explanation_test/>
         </div>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/defender_broken.png")}" class="img-responsive border p-2"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defender_broken.png", i18n)}"
+                class="img-responsive border p-2"/></p>
         <p>If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a method call.</p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/defender_error.png")}" class="img-responsive border p-2"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defender_error.png", i18n)}"
+                class="img-responsive border p-2"/></p>
         <p>After re-submitting the test, we see that it compiled successfully and killed the mutant.</p>
         <p>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/defender_fix.png")}" class="img-responsive border p-2"/>
+            <img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defender_fix.png", i18n)}"
+                 class="img-responsive border p-2"/>
         </p>
         <p>Below these panels are two more panels, which show existing mutants and tests. </p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/defender_bottom.png")}" class="img-responsive border p-2"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defender_bottom.png", i18n)}"
+                class="img-responsive border p-2"/></p>
         <p>The actual changes made in killed mutants can be viewed by clicking the &#34;View Diff&#34; button on the killed tab of the mutants panel.</p>
         <p>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/defender_diff.png")}" class="img-responsive border p-2"/>
-            <!--<img style="margin-top:16px" src="${url.forPath("/images/help/defend_08.png")}" class="img-responsive border p-2"/>-->
+            <img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defender_diff.png", i18n)}"
+                 class="img-responsive border p-2"/>
+            <!--<img style="margin-top:16px" src="${url.forPathLocalized("/images/help/defend_08.png", i18n)}" class="img-responsive border p-2"/>-->
         </p>
 
         <h2>Attackers</h2>
         <p>The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage.</p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/attack_01.png")}" class="img-responsive"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/attack_01.png", i18n)}"
+                class="img-responsive"/></p>
         <p>Similarly to tests, mutants are limited by rules, which come in three strictness levels:</p>
         <div class="card p-4">
             <t:validator_explanation_mutant/>
         </div>
         <p>Here I have created a mutant by changing the &gt; comparator to &lt;. Return values, variables, etc. can also be changed.</p>
         <p>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/attacker_snippet_original.png")}" class="img-responsive border p-2"/>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/attacker_snippet_mutated.png")}" class="img-responsive border p-2"/>
+            <img style="margin-top:16px"
+                 src="${url.forPathLocalized("/images/help/attacker_snippet_original.png", i18n)}"
+                 class="img-responsive border p-2"/>
+            <img style="margin-top:16px"
+                 src="${url.forPathLocalized("/images/help/attacker_snippet_mutated.png", i18n)}"
+                 class="img-responsive border p-2"/>
         </p>
         <p>After submitting our mutant by pressing the &#34;Attack!&#34; button, we see that it survived two existing tests. Similarly to submitting a test, an error will be displayed if the mutated class did not compile.</p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/attack_03.png")}" class="img-responsive"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/attack_03.png", i18n)}"
+                class="img-responsive"/></p>
 
         <h2>Equivalents</h2>
 
         <p>It is possible to create a mutant which is identical in functionality to the CUT, so no test can pass on the CUT and fail on the mutated class.</p>
         <p>For example, the following functions are identical in behaviour, they are equivalent:</p>
         <p>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/equivalence_original.png")}" class="img-responsive border p-2"/>
-            <img style="margin-top:16px" src="${url.forPath("/images/help/equivalence_mutated.png")}" class="img-responsive border p-2"/>
+            <img style="margin-top:16px" src="${url.forPathLocalized("/images/help/equivalence_original.png", i18n)}"
+                 class="img-responsive border p-2"/>
+            <img style="margin-top:16px" src="${url.forPathLocalized("/images/help/equivalence_mutated.png", i18n)}"
+                 class="img-responsive border p-2"/>
         </p>
         <p>If a Defender believes that an Attacker&#39;s mutant is equivalent, they can click the &#34;Claim Equivalent&#34; button on the mutant.</p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/equiv_03.png")}" class="img-responsive"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/equiv_03.png", i18n)}"
+                class="img-responsive"/></p>
         <p>After this, the Attacker will see that their mutant was marked as equivalent. If the mutant is equivalent, they should accept it as equivalent.</p>
         <p>However, if the mutant isn&#39;t equivalent, the Attacker can prove that it isn&#39;t by writing a test which kills it.</p>
-        <p><img style="margin-top:16px" src="${url.forPath("/images/help/equiv_04.png")}" class="img-responsive"/></p>
+        <p><img style="margin-top:16px" src="${url.forPathLocalized("/images/help/equiv_04.png", i18n)}"
+                class="img-responsive"/></p>
 
         <h2>Scoring System</h2>
         <h3>Mutants</h3>
