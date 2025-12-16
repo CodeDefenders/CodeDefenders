@@ -36,7 +36,7 @@
     pageContext.setAttribute("pwMinLength", pwMinLength);
 %>
 
-<c:set var="title" value="Account Settings"/>
+<c:set var="title" value="${i18n.tr('Account Settings')}"/>
 
 <p:main_page title="${title}">
     <div class="container form-width">
@@ -56,8 +56,14 @@
                             <select id="language-switch" class="form-control" name="updatedLanguage">
                                 <c:forEach items="${supportedLocales}" var="l">
                                     <option value="${l.language}"
-                                            <c:if test="${login.user.locale == l}">selected</c:if>>
-                                            ${l.displayLanguage}
+                                            <c:choose>
+                                                <c:when test="${login.user.locale == l}">selected>
+                                                    ${l.getDisplayLanguage(login.user.locale)}
+                                                </c:when>
+                                                <c:otherwise>>
+                                                    ${l.getDisplayLanguage(login.user.locale)} (${l.getDisplayLanguage(l)})
+                                                </c:otherwise>
+                                            </c:choose>
                                     </option>
                                 </c:forEach>
                             </select>
@@ -74,7 +80,7 @@
         </c:if>
 
         <section class="mt-5" aria-labelledby="email-settings">
-            <h2 class="mb-3" id="email-settings">Email Settings</h2>
+            <h2 class="mb-3" id="email-settings">${i18n.tr('Email Settings')}</h2>
 
             <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post"
                   class="row g-3 needs-validation"
@@ -83,28 +89,30 @@
 
                 <div class="col-12">
                     <div class="mb-2">
-                        <label for="updatedEmail" class="form-label">Email</label>
+                        <label for="updatedEmail" class="form-label">${i18n.tr('Email')}</label>
                         <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                               value="${login.user.email}" placeholder="Email" required>
+                               value="${login.user.email}" placeholder="${i18n.tr('Email')}" required>
                     </div>
 
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
                                ${login.user.contactingAllowed ? "checked" : ""}>
                         <label class="form-check-label" for="allowContact">
-                            Allow us to contact your email address.
+                                ${i18n.tr('Allow us to contact your email address.')}
                         </label>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Email Preferences</button>
+                    <button id="submitUpdateProfile" type="submit" class="btn btn-primary">
+                            ${i18n.tr('Update Email Preferences')}
+                    </button>
                 </div>
             </form>
         </section>
 
         <section class="mt-5" aria-labelledby="password-settings">
-            <h2 class="mb-3" id="password-settings">Update Password</h2>
+            <h2 class="mb-3" id="password-settings">${i18n.tr('Update Password')}</h2>
 
             <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post"
                   class="row g-3 needs-validation"
@@ -113,30 +121,30 @@
 
                 <div class="col-12">
                     <div class="mb-2">
-                        <label for="updatedPassword" class="form-label">New password</label>
+                        <label for="updatedPassword" class="form-label">${i18n.tr('New password')}</label>
                         <input type="password" class="form-control" id="updatedPassword" required
-                               name="updatedPassword" placeholder="Password"
+                               name="updatedPassword" placeholder="${i18n.tr('Password')}"
                                minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
                         <div class="invalid-feedback">
-                            Please enter a valid password.
+                                ${i18n.tr('Please enter a valid password.')}
                         </div>
                     </div>
 
                     <div>
                         <input type="password" class="form-control" id="repeatedPassword" name="repeatedPassword"
-                               placeholder="Confirm Password" aria-label="Confirm Password">
+                               placeholder="${i18n.tr('Confirm Password')}" aria-label="${i18n.tr('Confirm Password')}">
                         <div class="invalid-feedback" id="confirm-password-feedback">
-                            Please confirm your password.
+                                ${i18n.tr('Please confirm your password.')}
                         </div>
                         <div class="form-text">
-                            Password requirements: ${pwMinLength}-20 alphanumeric characters,
-                            no whitespace or special characters.
+                                ${i18n.tr('Password requirements: {0}-20 alphanumeric characters, no whitespace or special characters.', pwMinLength)}
                         </div>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <button id="submitChangePassword" type="submit" class="btn btn-primary">Change Password</button>
+                    <button id="submitChangePassword" type="submit"
+                            class="btn btn-primary">${i18n.tr('Change Password')}</button>
                 </div>
 
                 <script>
@@ -161,11 +169,11 @@
         </section>
 
         <section class="mt-5" aria-labelledby="delete-account">
-            <h2 class="mb-3" id="delete-account">Account Deletion</h2>
+            <h2 class="mb-3" id="delete-account">${i18n.tr('Account Deletion')}</h2>
 
-            <p>Delete all personalized information related to your account.</p>
+            <p>${i18n.tr('Delete all personalized information related to your account.')}</p>
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
-                Delete Account
+                    ${i18n.tr('Delete Account')}
             </button>
 
             <div class="modal" id="account-deletion-modal" tabindex="-1">
@@ -175,20 +183,19 @@
                             <input type="hidden" class="form-control" name="formType" value="deleteAccount">
 
                             <div class="modal-header">
-                                <h3 class="modal-title">Confirm Account Deletion</h3>
+                                <h3 class="modal-title">${i18n.tr('Confirm Account Deletion')}</h3>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <p><b>This cannot be undone.</b></p>
+                                <p><b>${i18n.tr('This cannot be undone.')}</b></p>
                                 <p class="mb-0">
-                                    We will delete all personalized information related to your account.
-                                    Please be aware that you will no longer be able to log in again.
-                                    To play further games, you will have to create a new account.
+                                        ${i18n.tr('We will delete all personalized information related to your account. Please be aware that you will no longer be able to log in again. To play further games, you will have to create a new account.')}
                                 </p>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-danger">Delete Account</button>
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">${i18n.tr('Close')}</button>
+                                <button type="submit" class="btn btn-danger">${i18n.tr('Delete Account')}</button>
                             </div>
                         </form>
                     </div>
