@@ -21,6 +21,7 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 
@@ -29,6 +30,7 @@
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
+<%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
 
 <%--
     Provides the navigation bar.
@@ -108,7 +110,28 @@
                     <ul class="navbar-nav me-auto">
                     </ul>
                     <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
-                        <ul class="navbar-nav ms-auto">
+                        <ul class="navbar-nav ms-auto gap-4">
+                            <c:set var="supportedLocales" value="${i18nService.supportedLocales}"/>
+                            <c:if test="${fn:length(supportedLocales) > 1}">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" id="header-language" href="#" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                            ${i18n.tr('Language')}
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="header-language">
+                                        <c:forEach var="l" items="${supportedLocales}">
+                                            <li>
+                                                <form method="post" action="${url.forPath("/change-language")}">
+                                                    <input type="hidden" name="lang" value="${l.language}"/>
+                                                    <button type="submit" class="btn btn-link dropdown-item px-3 py-1">
+                                                            ${i18n.tr(l.displayName)}
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </c:forEach>
+                                    </ul>
+                                </li>
+                            </c:if>
                             <li class="nav-item">
                                 <a class="nav-link" href="${url.forPath("/login")}">${i18n.tr('Login')}</a>
                             </li>

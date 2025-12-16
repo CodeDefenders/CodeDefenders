@@ -38,6 +38,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -61,16 +62,18 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     private final UserService userService;
     private final URLUtils url;
     private final UserRepository userRepository;
+    private final I18nService i18nService;
 
     @Inject
     public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils,
-                                                 UserRepository userRepository) {
+                                                 UserRepository userRepository, I18nService i18nService) {
         super();
 
         this.messages = messages;
         this.userService = userService;
         this.userRepository = userRepository;
         this.url = urlUtils;
+        this.i18nService = i18nService;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
         this.setLoginUrl(Paths.LOGIN);
@@ -106,7 +109,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         if (userOpt.isPresent()) {
             var user = userOpt.get();
             if (user.getLocale() == null) {
-                var locale = request.getLocale();
+                var locale = i18nService.getSessionLocale(request);
                 user.setLocale(locale);
                 userRepository.update(user);
                 logger.info("Changed language of user '{}' to {}", user.getUsername(), locale.getLanguage());

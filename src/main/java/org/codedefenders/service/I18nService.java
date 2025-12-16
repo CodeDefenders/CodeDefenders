@@ -32,6 +32,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
@@ -171,8 +172,22 @@ public class I18nService {
         var user = login.isLoggedIn() ? login.getUser() : null;
         var lang = Optional.ofNullable(user)
                 .map(User::getLocale)
-                .orElseGet(request::getLocale)
+                .orElseGet(() -> getSessionLocale(request))
                 .getLanguage();
+
         return getI18n(toSupportedLocale(lang));
+    }
+
+    /**
+     * Tries to get the session locale if set, or uses the request locale as fallback else.
+     *
+     * @param request The current HttpServletRequest
+     * @return The locale
+     */
+    public Locale getSessionLocale(ServletRequest request) {
+        var httpReq = (HttpServletRequest) request;
+        var session = httpReq.getSession();
+        var locale = session.getAttribute("locale");
+        return locale != null ? (Locale) locale : request.getLocale();
     }
 }

@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -42,6 +43,9 @@ public class UserServlet extends HttpServlet {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private I18nService i18nService;
 
     @Inject
     private URLUtils url;
@@ -59,7 +63,7 @@ public class UserServlet extends HttpServlet {
                 // This check should be performed in the user interface too.
                 messages.add("Could not create user. Password entries did not match.");
             } else {
-                var locale = request.getLocale(); // init with request locale
+                var locale = i18nService.getSessionLocale(request); // init with session/request locale
                 Optional<String> result = userService.registerUser(username, password, email, locale);
                 if (result.isEmpty()) {
                     messages.add("Your user has been created. You can login now.");
