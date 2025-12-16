@@ -21,14 +21,18 @@ package org.codedefenders.util;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 import jakarta.annotation.Nonnull;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.ServletContext;
 
 import org.codedefenders.configuration.Configuration;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * A helper class for constructing relative and absolute URLs for paths in our application
@@ -38,11 +42,14 @@ import org.codedefenders.configuration.Configuration;
 @ApplicationScoped
 public class URLUtils {
 
+    private final ServletContext servletContext;
     private Optional<URI> appURI = Optional.empty();
 
     @Inject
-    public URLUtils(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+    public URLUtils(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+                    ServletContext servletContext) {
         config.getApplicationURL().ifPresent(this::setAppURI);
+        this.servletContext = servletContext;
     }
 
     /**
@@ -78,6 +85,25 @@ public class URLUtils {
     @Nonnull
     public String forPath(@Nonnull String path) {
         return getURIForPath(path).getPath();
+    }
+
+    /**
+     * Constructs a root-relative URL from the given context-relative URL.
+     * If a localized version (name_languageCode.ext) exists, the URL to this file is given instead.
+     *
+     * @param path A context-relative URL with or without leading slash(es). Will be used as fallback if no localized version of the file exists
+     * @param i18n The requests i18n instance. Used to determine the language.
+     * @return A root-relative URL.
+     */
+    @Nonnull
+    public String forPathLocalized(@Nonnull String path, I18n i18n) {
+        var ext = path.substring(path.lastIndexOf("."));
+        var base = path.substring(0, path.lastIndexOf("."));
+        var lang = i18n.getLocale().getLanguage();
+        var localizedPath = base + '_' + lang + ext;
+        var realPathStr = servletContext.getRealPath(localizedPath);
+        var existingPath = Files.exists(Paths.get(realPathStr)) ? localizedPath : path;
+        return forPath(existingPath);
     }
 
     /**
