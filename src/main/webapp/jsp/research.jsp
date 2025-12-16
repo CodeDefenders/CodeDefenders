@@ -23,6 +23,27 @@
 <div id="research" class="paper-list">
     <ul class="papercite_bibliography">
         <li>
+            <a href="https://study.code-defenders.org/papers/Mutation2025.pdf" title="Download PDF" class="pdf_link">
+                <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
+            </a>
+            Philipp Straubinger, Alexander Degenhart and Gordon Fraser.
+            <span class="paper_title">&#8220;An Empirical Evaluation of Manually Created Equivalent Mutants,&#8221;</span>
+            In <span class="paper_venue">Proc. of the International Workshop on Mutation Testing</span>, IEEE, 2024.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#mutation24_bibtex">[Bibtex]</a>
+            <div id="mutation24_bibtex" class="bibtex collapse" >
+<pre class="tex"><code>@inproceedings{Mutation24,
+  title={An Empirical Evaluation of Manually Created Equivalent Mutants},
+  author={Straubinger, Philipp and Degenhart, Alexander and Fraser, Gordon},
+  booktitle={IEEE International Conference on Software Testing, Verification and Validation Workshops (ICSTW)},
+  pages={237--246},
+  year={2024},
+  organization={IEEE}
+}}</code></pre>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+
+        </li>
+        <li>
             <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
                 <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>

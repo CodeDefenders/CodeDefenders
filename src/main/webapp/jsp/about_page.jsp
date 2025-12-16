@@ -61,9 +61,7 @@
             <p class="mb-0">
                 CodeDefenders is developed and maintained at the
                 <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software
-                    Engineering&nbspII</a>
-                at the University of Passau and the
-                <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
+                    Engineering&nbspII</a> at the University of Passau.
             </p>
             <p class="mb-0">
                 Code Defenders is an open source project.
@@ -75,20 +73,19 @@
 
         <h3 class="mt-4 mb-3">Contributors</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
-            <ul>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser
-                    (University of Passau)</a></li>
-                <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (University of Leicester)</a></li>
-            </ul>
             <ul class="mb-0">
                 <li>Ben Clegg (The University of Sheffield)</li>
                 <li>Alexander Degenhart (University of Passau)</li>
+                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (University of Passau)</a></li>
                 <li>Sabina Galdobin (University of Passau)</li>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi
-                    (University of Passau)</a></li>
+                <li><a href="https://publications.ait.ac.at/de/persons/alessio-gambi/">Alessio Gambi (AIT)</a></li>
+                <li>Tim Greller (University of Passau)</li>
                 <li>Marvin Kreis (University of Passau)</li>
                 <li>Kassian K&ouml;ck (University of Passau)</li>
+                <li>Aaron Prott (University of Passau)</li>
+                <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (The University of Sheffield)</a></li>
                 <li>Rob Sharp (The University of Sheffield)</li>
+                <li>Philipp Straubinger (University of Passau)</li>
                 <li>Lorenz Wendlinger (University of Passau)</li>
                 <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
                 <li>Thomas White (The University of Sheffield)</li>
@@ -98,6 +95,7 @@
         <h3 class="mt-4 mb-3">Supporters</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul class="mb-0">
+                <li><a href="https://www.dfg.de">DFG Project</a> FR 2955/2-1 (QuestWare: Gamifying the Quest for Software Tests)</li>
                 <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in
                     Software Engineering Courses through Gamification)
                 </li>
