@@ -89,7 +89,7 @@ public class I18nService {
         try {
             var path = Path.of(url.toURI());
             json = Files.readString(path, UTF_8);
-            logger.info("i18n.js.json loaded: {}", json);
+            logger.debug("i18n.js.json loaded: {}", json);
         } catch (URISyntaxException | IOException ex) {
             logger.error(ex.getMessage());
             return set;
@@ -129,7 +129,8 @@ public class I18nService {
         var locales = Arrays.stream(supportedLanguageSetting.split("[,;]"))
                 .filter(not(String::isBlank)).map(Locale::new).toArray(Locale[]::new);
         if (locales.length == 0) {
-            logger.warn("no locales set in the admin settings, falling back to English");
+            logger.warn("no locales set in the admin settings, falling back to {}",
+                    FALLBACK_LOCALE.getDisplayLanguage());
             return new Locale[] {FALLBACK_LOCALE};
         } else {
             return locales;
