@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Optional;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.model.Achievement;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 
+@ApplicationScoped
 public class AchievementRepository {
     private static final Logger logger = LoggerFactory.getLogger(AchievementRepository.class);
 

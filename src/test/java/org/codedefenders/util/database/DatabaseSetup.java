@@ -16,29 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.util.database;
 
-import org.junit.jupiter.api.Test;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+/**
+ * An annotation for configuring the {@link DatabaseExtension}.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+public @interface DatabaseSetup {
 
-public class EnvironmentVariableConfigurationTest {
-
-    @Test
-    public void resolvingStringValue() {
-        String dbUser = "SomeOne";
-
-        EnvironmentVariableConfiguration config = new EnvironmentVariableConfiguration() {
-            @Override
-            protected String getenv(String name) {
-                if (name.equals("CODEDEFENDERS_DB_USERNAME")) {
-                    return dbUser;
-                } else {
-                    return super.getenv(name);
-                }
-            }
-        };
-        config.init();
-        assertEquals(dbUser, config.getDbUsername());
-    }
 }
+

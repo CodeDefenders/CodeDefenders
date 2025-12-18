@@ -84,6 +84,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     private final UserRepository userRepo;
     private final RoleService roleService;
 
+    @Singleton
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
         private final MetricsRegistry metricsRegistry;
 
@@ -104,6 +105,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         }
     }
 
+    @Singleton
     public static class CodeDefendersCredentialsMatcher implements CredentialsMatcher {
         private final PasswordEncoder passwordEncoder;
 

@@ -24,7 +24,7 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.util.DatabaseExtension;
+import org.codedefenders.util.database.DatabaseExtension;
 import org.codedefenders.util.tags.DatabaseTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

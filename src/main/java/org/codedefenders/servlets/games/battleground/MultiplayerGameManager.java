@@ -109,7 +109,6 @@ public class MultiplayerGameManager extends HttpServlet {
             GameManagingUtils.automaticEquivalenceDuelsTriggered
                     .labels("multiplayer");
 
-    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 

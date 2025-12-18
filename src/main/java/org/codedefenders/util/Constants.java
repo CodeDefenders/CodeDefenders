@@ -33,10 +33,6 @@ import org.codedefenders.configuration.Configuration;
  * @see org.codedefenders.util.Paths
  */
 public class Constants {
-
-    // TODO(Alex): Remove workaround when the *_CLASSPATH constants below are exposed in a better way
-    public static final Configuration config = CDIUtil.getBeanFromCDI(Configuration.class);
-
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;
 

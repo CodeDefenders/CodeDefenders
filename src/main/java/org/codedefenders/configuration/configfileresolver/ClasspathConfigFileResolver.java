@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
+@Singleton
 class ClasspathConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ClasspathConfigFileResolver.class);
 
@@ -42,5 +45,10 @@ class ClasspathConfigFileResolver extends ConfigFileResolver {
         }
 
         return new InputStreamReader(inputStream);
+    }
+
+    @Override
+    public int getPriority() {
+        return 10;
     }
 }

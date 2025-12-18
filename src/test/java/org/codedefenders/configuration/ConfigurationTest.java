@@ -19,10 +19,13 @@
 package org.codedefenders.configuration;
 
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -33,7 +36,7 @@ public class ConfigurationTest {
     @BeforeEach
     public void prepareObjects() {
         // Setup configuration which will pass
-        config = new Configuration();
+        config = new Configuration(camelCaseName -> Optional.empty());
         config.dbPort = 3306;
         config.dbHost = "localhost";
     }
@@ -76,5 +79,23 @@ public class ConfigurationTest {
         config.authAdminUsers = "userA   ,  userB,  , userC," + someSymbols;
         assertThat(config.getAuthAdminUsers())
                 .containsExactly("userA", "userB", "userC", someSymbols);
+    }
+
+    @Test
+    public void testCorrectTypeCoercion() {
+        assertEquals(true, config.coerceType("", Boolean.class, "true").orElse(null));
+        assertEquals(true, config.coerceType("", Boolean.class, "enabled").orElse(null));
+        assertEquals(false, config.coerceType("", Boolean.class, "false").orElse(null));
+        assertEquals(false, config.coerceType("", Boolean.class, "disabled").orElse(null));
+
+        assertEquals(123, config.coerceType("", Integer.class, "123").orElse(null));
+        assertEquals(-234, config.coerceType("", Integer.class, "-234").orElse(null));
+
+        assertEquals("123", config.coerceType("", String.class, "123").orElse(null));
+        assertEquals("-234", config.coerceType("", String.class, "-234").orElse(null));
+
+        assertTrue(config.coerceType("", Boolean.class, "").isEmpty());
+        assertTrue(config.coerceType("", Integer.class, "").isEmpty());
+        assertTrue(config.coerceType("", String.class, "").isEmpty());
     }
 }

@@ -16,16 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.servlets.auth;
+package org.codedefenders.configuration.source;
 
-import jakarta.inject.Singleton;
+import java.util.Optional;
 
-import org.apache.shiro.web.filter.authc.AnonymousFilter;
+public interface ConfigurationSource {
+    /** Resolves the config attribute with the given name. */
+    Optional<String> resolveAttribute(String camelCaseName);
 
-/**
- * This class only exists so the {@link AnonymousFilter} is discoverable by CDI. There is probably a better way
- * to solve this issue.
- */
-@Singleton
-public class AnonFilter extends AnonymousFilter {
+    /** Returns the priority of the source. Higher numbers mean higher priority. */
+    default int getPriority() {
+        return 0;
+    }
 }
