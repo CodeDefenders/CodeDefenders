@@ -50,7 +50,7 @@ public class ConnectionFactory {
     private final BasicDataSource dataSource;
 
     @Inject
-    public ConnectionFactory(@SuppressWarnings("CdiInjectionPointsInspection") final Configuration config) {
+    public ConnectionFactory(final Configuration config) {
         if (config.isValid()) {
             dataSource = new BasicDataSource();
             dataSource.setDriverClassName("net.bull.javamelody.JdbcDriver");

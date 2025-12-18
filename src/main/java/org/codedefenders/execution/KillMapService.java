@@ -70,7 +70,7 @@ public class KillMapService {
 
     @Inject
     public KillMapService(BackendExecutorService backendExecutorService, ExecutorServiceProvider executorServiceProvider,
-            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config, TestRepository testRepo, MutantRepository mutantRepo) {
+            Configuration config, TestRepository testRepo, MutantRepository mutantRepo) {
         this.backendExecutorService = backendExecutorService;
         this.config = config;
         this.testRepo = testRepo;

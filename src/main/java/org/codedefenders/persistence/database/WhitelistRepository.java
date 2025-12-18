@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.model.WhitelistElement;
@@ -32,6 +33,7 @@ import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.util.Constants;
 import org.intellij.lang.annotations.Language;
 
+@ApplicationScoped
 public class WhitelistRepository {
 
     private final QueryRunner queryRunner;

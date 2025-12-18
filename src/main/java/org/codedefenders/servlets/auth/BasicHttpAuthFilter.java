@@ -18,11 +18,13 @@
  */
 package org.codedefenders.servlets.auth;
 
+import jakarta.inject.Singleton;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 
+@Singleton
 public class BasicHttpAuthFilter extends BasicHttpAuthenticationFilter {
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {

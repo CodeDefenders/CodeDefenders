@@ -21,35 +21,15 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 
-import jakarta.enterprise.inject.Produces;
 import jakarta.servlet.ServletException;
 
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.FileUtils;
-import org.jboss.weld.junit5.WeldInitiator;
-import org.jboss.weld.junit5.WeldJunit5Extension;
-import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * @author Jose Rojas
- */
-@ExtendWith(WeldJunit5Extension.class)
+
 public class GameManagerTest {
-
-    // Required for mocking Configuration, which is loaded into a static field of FileUtils.
-    @WeldSetup
-    public WeldInitiator weld = WeldInitiator.of(GameManagerTest.class);
-
-    @Produces
-    public Configuration produceConfiguration() {
-        return new Configuration() {};
-    }
-
-
     @Test
     public void testGetNextSubDirEmpty() throws IOException {
         File folder = getCleanTmpGameDir(1);

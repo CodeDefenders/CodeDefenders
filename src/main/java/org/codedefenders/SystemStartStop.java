@@ -51,7 +51,6 @@ import net.bull.javamelody.ReportServlet;
 public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
 
-    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 
