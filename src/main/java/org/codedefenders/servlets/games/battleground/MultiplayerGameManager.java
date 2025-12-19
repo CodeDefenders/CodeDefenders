@@ -400,6 +400,7 @@ public class MultiplayerGameManager extends HttpServlet {
             previousSubmission.clear();
 
         } else {
+            previousSubmission.setTestCode(testText.get());
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {
