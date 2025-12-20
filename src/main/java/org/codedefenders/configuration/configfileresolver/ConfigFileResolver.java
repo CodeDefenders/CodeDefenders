@@ -38,6 +38,9 @@ public abstract class ConfigFileResolver {
 
     public abstract Reader getConfigFile(String filename);
 
+    /** Returns the priority of the source. Higher numbers mean higher priority. */
+    public abstract int getPriority();
+
     protected Reader getConfigFileImpl(String path, String filename) {
         Reader result = null;
         if (path != null) {

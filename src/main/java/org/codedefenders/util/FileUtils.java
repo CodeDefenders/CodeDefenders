@@ -506,19 +506,31 @@ public class FileUtils {
         return path;
     }
 
-    /**
-     * Returns the "top-level" directory for an uploaded CuT with dependencies,
-     * i.e. the directory below the "sources" directory.
-     *
-     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
-     */
-    public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
+    private static void validateJavaFilePath(Path javaFilePath) {
         Path sourcesDir = getConfig().getSourcesDir().toPath();
         if (!javaFilePath.startsWith(sourcesDir)) {
             throw new IllegalArgumentException("The given file: " + javaFilePath
                     + ", is not inside the sources directory.");
-
         }
+        if (javaFilePath.equals(sourcesDir)) {
+            throw new IllegalArgumentException("The given file: " + javaFilePath
+                    + ", is the sources directory itself.");
+        }
+    }
+
+    /**
+     * Returns the "top-level" directory for an uploaded CuT with dependencies,
+     * i.e. the directory below the "sources" directory. This the root of the CuT's files.
+     *
+     * Examples:
+     * /srv/codedefenders/sources/Puzzle_02/classes/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/
+     * /srv/codedefenders/sources/Puzzle_02/mutants/01/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/
+     *
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getTopLevelDirectoryFromJavaFile(Path javaFilePath) {
+        validateJavaFilePath(javaFilePath);
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
         Path relativePath = sourcesDir.relativize(javaFilePath);
         return sourcesDir.resolve(relativePath.getName(0));
     }
@@ -528,21 +540,38 @@ public class FileUtils {
      * {@link #getTopLevelDirectoryFromJavaFile(Path)}, for example "sources" or "mutants", that is still an ancestor
      * of the given file.
      *
+     * Examples:
+     * /srv/codedefenders/sources/Puzzle_02/classes/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/classes/
+     * /srv/codedefenders/sources/Puzzle_02/mutants/01/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/mutants/
+     *
      * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
      */
     public static Path getMidLevelDirectoryFromJavaFile(Path javaFilePath) {
+        validateJavaFilePath(javaFilePath);
         Path sourcesDir = getConfig().getSourcesDir().toPath();
-        if (!javaFilePath.startsWith(sourcesDir)) {
-            throw new IllegalArgumentException("The given file: " + javaFilePath
-                    + ", is not inside the sources directory.");
-
-        }
-        if (javaFilePath.equals(sourcesDir)) {
-            throw new IllegalArgumentException("The given file: " + javaFilePath
-                    + ", is the sources directory itself.");
-        }
         Path relativePath = sourcesDir.relativize(javaFilePath);
         return sourcesDir.resolve(relativePath.subpath(0, 2));
+    }
+
+    /**
+     * Returns the directory that serves as the classpath root for the given CuT, mutant or test file.
+     *
+     * Examples:
+     * /srv/codedefenders/sources/Puzzle_02/classes/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/classes/
+     * /srv/codedefenders/sources/Puzzle_02/mutants/01/Puzzle.java -> /srv/codedefenders/sources/Puzzle_02/mutants/01/
+     *
+     * @param javaFilePath The absolute path of any file inside that folder. Doesn't even have to be real.
+     */
+    public static Path getBottomLevelDirectoryFromJavaFile(Path javaFilePath) {
+        validateJavaFilePath(javaFilePath);
+        Path sourcesDir = getConfig().getSourcesDir().toPath();
+        Path relativePath = sourcesDir.relativize(javaFilePath);
+        if (relativePath.getName(1).toString().equals(Constants.CUTS_CLASSES_DIR)) {
+            return sourcesDir.resolve(relativePath.subpath(0, 2));
+        } else {
+            // mutants and tests are in numbered subdirectories
+            return sourcesDir.resolve(relativePath.subpath(0, 3));
+        }
     }
 
     /**

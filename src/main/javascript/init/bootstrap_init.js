@@ -68,7 +68,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.querySelectorAll(`.${classname}`).forEach(function (e) {
                     e.classList.remove(classname);
                 });
-                let dd = this._element.closest('.dropdown').parentNode.closest('.dropdown');
+                let dd = this._element.closest('.dropdown');
+                if (dd !== null) {
+                    dd = dd.parentNode.closest('.dropdown');
+                }
                 for (; dd && dd !== document; dd = dd.parentNode.closest('.dropdown')) {
                     dd.classList.add(classname);
                 }

@@ -35,7 +35,7 @@ public class URLUtilsTest {
 
     @BeforeEach
     public void setup() {
-        urlUtilsEmpty = new URLUtils((new Configuration(){
+        urlUtilsEmpty = new URLUtils((new Configuration(camelCaseName -> Optional.empty()){
             @Override
             public Optional<URL> getApplicationURL() {
                 return Optional.empty();
@@ -64,7 +64,7 @@ public class URLUtilsTest {
         String url = "http://example.org/";
         URL applicationURL = new URL(url);
 
-        URLUtils urlUtils = new URLUtils(new Configuration(){
+        URLUtils urlUtils = new URLUtils(new Configuration(camelCaseName -> Optional.empty()){
             @Override
             public Optional<URL> getApplicationURL() {
                 return Optional.of(applicationURL);

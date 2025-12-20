@@ -18,11 +18,14 @@
  */
 package org.codedefenders.servlets.auth;
 
+import jakarta.inject.Singleton;
+
 import org.apache.shiro.web.filter.authc.AnonymousFilter;
 
 /**
  * This class only exists so the {@link AnonymousFilter} is discoverable by CDI. There is probably a better way
  * to solve this issue.
  */
+@Singleton
 public class AnonFilter extends AnonymousFilter {
 }

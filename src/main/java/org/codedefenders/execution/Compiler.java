@@ -96,7 +96,7 @@ public class Compiler {
     private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
+        final Path classesDir = FileUtils.getBottomLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
@@ -197,7 +197,7 @@ public class Compiler {
             throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
-        final Path classesDir = FileUtils.getMidLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
+        final Path classesDir = FileUtils.getBottomLevelDirectoryFromJavaFile(Paths.get(javaFile.getPath()));
         javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();

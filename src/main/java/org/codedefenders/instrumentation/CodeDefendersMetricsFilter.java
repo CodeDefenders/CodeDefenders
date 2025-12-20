@@ -43,7 +43,6 @@ public class CodeDefendersMetricsFilter extends MetricsFilter {
             .help("The amount of requests our MetricsFilter did not sample because it contained a 'jsessionid' in the URL")
             .register();
 
-    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     Configuration config;
 

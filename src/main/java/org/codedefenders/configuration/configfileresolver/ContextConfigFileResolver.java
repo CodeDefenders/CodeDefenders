@@ -20,13 +20,16 @@ package org.codedefenders.configuration.configfileresolver;
 
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.codedefenders.configuration.source.ContextSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Singleton
 class ContextConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ContextConfigFileResolver.class);
 
@@ -40,5 +43,10 @@ class ContextConfigFileResolver extends ConfigFileResolver {
             return null;
         }
         return getConfigFileImpl(filePath, filename);
+    }
+
+    @Override
+    public int getPriority() {
+        return ContextSource.PRIORITY;
     }
 }
