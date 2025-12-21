@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.misc.WeldInit;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -130,7 +131,7 @@ public class CodeValidatorTest {
     @ParameterizedTest(name = "[{index}] Validating test {0} with max {1} assertions and assertion library {2} is successful")
     @ArgumentsSource(ValidTestArgumentSource.class)
     public void testValidateTestCodeGetMessageContainsNoValidationErrors(String test, int maxNumberOfAssertions,
-            AssertionLibrary assertionLibrary) {
+                                                                         AssertionLibrary assertionLibrary) {
         String testCode = loadTest(test);
 
         List<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
@@ -146,8 +147,8 @@ public class CodeValidatorTest {
          * created from the {@code expectedValidationMessage} concatenated (if present) with the {@code otherExpectedValidationMessages}.
          */
         private Stream<Arguments> testCase(String testFile, int maxNumberOfAssertions,
-                AssertionLibrary assertionLibrary,
-                String expectedValidationMessage, String... otherExpectedValidationMessages) {
+                                           AssertionLibrary assertionLibrary,
+                                           String expectedValidationMessage, String... otherExpectedValidationMessages) {
             return Stream.of(arguments(testFile, maxNumberOfAssertions, assertionLibrary, Stream.concat(Stream.of(expectedValidationMessage), Stream.of(otherExpectedValidationMessages)).collect(Collectors.toList())));
         }
 
@@ -156,7 +157,7 @@ public class CodeValidatorTest {
          * {@code maxNumberOfAssertions} and {@code assertionLibrary}.
          */
         private Stream<Arguments> testCase(String test, String expectedValidationMessage,
-                String... otherExpectedValidationMessages) {
+                                           String... otherExpectedValidationMessages) {
             return testCase(test, DEFAULT_NB_ASSERTIONS, JUNIT4_HAMCREST, expectedValidationMessage, otherExpectedValidationMessages);
         }
 
@@ -165,7 +166,7 @@ public class CodeValidatorTest {
          * {@code assertionLibrary}.
          */
         private Stream<Arguments> testCase(String test, int maxNumberOfAssertions, String expectedValidationMessage,
-                String... otherExpectedValidationMessages) {
+                                           String... otherExpectedValidationMessages) {
             return testCase(test, maxNumberOfAssertions, JUNIT4_HAMCREST, expectedValidationMessage, otherExpectedValidationMessages);
         }
 
@@ -174,7 +175,7 @@ public class CodeValidatorTest {
          * {@code maxNumberOfAssertions}.
          */
         private Stream<Arguments> testCase(String test, AssertionLibrary assertionLibrary,
-                String expectedValidationMessage, String... otherExpectedValidationMessages) {
+                                           String expectedValidationMessage, String... otherExpectedValidationMessages) {
             return testCase(test, DEFAULT_NB_ASSERTIONS, assertionLibrary, expectedValidationMessage, otherExpectedValidationMessages);
         }
 
@@ -199,7 +200,7 @@ public class CodeValidatorTest {
     @ParameterizedTest(name = "[{index}] Validating test {0} with max {1} assertions and assertion library {2} results in one of {3}")
     @ArgumentsSource(InvalidTestArgumentSource.class)
     public void testValidateTestCodeGetMessageContainsValidationError(String test, int maxNumberOfAssertions,
-            AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
+                                                                      AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
 
         List<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
@@ -218,7 +219,7 @@ public class CodeValidatorTest {
          * created from the {@code validationMessage} concatenated (if present) with the {@code validationMessages}.
          */
         private Stream<Arguments> testCase(String mutantDirectory, CodeValidatorLevel codeValidatorLevel,
-                ValidationMessage validationMessage, ValidationMessage... validationMessages) {
+                                           ValidationMessage validationMessage, ValidationMessage... validationMessages) {
             return Stream.of(arguments(mutantDirectory, codeValidatorLevel, Stream.concat(Stream.of(validationMessage), Stream.of(validationMessages)).collect(Collectors.toList())));
         }
 
@@ -240,8 +241,8 @@ public class CodeValidatorTest {
          * <br>See: {@link #testCasesFailUpTo(String, CodeValidatorLevel, ValidationMessage, ValidationMessage...)}
          */
         private Stream<Arguments> testCases(String mutantDirectory, CodeValidatorLevel upToIncludingLevel,
-                ValidationMessage expectedValidationMessage,
-                ValidationMessage... otherExpectedValidationMessagesOnFailure) {
+                                            ValidationMessage expectedValidationMessage,
+                                            ValidationMessage... otherExpectedValidationMessagesOnFailure) {
             if (expectedValidationMessage.equals(MUTANT_VALIDATION_SUCCESS)) {
                 assume().that(otherExpectedValidationMessagesOnFailure).asList().isEmpty();
 
@@ -261,7 +262,7 @@ public class CodeValidatorTest {
          * {@link CodeValidatorLevel#RELAXED} and {@link CodeValidatorLevel#MODERATE}.
          */
         private Stream<Arguments> testCasesSucceedUpTo(String mutantDirectory,
-                CodeValidatorLevel succeedsUpToIncludingLevel) {
+                                                       CodeValidatorLevel succeedsUpToIncludingLevel) {
             return Arrays.stream(CodeValidatorLevel.values())
                     .filter(level -> level.compareTo(succeedsUpToIncludingLevel) <= 0)
                     .flatMap(level -> testCase(mutantDirectory, level, MUTANT_VALIDATION_SUCCESS));
@@ -282,8 +283,8 @@ public class CodeValidatorTest {
          * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link CodeValidatorLevel#RELAXED}.
          */
         private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, CodeValidatorLevel upToIncludingLevel,
-                ValidationMessage expectedValidationMessageOnFailure,
-                ValidationMessage... otherExpectedValidationMessagesOnFailure) {
+                                                    ValidationMessage expectedValidationMessageOnFailure,
+                                                    ValidationMessage... otherExpectedValidationMessagesOnFailure) {
             assume().that(expectedValidationMessageOnFailure).isNotEqualTo(MUTANT_VALIDATION_SUCCESS);
             assume().that(otherExpectedValidationMessagesOnFailure).asList().doesNotContain(MUTANT_VALIDATION_SUCCESS);
 
@@ -429,17 +430,15 @@ public class CodeValidatorTest {
     @ParameterizedTest(name = "[{index}] Validating mutant {0} on level {1} results in one of {2}")
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, CodeValidatorLevel codeValidatorLevel,
-            Iterable<ValidationMessage> expectedValidationMessages) {
+                                             Iterable<ValidationMessage> expectedValidationMessages) {
+        try (var ignored = WeldInit.initWeld(new Class[]{}, false)) {
+            String original = loadMutantOriginal(mutant);
+            String mutated = loadMutantMutated(mutant);
 
-        if (mutant.equals("systemCalls/addedCallToJavaUtilRandom_nextInt")) {
-            System.out.println("hi");
+            ValidationMessage actual = validateMutantGetMessage(original, mutated, codeValidatorLevel);
+
+            assertThat(actual).isIn(expectedValidationMessages);
         }
-        String original = loadMutantOriginal(mutant);
-        String mutated = loadMutantMutated(mutant);
-
-        ValidationMessage actual = validateMutantGetMessage(original, mutated, codeValidatorLevel);
-
-        assertThat(actual).isIn(expectedValidationMessages);
     }
 
 
