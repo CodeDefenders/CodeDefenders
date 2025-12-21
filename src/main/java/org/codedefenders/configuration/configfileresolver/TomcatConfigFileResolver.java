@@ -21,6 +21,8 @@ package org.codedefenders.configuration.configfileresolver;
 import java.io.File;
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
+@Singleton
 class TomcatConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(TomcatConfigFileResolver.class);
 
@@ -45,5 +48,10 @@ class TomcatConfigFileResolver extends ConfigFileResolver {
             return null;
         }
         return getConfigFileImpl(folder.getAbsolutePath(), filename);
+    }
+
+    @Override
+    public int getPriority() {
+        return 20;
     }
 }

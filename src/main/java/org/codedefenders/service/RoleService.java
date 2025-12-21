@@ -18,8 +18,11 @@
  */
 package org.codedefenders.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
@@ -29,8 +32,6 @@ import jakarta.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.catalina.Role;
-import org.apache.catalina.UserDatabase;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.auth.annotation.RequiresPermission;
 import org.codedefenders.auth.permissions.AdminPermission;
@@ -230,26 +231,47 @@ public class RoleService {
      * @return A list of found usernames with the role, or {@code null} if there was a problem with the lookup.
      */
     private List<String> getUsersWithRoleFromUserDatabase(String roleName) {
-        UserDatabase userDatabase;
+        Object userDatabase;
         try {
-            userDatabase = (UserDatabase) new InitialContext().lookup("java:comp/env/auth/UserDatabase");
+            userDatabase = new InitialContext().lookup("java:comp/env/auth/UserDatabase");
         } catch (NamingException e) {
-            logger.error("Exception while looking up Tomcat UserDatabase.", e);
+            logger.info("No Tomcat UserDatabase found in JNDI");
+            return null;
+        }
+        if (userDatabase == null) {
+            logger.info("No Tomcat UserDatabase found in JNDI");
             return null;
         }
 
-        Role adminRole = userDatabase.findRole(roleName);
-        if (adminRole == null) {
-            logger.error("Couldn't find role '{}' in Tomcat UserDatabase.", roleName);
-            return null;
-        }
+        try {
+            Class<?> UserDatabase = Class.forName("org.apache.catalina.UserDatabase");
+            Class<?> Role = Class.forName("org.apache.catalina.Role");
+            Class<?> User = Class.forName("org.apache.catalina.User");
+            Method findRole = UserDatabase.getMethod("findRole", String.class);
+            Method isInRole = User.getMethod("isInRole", Role);
+            Method getUserName = User.getMethod("getUsername");
 
-        List<String> adminUserNames = new ArrayList<>();
-        userDatabase.getUsers().forEachRemaining(user -> {
-            if (user.isInRole(adminRole)) {
-                adminUserNames.add(user.getUsername());
+            var adminRole = findRole.invoke(userDatabase, roleName);
+            if (adminRole == null) {
+                logger.error("Couldn't find role '{}' in Tomcat UserDatabase.", roleName);
+                return null;
             }
-        });
-        return adminUserNames;
+
+            List<String> adminUserNames = new ArrayList<>();
+            Iterator<?> users = (Iterator<?>) UserDatabase.getMethod("getUsers").invoke(userDatabase);
+            while (users.hasNext()) {
+                var user = users.next();
+                if ((boolean) isInRole.invoke(user, adminRole)) {
+                    adminUserNames.add((String) getUserName.invoke(user));
+                }
+            }
+            return adminUserNames;
+
+        } catch (ClassNotFoundException
+                 | InvocationTargetException
+                 | IllegalAccessException
+                 | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

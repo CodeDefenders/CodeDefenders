@@ -20,6 +20,9 @@ package org.codedefenders.configuration.configfileresolver;
 
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
+
+import org.codedefenders.configuration.source.EnvironmentVariableSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
+@Singleton
 class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfigFileResolver.class);
 
@@ -40,6 +44,11 @@ class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
         } else {
             return getConfigFileImpl(envVar, filename);
         }
+    }
+
+    @Override
+    public int getPriority() {
+        return EnvironmentVariableSource.PRIORITY;
     }
 }
 

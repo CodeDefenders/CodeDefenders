@@ -82,7 +82,7 @@
                         <label for="updatedPassword" class="form-label">New password</label>
                         <input type="password" class="form-control" id="updatedPassword" required
                                name="updatedPassword" placeholder="Password"
-                               minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
+                               minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
                         <div class="invalid-feedback">
                             Please enter a valid password.
                         </div>
@@ -95,7 +95,7 @@
                             Please confirm your password.
                         </div>
                         <div class="form-text">
-                            Password requirements: ${pwMinLength}-20 alphanumeric characters,
+                            Password requirements: min. ${pwMinLength} alphanumeric characters,
                             no whitespace or special characters.
                         </div>
                     </div>

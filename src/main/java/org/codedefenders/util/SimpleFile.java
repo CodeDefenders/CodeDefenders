@@ -28,6 +28,7 @@ import java.nio.file.Path;
 public class SimpleFile {
     private final Path path;
     private final byte[] content;
+    private final int unixPermissions;
 
     private String stringContent;
 
@@ -35,6 +36,14 @@ public class SimpleFile {
         this.content = content;
         this.path = path;
         this.stringContent = null;
+        this.unixPermissions = 0644;
+    }
+
+    public SimpleFile(Path path, byte[] content, int unixPermissions) {
+        this.content = content;
+        this.path = path;
+        this.stringContent = null;
+        this.unixPermissions = unixPermissions;
     }
 
     public byte[] getContent() {
@@ -57,5 +66,9 @@ public class SimpleFile {
 
     public String getFilename() {
         return path.getFileName().toString();
+    }
+
+    public int getUnixPermissions() {
+        return unixPermissions;
     }
 }

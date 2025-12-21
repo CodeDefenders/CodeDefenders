@@ -22,9 +22,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,6 +44,7 @@ import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.SimpleFile;
 import org.codedefenders.util.ZipFileUtils;
 
 /**
@@ -105,26 +105,30 @@ public class ProjectExportManager extends HttpServlet {
                 .collect(Collectors.toSet());
         paths.add(Paths.get(cut.getJavaFile()));
 
-        final Map<String, byte[]> files = new HashMap<>();
+        final List<SimpleFile> files = new ArrayList<>();
         {
             final String templateFileName = testDir
                     .resolve(packagePath.resolve("Test" + Paths.get(cut.getJavaFile()).getFileName().toString()))
                     .toString();
             final byte[] templateFileContent = cut.getTestTemplate().getBytes();
-            files.put(templateFileName, templateFileContent);
+            files.add(new SimpleFile(Path.of(templateFileName), templateFileContent));
         }
-        files.put("settings.gradle", ("rootProject.name = 'Code Defenders - " + cut.getBaseName() + "'").getBytes());
+        files.add(new SimpleFile(Path.of("settings.gradle"), ("rootProject.name = 'Code Defenders - " + cut.getBaseName() + "'").getBytes()));
 
         for (Path path : paths) {
             String filePath = mainDir.resolve(packagePath.resolve(path.getFileName())).toString();
             byte[] fileContent = Files.readAllBytes(path);
-            files.put(filePath, fileContent);
+            files.add(new SimpleFile(Path.of(filePath), fileContent));
         }
 
         Path gradleDir = Paths.get(getServletContext().getRealPath("/")).resolve(exporterDir);
         for (String gradleFilePath : gradleFiles) {
             byte[] fileContent = Files.readAllBytes(gradleDir.resolve(gradleFilePath));
-            files.put(gradleFilePath, fileContent);
+            if (gradleFilePath.startsWith("gradlew")) {
+                files.add(new SimpleFile(Path.of(gradleFilePath), fileContent, 0755));
+            } else {
+                files.add(new SimpleFile(Path.of(gradleFilePath), fileContent));
+            }
         }
 
         byte[] zipFileBytes = ZipFileUtils.zipFiles(files);

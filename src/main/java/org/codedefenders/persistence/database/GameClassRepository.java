@@ -204,11 +204,10 @@ public class GameClassRepository {
      */
     public boolean gamesExistsForClass(Integer classId) {
         @Language("SQL") String query = """
-                SELECT (COUNT(games.ID) > 0) AS games_exist
-                FROM games
-                WHERE games.Class_ID = ?
+            SELECT EXISTS(SELECT ID from games WHERE games.Class_ID = ?) as games_exist;
         """;
-        return queryRunner.query(query, rs -> rs.getBoolean("games_exist"), classId);
+        return queryRunner.query(query, oneFromRS(rs -> rs.getBoolean("games_exist")), classId)
+            .orElseThrow();
     }
 
     /**

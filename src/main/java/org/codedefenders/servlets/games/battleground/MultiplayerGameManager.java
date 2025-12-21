@@ -109,7 +109,6 @@ public class MultiplayerGameManager extends HttpServlet {
             GameManagingUtils.automaticEquivalenceDuelsTriggered
                     .labels("multiplayer");
 
-    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 
@@ -401,6 +400,7 @@ public class MultiplayerGameManager extends HttpServlet {
             previousSubmission.clear();
 
         } else {
+            previousSubmission.setTestCode(testText.get());
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {

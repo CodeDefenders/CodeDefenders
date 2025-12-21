@@ -664,6 +664,42 @@ public class MutantTest {
             return Arguments.of(originalCode, mutantCode, assertions);
         }
 
+        private Arguments testIfAddionalLinesRemainUntouched() {
+            String originalCode = """
+                        line 1
+                        line 2
+                        line 3
+                        line 4
+                        line 5
+                    }""".stripIndent().replaceAll("x", "");
+
+            String mutantCode = """
+                        new line
+                        line 1
+                        line 2
+                        line 3
+                        line 4
+                    }""".stripIndent();
+
+            Consumer<Mutant> assertions = mutant -> {
+                var expected = """
+                    --- /dev/null
+                    +++ /dev/null
+                    @@ -1,6 +1,6 @@
+                    +    new line
+                         line 1
+                         line 2
+                         line 3
+                         line 4
+                    -    line 5
+                     }
+                    """.stripIndent().replaceAll("x", "");
+                assertEquals(expected, mutant.getPatchString());
+            };
+
+            return Arguments.of(originalCode, mutantCode, assertions);
+        }
+
         @Override
         public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
             return Arrays.stream(getClass().getDeclaredMethods())
