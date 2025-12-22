@@ -21,7 +21,7 @@ package org.codedefenders.model.creategames;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 public class StagedGameListTest {
     private final GameSettings defaultSettings = new GameSettings(GameType.MULTIPLAYER, -1, false, false, 3,
-            CodeValidatorLevel.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
+            DefaultRuleSets.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
 
     private StagedGameList stagedGameList;
 

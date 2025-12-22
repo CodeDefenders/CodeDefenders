@@ -18,6 +18,7 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -44,13 +45,10 @@ import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
 import static org.codedefenders.validation.code.CodeValidator.validateTestCodeGetMessage;
-import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
-import static org.codedefenders.validation.code.CodeValidatorLevel.RELAXED;
-import static org.codedefenders.validation.code.CodeValidatorLevel.STRICT;
+import static org.codedefenders.validation.code.DefaultRuleSets.*;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CALLS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_FIELD_NAME;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC;
@@ -215,12 +213,12 @@ public class CodeValidatorTest {
         /**
          * Creates a {@link Stream} consisting of exactly one {@link Arguments}.
          *
-         * <p>The {@link Arguments} contains the {@code mutantDirectory}, {@code codeValidatorLevel}, and a {@link List}
+         * <p>The {@link Arguments} contains the {@code mutantDirectory}, {@code ruleSet}, and a {@link List}
          * created from the {@code validationMessage} concatenated (if present) with the {@code validationMessages}.
          */
-        private Stream<Arguments> testCase(String mutantDirectory, CodeValidatorLevel codeValidatorLevel,
+        private Stream<Arguments> testCase(String mutantDirectory, MutantValidationRuleSet ruleSet,
                                            ValidationMessage validationMessage, ValidationMessage... validationMessages) {
-            return Stream.of(arguments(mutantDirectory, codeValidatorLevel, Stream.concat(Stream.of(validationMessage), Stream.of(validationMessages)).collect(Collectors.toList())));
+            return Stream.of(arguments(mutantDirectory, ruleSet, Stream.concat(Stream.of(validationMessage), Stream.of(validationMessages)).collect(Collectors.toList())));
         }
 
         /**
@@ -228,19 +226,19 @@ public class CodeValidatorTest {
          *
          * <p>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} it will generate
          * arguments with {@code validationMessage} {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for all
-         * {@link CodeValidatorLevel}s that are less strict than the given {@code upToIncludingLevel}.
+         * {@link MutantValidationRuleSet}s that are less strict than the given {@code upToIncludingLevel}.
          * <br>It this case we also expect {@code otherExpectedValidationMessagesOnFailure} to be empty (there is only a
          * single return value that indicates success).
-         * <br>See: {@link #testCasesSucceedUpTo(String, CodeValidatorLevel)}.
+         * <br>See: {@link #testCasesSucceedUpTo(String, MutantValidationRuleSet)}.
          *
          * <p>If {@code expectedValidationMessage} is not {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} it will
          * generate arguments with the given {@code validationMessage} and {@code otherExpectedValidationMessagesOnFailure}
-         * for all {@link CodeValidatorLevel}s that are stricter than the given {@code upToIncludingLevel} and additionally
-         * arguments with {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for the {@link CodeValidatorLevel}s that
+         * for all {@link MutantValidationRuleSet}s that are stricter than the given {@code upToIncludingLevel} and additionally
+         * arguments with {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for the {@link MutantValidationRuleSet}s that
          * are less strict.
-         * <br>See: {@link #testCasesFailUpTo(String, CodeValidatorLevel, ValidationMessage, ValidationMessage...)}
+         * <br>See: {@link #testCasesFailUpTo(String, MutantValidationRuleSet, ValidationMessage, ValidationMessage...)}
          */
-        private Stream<Arguments> testCases(String mutantDirectory, CodeValidatorLevel upToIncludingLevel,
+        private Stream<Arguments> testCases(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
                                             ValidationMessage expectedValidationMessage,
                                             ValidationMessage... otherExpectedValidationMessagesOnFailure) {
             if (expectedValidationMessage.equals(MUTANT_VALIDATION_SUCCESS)) {
@@ -253,24 +251,31 @@ public class CodeValidatorTest {
         }
 
         /**
-         * Creates a {@link Stream} of {@link Arguments}, one argument for each {@link CodeValidatorLevel} that is equal
-         * or stricter than the given {@code succeedsUpToIncludingLevel}.
+         * Creates a {@link Stream} of {@link Arguments}, one argument for each {@link MutantValidationRuleSet}
+         * that is equal
+         * or less strict than the given {@code succeedsUpToIncludingLevel}.
+         * This only follows the {@link MutantValidationRuleSet#getParent()} order.
          *
          * <p>Example:
-         * <br>If {@code succeedsUpToIncludingLevel} is {@link CodeValidatorLevel#MODERATE} it will create arguments
+         * <br>If {@code succeedsUpToIncludingLevel} is {@link DefaultRuleSets#MODERATE} it will create arguments
          * with an expected return value of {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for
-         * {@link CodeValidatorLevel#RELAXED} and {@link CodeValidatorLevel#MODERATE}.
+         * {@link DefaultRuleSets#RELAXED} and {@link DefaultRuleSets#MODERATE}.
          */
         private Stream<Arguments> testCasesSucceedUpTo(String mutantDirectory,
-                                                       CodeValidatorLevel succeedsUpToIncludingLevel) {
-            return Arrays.stream(CodeValidatorLevel.values())
-                    .filter(level -> level.compareTo(succeedsUpToIncludingLevel) <= 0)
+                                                       MutantValidationRuleSet succeedsUpToIncludingLevel) {
+            List<MutantValidationRuleSet> sets = new ArrayList<>();
+            for (MutantValidationRuleSet i = succeedsUpToIncludingLevel; i != null; i = i.getParent()) {
+                sets.add(i);
+            }
+
+            return sets.stream()
                     .flatMap(level -> testCase(mutantDirectory, level, MUTANT_VALIDATION_SUCCESS));
         }
 
         /**
-         * Creates a {@link Stream} of {@link Arguments}, one argument for each {@link CodeValidatorLevel}.
-         * <br>In the cases where the level is less strict than the given {@code upToIncludingLevel}, it will generate an
+         * Creates a {@link Stream} of {@link Arguments}, one argument for each Ruleset in the
+         * {@link MutantValidationRuleSet#getParent()} ancestor and children chain.
+         * <br>In the cases where the ruleset is an ancestor of the given {@code upToIncludingLevel}, it will generate an
          * argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS}.
          *
          * <p>This method assumes that {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} is neither passed as
@@ -278,26 +283,24 @@ public class CodeValidatorTest {
          *
          * <p>Example:
          * <br>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTATION_IF_STATEMENT} and
-         * {@code upToIncludingLevel} is {@link CodeValidatorLevel#MODERATE} then it will create arguments that expect
-         * {@link ValidationMessage#MUTATION_IF_STATEMENT} for {@link CodeValidatorLevel#STRICT} and {@link CodeValidatorLevel#MODERATE}
-         * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link CodeValidatorLevel#RELAXED}.
+         * {@code upToIncludingLevel} is {@link DefaultRuleSets#MODERATE} then it will create arguments that expect
+         * {@link ValidationMessage#MUTATION_IF_STATEMENT} for {@link DefaultRuleSets#STRICT} and {@link DefaultRuleSets#MODERATE}
+         * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link DefaultRuleSets#RELAXED}.
          */
-        private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, CodeValidatorLevel upToIncludingLevel,
+        private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
                                                     ValidationMessage expectedValidationMessageOnFailure,
                                                     ValidationMessage... otherExpectedValidationMessagesOnFailure) {
             assume().that(expectedValidationMessageOnFailure).isNotEqualTo(MUTANT_VALIDATION_SUCCESS);
             assume().that(otherExpectedValidationMessagesOnFailure).asList().doesNotContain(MUTANT_VALIDATION_SUCCESS);
 
-            return Arrays.stream(CodeValidatorLevel.values())
-                    .sorted()
-                    .flatMap(level -> {
-                        if (level.compareTo(upToIncludingLevel) >= 0) {
-                            return testCase(mutantDirectory, level, expectedValidationMessageOnFailure, otherExpectedValidationMessagesOnFailure);
-                        } else {
-                            return testCase(mutantDirectory, level, MUTANT_VALIDATION_SUCCESS);
-                        }
-                    });
-
+            List<Arguments> result = new ArrayList<>();
+            upToIncludingLevel.getDescendants().stream()
+                    .flatMap(l -> testCase(mutantDirectory, l, expectedValidationMessageOnFailure, otherExpectedValidationMessagesOnFailure))
+                    .forEach(result::add);
+            upToIncludingLevel.getAncestors().stream()
+                    .flatMap(l -> testCase(mutantDirectory, l, MUTANT_VALIDATION_SUCCESS))
+                    .forEach(result::add);
+            return result.stream();
         }
 
         @Override
@@ -429,13 +432,13 @@ public class CodeValidatorTest {
 
     @ParameterizedTest(name = "[{index}] Validating mutant {0} on level {1} results in one of {2}")
     @ArgumentsSource(MutantsArgumentSource.class)
-    public void testValidateMutantGetMessage(String mutant, CodeValidatorLevel codeValidatorLevel,
+    public void testValidateMutantGetMessage(String mutant, MutantValidationRuleSet ruleSet,
                                              Iterable<ValidationMessage> expectedValidationMessages) {
         try (var ignored = WeldInit.initWeld(new Class[]{}, false)) {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
-            ValidationMessage actual = validateMutantGetMessage(original, mutated, codeValidatorLevel);
+            ValidationMessage actual = validateMutantGetMessage(original, mutated, ruleSet);
 
             assertThat(actual).isIn(expectedValidationMessages);
         }

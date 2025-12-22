@@ -37,7 +37,7 @@
     List<Mutant> mutants = (List<Mutant>) request.getAttribute("mutants");
     @SuppressWarnings("unchecked")
     List<Test> tests = (List<Test>) request.getAttribute("tests");
-    mutantExplanation.setCodeValidatorLevel(puzzle.getMutantValidatorLevel());
+    mutantExplanation.setMutantRuleSet(puzzle.getMutantValidatorLevel());
     pageContext.setAttribute("puzzle", puzzle);
 %>
 

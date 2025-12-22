@@ -26,7 +26,7 @@
 
 <%@ page import="org.codedefenders.persistence.database.GameClassRepository" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
-<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.validation.code.DefaultRuleSets" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
@@ -156,16 +156,16 @@
                                 </a>
                             </label>
                             <div class="col-8" id="mutant-validator-group">
-                                <c:forEach items="${CodeValidatorLevel.values()}" var="level" varStatus="s">
+                                <c:forEach items="${DefaultRuleSets.getValues()}" var="level" varStatus="s">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               id="mutant-validator-radio-${level.name().toLowerCase()}"
+                                               id="mutant-validator-radio-${level.getName().toLowerCase()}"
                                                name="mutantValidatorLevel"
-                                               value="${level.name()}" required
-                                               ${level == CodeValidatorLevel.MODERATE ? "checked" : ""}>
+                                               value="${level.getName()}" required
+                                               ${level == DefaultRuleSets.MODERATE ? "checked" : ""}>
                                         <label class="form-check-label"
-                                               for="mutant-validator-radio-${level.name().toLowerCase()}">
-                                            ${level.displayName}
+                                               for="mutant-validator-radio-${level.getName().toLowerCase()}">
+                                            ${level.getName()}
                                         </label>
                                         <c:if test="${s.last}">
                                             <div class="invalid-feedback">Please select a mutant validator level.</div>

@@ -87,7 +87,7 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,7 +313,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
         boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;

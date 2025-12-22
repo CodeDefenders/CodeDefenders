@@ -87,7 +87,7 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -602,7 +602,7 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
         boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;

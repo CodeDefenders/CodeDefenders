@@ -62,7 +62,8 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.SimpleFile;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -449,7 +450,7 @@ public class PuzzleImporter {
             // Default values
             // TODO: Don't use default value for puzzles
             int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
+            MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.MODERATE;
 
             // Find the next position in the chapter.
             List<Puzzle> otherPuzzles = chapterId != null

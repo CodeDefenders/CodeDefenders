@@ -23,6 +23,7 @@
 --%>
 
 <%@ page import="org.apache.commons.lang3.StringUtils"%>
+<%@ page import="org.codedefenders.validation.code.DefaultRuleSets" %>
 
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
@@ -30,17 +31,13 @@
 
 <%
     String levelStyling;
-    switch (mutantExplanation.getCodeValidatorLevel()) {
-    case RELAXED:
+    if (mutantExplanation.getValidationRuleSet() == DefaultRuleSets.RELAXED) {
         levelStyling = "btn-success";
-        break;
-    case MODERATE:
+    } else if (mutantExplanation.getValidationRuleSet() == DefaultRuleSets.MODERATE) {
         levelStyling = "btn-warning";
-        break;
-    case STRICT:
+    } else if (mutantExplanation.getValidationRuleSet() == DefaultRuleSets.STRICT) {
         levelStyling = "btn-danger";
-        break;
-    default:
+    } else {
         levelStyling = "btn-primary";
     }
 %>
@@ -71,7 +68,7 @@
          <button type="button" data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
                  title="Click for more information"
                  class="btn btn-xs <%=levelStyling%> align-middle">
-             <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>
+             <%= StringUtils.capitalize(mutantExplanation.getValidationRuleSet().getName()) %>
              <i class="fa fa-question-circle ms-1"></i>
          </button>
     </div>

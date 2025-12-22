@@ -39,7 +39,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +79,7 @@ public abstract class AbstractGame {
     /**
      * Validation level used to check submitted mutants.
      */
-    protected CodeValidatorLevel mutantValidatorLevel;
+    protected MutantValidationRuleSet mutantValidatorLevel;
     /**
      * Maximum number of allowed assertions per submitted test.
      */
@@ -116,7 +116,7 @@ public abstract class AbstractGame {
         return cut;
     }
 
-    public CodeValidatorLevel getMutantValidatorLevel() {
+    public MutantValidationRuleSet getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
 

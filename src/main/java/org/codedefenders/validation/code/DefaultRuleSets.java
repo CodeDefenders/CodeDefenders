@@ -18,6 +18,8 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.List;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -30,9 +32,9 @@ import static org.codedefenders.validation.code.MutantValidationRules.*;
 @Named("defaultRuleSets") //TODO Das muss wahrscheinlich alles woanders hin??
 @ApplicationScoped
 public class DefaultRuleSets {
-    Logger logger = LoggerFactory.getLogger(DefaultRuleSets.class);
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRuleSets.class);
 
-    private final MutantValidationRuleSet relaxed = new MutantValidationRuleSet("Relaxed")
+    public static final MutantValidationRuleSet RELAXED = new MutantValidationRuleSet("Relaxed")
             .addRule(noCommentsEqual)
             .addRule(packageDeclarations)
             .addRule(classDeclarations)
@@ -40,12 +42,12 @@ public class DefaultRuleSets {
             .addRule(astEqual)
             .addRule(prohibitedCalls);
 
-    private final MutantValidationRuleSet moderate = new MutantValidationRuleSet("Moderate", relaxed)
+    public static final MutantValidationRuleSet MODERATE = new MutantValidationRuleSet("Moderate", RELAXED)
             .addRule(noChangesToComments)
             .addRule(logicalOperator)
             .addRule(prohibitedControlStructures);
 
-    private final MutantValidationRuleSet strict = new MutantValidationRuleSet("Strict", moderate)
+    public static final MutantValidationRuleSet STRICT = new MutantValidationRuleSet("Strict", MODERATE)
             .addRule(changesMethodSignatures)
             .addRule(changesImportStatements)
             .addRule(instanceofChanges)
@@ -57,34 +59,30 @@ public class DefaultRuleSets {
 
     }
 
+    public static List<MutantValidationRuleSet> getValues() {
+        return List.of(RELAXED, MODERATE, STRICT);
+    }
+
     public MutantValidationRuleSet getRelaxed() {
-        return relaxed;
+        return RELAXED;
     }
 
     public MutantValidationRuleSet getModerate() {
-        return moderate;
+        return MODERATE;
     }
 
     public MutantValidationRuleSet getStrict() {
-        return strict;
+        return STRICT;
     }
 
-    public MutantValidationRuleSet getRulesetFromName(String name) {
+    public static MutantValidationRuleSet getRulesetFromName(String name) {
         logger.info("getRuleSet: {}", name);
         name = name.toLowerCase();
         return switch (name) {
-            case "relaxed" -> relaxed;
-            case "moderate" -> moderate;
-            case "strict" -> strict;
+            case "relaxed" -> RELAXED;
+            case "moderate" -> MODERATE;
+            case "strict" -> STRICT;
             default -> throw new IllegalArgumentException("No such ruleset: " + name);
-        };
-    }
-
-    public MutantValidationRuleSet getRuleSetFromEnum(CodeValidatorLevel level) {
-        return switch (level) {
-            case RELAXED -> relaxed;
-            case MODERATE -> moderate;
-            case STRICT -> strict;
         };
     }
 }

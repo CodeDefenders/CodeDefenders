@@ -40,7 +40,8 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 @WebServlet("/llm-api/battleground/create")
 public class CreateGameAPI extends APIServlet {
@@ -102,7 +103,7 @@ public class CreateGameAPI extends APIServlet {
         var automaticEquivalenceTrigger = ServletUtils.getIntParameter(request, "automaticEquivalenceTrigger");
         var mutantValidatorLevel = ServletUtils.getStringParameter(request, "mutantValidatorLevel")
                 .map(String::toUpperCase)
-                .map(CodeValidatorLevel::valueOf);
+                .map(DefaultRuleSets::getRulesetFromName);
         var creatorRole = ServletUtils.getStringParameter(request, "creatorRole")
                 .map(String::toUpperCase)
                 .map(Role::valueOf);
@@ -151,7 +152,7 @@ public class CreateGameAPI extends APIServlet {
                 withTests.orElse(false),
                 maxAssertionsPerTest.orElse(CodeValidator.DEFAULT_NB_ASSERTIONS),
                 automaticEquivalenceTrigger.orElse(0),
-                mutantValidatorLevel.orElse(CodeValidatorLevel.MODERATE),
+                mutantValidatorLevel.orElse(DefaultRuleSets.MODERATE),
                 creatorRole.orElse(Role.OBSERVER),
                 durationMinutes.orElse(defaultDuration),
                 level.orElse(GameLevel.HARD),
@@ -166,7 +167,7 @@ public class CreateGameAPI extends APIServlet {
             boolean withTests,
             int maxAssertionsPerTest,
             int automaticEquivalenceTrigger,
-            CodeValidatorLevel mutantValidatorLevel,
+            MutantValidationRuleSet mutantValidatorLevel,
             Role creatorRole,
             int durationMinutes,
             GameLevel level,

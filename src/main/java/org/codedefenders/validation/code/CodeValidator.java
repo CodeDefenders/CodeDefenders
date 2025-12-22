@@ -74,7 +74,7 @@ import com.github.javaparser.ast.visitor.Visitable;
  *
  * <p>Use {@link #validateTestCodeGetMessage(String, int, AssertionLibrary)} to validate test code with a boolean result value.
  *
- * <p>Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
+ * <p>Use {@link #validateMutantGetMessage(String, String, MutantValidationRuleSet)} to validate
  * mutants and get a {@link ValidationMessage} back.
  *
  * @author Jose Rojas
@@ -123,13 +123,6 @@ public class CodeValidator {
         } else {
             return new ArrayList<>();
         }
-    }
-
-    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
-                                                             CodeValidatorLevel level) {
-        DefaultRuleSets defaultRuleSets = CDIUtil.getBeanFromCDI(DefaultRuleSets.class);
-        MutantValidationRuleSet ruleSet = defaultRuleSets.getRuleSetFromEnum(level);
-        return validateMutantGetMessage(originalCode, mutatedCode, ruleSet);
     }
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern

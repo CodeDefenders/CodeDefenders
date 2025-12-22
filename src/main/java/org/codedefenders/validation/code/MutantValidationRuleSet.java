@@ -25,18 +25,20 @@ import java.util.Set;
 public class MutantValidationRuleSet {
     private final String name;
     private final List<MutantRule> rules = new ArrayList<>();
-    private final MutantValidationRuleSet ancestor;
+    private final MutantValidationRuleSet parent;
+    private final List<MutantValidationRuleSet> children = new ArrayList<>();
 
 
 
     public MutantValidationRuleSet(String name) {
         this.name = name;
-        ancestor = null;
+        parent = null;
     }
 
     public MutantValidationRuleSet(String name, MutantValidationRuleSet from) {
         this.name = name;
-        ancestor = from;
+        parent = from;
+        parent.children.add(this);
         rules.addAll(from.rules);
     }
 
@@ -71,6 +73,37 @@ public class MutantValidationRuleSet {
             List<MutantRule> newList = new ArrayList<>();
             newList.add(r);
             result.add(newList);
+        }
+        return result;
+    }
+
+    public MutantValidationRuleSet getParent() {
+        return parent;
+    }
+
+    public List<MutantValidationRuleSet> getChildren() {
+        return children;
+    }
+
+    /**
+     * Returns all descendants of this rule set, including itself
+     */
+    public List<MutantValidationRuleSet> getDescendants() {
+        List<MutantValidationRuleSet> results = new ArrayList<>();
+        results.add(this);
+        for (MutantValidationRuleSet child : children) {
+            results.addAll(child.getDescendants());
+        }
+        return results;
+    }
+
+    /**
+     * Returns all ancestors of this rule set, <b>not</b> including itself
+     */
+    public List<MutantValidationRuleSet> getAncestors() {
+        List<MutantValidationRuleSet> result = new ArrayList<>();
+        for (MutantValidationRuleSet i = parent; i != null; i = i.parent) {
+            result.add(i);
         }
         return result;
     }

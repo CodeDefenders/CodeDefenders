@@ -77,7 +77,7 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -788,7 +788,7 @@ public class PuzzleGameManager extends HttpServlet {
         mse.setUserId(login.getUserId());
         notificationService.post(mse);
 
-        final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
+        final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
         ValidationMessage validationMessage =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);

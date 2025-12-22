@@ -46,7 +46,6 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.WhitelistElement;
-import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
@@ -61,7 +60,8 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +170,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         int classId;
         int maxAssertionsPerTest;
         int automaticEquivalenceTrigger;
-        CodeValidatorLevel mutantValidatorLevel;
+        MutantValidationRuleSet mutantValidatorLevel;
         Role creatorRole;
         int duration;
 
@@ -179,7 +179,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
-                    .map(CodeValidatorLevel::valueOrNull)
+                    .map(DefaultRuleSets::getRulesetFromName)
                     .get();
             creatorRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
             duration = getIntParameter(request, "gameDurationMinutes").get();

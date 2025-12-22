@@ -49,8 +49,8 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
@@ -115,7 +115,7 @@ public class MultiplayerGame extends AbstractGame {
         private int attackerValue = 100;
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
-        private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+        private MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.STRICT;
         private Set<WhitelistElement> whitelist = new HashSet<>();
 
         private int automaticMutantEquivalenceThreshold = 0;
@@ -198,7 +198,7 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
-        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+        public Builder mutantValidatorLevel(MutantValidationRuleSet mutantValidatorLevel) {
             this.mutantValidatorLevel = mutantValidatorLevel;
             return this;
         }
