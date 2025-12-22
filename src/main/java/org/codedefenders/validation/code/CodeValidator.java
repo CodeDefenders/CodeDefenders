@@ -150,7 +150,7 @@ public class CodeValidator {
 
 
 
-        for (MutantComparisonRule<CompilationUnit> rule : ruleSet.getCompilationUnitRules()) {
+        for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCU, mutatedCU)) {
                 return rule.getMessage();
             }
@@ -161,21 +161,15 @@ public class CodeValidator {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
-        for (MutantComparisonRule<String> rule : ruleSet.getCodeRules()) {
+        for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCode, mutatedCode)) {
                 return rule.getMessage();
             }
-        }
-
-        for (MutantComparisonRule<List<List<String>>> rule : ruleSet.getLinediffRules()) {
             if (rule.fails(originalLines, changedLines)) {
                 return rule.getMessage();
             }
         }
 
-
-
-        //TODO Bleibt!!
         // Runs character-level diff match patch between the two Strings to see if there are any differences.
         DiffMatchPatch dmp = new DiffMatchPatch();
         final String text1 = originalCode.trim().replace("\n", "").replace("\r", "");
@@ -515,7 +509,7 @@ public class CodeValidator {
         // remove whitespaces
         String diff2 = diff.replaceAll("\\s+", "");
 
-        for (MutantInsertionRule rule : ruleSet.getInsertionRules()) {
+        for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(diff2)) {
                 return rule.getMessage();
             }

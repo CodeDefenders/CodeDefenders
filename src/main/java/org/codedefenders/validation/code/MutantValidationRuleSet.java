@@ -19,50 +19,29 @@
 package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.github.javaparser.ast.CompilationUnit;
-
 public class MutantValidationRuleSet {
     private final String name;
-    private final List<MutantComparisonRule<CompilationUnit>> compilationUnitRules = new ArrayList<>();
-    private final List<MutantComparisonRule<List<List<String>>>> linediffRules = new ArrayList<>();
-    private final List<MutantComparisonRule<String>> codeRules = new ArrayList<>();
-    private final List<MutantInsertionRule> insertionRules = new ArrayList<>();
+    private final List<MutantRule> rules = new ArrayList<>();
+    private final MutantValidationRuleSet ancestor;
 
 
 
     public MutantValidationRuleSet(String name) {
         this.name = name;
+        ancestor = null;
     }
 
     public MutantValidationRuleSet(String name, MutantValidationRuleSet from) {
         this.name = name;
-        compilationUnitRules.addAll(from.compilationUnitRules);
-        linediffRules.addAll(from.linediffRules);
-        codeRules.addAll(from.codeRules);
-        insertionRules.addAll(from.insertionRules);
+        ancestor = from;
+        rules.addAll(from.rules);
     }
 
-    public MutantValidationRuleSet addCompRule(MutantComparisonRule<CompilationUnit> rule) {
-        compilationUnitRules.add(rule);
-        return this;
-    }
-
-    public MutantValidationRuleSet addDiffRule(MutantComparisonRule<List<List<String>>> rule) {
-        linediffRules.add(rule);
-        return this;
-    }
-
-    public MutantValidationRuleSet addCodeRule(MutantComparisonRule<String> rule) {
-        codeRules.add(rule);
-        return this;
-    }
-
-    public MutantValidationRuleSet addInsertionRule(MutantInsertionRule rule) {
-        insertionRules.add(rule);
+    public MutantValidationRuleSet addRule(MutantRule rule) {
+        rules.add(rule);
         return this;
     }
 
@@ -70,44 +49,29 @@ public class MutantValidationRuleSet {
         return name;
     }
 
-    public List<MutantComparisonRule<CompilationUnit>> getCompilationUnitRules() {
-        return compilationUnitRules;
-    }
-
-    public List<MutantComparisonRule<List<List<String>>>> getLinediffRules() {
-        return linediffRules;
-    }
-
-    public List<MutantComparisonRule<String>> getCodeRules() {
-        return codeRules;
-    }
-
-    public List<MutantInsertionRule> getInsertionRules() {
-        return insertionRules;
-    }
-
     public boolean contains(MutantRule rule) {
-        if (rule instanceof MutantComparisonRule<?> comparisonRule) {
-            return compilationUnitRules.contains(comparisonRule) || linediffRules.contains(comparisonRule)
-                    || codeRules.contains(comparisonRule);
-        } else if (rule instanceof MutantInsertionRule insertionRule) {
-            return insertionRules.contains(insertionRule);
-        } else throw new RuntimeException("Rules of this type are not supported: " + rule);
+        return rules.contains(rule);
     }
 
-    public Set<MutantRule> getAllRules() {
-        Set<MutantRule> result = new HashSet<>(compilationUnitRules);
-        result.addAll(codeRules);
-        result.addAll(linediffRules);
-        result.addAll(insertionRules);
-        return Set.copyOf(result);
+    public Set<MutantRule> getRules() {
+        return Set.copyOf(rules);
     }
 
-    public Set<String> getGeneralDescriptions() {
-        Set<String> descriptions = new HashSet<>();
-        for (MutantRule rule : getAllRules()) {
-            descriptions.add(rule.getGeneralDescription());
+    public List<List<MutantRule>> getTieredRules() {
+        List<List<MutantRule>> result = new ArrayList<>();
+        Set<MutantRule> unordered = getRules();
+        outer:
+        for (MutantRule r : unordered) {
+            for (List<MutantRule> list : result) {
+                if (!list.isEmpty() && list.get(0).generalDescription.equals(r.generalDescription)) {
+                    list.add(r);
+                    continue outer;
+                }
+            }
+            List<MutantRule> newList = new ArrayList<>();
+            newList.add(r);
+            result.add(newList);
         }
-        return descriptions;
+        return result;
     }
 }

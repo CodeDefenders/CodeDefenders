@@ -33,26 +33,24 @@ public class DefaultRuleSets {
     Logger logger = LoggerFactory.getLogger(DefaultRuleSets.class);
 
     private final MutantValidationRuleSet relaxed = new MutantValidationRuleSet("Relaxed")
-            .addCompRule(noCommentsEqual)
-            .addCompRule(packageDeclarations)
-            .addCompRule(classDeclarations)
-            .addCompRule(addOrRenameMethodsOrFields)
-            .addCompRule(astEqual)
-            .addInsertionRule(prohibitedCalls);
+            .addRule(noCommentsEqual)
+            .addRule(packageDeclarations)
+            .addRule(classDeclarations)
+            .addRule(addOrRenameMethodsOrFields)
+            .addRule(astEqual)
+            .addRule(prohibitedCalls);
 
     private final MutantValidationRuleSet moderate = new MutantValidationRuleSet("Moderate", relaxed)
-            .addCompRule(noChangesToComments)
-            .addDiffRule(ternaryOperators)
-            .addDiffRule(logicalOperator)
-            .addInsertionRule(prohibitedControlStructures)
-            .addInsertionRule(commentTokens);
+            .addRule(noChangesToComments)
+            .addRule(logicalOperator)
+            .addRule(prohibitedControlStructures);
 
     private final MutantValidationRuleSet strict = new MutantValidationRuleSet("Strict", moderate)
-            .addCompRule(changesMethodSignatures)
-            .addCompRule(changesImportStatements)
-            .addCompRule(instanceofChanges)
-            .addCodeRule(prohibitedModifier)
-            .addInsertionRule(prohibitedBitwiseOperators);
+            .addRule(changesMethodSignatures)
+            .addRule(changesImportStatements)
+            .addRule(instanceofChanges)
+            .addRule(prohibitedModifier)
+            .addRule(prohibitedBitwiseOperators);
 
     @Inject
     public DefaultRuleSets() {

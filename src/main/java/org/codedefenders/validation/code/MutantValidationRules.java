@@ -19,9 +19,7 @@
 package org.codedefenders.validation.code;
 
 import java.util.Arrays;
-import java.util.List;
 
-import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.visitor.NoCommentEqualsVisitor;
 
@@ -29,43 +27,45 @@ public class MutantValidationRules {
     /**
      * Categories of rules.
      */
-    private static final String IDENTICAL = "No mutants with only changes to comments or formatting";
-    private static final String RENAMING = "No renaming of methods or fields, no additional methods or fields";
-    private static final String COMMENTS = "No changes to comments";
+    private static final String IDENTICAL = "Mutants must include a real change of code";
+    private static final String RENAMING = "Mutants must keep the names of methods and fields unchanged";
+    private static final String CONTROL = "Mutants may not change control structures";
+    private static final String FORBIDDEN_EXPRESSIONS = "Some statements and expressions may not be changed by a mutant";
 
-
-    public static MutantComparisonRule<CompilationUnit> noCommentsEqual = new MutantComparisonRule<>(
+    public static MutantRule noCommentsEqual = new MutantRule.Builder(
             IDENTICAL,
-            NoCommentEqualsVisitor::equals,
-            ValidationMessage.MUTANT_VALIDATION_IDENTICAL
-    );
+            "No mutants that only change comments",
+            ValidationMessage.MUTANT_VALIDATION_IDENTICAL)
+            .withCompilation(NoCommentEqualsVisitor::equals)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> packageDeclarations = new MutantComparisonRule<>(
+    public static MutantRule packageDeclarations = new MutantRule.Builder(
             RENAMING,
             "Changes to package signatures are not allowed",
-            CodeValidator::containsChangesToPackageDeclarations,
-            ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE
-    );
+            ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE)
+            .withCompilation(CodeValidator::containsChangesToPackageDeclarations)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> classDeclarations = new MutantComparisonRule<>(
+    public static MutantRule classDeclarations = new MutantRule.Builder(
             RENAMING,
             "Changes to class signatures are not allowed",
-            CodeValidator::containsChangesToClassDeclarations,
-            ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE
-    );
+            ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE)
+            .withCompilation(CodeValidator::containsChangesToClassDeclarations)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> addOrRenameMethodsOrFields = new MutantComparisonRule<>(
+    public static MutantRule addOrRenameMethodsOrFields = new MutantRule.Builder(
             RENAMING,
             "No methods or fields may be added or renamed",
-            CodeValidator::mutantAddsOrRenamesMethodOrField,
-            ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED
-    );
+            ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED).
+            withCompilation(CodeValidator::mutantAddsOrRenamesMethodOrField)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> changesMethodSignatures = new MutantComparisonRule<>(
+    public static MutantRule changesMethodSignatures = new MutantRule.Builder(
+            RENAMING,
             "No changes to method signatures are allowed",
-            CodeValidator::mutantChangesMethodSignatures,
-            ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE
-    );
+            ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE).
+            withCompilation(CodeValidator::mutantChangesMethodSignatures)
+            .build();
 
     /* TODO Ist jetzt eh unnötig??
     if (level == CodeValidatorLevel.STRICT && mutantChangesFieldNames(originalCU, mutatedCU)) {
@@ -73,75 +73,68 @@ public class MutantValidationRules {
         }
      */
 
-    public static MutantComparisonRule<CompilationUnit> changesImportStatements = new MutantComparisonRule<>(
+    public static MutantRule changesImportStatements = new MutantRule.Builder(
+            FORBIDDEN_EXPRESSIONS,
             "No changes to import statements are allowed.",
-            CodeValidator::mutantChangesImportStatements,
-            ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT
-    );
+            ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT).
+            withCompilation(CodeValidator::mutantChangesImportStatements)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> instanceofChanges = new MutantComparisonRule<>(
+    public static MutantRule instanceofChanges = new MutantRule.Builder(
+            CONTROL,
             "No changes to instanceof statements are allowed",
-            CodeValidator::containsInstanceOfChanges,
-            ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF
-    );
+            ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF).
+            withCompilation(CodeValidator::containsInstanceOfChanges)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> astEqual = new MutantComparisonRule<>(
+    public static MutantRule astEqual = new MutantRule.Builder(
             IDENTICAL,
-            Node::equals,
-            ValidationMessage.MUTANT_VALIDATION_IDENTICAL
-    );
+            "Mutants may not be identical to the Class under Test",
+            ValidationMessage.MUTANT_VALIDATION_IDENTICAL).
+            withCompilation(Node::equals)
+            .build();
 
-    public static MutantComparisonRule<CompilationUnit> noChangesToComments = new MutantComparisonRule<>(
-            "Changes to comments are not allowed",
-            CodeValidator::containsModifiedComments,
-            ValidationMessage.MUTANT_VALIDATION_COMMENT
-    );
+    public static MutantRule noChangesToComments = new MutantRule.Builder(
+            IDENTICAL,
+            "Any changes to comments are not allowed",
+            ValidationMessage.MUTANT_VALIDATION_COMMENT)
+            .withCompilation(CodeValidator::containsModifiedComments)
+            .withInsertion(CodeValidator.COMMENT_TOKENS)
+            .build();
 
-    public static MutantComparisonRule<String> prohibitedModifier = new MutantComparisonRule<>(
-            "Contains changes to modifiers that are not allowed", //TODO Was genau?
-            CodeValidator::containsProhibitedModifierChanges,
-            ValidationMessage.MUTANT_VALIDATION_MODIFIER
-    );
+    public static MutantRule prohibitedModifier = new MutantRule.Builder(
+            FORBIDDEN_EXPRESSIONS,
+            "Contains changes to modifiers that are not allowed",//TODO Was genau?
+            ValidationMessage.MUTANT_VALIDATION_MODIFIER)
+            .withCode(CodeValidator::containsProhibitedModifierChanges)
+            .build();
 
-    public static MutantComparisonRule<List<List<String>>> ternaryOperators = new MutantComparisonRule<>(
-            "Ternary operators are not allowed",
-            CodeValidator::ternaryAdded,
-            ValidationMessage.MUTANT_VALIDATION_OPERATORS
-    );
+    public static MutantRule logicalOperator = new MutantRule.Builder(
+            CONTROL,
+            "New logical operators are not allowed",
+            ValidationMessage.MUTANT_VALIDATION_LOGIC)
+            .withLinediff(CodeValidator::logicalOpAdded)
+            .build();
 
-    public static MutantComparisonRule<List<List<String>>> logicalOperator = new MutantComparisonRule<>(
-            "New logical Operations are not allowed",
-            CodeValidator::logicalOpAdded,
-            ValidationMessage.MUTANT_VALIDATION_LOGIC
-    );
-
-    public static MutantInsertionRule prohibitedControlStructures = new MutantInsertionRule(
-            "Adding new control structures is not allowed",
+    public static MutantRule prohibitedControlStructures = new MutantRule.Builder(
+            CONTROL,
             "These control structures are not allowed: " + Arrays.toString(CodeValidator.PROHIBITED_CONTROL_STRUCTURES),
-            CodeValidator.PROHIBITED_CONTROL_STRUCTURES,
-            ValidationMessage.MUTANT_VALIDATION_CALLS
-    );
+            ValidationMessage.MUTANT_VALIDATION_OPERATORS)
+            .withInsertion(CodeValidator.PROHIBITED_CONTROL_STRUCTURES)
+            .withLinediff(CodeValidator::ternaryAdded)
+            .build();
 
-    public static MutantInsertionRule commentTokens = new MutantInsertionRule(
-            COMMENTS,
-            CodeValidator.COMMENT_TOKENS,
-            ValidationMessage.MUTANT_VALIDATION_COMMENT
-    );
-
-    public static MutantInsertionRule prohibitedCalls = new MutantInsertionRule(
-            "No calls to System.*, Random.*",
+    public static MutantRule prohibitedCalls = new MutantRule.Builder(
+            FORBIDDEN_EXPRESSIONS,
             "No calls to these packages are allowed: " + Arrays.toString(CodeValidator.PROHIBITED_CALLS),
-            CodeValidator.PROHIBITED_CALLS,
-            ValidationMessage.MUTANT_VALIDATION_CALLS
-    );
+            ValidationMessage.MUTANT_VALIDATION_CALLS)
+            .withInsertion(CodeValidator.PROHIBITED_CALLS)
+            .build();
 
-    public static MutantInsertionRule prohibitedBitwiseOperators = new MutantInsertionRule(
+    public static MutantRule prohibitedBitwiseOperators = new MutantRule.Builder(
+            CONTROL,
             "Bitwise operators are not allowed",
-            CodeValidator.PROHIBITED_BITWISE_OPERATORS,
-            ValidationMessage.MUTANT_VALIDATION_OPERATORS
-    );
-
-
-
-
+            ValidationMessage.MUTANT_VALIDATION_OPERATORS)
+            .withInsertion(CodeValidator.PROHIBITED_BITWISE_OPERATORS)
+            .build();
 }

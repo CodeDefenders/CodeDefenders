@@ -314,15 +314,15 @@ public class CodeValidatorTest {
                     testCase("classSignature/changedPublicClassToPublicFinalClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
 
                     // MUTANT_VALIDATION_COMMENT
-                    testCases("comments/addedAnotherCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/addedAnotherCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/addedMultiLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/addedSingleLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/addedSingleLineCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/modifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/addedAnotherCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedAnotherCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedMultiLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedSingleLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedSingleLineCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/modifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
                     testCases("comments/modifiedCommentAndChangedCode", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
 
                     // MUTANT_VALIDATION_FIELD_NAME - is only forbidden with STRICT validation
                     testCases("fields/changedName", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
@@ -372,7 +372,7 @@ public class CodeValidatorTest {
                     testCases("methodSignature/changedConstructor", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
                     testCases("methodSignature/changedConstructorOfInnerClass", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
                     testCases("methodSignature/changedPrivateMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
+                    testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_VALIDATION_METHOD_SIGNATURE, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
                     testCases("methodSignature/changedPublicMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
 
                     // Bit Shifts are only forbidden with STRICT validation
@@ -384,9 +384,9 @@ public class CodeValidatorTest {
                     // TODO: Same as 01, but without newlines
                     testCases("otherInvalid/addedIfSameLine02", MODERATE, MUTATION_IF_STATEMENT),
                     // TODO: Look at this one too
-                    testCases("otherInvalid/addedSecondIfSameLine01", MODERATE, MUTANT_VALIDATION_CALLS, MUTATION_WHILE_STATEMENT),
+                    testCases("otherInvalid/addedSecondIfSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Same as 01, but without newlines
-                    testCases("otherInvalid/addedSecondIfSameLine02", MODERATE, MUTANT_VALIDATION_CALLS, MUTATION_WHILE_STATEMENT),
+                    testCases("otherInvalid/addedSecondIfSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Look at this one again
                     testCases("otherInvalid/addedWhileSameLine01", MODERATE, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
                     // TODO: Same as 01 but without newlines

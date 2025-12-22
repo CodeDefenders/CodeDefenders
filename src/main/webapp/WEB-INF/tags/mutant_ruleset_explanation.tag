@@ -20,11 +20,29 @@
 
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<%@ attribute name="ruleset" required="true" type="org.codedefenders.validation.code.MutantValidationRuleSet"%>
+<%@ attribute name="ruleset" required="true" type="org.codedefenders.validation.code.MutantValidationRuleSet" %>
 
 <b>${ruleset.name}</b> <br>
-<ul>
-    <c:forEach items="${ruleset.generalDescriptions}" var="desc">
-        <li>${desc}</li>
+
+<div class="accordion" id="rule-accordion-${ruleset.name}">
+    <c:forEach items="${ruleset.tieredRules}" var="group" varStatus="groupStatus">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="rule-heading-${ruleset.name}-${groupStatus.index}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#rule-collapse-${ruleset.name}-${groupStatus.index}"
+                        aria-expanded="false" aria-controls="rule-collapse-${ruleset.name}-${groupStatus.index}">
+                        ${group.get(0).generalDescription}
+                </button>
+            </h2>
+            <div id="rule-collapse-${ruleset.name}-${groupStatus.index}" class="accordion-collapse collapse" aria-labelledby="rule-heading-${ruleset.name}-${groupStatus.index}" data-bs-parent="#rule-accordion-${ruleset.name}">
+                <div class="accordion-body">
+                    <ul>
+                        <c:forEach items="${group}" var="rule">
+                            <li>${rule.detailedDescription}</li>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </c:forEach>
-</ul>
+</div>
