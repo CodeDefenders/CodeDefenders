@@ -19,29 +19,6 @@
 
 --%>
 
-<!--
-Originally it looked like this:
-
-<b>Relaxed</b> <br>
-<ul>
-    <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-    <li>No mutants with only changes to comments or formatting</li>
-    <li>No renaming of methods or fields, no additional methods or fields</li>
-</ul>
-<b>Moderate</b> <br>
-<ul>
-    <li>No changes to comments</li>
-    <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-    <li>No ternary operators</li>
-    <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
-</ul>
-<b>Strict</b> <br>
-<ul class="mb-0">
-    <li>No reflection</li>
-    <li>No bitwise operators (bitshifts and logical)</li>
-    <li>No signature changes</li>
-</ul>
--->
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
