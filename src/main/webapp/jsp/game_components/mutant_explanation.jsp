@@ -31,6 +31,7 @@
 
 <%
     String levelStyling;
+   pageContext.setAttribute("validationRuleset", mutantExplanation.getValidationRuleSet());
     if (mutantExplanation.getValidationRuleSet() == DefaultRuleSets.RELAXED) {
         levelStyling = "btn-success";
     } else if (mutantExplanation.getValidationRuleSet() == DefaultRuleSets.MODERATE) {
@@ -78,7 +79,7 @@
 
 <t:modal id="validator-explanation-modal" title="Validator Explanation">
         <jsp:attribute name="content">
-            <t:validator_explanation_mutant/>
+            <t:validator_explanation_mutant ruleset="${validationRuleset.name}"/>
             <div class="mt-3"></div> <%-- spacing --%>
             <t:validator_explanation_test/>
         </jsp:attribute>

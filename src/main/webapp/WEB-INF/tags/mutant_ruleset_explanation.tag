@@ -21,8 +21,7 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ attribute name="ruleset" required="true" type="org.codedefenders.validation.code.MutantValidationRuleSet" %>
-<h2>Mutation rules</h2>
-<h3>${ruleset.name}</h3> <br>
+<h3>Mutation rules: ${ruleset.name}</h3> <br>
 
 <div class="accordion" id="rule-accordion-${ruleset.name}">
     <c:forEach items="${ruleset.tieredRules}" var="group" varStatus="groupStatus">

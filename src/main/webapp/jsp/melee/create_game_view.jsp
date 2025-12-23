@@ -159,18 +159,26 @@
                                 <c:forEach items="${DefaultRuleSets.getValues()}" var="level" varStatus="s">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               id="mutant-validator-radio-${level.getName().toLowerCase()}"
+                                               id="mutant-validator-radio-${level.getName()}"
                                                name="mutantValidatorLevel"
                                                value="${level.getName()}" required
                                                ${level == DefaultRuleSets.MODERATE ? "checked" : ""}>
                                         <label class="form-check-label"
-                                               for="mutant-validator-radio-${level.getName().toLowerCase()}">
+                                               for="mutant-validator-radio-${level.getName()}">
                                             ${level.getName()}
                                         </label>
                                         <c:if test="${s.last}">
                                             <div class="invalid-feedback">Please select a mutant validator level.</div>
                                         </c:if>
                                     </div>
+                                    <script>
+                                        document.getElementById("mutant-validator-radio-${level.getName()}")
+                                                .addEventListener('click', e => {
+                                                    document.querySelectorAll("[id^='rule-div-']").forEach(d => {
+                                                        d.hidden = d.id !== 'rule-div-${level.getName()}';
+                                                    })
+                                                })
+                                    </script>
                                 </c:forEach>
                             </div>
                         </div>
@@ -316,7 +324,7 @@
 
                     <t:modal id="validatorExplanation" title="Validator Explanation">
                     <jsp:attribute name="content">
-                        <t:validator_explanation_mutant/>
+                        <t:validator_explanation_mutant ruleset="Moderate"/>
                         <div class="mt-3"></div> <%-- spacing --%>
                         <t:validator_explanation_test/>
                     </jsp:attribute>

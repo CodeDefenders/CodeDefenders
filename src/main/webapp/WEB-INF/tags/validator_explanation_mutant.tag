@@ -18,20 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ tag pageEncoding="UTF-8" %>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%--@elvariable id="defaultRuleSets" type="org.codedefenders.validation.code.DefaultRuleSets"--%>
-<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-
-
-<h3>Mutation rules</h3>
-<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.relaxed}"/>
-<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.moderate}"/>
-<t:mutant_ruleset_explanation ruleset="${defaultRuleSets.strict}"/>
-
-________________________________REMOVE <!--TODO remove -->
+<!--
+Originally it looked like this:
 
 <b>Relaxed</b> <br>
 <ul>
@@ -52,3 +41,20 @@ ________________________________REMOVE <!--TODO remove -->
     <li>No bitwise operators (bitshifts and logical)</li>
     <li>No signature changes</li>
 </ul>
+-->
+<%@ tag pageEncoding="UTF-8" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ attribute name="ruleset" required="false" type="java.lang.String" %>
+
+
+<%--@elvariable id="defaultRuleSets" type="org.codedefenders.validation.code.DefaultRuleSets"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
+
+<c:forEach items="${defaultRuleSets.getValues()}" var="set">
+    <div id="rule-div-${set.getName()}" ${ruleset != null && !set.getName().equals(ruleset) ? "hidden" : ""}>
+        <t:mutant_ruleset_explanation ruleset="${set}"/>
+    </div>
+</c:forEach>
+
