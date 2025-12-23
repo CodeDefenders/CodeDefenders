@@ -53,6 +53,9 @@ class ShowToasts {
                     'align-items-center',
                     'align-self-stretch',
                     'justify-content-center');
+
+            iconAnchor.setAttribute('target', '_blank');
+            iconAnchor.setAttribute('rel', 'noopener');
             if (link !== '') {
                 iconAnchor.setAttribute('href', link);
             }
