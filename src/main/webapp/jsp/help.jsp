@@ -85,7 +85,7 @@
                 <li>No bitwise operators (bitshifts and logical)</li>
                 <li>No signature changes</li>
             </ul>
-            
+
         </div>
         <p>Here I have created a mutant by changing the &gt; comparator to &lt;. Return values, variables, etc. can also be changed.</p>
         <p>

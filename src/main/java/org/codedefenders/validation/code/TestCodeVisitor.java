@@ -17,7 +17,6 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codedefenders.validation.code;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -25,11 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.github.javaparser.ast.Node;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -51,10 +51,8 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
 import static org.codedefenders.game.AssertionLibrary.GOOGLE_TRUTH;
 import static org.codedefenders.game.AssertionLibrary.HAMCREST;
-
 /**
  * This class checks test code and checks whether the code is valid or not.
  *
@@ -69,220 +67,85 @@ import static org.codedefenders.game.AssertionLibrary.HAMCREST;
 class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
     // we can use TypeSolver for the visit to implement a fine grain security mechanism
-
     private static final int MAX_NUMBER_OF_CLASSES = 1;
     private static final int MAX_NUMBER_OF_METHODS = 1;
     private static final int MIN_NUMBER_OF_STATEMENTS = 0;
-
-    private boolean isValid = true;
     private final List<String> messages = new LinkedList<>();
 
-    private int classCount = 0;
-    private int methodCount = 0;
-    private int stmtCount = 0;
-    private int assertionCount = 0;
+    private final List<TestRule> rules;
+    private final List<ImmutablePair<TestRule, Node>> failedRules = new ArrayList<>();
 
+    List<Node> classes = new ArrayList<>();
+    List<Node> methods = new ArrayList<>();
+    int stmtCount = 0;
     // Per game configuration
     private final int maxNumberOfAssertions;
-
     // Per class configuraion
     private final AssertionLibrary assertionLibrary;
-
     /**
      * @return A list of validation messages. If the list is empty, the validation passed
      */
-    static List<String> validFor(CompilationUnit cu, int maxNumberOfAssertions, AssertionLibrary assertionLibrary) {
-        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, assertionLibrary);
+    static List<String> validFor(CompilationUnit cu, int maxNumberOfAssertions, AssertionLibrary assertionLibrary,
+                                 List<TestRule> rules) {
+        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, assertionLibrary, rules);
         // Collect the observations first
         visitor.visit(cu, null);
+        for (TestRule r : rules) {
+            if (r.fails(visitor)) {
+                visitor.messages.add(r.getValidationMessage());
+            }
+        }
         return visitor.buildValidationMessages();
     }
-
-    private TestCodeVisitor(int maxNumberOfAssertions, AssertionLibrary assertionLibrary) {
+    private TestCodeVisitor(int maxNumberOfAssertions, AssertionLibrary assertionLibrary, List<TestRule> rules) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
         this.assertionLibrary = assertionLibrary;
+        this.rules = rules;
     }
-
-    public List<String> buildValidationMessages() {
+    public List<String> buildValidationMessages() {//TODO reicht ein String??
         List<String> formattedValidationMessages = new ArrayList<>();
-
-        if (classCount > MAX_NUMBER_OF_CLASSES) {
-            formattedValidationMessages.add("Invalid test suite contains more than one class declaration.");
-        }
-        if (methodCount > MAX_NUMBER_OF_METHODS) {
-            formattedValidationMessages.add("Invalid test suite contains more than one method declaration.");
-        }
-
-        // Conditions on the aggregate metrics (i.e., total count of statement)
-        // cannot be checked only after the visit completes
-        if (stmtCount == MIN_NUMBER_OF_STATEMENTS) {
-            isValid = false;
-            messages.add("Test does not contain any valid statement.");
-        }
-
-        if (!isValid) {
+        if (!messages.isEmpty()) {
             formattedValidationMessages.add("The submitted test is not valid:\n" + String.join("\n", "\t-" + messages));
         }
         return formattedValidationMessages;
     }
-
     @Override
     public void visit(ClassOrInterfaceDeclaration stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-
-        if (classCount++ > MAX_NUMBER_OF_CLASSES) {
-            isValid = false;
-            return;
-        }
+        classes.add(stmt);
         super.visit(stmt, args);
     }
-
     @Override
     public void visit(RecordDeclaration decl, Void args) {
-        if (!isValid) {
-            return;
-        }
-
-        if (classCount++ > MAX_NUMBER_OF_CLASSES) {
-            isValid = false;
-            return;
-        }
+        classes.add(decl);
         super.visit(decl, args);
     }
-
     @Override
     public void visit(MethodDeclaration stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-
-        if (methodCount++ > MAX_NUMBER_OF_METHODS) {
-            isValid = false;
-            return;
+        methods.add(stmt);
+        super.visit(stmt, args);
+    }
+    @Override
+    public void visit(ExpressionStmt stmt, Void args) {
+        for (TestRule rule : rules) {
+            if (rule.fails(stmt)) {
+                failedRules.add(new ImmutablePair<>(rule, stmt));
+            }
         }
         super.visit(stmt, args);
     }
-
     @Override
-    public void visit(ExpressionStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        stmtCount++;
-        String stmtString = JavaParserUtils.unparse(stmt);
-        for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
-            // This might be a bit too strict... We shall use typeSolver otherwise.
-            if (stmtString.contains(prohibited)) {
-                messages.add("Test contains a prohibited call to " + prohibited);
-                isValid = false;
-                return;
+    public void visit(NameExpr stmt, Void args) {
+        for (TestRule rule : rules) {
+            if (rule.fails(stmt)) {
+                failedRules.add(new ImmutablePair<>(rule, stmt));
             }
         }
         super.visit(stmt, args);
     }
 
     @Override
-    public void visit(NameExpr stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        final String name = stmt.getNameAsString();
-        if (name.equals("System") || name.equals("Random") || name.equals("Thread")) {
-            messages.add("Test contains a call to a prohibited method: " + name);
-            isValid = false;
-            return;
-        }
-        super.visit(stmt, args);
-    }
-
-    @Override
-    public void visit(ForEachStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(ForStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(WhileStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(DoStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(SwitchStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(IfStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(ConditionalExpr expr, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid expression: " + JavaParserUtils.unparse(expr));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(SwitchExpr expr, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid expression: " + JavaParserUtils.unparse(expr));
-        isValid = false;
-    }
-
-    @Override
-    public void visit(AssertStmt stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
-        isValid = false;
-    }
-
-    @Override
     public void visit(MethodCallExpr stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
+
         stmtCount++;
         String stmtString = JavaParserUtils.unparse(stmt);
         if (stmtString.startsWith("System.") || stmtString.startsWith("Random.")) {
@@ -290,24 +153,20 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             isValid = false;
             return;
         }
-
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",
                 "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-
         // TODO This works the same for Hamcrest and Google Truth
         final boolean assertThatMatch = Arrays.stream(new String[]{"assertThat"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-
         /*
          * Count assertions
          */
         if (anyJunitAssertionMatch || assertThatMatch) {
             assertionCount++;
         }
-
         /*
          * If forced Hamcrest or Google Truth are on, then there must not be JUnit assertions.
          *
@@ -318,22 +177,17 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             isValid = false;
             return;
         }
-
         if (assertionCount > maxNumberOfAssertions) {
             messages.add("Test contains more than "
                     + maxNumberOfAssertions + (maxNumberOfAssertions < 2 ? "assertion" : " assertions"));
             isValid = false;
             return;
         }
-
         super.visit(stmt, args);
     }
-
     @Override
     public void visit(VariableDeclarator stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
+
         Optional<Expression> initializer = stmt.getInitializer();
         if (initializer.isPresent()) {
             String initString = JavaParserUtils.unparse(initializer.get());
@@ -346,12 +200,9 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         super.visit(stmt, args);
     }
-
     @Override
     public void visit(final BinaryExpr stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
+
         final BinaryExpr.Operator operator = stmt.getOperator();
         if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
             messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
@@ -360,14 +211,10 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         super.visit(stmt, args);
     }
-
     @Override
     public void visit(final AssignExpr stmt, Void args) {
-        if (!isValid) {
-            return;
-        }
-        final AssignExpr.Operator operator = stmt.getOperator();
 
+        final AssignExpr.Operator operator = stmt.getOperator();
         boolean isIllegal = Stream.of(
                     AssignExpr.Operator.BINARY_AND,
                     AssignExpr.Operator.BINARY_OR,

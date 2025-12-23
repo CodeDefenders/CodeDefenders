@@ -119,7 +119,8 @@ public class CodeValidator {
             AssertionLibrary assertionLibrary) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
         if (parseResult.isPresent()) {
-            return TestCodeVisitor.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary);
+            return TestCodeVisitor.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary,
+                    TestValidationRules.getRules());
         } else {
             return new ArrayList<>();
         }
