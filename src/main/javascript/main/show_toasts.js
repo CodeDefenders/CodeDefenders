@@ -68,6 +68,8 @@ class ShowToasts {
         const toastBody = document.createElement('a');
         if (link !== '') {
             toastBody.setAttribute('href', link);
+            toastBody.setAttribute('target', '_blank');
+            toastBody.setAttribute('rel', 'noopener');
         }
         toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-column', 'justify-content-between',
                 'text-decoration-none', 'text-reset');
