@@ -196,7 +196,7 @@ public class LlmManagerService {
         }
     }
 
-    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
+    public void setPlayerModel(AbstractGame game, Role role, LlModel model, LlmStrategy strategy) {
         Map<Integer, LlModel> m = getCorrectMap(role);
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
@@ -215,8 +215,12 @@ public class LlmManagerService {
             final Role finalRole = role;
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversationBatch(game, user), new FullTestSuiteStrategy(), new Random())));//TODO: Make strategy flexible
+                    new LlmConversationBatch(game, user, strategy), strategy, new Random())));
         }
+    }
+
+    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
+        setPlayerModel(game, role, model,  new FullTestSuiteStrategy());
     }
 
     public void finishPlayer(int gameId, Role role) {

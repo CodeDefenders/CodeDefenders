@@ -31,6 +31,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmType;
+import org.codedefenders.model.llm.strategy.LlmStrategy;
 import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -54,7 +55,10 @@ public class SetLlmAPI extends APIServlet {
                 .map(String::toUpperCase)
                 .map(Role::valueOrNull);
         final Optional<Action> action = ServletUtils.getEnumParameter(request, Action.class, "action");
-        if (gameId.isEmpty() || modelName.isEmpty() || modelType.isEmpty() || action.isEmpty() || role.isEmpty()) {
+        final Optional<LlmStrategy> strategy = ServletUtils.getStringParameter(request, "strategy")
+                .flatMap(LlmStrategy::fromName);
+        if (gameId.isEmpty() || modelName.isEmpty() || modelType.isEmpty() || action.isEmpty() || role.isEmpty()
+                || strategy.isEmpty()) {
             if (gameId.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'gameId' missing."));
@@ -67,9 +71,12 @@ public class SetLlmAPI extends APIServlet {
             } else if (action.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'action' missing or invalid."));
-            }else {
+            } else if (role.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'role' is missing or invalid"));
+            } else {
+                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
+                        new Common.ErrorResponseDTO("Parameter 'strategy' is missing or invalid"));
             }
             return;
         }
@@ -82,7 +89,7 @@ public class SetLlmAPI extends APIServlet {
         }
         LlModel model = new LlModel(modelName.get(), modelType.get());
         if (action.get() == Action.START) {
-            llmService.setPlayerModel(game, role.get(), model);
+            llmService.setPlayerModel(game, role.get(), model, strategy.get());
         } else {
             llmService.finishPlayer(gameId.get(), role.get());
         }

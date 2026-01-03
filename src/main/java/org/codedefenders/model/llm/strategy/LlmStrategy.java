@@ -18,10 +18,20 @@
  */
 package org.codedefenders.model.llm.strategy;
 
+import java.util.Optional;
+
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 public abstract class LlmStrategy {
+
+    public static Optional<LlmStrategy> fromName(String name) {
+        return switch (name) {
+            case "DEFAULT" -> Optional.of(new DefaultStrategy());
+            case "FULL_TEST_SUITE" -> Optional.of(new FullTestSuiteStrategy());
+            default -> Optional.empty();
+        };
+    }
 
     private final String name;
 

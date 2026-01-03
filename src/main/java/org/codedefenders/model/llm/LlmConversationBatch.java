@@ -20,11 +20,11 @@ package org.codedefenders.model.llm;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.strategy.LlmStrategy;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.SystemMessage;
@@ -47,9 +47,12 @@ public class LlmConversationBatch {
 
     private PromptType currentType;
 
-    public LlmConversationBatch(AbstractGame game, SimpleUser user) {
+    private final LlmStrategy strategy;
+
+    public LlmConversationBatch(AbstractGame game, SimpleUser user, LlmStrategy strategy) {
         this.game = game;
         this.user = user;
+        this.strategy = strategy;
     }
 
     public LlmConversation currentConversation() {
@@ -125,7 +128,7 @@ public class LlmConversationBatch {
         }
         this.currentType = currentType;
         if (!messageLists.containsKey(currentType)) {
-            LlmConversation con = new LlmConversation(currentType, game, user, "ALPHA", true, false);
+            LlmConversation con = new LlmConversation(currentType, game, user, strategy.getName(), true, false);
             messageLists.put(currentType, con);
         }
     }
