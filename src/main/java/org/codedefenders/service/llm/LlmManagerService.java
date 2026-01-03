@@ -19,8 +19,10 @@
 package org.codedefenders.service.llm;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -36,6 +38,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -45,7 +48,9 @@ import org.codedefenders.model.llm.strategy.DefaultStrategy;
 import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
 import org.codedefenders.model.llm.strategy.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -89,11 +94,22 @@ public class LlmManagerService {
     private final Map<Integer, String> defenderErrorMessages = new HashMap<>();
     private final Map<Integer, String> attackerErrorMessages = new HashMap<>();
 
+    /*
+        Only for the thesis. Lists all gameIds that are in equivalent-only-mode
+     */
+    private final List<Integer> equivalentOnlyGames = new ArrayList<>();
+
     @Inject
     private GameRepository gameRepository;
 
     @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
     private UserService userService;
+
+    @Inject
+    private GameService gameService;
 
     @Inject
     public LlmManagerService() {
@@ -107,7 +123,20 @@ public class LlmManagerService {
      * active model.
      */
     public Optional<LlModel> getModelForGame(AbstractGame game, Role role) {
-        return Optional.ofNullable(getCorrectMap(role).get(game.getId()));
+        return getModelForGame(game.getId(), role);
+    }
+
+    public Optional<LlModel> getModelForGame(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectMap(role).get(gameId));
+    }
+
+    public void setEquivalentOnly(int gameId) {
+        if (activeLlmAttackers.containsKey(gameId)) {
+            equivalentOnlyGames.add(gameId);
+        }
+        if (activeLlmDefenders.containsKey(gameId)) {
+            finishPlayer(gameId, Role.DEFENDER);
+        }
     }
 
 
@@ -235,6 +264,16 @@ public class LlmManagerService {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
 
+        if (equivalentOnlyGames.contains(game.getId())) {
+            game.getAliveMutants().stream()
+                    .filter(m -> m.getCreatorId() == Constants.AI_ATTACKER_USER_ID)
+                    .forEach(m -> {
+                        m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                        mutantRepo.updateMutant(m);
+                        mutantRepo.insertEquivalence(m, Constants.DUMMY_CREATOR_USER_ID);
+                    });
+        }
+
         int userId = switch (role) {
             case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
             case DEFENDER -> Constants.AI_DEFENDER_USER_ID;
@@ -246,7 +285,13 @@ public class LlmManagerService {
         if (isLlmPlayerActive(game, role)) {
             try {
                 singleLlmAction(game, user, role, conversation, strategy, random);
-                long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+                long timeToWait;
+                if (equivalentOnlyGames.contains(game.getId())) {
+                    timeToWait = 0;
+                } else {
+                    timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+                }
+
                 organizerExecutor.schedule(() -> llmExecutor.execute(
                                 () -> runLlmAction(
                                         gameRepository.getGame(game.getId()), role, conversation, strategy, random)),
@@ -310,7 +355,12 @@ public class LlmManagerService {
                 testService.run();
             } else {
                 equivalenceService.run();
-                if (role == Role.ATTACKER) {
+                if (equivalentOnlyGames.contains(game.getId()) && gameService.getFlaggedMutants(user, game).isEmpty()) {
+                    equivalentOnlyGames.remove((Integer) game.getId());
+                    finishPlayer(game.getId(), role);
+                    return;
+                }
+                if (role == Role.ATTACKER && !equivalentOnlyGames.contains(game.getId())) {
                     mutantService.run();
                 } else {
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;

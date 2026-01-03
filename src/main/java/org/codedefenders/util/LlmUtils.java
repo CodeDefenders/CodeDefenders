@@ -62,7 +62,11 @@ public class LlmUtils {
             String methodContent = ast.get().findAll(MethodDeclaration.class).stream()
                     .flatMap(method -> {
                         var range = method.getRange().orElseThrow();
-                        return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                        if (range.begin.line < range.end.line - 1) {
+                            return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                        } else if (range.begin.line <= range.end.line) {
+                            return lines.subList(range.begin.line, range.end.line).stream();
+                        } else return lines.stream();
                     })
                     .collect(Collectors.joining("\n"));
             if (!methodContent.isEmpty()) {
