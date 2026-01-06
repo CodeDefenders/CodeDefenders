@@ -30,6 +30,7 @@ public abstract class LlmStrategy {
             case "DEFAULT" -> Optional.of(new DefaultStrategy());
             case "FULL_TEST_SUITE" -> Optional.of(new FullTestSuiteStrategy());
             case "SINGLE_METHOD_TEST" -> Optional.of(new SingleMethodTestStrategy());
+            case "ANNOTATED_FULL_CLASS_MUTANT" -> Optional.of(new AnnotatedFullClassMutantStrategy());
             default -> Optional.empty();
         };
     }

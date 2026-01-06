@@ -31,7 +31,7 @@ create table if not exists `llm_prompts`(
 
 create table if not exists `llm_conversations` (
     Conversation_ID int(11) not null primary key auto_increment,
-    Strategy varchar(20) not null,
+    Strategy varchar(100) not null,
     Type varchar(20) not null,
     Game_ID int(11) not null,
     User_ID int(11) not null,

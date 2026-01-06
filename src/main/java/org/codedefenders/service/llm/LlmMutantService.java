@@ -27,6 +27,7 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.model.llm.strategy.AnnotatedFullClassMutantStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.LlmUtils;
@@ -42,13 +43,21 @@ class LlmMutantService extends LlmSubActionService {
         PromptType promptType = getCorrectAttackPromptType();
         setConversationType(promptType);
         resetConversationAfterTooManyTries();
+
+
+
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
-            String userMessage = getSourceCodeForUserMessage();
-            if (random.nextBoolean()) {
-                userMessage += "\n####\n" + getExistingMutantDiffsMessage();
+            if (strategy instanceof AnnotatedFullClassMutantStrategy) {
+                conversation.addSystemMessage(AnnotatedFullClassMutantStrategy.initialPrompt, model);
+                conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
+            } else {
+                conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
+                String userMessage = getSourceCodeForUserMessage();
+                if (random.nextBoolean()) {
+                    userMessage += "\n####\n" + getExistingMutantDiffsMessage();
+                }
+                conversation.addUserMessage(userMessage, model);
             }
-            conversation.addUserMessage(userMessage, model);
         }
 
         String result = promptService.getResponse(model, conversation);

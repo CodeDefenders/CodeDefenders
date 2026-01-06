@@ -18,16 +18,13 @@
  */
 package org.codedefenders.model.llm.strategy;
 
-public class SingleMethodTestStrategy extends LlmStrategy {
-    public static final String systemPrompt = """
+public class AnnotatedFullClassMutantStrategy extends LlmStrategy {
+
+    public static final String initialPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.
-            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
-            changes to the code. These changes are called 'mutants'.
-            These mutants are difficult to find, so you have to be crafty.
-            If your test fails on a piece of mutated code, but succeeds on the original code, that mutant is killed.
-            You get points for every mutant your tests kill. If many other tests have already covered this mutant
-            without having killed it, detecting the mutant gets you more points.
-            You get no points by detecting a mutant that has already been killed.
+            You get points by writing bugs in source code that are difficult to detect by unit tests.
+            Every unit test that covers your bug without failing gets you a point.
+            Once your bug is detected, it will stop gathering points.
 
             You will see a java class with specific annotations. Every line has a comment in the format
             `//coverage: c, killed: k, alive: a`
@@ -36,16 +33,15 @@ public class SingleMethodTestStrategy extends LlmStrategy {
             k refers to the mutants that have already been killed here.
             a refers to the mutants that are currently alive.
 
-            There is a strict rule of using at most 2 assertions per test. Always abide by it.
+            Write a mutated version of this class to get points.
+            It is crucial that you do not include these comments with the specific annotations. Your submission
+            will be rejected if any comments of this format are included.
 
-            Write nothing but the code of the test class.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
+            Write nothing but the mutated test class.
+            Never use natural language.
             """;
 
-    public SingleMethodTestStrategy() {
-        super("SINGLE_METHOD_TEST");
+    public AnnotatedFullClassMutantStrategy() {
+        super("ANNOTATED_FULL_CLASS_MUTANT");
     }
 }
