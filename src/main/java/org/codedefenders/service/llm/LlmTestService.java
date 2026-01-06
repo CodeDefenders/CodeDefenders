@@ -35,6 +35,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
+import org.codedefenders.model.llm.strategy.SingleMethodTestStrategy;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -78,20 +79,27 @@ class LlmTestService extends LlmSubActionService {
                     conversation.resetCurrent(true);
                     conversation.setCurrentType(PromptType.ONE_FROM_MANY);
                     return fullTestSuiteStrategy.getOneTest();
-                } else throw new BadGenerationException(); //TODO Exception werfen?? Direkt Conversation abbrechen, neu versuchen
+                } else
+                    throw new BadGenerationException(); //TODO Exception werfen?? Direkt Conversation abbrechen, neu versuchen
             }
         } else {
             if (!conversation.lastMessageWasError()) {
-                String systemMessage = getSystemPrompt(model, promptType);
-                if (promptType == PromptType.DEFEND_FOCUS) {
-                    Optional<String> methodName = getRandomMethodWithLivingMutant();
-                    if (methodName.isPresent()) {
-                        systemMessage = String.format(systemMessage, methodName.get());
+                if (strategy instanceof SingleMethodTestStrategy) {
+                    conversation.addSystemMessage(SingleMethodTestStrategy.systemPrompt, model);
+                    conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
+                    //TODO dependencies
+                } else {
+                    String systemMessage = getSystemPrompt(model, promptType);
+                    if (promptType == PromptType.DEFEND_FOCUS) {
+                        Optional<String> methodName = getRandomMethodWithLivingMutant();
+                        if (methodName.isPresent()) {
+                            systemMessage = String.format(systemMessage, methodName.get());
+                        }
                     }
-                }
-                conversation.addSystemMessage(systemMessage, model);
+                    conversation.addSystemMessage(systemMessage, model);
 
-                conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+                    conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+                }
                 String reply = promptService.getResponse(model, conversation);
                 return LlmUtils.testTemplateFromReply(reply, game);
             } else {

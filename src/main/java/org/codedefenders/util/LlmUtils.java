@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -192,5 +195,36 @@ public class LlmUtils {
             }
         }
         return false;
+    }
+
+    public static String annotatedCut(AbstractGame game) {
+        String[] lines = game.getCUT().getSourceCode().split("\n");
+        int[] coverage = new int[lines.length];
+        int[] killedLines = new int[lines.length];
+        int[] livingLines = new int[lines.length];
+
+        for (Test t : game.getTests()) {
+            LineCoverage lc = t.getLineCoverage();
+            for (int i : lc.getLinesCovered()) {
+                coverage[i - 1]++;
+            }
+        }
+
+        for (Mutant m : game.getKilledMutants()) {
+            for (int i : m.getLines()) {
+                killedLines[i - 1]++;
+            }
+        }
+        for (Mutant m : game.getAliveMutants()) {
+            for (int i : m.getLines()) {
+                livingLines[i - 1]++;
+            }
+        }
+
+        for (int i = 0; i < lines.length; i++) {
+            lines[i] += "//coverage:%d, killed:%d, alive:%d".formatted(coverage[i], killedLines[i], livingLines[i]);
+        }
+
+        return String.join("\n", lines);
     }
 }

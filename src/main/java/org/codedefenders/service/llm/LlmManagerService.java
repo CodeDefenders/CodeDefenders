@@ -47,6 +47,7 @@ import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.strategy.DefaultStrategy;
 import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
 import org.codedefenders.model.llm.strategy.LlmStrategy;
+import org.codedefenders.model.llm.strategy.SingleMethodTestStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.UserService;
@@ -220,7 +221,7 @@ public class LlmManagerService {
     }
 
     public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
-        setPlayerModel(game, role, model,  new FullTestSuiteStrategy());
+        setPlayerModel(game, role, model,  new SingleMethodTestStrategy());
     }
 
     public void finishPlayer(int gameId, Role role) {

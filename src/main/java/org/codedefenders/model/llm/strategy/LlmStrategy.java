@@ -29,6 +29,7 @@ public abstract class LlmStrategy {
         return switch (name) {
             case "DEFAULT" -> Optional.of(new DefaultStrategy());
             case "FULL_TEST_SUITE" -> Optional.of(new FullTestSuiteStrategy());
+            case "SINGLE_METHOD_TEST" -> Optional.of(new SingleMethodTestStrategy());
             default -> Optional.empty();
         };
     }
