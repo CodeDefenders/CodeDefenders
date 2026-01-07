@@ -21,6 +21,8 @@ package org.codedefenders.model.llm.strategy;
 import java.util.Optional;
 
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 public abstract class LlmStrategy {
@@ -40,6 +42,8 @@ public abstract class LlmStrategy {
     protected LlmStrategy(String name) {
         this.name = name;
     }
+
+    //public abstract Optional<String> generate(AbstractGame game, LlModel model);
 
     public int getNormalNumberOfTries() {
         return AdminDAO.getSystemSetting(

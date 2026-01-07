@@ -63,6 +63,8 @@ class LlmTestService extends LlmSubActionService {
         setConversationType(promptType);
         resetConversationAfterTooManyTries();
 
+        Optional<String> testSource = strategy.generate(game, model);
+
         if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
             if (conversation.currentConversation().getType() == PromptType.ONE_FROM_MANY) {
                 //conversation.addSystemMessage(fullTestSuiteStrategy.correctionPrompt, model);
