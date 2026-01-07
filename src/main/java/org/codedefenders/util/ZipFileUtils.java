@@ -29,13 +29,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,16 +165,17 @@ public class ZipFileUtils {
      * @return the bytes of a ZIP file
      * @throws IOException when creating the zip file fails at any point.
      */
-    public static byte[] zipFiles(Map<String, byte[]> files) throws IOException {
+    public static byte[] zipFiles(List<SimpleFile> files) throws IOException {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        final ZipOutputStream zos = new ZipOutputStream(baos);
+        ZipArchiveOutputStream zos = new ZipArchiveOutputStream(baos);
 
-        for (String fileName : files.keySet()) {
-            final ZipEntry e = new ZipEntry(fileName);
+        for (var file : files) {
+            var e = new ZipArchiveEntry(file.getPath().toString());
+            e.setUnixMode(file.getUnixPermissions());
             try {
-                zos.putNextEntry(e);
-                zos.write(files.get(fileName));
-                zos.closeEntry();
+                zos.putArchiveEntry(e);
+                zos.write(file.getContent());
+                zos.closeArchiveEntry();
             } catch (Exception entryException) {
                 logger.error("Failed to add file to ZIP file.", entryException);
             }

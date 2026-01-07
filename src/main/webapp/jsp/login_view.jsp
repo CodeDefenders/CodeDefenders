@@ -129,7 +129,7 @@
                                 <div class="mb-2">
                                     <label for="createacc-password-input" class="form-label">Password</label>
                                     <input type="password" class="form-control" id="createacc-password-input" name="password" placeholder="Password"
-                                           required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
+                                           required minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
                                     <div class="invalid-feedback">
                                         Please enter a valid password.
                                     </div>
@@ -142,7 +142,7 @@
                                         Please confirm your password.
                                     </div>
                                     <div class="form-text">
-                                        ${pwMinLength}-20 alphanumeric characters, no whitespace or special characters.
+                                        min. ${pwMinLength} alphanumeric characters, no whitespace or special characters.
                                     </div>
                                 </div>
                             </div>

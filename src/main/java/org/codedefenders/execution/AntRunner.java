@@ -80,7 +80,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final DependencyProvider dependencyProvider;
 
     @Inject
-    public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+    public AntRunner(Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
                      MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo,
                      DependencyProvider dependencyProvider) {

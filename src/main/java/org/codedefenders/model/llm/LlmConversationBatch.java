@@ -45,8 +45,6 @@ public class LlmConversationBatch {
     private final AbstractGame game;
     private final SimpleUser user;
 
-    private PromptType currentType;
-
     private final LlmStrategy strategy;
 
     public LlmConversationBatch(AbstractGame game, SimpleUser user, LlmStrategy strategy) {
@@ -55,45 +53,8 @@ public class LlmConversationBatch {
         this.strategy = strategy;
     }
 
-    public LlmConversation currentConversation() {
-        if (currentType == null) {
-            throw new RuntimeException("currentType has not been set yet.");
-        }
-        LlmConversation result = messageLists.get(currentType);
-        if (result == null) {
-            throw new IllegalStateException("currentType has been set, but there is no conversation.");
-        }
-        return result;
-    }
-
-    public void addAiMessage(AiMessage msg, LlModel model, int inputTokens, int outputTokens) {
-        if (currentConversation().isEmpty()) {
-            throw new IllegalStateException("AiMessage cannot be the first message in a conversation");
-        }
-        currentConversation().add(msg, model, inputTokens, outputTokens);
-    }
-
-    public void addSystemMessage(String content, LlModel model) {
-        currentConversation().add(SystemMessage.from(content), model);
-    }
-
-    public void addUserMessage(String content, LlModel model) {
-        currentConversation().add(UserMessage.from(content), model);
-    }
-
-
-
-    public boolean isEmpty() {
-        return currentConversation().isEmpty();
-    }
-
-    public void resetCurrent(boolean success) {
-        if (currentType == null) {
-            throw new IllegalStateException("The current type is already null");
-        }
-        currentConversation().finish(success);
-        messageLists.remove(currentType);
-        currentType = null;
+    public void remove(LlmConversation toRemove) {
+        messageLists.remove(toRemove.getType());
     }
 
     @Override
@@ -107,41 +68,15 @@ public class LlmConversationBatch {
         return sb.toString();
     }
 
-    public PromptType getCurrentType() {
-        return currentType;
-    }
-
-    public void resetCurrentType() {
-        currentType = null;
-    }
-
     /**
-     * Set the current prompt type of the batch. If there is no conversation for this type yet, a new one is created
+     * Returns the conversation associated with the specified type.
+     * If no such conversation exists, a new one is created.
      */
-    public void setCurrentType(PromptType currentType) {
-        if (this.currentType != null) {
-            throw new RuntimeException("Current type has already been set. " +
-                    "It should only be reset at the end of an llm action");
+    public LlmConversation getConversation(PromptType type) {
+        if (!messageLists.containsKey(type)) {
+            LlmConversation con = new LlmConversation(type, game, user, strategy.getName(), true, false);
+            messageLists.put(type, con);
         }
-        if (currentType == null) {
-            throw new IllegalArgumentException("null is not allowed here. Use 'resetCurrentType()' instead");
-        }
-        this.currentType = currentType;
-        if (!messageLists.containsKey(currentType)) {
-            LlmConversation con = new LlmConversation(currentType, game, user, strategy.getName(), true, false);
-            messageLists.put(currentType, con);
-        }
-    }
-
-    public Collection<LlmConversation> getConversations() {
-        return messageLists.values();
-    }
-
-    public boolean lastMessageWasError() {
-        return currentConversation().lastMessageWasError();
-    }
-
-    public boolean hasSystemMessage() {
-        return currentConversation().hasSystemMessage();
+        return messageLists.get(type);
     }
 }

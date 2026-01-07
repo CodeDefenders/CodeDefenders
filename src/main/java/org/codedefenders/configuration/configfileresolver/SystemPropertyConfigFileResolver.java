@@ -20,6 +20,9 @@ package org.codedefenders.configuration.configfileresolver;
 
 import java.io.Reader;
 
+import jakarta.inject.Singleton;
+
+import org.codedefenders.configuration.source.SystemPropertySource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
+@Singleton
 class SystemPropertyConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfigFileResolver.class);
 
@@ -40,5 +44,10 @@ class SystemPropertyConfigFileResolver extends ConfigFileResolver {
         } else {
             return getConfigFileImpl(sysProp, filename);
         }
+    }
+
+    @Override
+    public int getPriority() {
+        return SystemPropertySource.PRIORITY;
     }
 }

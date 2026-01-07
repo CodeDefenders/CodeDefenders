@@ -19,7 +19,10 @@
 package org.codedefenders.configuration.implementation;
 
 import java.util.Arrays;
+import java.util.Optional;
 
+import org.codedefenders.configuration.source.ConfigurationSource;
+import org.codedefenders.configuration.source.TieredSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,65 +30,72 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TieredConfigurationTest {
 
-    private TieredConfiguration config;
+    private TieredSource config;
 
     @BeforeEach
     public void prepareObjects() {
-        BaseConfiguration config1 = new BaseConfiguration() {
+        ConfigurationSource config1 = new ConfigurationSource() {
             @Override
-            protected Object resolveAttribute(String camelCaseName) {
+            public Optional<String> resolveAttribute(String camelCaseName) {
                 switch (camelCaseName) {
                     case "clusterTimeout":
-                        return 2;
+                        return Optional.of("2");
                     case "dbUsername":
-                        return "testDatabaseUser";
+                        return Optional.of("testDatabaseUser");
                     case "blockAttacker":
-                        return true;
+                        return Optional.of("true");
                     case "mutantCoverage":
-                        return false;
+                        return Optional.of("false");
                     default:
-                        return null;
+                        return Optional.empty();
                 }
             }
-        };
-        config1.init();
 
-        BaseConfiguration config2 = new BaseConfiguration() {
             @Override
-            protected Object resolveAttribute(String camelCaseName) {
+            public int getPriority() {
+                return 1;
+            }
+        };
+
+        ConfigurationSource config2 = new ConfigurationSource() {
+            @Override
+            public Optional<String> resolveAttribute(String camelCaseName) {
                 switch (camelCaseName) {
                     case "clusterTimeout":
-                        return 4;
+                        return Optional.of("4");
                     case "dbPassword":
-                        return "123456789";
+                        return Optional.of("123456789");
                     case "blockAttacker":
-                        return false;
+                        return Optional.of("false");
                     case "mutantCoverage":
-                        return true;
+                        return Optional.of("true");
                     default:
-                        return null;
+                        return Optional.empty();
                 }
             }
-        };
-        config2.init();
 
-        config = new TieredConfiguration(Arrays.asList(config1, config2));
-        config.init();
+            @Override
+            public int getPriority() {
+                return 2;
+            }
+        };
+
+        config = new TieredSource(Arrays.asList(config1, config2));
     }
 
     @Test
     public void lowerOnlyPropertyAccess() {
-        assertEquals("testDatabaseUser", config.getDbUsername());
+        assertEquals("testDatabaseUser", config.resolveAttribute("dbUsername").orElse(null));
     }
 
     @Test
     public void upperOnlyPropertyAccess() {
-        assertEquals("123456789", config.getDbPassword());
+        assertEquals("123456789", config.resolveAttribute("dbPassword").orElse(null));
     }
 
     @Test
     public void overwrittenPropertyAccess() {
-        assertEquals(4, config.getClusterTimeout());
+        assertEquals("4", config.resolveAttribute("clusterTimeout").orElse(null));
     }
 
 }

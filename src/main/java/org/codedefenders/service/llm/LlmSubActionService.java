@@ -67,7 +67,8 @@ abstract class LlmSubActionService {
 
     protected LlModel model;
     protected AbstractGame game;
-    protected LlmConversationBatch conversation;
+    protected LlmConversationBatch conversationBatch;
+    protected LlmConversation conversation = null;
     protected SimpleUser user;
     protected Random random;
     protected int numberOfRepairAttempts;
@@ -83,11 +84,11 @@ abstract class LlmSubActionService {
             updateGame();
             submit(reply);
             } catch (BadGenerationException e) {
-                conversation.resetCurrent(false);
+                finishConversation(false);
             }
 
-            if (conversation.getCurrentType() != null) {
-                conversationRepository.saveConversation(conversation.currentConversation());
+            if (conversation != null) {
+                conversationRepository.saveConversation(conversation);
             }
 
         } else {
@@ -109,7 +110,7 @@ abstract class LlmSubActionService {
         }
         this.user = user;
         this.game = game;
-        this.conversation = conversation;
+        this.conversationBatch = conversation;
         this.strategy = strategy;
         this.random = random;
         this.numberOfRepairAttempts = numberOfRepairAttempts;
@@ -120,15 +121,21 @@ abstract class LlmSubActionService {
     }
 
     protected void resetConversationAfterTooManyTries() {
-        PromptType tmp = conversation.currentConversation().getType();
-        if (conversation.currentConversation().numberOfTries() > numberOfRepairAttempts) {
-            conversation.resetCurrent(false);
-            conversation.setCurrentType(tmp);
+        PromptType tmp = conversation.getType();
+        if (conversation.numberOfTries() > numberOfRepairAttempts) {
+            finishConversation(false);
+            conversation = conversationBatch.getConversation(tmp);
         }
     }
 
     protected void setConversationType(PromptType type) {
-        conversation.setCurrentType(type);
+        conversation = conversationBatch.getConversation(type);
+    }
+
+    protected void finishConversation(boolean success) {
+        conversation.finish(success);
+        conversationBatch.remove(conversation);
+        conversation = null;
     }
 
     /**
@@ -136,8 +143,8 @@ abstract class LlmSubActionService {
      * included, the source code of the dependencies is included as well.
      */
     protected String getSourceCodeForUserMessage() {
-        if (conversation.getCurrentType() == PromptType.DEFEND_DEPENDENCIES
-                || conversation.getCurrentType() == PromptType.ATTACK_DEPENDENCIES) {
+        if (conversation.getType() == PromptType.DEFEND_DEPENDENCIES
+                || conversation.getType() == PromptType.ATTACK_DEPENDENCIES) {
             return game.getCUT().getSourceCode() + "\n####\n"
                     + String.join("\n####\n", game.getCUT().getDependencyCode());
         } else {

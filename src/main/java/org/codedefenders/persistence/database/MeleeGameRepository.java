@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.database.UncheckedSQLException;
@@ -47,6 +48,7 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
  *
  * @see MeleeGame
  */
+@ApplicationScoped
 public class MeleeGameRepository {
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameRepository.class);
 

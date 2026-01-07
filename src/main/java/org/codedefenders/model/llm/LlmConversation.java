@@ -83,6 +83,18 @@ public class LlmConversation {
         add(message, model, 0, 0);
     }
 
+    public void addAiMessage(AiMessage msg, LlModel model, int inputTokens, int outputTokens) {
+        add(msg, model, inputTokens, outputTokens);
+    }
+
+    public void addSystemMessage(String msg, LlModel model) {
+        add(SystemMessage.from(msg), model);
+    }
+
+    public void addUserMessage(String msg, LlModel model) {
+        add(SystemMessage.from(msg), model);
+    }
+
     public ChatMessage[] toArray() {
         ChatMessage[] result = new ChatMessage[messages.size()];
         for (int i = 0; i < messages.size(); i++) {

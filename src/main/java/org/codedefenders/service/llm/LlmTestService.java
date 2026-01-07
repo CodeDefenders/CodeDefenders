@@ -63,10 +63,10 @@ class LlmTestService extends LlmSubActionService {
         setConversationType(promptType);
         resetConversationAfterTooManyTries();
 
-        Optional<String> testSource = strategy.generate(game, model);
+        //Optional<String> testSource = strategy.generate(game, model);
 
         if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
-            if (conversation.currentConversation().getType() == PromptType.ONE_FROM_MANY) {
+            if (conversation.getType() == PromptType.ONE_FROM_MANY) {
                 //conversation.addSystemMessage(fullTestSuiteStrategy.correctionPrompt, model);
                 String reply = promptService.getResponse(model, conversation);
                 return LlmUtils.testTemplateFromReply(reply, game);
@@ -78,8 +78,8 @@ class LlmTestService extends LlmSubActionService {
                     LlmUtils.suiteOfTestTemplatesFromReply(reply, game).forEach(fullTestSuiteStrategy::addTest);
                 }
                 if (!fullTestSuiteStrategy.isEmpty()) {
-                    conversation.resetCurrent(true);
-                    conversation.setCurrentType(PromptType.ONE_FROM_MANY);
+                    finishConversation(true);
+                    setConversationType(PromptType.ONE_FROM_MANY);
                     return fullTestSuiteStrategy.getOneTest();
                 } else
                     throw new BadGenerationException(); //TODO Exception werfen?? Direkt Conversation abbrechen, neu versuchen
@@ -121,11 +121,11 @@ class LlmTestService extends LlmSubActionService {
      */
     @Override
     protected void submit(String testSrc) {
-        switch (conversation.getCurrentType()) {
+        switch (conversation.getType()) {
             case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, ONE_FROM_MANY -> {
             }
             default -> throw new RuntimeException("Conversation during test submission may not be of type " +
-                    conversation.getCurrentType());
+                    conversation.getType());
         }
         try {
             GameManagingUtils.CreateBattlegroundTestResult result;
@@ -138,7 +138,7 @@ class LlmTestService extends LlmSubActionService {
                 logger.info("LLM successfully submitted test.");
                 if (strategy instanceof FullTestSuiteStrategy fullTestSuiteStrategy) {
                     if (fullTestSuiteStrategy.isEmpty()) {
-                        conversation.resetCurrent(true);
+                        finishConversation(true);
                     }
                 }
             } else {

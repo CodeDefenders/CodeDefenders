@@ -18,64 +18,47 @@
  */
 package org.codedefenders.coverage;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Produces;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
-import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
-import org.codedefenders.instrumentation.MetricsRegistry;
-import org.codedefenders.persistence.database.GameClassRepository;
-import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.service.ClassAnalysisService;
-import org.jboss.weld.junit5.WeldInitiator;
-import org.jboss.weld.junit5.WeldJunit5Extension;
-import org.jboss.weld.junit5.WeldSetup;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
-@ExtendWith(WeldJunit5Extension.class)
 public class TestTemplateTest {
-
-    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @WeldSetup
-    public WeldInitiator weld = WeldInitiator
-                .from(TestTemplateTest.class,
-                        ClassAnalysisService.class,
-                        ClassCodeAnalyser.class,
-                        GameClassRepository.class)
-                .inject(this)
-                .activate(ApplicationScoped.class)
-                .build();
-
-    @Produces
-    public Configuration produceConfiguration() {
-        return new Configuration() {};
-    }
-
-    @ApplicationScoped
-    @Produces
-    public MetricsRegistry getMockedMetricsRegistry() {
-        return mock(MetricsRegistry.class);
-    }
-
-    @Produces
-    public QueryRunner getMockedQueryRunner() {
-        return mock(QueryRunner.class);
-    }
-
     private void assertEditableLineCorrect(GameClass gc) {
         int editableLineNr = gc.getTestTemplateFirstEditLine();
         String editableLine = gc.getTestTemplate().split("\n")[editableLineNr - 1]; // lines are one-indexed
         assertThat(editableLine, containsString("test here"));
+    }
+
+    public record MockGameClassAndImports(GameClass gameClass, List<String> imports) {}
+    private MockGameClassAndImports mockWithAdditionalImports(GameClass gc) {
+        try {
+            List<@NotNull String> imports = Files.readAllLines(Path.of(gc.getJavaFile()))
+                    .stream()
+                    .filter(line -> line.startsWith("import "))
+                    .map(line -> line + "\n")
+                    .toList();
+            gc = Mockito.spy(gc);
+            Mockito.doReturn(imports).when(gc).getAdditionalImports();
+            return new MockGameClassAndImports(gc, imports);
+        } catch (IOException e) {
+            fail();
+            throw new RuntimeException();
+        }
     }
 
     @Test
@@ -88,7 +71,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
-
+        gc = mockWithAdditionalImports(gc).gameClass;
         assertEditableLineCorrect(gc);
     }
 
@@ -102,6 +85,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("package my.little.test;"));
@@ -118,6 +102,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("mock"));
@@ -134,6 +119,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("import java.util.List;"));
@@ -150,6 +136,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), allOf(
@@ -171,6 +158,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4)
                 .create();
+        gc1 = mockWithAdditionalImports(gc1).gameClass;
 
         assertThat(gc1.getTestTemplate(), containsString("org.junit.Assert"));
         assertThat(gc1.getTestTemplate(), not(containsString("hamcrest")));
@@ -185,6 +173,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
+        gc2 = mockWithAdditionalImports(gc2).gameClass;
 
         assertThat(gc2.getTestTemplate(), containsString("org.junit.Assert"));
         assertThat(gc2.getTestTemplate(), containsString("hamcrest"));
@@ -199,6 +188,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT5)
                 .create();
+        gc3 = mockWithAdditionalImports(gc3).gameClass;
 
         assertThat(gc3.getTestTemplate(), not(containsString("org.junit.jupiter.Assertions")));
         assertThat(gc3.getTestTemplate(), not(containsString("hamcrest")));
@@ -213,6 +203,7 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.JUNIT5_HAMCREST)
                 .create();
+        gc4 = mockWithAdditionalImports(gc4).gameClass;
 
         assertThat(gc4.getTestTemplate(), not(containsString("org.jupiter.Assertions")));
         assertThat(gc4.getTestTemplate(), containsString("hamcrest"));
@@ -227,9 +218,99 @@ public class TestTemplateTest {
                 .testingFramework(TestingFramework.JUNIT4)
                 .assertionLibrary(AssertionLibrary.HAMCREST)
                 .create();
+        gc5 = mockWithAdditionalImports(gc5).gameClass;
 
         assertThat(gc5.getTestTemplate(), not(containsString("org.jupiter.Assertions")));
         assertThat(gc5.getTestTemplate(), containsString("hamcrest"));
         assertThat(gc5.getTestTemplate(), not(containsString("org.junit.jupiter.api.Assertions")));
+    }
+
+    @Test
+    public void testAutomaticImportOfMockitoIfEnabled() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(true)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
+
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, containsString("mockito"));
+    }
+
+    @Test
+    public void testNoAutomaticImportOfMockitoIfDisabled() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(false)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
+
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, not(containsString("mockito")));
+    }
+
+    @Test
+    public void testAutomaticImportOnlyPrimitive() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(true)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .create();
+        gc = mockWithAdditionalImports(gc).gameClass;
+
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, allOf(
+                containsString("junit"),
+                containsString("hamcrest"),
+                containsString("mockito")));
+        // We need -1 to get rid of the last token
+        int expectedImports = 5;
+        int actualImports = testTemplate.split("import").length - 1;
+        assertEquals(expectedImports, actualImports,
+                "The test template has the wrong number of imports");
+    }
+
+    @Test
+    public void testAutomaticImport() throws IOException {
+        GameClass gc = GameClass.build()
+                .name("XmlElement")
+                .alias("XmlElement")
+                .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
+                .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .mockingEnabled(true)
+                .create();
+        var mock = mockWithAdditionalImports(gc);
+        gc = mock.gameClass;
+
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+
+        assertThat(testTemplate, allOf(
+                containsString("junit"),
+                containsString("hamcrest"),
+                containsString("mockito")));
+        for (var import_ : mock.imports()) {
+            assertThat(testTemplate, containsString(import_));
+        }
+        int expectedImports = 10;
+        int actualImports = testTemplate.split("import").length - 1;
+
+        assertEquals(expectedImports, actualImports,
+                "The test template has the wrong number of imports");
     }
 }

@@ -386,7 +386,6 @@ public class LlmManagerService {
             }
         } finally {
             requestContextController.deactivate();
-            conversation.resetCurrentType();
         }
     }
 }
