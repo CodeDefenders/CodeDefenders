@@ -30,8 +30,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
-import org.codedefenders.model.llm.strategy.LlmStrategy;
 import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -55,10 +55,10 @@ public class SetLlmAPI extends APIServlet {
                 .map(String::toUpperCase)
                 .map(Role::valueOrNull);
         final Optional<Action> action = ServletUtils.getEnumParameter(request, Action.class, "action");
-        final Optional<LlmStrategy> strategy = ServletUtils.getStringParameter(request, "strategy")
-                .flatMap(LlmStrategy::fromName);
+        final LlmStrategy strategy = ServletUtils.getStringParameter(request, "strategy")
+                .map(LlmStrategy::of).orElseThrow();
         if (gameId.isEmpty() || modelName.isEmpty() || modelType.isEmpty() || action.isEmpty() || role.isEmpty()
-                || strategy.isEmpty()) {
+                || strategy == LlmStrategy.INVALID) {
             if (gameId.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'gameId' missing."));
@@ -89,7 +89,7 @@ public class SetLlmAPI extends APIServlet {
         }
         LlModel model = new LlModel(modelName.get(), modelType.get());
         if (action.get() == Action.START) {
-            llmService.setPlayerModel(game, role.get(), model, strategy.get());
+            llmService.setPlayerModel(game, role.get(), model, strategy);
         } else {
             llmService.finishPlayer(gameId.get(), role.get());
         }

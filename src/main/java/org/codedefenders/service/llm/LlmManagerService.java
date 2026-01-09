@@ -44,10 +44,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
-import org.codedefenders.model.llm.strategy.DefaultStrategy;
-import org.codedefenders.model.llm.strategy.FullTestSuiteStrategy;
-import org.codedefenders.model.llm.strategy.LlmStrategy;
-import org.codedefenders.model.llm.strategy.SingleMethodTestStrategy;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.UserService;
@@ -201,6 +198,20 @@ public class LlmManagerService {
         Map<Integer, LlModel> m = getCorrectMap(role);
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
+        LlmStrategy testStrategy = role == Role.DEFENDER ? strategy : null;
+        LlmStrategy mutantStrategy = role == Role.ATTACKER ? strategy : null;
+        LlmStrategy equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT; //TODO Adjustable
+        LlmStrategy conStrategy;
+        if (strategy != null) {
+            conStrategy = strategy;
+        } else {
+            if (role == Role.DEFENDER) {
+                conStrategy = LlmStrategy.TEST_DEFAULT;
+            } else {
+                conStrategy = LlmStrategy.MUTANT_DEFAULT;
+            }
+        }
+
         if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
             m.put(game.getId(), model);
         }
@@ -216,12 +227,14 @@ public class LlmManagerService {
             final Role finalRole = role;
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversationBatch(game, user, strategy), strategy, new Random())));
+                    new LlmConversationBatch(game, user, conStrategy),
+                    testStrategy, mutantStrategy, equivalenceStrategy,
+                    new Random())));
         }
     }
 
     public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
-        setPlayerModel(game, role, model,  new SingleMethodTestStrategy());
+        setPlayerModel(game, role, model, null);
     }
 
     public void finishPlayer(int gameId, Role role) {
@@ -265,7 +278,8 @@ public class LlmManagerService {
      * the model has been deactivated, it terminates itself.
      */
     private void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
-                             final LlmStrategy strategy, final Random random) {
+                             final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
+                              final LlmStrategy equivalenceStrategy, final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
 
@@ -289,7 +303,8 @@ public class LlmManagerService {
 
         if (isLlmPlayerActive(game, role)) {
             try {
-                singleLlmAction(game, user, role, conversation, strategy, random);
+                singleLlmAction(game, user, role, conversation,
+                        testStrategy, mutantStrategy, equivalenceStrategy, random);
                 long timeToWait;
                 if (equivalentOnlyGames.contains(game.getId())) {
                     timeToWait = 0;
@@ -299,7 +314,8 @@ public class LlmManagerService {
 
                 organizerExecutor.schedule(() -> llmExecutor.execute(
                                 () -> runLlmAction(
-                                        gameRepository.getGame(game.getId()), role, conversation, strategy, random)),
+                                        gameRepository.getGame(game.getId()), role, conversation,
+                                        testStrategy, mutantStrategy, equivalenceStrategy, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
@@ -322,7 +338,8 @@ public class LlmManagerService {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
                             () -> runLlmAction(
-                                    gameRepository.getGame(game.getId()), role, conversation, strategy, random)),
+                                    gameRepository.getGame(game.getId()), role, conversation,
+                                    testStrategy, mutantStrategy, equivalenceStrategy, random)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
             finishPlayer(game.getId(), role);
@@ -331,14 +348,24 @@ public class LlmManagerService {
 
     private void singleLlmAction(AbstractGame game, final SimpleUser user, final Role role,
                                  final LlmConversationBatch conversation,
-                                 LlmStrategy strategy,
+                                 LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
+        if (testStrategy == null) {
+            testStrategy = LlmStrategy.TEST_DEFAULT;
+        }
+        if (mutantStrategy == null) {
+            mutantStrategy = LlmStrategy.MUTANT_DEFAULT;
+        }
+        if (equivalenceStrategy == null) {
+            equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
+        }
+
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
 
         try {
-            int normalNumberOfTries = strategy.getNormalNumberOfTries();
-            int equivalenceNumberOfTries = strategy.getEquivalenceNumberOfTries();
+            //int normalNumberOfTries = strategy.getNormalNumberOfTries();
+            //int equivalenceNumberOfTries = strategy.getEquivalenceNumberOfTries();
 
             LlmEquivalenceService equivalenceService;
             LlmMutantService mutantService;
@@ -347,13 +374,14 @@ public class LlmManagerService {
             Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
             Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
 
-            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.class);
-            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
-            testService = CDIUtil.getBeanFromCDI(LlmTestService.class);
 
-            equivalenceService.init(game, user, attackModel, conversation, strategy, random, equivalenceNumberOfTries);
-            mutantService.init(game, user, attackModel, conversation, strategy, random, normalNumberOfTries);
-            testService.init(game, user, defendModel, conversation, strategy, random, normalNumberOfTries);
+            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.getService(equivalenceStrategy));
+            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.getService(mutantStrategy));
+            testService = CDIUtil.getBeanFromCDI(LlmTestService.getService(testStrategy));
+
+            equivalenceService.init(game, user, attackModel, conversation, random);
+            mutantService.init(game, user, attackModel, conversation, random);
+            testService.init(game, user, defendModel, conversation, random);
 
             if (role == Role.DEFENDER) {
                 testService.claimEquivalent();

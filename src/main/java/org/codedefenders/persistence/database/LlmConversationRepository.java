@@ -21,6 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -31,6 +32,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.util.QueryRunner;
@@ -66,7 +68,7 @@ public class LlmConversationRepository {
                         value (?, ?, ?, ?, ?, ?, ?, ?);
                     """;
             conversation.setId(queryRunner.insert(sql, ResultSetUtils.generatedKeyFromRS(),
-                    conversation.getStrategy(),
+                    conversation.getStrategy().name(),
                     conversation.getType().toString(),
                     conversation.getGame().getId(),
                     conversation.getUser().getId(),
@@ -130,7 +132,7 @@ public class LlmConversationRepository {
             while (rs.next()) {
                 int id = rs.getInt("Conversation_ID");
                 if (currentConversation == null || currentConversation.getId() != id) {
-                    String strategy = rs.getString("Strategy");
+                    LlmStrategy strategy = Optional.of(LlmStrategy.valueOf(rs.getString("Strategy"))).orElse(LlmStrategy.INVALID);
                     PromptType promptType = PromptType.valueOf(rs.getString("Type"));
                     int userId = rs.getInt("User_ID");
                     SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();

@@ -48,7 +48,7 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
  * technical details of communication with the LLM from outside classes.
  */
 @ApplicationScoped
-class LlmPromptService {
+public class LlmPromptService {
     private static final Logger logger = LoggerFactory.getLogger(LlmPromptService.class);
 
     //Maps model name to ChatModel
@@ -82,7 +82,7 @@ class LlmPromptService {
      * This method will block until the LLM has returned a result, or it has timed out
      * (usually after 3 Minutes).
      */
-    String getResponse(LlModel model, LlmConversation conversation) {
+    public String getResponse(LlModel model, LlmConversation conversation) {
         ChatMessage[] chatMessages = conversation.toArray();
 
         int inputLength = 0;

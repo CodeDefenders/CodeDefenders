@@ -19,66 +19,40 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.PromptType;
-import org.codedefenders.model.llm.strategy.AnnotatedFullClassMutantStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequestScoped
-class LlmMutantService extends LlmSubActionService {
+abstract class LlmMutantService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmMutantService.class);
 
-    @Override
-    protected String generate() {
-        PromptType promptType = getCorrectAttackPromptType();
-        setConversationType(promptType);
-        resetConversationAfterTooManyTries();
+    protected abstract void onSubmitSuccess();
 
-
-
-        if (conversation.isEmpty()) {
-            if (strategy instanceof AnnotatedFullClassMutantStrategy) {
-                conversation.addSystemMessage(AnnotatedFullClassMutantStrategy.initialPrompt, model);
-                conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
-            } else {
-                conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
-                String userMessage = getSourceCodeForUserMessage();
-                if (random.nextBoolean()) {
-                    userMessage += "\n####\n" + getExistingMutantDiffsMessage();
-                }
-                conversation.addUserMessage(userMessage, model);
-            }
-        }
-
-        String result = promptService.getResponse(model, conversation);
-        return LlmUtils.extractMutantFromReply(result, true, game);
-    }
+    protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundMutantResult result, String testSrc);
 
     @Override
     protected void submit(String mutantSrc) {
         try {
             GameManagingUtils.CreateBattlegroundMutantResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                result = gameManagingUtils.createBattlegroundMutant(multiplayerGame, Constants.AI_ATTACKER_USER_ID, mutantSrc);
+                result = gameManagingUtils.createBattlegroundMutant(multiplayerGame,
+                        Constants.AI_ATTACKER_USER_ID, mutantSrc);
             } else if (game instanceof MeleeGame meleeGame) {
                 result = gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
             } else {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
             if (result.isSuccess()) {
-                finishConversation(true);
-                logger.info("LLM successfully submitted mutant.");
-
+                onSubmitSuccess();
             } else {
                 conversation.addSystemMessage(
                         switch (result.failureReason().orElseThrow()) {
@@ -95,7 +69,7 @@ class LlmMutantService extends LlmSubActionService {
     }
 
 
-    private PromptType getCorrectAttackPromptType() {
+    protected PromptType getCorrectAttackPromptType() {
         if (model.isAttackerDependencies() && !game.getCUT().getDependencyNames().isEmpty()) {
             return PromptType.ATTACK_DEPENDENCIES;
         } else {
@@ -103,8 +77,16 @@ class LlmMutantService extends LlmSubActionService {
         }
     }
 
-    private String getExistingMutantDiffsMessage() {
+    protected String getExistingMutantDiffsMessage() {
         return String.join("\n####\n",
                 gameService.getMutants(user, game).stream().map(MutantDTO::getPatchString).collect(Collectors.toSet()));
+    }
+
+    static Class<? extends LlmMutantService> getService(LlmStrategy strategy) {
+        List<Class<? extends LlmSubActionService>> l = List.of(
+                MutantStrategyDefault.class,
+                MutantStrategyAnnotatedFullClass.class,
+                MutantStrategySingleMethod.class);
+        return getServiceClass(l, strategy).asSubclass(LlmMutantService.class);
     }
 }

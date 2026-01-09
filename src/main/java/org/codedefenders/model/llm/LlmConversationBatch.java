@@ -18,17 +18,11 @@
  */
 package org.codedefenders.model.llm;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.llm.strategy.LlmStrategy;
-
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 
 /**
  * Contains mutable lists of {@link LlmConversation}s, representing the back and forth
@@ -74,7 +68,7 @@ public class LlmConversationBatch {
      */
     public LlmConversation getConversation(PromptType type) {
         if (!messageLists.containsKey(type)) {
-            LlmConversation con = new LlmConversation(type, game, user, strategy.getName(), true, false);
+            LlmConversation con = new LlmConversation(type, game, user, strategy, true, false);
             messageLists.put(type, con);
         }
         return messageLists.get(type);

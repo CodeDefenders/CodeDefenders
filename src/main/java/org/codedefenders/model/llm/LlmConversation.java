@@ -37,7 +37,7 @@ import dev.langchain4j.data.message.SystemMessage;
  * This represents the prompts and responses of an LLM.
  */
 public class LlmConversation {
-    private final String strategy;
+    private final LlmStrategy strategy;
     private final AbstractGame game;
     private final SimpleUser user;
     private final List<ChatMessageDTO> messages = new ArrayList<>();
@@ -49,7 +49,7 @@ public class LlmConversation {
     private int mutantId;
 
 
-    public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, String strategy,
+    public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, LlmStrategy strategy,
                            boolean active, boolean success) {
         this.type = type;
         this.game = game;
@@ -144,7 +144,7 @@ public class LlmConversation {
         return String.join("", messages.stream().map(m -> "[" + m + "]").toList());
     }
 
-    public String getStrategy() {
+    public LlmStrategy getStrategy() {
         return strategy;
     }
 

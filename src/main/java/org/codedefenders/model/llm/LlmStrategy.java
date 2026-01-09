@@ -16,10 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model.llm.strategy;
+package org.codedefenders.model.llm;
 
-public class DefaultStrategy extends LlmStrategy {
-    public DefaultStrategy() {
-        super("DEFAULT");
+public enum LlmStrategy {
+    TEST_DEFAULT,
+    TEST_ANNOTATED_SINGLE_TEST,
+    TEST_FULL_SUITE,
+    MUTANT_ANNOTATED_FULL_CLASS,
+    MUTANT_ANNOTATED_SINGLE_METHOD,
+    MUTANT_DEFAULT,
+    EQUIVALENCE_DEFAULT,
+    INVALID;
+
+    /**
+     * Returns the enum with the specified name, or {@link LlmStrategy#INVALID} if such a name does not exist.
+     */
+    public static LlmStrategy of(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return INVALID;
+        }
     }
 }

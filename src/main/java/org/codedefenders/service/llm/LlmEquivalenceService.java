@@ -19,12 +19,15 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
@@ -43,6 +46,7 @@ import org.slf4j.LoggerFactory;
 @RequestScoped
 class LlmEquivalenceService extends LlmSubActionService {
     Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
+    static LlmStrategy strategy = LlmStrategy.EQUIVALENCE_DEFAULT;
 
     @Inject
     LlmPromptService promptService;
@@ -78,13 +82,13 @@ class LlmEquivalenceService extends LlmSubActionService {
      * llm is complete.
      */
     @Override
-    protected String generate() {
+    protected Optional<String> generate() {
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
             conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString(), model);
         }
         String response = promptService.getResponse(model, conversation);
-        return LlmUtils.testTemplateFromReply(response, game);
+        return Optional.of(LlmUtils.testTemplateFromReply(response, game));
     }
 
     @Override
@@ -130,6 +134,11 @@ class LlmEquivalenceService extends LlmSubActionService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    static Class<? extends LlmEquivalenceService> getService(LlmStrategy strategy) {
+        List<Class<? extends LlmSubActionService>> l = List.of(LlmEquivalenceService.class);
+        return getServiceClass(l, strategy).asSubclass(LlmEquivalenceService.class);
     }
 
 

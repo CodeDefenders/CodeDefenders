@@ -16,9 +16,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model.llm.strategy;
+package org.codedefenders.service.llm;
 
-public class SingleMethodTestStrategy extends LlmStrategy {
+import java.util.Optional;
+
+import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.servlets.games.GameManagingUtils;
+
+public class TestStrategyAnnotatedSingleTest extends LlmTestService {
+    static LlmStrategy strategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST;
     public static final String systemPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.
             Your task is to write a single unit test for a specific java class. This unit test should be able to detect
@@ -45,7 +51,18 @@ public class SingleMethodTestStrategy extends LlmStrategy {
             Never reply in natural language.
             """;
 
-    public SingleMethodTestStrategy() {
-        super("SINGLE_METHOD_TEST");
+    @Override
+    protected void onSubmitSuccess() {
+
+    }
+
+    @Override
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+
+    }
+
+    @Override
+    protected Optional<String> generate() {
+        return Optional.empty();
     }
 }

@@ -16,18 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model.llm.strategy;
+package org.codedefenders.service.llm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import jakarta.enterprise.context.RequestScoped;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.LlmUtils;
 
-public class FullTestSuiteStrategy extends LlmStrategy {
-    private List<String> tests = new ArrayList<>();
+@RequestScoped
+public class TestStrategyFullSuite extends LlmTestService {
+    private final List<String> tests = new ArrayList<>();
+    static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE;
 
-    public final String fullSuitePrompt = """
+    private static final String fullSuitePrompt = """
             You will see a class of java code. Write a complete test suite for it, using JUnit4.
 
             There is a strict rule of using at most 2 assertions per test. Always abide by it.
@@ -37,7 +45,7 @@ public class FullTestSuiteStrategy extends LlmStrategy {
             Never reply in natural language.
             """;
 
-    public final String correctionSystemPrompt = """
+    private static final String correctionSystemPrompt = """
             You will see 3 things:
             1. The code of a java class under test.
             2. The code of a test method. This test has at least one issue.
@@ -52,10 +60,6 @@ public class FullTestSuiteStrategy extends LlmStrategy {
             Write nothing but the test code.
             Never use natural language.
             """;
-
-    public FullTestSuiteStrategy() {
-        super("FULL_TEST_SUITE");
-    }
 
     public String getOneTest() {
         return tests.remove(0);
@@ -97,5 +101,58 @@ public class FullTestSuiteStrategy extends LlmStrategy {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public Optional<String> generate() {
+        if (isEmpty()) {
+            setConversationType(PromptType.DEFEND_DEFAULT);
+        } else {
+            setConversationType(PromptType.ONE_FROM_MANY);
+        }
+        if (conversation.numberOfTries() > numberOfRepairAttempts) {
+            finishConversation(false);
+            conversation = conversationBatch.getConversation(PromptType.DEFEND_DEFAULT);
+        }
+        if (conversation.getType() == PromptType.DEFEND_DEFAULT) {
+            conversation.addSystemMessage(fullSuitePrompt, model);
+            conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+            String reply = promptService.getResponse(model, conversation);
+            LlmUtils.suiteOfTestTemplatesFromReply(reply, game).forEach(this::addTest);
+            if (isEmpty()) {
+                //Not a single valid test was generated
+                finishConversation(false);
+                return Optional.empty();
+            } else {
+                finishConversation(true);
+                setConversationType(PromptType.ONE_FROM_MANY);
+            }
+        }
+        if (!conversation.isEmpty()) {
+            //There was an error on the last submission
+            String reply = promptService.getResponse(model, conversation);
+            return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
+        } else {
+            finishConversation(true);
+            setConversationType(PromptType.ONE_FROM_MANY);
+            return Optional.of(getOneTest());
+        }
+    }
+
+    @Override
+    protected void onSubmitSuccess() {
+        if (isEmpty()) {
+            finishConversation(true);
+        }
+    }
+
+    @Override
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+        if (conversation.hasSystemMessage()) {
+            conversation.addSystemMessage(correctionSystemPrompt, model);
+        }
+        String testContent = LlmUtils.extractTestContentFromReply(testSrc);
+        String userMessage = getCorrectionUserMessage(game, testContent, result);
+        conversation.addUserMessage(userMessage, model);
     }
 }

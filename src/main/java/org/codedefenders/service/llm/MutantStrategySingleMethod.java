@@ -16,9 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.model.llm.strategy;
+package org.codedefenders.service.llm;
 
-public class AnnotatedFullClassMutantStrategy extends LlmStrategy {
+import java.util.Optional;
+
+import jakarta.enterprise.context.RequestScoped;
+
+import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.servlets.games.GameManagingUtils;
+
+@RequestScoped
+public class MutantStrategySingleMethod extends LlmMutantService {
+    static LlmStrategy strategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
 
     public static final String initialPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.
@@ -26,22 +35,43 @@ public class AnnotatedFullClassMutantStrategy extends LlmStrategy {
             Every unit test that covers your bug without failing gets you a point.
             Once your bug is detected, it will stop gathering points.
 
-            You will see a java class with specific annotations. Every line has a comment in the format
-            `//coverage: c, killed: k, alive: a`
+
+            You will see the method signatures of all methods in the class.
+            Beneath every signature, there will be an annotation in this format:
+
+            ```
+            coverage: c
+            killed: k
+            alive: a
+            ```
+
             Instead of c, k or a there will be a number.
             c refers to the number of tests that already cover this line.
             k refers to the mutants that have already been killed here.
             a refers to the mutants that are currently alive.
 
-            Write a mutated version of this class to get points.
-            It is crucial that you do not include these comments with the specific annotations. Your submission
-            will be rejected if any comments of this format are included.
-
-            Write nothing but the mutated test class.
-            Never use natural language.
+            Select one method which you want to mutate. Reply with the method signature and nothing else.
             """;
 
-    public AnnotatedFullClassMutantStrategy() {
-        super("ANNOTATED_FULL_CLASS_MUTANT");
+    public static final String secondaryPrompt = """
+            Change the following piece of code in a way that is difficult to test against. It should, however, change
+            the behaviour of the program.
+
+            Reply only with the modified code, nothing else.
+            """;
+
+    @Override
+    protected void onSubmitSuccess() {
+
+    }
+
+    @Override
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundMutantResult result, String testSrc) {
+
+    }
+
+    @Override
+    protected Optional<String> generate() {
+        return Optional.empty();
     }
 }
