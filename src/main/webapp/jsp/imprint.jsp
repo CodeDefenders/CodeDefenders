@@ -34,7 +34,7 @@
 <p:main_page title="Imprint & Privacy Policy">
     <div class="container">
 
-        <h3 class="mb-3">Imprint</h3>
+        <h1 class="mb-3">Site Notice</h1>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>
@@ -47,7 +47,7 @@
             </c:choose>
         </div>
 
-        <h3 class="mt-4 mb-3">Privacy Policy</h3>
+        <h2 class="mt-4 mb-3 h1">Privacy Policy</h2>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>
