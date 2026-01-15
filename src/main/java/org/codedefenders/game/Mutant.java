@@ -317,7 +317,7 @@ public class Mutant implements Serializable {
     }
 
     public boolean doesRequireRecompilation() {
-        return CollectionUtils.containsAny(getCUT().getCompileTimeConstants(), getLines());
+        return CollectionUtils.containsAny(getCUT().getCompileTimeConstantLines(), getLines());
     }
 
     public Patch<String> getDifferences() {

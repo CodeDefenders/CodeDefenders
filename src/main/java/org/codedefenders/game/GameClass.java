@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.service.ClassAnalysisService;
@@ -283,7 +284,11 @@ public class GameClass {
      * @return All lines of compile time constants as a {@link List} of {@link Integer Integers}.
      * Can be empty, but never {@code null}.
      */
-    public List<Integer> getCompileTimeConstants() {
+    public List<Integer> getCompileTimeConstantLines() {
+        return Collections.unmodifiableList(getClassAnalysis().getCompileTimeConstantLines());
+    }
+
+    public List<ClassCodeAnalyser.CompileTimeConstant> getCompileTimeConstants() {
         return Collections.unmodifiableList(getClassAnalysis().getCompileTimeConstants());
     }
 
