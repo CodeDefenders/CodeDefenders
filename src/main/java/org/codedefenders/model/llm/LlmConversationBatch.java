@@ -41,6 +41,11 @@ public class LlmConversationBatch {
 
     private final LlmStrategy strategy;
 
+    /**
+     * An undefined item that can be used in any way necessary to transport data between actions.
+     */
+    private Object baggage;
+
     public LlmConversationBatch(AbstractGame game, SimpleUser user, LlmStrategy strategy) {
         this.game = game;
         this.user = user;
@@ -72,5 +77,13 @@ public class LlmConversationBatch {
             messageLists.put(type, con);
         }
         return messageLists.get(type);
+    }
+
+    public Object getBaggage() {
+        return baggage;
+    }
+
+    public void setBaggage(Object baggage) {
+        this.baggage = baggage;
     }
 }

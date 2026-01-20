@@ -19,7 +19,6 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,11 +37,8 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.jboss.weld.environment.util.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.reflect.Reflection;
 
 abstract class LlmTestService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
@@ -65,7 +61,7 @@ abstract class LlmTestService extends LlmSubActionService {
     @Override
     protected void submit(String testSrc) {
         switch (conversation.getType()) {
-            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, ONE_FROM_MANY -> {
+            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, DEFEND_ONE_FROM_MANY -> {
             }
             default -> throw new RuntimeException("Conversation during test submission may not be of type "
                     + conversation.getType());

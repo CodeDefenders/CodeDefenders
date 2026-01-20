@@ -32,13 +32,15 @@ import org.codedefenders.util.LlmUtils;
 
 @RequestScoped
 public class TestStrategyFullSuite extends LlmTestService {
-    private final List<String> tests = new ArrayList<>();
+    //private final List<String> tests = new ArrayList<>();
     static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE;
 
     private static final String fullSuitePrompt = """
             You will see a class of java code. Write a complete test suite for it, using JUnit4.
 
             There is a strict rule of using at most 2 assertions per test. Always abide by it.
+
+            Every test must be self-contained, do not use any setup or utility methods.
 
             Write nothing but the code of the test class.
 
@@ -54,26 +56,33 @@ public class TestStrategyFullSuite extends LlmTestService {
             Your task is to fix the issue. The response should consist of nothing but the fixed test code.
             If the test cannot be fixed, it is acceptable to write a new test.
 
-            A test should never have more than 2 assertions.
+            There is a strict rule of using at most 2 assertions per test. Always abide by it.
             A test should only use JUnit4.
 
             Write nothing but the test code.
             Never use natural language.
             """;
 
+    private FullSuiteBaggage baggage() {
+        if (conversationBatch.getBaggage() == null) {
+            conversationBatch.setBaggage(new FullSuiteBaggage());
+        }
+        return (FullSuiteBaggage)conversationBatch.getBaggage();
+    }
+
     public String getOneTest() {
-        return tests.remove(0);
+        return baggage().tests.remove(0);
     }
 
     public boolean isEmpty() {
-        return tests.isEmpty();
+        return baggage().tests.isEmpty();
     }
 
     public void addTest(String test) {
         if (test == null) {
             throw new NullPointerException("Test may not be null");
         }
-        tests.add(test);
+        baggage().tests.add(test);
     }
 
     public String getCorrectionUserMessage(AbstractGame game, String testCode,
@@ -108,7 +117,7 @@ public class TestStrategyFullSuite extends LlmTestService {
         if (isEmpty()) {
             setConversationType(PromptType.DEFEND_DEFAULT);
         } else {
-            setConversationType(PromptType.ONE_FROM_MANY);
+            setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
         }
         if (conversation.numberOfTries() > numberOfRepairAttempts) {
             finishConversation(false);
@@ -125,7 +134,7 @@ public class TestStrategyFullSuite extends LlmTestService {
                 return Optional.empty();
             } else {
                 finishConversation(true);
-                setConversationType(PromptType.ONE_FROM_MANY);
+                setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
             }
         }
         if (!conversation.isEmpty()) {
@@ -134,25 +143,29 @@ public class TestStrategyFullSuite extends LlmTestService {
             return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
         } else {
             finishConversation(true);
-            setConversationType(PromptType.ONE_FROM_MANY);
+            setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
             return Optional.of(getOneTest());
         }
     }
 
     @Override
     protected void onSubmitSuccess() {
-        if (isEmpty()) {
+        if (isEmpty()  || !conversation.isEmpty()) {
             finishConversation(true);
         }
     }
 
     @Override
     protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
-        if (conversation.hasSystemMessage()) {
+        if (!conversation.hasSystemMessage()) {
             conversation.addSystemMessage(correctionSystemPrompt, model);
         }
         String testContent = LlmUtils.extractTestContentFromReply(testSrc);
         String userMessage = getCorrectionUserMessage(game, testContent, result);
         conversation.addUserMessage(userMessage, model);
+    }
+
+    private static class FullSuiteBaggage {
+        private final List<String> tests = new ArrayList<>();
     }
 }

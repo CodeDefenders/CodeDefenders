@@ -54,5 +54,5 @@ public enum PromptType {
     /**
      * Used for Whole-test-suite-strategies.
      */
-    ONE_FROM_MANY
+    DEFEND_ONE_FROM_MANY
 }
