@@ -21,7 +21,9 @@ package org.codedefenders.service.llm;
 import java.util.Optional;
 
 import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.LlmUtils;
 
 public class TestStrategyAnnotatedSingleTest extends LlmTestService {
     static LlmStrategy strategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST;
@@ -44,7 +46,7 @@ public class TestStrategyAnnotatedSingleTest extends LlmTestService {
 
             There is a strict rule of using at most 2 assertions per test. Always abide by it.
 
-            Write nothing but the code of the test class.
+            Write nothing but the code of the single test.
 
             Use JUnit 4.
 
@@ -53,16 +55,23 @@ public class TestStrategyAnnotatedSingleTest extends LlmTestService {
 
     @Override
     protected void onSubmitSuccess() {
-
+        finishConversation(true);
     }
 
     @Override
     protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
-
+        standardSubmitFailure(result, testSrc);
     }
 
     @Override
     protected Optional<String> generate() {
-        return Optional.empty();
+        setConversationType(PromptType.DEFEND_DEFAULT);
+        resetConversationAfterTooManyTries();
+        if (!conversation.lastMessageWasError()) {
+            conversation.addSystemMessage(systemPrompt, model);
+            conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
+        }
+        String reply = promptService.getResponse(model, conversation);
+        return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
     }
 }

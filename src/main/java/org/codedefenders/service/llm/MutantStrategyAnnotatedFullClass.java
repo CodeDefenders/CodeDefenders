@@ -21,6 +21,7 @@ package org.codedefenders.service.llm;
 import java.util.Optional;
 
 import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
@@ -52,7 +53,7 @@ public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
 
     @Override
     protected void onSubmitSuccess() {
-
+        finishConversation(true);
     }
 
     @Override
@@ -62,6 +63,8 @@ public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
 
     @Override
     protected Optional<String> generate() {
+        setConversationType(PromptType.ATTACK_DEFAULT);
+        resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             conversation.addSystemMessage(MutantStrategyAnnotatedFullClass.initialPrompt, model);
             conversation.addUserMessage(LlmUtils.annotatedCut(game), model);

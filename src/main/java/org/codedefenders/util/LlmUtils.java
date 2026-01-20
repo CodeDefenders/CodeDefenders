@@ -206,17 +206,20 @@ public class LlmUtils {
         for (Test t : game.getTests()) {
             LineCoverage lc = t.getLineCoverage();
             for (int i : lc.getLinesCovered()) {
+                i = Math.min(i, coverage.length - 1);
                 coverage[i - 1]++;
             }
         }
 
         for (Mutant m : game.getKilledMutants()) {
             for (int i : m.getLines()) {
+                i = Math.min(i, killedLines.length - 1);
                 killedLines[i - 1]++;
             }
         }
         for (Mutant m : game.getAliveMutants()) {
             for (int i : m.getLines()) {
+                i = Math.min(i, livingLines.length - 1);
                 livingLines[i - 1]++;
             }
         }

@@ -204,9 +204,9 @@ public class LlmManagerService {
         LlmStrategy conStrategy;
         if (strategy != null) {
             conStrategy = strategy;
-        } else {
+        } else { //TODO Define default strategies elsewhere
             if (role == Role.DEFENDER) {
-                conStrategy = LlmStrategy.TEST_DEFAULT;
+                conStrategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST;
             } else {
                 conStrategy = LlmStrategy.MUTANT_DEFAULT;
             }
@@ -351,7 +351,7 @@ public class LlmManagerService {
                                  LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
         if (testStrategy == null) {
-            testStrategy = LlmStrategy.TEST_DEFAULT;
+            testStrategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST; //TODO Define default strategies elsewhere
         }
         if (mutantStrategy == null) {
             mutantStrategy = LlmStrategy.MUTANT_DEFAULT;

@@ -32,6 +32,7 @@ import org.codedefenders.util.CDIUtil;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 
 /**
  * This represents the prompts and responses of an LLM.
@@ -92,7 +93,7 @@ public class LlmConversation {
     }
 
     public void addUserMessage(String msg, LlModel model) {
-        add(SystemMessage.from(msg), model);
+        add(UserMessage.from(msg), model);
     }
 
     public ChatMessage[] toArray() {
