@@ -165,7 +165,10 @@ public class TestStrategyFullSuite extends LlmTestService {
         conversation.addUserMessage(userMessage, model);
     }
 
-    private static class FullSuiteBaggage {
+    static class FullSuiteBaggage {
         private final List<String> tests = new ArrayList<>();
+        boolean isEmpty() {
+            return tests.isEmpty();
+        }
     }
 }

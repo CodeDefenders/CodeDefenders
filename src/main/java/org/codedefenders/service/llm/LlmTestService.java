@@ -161,7 +161,9 @@ abstract class LlmTestService extends LlmSubActionService {
         List<Class<? extends LlmSubActionService>> l = List.of(
                 TestStrategyDefault.class,
                 TestStrategyAnnotatedSingleTest.class,
-                TestStrategyFullSuite.class);
+                TestStrategyFullSuite.class,
+                TestStrategyFullSuitePlusDefault.class
+                );
         return getServiceClass(l, strategy).asSubclass(LlmTestService.class);
     }
 
