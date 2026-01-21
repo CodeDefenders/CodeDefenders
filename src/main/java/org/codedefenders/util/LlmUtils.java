@@ -30,6 +30,7 @@ import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -92,7 +93,7 @@ public class LlmUtils {
         return extractMutantFromReply(reply, firstDependencyName);
     }
 
-    static String extractMutantFromReply(String reply, String firstDependencyName) {
+    public static String extractMutantFromReply(String reply, String firstDependencyName) {
         String formattedResult = reply.replace("```java\n", "")
                 .replace("```java", "")
                 .replace("```\n", "")
@@ -229,5 +230,53 @@ public class LlmUtils {
         }
 
         return String.join("\n", lines);
+    }
+
+    public static String annotatedMethodDescriptions(AbstractGame game, CompilationUnit cu) {
+        List<MethodDeclaration> declarations = new ArrayList<>();
+        cu.stream().forEach(node -> {
+            if (node instanceof MethodDeclaration decl) {
+                declarations.add(decl);
+            }
+        });
+
+        List<String> resultList = new ArrayList<>();
+
+        for (MethodDeclaration decl : declarations) {
+            int alive = 0;
+            int killed = 0;
+            List<Mutant> mutants = game.getMutants();
+            for (Mutant m : mutants) {
+                if (isInMethod(decl, m.getLines())) {
+                    if (m.isAlive()) {
+                        alive++;
+                    } else {
+                        killed++;
+                    }
+                }
+            }
+            int coverage = 0;
+            for (Test t : game.getTests()) {
+                if (isInMethod(decl, t.getLineCoverage().getLinesCovered())) {
+                    coverage++;
+                }
+            }
+            resultList.add(decl.getDeclarationAsString());
+            resultList.add("coverage: " + coverage);
+            resultList.add("killed: " + killed);
+            resultList.add("alive: " + alive);
+        }
+        return String.join("\n", resultList);
+    }
+
+    private static boolean isInMethod(MethodDeclaration decl, List<Integer> lines) {
+        int begin = decl.getBegin().orElseThrow().line;
+        int end = decl.getEnd().orElseThrow().line;
+        for (int i : lines) {
+            if (i >= begin && i <= end) {
+                return true;
+            }
+        }
+        return false;
     }
 }

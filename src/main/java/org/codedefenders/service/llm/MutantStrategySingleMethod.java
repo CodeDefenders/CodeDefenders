@@ -18,22 +18,36 @@
  */
 package org.codedefenders.service.llm;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import jakarta.enterprise.context.RequestScoped;
 
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.JavaParserUtils;
+import org.codedefenders.util.LlmUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.Range;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
 @RequestScoped
 public class MutantStrategySingleMethod extends LlmMutantService {
+    private static Logger logger = LoggerFactory.getLogger(MutantStrategySingleMethod.class);
     static LlmStrategy strategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
 
     public static final String initialPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.
             You get points by writing bugs in source code that are difficult to detect by unit tests.
-            Every unit test that covers your bug without failing gets you a point.
-            Once your bug is detected, it will stop gathering points.
+            These bugs are called mutants.
+            Every unit test that covers your mutant without failing gets you a point.
+            Once your mutant is detected, it will stop gathering points.
 
 
             You will see the method signatures of all methods in the class.
@@ -46,11 +60,16 @@ public class MutantStrategySingleMethod extends LlmMutantService {
             ```
 
             Instead of c, k or a there will be a number.
-            c refers to the number of tests that already cover this line.
-            k refers to the mutants that have already been killed here.
-            a refers to the mutants that are currently alive.
+            c refers to the number of tests that already cover this method.
+            k refers to the mutants in this method that have already been killed.
+            a refers to the mutants in this method that are currently alive.
 
             Select one method which you want to mutate. Reply with the method signature and nothing else.
+            Never reply with natural language.
+            """;
+
+    public static final String initialRepairPrompt = """
+                There is no method with this signature.
             """;
 
     public static final String secondaryPrompt = """
@@ -62,7 +81,8 @@ public class MutantStrategySingleMethod extends LlmMutantService {
 
     @Override
     protected void onSubmitSuccess() {
-
+        finishConversation(true);
+        baggage().methodDeclaration = null;
     }
 
     @Override
@@ -72,6 +92,90 @@ public class MutantStrategySingleMethod extends LlmMutantService {
 
     @Override
     protected Optional<String> generate() {
-        return Optional.empty();
+        if (baggage().methodDeclaration == null) {
+            setConversationType(PromptType.ATTACK_DEFAULT);
+        } else {
+            setConversationType(PromptType.ATTACK_DEPENDENCIES);
+        }
+        resetConversationAfterTooManyTries();
+        if (conversation.getType() == PromptType.ATTACK_DEFAULT) {
+            if (conversation.isEmpty()) {
+                conversation.addSystemMessage(initialPrompt, model);
+                conversation.addUserMessage(
+                        LlmUtils.annotatedMethodDescriptions(game, baggage().compilationUnit), model);
+            }
+            String reply = promptService.getResponse(model, conversation);
+            MethodDeclaration declaration = baggage().getMethodDeclaration(reply);
+            if (declaration == null) {
+                conversation.addUserMessage(initialRepairPrompt, model);
+            } else {
+                baggage().methodDeclaration = declaration;
+                finishConversation(true);
+                setConversationType(PromptType.ATTACK_DEPENDENCIES);
+            }
+            return Optional.empty();
+            //baggage().methodSignature = reply;
+
+        } else if (conversation.getType() == PromptType.ATTACK_DEPENDENCIES) {
+            //TODO Define other enum values, dependencies is placeholder
+            String originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
+
+            if (conversation.isEmpty()) {
+                conversation.addSystemMessage(secondaryPrompt, model);
+                conversation.addUserMessage(originalMethodCode, model);
+            }
+
+            String reply = promptService.getResponse(model, conversation);
+            reply = LlmUtils.extractMutantFromReply(reply, null);
+            return Optional.of(game.getCUT().getSourceCode().replace(originalMethodCode, reply));
+        } else {
+            throw new RuntimeException("No support for this conversation type: " + conversation.getType());
+        }
     }
+
+    private SingleMethodBaggage baggage() {
+        if (conversationBatch.getBaggage() == null) {
+            conversationBatch.setBaggage(new SingleMethodBaggage(game));
+        }
+        return (SingleMethodBaggage)conversationBatch.getBaggage();
+    }
+
+    private static class SingleMethodBaggage {
+        private MethodDeclaration methodDeclaration;
+        private final CompilationUnit compilationUnit;
+
+        private SingleMethodBaggage(AbstractGame game) {
+            compilationUnit = JavaParserUtils.parse(game.getCUT().getSourceCode())
+                    .orElseThrow(IllegalStateException::new);
+        }
+
+        private MethodDeclaration getMethodDeclaration(String signature) {
+            return compilationUnit.accept(new MethodNameVisitor(), signature);
+        }
+
+        private String getMethodContent(String source) {
+            Range range =  methodDeclaration.getRange().orElseThrow();
+            int begin = range.begin.line - 1;
+            int end = range.end.line;
+            String[] lines = source.split("\n");
+            String [] methodLines = Arrays.copyOfRange(lines, begin, end);
+            String methodString = String.join("\n", methodLines);
+            logger.info("Original method String: {}", methodString);
+            return methodString;
+        }
+    }
+
+    private static class MethodNameVisitor extends GenericVisitorAdapter<MethodDeclaration, String> {
+        @Override
+        public MethodDeclaration visit(MethodDeclaration methodDeclaration, String searchedFor) {
+            //super.visit(methodDeclaration, searchedFor);
+            String stringRepresentation = methodDeclaration.getDeclarationAsString();
+            if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
+                return methodDeclaration;
+            } else {
+                return null;
+            }
+        }
+    }
+
 }
