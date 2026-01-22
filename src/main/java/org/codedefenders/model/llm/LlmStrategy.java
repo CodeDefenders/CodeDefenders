@@ -25,10 +25,27 @@ public enum LlmStrategy {
     TEST_FULL_SUITE_PLUS_DEFAULT,
     TEST_FULL_SUITE_PLUS_ANNOTATED,
     MUTANT_ANNOTATED_FULL_CLASS,
-    MUTANT_ANNOTATED_SINGLE_METHOD,
+    MUTANT_ANNOTATED_SINGLE_METHOD(0.5),
     MUTANT_DEFAULT,
     EQUIVALENCE_DEFAULT,
     INVALID;
+
+    /**
+     * The time between LLM actions is reduced by this multiplier.
+     */
+    final double timeModifier;
+
+    LlmStrategy(double timeModifier) {
+        this.timeModifier = timeModifier;
+    }
+
+    LlmStrategy() {
+        this(1);
+    }
+
+    public double getTimeModifier() {
+        return timeModifier;
+    }
 
     /**
      * Returns the enum with the specified name, or {@link LlmStrategy#INVALID} if such a name does not exist.

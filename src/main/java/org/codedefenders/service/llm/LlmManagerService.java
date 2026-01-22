@@ -167,8 +167,8 @@ public class LlmManagerService {
      * Returns the minimum number of seconds between two actions of the same llm thread.
      */
     private int getLlmActionInterval() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
-                .getIntValue();
+        return (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
+                .getIntValue());
     }
 
     private boolean isLlmPlayerActive(AbstractGame game, Role role) {
@@ -281,7 +281,11 @@ public class LlmManagerService {
                              final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
                               final LlmStrategy equivalenceStrategy, final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
-        long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
+
+        double timeModifier = role == Role.DEFENDER ? testStrategy.getTimeModifier()
+                : role == Role.ATTACKER ? mutantStrategy.getTimeModifier()
+                : 1;
+        long timeToStartNextThread = (int)(getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
         if (equivalentOnlyGames.contains(game.getId())) {
             game.getAliveMutants().stream()
