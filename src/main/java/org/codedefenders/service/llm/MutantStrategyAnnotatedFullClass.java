@@ -44,12 +44,15 @@ public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
             a refers to the mutants that are currently alive.
 
             Write a mutated version of this class to get points.
+
             It is crucial that you do not include these comments with the specific annotations. Your submission
             will be rejected if any comments of this format are included.
             Other comments must remain as they are.
 
+            Changing several parts of will only make you more likely to be detected, so keep your changes small.
+
             There is a strict rule of not allowing any new control structures, such as if, while, ternary \
-            operators, etc.
+            operators, etc. Always abide by it.
 
             Reply only with the modified code, nothing else.
 
