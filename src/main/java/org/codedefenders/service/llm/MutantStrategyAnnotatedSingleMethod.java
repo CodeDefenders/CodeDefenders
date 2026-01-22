@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.CallableDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
@@ -109,7 +111,7 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
                         LlmUtils.annotatedMethodDescriptions(game, baggage().compilationUnit), model);
             }
             String reply = promptService.getResponse(model, conversation);
-            MethodDeclaration declaration = baggage().getMethodDeclaration(reply);
+            CallableDeclaration<?> declaration = baggage().getCallableDeclaration(reply);
             if (declaration == null) {
                 conversation.addUserMessage(initialRepairPrompt, model);
             } else {
@@ -145,7 +147,7 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
     }
 
     private static class SingleMethodBaggage {
-        private MethodDeclaration methodDeclaration;
+        private CallableDeclaration<?> methodDeclaration;
         private final CompilationUnit compilationUnit;
 
         private SingleMethodBaggage(AbstractGame game) {
@@ -153,7 +155,7 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
                     .orElseThrow(IllegalStateException::new);
         }
 
-        private MethodDeclaration getMethodDeclaration(String signature) {
+        private CallableDeclaration<?> getCallableDeclaration(String signature) {
             return compilationUnit.accept(new MethodNameVisitor(), signature);
         }
 
@@ -169,13 +171,25 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
         }
     }
 
-    private static class MethodNameVisitor extends GenericVisitorAdapter<MethodDeclaration, String> {
+    //TODO Generalize with other Single-Method-Mutants
+    private static class MethodNameVisitor extends GenericVisitorAdapter<CallableDeclaration<?>, String> {
         @Override
         public MethodDeclaration visit(MethodDeclaration methodDeclaration, String searchedFor) {
             //super.visit(methodDeclaration, searchedFor);
             String stringRepresentation = methodDeclaration.getDeclarationAsString();
             if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
                 return methodDeclaration;
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public ConstructorDeclaration visit(ConstructorDeclaration constructorDeclaration, String searchedFor) {
+            //super.visit(methodDeclaration, searchedFor);
+            String stringRepresentation = constructorDeclaration.getDeclarationAsString();
+            if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
+                return constructorDeclaration;
             } else {
                 return null;
             }
