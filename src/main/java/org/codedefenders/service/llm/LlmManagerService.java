@@ -282,9 +282,10 @@ public class LlmManagerService {
                               final LlmStrategy equivalenceStrategy, final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
 
-        double timeModifier = role == Role.DEFENDER ? testStrategy.getTimeModifier()
-                : role == Role.ATTACKER ? mutantStrategy.getTimeModifier()
-                : 1;
+        LlmStrategy timeModStrategy = role == Role.DEFENDER ? testStrategy : mutantStrategy; //TODO melee games
+        double timeModifier = timeModStrategy != null ? timeModStrategy.getTimeModifier() : 1;
+
+
         long timeToStartNextThread = (int)(getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
         if (equivalentOnlyGames.contains(game.getId())) {
