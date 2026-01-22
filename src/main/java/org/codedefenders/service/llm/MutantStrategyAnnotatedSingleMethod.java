@@ -38,8 +38,8 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
 @RequestScoped
-public class MutantStrategySingleMethod extends LlmMutantService {
-    private static Logger logger = LoggerFactory.getLogger(MutantStrategySingleMethod.class);
+public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
+    private static Logger logger = LoggerFactory.getLogger(MutantStrategyAnnotatedSingleMethod.class);
     static LlmStrategy strategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
 
     public static final String initialPrompt = """
@@ -74,7 +74,7 @@ public class MutantStrategySingleMethod extends LlmMutantService {
 
     public static final String secondaryPrompt = """
             Change the following piece of java code in a way that is difficult to test against.
-            It should, however, change the behaviour of the program.
+            Your change has to introduce changes to the behaviour, it must not be equivalent to the original code.
 
             There is a strict rule of not allowing any new control structures, such as if, while, ternary \
             operators, etc.

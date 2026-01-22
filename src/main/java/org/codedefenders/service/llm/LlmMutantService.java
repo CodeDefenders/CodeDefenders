@@ -86,7 +86,8 @@ abstract class LlmMutantService extends LlmSubActionService {
         List<Class<? extends LlmSubActionService>> l = List.of(
                 MutantStrategyDefault.class,
                 MutantStrategyAnnotatedFullClass.class,
-                MutantStrategySingleMethod.class);
+                MutantStrategyAnnotatedSingleMethod.class,
+                MutantStrategyRandomSingleMethod.class);
         return getServiceClass(l, strategy).asSubclass(LlmMutantService.class);
     }
 }

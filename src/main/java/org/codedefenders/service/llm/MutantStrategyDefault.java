@@ -36,7 +36,7 @@ public class MutantStrategyDefault extends LlmMutantService {
 
     private static final String systemPrompt = """
             Change the following java class in a way that is difficult to test against.
-            It should, however, change the behaviour of the program.
+            Your change has to introduce changes to the behaviour, it must not be equivalent to the original code.
 
             There is a strict rule of not allowing any new control structures, such as if, while, ternary \
             operators, etc.

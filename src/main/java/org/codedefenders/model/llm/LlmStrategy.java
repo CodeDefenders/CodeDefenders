@@ -28,7 +28,7 @@ public enum LlmStrategy {
     MUTANT_ANNOTATED_SINGLE_METHOD(0.5),
     MUTANT_DEFAULT,
     EQUIVALENCE_DEFAULT,
-    INVALID;
+    INVALID, MUTANT_RANDOM_SINGLE_METHOD;
 
     /**
      * The time between LLM actions is reduced by this multiplier.
