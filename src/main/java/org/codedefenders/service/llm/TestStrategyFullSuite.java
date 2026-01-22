@@ -36,7 +36,9 @@ public class TestStrategyFullSuite extends LlmTestService {
     static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE;
 
     private static final String fullSuitePrompt = """
-            You will see a class of java code. Write a complete test suite for it, using JUnit4.
+            You are an experienced Java developer.
+
+            You will see a class of java code. Write a complete test suite for it.
 
             There is a strict rule of using at most 2 assertions per test. Always abide by it.
 
@@ -44,10 +46,14 @@ public class TestStrategyFullSuite extends LlmTestService {
 
             Write nothing but the code of the test class.
 
+            Use JUnit 4.
+
             Never reply in natural language.
             """;
 
     private static final String correctionSystemPrompt = """
+            You are an experienced Java developer.
+
             You will see 3 things:
             1. The code of a java class under test.
             2. The code of a test method. This test has at least one issue.
@@ -57,10 +63,12 @@ public class TestStrategyFullSuite extends LlmTestService {
             If the test cannot be fixed, it is acceptable to write a new test.
 
             There is a strict rule of using at most 2 assertions per test. Always abide by it.
-            A test should only use JUnit4.
 
             Write nothing but the test code.
-            Never use natural language.
+
+            Use JUnit 4.
+
+            Never reply in natural language.
             """;
 
     private FullSuiteBaggage baggage() {

@@ -46,8 +46,13 @@ public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
             Write a mutated version of this class to get points.
             It is crucial that you do not include these comments with the specific annotations. Your submission
             will be rejected if any comments of this format are included.
+            Other comments must remain as they are.
 
-            Write nothing but the mutated test class.
+            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
+            operators, etc.
+
+            Reply only with the modified code, nothing else.
+
             Never use natural language.
             """;
 

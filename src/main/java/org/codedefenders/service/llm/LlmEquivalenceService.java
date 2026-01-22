@@ -48,6 +48,24 @@ class LlmEquivalenceService extends LlmSubActionService {
     Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
     static LlmStrategy strategy = LlmStrategy.EQUIVALENCE_DEFAULT;
 
+    private static final String systemPrompt = """
+            You are an experienced Java developer.
+
+            You will see two things, separated by "###":
+            1: The code of a java class.
+            2: The git diff of a change to that class.
+
+            Your task is to write a test that succeeds on the class as seen, but fails after the diff is applied.
+
+            There is a strict rule of using at most 2 assertions. Always abide by it.
+
+            Write nothing but the code of the single test.
+
+            Use JUnit 4.
+
+            Never reply in natural language.
+            """;
+
     @Inject
     LlmPromptService promptService;
 
@@ -84,8 +102,10 @@ class LlmEquivalenceService extends LlmSubActionService {
     @Override
     protected Optional<String> generate() {
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
-            conversation.addUserMessage(game.getCUT().getSourceCode() + "\n" + flagged.getPatchString(), model);
+            //conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
+            conversation.addSystemMessage(systemPrompt, model); //TODO Eventually add customizability back in
+            conversation.addUserMessage(game.getCUT().getSourceCode()
+                    + "\n###\n" + flagged.getPatchString(), model);
         }
         String response = promptService.getResponse(model, conversation);
         return Optional.of(LlmUtils.testTemplateFromReply(response, game));

@@ -29,18 +29,44 @@ public class TestStrategyDefault extends LlmTestService {
     static LlmStrategy strategy = LlmStrategy.TEST_DEFAULT;
 
     private static final String defaultPrompt = """
-            Write a single test for the following Java code using a maximum of 2 assertions.
-            Write only the content of the test method, without including formatting, comments,
-            the header or the method declaration. Use JUnit 4.""";
+            You are an experienced Java developer.
+
+            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
+            changes to the code. These changes are called 'mutants'.
+            These mutants are difficult to find, so you have to be crafty.
+
+            You will see a class of Java code.
+            The test must target this class.
+
+            There is a strict rule of using at most 2 assertions. Always abide by it.
+
+            Write nothing but the code of the single test.
+
+            Use JUnit 4.
+
+            Never reply in natural language.
+            """;
     private static final String dependencyPrompt = """
             Write a single test for the first class of the following Java code using a maximum of 2 assertions.
             The other classes are dependencies of the first class, you don't need to test them.
             Write only the content of the test method, without including formatting, comments,
-            the header or the method declaration. Use JUnit 4.""";
+            the header or the method declaration. Use JUnit 4.""";//TODO Not in use for the experiment
     private static final String focusPrompt = """
-            Write a single test for the method %s of the following Java code using a maximum of 2 assertions.
-            Write only the content of the test method, without including formatting, comments,
-            the header or the method declaration. Use JUnit 4.""";
+            You are an experienced Java developer.
+
+            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
+            changes to the code. These changes are called 'mutants'.
+            These mutants are difficult to find, so you have to be crafty.
+
+            You will see a class of Java code.
+            The test must target the method %s.
+
+            There is a strict rule of using at most 2 assertions. Always abide by it.
+
+            Write nothing but the code of the single test.
+
+            Never reply in natural language.
+            """;
 
     @Override
     public Optional<String> generate() {

@@ -34,6 +34,22 @@ public class MutantStrategyDefault extends LlmMutantService {
     Logger logger = LoggerFactory.getLogger(MutantStrategyDefault.class);
     static LlmStrategy strategy = LlmStrategy.MUTANT_DEFAULT;
 
+    private static final String systemPrompt = """
+            Change the following java class in a way that is difficult to test against.
+            It should, however, change the behaviour of the program.
+
+            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
+            operators, etc.
+            Comments must remain as they are.
+
+            You might see some diffs of mutants at the end of the user message.
+            Those mutants already exist, create different ones.
+
+            Reply only with the modified code, nothing else.
+
+            Never reply with natural language.
+            """;
+
     @Override
     protected Optional<String> generate() {
         PromptType promptType = getCorrectAttackPromptType();
@@ -41,7 +57,8 @@ public class MutantStrategyDefault extends LlmMutantService {
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             {
-                conversation.addSystemMessage(getSystemPrompt(model, promptType), model);
+                //conversation.addSystemMessage(getSystemPrompt(model, promptType), model);TODO Eventually add back
+                conversation.addSystemMessage(systemPrompt, model);
                 String userMessage = getSourceCodeForUserMessage();
                 if (random.nextBoolean()) {
                     userMessage += "\n####\n" + getExistingMutantDiffsMessage();

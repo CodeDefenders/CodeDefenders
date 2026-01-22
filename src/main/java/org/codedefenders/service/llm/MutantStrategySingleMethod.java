@@ -73,8 +73,12 @@ public class MutantStrategySingleMethod extends LlmMutantService {
             """;
 
     public static final String secondaryPrompt = """
-            Change the following piece of code in a way that is difficult to test against. It should, however, change
-            the behaviour of the program.
+            Change the following piece of java code in a way that is difficult to test against.
+            It should, however, change the behaviour of the program.
+
+            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
+            operators, etc.
+            Comments must remain as they are.
 
             Reply only with the modified code, nothing else.
             """;
