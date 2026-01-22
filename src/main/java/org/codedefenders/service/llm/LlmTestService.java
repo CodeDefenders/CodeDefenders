@@ -162,7 +162,8 @@ abstract class LlmTestService extends LlmSubActionService {
                 TestStrategyDefault.class,
                 TestStrategyAnnotatedSingleTest.class,
                 TestStrategyFullSuite.class,
-                TestStrategyFullSuitePlusDefault.class
+                TestStrategyFullSuitePlusDefault.class,
+                TestStrategyFullSuitePlusAnnotated.class
                 );
         return getServiceClass(l, strategy).asSubclass(LlmTestService.class);
     }
