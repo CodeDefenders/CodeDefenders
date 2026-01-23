@@ -36,6 +36,8 @@ import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 
+import com.google.gson.Gson;
+
 
 @WebServlet("/llm-api/battleground/set-llm")
 public class SetLlmAPI extends APIServlet {
@@ -108,7 +110,18 @@ public class SetLlmAPI extends APIServlet {
         }
         boolean active = llmService.getModelForGame(gameId.get(), Role.DEFENDER).isPresent()
                 || llmService.getModelForGame(gameId.get(), Role.ATTACKER).isPresent();
-        writeResponse(response, HttpServletResponse.SC_OK, active);
+        String attackerError = llmService.getErrorMessage(gameId.get(), Role.ATTACKER).orElse("");
+        String defenderError = llmService.getErrorMessage(gameId.get(), Role.DEFENDER).orElse("");
+
+        Gson gson = new Gson();
+        CheckStatusDTO dto = new CheckStatusDTO(active, attackerError, defenderError);
+        String json = gson.toJson(dto);
+        writeResponse(response, HttpServletResponse.SC_OK, json);
+
+
+    }
+
+    private record CheckStatusDTO(boolean active, String attackerError, String defenderError) {
     }
 
     private enum Action {

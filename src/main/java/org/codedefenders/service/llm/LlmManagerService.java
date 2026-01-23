@@ -267,8 +267,12 @@ public class LlmManagerService {
         getCorrectErrorMap(role).put(game.getId(), timestamp + ": " + e.toString());
     }
 
+    public Optional<String> getErrorMessage(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectErrorMap(role).get(gameId));
+    }
+
     public Optional<String> getErrorMessage(AbstractGame game, Role role) {
-        return Optional.ofNullable(getCorrectErrorMap(role).get(game.getId()));
+        return getErrorMessage(game.getId(), role);
     }
 
     /**
@@ -278,7 +282,7 @@ public class LlmManagerService {
      * the model has been deactivated, it terminates itself.
      */
     private void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
-                             final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
+                              final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
                               final LlmStrategy equivalenceStrategy, final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
 
@@ -286,7 +290,7 @@ public class LlmManagerService {
         double timeModifier = timeModStrategy != null ? timeModStrategy.getTimeModifier() : 1;
 
 
-        long timeToStartNextThread = (int)(getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
+        long timeToStartNextThread = (int) (getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
         if (equivalentOnlyGames.contains(game.getId())) {
             game.getAliveMutants().stream()
