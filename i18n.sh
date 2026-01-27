@@ -1,6 +1,7 @@
 if [ "$1" = "extract" ]; then
   # create keys.pot file by extracting all strings that should be translated
-  node ./node_modules/xgettext-regex/bin/xgettext-regex.js src -f "(?:i18n.tr|I18n.marktr)" -o po/keys.pot
+  node ./node_modules/xgettext-regex/bin/xgettext-regex.js src -r "(?<=(?:i18n.tr|I18n.marktr|i18n.trn)\\(\\s*(?:(?:\"(?:[^\"]|\\\\.)*\"|'(?:[^']|\\\\.)*')\\s*,\\s*)*)(([\"'])(?:(?=(\\\\?))\\3.)*?\\2)(?=(?:\\s*,\\s*(?:\"(?:[^\"]|\\\\.)*\"|'(?:[^']|\\\\.)*'|[^\"')]+))*\\s*\\))" -i 1 -o po/keys.pot
+  #node ./node_modules/xgettext-regex/bin/xgettext-regex.js src -f "(?:i18n.tr|I18n.marktr|i18n.trn)" -o po/keys.pot
 elif [ "$1" = "compile" ]; then
   # create the Messages_language.class resource bundle files for all of the .po files
   for po_file in po/*.po; do
