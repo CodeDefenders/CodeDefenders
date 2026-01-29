@@ -138,7 +138,10 @@ public class LlmConversationRepository {
                     SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
                     boolean active = rs.getBoolean("Is_active");
                     boolean success = rs.getBoolean("Is_success");
-                    currentConversation = new LlmConversation(promptType, game, user, strategy, active, success);
+                    int testId = rs.getInt("TEST_ID");
+                    int mutantId = rs.getInt("MUTANT_ID");
+                    currentConversation = new LlmConversation(
+                            promptType, game, user, strategy, active, success, testId, mutantId);
                     currentConversation.setId(id);
                     result.add(currentConversation);
                 }

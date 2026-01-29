@@ -75,6 +75,7 @@ abstract class LlmTestService extends LlmSubActionService {
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
+                conversation.setTestId(result.test().orElseThrow().getId());
                 onSubmitSuccess();
             } else {
                 onSubmitFailure(result, testSrc);

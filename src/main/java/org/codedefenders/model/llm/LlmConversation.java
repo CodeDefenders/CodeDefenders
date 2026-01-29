@@ -51,13 +51,15 @@ public class LlmConversation {
 
 
     public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, LlmStrategy strategy,
-                           boolean active, boolean success) {
+                           boolean active, boolean success, int testId, int mutantId) {
         this.type = type;
         this.game = game;
         this.user = user;
         this.strategy = strategy;
         this.active = active;
         this.success = success;
+        this.testId = testId;
+        this.mutantId = mutantId;
     }
 
     public boolean isEmpty() {

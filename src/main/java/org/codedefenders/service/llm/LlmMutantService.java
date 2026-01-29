@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -52,6 +53,7 @@ abstract class LlmMutantService extends LlmSubActionService {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
             }
             if (result.isSuccess()) {
+                conversation.setMutantId(result.mutant().orElseThrow().getId());
                 onSubmitSuccess();
             } else {
                 conversation.addSystemMessage(
@@ -62,6 +64,11 @@ abstract class LlmMutantService extends LlmSubActionService {
                             case COMPILATION_FAILED -> "Your mutant failed to compile. Compilation error: "
                                     + result.compilationError().orElseThrow();
                         } + "\n Fix this.", model);
+            }
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                conversation.addSystemMessage(
+                        "Your mutant changed to many lines. Stick closer to the original code", model);
             }
         } catch (IOException | GameManagingUtils.MutantCreationException e) {
             throw new RuntimeException(e);
@@ -87,7 +94,8 @@ abstract class LlmMutantService extends LlmSubActionService {
                 MutantStrategyDefault.class,
                 MutantStrategyAnnotatedFullClass.class,
                 MutantStrategyAnnotatedSingleMethod.class,
-                MutantStrategyRandomSingleMethod.class);
+                MutantStrategyRandomSingleMethod.class,
+                MutantStrategyDefaultWithoutExisting.class);
         return getServiceClass(l, strategy).asSubclass(LlmMutantService.class);
     }
 }

@@ -73,7 +73,7 @@ public class LlmConversationBatch {
      */
     public LlmConversation getConversation(PromptType type) {
         if (!messageLists.containsKey(type)) {
-            LlmConversation con = new LlmConversation(type, game, user, strategy, true, false);
+            LlmConversation con = new LlmConversation(type, game, user, strategy, true, false, 0, 0);
             messageLists.put(type, con);
         }
         return messageLists.get(type);

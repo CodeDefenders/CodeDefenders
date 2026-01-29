@@ -402,8 +402,10 @@ public class LlmManagerService {
                     finishPlayer(game.getId(), role);
                     return;
                 }
-                if (role == Role.ATTACKER && !equivalentOnlyGames.contains(game.getId())) {
-                    mutantService.run();
+                if (role == Role.ATTACKER) {
+                    if (!equivalentOnlyGames.contains(game.getId())) {
+                        mutantService.run();
+                    }
                 } else {
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
