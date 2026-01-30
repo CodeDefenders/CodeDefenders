@@ -206,9 +206,9 @@ public class LlmManagerService {
             conStrategy = strategy;
         } else { //TODO Define default strategies elsewhere
             if (role == Role.DEFENDER) {
-                conStrategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST;
+                conStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
             } else {
-                conStrategy = LlmStrategy.MUTANT_DEFAULT;
+                conStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
             }
         }
 
