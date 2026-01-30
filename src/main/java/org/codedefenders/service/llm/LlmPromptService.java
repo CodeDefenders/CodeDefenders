@@ -26,6 +26,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
@@ -33,6 +34,7 @@ import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +66,8 @@ public class LlmPromptService {
         for (LlModel m : models) {
             if (m.getType() == LlmType.OPENAI) {
                 openaiModels.put(m, OpenAiChatModel.builder()
-                        .apiKey(config.getOpenaiApiKey())
+                        //.apiKey(config.getOpenaiApiKey())
+                        .apiKey(AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.OPENAI_KEY).getStringValue())
                         .modelName(m.getName())
                         .build());
             }
