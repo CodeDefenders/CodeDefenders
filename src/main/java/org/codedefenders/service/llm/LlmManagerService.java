@@ -360,10 +360,10 @@ public class LlmManagerService {
                                  LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
         if (testStrategy == null) {
-            testStrategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST; //TODO Define default strategies elsewhere
+            testStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT; //TODO Define default strategies elsewhere
         }
         if (mutantStrategy == null) {
-            mutantStrategy = LlmStrategy.MUTANT_DEFAULT;
+            mutantStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
         }
         if (equivalenceStrategy == null) {
             equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
