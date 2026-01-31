@@ -80,9 +80,13 @@ public class UserEntity implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
+    public String getDisplayName() {
         //return username; TODO CHANGE BACK!!
         return "anonymous";
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public void setUsername(String username) {

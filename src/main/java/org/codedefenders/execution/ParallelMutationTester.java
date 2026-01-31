@@ -247,7 +247,7 @@ public class ParallelMutationTester extends MutationTester {
                     }
 
                     Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
-                            u.get().getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
+                            u.get().getDisplayName() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                             EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
 
@@ -278,7 +278,7 @@ public class ParallelMutationTester extends MutationTester {
             mutantRepo.incrementMutantScore(mutant, score);
         }
 
-        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
+        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getDisplayName() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
 

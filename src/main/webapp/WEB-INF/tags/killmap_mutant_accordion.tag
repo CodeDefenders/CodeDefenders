@@ -123,7 +123,7 @@
                                                 </span>
                                                 <span class="kma-col">
                                                     <span class="kma-column-name mx-2">by</span>
-                                                    ${mutant.creator.name}
+                                                    ${"anonymous"}
                                                 </span>
                                                 <span class="kma-col">
                                                     ${mutant.description}
