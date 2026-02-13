@@ -157,7 +157,7 @@ public class CoverageTest {
         // transform the coverage
         CoverageGenerator coverageGenerator = new CoverageGenerator(new AstCoverageGenerator(), coverageTokenGenerator,
                 new CoverageTokenAnalyser());
-        CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit);
+        CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit, null, null);
 
         // write HTML report if enabled
         CoverageOutputWriter writer = new CoverageOutputWriter(

@@ -25,7 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,8 +42,10 @@ import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.SimpleLineCoverage;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
@@ -53,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.expr.SimpleName;
 
 @ApplicationScoped
 public class CoverageGenerator {
@@ -92,7 +97,8 @@ public class CoverageGenerator {
         CompilationUnit compilationUnit = JavaParserUtils.parse(gameClass.getSourceCode())
                 .orElseThrow(() -> new CoverageGeneratorException("Could not parse java file: " + gameClass.getJavaFile()));
 
-        return generate(originalCoverage, compilationUnit).getLineCoverage();
+        String testSource = FileUtils.readJavaFileWithDefault(testJavaFile);
+        return generate(originalCoverage, compilationUnit, testSource, gameClass).getLineCoverage();
     }
 
     /**
@@ -102,14 +108,35 @@ public class CoverageGenerator {
      * @param compilationUnit The CompilationUnit for the file that the line coverage is for.
      * @return The extended line coverage.
      */
-    CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
+    CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit,
+                                     String testSource, GameClass gameClass) {
         AstCoverage astCoverage = astCoverageGenerator.generate(compilationUnit, originalCoverage);
 
         CoverageTokens coverageTokens = coverageTokenGenerator.generate(compilationUnit, originalCoverage, astCoverage);
 
         SimpleLineCoverage transformedCoverage = coverageTokenAnalyser.analyse(coverageTokens);
 
-        return new CoverageGeneratorResult(originalCoverage, transformedCoverage, coverageTokens);
+        Set<Integer> additionalLines = new HashSet<>();
+        if (testSource != null && gameClass != null) {
+            additionalLines = getConstantDefinitionsCoverage(gameClass, testSource);
+        }
+
+        return new CoverageGeneratorResult(originalCoverage, transformedCoverage, coverageTokens, additionalLines);
+    }
+
+    private Set<Integer> getConstantDefinitionsCoverage(GameClass gameClass, String testCode) {
+        Set<Integer> result = new HashSet<>();
+
+        List<ClassCodeAnalyser.CompileTimeConstant> compileTimeConstants = gameClass.getCompileTimeConstants();
+        CompilationUnit testCompilationUnit = JavaParserUtils.parse(testCode).orElseThrow();
+        for (var c : compileTimeConstants) {
+            if (testCompilationUnit.findAll(SimpleName.class).stream()
+                    .anyMatch(n -> n.asString().equals(c.getName()))) {
+                result.addAll(c.getLines());
+            }
+        }
+        return result;
+
     }
 
     /**
@@ -199,18 +226,21 @@ public class CoverageGenerator {
         }
     }
 
-    static class CoverageGeneratorResult {
+    static class CoverageGeneratorResult {//TODO originalCoverage and coverageTokens seem to be unnecessary
         public final DetailedLineCoverage originalCoverage;
         public final SimpleLineCoverage transformedCoverage;
         public final CoverageTokens coverageTokens;
+        public final Set<Integer> additionalLines;
 
         public CoverageGeneratorResult(
                 DetailedLineCoverage originalCoverage,
                 SimpleLineCoverage transformedCoverage,
-                CoverageTokens coverageTokens) {
+                CoverageTokens coverageTokens,
+                Set<Integer> additionalLines) {
             this.originalCoverage = originalCoverage;
             this.transformedCoverage = transformedCoverage;
             this.coverageTokens = coverageTokens;
+            this.additionalLines = additionalLines;
         }
 
         public LineCoverage getLineCoverage() {
@@ -225,7 +255,9 @@ public class CoverageGenerator {
                         coveredLines.add(line);
                         break;
                     case NOT_COVERED:
-                        uncoveredLines.add(line);
+                        if (!additionalLines.contains(line)) {
+                            uncoveredLines.add(line);
+                        }
                         break;
                     case EMPTY:
                         break;
@@ -233,6 +265,7 @@ public class CoverageGenerator {
                         throw new IllegalStateException("Encountered unknown LineCoverageStatus " + transformedCoverage.get(line));
                 }
             }
+            coveredLines.addAll(additionalLines);
             return new LineCoverage(coveredLines, uncoveredLines);
         }
     }

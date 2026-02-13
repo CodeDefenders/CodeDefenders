@@ -23,12 +23,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.util.JavaParserUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
@@ -52,6 +53,8 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
  */
 @ApplicationScoped
 public class ClassCodeAnalyser {
+    public static final Logger logger = LoggerFactory.getLogger(ClassCodeAnalyser.class);
+
     /**
      * Performs the analysis on the given compilation unit.
      *
@@ -96,8 +99,11 @@ public class ClassCodeAnalyser {
 
             if (isCompileTimeConstant) {
                 for (VariableDeclarator varDecl : fieldDecl.getVariables()) {
+                    CompileTimeConstant c = new CompileTimeConstant(varDecl.getName().asString());
+
                     IntStream.rangeClosed(beginOf(varDecl), endOf(varDecl))
-                            .forEach(result.compileTimeConstants::add);
+                            .forEach(c::addLine);
+                    result.compileTimeConstants.add(c);
                 }
             }
         }
@@ -129,21 +135,48 @@ public class ClassCodeAnalyser {
 
     public static class ClassAnalysisResult {
         private final List<String> additionalImports = new ArrayList<>();
-        private final Set<Integer> compileTimeConstants = new HashSet<>();
+        private final List<CompileTimeConstant> compileTimeConstants = new ArrayList<>();
         private final List<MethodDescription> methodDescriptions = new ArrayList<>();
 
         public List<String> getAdditionalImports() {
             return additionalImports;
         }
 
-        public List<Integer> getCompileTimeConstants() {
-            return compileTimeConstants.stream()
-                    .sorted()
-                    .collect(Collectors.toList());
+        public List<Integer> getCompileTimeConstantLines() {
+            Set<Integer> result = new HashSet<>();
+            for (CompileTimeConstant c : compileTimeConstants) {
+                result.addAll(c.lines);
+            }
+            return result.stream().sorted().toList();
         }
 
         public List<MethodDescription> getMethodDescriptions() {
             return methodDescriptions;
+        }
+
+        public List<CompileTimeConstant> getCompileTimeConstants() {
+            return compileTimeConstants;
+        }
+    }
+
+    public static class CompileTimeConstant {
+        private final List<Integer> lines = new ArrayList<>();
+        private final String name;
+
+        public CompileTimeConstant(String name) {
+            this.name = name;
+        }
+
+        private void addLine(int i) {
+            lines.add(i);
+        }
+
+        public List<Integer> getLines() {
+            return lines;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }

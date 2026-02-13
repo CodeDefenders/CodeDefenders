@@ -34,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -299,7 +300,8 @@ public class FileUtilsTest {
         assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingDeclaration));
 
         final String missingSemicolon = "package top" + System.lineSeparator() + "public class Test {}";
-        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingSemicolon));
+        assertThrows(IllegalArgumentException.class,
+            () -> FileUtils.getPackagePathFromJavaFile(missingSemicolon));
     }
 
     @Test
@@ -328,7 +330,8 @@ public class FileUtilsTest {
                         public class Test {
                         }
                         """;
-        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
+        assertThrows(IllegalArgumentException.class,
+            () -> FileUtils.getPackagePathFromJavaFile(packageJustSlash));
     }
 
     @Test
