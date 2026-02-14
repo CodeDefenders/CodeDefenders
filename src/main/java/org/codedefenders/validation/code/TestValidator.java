@@ -36,8 +36,8 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 
 /**
  * This class checks test code and checks whether the code is valid or not.
- * While traversing the AST, it checks every node for node test rule violations. It also collects some "result variables",
- * that are checked for visitor test rule violations.
+ * While traversing the AST, it checks every node for node test rule violations. It also collects some
+ * "result variables", that are checked for visitor test rule violations.
  */
 // Does this really need to short-circuit at the first error?
 class TestValidator {
@@ -61,6 +61,10 @@ class TestValidator {
 
     /**
      * Returns a list of validation messages. If the list is empty, the validation passed
+     *
+     * <p>
+     * TODO If I'm not mistaken, this can only return a list of either 0 or 1 elements. Either we make use of this
+     * TODO being a list, or this should be an optional.
      */
     static List<String> validFor(CompilationUnit cu, int maxNumberOfAssertions, AssertionLibrary assertionLibrary,
                                  List<TestRule> rules) {
@@ -71,7 +75,18 @@ class TestValidator {
 
 
         for (ImmutablePair<TestRule, Node> pair : visitor.failedRules) {
-            visitor.messages.add(pair.left.getValidationMessage() + pair.right.toString());
+            String prettyPrintedOffender = ("\n" + pair.right.toString()).replace("\n", "\n\t\t");
+            /*Arrays.stream(
+
+                         pair.right.toString()
+
+                                 .split("\n"))
+
+                 .map(line -> "\t\t" + line)
+
+                 .reduce(String::concat).orElseThrow();*/
+
+            visitor.messages.add(pair.left.getValidationMessage() + prettyPrintedOffender);
         }
 
         for (TestRule r : rules) {
@@ -111,8 +126,14 @@ class TestValidator {
 
     public List<String> buildValidationMessages() { //TODO reicht ein String??
         List<String> formattedValidationMessages = new ArrayList<>();
+
         if (!messages.isEmpty()) {
-            formattedValidationMessages.add("The submitted test is not valid:\n" + String.join("\n", "\t-" + messages));
+            StringBuilder sb = new StringBuilder("The submitted test is not valid:");
+            for (int i = 0; i < messages.size(); i++) {
+                sb.append("\n\t").append(i + 1).append(": ").append(messages.get(i));
+            }
+            //formattedValidationMessages.add("The submitted test is not valid:\n" + String.join("\n", "\t-" + messages));
+            formattedValidationMessages.add(sb.toString());
         }
         return formattedValidationMessages;
     }
@@ -122,8 +143,8 @@ class TestValidator {
         //TODO assertThrows is missing? Very hard-coded
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
-                "assertEquals", "assertTrue", "assertFalse", "assertNull",
-                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
+                        "assertEquals", "assertTrue", "assertFalse", "assertNull",
+                        "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
         // TODO This works the same for Hamcrest and Google Truth
         final boolean assertThatMatch = Arrays.stream(new String[]{"assertThat"})
