@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.AssertionLibrary;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,7 @@ public class CodeValidator {
     static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
     static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
     static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
-    // This is package protected to enable TestCodeVisitor to check for prohibited call as well
+    // This is package protected to enable TestValidator to check for prohibited call as well
     static final String[] PROHIBITED_CALLS = {
             "Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
             "java.net", "java.nio", "java.sql", "random(", "randomUUID("
@@ -119,7 +118,7 @@ public class CodeValidator {
             AssertionLibrary assertionLibrary) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
         if (parseResult.isPresent()) {
-            return TestCodeVisitor.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary,
+            return TestValidator.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary,
                     TestValidationRules.getRules());
         } else {
             return new ArrayList<>();

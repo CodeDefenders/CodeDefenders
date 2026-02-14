@@ -1,21 +1,39 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.validation.code;
-
-import com.github.javaparser.ast.Node;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import com.github.javaparser.ast.Node;
 
 public class TestRule {
     private final String generalDescription;
     private final String detailedDescription;
     private final String validationMessage;
 
-    private final List<Predicate<TestCodeVisitor>> visitorRules;
+    private final List<Predicate<TestValidator>> visitorRules;
     private final List<Predicate<Node>> stmtRules;
 
     private TestRule(String generalDescription, String detailedDescription, String validationMessage,
-                    List<Predicate<TestCodeVisitor>> visitorRules,
+                    List<Predicate<TestValidator>> visitorRules,
                     List<Predicate<Node>> stmtRules) {
         this.generalDescription = generalDescription;
         this.detailedDescription = detailedDescription;
@@ -36,15 +54,7 @@ public class TestRule {
         return validationMessage;
     }
 
-    void addVisitorRule(Predicate<TestCodeVisitor> rule) {
-        visitorRules.add(rule);
-    }
-
-    void addStmtRule(Predicate<Node> rule) {
-        stmtRules.add(rule);
-    }
-
-    boolean fails(TestCodeVisitor visitor) {
+    boolean fails(TestValidator visitor) {
         return visitorRules.stream().anyMatch(r -> r.test(visitor));
     }
 
@@ -56,7 +66,7 @@ public class TestRule {
         private final String generalDescription;
         private final String detailedDescription;
         private final String validationMessage;
-        private final List<Predicate<TestCodeVisitor>> visitorRules = new ArrayList<>();
+        private final List<Predicate<TestValidator>> visitorRules = new ArrayList<>();
         private final List<Predicate<Node>> nodeRules = new ArrayList<>();
 
         Builder(String generalDescription, String detailedDescription, String validationMessage) {
@@ -65,11 +75,20 @@ public class TestRule {
             this.validationMessage = validationMessage;
         }
 
-        Builder withVisitor(Predicate<TestCodeVisitor> rule) {
+        /**
+         * Adds a rule that takes a {@link TestValidator} as an argument. The predicate will only be checked after
+         * the {@link TestValidator} has walked through the AST. The intended use case for this is to check the
+         * "result variables" that are set during the walk.
+         */
+        Builder withVisitor(Predicate<TestValidator> rule) {
             visitorRules.add(rule);
             return this;
         }
 
+        /**
+         * Adds a rule that takes a {@link Node} as an argument. The predicate will be checked while the
+         * {@link TestValidator} is walking through the AST.
+         */
         Builder withNode(Predicate<Node> rule) {
             nodeRules.add(rule);
             return this;
