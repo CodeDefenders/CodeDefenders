@@ -74,23 +74,22 @@ class TestValidator {
         visitor.validate(cu);
 
 
+        List<TestRule> violatingRules = new ArrayList<>();
         for (ImmutablePair<TestRule, Node> pair : visitor.failedRules) {
-            String prettyPrintedOffender = ("\n" + pair.right.toString()).replace("\n", "\n\t\t");
-            /*Arrays.stream(
+            if (!violatingRules.contains(pair.left)) {
+                violatingRules.add(pair.left);
+                String prettyPrintedOffender = ("\n" + pair.right.toString()).replace("\n", "\n\t\t");
 
-                         pair.right.toString()
 
-                                 .split("\n"))
-
-                 .map(line -> "\t\t" + line)
-
-                 .reduce(String::concat).orElseThrow();*/
-
-            visitor.messages.add(pair.left.getValidationMessage() + prettyPrintedOffender);
+                visitor.messages.add(pair.left.getValidationMessage() + prettyPrintedOffender);
+            }
         }
 
         for (TestRule r : rules) {
             if (r.fails(visitor)) {
+                if (!violatingRules.contains(r)) {
+                    violatingRules.add(r);
+                }
                 visitor.messages.add(r.getValidationMessage());
             }
         }
