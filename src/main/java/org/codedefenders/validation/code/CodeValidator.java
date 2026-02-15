@@ -126,7 +126,7 @@ public class CodeValidator {
     }
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern
-    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
+    public static String validateMutantGetMessage(String originalCode, String mutatedCode,
             MutantValidationRuleSet ruleSet) {
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
@@ -145,7 +145,7 @@ public class CodeValidator {
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCU, mutatedCU)) {
-                return rule.getMessage();
+                return rule.getValidationMessage();
             }
         }
 
@@ -156,10 +156,10 @@ public class CodeValidator {
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCode, mutatedCode)) {
-                return rule.getMessage();
+                return rule.getValidationMessage();
             }
             if (rule.fails(originalLines, changedLines)) {
-                return rule.getMessage();
+                return rule.getValidationMessage();
             }
         }
 
@@ -174,8 +174,8 @@ public class CodeValidator {
             if (d.operation != DiffMatchPatch.Operation.EQUAL) {
                 hasChanges = true;
                 if (d.operation == DiffMatchPatch.Operation.INSERT) {
-                    ValidationMessage insertionValidityMessage = validInsertion(d.text, ruleSet);
-                    if (insertionValidityMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+                    String insertionValidityMessage = validInsertion(d.text, ruleSet);
+                    if (!insertionValidityMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS)) {
                         return insertionValidityMessage;
                     }
                 }
@@ -482,7 +482,7 @@ public class CodeValidator {
         return !cutFieldNames.equals(mutantFieldNames);
     }
 
-    private static ValidationMessage validInsertion(String diff,
+    private static String validInsertion(String diff,
                                                     MutantValidationRuleSet ruleSet) {
         String stmtString = String.format("{ %s }", diff);
 
@@ -504,7 +504,7 @@ public class CodeValidator {
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(diff2)) {
-                return rule.getMessage();
+                return rule.getValidationMessage();
             }
         }
 

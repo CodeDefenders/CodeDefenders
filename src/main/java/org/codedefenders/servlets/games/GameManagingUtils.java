@@ -276,7 +276,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             Optional<String> mutationTesterMessage,
             // on failure
             Optional<FailureReason> failureReason,
-            Optional<ValidationMessage> validationErrorMessage,
+            Optional<String> validationErrorMessage,
             Optional<String> compilationError
     ) {
         public enum FailureReason {
@@ -296,7 +296,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         public static CreateBattlegroundMutantResult failure(
-                FailureReason reason, ValidationMessage validationErrorMessage, String compilationError) {
+                FailureReason reason, String validationErrorMessage, String compilationError) {
             return new CreateBattlegroundMutantResult(false, Optional.empty(), Optional.empty(), Optional.of(reason),
                     Optional.ofNullable(validationErrorMessage), Optional.ofNullable(compilationError));
         }
@@ -314,9 +314,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage =
+        String validationMessage =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());

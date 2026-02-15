@@ -460,7 +460,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         var intention = ServletUtils.getStringParameter(request, "attacker_intention").map(AttackerIntention::fromString);
         if (game.isCapturePlayersIntention() && intention.isEmpty()) {
-            messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.get());
+            messages.add(ValidationMessage.MUTANT_MISSING_INTENTION); //TODO Should this be a ValidationMessage? Seems wrong
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -532,7 +532,7 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error).alert());
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);

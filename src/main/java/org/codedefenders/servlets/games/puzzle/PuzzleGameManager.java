@@ -790,20 +790,20 @@ public class PuzzleGameManager extends HttpServlet {
 
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
-        ValidationMessage validationMessage =
+        String validationMessage =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
         mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationMessage.get());
+        mve.setValidationMessage(validationSuccess ? null : validationMessage);
         notificationService.post(mve);
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get()).alert();
+            messages.add(validationMessage).alert();
             Redirect.redirectBack(request, response);
             return;
         }

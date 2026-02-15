@@ -603,9 +603,9 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
+        String validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());
@@ -615,7 +615,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get()).alert();
+            messages.add(validationMessage).alert();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }

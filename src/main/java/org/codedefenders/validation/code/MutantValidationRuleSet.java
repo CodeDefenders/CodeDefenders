@@ -60,12 +60,13 @@ public class MutantValidationRuleSet {
     }
 
     public List<List<MutantRule>> getTieredRules() {
-        List<List<MutantRule>> result = new ArrayList<>();
+        return ValidationUtils.getTieredRules(rules);
+        /*List<List<MutantRule>> result = new ArrayList<>();
         Set<MutantRule> unordered = getRules();
         outer:
         for (MutantRule r : unordered) {
             for (List<MutantRule> list : result) {
-                if (!list.isEmpty() && list.get(0).generalDescription.equals(r.generalDescription)) {
+                if (!list.isEmpty() && list.get(0).getGeneralDescription().equals(r.getGeneralDescription())) {
                     list.add(r);
                     continue outer;
                 }
@@ -74,7 +75,11 @@ public class MutantValidationRuleSet {
             newList.add(r);
             result.add(newList);
         }
-        return result;
+        return result;*/
+    }
+
+    public List<MutantRule> getSingleRules() {
+        return ValidationUtils.getSingleRules(rules);
     }
 
     public MutantValidationRuleSet getParent() {

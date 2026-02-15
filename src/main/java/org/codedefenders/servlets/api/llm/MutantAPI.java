@@ -143,7 +143,7 @@ public class MutantAPI extends APIServlet {
         } else {
             var failureReason = result.failureReason().orElseThrow();
             switch (failureReason) {
-                case VALIDATION_FAILED -> result.validationErrorMessage().ifPresent(msg -> messages.add(msg.get()));
+                case VALIDATION_FAILED -> result.validationErrorMessage().ifPresent(messages::add);
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);
                     result.compilationError().ifPresent(messages::add);

@@ -19,7 +19,6 @@
 package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -217,7 +216,7 @@ public class CodeValidatorTest {
          * created from the {@code validationMessage} concatenated (if present) with the {@code validationMessages}.
          */
         private Stream<Arguments> testCase(String mutantDirectory, MutantValidationRuleSet ruleSet,
-                                           ValidationMessage validationMessage, ValidationMessage... validationMessages) {
+                                           String validationMessage, String... validationMessages) {
             return Stream.of(arguments(mutantDirectory, ruleSet, Stream.concat(Stream.of(validationMessage), Stream.of(validationMessages)).collect(Collectors.toList())));
         }
 
@@ -236,11 +235,11 @@ public class CodeValidatorTest {
          * for all {@link MutantValidationRuleSet}s that are stricter than the given {@code upToIncludingLevel} and additionally
          * arguments with {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for the {@link MutantValidationRuleSet}s that
          * are less strict.
-         * <br>See: {@link #testCasesFailUpTo(String, MutantValidationRuleSet, ValidationMessage, ValidationMessage...)}
+         * <br>See: {@link #testCasesFailUpTo(String, MutantValidationRuleSet, String, String...)}
          */
         private Stream<Arguments> testCases(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
-                                            ValidationMessage expectedValidationMessage,
-                                            ValidationMessage... otherExpectedValidationMessagesOnFailure) {
+                                            String expectedValidationMessage,
+                                            String... otherExpectedValidationMessagesOnFailure) {
             if (expectedValidationMessage.equals(MUTANT_VALIDATION_SUCCESS)) {
                 assume().that(otherExpectedValidationMessagesOnFailure).asList().isEmpty();
 
@@ -288,8 +287,8 @@ public class CodeValidatorTest {
          * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link DefaultRuleSets#RELAXED}.
          */
         private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
-                                                    ValidationMessage expectedValidationMessageOnFailure,
-                                                    ValidationMessage... otherExpectedValidationMessagesOnFailure) {
+                                                    String expectedValidationMessageOnFailure,
+                                                    String... otherExpectedValidationMessagesOnFailure) {
             assume().that(expectedValidationMessageOnFailure).isNotEqualTo(MUTANT_VALIDATION_SUCCESS);
             assume().that(otherExpectedValidationMessagesOnFailure).asList().doesNotContain(MUTANT_VALIDATION_SUCCESS);
 
@@ -433,12 +432,12 @@ public class CodeValidatorTest {
     @ParameterizedTest(name = "[{index}] Validating mutant {0} on level {1} results in one of {2}")
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, MutantValidationRuleSet ruleSet,
-                                             Iterable<ValidationMessage> expectedValidationMessages) {
+                                             Iterable<String> expectedValidationMessages) {
         try (var ignored = WeldInit.initWeld(new Class[]{}, false)) {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
-            ValidationMessage actual = validateMutantGetMessage(original, mutated, ruleSet);
+            String actual = validateMutantGetMessage(original, mutated, ruleSet);
 
             assertThat(actual).isIn(expectedValidationMessages);
         }

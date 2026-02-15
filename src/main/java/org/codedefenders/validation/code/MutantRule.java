@@ -25,48 +25,25 @@ import java.util.function.BiPredicate;
 
 import com.github.javaparser.ast.CompilationUnit;
 
-public class MutantRule {
+public class MutantRule extends ValidationRule {
 
     private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules;
     private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules;
     private final List<BiPredicate<String, String>> codeRules;
     private final List<String[]> insertionRules;
 
-    protected final String generalDescription;
-    protected final String detailedDescription;
-    protected final ValidationMessage message;
-    protected boolean hidden = false;
 
-    private MutantRule(boolean hidden,
-                       ValidationMessage message,
-                       String detailedDescription,
-                       String generalDescription,
+    private MutantRule(String generalDescription, String detailedDescription, String message, boolean visible,
                        List<String[]> insertionRules,
                        List<BiPredicate<String, String>> codeRules,
                        List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules,
                        List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules) {
-        this.hidden = hidden;
-        this.message = message;
-        this.detailedDescription = detailedDescription;
-        this.generalDescription = generalDescription;
+        super(generalDescription, detailedDescription, message, visible);
         this.insertionRules = insertionRules;
         this.codeRules = codeRules;
         this.linediffRules = linediffRules;
         this.compilationUnitRules = compilationUnitRules;
     }
-
-    public String getGeneralDescription() {
-        return generalDescription;
-    }
-
-    public String getDetailedDescription() {
-        return detailedDescription;
-    }
-
-    public ValidationMessage getMessage() {
-        return message;
-    }
-
 
     public boolean fails(CompilationUnit original, CompilationUnit changed) {
         return compilationUnitRules.stream().anyMatch(r -> r.test(original, changed));
@@ -89,13 +66,13 @@ public class MutantRule {
         private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules = new ArrayList<>();
         private final List<BiPredicate<String, String>> codeRules = new ArrayList<>();
         private final List<String[]> insertionRules = new ArrayList<>();
-        private boolean hidden = false;
+        private boolean visible = true;
 
         final String generalDescription;
         final String detailedDescription;
-        final ValidationMessage message;
+        final String message;
 
-        Builder(String generalDescription, String detailedDescription, ValidationMessage message) {
+        Builder(String generalDescription, String detailedDescription, String message) {
             this.generalDescription = generalDescription;
             this.detailedDescription = detailedDescription;
             this.message = message;
@@ -122,15 +99,12 @@ public class MutantRule {
         }
 
         Builder hidden() {
-            hidden = true;
+            visible = false;
             return this;
         }
 
         MutantRule build() {
-            return new MutantRule(hidden,
-                    message,
-                    detailedDescription,
-                    generalDescription,
+            return new MutantRule(generalDescription, detailedDescription, message, visible,
                     Collections.unmodifiableList(insertionRules),
                     Collections.unmodifiableList(codeRules),
                     Collections.unmodifiableList(linediffRules),

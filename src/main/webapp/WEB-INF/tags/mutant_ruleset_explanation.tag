@@ -44,4 +44,16 @@
             </div>
         </div>
     </c:forEach>
+    <c:if test="${ruleset.singleRules.size() != 0}">
+        <div class="accordion-item pt-2">
+            <ul>
+                <c:forEach items="${ruleset.singleRules}" var="rule">
+                    <li>
+                            ${rule.detailedDescription}
+                    </li>
+                </c:forEach>
+            </ul>
+        </div>
+    </c:if>
+
 </div>

@@ -169,12 +169,8 @@ public class TestValidationRules {
 
     );
 
-    private static List<List<TestRule>> tieredRules;
-    private static List<TestRule> singleRules;
-
-    static {
-        calculateTieredAndSingleRules();
-    }
+    private static final List<List<TestRule>> tieredRules = ValidationUtils.getTieredRules(rules);
+    private static final List<TestRule> singleRules = ValidationUtils.getSingleRules(rules);
 
     //No classes
     //No methods
@@ -191,36 +187,6 @@ public class TestValidationRules {
     }
 
     //TODO This is basically identical to mutantRules, create a common supertype
-
-    private static void calculateTieredAndSingleRules() {
-        List<List<TestRule>> tieredResult = new ArrayList<>();
-        List<TestRule> singleResult = new ArrayList<>();
-        List<TestRule> unordered = getRules();
-        outer:
-        for (TestRule r : unordered) {
-            if (r.isVisible()) {
-                for (List<TestRule> list : tieredResult) {
-                    if (!list.isEmpty() && list.get(0).getGeneralDescription().equals(r.getGeneralDescription())) {
-                        list.add(r);
-                        continue outer;
-                    }
-                }
-                List<TestRule> newList = new ArrayList<>();
-                newList.add(r);
-                tieredResult.add(newList);
-            }
-        }
-        for (int i = 0; i < tieredResult.size(); i++) {
-            List<TestRule> l = tieredResult.get(i);
-            if (l.size() == 1) {
-                singleResult.add(l.get(0));
-                tieredResult.remove(i);
-                i--;
-            }
-        }
-        tieredRules = tieredResult;
-        singleRules = singleResult;
-    }
 
     /**
      * Returns all categories, that is, collections of rules with the same {@link TestRule#getGeneralDescription()},

@@ -68,7 +68,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
     private final MutantValidationRuleSet ruleSet;
 
     private boolean isValid = true;
-    private ValidationMessage message;
+    private String message;
 
     MutationVisitor(MutantValidationRuleSet ruleSet) {
         this.ruleSet = ruleSet;
@@ -78,7 +78,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
         return isValid;
     }
 
-    public ValidationMessage getMessage() {
+    public String getMessage() {
         return this.message;
     }
 

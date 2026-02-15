@@ -24,42 +24,19 @@ import java.util.function.Predicate;
 
 import com.github.javaparser.ast.Node;
 
-public class TestRule {
-    private final String generalDescription;
-    private final String detailedDescription;
-    private final String validationMessage;
-
-    private final boolean visible;
+public class TestRule extends ValidationRule {
 
     private final List<Predicate<TestValidator>> visitorRules;
     private final List<Predicate<Node>> stmtRules;
 
     private TestRule(String generalDescription, String detailedDescription, String validationMessage,
-                    List<Predicate<TestValidator>> visitorRules,
-                    List<Predicate<Node>> stmtRules,
-                     boolean visible) {
-        this.generalDescription = generalDescription;
-        this.detailedDescription = detailedDescription;
-        this.validationMessage = validationMessage;
+                     boolean visible,
+                     List<Predicate<TestValidator>> visitorRules,
+                     List<Predicate<Node>> stmtRules
+    ) {
+        super(generalDescription, detailedDescription, validationMessage, visible);
         this.visitorRules = visitorRules;
         this.stmtRules = stmtRules;
-        this.visible = visible;
-    }
-
-    public String getGeneralDescription() {
-        return generalDescription;
-    }
-
-    public String getDetailedDescription() {
-        return detailedDescription;
-    }
-
-    public String getValidationMessage() {
-        return validationMessage;
-    }
-
-    public boolean isVisible() {
-        return visible;
     }
 
     boolean fails(TestValidator visitor) {
@@ -115,9 +92,9 @@ public class TestRule {
             return new TestRule(generalDescription,
                     detailedDescription,
                     validationMessage,
+                    visible,
                     visitorRules,
-                    nodeRules,
-                    visible);
+                    nodeRules);
         }
     }
 }
