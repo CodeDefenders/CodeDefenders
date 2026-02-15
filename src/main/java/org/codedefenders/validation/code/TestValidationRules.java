@@ -18,10 +18,15 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
+
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
 
 import org.codedefenders.util.JavaParserUtils;
 
@@ -45,6 +50,8 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import static org.codedefenders.game.AssertionLibrary.GOOGLE_TRUTH;
 import static org.codedefenders.game.AssertionLibrary.HAMCREST;
 
+@Named("testValidationRules")
+@ApplicationScoped
 public class TestValidationRules {
     //Categories
     private static final String ASSERTION_LIMITS = "Do not use too many assertions.";
@@ -53,7 +60,7 @@ public class TestValidationRules {
     private static final String NO_SYSTEM_CALLS = "Calls to certain packages are not allowed";
     private static final String NOT_EMPTY = "Test may not be empty";
 
-    private static List<TestRule> rules = List.of(
+    private static final List<TestRule> rules = List.of(
             new TestRule.Builder(NO_NEW_CLASSES_OR_METHODS,
                     "New class definitions are not allowed",
                     "You cannot create a second class.")
@@ -148,6 +155,7 @@ public class TestValidationRules {
                     "Keep the assertion limit of your game!",
                     "You used too many assertions.") //TODO Get the number of assertions into the message?
                     .withVisitor(v -> v.assertionCount > v.maxNumberOfAssertions)
+                    .hidden()
                     .build(),
 
             new TestRule.Builder(ASSERTION_LIMITS,
@@ -161,6 +169,13 @@ public class TestValidationRules {
 
     );
 
+    private static List<List<TestRule>> tieredRules;
+    private static List<TestRule> singleRules;
+
+    static {
+        calculateTieredAndSingleRules();
+    }
+
     //No classes
     //No methods
     //No loops
@@ -173,5 +188,52 @@ public class TestValidationRules {
 
     public static List<TestRule> getRules() {
         return rules;
+    }
+
+    //TODO This is basically identical to mutantRules, create a common supertype
+
+    private static void calculateTieredAndSingleRules() {
+        List<List<TestRule>> tieredResult = new ArrayList<>();
+        List<TestRule> singleResult = new ArrayList<>();
+        List<TestRule> unordered = getRules();
+        outer:
+        for (TestRule r : unordered) {
+            if (r.isVisible()) {
+                for (List<TestRule> list : tieredResult) {
+                    if (!list.isEmpty() && list.get(0).getGeneralDescription().equals(r.getGeneralDescription())) {
+                        list.add(r);
+                        continue outer;
+                    }
+                }
+                List<TestRule> newList = new ArrayList<>();
+                newList.add(r);
+                tieredResult.add(newList);
+            }
+        }
+        for (int i = 0; i < tieredResult.size(); i++) {
+            List<TestRule> l = tieredResult.get(i);
+            if (l.size() == 1) {
+                singleResult.add(l.get(0));
+                tieredResult.remove(i);
+                i--;
+            }
+        }
+        tieredRules = tieredResult;
+        singleRules = singleResult;
+    }
+
+    /**
+     * Returns all categories, that is, collections of rules with the same {@link TestRule#getGeneralDescription()},
+     * that have at least two rules.
+     */
+    public List<List<TestRule>> getTieredRules() {
+        return tieredRules;
+    }
+
+    /**
+     * Returns all rules that have a unique {@link TestRule#getGeneralDescription()}.
+     */
+    public List<TestRule> getSingleRules() {
+        return singleRules;
     }
 }

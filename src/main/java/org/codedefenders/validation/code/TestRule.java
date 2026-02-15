@@ -29,17 +29,21 @@ public class TestRule {
     private final String detailedDescription;
     private final String validationMessage;
 
+    private final boolean visible;
+
     private final List<Predicate<TestValidator>> visitorRules;
     private final List<Predicate<Node>> stmtRules;
 
     private TestRule(String generalDescription, String detailedDescription, String validationMessage,
                     List<Predicate<TestValidator>> visitorRules,
-                    List<Predicate<Node>> stmtRules) {
+                    List<Predicate<Node>> stmtRules,
+                     boolean visible) {
         this.generalDescription = generalDescription;
         this.detailedDescription = detailedDescription;
         this.validationMessage = validationMessage;
         this.visitorRules = visitorRules;
         this.stmtRules = stmtRules;
+        this.visible = visible;
     }
 
     public String getGeneralDescription() {
@@ -52,6 +56,10 @@ public class TestRule {
 
     public String getValidationMessage() {
         return validationMessage;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 
     boolean fails(TestValidator visitor) {
@@ -68,6 +76,7 @@ public class TestRule {
         private final String validationMessage;
         private final List<Predicate<TestValidator>> visitorRules = new ArrayList<>();
         private final List<Predicate<Node>> nodeRules = new ArrayList<>();
+        private boolean visible = true;
 
         Builder(String generalDescription, String detailedDescription, String validationMessage) {
             this.generalDescription = generalDescription;
@@ -94,8 +103,21 @@ public class TestRule {
             return this;
         }
 
+        /**
+         * Will make this rule invisible in the rule descriptions.
+         */
+        Builder hidden() {
+            visible = false;
+            return this;
+        }
+
         TestRule build() {
-            return new TestRule(generalDescription, detailedDescription, validationMessage, visitorRules, nodeRules);
+            return new TestRule(generalDescription,
+                    detailedDescription,
+                    validationMessage,
+                    visitorRules,
+                    nodeRules,
+                    visible);
         }
     }
 }
