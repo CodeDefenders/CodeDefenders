@@ -113,7 +113,7 @@ public class TestValidationRules {
                     .withNode(n -> n instanceof AssertStmt).build(),
 
             new TestRule.Builder(NO_SYSTEM_CALLS,
-                    "Calls to these packages are not allowed: " + "TODO",
+                    "Calls to these packages are not allowed: " + "System, Random, Thread",
                     "You have called a package you may not call. Offending statement: ")
                     .withNode(n ->
                             n instanceof ExpressionStmt
@@ -153,7 +153,7 @@ public class TestValidationRules {
                     ).build(),
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Keep the assertion limit of your game!",
-                    "You used too many assertions.") //TODO Get the number of assertions into the message?
+                    "You used more than ${MAX_ASSERTIONS} assertions.") //TODO Get the number of assertions into the message?
                     .withVisitor(v -> v.assertionCount > v.maxNumberOfAssertions)
                     .hidden()
                     .build(),

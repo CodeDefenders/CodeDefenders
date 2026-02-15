@@ -131,8 +131,8 @@ class TestValidator {
             for (int i = 0; i < messages.size(); i++) {
                 sb.append("\n\t").append(i + 1).append(": ").append(messages.get(i));
             }
-            //formattedValidationMessages.add("The submitted test is not valid:\n" + String.join("\n", "\t-" + messages));
-            formattedValidationMessages.add(sb.toString());
+            formattedValidationMessages.add(sb.toString()
+                    .replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions)));
         }
         return formattedValidationMessages;
     }

@@ -181,15 +181,15 @@ public class CodeValidatorTest {
             // Please order the testCase(s) alphabetically according to their test, so it is easier to match
             // them with their associated directory
             return Stream.of(
-                    testCase("invalid/assertionsJunitFive", 4, "Test contains more than 4 assertions"),
-                    testCase("invalid/assertionsJunitThree", 2, "Test contains more than 2 assertions"),
-                    testCase("invalid/EmptyTest", "Test does not contain any valid statement."),
-                    testCase("invalid/TestWithIf", "Test contains an invalid statement:"),
-                    testCase("invalid/TestWithSystemCall", "Test contains a prohibited call to System."),
-                    testCase("invalid/TestWithSystemCall2", "Test contains a prohibited call to java.io"),
-                    testCase("invalid/TestWithSystemCall3", "Test contains a prohibited call to System."),
-                    testCase("invalid/TwoClasses", "Invalid test suite contains more than one class declaration."),
-                    testCase("invalid/TwoTests", "Invalid test suite contains more than one method declaration.")
+                    testCase("invalid/assertionsJunitFive", 4, "You used more than 4 assertions"),
+                    testCase("invalid/assertionsJunitThree", 2, "You used more than 2 assertions"),
+                    testCase("invalid/EmptyTest", "The test is empty."),
+                    testCase("invalid/TestWithIf", "If-like statements are not allowed"),
+                    testCase("invalid/TestWithSystemCall", "You have called a package you may not call."),
+                    testCase("invalid/TestWithSystemCall2", "You have called a package you may not call."),
+                    testCase("invalid/TestWithSystemCall3", "You have called a package you may not call."),
+                    testCase("invalid/TwoClasses", "You cannot create a second class."),
+                    testCase("invalid/TwoTests", "You cannot create a new method.")
             ).flatMap(Function.identity());
         }
     }

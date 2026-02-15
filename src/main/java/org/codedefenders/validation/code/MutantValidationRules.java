@@ -118,7 +118,8 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedControlStructures = new MutantRule.Builder(
             CONTROL,
-            "These control structures are not allowed: " + Arrays.toString(CodeValidator.PROHIBITED_CONTROL_STRUCTURES),
+            "These control structures are not allowed: "
+                    + String.join(", ", CodeValidator.PROHIBITED_CONTROL_STRUCTURES),
             ValidationMessage.MUTANT_VALIDATION_OPERATORS)
             .withInsertion(CodeValidator.PROHIBITED_CONTROL_STRUCTURES)
             .withLinediff(CodeValidator::ternaryAdded)
@@ -126,7 +127,8 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedCalls = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
-            "No calls to these packages are allowed: " + Arrays.toString(CodeValidator.PROHIBITED_CALLS),
+            "No calls to these packages are allowed:\n"
+                    + String.join(", ", CodeValidator.PROHIBITED_CALLS),
             ValidationMessage.MUTANT_VALIDATION_CALLS)
             .withInsertion(CodeValidator.PROHIBITED_CALLS)
             .build();
