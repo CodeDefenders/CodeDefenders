@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
@@ -49,7 +50,7 @@
     pageContext.setAttribute("TEACHER_APPLICATIONS_EMAIL", SETTING_NAME.TEACHER_APPLICATIONS_EMAIL);
 %>
 
-<p:main_page title="System Settings">
+<p:main_page title="${i18n.tr('System Settings')}">
     <div class="container">
         <t:admin_navigation activePage="adminSystemSettings"/>
 
@@ -85,15 +86,15 @@
                                     </c:when>
                                     <c:otherwise>
                                         <div class="col-8">
-                                            <input type="${settingId.contains("PASSWORD") ? 'password' : 'text'}"
+                                            <input type="${settingId.contains(\"PASSWORD\") ? 'password' : 'text'}"
                                                    class="form-control"
                                                    name="${settingId}"
                                                    id="${settingId}"
                                                    value="${setting.stringValue}">
                                             <c:if test="${settingId.startsWith('EMAIL')}">
                                                 <div class="invalid-feedback">
-                                                    This setting is required for sending emails.
-                                                    Please provide a valid value, or disable emails.
+                                                        ${i18n.tr('This setting is required for sending emails.')}
+                                                        ${i18n.tr('Please provide a valid value, or disable emails.')}
                                                 </div>
                                             </c:if>
                                         </div>
@@ -123,8 +124,8 @@
                                            value="${setting.intValue}">
                                     <c:if test="${settingId.startsWith('EMAIL')}">
                                         <div class="invalid-feedback">
-                                            This setting is required for sending emails.
-                                            Please provide a valid value, or disable emails.
+                                                ${i18n.tr('This setting is required for sending emails.')}
+                                                ${i18n.tr('Please provide a valid value, or disable emails.')}
                                         </div>
                                     </c:if>
                                 </div>
@@ -136,16 +137,20 @@
 
             <div class="row g-2">
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn">Save</button>
+                    <button type="submit" class="btn btn-primary" name="saveSettingsBtn"
+                            id="saveSettingsBtn">${i18n.tr('Save')}</button>
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="window.location.reload();">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn"
+                            onclick="window.location.reload();">${i18n.tr('Cancel')}</button>
                 </div>
             </div>
         </form>
 
         <script type="module">
             import $ from '${url.forPath("/js/jquery.mjs")}';
+
+            const valueMissingKey = "value-missing";
 
             // Validate regular contact email settings.
             $(document).ready(() => {
@@ -160,7 +165,7 @@
                 const validateEmailSettings = function () {
                     for (const emailInput of otherEmailInputs) {
                         const valid = !emailSwitch.checked || emailInput.value.trim().length > 0;
-                        emailInput.setCustomValidity(valid ? '' : 'value-missing');
+                        emailInput.setCustomValidity(valid ? '' : valueMissingKey);
                     }
                 };
 
@@ -179,7 +184,7 @@
 
                 const validateEmailSettings = function () {
                     const valid = !teacherApplicationsSwitch.checked || teacherApplicationsEmail.value.trim().length > 0;
-                    teacherApplicationsEmail.setCustomValidity(valid ? '' : 'value-missing');
+                    teacherApplicationsEmail.setCustomValidity(valid ? '' : valueMissingKey);
                 };
 
                 teacherApplicationsSwitch.addEventListener('change', validateEmailSettings);
@@ -190,4 +195,3 @@
         </script>
     </div>
 </p:main_page>
-

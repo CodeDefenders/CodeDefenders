@@ -24,6 +24,8 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%
     String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
     String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
@@ -31,15 +33,15 @@
     pageContext.setAttribute("privacyNotice", privacyNotice);
 %>
 
-<p:main_page title="Imprint & Privacy Policy">
+<p:main_page title="${i18n.tr('Imprint & Privacy Policy')}">
     <div class="container">
 
-        <h3 class="mb-3">Imprint</h3>
+        <h3 class="mb-3">${i18n.tr('Imprint')}</h3>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>
                 <c:when test="${empty siteNotice}">
-                    <p class="mb-0">Please add an imprint in the system settings.</p>
+                    <p class="mb-0">${i18n.tr('Please add an imprint in the system settings.')}</p>
                 </c:when>
                 <c:otherwise>
                     <p style="white-space: pre-wrap" class="mb-0"><c:out value="${siteNotice}" escapeXml="false"/></p>
@@ -47,12 +49,12 @@
             </c:choose>
         </div>
 
-        <h3 class="mt-4 mb-3">Privacy Policy</h3>
+        <h3 class="mt-4 mb-3">${i18n.tr('Privacy Policy')}</h3>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>
                 <c:when test="${empty privacyNotice}">
-                    <p class="mb-0">Please add a privacy policy in the system settings.</p>
+                    <p class="mb-0">${i18n.tr('Please add a privacy policy in the system settings.')}</p>
                 </c:when>
                 <c:otherwise>
                     <p style="white-space: pre-wrap" class="mb-0"><c:out value="${privacyNotice}" escapeXml="false"/></p>

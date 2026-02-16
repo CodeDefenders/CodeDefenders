@@ -21,6 +21,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
@@ -75,16 +76,16 @@
 
 <div class="container">
 
-    <h2 class="mb-3">My Games</h2>
+    <h2 class="mb-3">${i18n.tr('My Games')}</h2>
     <table id="my-games" class="table table-striped table-v-align-middle">
         <thead>
             <tr>
                 <th></th>
-                <th>ID</th>
-                <th>Creator</th>
-                <th>Class</th>
-                <th>Players</th>
-                <th>Level</th>
+                <th>${i18n.tr('ID')}</th>
+                <th>${i18n.tr('Creator')}</th>
+                <th>${i18n.tr('Class')}</th>
+                <th>${i18n.tr('Players')}</th>
+                <th>${i18n.tr('Level')}</th>
                 <th></th>
             </tr>
         </thead>
@@ -93,7 +94,8 @@
             <c:choose>
                 <c:when test="${empty activeGames}">
                     <tr class="<%=oddEven()%>">
-                        <td colspan="100" class="text-center">You are currently not active in any games.</td>
+                        <td colspan="100"
+                            class="text-center">${i18n.tr('You are currently not active in any games.')}</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -122,8 +124,8 @@
                                 <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                             </td>
                             <td>
-                                <span><%=attackers.size()%>&nbsp;Attackers</span>,
-                                <span><%=defenders.size()%>&nbsp;Defenders</span>
+                                <span><%=attackers.size()%>&nbsp;${i18n.tr('Attackers')}</span>,
+                                <span><%=defenders.size()%>&nbsp;${i18n.tr('Defenders')}</span>
                             </td>
                             <td><%=info.gameLevel().getFormattedString()%></td>
                             <td>
@@ -137,7 +139,7 @@
                                           method="post">
                                         <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                 form="adminStartBtn-<%=gameId%>">
-                                            Start battleground game
+                                                ${i18n.tr('Start battleground game')}
                                         </button>
                                         <input type="hidden" name="formType" value="startGame">
                                         <input type="hidden" name="gameId" value="<%= gameId %>"/>
@@ -150,13 +152,13 @@
                                 %>
                                     <a class="btn btn-sm btn-attacker text-nowrap" id="<%="attack-"+gameId%>"
                                        href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
-                                        Attack in battleground
+                                            ${i18n.tr('Attack in battleground')}
                                     </a>
                                 <%
                                                 } else {
                                 %>
                                     <div class="d-flex flex-column gap-1">
-                                        <span>Joined as attacker</span>
+                                        <span>${i18n.tr('Joined as attacker')}</span>
                                 <%
                                                     if (gamesJoinable) {
                                 %>
@@ -167,7 +169,7 @@
                                             <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-attacker-"+gameId%>" type="submit"
                                                     form="attLeave"
                                                     value="Leave">
-                                                Leave battleground
+                                                    ${i18n.tr('Leave battleground')}
                                             </button>
                                         </form>
                                 <%
@@ -182,13 +184,13 @@
                                 %>
                                     <a class="btn btn-sm btn-defender text-nowrap" id="<%="defend-"+gameId%>"
                                        href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
-                                        Defend in battleground
+                                            ${i18n.tr('Defend in battleground')}
                                     </a>
                                 <%
                                                 } else {
                                 %>
                                     <div class="d-flex flex-column gap-1">
-                                        <span>Joined as defender</span>
+                                        <span>${i18n.tr('Joined as defender')}</span>
                                 <%
                                                     if (gamesJoinable) {
                                 %>
@@ -199,7 +201,7 @@
                                                 <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-defender-"+gameId%>" type="submit"
                                                         form="defLeave"
                                                         value="Leave">
-                                                    Leave battleground
+                                                        ${i18n.tr('Leave battleground')}
                                                 </button>
                                             </form>
                                 <%
@@ -213,7 +215,7 @@
                                 %>
                                     <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
                                        href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%= gameId %>">
-                                        Observe battleground
+                                            ${i18n.tr('Observe battleground')}
                                     </a>
                                 <%
                                             break;
@@ -230,10 +232,11 @@
                                     <table class="child-row-details">
                                         <thead>
                                             <tr>
-                                                <th style="min-width: 10em;">Attacker</th>
-                                                <th style="min-width: 7em;" class="text-end">Mutants</th>
-                                                <th style="min-width: 10em;" class="text-end">Alive Mutants</th>
-                                                <th class="text-end">Points</th>
+                                                <th style="min-width: 10em;">${i18n.tr('Attacker')}</th>
+                                                <th style="min-width: 7em;" class="text-end">${i18n.tr('Mutants')}</th>
+                                                <th style="min-width: 10em;"
+                                                    class="text-end">${i18n.tr('Alive Mutants')}</th>
+                                                <th class="text-end">${i18n.tr('Points')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -241,7 +244,8 @@
                                                 if (attackers.isEmpty()) {
                                             %>
                                                 <tr>
-                                                    <td colspan="100" class="text-center">There are no Attackers.</td>
+                                                    <td colspan="100"
+                                                        class="text-center">${i18n.tr('There are no Attackers.')}</td>
                                                 </tr>
                                             <%
                                                 } else {
@@ -264,10 +268,11 @@
                                     <table class="child-row-details">
                                         <thead>
                                             <tr>
-                                                <th style="min-width: 10em;">Defender</th>
-                                                <th style="min-width: 7em;" class="text-end">Tests</th>
-                                                <th style="min-width: 10em;" class="text-end">Mutants Killed</th>
-                                                <th class="text-end">Points</th>
+                                                <th style="min-width: 10em;">${i18n.tr('Defender')}</th>
+                                                <th style="min-width: 7em;" class="text-end">${i18n.tr('Tests')}</th>
+                                                <th style="min-width: 10em;"
+                                                    class="text-end">${i18n.tr('Mutants Killed')}</th>
+                                                <th class="text-end">${i18n.tr('Points')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -275,7 +280,8 @@
                                                 if (defenders.isEmpty()) {
                                             %>
                                                 <tr>
-                                                    <td colspan="100" class="text-center">There are no Defenders.</td>
+                                                    <td colspan="100"
+                                                        class="text-center">${i18n.tr('There are no Defenders.')}</td>
                                                 </tr>
                                             <%
                                                 } else {
@@ -317,7 +323,7 @@
                                     <% pageContext.setAttribute("gameId", gameId); %>
                                     <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                                 </td>
-                                <td><span><%=players.size()%> Players</span></td>
+                                <td><span><%=players.size()%> ${i18n.tr('Players')}</span></td>
                                 <td><%=info.gameLevel().getFormattedString()%></td>
                                 <td>
                                     <%
@@ -330,7 +336,7 @@
                                               method="post">
                                             <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                     form="adminStartBtn-<%=gameId%>">
-                                                Start melee game
+                                                    ${i18n.tr('Start melee game')}
                                             </button>
                                             <input type="hidden" name="formType" value="startGame">
                                             <input type="hidden" name="gameId" value="<%= gameId %>"/>
@@ -342,7 +348,7 @@
                                     %>
                                         <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
                                            href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%= gameId %>">
-                                            Observe melee game
+                                                ${i18n.tr('Observe melee game')}
                                         </a>
                                     <%
                                                     break;
@@ -352,13 +358,13 @@
                                     %>
                                         <a class="btn btn-sm btn-player text-nowrap" id="<%="play-"+gameId%>"
                                            href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gameId%>">
-                                            Play in melee game
+                                                ${i18n.tr('Play in melee game')}
                                         </a>
                                     <%
                                                     } else {
                                     %>
                                         <div class="d-flex flex-column gap-1">
-                                            <span>Joined as player</span>
+                                            <span>${i18n.tr('Joined as player')}</span>
                                     <%
                                                         if (gamesJoinable) {
                                     %>
@@ -367,7 +373,7 @@
                                                 <input type="hidden" name="gameId" value="<%=gameId%>">
                                                 <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-"+gameId%>" type="submit" form="leave"
                                                         value="Leave">
-                                                    Leave Melee Game
+                                                        ${i18n.tr('Leave Melee Game')}
                                                 </button>
                                             </form>
                                     <%
@@ -388,14 +394,15 @@
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th style="min-width: 10em;">Player</th>
-                                                    <th class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">${i18n.tr('Player')}</th>
+                                                    <th class="text-end">${i18n.tr('Points')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (players.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="100" class="text-center">There are no Players.</td>
+                                                        <td colspan="100"
+                                                            class="text-center">${i18n.tr('There are no Players. Go Join!')}</td>
                                                     </tr>
                                                 <% } %>
                                                 <% for (Player player : players) { %>
@@ -421,10 +428,10 @@
     <% if (gamesCreatable) { %>
         <div>
             <a id="createBattleground" class="btn btn-outline-primary me-2" href="${url.forPath(Paths.BATTLEGROUND_CREATE)}?origin=<%=Paths.GAMES_OVERVIEW%>">
-                Create battleground game
+                ${i18n.tr('Create battleground game')}
             </a>
             <a id="createMelee" class="btn btn-outline-primary" href="${url.forPath(Paths.MELEE_CREATE)}?origin=<%=Paths.GAMES_OVERVIEW%>">
-                Create melee game
+                ${i18n.tr('Create melee game')}
             </a>
         </div>
     <% } %>
@@ -433,20 +440,20 @@
         if (gamesJoinable) {
     %>
 
-        <h2 class="mt-5 mb-3">Open Battleground Games</h2>
+    <h2 class="mt-5 mb-3">${i18n.tr('Open Battleground Games')}</h2>
         <table id="tableOpenBattleground" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
                     <th></th>
                     <th>ID</th>
-                    <th>Creator</th>
-                    <th>Class</th>
-                    <th>Attackers</th>
-                    <th>Defenders</th>
+                    <th>${i18n.tr('Creator')}</th>
+                    <th>${i18n.tr('Class')}</th>
+                    <th>${i18n.tr('Attackers')}</th>
+                    <th>${i18n.tr('Defenders')}</th>
                     <c:if test="${auth.admin}">
-                        <th>Observers</th>
+                        <th>${i18n.tr('Observers')}</th>
                     </c:if>
-                    <th>Level</th>
+                    <th>${i18n.tr('Level')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -454,7 +461,8 @@
                 <c:choose>
                     <c:when test="${empty openMultiplayerGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="100" class="text-center">There are currently no open battleground games.</td>
+                            <td colspan="100"
+                                class="text-center">${i18n.tr('There are currently no open battleground games.')}</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -538,7 +546,7 @@
                                             <button type="submit" id="<%="join-observer-"+gameId%>"
                                                     class="btn btn-sm btn-info ms-1"
                                                     value="Join as Observer">
-                                                Observe
+                                                    ${i18n.tr('Observe')}
                                             </button>
                                         </span>
                                         </form>
@@ -552,16 +560,20 @@
                                         <table class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th style="min-width: 10em;">Attacker</th>
-                                                    <th style="min-width: 7em;" class="text-end">Mutants</th>
-                                                    <th style="min-width: 10em;" class="text-end">Alive Mutants</th>
-                                                    <th style="min-width: 5.3em;" class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">${i18n.tr('Attacker')}</th>
+                                                    <th style="min-width: 7em;"
+                                                        class="text-end">${i18n.tr('Mutants')}</th>
+                                                    <th style="min-width: 10em;"
+                                                        class="text-end">${i18n.tr('Alive Mutants')}</th>
+                                                    <th style="min-width: 5.3em;"
+                                                        class="text-end">${i18n.tr('Points')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (attackers.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="100" class="text-center">There are no Attackers. Go Join!</td>
+                                                        <td colspan="100"
+                                                            class="text-center">${i18n.tr('There are no Attackers. Go Join!')}</td>
                                                     </tr>
                                                 <%
                                                     } else {
@@ -584,16 +596,20 @@
                                         <table class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th style="min-width: 10em;">Defender</th>
-                                                    <th style="min-width: 7em;" class="text-end">Tests</th>
-                                                    <th style="min-width: 10em;" class="text-end">Mutants Killed</th>
-                                                    <th style="min-width: 5.3em;" class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">${i18n.tr('Defender')}</th>
+                                                    <th style="min-width: 7em;"
+                                                        class="text-end">${i18n.tr('Tests')}</th>
+                                                    <th style="min-width: 10em;"
+                                                        class="text-end">${i18n.tr('Mutants Killed')}</th>
+                                                    <th style="min-width: 5.3em;"
+                                                        class="text-end">${i18n.tr('Points')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (defenders.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="100" class="text-center">There are no Defenders. Go Join!</td>
+                                                        <td colspan="100"
+                                                            class="text-center">${i18n.tr('There are no Defenders. Go Join!')}</td>
                                                     </tr>
                                                 <%
                                                     } else {
@@ -624,19 +640,19 @@
             </tbody>
         </table>
 
-        <h2 class="mt-5 mb-3">Open Melee Games</h2>
+    <h2 class="mt-5 mb-3">${i18n.tr('Open Melee Games')}</h2>
         <table id="tableOpenMelee" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
                     <th></th>
                     <th>ID</th>
-                    <th>Creator</th>
-                    <th>Class</th>
-                    <th>Players</th>
+                    <th>${i18n.tr('Creator')}</th>
+                    <th>${i18n.tr('Class')}</th>
+                    <th>${i18n.tr('Players')}</th>
                     <c:if test="${auth.admin}">
-                        <th>Observers</th>
+                        <th>${i18n.tr('Observers')}</th>
                     </c:if>
-                    <th>Level</th>
+                    <th>${i18n.tr('Level')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -644,7 +660,8 @@
                 <c:choose>
                     <c:when test="${empty openMeleeGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="100" class="text-center">There are currently no open melee games.</td>
+                            <td colspan="100"
+                                class="text-center">${i18n.tr('There are currently no open melee games.')}</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -681,7 +698,7 @@
                                             <button type="submit" id="<%="join-"+info.gameId()%>"
                                                     class="btn btn-player btn-sm ms-1"
                                                     value="Join">
-                                                Join
+                                                    ${i18n.tr('Join')}
                                             </button>
                                         </span>
                                     </form>
@@ -698,7 +715,7 @@
                                                 <button type="submit" id="<%="join-observer-"+info.gameId()%>"
                                                         class="btn btn-info btn-sm ms-1"
                                                         value="Join">
-                                                    Observe
+                                                        ${i18n.tr('Observe')}
                                                 </button>
                                             </span>
                                         </form>
@@ -712,14 +729,15 @@
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th style="min-width: 10em;">Player</th>
-                                                    <th class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">${i18n.tr('Player')}</th>
+                                                    <th class="text-end">${i18n.tr('Points')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <% if (players.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="100" class="text-center">There are no Players. Go Join!</td>
+                                                        <td colspan="100"
+                                                            class="text-center">${i18n.tr('There are no Players. Go Join!')}</td>
                                                     </tr>
                                                 <% } %>
                                                 <% for (Player player : players) { %>
@@ -778,3 +796,4 @@
     </script>
 
 </div>
+

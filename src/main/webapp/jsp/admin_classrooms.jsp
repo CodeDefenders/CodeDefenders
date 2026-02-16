@@ -26,8 +26,9 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
-<p:main_page title="Classrooms">
+<p:main_page title="${i18n.tr('Classrooms')}">
     <div class="container">
         <t:admin_navigation activePage="classrooms"/>
 
@@ -35,16 +36,16 @@
             <div class="d-flex justify-content-between flex-wrap align-items-baseline">
 
                 <div class="mb-3 d-flex gap-3">
-                    <h2 class="mb-0">Classrooms</h2>
+                    <h2 class="mb-0">${i18n.tr('Classrooms')}</h2>
 
                     <button id="create-classroom" type="button" class="btn btn-primary rounded-pill"
                             data-bs-toggle="modal" data-bs-target="#create-classroom-modal">
-                        New Classroom
+                            ${i18n.tr('New Classroom')}
                         <i class="fa fa-plus ms-1" aria-hidden="true"></i>
                     </button>
                 </div>
 
-                <input type="search" id="search-classrooms" placeholder="Search"
+                <input type="search" id="search-classrooms" placeholder="${i18n.tr('Search')}"
                        class="form-control form-control-sm" style="width: 15em;">
             </div>
             <table id="classrooms-table" class="table"></table>
@@ -53,20 +54,21 @@
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="create-classroom"/>
 
-            <t:modal title="Create classroom" id="create-classroom-modal" closeButtonText="Cancel">
+            <t:modal title="${i18n.tr('Create classroom')}" id="create-classroom-modal"
+                     closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    <label for="name-input" class="form-label">Name</label>
+                    <label for="name-input" class="form-label">${i18n.tr('Name')}</label>
                     <input type="text" class="form-control" id="name-input" name="name"
-                           required maxlength="100" placeholder="Name">
+                           required maxlength="100" placeholder="${i18n.tr('Name')}">
                     <div class="invalid-feedback">
-                        Please enter a valid name.
+                            ${i18n.tr('Please enter a valid name.')}
                     </div>
                     <div class="form-text">
-                        Maximum length: 100 characters.
+                            ${i18n.tr('Maximum length: 100 characters.')}
                     </div>
                 </jsp:attribute>
                 <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-primary">Create Classroom</button>
+                    <button type="submit" class="btn btn-primary">${i18n.tr('Create Classroom')}</button>
                 </jsp:attribute>
             </t:modal>
         </form>
@@ -104,7 +106,7 @@
                         return memberCount;
                     case 'display':
                         return `
-                            <span class="text-muted">\${memberCount} Members</span>
+                            <span class="text-muted">\${memberCount} ${i18n.tr('Members')}</span>
                         `;
                 }
             };
@@ -135,39 +137,39 @@
                     {
                         data: 'id',
                         type: 'number',
-                        title: 'ID'
+                        title: '${i18n.tr('ID')}'
                     },
                     {
                         data: 'name',
                         type: 'string',
-                        title: 'Name',
+                        title: '${i18n.tr('Name')}',
                         width: '25em',
                         className: 'truncate'
                     },
                     {
                         data: 'memberCount',
                         type: 'html',
-                        title: 'Members',
+                        title: '${i18n.tr('Members')}',
                         render: renderMemberCount
                     },
                     {
                         data: 'uuid',
                         type: 'string',
-                        title: 'UID'
+                        title: '${i18n.tr('UID')}'
                     },
                     {
                         data: 'open',
                         type: 'boolean',
-                        title: 'Open'
+                        title: '${i18n.tr('Open')}'
                     },
                     {
                         data: 'visible',
                         type: 'boolean',
-                        title: 'Visible'
+                        title: '${i18n.tr('Visible')}'
                     },
                     {
                         data: null,
-                        title: 'Link',
+                        title: '${i18n.tr('Link')}',
                         render: renderLinkButton,
                         width: '2em'
                     },
@@ -177,7 +179,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: "There aren't any classrooms... yet."}
+                language: {emptyTable: "${i18n.tr('There aren\'t any classrooms... yet.')}"}
             });
             LoadingAnimation.hideAnimation(classroomsTable.table().container());
 

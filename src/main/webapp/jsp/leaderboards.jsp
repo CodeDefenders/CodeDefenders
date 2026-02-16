@@ -23,10 +23,11 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
-<c:set var="title" value="Battlegrounds Leaderboard"/>
+<c:set var="title" value="${i18n.tr('Battlegrounds Leaderboard')}"/>
 
 <p:main_page title="${title}">
     <div class="container">
@@ -35,13 +36,13 @@
         <table id="tableMPLeaderboard" class="table table-striped">
             <thead>
                 <tr>
-                    <th>User</th>
-                    <th>Mutants</th>
-                    <th>Attacker Score</th>
-                    <th>Tests</th>
-                    <th>Defender Score</th>
-                    <th>Mutants Killed</th>
-                    <th>Total Score</th>
+                    <th>${i18n.tr('User')}</th>
+                    <th>${i18n.tr('Mutants')}</th>
+                    <th>${i18n.tr('Attacker Score')}</th>
+                    <th>${i18n.tr('Tests')}</th>
+                    <th>${i18n.tr('Defender Score')}</th>
+                    <th>${i18n.tr('Mutants Killed')}</th>
+                    <th>${i18n.tr('Total Score')}</th>
                 </tr>
             </thead>
             <tbody>

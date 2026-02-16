@@ -18,20 +18,23 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <div class="d-flex mb-3">
-    <h2 class="w-50 text-center fg-attacker">Attackers</h2>
-    <h2 class="w-50 text-center fg-defender">Defenders</h2>
+    <h2 class="w-50 text-center fg-attacker">${i18n.tr('Attackers')}</h2>
+    <h2 class="w-50 text-center fg-defender">${i18n.tr('Defenders')}</h2>
 </div>
 
-<h4 class="text-center">Get one point for:</h4>
+<h4 class="text-center">${i18n.tr('Get one point for:')}</h4>
 
 <div class="row g-3 mb-3">
     <div class="col-6">
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Creating a mutant that survives one test</li>
-                    <li>Every additional test that executes the mutant and does not kill it</li>
+                    <li>${i18n.tr('Creating a mutant that survives one test')}</li>
+                    <li>${i18n.tr('Every additional test that executes the mutant and does not kill it')}</li>
                 </ul>
             </div>
         </div>
@@ -40,25 +43,25 @@
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Each mutant your test kills</li>
-                    <li>Each point that mutant had accumulated</li>
-                    <li>Each previously untouched mutant your test kills</li>
+                    <li>${i18n.tr('Each mutant your test kills')}</li>
+                    <li>${i18n.tr('Each point that mutant had accumulated')}</li>
+                    <li>${i18n.tr('Each previously untouched mutant your test kills')}</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-<h4 class="text-center">Equivalence Duels:</h4>
+<h4 class="text-center">${i18n.tr('Equivalence Duels:')}</h4>
 
-<h5 class="text-center">Mutant is proven to <b>not</b> be equivalent:</h5>
+<h5 class="text-center">${i18n.tr('Mutant is proven to <b>not</b> be equivalent:')}</h5>
 
 <div class="row g-3 mb-3">
     <div class="col-6">
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Keep the mutant's points and get an extra point</li>
+                    <li>${i18n.tr('Keep the mutant\'s points and get an extra point')}</li>
                 </ul>
             </div>
         </div>
@@ -67,21 +70,21 @@
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Your score does not change</li>
+                    <li>${i18n.tr('Your score does not change')}</li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
 
-<h5 class="text-center">Equivalence is accepted or no killing test is provided in time:</h5>
+<h5 class="text-center">${i18n.tr('Equivalence is accepted or no killing test is provided in time:')}</h5>
 
 <div class="row g-3">
     <div class="col-6">
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Lose the mutant's points</li>
+                    <li>${i18n.tr('Lose the mutant\'s points')}</li>
                 </ul>
             </div>
         </div>
@@ -90,7 +93,7 @@
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>Gain one additional point</li>
+                    <li>${i18n.tr('Gain one additional point')}</li>
                 </ul>
             </div>
         </div>

@@ -25,12 +25,14 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 <%@ page import="org.codedefenders.util.CDIUtil" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="killMapCronJob" type="org.codedefenders.cron.KillMapCronJob"--%>
 
@@ -55,19 +57,21 @@
     pageContext.setAttribute("numClassesQueued", numClassesQueued);
     pageContext.setAttribute("numGamesQueued", numGamesQueued);
 
+    I18n i18n = (I18n) request.getAttribute("i18n");
+
     if (currentJob != null) {
         String jobType;
         switch (currentJob.getType()) {
             case CLASS: jobType = "Class";
                 break;
             case GAME:
-                jobType = "Game";
+                jobType = i18n.tr("Game");
                 break;
             case CLASSROOM:
-                jobType = "Classroom";
+                jobType = i18n.tr("Classroom");
                 break;
             default:
-                jobType = "[Unknown]";
+                jobType = i18n.tr("[Unknown]");
         }
         pageContext.setAttribute("jobType", jobType);
     }
@@ -78,32 +82,32 @@
     pageContext.setAttribute("QUEUE", KillmapPage.QUEUE);
 %>
 
-<p:main_page title="KillMap Management">
+<p:main_page title="${i18n.tr('KillMap Management')}">
     <div class="container">
         <t:admin_navigation activePage="adminKillMaps"/>
 
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Killmap Status</h5>
+                <h5 class="card-title">${i18n.tr('Killmap Status')}</h5>
 
                 <p class="m-0">
-                    ${numClassesQueued} ${fn:pluralize(numClassesQueued, "Class", "Classes")} and
-                    ${numGamesQueued} ${fn:pluralize(numGamesQueued, "Game", "Games")} currently queued.
+                        ${numClassesQueued} ${i18n.trn('Class', 'Classes', numClassesQueued)} ${i18n.tr('and')}
+                        ${numGamesQueued} ${i18n.trn('Game', 'Games', numGamesQueued)} ${i18n.tr('currently queued.')}
                 </p>
 
                 <p class="m-0">
                     <c:choose>
                         <c:when test="${killMapCronJob.enabled}">
-                            Killmap Processing is <span class="text-success">enabled</span>.
+                            ${i18n.tr('Killmap Processing is')} <span class="text-success">${i18n.tr('enabled')}</span>.
                         </c:when>
                         <c:otherwise>
-                            Killmap Processing is <span class="text-danger">disabled</span>.
+                            ${i18n.tr('Killmap Processing is')} <span class="text-danger">${i18n.tr('disabled')}</span>.
                         </c:otherwise>
                     </c:choose>
                 </p>
 
                 <c:if test="${currentJob != null}">
-                    <p>Currently processing: ${jobType} with ID ${currentJob.id}</p>
+                    <p>${i18n.tr('Currently processing: {0} with ID {1}', jobType, currentJob.id)}</p>
                 </c:if>
 
                 <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="${processorExplanation}"
@@ -112,12 +116,12 @@
                     <c:choose>
                         <c:when test="${killMapCronJob.enabled}">
                             <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
-                                Disable KillMap Processing
+                                    ${i18n.tr('Disable KillMap Processing')}
                             </button>
                         </c:when>
                         <c:otherwise>
                             <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
-                                Enable KillMap Processing
+                                    ${i18n.tr('Enable KillMap Processing')}
                             </button>
                         </c:otherwise>
                     </c:choose>
@@ -129,19 +133,19 @@
             <li class="nav-item">
                 <a class="nav-link ${currentPage == MANUAL ? 'active' : ''}"
                    href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">
-                    Enter IDs
+                        ${i18n.tr('Enter IDs')}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link ${currentPage == AVAILABLE ? 'active' : ''}"
                    href="${url.forPath(Paths.ADMIN_KILLMAPS)}/available">
-                    Select Classes / Games / Classrooms
+                        ${i18n.tr('Select Classes / Games / Classrooms')}
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link ${currentPage == QUEUE ? 'active' : ''}"
                    href="${url.forPath(Paths.ADMIN_KILLMAPS)}/queue">
-                    Queued Killmap Jobs
+                        ${i18n.tr('Queued Killmap Jobs')}
                 </a>
             </li>
         </ul>
@@ -149,26 +153,27 @@
         <c:if test="${currentPage == MANUAL}">
             <div class="card mb-4">
                 <div class="card-header">
-                    Classes
+                        ${i18n.tr('Classes')}
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="class-ids" class="form-label">
                                 <a data-bs-toggle="modal" data-bs-target="#class-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
-                                    Class IDs
+                                        ${i18n.tr('Class IDs')}
                                     <span class="fa fa-question-circle ms-1"></span>
                                 </a>
                             </label>
-                            <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
+                            <textarea name="ids" id="class-ids" class="form-control"
+                                      placeholder="${i18n.tr('Class IDs')}" rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row g-2">
                         <div class="col-auto">
-                            <button id="queue-ids-classes" class="btn btn-primary">Queue</button>
+                            <button id="queue-ids-classes" class="btn btn-primary">${i18n.tr('Queue')}</button>
                         </div>
                         <div class="col-auto">
-                            <button id="delete-ids-classes" class="btn btn-danger">Delete</button>
+                            <button id="delete-ids-classes" class="btn btn-danger">${i18n.tr('Delete')}</button>
                         </div>
                     </div>
                 </div>
@@ -176,41 +181,40 @@
 
             <div class="card">
                 <div class="card-header">
-                    Games
+                        ${i18n.tr('Games')}
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-12">
                             <label for="game-ids" class="form-label">
                                 <a data-bs-toggle="modal" data-bs-target="#game-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
-                                    Game IDs
+                                        ${i18n.tr('Game IDs')}
                                     <span class="fa fa-question-circle ms-1"></span>
                                 </a>
                             </label>
-                            <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
+                            <textarea name="ids" id="game-ids" class="form-control" placeholder="${i18n.tr('Game IDs')}"
+                                      rows="3"></textarea>
                         </div>
                     </div>
                     <div class="row g-2">
                         <div class="col-auto">
-                            <button id="queue-ids-games" class="btn btn-primary">Queue</button>
+                            <button id="queue-ids-games" class="btn btn-primary">${i18n.tr('Queue')}</button>
                         </div>
                         <div class="col-auto">
-                            <button id="delete-ids-games" class="btn btn-danger">Delete</button>
+                            <button id="delete-ids-games" class="btn btn-danger">${i18n.tr('Delete')}</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <t:modal title="Class IDs Explanation" id="class-ids-explanation">
+            <t:modal title="${i18n.tr('Class IDs Explanation')}" id="class-ids-explanation">
                 <jsp:attribute name="content">
-                    Comma separated list of class IDs to generate killmaps for.
-                    Newlines and whitespaces are allowed.
+                    ${i18n.tr('Comma separated list of class IDs to generate killmaps for. Newlines and whitespaces are allowed.')}
                 </jsp:attribute>
             </t:modal>
-            <t:modal title="Game IDs Explanation" id="game-ids-explanation">
+            <t:modal title="${i18n.tr('Game IDs Explanation')}" id="game-ids-explanation">
                 <jsp:attribute name="content">
-                    Comma separated list of game IDs to generate killmaps for.
-                    Newlines and whitespaces are allowed.
+                    ${i18n.tr('Comma separated list of game IDs to generate killmaps for. Newlines and whitespaces are allowed.')}
                 </jsp:attribute>
             </t:modal>
         </c:if>
@@ -218,28 +222,33 @@
         <c:if test="${currentPage == AVAILABLE || currentPage == QUEUE}">
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-                    Classes
+                        ${i18n.tr('Classes')}
                     <div class="d-flex flex-wrap gap-2">
                         <div>
                             <input type="checkbox" id="toggle-progress-classes" class="btn-check" autocomplete="off">
                             <label for="toggle-progress-classes" class="btn btn-xs btn-outline-secondary">
-                                Show progress
+                                    ${i18n.tr('Show progress')}
                                 <i class="fa fa-check btn-check-active"></i>
                             </label>
                         </div>
-                        <button id="invert-selection-classes" class="btn btn-xs btn-secondary">Invert Selection</button>
+                        <button id="invert-selection-classes"
+                                class="btn btn-xs btn-secondary">${i18n.tr('Invert Selection')}</button>
                         <c:choose>
                             <c:when test="${currentPage == AVAILABLE}">
                                 <div class="text-nowrap">
-                                    <button id="queue-selection-classes" class="btn btn-xs btn-primary">Queue Selected</button>
-                                    <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                                    <button id="queue-selection-classes"
+                                            class="btn btn-xs btn-primary">${i18n.tr('Queue Selected')}</button>
+                                    <button id="delete-selection-classes"
+                                            class="btn btn-xs btn-danger">${i18n.tr('Delete Selected Killmaps')}</button>
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <button id="cancel-selection-classes" class="btn btn-xs btn-primary">Cancel Selected</button>
+                                <button id="cancel-selection-classes"
+                                        class="btn btn-xs btn-primary">${i18n.tr('Cancel Selected')}</button>
                             </c:otherwise>
                         </c:choose>
-                        <input type="search" id="search-classes" class="form-control input-xs" placeholder="Search">
+                        <input type="search" id="search-classes" class="form-control input-xs"
+                               placeholder="${i18n.tr('Search')}">
                     </div>
                 </div>
                 <div class="card-body">
@@ -249,28 +258,33 @@
 
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-                    Games
+                        ${i18n.tr('Games')}
                     <div class="d-flex flex-wrap gap-2">
                         <div>
                             <input type="checkbox" id="toggle-progress-games" class="btn-check" autocomplete="off">
                             <label for="toggle-progress-games" class="btn btn-xs btn-outline-secondary">
-                                Show progress
+                                    ${i18n.tr('Show progress')}
                                 <i class="fa fa-check btn-check-active"></i>
                             </label>
                         </div>
-                        <button id="invert-selection-games" class="btn btn-xs btn-secondary">Invert Selection</button>
+                        <button id="invert-selection-games"
+                                class="btn btn-xs btn-secondary">${i18n.tr('Invert Selection')}</button>
                         <c:choose>
                             <c:when test="${currentPage == AVAILABLE}">
                                 <div class="text-nowrap">
-                                    <button id="queue-selection-games" class="btn btn-xs btn-primary">Queue Selected</button>
-                                    <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                                    <button id="queue-selection-games"
+                                            class="btn btn-xs btn-primary">${i18n.tr('Queue Selected')}</button>
+                                    <button id="delete-selection-games"
+                                            class="btn btn-xs btn-danger">${i18n.tr('Delete Selected Killmaps')}</button>
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <button id="cancel-selection-games" class="btn btn-xs btn-primary">Cancel Selected</button>
+                                <button id="cancel-selection-games"
+                                        class="btn btn-xs btn-primary">${i18n.tr('Cancel Selected')}</button>
                             </c:otherwise>
                         </c:choose>
-                        <input type="search" id="search-games" class="form-control input-xs" placeholder="Search">
+                        <input type="search" id="search-games" class="form-control input-xs"
+                               placeholder="${i18n.tr('Search')}">
                     </div>
                 </div>
                 <div class="card-body">
@@ -278,30 +292,35 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-                    Classrooms
+                        ${i18n.tr('Classrooms')}
                     <div class="d-flex flex-wrap gap-2">
                         <div>
                             <input type="checkbox" id="toggle-progress-classrooms" class="btn-check" autocomplete="off">
                             <label for="toggle-progress-classrooms" class="btn btn-xs btn-outline-secondary">
-                                Show progress
+                                    ${i18n.tr('Show progress')}
                                 <i class="fa fa-check btn-check-active"></i>
                             </label>
                         </div>
-                        <button id="invert-selection-classrooms" class="btn btn-xs btn-secondary">Invert Selection</button>
+                        <button id="invert-selection-classrooms"
+                                class="btn btn-xs btn-secondary">${i18n.tr('Invert Selection')}</button>
                         <c:choose>
                             <c:when test="${currentPage == AVAILABLE}">
                                 <div class="text-nowrap">
-                                    <button id="queue-selection-classrooms" class="btn btn-xs btn-primary">Queue Selected</button>
-                                    <button id="delete-selection-classrooms" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                                    <button id="queue-selection-classrooms"
+                                            class="btn btn-xs btn-primary">${i18n.tr('Queue Selected')}</button>
+                                    <button id="delete-selection-classrooms"
+                                            class="btn btn-xs btn-danger">${i18n.tr('Delete Selected Killmaps')}</button>
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <button id="cancel-selection-classrooms" class="btn btn-xs btn-primary">Cancel Selected</button>
+                                <button id="cancel-selection-classrooms"
+                                        class="btn btn-xs btn-primary">${i18n.tr('Cancel Selected')}</button>
                             </c:otherwise>
                         </c:choose>
-                        <input type="search" id="search-classrooms" class="form-control input-xs" placeholder="Search">
+                        <input type="search" id="search-classrooms" class="form-control input-xs"
+                               placeholder="${i18n.tr('Search')}">
                     </div>
                 </div>
                 <div class="card-body">
@@ -316,17 +335,17 @@
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=class&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-classes">
                             <i class="fa fa-download me-1"></i>
-                            Download classes table
+                                ${i18n.tr('Download classes table')}
                         </a>
                         <a download="classes.csv"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=class&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-classes-csv">
-                            as CSV
+                                ${i18n.tr('as CSV')}
                         </a>
                         <a download="classes.json"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=class&fileType=json"
                            class="btn btn-sm btn-outline-secondary" id="download-classes-json">
-                            as JSON
+                                ${i18n.tr('as JSON')}
                         </a>
                     </div>
                 </div>
@@ -336,17 +355,17 @@
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=game&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-games">
                             <i class="fa fa-download me-1"></i>
-                            Download games table
+                                ${i18n.tr('Download games table')}
                         </a>
                         <a download="games.csv"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=game&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-games-csv">
-                            as CSV
+                                ${i18n.tr('as CSV')}
                         </a>
                         <a download="games.json"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=game&fileType=json"
                            class="btn btn-sm btn-outline-secondary" id="download-games-json">
-                            as JSON
+                                ${i18n.tr('as JSON')}
                         </a>
                     </div>
                 </div>
@@ -356,17 +375,17 @@
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=classroom&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-classrooms">
                             <i class="fa fa-download me-1"></i>
-                            Download classrooms table
+                                ${i18n.tr('Download classrooms table')}
                         </a>
                         <a download="classrooms.csv"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=classroom&fileType=csv"
                            class="btn btn-sm btn-outline-secondary" id="download-classrooms-csv">
-                            as CSV
+                                ${i18n.tr('as CSV')}
                         </a>
                         <a download="classrooms.json"
                            href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=${currentPage}&killmapType=classroom&fileType=json"
                            class="btn btn-sm btn-outline-secondary" id="download-classrooms-json">
-                            as JSON
+                                ${i18n.tr('as JSON')}
                         </a>
                     </div>
                 </div>
@@ -399,7 +418,7 @@
 
             document.getElementById('delete-ids-classes').addEventListener('click', event => {
                 const idsField = document.getElementById('class-ids');
-                if (confirm('Are you sure you want to delete the specified killmaps?')) {
+                if (confirm('${i18n.tr('Are you sure you want to delete the specified killmaps?')}')) {
                     postForm(null, {
                         ids: idsField.value,
                         formType: 'deleteKillmaps',
@@ -409,7 +428,7 @@
             });
             document.getElementById('delete-ids-games').addEventListener('click', event => {
                 const idsField = document.getElementById('class-ids');
-                if (confirm('Are you sure you want to delete the specified killmaps?')) {
+                if (confirm('${i18n.tr('Are you sure you want to delete the specified killmaps?')}')) {
                     postForm(null, {
                         ids: idsField.value,
                         formType: 'deleteKillmaps',
@@ -498,14 +517,14 @@
 
             <c:choose>
                 <c:when test="${currentPage == AVAILABLE}">
-                    emptyClassTableMessage = 'No classes available.';
-                    emptyGameTableMessage = 'No games available.';
-                    emptyClassroomTableMessage = 'No classrooms available.';
+        emptyClassTableMessage = '${i18n.tr('No classes available.')}';
+        emptyGameTableMessage = '${i18n.tr('No games available.')}';
+        emptyClassroomTableMessage = '${i18n.tr('No classrooms available.')}';
                 </c:when>
                 <c:otherwise>
-                    emptyClassTableMessage = 'No classes queued for killmap computation.';
-                    emptyGameTableMessage = 'No games queued for killmap computation.';
-                    emptyClassroomTableMessage = 'No classrooms queued for killmap computation.';
+        emptyClassTableMessage = '${i18n.tr('No classes queued for killmap computation.')}';
+        emptyGameTableMessage = '${i18n.tr('No games queued for killmap computation.')}';
+        emptyClassroomTableMessage = '${i18n.tr('No classrooms queued for killmap computation.')}';
                 </c:otherwise>
             </c:choose>
 
@@ -517,7 +536,7 @@
                 columns: [
                     {
                         data: null,
-                        title: 'Select',
+                        title: '${i18n.tr('Select')}',
                         defaultContent: '',
                         className: 'select-checkbox align-middle',
                         orderDataType: 'select-extension',
@@ -525,29 +544,29 @@
                     },
                     {
                         data: 'classId',
-                        title: 'Class',
+                        title: '${i18n.tr('Class')}',
                         type: 'num'
                     },
                     {
                         data: null,
                         render: renderClassName,
-                        title: 'Name',
+                        title: '${i18n.tr('Name')}',
                         type: 'string'
                     },
                     {
                         data: 'nrMutants',
-                        title: 'Mutants',
+                        title: '${i18n.tr('Mutants')}',
                         type: 'num'
                     },
                     {
                         data: 'nrTests',
-                        title: 'Tests',
+                        title: '${i18n.tr('Tests')}',
                         type: 'num'
                     },
                     {
                         data: null,
                         render: renderProgress,
-                        title: 'Computed',
+                        title: '${i18n.tr('Computed')}',
                         type: 'num'
                     }
                 ],
@@ -570,7 +589,7 @@
                 columns: [
                     {
                         data: null,
-                        title: 'Select',
+                        title: '${i18n.tr('Select')}',
                         defaultContent: '',
                         className: 'select-checkbox align-middle',
                         orderDataType: 'select-extension',
@@ -578,28 +597,28 @@
                     },
                     {
                         data: 'gameId',
-                        title: 'Game',
+                        title: '${i18n.tr('Game')}',
                         type: 'num'
                     },
                     {
                         data: 'gameMode',
-                        title: 'Mode',
+                        title: '${i18n.tr('Mode')}',
                         type: 'string'
                     },
                     {
                         data: 'nrMutants',
-                        title: 'Mutants',
+                        title: '${i18n.tr('Mutants')}',
                         type: 'num'
                     },
                     {
                         data: 'nrTests',
-                        title: 'Tests',
+                        title: '${i18n.tr('Tests')}',
                         type: 'num'
                     },
                     {
                         data: null,
                         render: renderProgress,
-                        title: 'Computed',
+                        title: '${i18n.tr('Computed')}',
                         type: 'num'
                     },
                 ],
@@ -622,7 +641,7 @@
                 columns: [
                     {
                         data: null,
-                        title: 'Select',
+                        title: '${i18n.tr('Select')}',
                         defaultContent: '',
                         className: 'select-checkbox align-middle',
                         orderDataType: 'select-extension',
@@ -631,24 +650,24 @@
                     {
                         data: 'classroomName',
                         type: 'string',
-                        title: 'Name',
+                        title: '${i18n.tr('Name')}',
                         width: '25em',
                         className: 'truncate'
                     },
                     {
                         data: 'nrMutants',
-                        title: 'Mutants',
+                        title: '${i18n.tr('Mutants')}',
                         type: 'num'
                     },
                     {
                         data: 'nrTests',
-                        title: 'Tests',
+                        title: '${i18n.tr('Tests')}',
                         type: 'num'
                     },
                     {
                         data: null,
                         render: renderProgress,
-                        title: 'Computed',
+                        title: '${i18n.tr('Computed')}',
                         type: 'string'
                     }
                 ],
@@ -720,7 +739,7 @@
                 });
 
                 document.getElementById('delete-selection-classes').addEventListener('click', event => {
-                    if (confirm('Are you sure you want to delete the selected killmaps?')) {
+                    if (confirm('${i18n.tr('Are you sure you want to delete the selected killmaps?')}')) {
                         postForm(null, {
                             ids: getSelectedIds(classTable),
                             formType: 'deleteKillMaps',
@@ -729,7 +748,7 @@
                     }
                 });
                 document.getElementById('delete-selection-games').addEventListener('click', event => {
-                    if (confirm('Are you sure you want to delete the selected killmaps?')) {
+                    if (confirm('${i18n.tr('Are you sure you want to delete the selected killmaps?')}')) {
                         postForm(null, {
                             ids: getSelectedIds(gameTable),
                             formType: 'deleteKillMaps',
@@ -738,7 +757,7 @@
                     }
                 });
                 document.getElementById('delete-selection-classrooms').addEventListener('click', event => {
-                    if (confirm('Are you sure you want to delete the selected killmaps?')) {
+                    if (confirm('${i18n.tr('Are you sure you want to delete the selected killmaps?')}')) {
                         postForm(null, {
                             ids: getSelectedIds(classroomTable),
                             formType: 'deleteKillMaps',

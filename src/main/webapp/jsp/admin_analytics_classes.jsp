@@ -21,6 +21,8 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <p:main_page title="Class Analytics">
@@ -85,60 +87,60 @@
                     <table class="child-row-details">
                         <thead>
                             <tr>
-                                <th>Win Rates</td>
+                                <th>${i18n.tr('Win Rates')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Attacker Wins:</td>
-                                <td>\${valPercent(data.attackerWins, data.nrGames)}</td>
+                                <td>${i18n.tr('Attacker Wins:')}</td>
+                                <td>${valPercent(data.attackerWins, data.nrGames)}</td>
                             </tr>
                             <tr>
-                                <td>Defender Wins:</td>
-                                <td>\${valPercent(data.defenderWins, data.nrGames)}</td>
+                                <td>${i18n.tr('Defender Wins:')}</td>
+                                <td>${valPercent(data.defenderWins, data.nrGames)}</td>
                             </tr>
                         </tbody>
                         <thead>
                             <tr>
-                                <th>Feedback</td>
+                                <th>${i18n.tr('Feedback')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Mutation Difficulty:</td>
+                                <td>${i18n.tr('Mutation Difficulty:')}</td>
                                 <td>\${div(rating1.sum, rating1.count, 'NA')}</td>
-                                <td>Number of votes:</td>
-                                <td>\${rating1.count}</td>
+                                <td>${i18n.tr('Number of votes:')}</td>
+                                <td>${rating1.count}</td>
                             </tr>
                             <tr>
-                                <td>Test Difficulty:</td>
+                                <td>${i18n.tr('Test Difficulty:')}</td>
                                 <td>\${div(rating2.sum, rating2.count, 'NA')}</td>
-                                <td>Number of votes:</td>
+                                <td>${i18n.tr('Number of votes:')}</td>
                                 <td>\${rating2.count}</td>
                             </tr>
                             <tr>
-                                <td>Game is engaging:</td>
+                                <td>${i18n.tr('Game is engaging:')}</td>
                                 <td>\${div(rating3.sum, rating3.count, 'NA')}</td>
-                                <td>Number of votes:</td>
+                                <td>${i18n.tr('Number of votes:')}</td>
                                 <td>\${rating3.count}</td>
                             </tr>
                         </tbody>
                         <thead>
                             <tr>
-                                <th>Mutants</td>
+                                <th>${i18n.tr('Mutants')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Mutants Alive:</td>
+                                <td>${i18n.tr('Mutants Alive:')}</td>
                                 <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
-                                <td>Per Game:</td>
+                                <td>${i18n.tr('Per Game:')}</td>
                                 <td>\${div(data.mutantsAlive, data.nrGames)}</td>
                             </tr>
                             <tr>
-                                <td>Mutants Equivalent:</td>
+                                <td>${i18n.tr('Mutants Equivalent:')}</td>
                                 <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
-                                <td>Per Game:</td>
+                                <td>${i18n.tr('Per Game:')}</td>
                                 <td>\${div(data.mutantsEquivalent, data.nrGames)}</td>
                             </tr>
                         </tbody>
@@ -184,7 +186,7 @@
                 "scrollY": '600px',
                 "scrollCollapse": true,
                 "paging": false,
-                "language": {"info": "Showing _TOTAL_ entries"}
+                "language": {"info": "${i18n.tr('Showing _TOTAL_ entries')}"}
             });
 
             DataTablesUtils.setupChildRows(table, format);

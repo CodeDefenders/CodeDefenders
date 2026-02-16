@@ -21,13 +21,15 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <t:error_page
-        title="You don't have permission to perform this request (403)"
+        title="${i18n.tr('You don\'t have permission to perform this request (403)')}"
         statusCode="403"
-        shortDescription="You don't have permission to perform this request.">
+        shortDescription="${i18n.tr('You don\'t have permission to perform this request.')}">
     <jsp:attribute name="message">
-        <p>Your accounts permissions do not include the accessed page or performed action.</p>
+        <p>${i18n.tr('Your accounts permissions do not include the accessed page or performed action.')}</p>
         <%-- TODO: Info about appyling for teacher roles here? --%>
-        <p>Please contact your administrator if you think this is a mistake.</p>
+        <p>${i18n.tr('Please contact your administrator if you think this is a mistake.')}</p>
     </jsp:attribute>
 </t:error_page>

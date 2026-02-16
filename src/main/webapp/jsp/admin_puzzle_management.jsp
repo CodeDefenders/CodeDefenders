@@ -23,10 +23,13 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 
-<p:main_page title="Puzzle Management">
+<p:main_page title="${i18n.tr('Puzzle Management')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/puzzle_management.css")}" rel="stylesheet">
     </jsp:attribute>
@@ -37,27 +40,27 @@
                 <div id="puzzle-management-controls">
                     <div class="d-flex gap-2">
                         <button type="button" id="button-upload-chapters" class="btn btn-sm btn-outline-secondary">
-                            Upload chapters
+        ${i18n.tr('Upload chapters')}
                             <i class="fa fa-upload ms-1"></i>
                         </button>
                         <button type="button" id="button-upload-puzzles" class="btn btn-sm btn-outline-secondary">
-                            Upload puzzles
+        ${i18n.tr('Upload puzzles')}
                             <i class="fa fa-upload ms-1"></i>
                         </button>
                         <button type="button" id="button-add-chapter" class="btn btn-sm btn-outline-secondary">
-                            Add empty chapter
+        ${i18n.tr('Add empty chapter')}
                             <i class="fa fa-plus ms-1"></i>
                         </button>
                     </div>
                     <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
-                        Save
+        ${i18n.tr('Save')}
                         <i class="fa fa-save ms-1"></i>
                     </button>
                 </div>
 
                 <div class="chapter" id="chapter-unassigned">
                     <div class="chapter__header">
-                        <span class="chapter__title">Unassigned Puzzles</span>
+        <span class="chapter__title">${i18n.tr('Unassigned Puzzles')}</span>
                     </div>
                     <div class="puzzles"></div>
                 </div>
@@ -66,20 +69,21 @@
 
                 <div class="chapter" id="chapter-archived">
                     <div class="chapter__header">
-                        <span class="chapter__title">Archived Puzzles</span>
+        <span class="chapter__title">${i18n.tr('Archived Puzzles')}</span>
                     </div>
                     <div class="puzzles"></div>
                 </div>
             </div>
         </div>
 
-        <t:modal title="Unsaved changes" id="unsaved-changes-modal" closeButtonText="Cancel">
+        <t:modal title="${i18n.tr('Unsaved changes')}" id="unsaved-changes-modal"
+                 closeButtonText="${i18n.tr('Cancel')}">
             <jsp:attribute name="content">
-                You have unsaved changes. Please save first.
+                ${i18n.tr('You have unsaved changes. Please save first.')}
             </jsp:attribute>
             <jsp:attribute name="footer">
                 <button type="button" class="btn btn-primary button-save">
-                    Save
+                        ${i18n.tr('Save')}
                     <i class="fa fa-save ms-1"></i>
                 </button>
             </jsp:attribute>
@@ -90,60 +94,59 @@
             <input type="hidden" name="formType" value="uploadPuzzles">
             <input type="hidden" name="chapterId" value="">
 
-            <t:modal title="Upload Puzzles" id="upload-puzzle-modal" modalDialogClasses="modal-dialog-responsive">
+        <t:modal title="${i18n.tr('Upload Puzzles')}" id="upload-puzzle-modal"
+                 modalDialogClasses="modal-dialog-responsive">
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
                         <p>
-                            Puzzles are uploaded in <code>.zip</code> archives.
-                            You can upload multiple puzzle archives at once by selecting multiple in the file dialog.
-                            For details on the convention, please expand the explanations.
+                                ${i18n.tr('Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations.')}
                         </p>
 
                         <input class="form-control mb-4" type="file" id="fileUploadPuzzle" name="fileUploadPuzzle"
                                accept=".zip" multiple>
 
                         <details class="border rounded p-2 mb-3">
-                            <summary>Puzzle Format Explanation</summary>
+                            <summary>${i18n.tr('Puzzle Format Explanation')}</summary>
                             <div class="mt-3 p-1">
                                 <t:import_puzzle_explanation/>
                             </div>
                         </details>
                         <details class="border rounded p-2 mb-3">
-                            <summary>Puzzle Properties Explanation</summary>
+                            <summary>${i18n.tr('Puzzle Properties Explanation')}</summary>
                             <div class="mt-3 p-1">
                                 <t:import_puzzle_properties_explanation/>
                             </div>
                         </details>
                         <details class="border rounded p-2">
-                            <summary>Downloads</summary>
+                            <summary>${i18n.tr('Downloads')}</summary>
                             <div class="mt-3 p-1">
                                 <ul>
                                     <li>
-                                        Empty puzzle template:
+                                            ${i18n.tr('Empty puzzle template:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
                                             puzzle_template.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example properties file:
+                                            ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_properties.zip")}" download>
                                             puzzle.properties
                                         </a>
                                     </li>
                                     <li>
-                                        Example attacker puzzle:
+                                            ${i18n.tr('Example attacker puzzle:')}
                                         <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
                                             puzzle_attacker.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example defender puzzle:
-                                        <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
+                                            ${i18n.tr('Example defender puzzle:')}
+                                        <a href="${url.forPath("puzzle_importer/puzzle_defender.zip")}" download>
                                             puzzle_defender.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example puzzle with dependencies:
+                                            ${i18n.tr('Example puzzle with dependencies:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
                                             puzzle_deps.zip
                                         </a>
@@ -155,8 +158,8 @@
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button class="btn btn-primary" type="submit" id="uploadPuzzlesButton"
-                            onclick="this.form.submit(); this.disabled = true; this.innerText='Uploading...';">
-                        Upload
+                            onclick="this.form.submit(); this.disabled = true; this.innerText='${i18n.tr('Uploading...')}';">
+                            ${i18n.tr('Upload')}
                     </button>
                 </jsp:attribute>
             </t:modal>
@@ -166,91 +169,90 @@
             class="form-width" method="post" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" name="formType" value="uploadPuzzleChapters">
 
-            <t:modal title="Upload Chapters" id="upload-chapter-modal" modalDialogClasses="modal-dialog-responsive">
+        <t:modal title="${i18n.tr('Upload Chapters')}" id="upload-chapter-modal"
+                 modalDialogClasses="modal-dialog-responsive">
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
                         <p>
-                            Chapters are uploaded in <code>.zip</code> archives.
-                            You can upload multiple chapter archives at once by selecting multiple in the file dialog.
-                            For details on the convention, please expand the explanation.
+                                ${i18n.tr('Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation.')}
                         </p>
 
                         <p>
-                            Uploading large chapters may take several minutes.
+                                ${i18n.tr('Uploading large chapters may take several minutes.')}
                         </p>
 
                         <input class="form-control mb-4" type="file" id="fileUploadChapter" name="fileUploadChapter"
                                accept=".zip" multiple>
 
                         <details class="border rounded p-2 mb-3">
-                            <summary>Chapter Format Explanation</summary>
+                            <summary>${i18n.tr('Chapter Format Explanation')}</summary>
                             <div class="mt-3 p-1">
                                 <t:import_puzzle_chapter_explanation/>
                             </div>
                         </details>
                         <details class="border rounded p-2 mb-3">
-                            <summary>Puzzle Format Explanation</summary>
+                            <summary>${i18n.tr('Puzzle Format Explanation')}</summary>
                             <div class="mt-3 p-1">
                                 <t:import_puzzle_explanation/>
                             </div>
                         </details>
                         <details class="border rounded p-2 mb-3">
-                            <summary>Puzzle Properties Explanation</summary>
+                            <summary>${i18n.tr('Puzzle Properties Explanation')}</summary>
                             <div class="mt-3 p-1">
                                 <t:import_puzzle_properties_explanation/>
                             </div>
                         </details>
                         <details class="border rounded p-2">
-                            <summary>Downloads</summary>
+                            <summary>${i18n.tr('Downloads')}</summary>
                             <div class="mt-3 p-1">
                                 <ul>
                                     <li>
-                                        Example chapter:
+                                            ${i18n.tr('Example chapter:')}
                                         <a href="${url.forPath("puzzle-importer/chapter_example.zip")}" download>
                                             chapter_example.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example properties file:
+                                            ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/chapter.properties")}" download>
                                             chapter.properties
                                         </a>
                                     </li>
                                     <li>
-                                        Empty chapter template:
+                                            ${i18n.tr('Empty chapter template:')}
                                         <a href="${url.forPath("puzzle-importer/chapter_template.zip")}" download>
                                             chapter_template.zip
                                         </a>
                                     </li>
                                 </ul>
-                                <p>Puzzle Downloads:</p>
+                                <p>${i18n.tr('Puzzle Downloads:')}</p>
                                 <ul>
                                     <li>
-                                        Empty puzzle template:
+                                            ${i18n.tr('Empty puzzle template:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
                                             puzzle_template.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example properties file:
+                                            ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle.properties")}" download>
                                             puzzle.properties
                                         </a>
                                     </li>
                                     <li>
-                                        Example attacker puzzle:
+                                            ${i18n.tr('Example attacker puzzle:')}
                                         <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
                                             puzzle_attacker.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example defender puzzle:
+                                            ${i18n.tr('Example defender puzzle:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
                                             puzzle_defender.zip
                                         </a>
                                     </li>
                                     <li>
-                                        Example puzzle with dependencies:
+                                            ${i18n.tr('Example puzzle with dependencies:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
                                             puzzle_deps.zip
                                         </a>
@@ -262,8 +264,8 @@
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                         <button class="btn btn-primary" type="submit" id="uploadChaptersButton"
-                                onclick="this.form.submit(); this.disabled = true; this.innerText='Uploading...';">
-                            Upload
+                                onclick="this.form.submit(); this.disabled = true; this.innerText='${i18n.tr('Uploading...')}';">
+                                ${i18n.tr('Upload')}
                         </button>
                 </jsp:attribute>
             </t:modal>
@@ -359,13 +361,13 @@
                             </div>
                             <div class="chapter__controls">
                                 <div class="chapter__handle me-3" title="Drag to move chapter"></div>
-                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="Edit">
+        <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="${i18n.tr('Edit')}">
                                     <i class="fa fa-edit"></i>
                                 </button>
-                                <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="Upload Puzzles">
+        <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="${i18n.tr('Upload Puzzles')}">
                                     <i class="fa fa-upload"></i>
                                 </button>
-                                <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="Delete">
+        <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="${i18n.tr('Delete')}">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
@@ -374,8 +376,8 @@
 
                     const controls = container.querySelector('.chapter__controls');
                     controls.firstElementChild.insertAdjacentElement('afterend', createChapterSelectDropdown({
-                        label: 'Move to position:',
-                        tooltip: 'Move to position'
+        label: ${i18n.tr('Move to position:')},
+        tooltip: ${i18n.tr('Move to position')}
                     }));
 
                     return container;
@@ -445,27 +447,27 @@
                             </div>
                             <div class="puzzle__tags">
                                 <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
-                                <span class="badge puzzle__tag puzzle__tag__games" title="Number of games with the puzzle"></span>
-                                <span class="badge puzzle__tag puzzle__tag__level" title="Puzzle level"></span>
-                                <span class="badge puzzle__tag puzzle__tag__equivalent title="Mutant is equivalent" hidden">
+        <span class="badge puzzle__tag puzzle__tag__games" title="${i18n.tr('Number of games with the puzzle')}"></span>
+        <span class="badge puzzle__tag puzzle__tag__level" title="${i18n.tr('Puzzle level')}"></span>
+        <span class="badge puzzle__tag puzzle__tag__equivalent title="${i18n.tr('Mutant is equivalent')}" hidden">
                                     <i class="fa fa-flag"></i>
                                 </span>
                             </div>
                         </div>
                         <div class="puzzle__controls">
-                            <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="Edit">
+        <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="${i18n.tr('Edit')}">
                                 <i class="fa fa-edit"></i>
                             </button>
 
-                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="Unassign">
+        <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="${i18n.tr('Unassign')}">
                                 <i class="fa fa-times"></i>
                             </button>
 
-                            <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="Archive">
+        <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="${i18n.tr('Archive')}">
                                 <i class="fa fa-archive"></i>
                             </button>
 
-                            <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="Delete">
+        <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="${i18n.tr('Delete')}">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>`;
@@ -473,8 +475,8 @@
                     container.appendChild(watermark);
                     container.querySelector('.puzzle__controls').firstElementChild
                             .insertAdjacentElement('afterend', createChapterSelectDropdown({
-                                label: 'Move to chapter:',
-                                tooltip: 'Move to chapter'
+        label: ${i18n.tr('Move to chapter:')},
+        tooltip: ${i18n.tr('Move to chapter')}
                             }));
                     return container;
                 }
@@ -503,7 +505,7 @@
                     if (puzzle.gameCount > 0) {
                         const deleteButton = this.container.querySelector('.puzzle__button__delete');
                         deleteButton.disabled = true;
-                        deleteButton.title = "Puzzles with existing games can't be deleted";
+        deleteButton.title = ${i18n.tr("Puzzles with existing games can't be deleted")};
                     }
                 }
 
@@ -534,7 +536,7 @@
              */
             function createChapterSelectDropdown({
                      tooltip = 'Move',
-                     label = 'Move to chapter:',
+                            label = ${i18n.tr('Move to chapter:')},
                      showButtonClasses = 'btn btn-xs btn-primary btn-fixed',
                      showButtonContent = '<i class="fa fa-arrow-right"></i>',
                      moveButtonContent = 'Move'
@@ -634,9 +636,9 @@
                 // --- Init 'Scroll to chapter' ------------------------------------------------------------------------
 
                 const scrollDropdown = createChapterSelectDropdown({
-                    tooltip: 'Scroll to chapter',
-                    label: 'Scroll to chapter:',
-                    moveButtonContent: 'Go',
+                            tooltip: ${i18n.tr('Scroll to chapter')},
+                            label: ${i18n.tr('Scroll to chapter:')},
+                            moveButtonContent: ${i18n.tr('Go')},
                     showButtonClasses: 'btn btn-sm btn-outline-secondary',
                     showButtonContent: 'Scroll to chapter <i class="fa fa-arrow-down ms-1"></i>',
                 });
@@ -735,7 +737,7 @@
                                     <input type="text" name="title" class="form-control" value=""
                                         placeholder="Title"
                                         required minlength="1" maxlength="100">
-                                    <div class="invalid-feedback">Please enter a title.</div>
+            <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                 </div>
                             </div>
 
@@ -743,13 +745,13 @@
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
                                     <input type="text" name="description" class="form-control" value=""
-                                        placeholder="Description"
+            placeholder="${i18n.tr('Description')}"
                                         maxlength="1000">
                                 </div>
                             </div>
                         </form>`;
-                    modal.title.innerText = 'Edit Chapter';
-                    modal.footerCloseButton.innerText = 'Cancel';
+            modal.title.innerText = ${i18n.tr('Edit Chapter')};
+            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
                     modal.modal.dataset.id = chapter.id;
                     modal.body.querySelector('input[name="title"]').value = chapter.title;
                     modal.body.querySelector('input[name="description"]').value = chapter.description;
@@ -778,9 +780,9 @@
                             chapter.description = response.chapter.description;
                             chapterComp.title.innerText = response.chapter.title;
                             chapterComp.description.innerText = response.chapter.description;
-                            ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                         }).catch(async response => {
-                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -805,26 +807,26 @@
                         <form class="" novalidate>
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Title</label>
+            <label class="form-label">${i18n.tr('Title')}</label>
                                     <input type="text" class="form-control" value="" name="title"
-                                        placeholder="Title"
+            placeholder="${i18n.tr('Title')}"
                                         required minlength="1" maxlength="100">
-                                    <div class="invalid-feedback">Please enter a title.</div>
+                                                <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Description</label>
+                                        <label class="form-label">${i18n.tr('Description')}</label>
                                     <input type="text" class="form-control" value="" name="description"
-                                        placeholder="Description"
+                                                placeholder="${i18n.tr('Description')}"
                                         maxlength="1000">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <label class="form-label">Max. Assertions</label>
+            <label class="form-label">${i18n.tr('Max. Assertions')}</label>
                                     <input type="number" class="form-control" value="" name="maxAssertionsPerTest"
                                         min="1">
                                 </div>
@@ -832,12 +834,12 @@
 
                             <div class="row g-3 mb-2 editable-lines">
                                 <div class="col-6">
-                                    <label class="form-label">First Editable Line</label>
+            <label class="form-label">${i18n.tr('First Editable Line')}</label>
                                     <input type="number" class="form-control" value="" name="editableLinesStart"
                                         min="1">
                                 </div>
                                 <div class="col-6">
-                                    <label class="form-label">Last Editable Line</label>
+            <label class="form-label">${i18n.tr('Last Editable Line')}</label>
                                     <input type="number" class="form-control" value="" name="editableLinesEnd"
                                         min="1">
                                 </div>
@@ -845,36 +847,36 @@
 
                             <div class="row g-3 mb-2 difficulty-level">
                                 <div class="col-12">
-                                    <label class="form-label">Game Level</label>
+            <label class="form-label">${i18n.tr('Game Level')}</label>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
                                                value="${GameLevel.EASY}" required>
-                                        <label class="form-check-label" for="level-radio-easy">Easy</label>
-                                        <div class="invalid-feedback">Please select a level.</div>
+            <label class="form-check-label" for="level-radio-easy">${i18n.tr('Easy')}</label>
+            <div class="invalid-feedback">${i18n.tr('Please select a level.')}</div>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
                                                value="${GameLevel.HARD}" required
                                                checked>
-                                        <label class="form-check-label" for="level-radio-hard">Hard</label>
+            <label class="form-check-label" for="level-radio-hard">${i18n.tr('Hard')}</label>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row g-3 mb-2 mutant-equivalent">
                                 <div class="col-12">
-                                    <label class="form-label">Equivalence</label>
+            <label class="form-label">${i18n.tr('Equivalence')}</label>
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent" id="mutantEquivalent">
                                         <label class="form-check-label" for="mutantEquivalent">
-                                            Mutant equivalent
+            ${i18n.tr('Mutant equivalent')}
                                         </label>
                                     </div>
                                 </div>
                             </div>
                         </form>`;
-                    modal.title.innerText = 'Edit Puzzle';
-                    modal.footerCloseButton.innerText = 'Cancel';
+            modal.title.innerText = ${i18n.tr('Edit Puzzle')};
+            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
                     modal.modal.dataset.id = puzzle.id;
 
                     const form = modal.body.querySelector("form");
@@ -935,9 +937,9 @@
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
                             puzzle.isEquivalent = response.puzzle.isEquivalent;
                             puzzleComp.setPuzzle(puzzle);
-                            ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                         }).catch(async response => {
-                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -960,14 +962,14 @@
                     const modal = new Modal();
                     modal.body.innerHTML = `
                         <div>
-                            Are you sure you want to delete chapter
+            ${i18n.tr('Are you sure you want to delete chapter')}
                             <span class="px-1 border rounded-1 edit-chapter-title"></span>?
-                            Any puzzles left in the chapter will be moved to
-                            <span class="px-1 border rounded-1">Unassigned</span>.
+            ${i18n.tr('Any puzzles left in the chapter will be moved to')}
+                    <span class="px-1 border rounded-1">${i18n.tr('Unassigned')}</span>.
                         </div>`;
 
-                    modal.title.innerText = 'Delete Chapter';
-                    modal.footerCloseButton.innerText = 'Cancel';
+            modal.title.innerText = ${i18n.tr('Delete Chapter')};
+            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
                     modal.modal.dataset.id = chapter.id;
                     modal.body.querySelector('.edit-chapter-title').innerText = chapter.title;
 
@@ -985,9 +987,9 @@
                                         unassignedChapter.addPuzzle(PuzzleComponent.fromChild(puzzleElem));
                                     }
                                     chapterComp.container.remove();
-                                    ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                                 }).catch(async response => {
-                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1010,28 +1012,28 @@
                     const modal = new Modal();
                     modal.body.innerHTML = `
                         <div>
-                            Are you sure you want to permanently delete puzzle
+            ${i18n.tr('Are you sure you want to permanently delete puzzle')}
                             <span class="px-1 border rounded-1 edit-puzzle-title"></span>?
                         </div>`;
 
-                    modal.title.innerText = 'Delete Puzzle';
-                    modal.footerCloseButton.innerText = 'Cancel';
+            modal.title.innerText = ${i18n.tr('Delete Puzzle')};
+            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
                     modal.modal.dataset.id = puzzle.id;
                     modal.body.querySelector('.edit-puzzle-title').innerText = puzzle.title;
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-danger');
                     saveButton.role = 'button';
-                    saveButton.innerText = 'Delete';
+            saveButton.innerText = ${i18n.tr('Delete')};
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
                         PuzzleAPI.deletePuzzle(puzzle.id)
                                 .then(response => {
                                     puzzleComp.container.remove();
-                                    ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                                 }).catch(async response => {
-                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1050,28 +1052,28 @@
                                     <div class="form-group">
                                         <label class="form-label">Title</label>
                                         <input type="text" name="title" class="form-control" value=""
-                                            placeholder="Title"
+            placeholder="${i18n.tr('Title')}"
                                             required minlength="1" maxlength="100">
-                                        <div class="invalid-feedback">Please enter a title.</div>
+            <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-2">
                                     <div class="form-group">
-                                        <label class="form-label">Description</label>
+            <label class="form-label">${i18n.tr('Description')}</label>
                                         <input type="text" name="description" class="form-control" value=""
-                                            placeholder="Description"
+            placeholder="${i18n.tr('Description')}"
                                             maxlength="1000">
                                     </div>
                                 </div>
                             </form>`;
-                    modal.title.innerText = 'Create New Chapter';
-                    modal.footerCloseButton.innerText = 'Cancel';
+            modal.title.innerText = ${i18n.tr('Create New Chapter')};
+            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
                     saveButton.role = 'button';
-                    saveButton.innerText = 'Save';
+            saveButton.innerText = ${i18n.tr('Save')};
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
@@ -1094,9 +1096,9 @@
                                 description: response.chapter.description
                             });
                             chaptersContainer.appendChild(chapterComp.container);
-                            ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                         }).catch(async response => {
-                            ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -1119,7 +1121,7 @@
                     const modal = new Modal();
                     modal.title.innerText = puzzle.title;
                     modal.title.classList.add('d-flex', 'align-items-center', 'gap-2');
-                    modal.footerCloseButton.innerText = 'Close';
+            modal.footerCloseButton.innerText = ${i18n.tr('Close')};
                     modal.modal.dataset.id = puzzle.id;
                     modal.dialog.classList.add('modal-dialog-responsive');
                     modal.body.classList.add('d-flex', 'p-0');
@@ -1200,20 +1202,20 @@
                     saveButton.addEventListener('click', function (event) {
                         for (const btn of saveButtons) {
                             btn.disabled = true;
-                            btn.innerText = 'Saving...';
+            btn.innerText = ${i18n.tr('Saving...')};
                         }
                         PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
                                 .then(response => {
                                     isUnsavedChanges = false
-                                    ShowToasts.showToast({title: 'Success', body: response.message});
+            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
                                 }).catch(async response => {
-                                    ShowToasts.showToast({title: 'Error', body: (await response).message, colorClass: 'bg-danger'});
-                                    alert('Could not save changes.');
+            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+            alert(${i18n.tr('Could not save changes.')});
                                 }).finally(function() {
                                     unsavedChangesModal.hide();
                                     for (const btn of saveButtons) {
                                         btn.disabled = false;
-                                        btn.innerText = 'Save';
+            btn.innerText = ${i18n.tr('Save')};
                                     }
                                 });
                     });
@@ -1240,7 +1242,7 @@
                     if (isUnsavedChanges) {
                         unsavedChangesModal.show();
                     } else {
-                        uploadPuzzleTitle.innerText = 'Upload Puzzles';
+            uploadPuzzleTitle.innerText = ${i18n.tr('Upload Puzzles')};
                         uploadPuzzleChapterId.value = '';
                         uploadPuzzleModal.show();
                     }

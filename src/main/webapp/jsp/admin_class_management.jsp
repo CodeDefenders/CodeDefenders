@@ -23,6 +23,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
@@ -34,19 +35,19 @@
     pageContext.setAttribute("allClasses", allClasses);
 %>
 
-<p:main_page title="Class Management">
+<p:main_page title="${i18n.tr('Class Management')}">
     <div class="container">
         <t:admin_navigation activePage="adminClasses"/>
 
         <table id="tableClasses" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Alias</th>
-                    <th>Assertion Library</th>
-                    <th>#Games</th>
-                    <th>Manage Class</th>
+                    <th>${i18n.tr('ID')}</th>
+                    <th>${i18n.tr('Name')}</th>
+                    <th>${i18n.tr('Alias')}</th>
+                    <th>${i18n.tr('Assertion Library')}</th>
+                    <th>${i18n.tr('#Games')}</th>
+                    <th>${i18n.tr('Manage Class')}</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,9 +55,9 @@
                 <c:if test="${empty allClasses}">
                     <tr>
                         <td colspan="100" class="text-center">
-                            There are no classes yet.
-                            <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">Click here</a>
-                            to upload a new class.
+                                ${i18n.tr('There are no classes yet.')}
+                            <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">${i18n.tr('Click here')}</a>
+                                ${i18n.tr('to upload a new class.')}
                         </td>
                     </tr>
                 </c:if>
@@ -83,8 +84,8 @@
                                         <form id="manageClass_${classId}" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
                                             <input type="hidden" name="formType" value="setClassInactive">
                                             <button class="btn btn-sm btn-danger" id="active_class_${classId}" type="submit" value="${classId}" name="classId"
-                                                    title="Set class as inactive. This class won't be available for games afterwards."
-                                                    onclick="return confirm('Are you sure you want to set class \'${gameClass.name}\' to inactive?');">
+                                                    title="${i18n.tr('Set class as inactive. This class won\'t be available for games afterwards.')}"
+                                                    onclick="return confirm('${i18n.tr('Are you sure you want to set class \'${gameClass.name}\' to inactive?')}');">
                                                 <i class="fa fa-power-off"></i>
                                             </button>
                                         </form>
@@ -93,8 +94,8 @@
                                         <form id="manageClass_${classId}" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
                                             <input type="hidden" name="formType" value="setClassActive">
                                             <button class="btn btn-sm btn-success" id="inactive_class_${classId}" type="submit" value="${classId}" name="classId"
-                                                    title="Set class as active. This class will be available for games afterwards again."
-                                                    onclick="return confirm('Are you sure you want to set class \'${gameClass.name}\' to active?');">
+                                                    title="${i18n.tr('Set class as active. This class will be available for games afterwards again.')}"
+                                                    onclick="return confirm('${i18n.tr('Are you sure you want to set class \'${gameClass.name}\' to active?')}');">
                                                 <i class="fa fa-power-off"></i>
                                             </button>
                                         </form>
@@ -105,12 +106,12 @@
                                     <button class="btn btn-sm btn-danger" id="delete_class_${classId}" type="submit" value="${classId}" name="classId"
                                             <c:choose>
                                                 <c:when test="${classInfo.deletable}">
-                                                    title="Delete class from the system. This class won't be available for games afterwards."
-                                                    onclick="return confirm('Are you sure you want to delete class \'${gameClass.name}\' forever? This cannot be undone.');"
+                                                    title="${i18n.tr('Delete class from the system. This class won\'t be available for games afterwards.')}"
+                                                    onclick="return confirm('${i18n.tr('Are you sure you want to delete class \'${gameClass.name}\' forever? This cannot be undone.')}');"
                                                 </c:when>
                                                 <c:otherwise>
                                                     disabled
-                                                    title="Class can't be deleted, since games were already played on it."
+                                                    title="${i18n.tr('Class can\'t be deleted, since games were already played on it.')}"
                                                 </c:otherwise>
                                             </c:choose>
                                         >
@@ -127,8 +128,8 @@
 
         <c:if test="${!empty allClasses}">
             <p>
-                <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">Click here</a>
-                to upload a new class.
+                <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.ADMIN_CLASSES}">${i18n.tr('Click here')}</a>
+                    ${i18n.tr('to upload a new class.')}
             </p>
         </c:if>
 

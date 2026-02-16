@@ -23,29 +23,30 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Analytics"); %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<p:main_page title="KillMap Analytics">
+<p:main_page title="${i18n.tr('KillMap Analytics')}">
     <div class="container">
         <t:admin_navigation activePage="adminAnalytics"/>
 
-        <h3>Useful Actions</h3>
+        <h3>${i18n.tr('Useful Actions')}</h3>
 
         <table id="tableKillmaps" class="table table-striped">
             <thead>
                 <tr>
-                    <th>User ID</th>
-                    <th>User Name</th>
-                    <th>Class ID</th>
-                    <th>Class Name</th>
-                    <th>Role</th>
-                    <th>Useful Mutants</th>
-                    <th>Useful Tests</th>
-                    <th>Useful Actions</th>
+                    <th>${i18n.tr('User ID')}</th>
+                    <th>${i18n.tr('User Name')}</th>
+                    <th>${i18n.tr('Class ID')}</th>
+                    <th>${i18n.tr('Class Name')}</th>
+                    <th>${i18n.tr('Role')}</th>
+                    <th>${i18n.tr('Useful Mutants')}</th>
+                    <th>${i18n.tr('Useful Tests')}</th>
+                    <th>${i18n.tr('Useful Actions')}</th>
                 </tr>
             </thead>
         </table>
@@ -53,7 +54,7 @@
         <div class="row g-3 mt-4">
             <div class="col-12">
                 <a data-bs-toggle="modal" data-bs-target="#useful-actions-explanation" class="btn btn-outline-secondary btn-sm">
-                    What are useful actions?
+                        ${i18n.tr('What are useful actions?')}
                 </a>
             </div>
             <div class="col-12">
@@ -61,40 +62,38 @@
                     <a download="killmap-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download">
                         <i class="fa fa-download me-1"></i>
-                        Download table
+                            ${i18n.tr('Download table')}
                     </a>
                     <a download="killmap-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                        as CSV
+                            ${i18n.tr('as CSV')}
                     </a>
                     <a download="killmap-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=json"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
-                        as JSON
+                            ${i18n.tr('as JSON')}
                     </a>
                 </div>
             </div>
         </div>
 
-        <t:modal title="Useful Actions Explanation" id="useful-actions-explanation">
+        <t:modal title="${i18n.tr('Useful Actions Explanation')}" id="useful-actions-explanation">
             <jsp:attribute name="content">
                 <p>
-                    This table uses data from the class killmaps to determine the number of useful tests and mutants per
-                    player, class and role.
+                        ${i18n.tr('This table uses data from the class killmaps to determine the number of useful tests and mutants per player, class and role.')}
                 </p>
                 <table class="table table-no-last-border mb-0">
                     <tbody>
                     <tr>
-                        <td class="text-nowrap"><b>Useful Tests:</b></td>
-                        <td>Number of tests, which killed at least one mutant.</td>
+                        <td class="text-nowrap"><b>${i18n.tr('Useful Tests:')}</b></td>
+                        <td>${i18n.tr('Number of tests, which killed at least one mutant.')}</td>
                     </tr>
                     <tr>
-                        <td class="text-nowrap"><b>Useful Mutants:</b></td>
-                        <td>Number of mutants, which were killed by at least one test,
-                            but were covered and not killed by at least one other test.</td>
+                        <td class="text-nowrap"><b>${i18n.tr('Useful Mutants:')}</b></td>
+                        <td>${i18n.tr('Number of mutants, which were killed by at least one test, but were covered and not killed by at least one other test.')}</td>
                     </tr>
                     <tr>
-                        <td class="text-nowrap"><b>Useful Actions:</b></td>
-                        <td>Sum of useful tests and useful mutants.</td>
+                        <td class="text-nowrap"><b>${i18n.tr('Useful Actions:')}</b></td>
+                        <td>${i18n.tr('Sum of useful tests and useful mutants.')}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -136,7 +135,7 @@
                 "scrollY": '600px',
                 "scrollCollapse": true,
                 "paging": false,
-                "language": {"info": "Showing _TOTAL_ entries"}
+                "language": {"info": "${i18n.tr('Showing _TOTAL_ entries')}"}
             });
         });
     </script>

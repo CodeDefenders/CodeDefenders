@@ -20,13 +20,14 @@
 --%>
 <%@ page isErrorPage="true" pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+f<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <t:error_page
-        title="Internal Server Error (500)"
+        title="${i18n.tr('Internal Server Error (500)')}"
         statusCode="500"
-        shortDescription="Internal Server Error">
+        shortDescription="${i18n.tr('Internal Server Error')}">
     <jsp:attribute name="message">
-        <p>There has been a problem on our side. Sorry about that.</p>
-        <p>Please try again and contact your administrator if this keeps happening.</p>
+        <p>${i18n.tr('There has been a problem on our side. Sorry about that.')}</p>
+        <p>${i18n.tr('Please try again and contact your administrator if this keeps happening.')}</p>
     </jsp:attribute>
 </t:error_page>

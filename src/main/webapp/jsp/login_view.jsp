@@ -22,6 +22,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
@@ -39,27 +40,29 @@
     pageContext.setAttribute("resetPw", resetPw);
 %>
 
-<p:main_page title="Login">
+<p:main_page title="${i18n.tr('Login')}">
     <div id="login" class="container" style="max-width: 25rem;">
-        <h2>Sign in</h2>
+        <h2>${i18n.tr('Sign in')}</h2>
         <form action="${url.forPath(Paths.LOGIN)}" method="post" id="login-form" class="needs-validation">
 
             <div class="row g-3">
                 <div class="col-12">
-                    <label for="login-username-input" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="login-username-input" name="username" placeholder="Username"
+                    <label for="login-username-input" class="form-label">${i18n.tr('Username')}</label>
+                    <input type="text" class="form-control" id="login-username-input" name="username"
+                           placeholder="${i18n.tr('Username')}"
                            required>
                     <div class="invalid-feedback">
-                        Please enter your username.
+                            ${i18n.tr('Please enter your username.')}
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <label for="login-password-input" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="login-password-input" name="password" placeholder="Password"
+                    <label for="login-password-input" class="form-label">${i18n.tr('Password')}</label>
+                    <input type="password" class="form-control" id="login-password-input" name="password"
+                           placeholder="${i18n.tr('Password')}"
                            required>
                     <div class="invalid-feedback">
-                        Please enter your password.
+                            ${i18n.tr('Please enter your password.')}
                     </div>
                 </div>
 
@@ -68,22 +71,25 @@
                         <input type="checkbox" class="form-check-input" id="login-consent-checkbox" checked
                                required>
                         <label for="login-consent-checkbox" class="form-check-label">
-                            I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+                                ${i18n.tr('I understand and consent that the mutants and tests I create in the game will be used for research purposes.')}
                         </label>
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <button id="login-button" type="submit" class="btn btn-primary btn-lg w-100">Sign in</button>
+                    <button id="login-button" type="submit"
+                            class="btn btn-primary btn-lg w-100">${i18n.tr('Sign in')}</button>
                 </div>
 
                 <div class="col-12 d-flex justify-content-between">
                     <c:if test="${registrationEnabled}">
-                        <a id="createacc-link" href="#" data-bs-toggle="modal" data-bs-target="#createacc-modal">Create an account</a>
+                        <a id="createacc-link" href="#" data-bs-toggle="modal"
+                           data-bs-target="#createacc-modal">${i18n.tr('Create an account')}</a>
                     </c:if>
 
                     <c:if test="${emailEnabled}">
-                        <a id="password-forgotten-link" href="#" data-bs-toggle="modal" data-bs-target="#resetpw-modal">Password forgotten</a>
+                        <a id="password-forgotten-link" href="#" data-bs-toggle="modal"
+                           data-bs-target="#resetpw-modal">${i18n.tr('Password forgotten')}</a>
                     </c:if>
                 </div>
             </div>
@@ -98,51 +104,56 @@
                     <input type="hidden" name="formType" value="create">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createacc-modal-title">Create a new account</h5>
+                        <h5 class="modal-title" id="createacc-modal-title">${i18n.tr('Create a new account')}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <label for="createacc-username-input" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="createacc-username-input" name="username" placeholder="Username"
+                                <label for="createacc-username-input" class="form-label">${i18n.tr('Username')}</label>
+                                <input type="text" class="form-control" id="createacc-username-input" name="username"
+                                       placeholder="${i18n.tr('Username')}"
                                        required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
                                 <div class="invalid-feedback">
-                                    Please enter a valid username.
+                                        ${i18n.tr('Please enter a valid username.')}
                                 </div>
                                 <div class="form-text">
-                                    3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
+                                        ${i18n.tr('3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.')}
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <label for="createacc-email-input" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="createacc-email-input" name="email" placeholder="Email"
+                                <label for="createacc-email-input" class="form-label">${i18n.tr('Email')}</label>
+                                <input type="email" class="form-control" id="createacc-email-input" name="email"
+                                       placeholder="${i18n.tr('Email')}"
                                        required>
                                 <div class="invalid-feedback">
-                                    Please enter a valid email address.
+                                        ${i18n.tr('Please enter a valid email address.')}
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="mb-2">
-                                    <label for="createacc-password-input" class="form-label">Password</label>
-                                    <input type="password" class="form-control" id="createacc-password-input" name="password" placeholder="Password"
+                                    <label for="createacc-password-input"
+                                           class="form-label">${i18n.tr('Password')}</label>
+                                    <input type="password" class="form-control" id="createacc-password-input"
+                                           name="password" placeholder="${i18n.tr('Password')}"
                                            required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
                                     <div class="invalid-feedback">
-                                        Please enter a valid password.
+                                            ${i18n.tr('Please enter a valid password.')}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <input type="password" class="form-control" id="createacc-confirm-password-input" name="confirm" placeholder="Confirm Password"
+                                    <input type="password" class="form-control" id="createacc-confirm-password-input"
+                                           name="confirm" placeholder="${i18n.tr('Confirm Password')}"
                                            required>
                                     <div class="invalid-feedback" id="createacc-confirm-password-feedback">
-                                        Please confirm your password.
+                                            ${i18n.tr('Please confirm your password.')}
                                     </div>
                                     <div class="form-text">
-                                        ${pwMinLength}-20 alphanumeric characters, no whitespace or special characters.
+                                            ${i18n.tr('{0}-20 alphanumeric characters, no whitespace or special characters.', pwMinLength)}
                                     </div>
                                 </div>
                             </div>
@@ -150,8 +161,9 @@
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Create Account</button>
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">${i18n.tr('Close')}</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Create Account')}</button>
                     </div>
                 </form>
             </div>
@@ -188,41 +200,44 @@
                     <input type="hidden" name="formType" value="resetPassword">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="resetpw-modal-title">Reset your password</h5>
+                        <h5 class="modal-title" id="resetpw-modal-title">${i18n.tr('Reset your password')}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
 
                         <div class="row g-3">
                             <div class="col-12">
-                                <label for="resetpw-username-input" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="resetpw-username-input" name="accountUsername" placeholder="Username"
+                                <label for="resetpw-username-input" class="form-label">${i18n.tr('Username')}</label>
+                                <input type="text" class="form-control" id="resetpw-username-input"
+                                       name="accountUsername" placeholder="${i18n.tr('Username')}"
                                        required autofocus>
                                 <div class="invalid-feedback">
-                                    Please enter your username.
+                                        ${i18n.tr('Please enter your username.')}
                                 </div>
                             </div>
 
                             <div class="col-12">
-                                <label for="resetpw-email-input" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="resetpw-email-input" name="accountEmail" placeholder="Email"
+                                <label for="resetpw-email-input" class="form-label">${i18n.tr('Email')}</label>
+                                <input type="email" class="form-control" id="resetpw-email-input" name="accountEmail"
+                                       placeholder="${i18n.tr('Email')}"
                                        required>
                                 <div class="invalid-feedback" id="resetpw-email-feedback">
-                                    Please enter your email address.
+                                        ${i18n.tr('Please enter your email address.')}
                                 </div>
                             </div>
 
                             <div class="col-12">
                                 <div class="form-text">
-                                    This will send a mail with a link to change your password to your email account.
+                                        ${i18n.tr('This will send a mail with a link to change your password to your email account.')}
                                 </div>
                             </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Reset Password</button>
+                        <button type="button" class="btn btn-secondary"
+                                data-bs-dismiss="modal">${i18n.tr('Close')}</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Reset Password')}</button>
                     </div>
                 </form>
             </div>
@@ -251,7 +266,7 @@
                         <input type="hidden" name="formType" value="changePassword">
 
                         <div class="modal-header">
-                            <h5 class="modal-title" id="changepw-modal-title">Reset your password</h5>
+                            <h5 class="modal-title" id="changepw-modal-title">${i18n.tr('Reset your password')}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
@@ -259,23 +274,26 @@
                             <div class="row g-3">
                                 <div class="col-12">
                                     <div class="mb-2">
-                                        <label for="changepw-password-input" class="form-label">Password</label>
-                                        <!-- TODO(Alex): Increase maxLength. OWASP says: "A common maximum length is 64 characters due to limitations in certain hashing algorithms […]"  -->
-                                        <input type="password" class="form-control" id="changepw-password-input" name="inputPasswordChange" placeholder="Password"
+                                        <label for="changepw-password-input"
+                                               class="form-label">${i18n.tr('Password')}</label>
+                                        <input type="password" class="form-control" id="changepw-password-input"
+                                               name="inputPasswordChange" placeholder="${i18n.tr('Password')}"
                                                required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
                                         <div class="invalid-feedback">
-                                            Please enter a valid password.
+                                                ${i18n.tr('Please enter a valid password.')}
                                         </div>
                                     </div>
 
                                     <div>
-                                        <input type="password" class="form-control" id="changepw-confirm-password-input" name="inputConfirmPasswordChange" placeholder="Confirm Password"
+                                        <input type="password" class="form-control" id="changepw-confirm-password-input"
+                                               name="inputConfirmPasswordChange"
+                                               placeholder="${i18n.tr('Confirm Password')}"
                                                required>
                                         <div class="invalid-feedback" id="changepw-confirm-password-feedback">
-                                            Please confirm your password.
+                                                ${i18n.tr('Please confirm your password.')}
                                         </div>
                                         <div class="form-text">
-                                            ${pwMinLength}-20 alphanumeric characters, no whitespace or special characters.
+                                                ${i18n.tr('{0}-20 alphanumeric characters, no whitespace or special characters.', pwMinLength)}
                                         </div>
                                     </div>
                                 </div>
@@ -283,8 +301,9 @@
 
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Change Password</button>
+                            <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">${i18n.tr('Close')}</button>
+                            <button type="submit" class="btn btn-primary">${i18n.tr('Change Password')}</button>
                         </div>
                     </form>
                 </div>
