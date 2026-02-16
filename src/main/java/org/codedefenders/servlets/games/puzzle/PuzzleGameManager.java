@@ -443,13 +443,11 @@ public class PuzzleGameManager extends HttpServlet {
                 tve.setGameId(gameId);
                 tve.setUserId(login.getUserId());
                 tve.setSuccess(validationSuccess);
-                tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+                tve.setValidationMessage(validationMessage.orElse(null));
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    for (var error : validationMessage) {
-                        messages.add(error).alert();
-                    }
+                    messages.add(validationMessage.get()).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -621,7 +619,7 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+        Optional<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -631,13 +629,11 @@ public class PuzzleGameManager extends HttpServlet {
         tve.setGameId(gameId);
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+        tve.setValidationMessage(validationMessage.orElse(null));
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            for (var error : validationMessage) {
-                messages.add(error).alert();
-            }
+            messages.add(validationMessage.get()).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;

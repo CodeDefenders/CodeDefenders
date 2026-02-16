@@ -113,15 +113,14 @@ public class CodeValidator {
         return DigestUtils.md5Hex(cleanedCode);
     }
 
-    // TODO Cannot use ValidationMessage as that is an ENUM type...
-    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
+    public static Optional<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
             AssertionLibrary assertionLibrary) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
         if (parseResult.isPresent()) {
             return TestValidator.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary,
                     TestValidationRules.getRules());
         } else {
-            return new ArrayList<>();
+            return Optional.empty(); //TODO Why do we pretend everything is ok if the parser failed?
         }
     }
 

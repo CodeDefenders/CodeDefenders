@@ -20,6 +20,7 @@ package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -131,9 +132,9 @@ public class CodeValidatorTest {
                                                                          AssertionLibrary assertionLibrary) {
         String testCode = loadTest(test);
 
-        List<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        Optional<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual).isEmpty();
+        assertThat(actual.isEmpty()).isTrue();
     }
 
     private static class InvalidTestArgumentSource implements ArgumentsProvider {
@@ -200,11 +201,13 @@ public class CodeValidatorTest {
                                                                       AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
 
-        List<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        Optional<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual)
-                .comparingElementsUsing(Correspondence.from((String act, String exp) -> act.contains(exp), "contains"))
-                .containsAtLeastElementsIn(expectedValidationMessages);
+        assertThat(actual.isEmpty()).isFalse();
+        for (String expected : expectedValidationMessages) {
+            assertThat(actual.get()).contains(expected);
+        }
+
     }
 
 

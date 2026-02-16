@@ -404,9 +404,7 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {
-                        for (var error : errors) {
-                            messages.add(error).alert();
-                        }
+                        messages.add(errors).alert();
                     });
                 }
                 case COMPILATION_FAILED -> {
@@ -599,7 +597,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
 
@@ -653,9 +652,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 switch (result.failureReason().orElseThrow()) {
                     case VALIDATION_FAILED -> {
                         result.validationErrorMessages().ifPresent(errors -> {
-                            for (var error : errors) {
-                                messages.add(error).alert();
-                            }
+                            messages.add(errors).alert();
                         });
                     }
                     case COMPILATION_FAILED -> {
@@ -696,7 +693,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
         Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");
