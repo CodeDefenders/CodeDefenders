@@ -22,24 +22,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 
 public class MutantRule extends ValidationRule {
 
     private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules;
     private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules;
     private final List<BiPredicate<String, String>> codeRules;
+    private final List<Predicate<Node>> insertionNodeRules;
     private final List<String[]> insertionRules;
 
 
     private MutantRule(String generalDescription, String detailedDescription, String message, boolean visible,
                        List<String[]> insertionRules,
+                       List<Predicate<Node>> insertionNodeRules,
                        List<BiPredicate<String, String>> codeRules,
                        List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules,
                        List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules) {
         super(generalDescription, detailedDescription, message, visible);
         this.insertionRules = insertionRules;
+        this.insertionNodeRules = insertionNodeRules;
         this.codeRules = codeRules;
         this.linediffRules = linediffRules;
         this.compilationUnitRules = compilationUnitRules;
@@ -61,10 +66,15 @@ public class MutantRule extends ValidationRule {
         return insertionRules.stream().anyMatch(r -> CodeValidator.containsAny(diff, r));
     }
 
+    public boolean fails(Node node) {
+        return insertionNodeRules.stream().anyMatch(p -> p.test(node));
+    }
+
     static class Builder {
         private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules = new ArrayList<>();
         private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules = new ArrayList<>();
         private final List<BiPredicate<String, String>> codeRules = new ArrayList<>();
+        private final List<Predicate<Node>> insertionNodeRules = new ArrayList<>();
         private final List<String[]> insertionRules = new ArrayList<>();
         private boolean visible = true;
 
@@ -98,6 +108,11 @@ public class MutantRule extends ValidationRule {
             return this;
         }
 
+        Builder withInsertionNode(Predicate<Node> rule) {
+            insertionNodeRules.add(rule);
+            return this;
+        }
+
         Builder hidden() {
             visible = false;
             return this;
@@ -106,6 +121,7 @@ public class MutantRule extends ValidationRule {
         MutantRule build() {
             return new MutantRule(generalDescription, detailedDescription, message, visible,
                     Collections.unmodifiableList(insertionRules),
+                    Collections.unmodifiableList(insertionNodeRules),
                     Collections.unmodifiableList(codeRules),
                     Collections.unmodifiableList(linediffRules),
                     Collections.unmodifiableList(compilationUnitRules));

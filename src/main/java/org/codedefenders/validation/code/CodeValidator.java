@@ -489,11 +489,11 @@ public class CodeValidator {
                 stmtString, JavaParserUtils.defaultParser()::parseBlock);
         if (parseResult.isPresent()) {
             // TODO Should this called always and not only for checking if there's validInsertion ?
-            MutationVisitor visitor = new MutationVisitor(ruleSet);
-            visitor.visit(parseResult.get(), null);
-            if (!visitor.isValid()) {
-                return visitor.getMessage();
+            List<ValidationError> errorMessages = validateInsertionAST(ruleSet, parseResult.get());
+            if (!errorMessages.isEmpty()) {
+                return String.join("\n", errorMessages.stream().map(ValidationError::toString).toList());
             }
+
         } else {
             // Ignore if we can't parse the diff. It shouldn't compile, so it will fail in the next step.
         }
@@ -508,6 +508,18 @@ public class CodeValidator {
         }
 
         return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+    }
+
+    private static List<ValidationError> validateInsertionAST(MutantValidationRuleSet ruleSet, BlockStmt insertionBlock) {
+        List<ValidationError> failedRules = new ArrayList<>();
+        insertionBlock.walk(n -> {
+            for (MutantRule rule : ruleSet.getRules()) {
+                if (rule.fails(n)) {
+                    failedRules.add(new ValidationError(rule, n));
+                }
+            }
+        });
+        return failedRules;
     }
 
     static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {

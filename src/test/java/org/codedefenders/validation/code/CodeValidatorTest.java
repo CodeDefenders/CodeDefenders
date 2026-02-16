@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -385,17 +386,17 @@ public class CodeValidatorTest {
                     testCases("otherInvalid/addedBitShift02", STRICT, MUTANT_VALIDATION_OPERATORS),
 
                     // Some other strange cases
-                    testCases("otherInvalid/addedIfSameLine01", MODERATE, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedIfSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Same as 01, but without newlines
-                    testCases("otherInvalid/addedIfSameLine02", MODERATE, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedIfSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Look at this one too
                     testCases("otherInvalid/addedSecondIfSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Same as 01, but without newlines
                     testCases("otherInvalid/addedSecondIfSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
                     // TODO: Look at this one again
-                    testCases("otherInvalid/addedWhileSameLine01", MODERATE, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
+                    testCases("otherInvalid/addedWhileSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
                     // TODO: Same as 01 but without newlines
-                    testCases("otherInvalid/addedWhileSameLine02", MODERATE, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
+                    testCases("otherInvalid/addedWhileSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
 
                     // MUTANT_VALIDATION_PACKAGE_SIGNATURE - Is always forbidden
                     testCase("packageSignature/addedPackage", RELAXED, MUTANT_VALIDATION_PACKAGE_SIGNATURE),
@@ -435,14 +436,17 @@ public class CodeValidatorTest {
     @ParameterizedTest(name = "[{index}] Validating mutant {0} on level {1} results in one of {2}")
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, MutantValidationRuleSet ruleSet,
-                                             Iterable<String> expectedValidationMessages) {
+                                             List<String> expectedValidationMessages) {
         try (var ignored = WeldInit.initWeld(new Class[]{}, false)) {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
             String actual = validateMutantGetMessage(original, mutated, ruleSet);
 
-            assertThat(actual).isIn(expectedValidationMessages);
+            String expectedRegex = expectedValidationMessages.stream().map(Pattern::quote)
+                    .collect(Collectors.joining("|"));
+            //assertThat(actual).isIn(expectedValidationMessages);
+            assertThat(actual).containsMatch(expectedRegex);
         }
     }
 
