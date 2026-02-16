@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.codedefenders.game.AssertionLibrary;
 
 import com.github.javaparser.ast.CompilationUnit;
@@ -46,7 +45,7 @@ class TestValidator {
     private final List<String> messages = new LinkedList<>();
 
     private final List<TestRule> rules;
-    private final List<ImmutablePair<TestRule, Node>> failedRules = new ArrayList<>();
+    private final List<ValidationError> failedRules = new ArrayList<>();
 
     //Result variables to be checked by VisitorRules
     List<Node> classes = new ArrayList<>();
@@ -74,14 +73,14 @@ class TestValidator {
         visitor.validate(cu);
 
 
-        List<TestRule> violatingRules = new ArrayList<>();
-        for (ImmutablePair<TestRule, Node> pair : visitor.failedRules) {
-            if (!violatingRules.contains(pair.left)) {
-                violatingRules.add(pair.left);
-                String prettyPrintedOffender = ("\n" + pair.right.toString()).replace("\n", "\n\t\t");
+        List<ValidationRule> violatingRules = new ArrayList<>();
+        for (ValidationError pair : visitor.failedRules) {
+            if (!violatingRules.contains(pair.rule())) {
+                violatingRules.add(pair.rule());
+                String prettyPrintedOffender = ("\n" + pair.node().toString()).replace("\n", "\n\t\t");
 
 
-                visitor.messages.add(pair.left.getValidationMessage() + prettyPrintedOffender);
+                visitor.messages.add(pair.rule().getValidationMessage() + prettyPrintedOffender);
             }
         }
 
@@ -100,7 +99,7 @@ class TestValidator {
         cu.walk(n -> {
             for (TestRule rule : rules) {
                 if (rule.fails(n)) {
-                    failedRules.add(new ImmutablePair<>(rule, n));
+                    failedRules.add(new ValidationError(rule, n));
                 }
             }
 
@@ -140,8 +139,8 @@ class TestValidator {
         //TODO assertThrows is missing? Very hard-coded
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
-                        "assertEquals", "assertTrue", "assertFalse", "assertNull",
-                        "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
+                "assertEquals", "assertTrue", "assertFalse", "assertNull",
+                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
         // TODO This works the same for Hamcrest and Google Truth
         final boolean assertThatMatch = Arrays.stream(new String[]{"assertThat"})
