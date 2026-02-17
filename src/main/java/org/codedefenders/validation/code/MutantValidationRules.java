@@ -208,7 +208,7 @@ public class MutantValidationRules {
 
     public static MutantRule noIO = new MutantRule.Builder(
             METHOD_CALLS,
-            "No calls new IO calls",
+            "No new IO calls",
             ValidationMessage.MUTANT_CALL_IO)
             .withInsertion("java.io", "java.nio", "java.net", "java.sql")
             .build();

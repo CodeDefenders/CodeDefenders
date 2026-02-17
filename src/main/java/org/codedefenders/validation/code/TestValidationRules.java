@@ -18,11 +18,9 @@
  */
 package org.codedefenders.validation.code;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -62,11 +60,11 @@ public class TestValidationRules {
 
     private static final List<TestRule> rules = List.of(
             new TestRule.Builder(NO_NEW_CLASSES_OR_METHODS,
-                    "New class definitions are not allowed",
+                    "No new classes",
                     "You cannot create a second class.")
                     .withVisitor(v -> v.classes.size() > 1).build(),
             new TestRule.Builder(NO_NEW_CLASSES_OR_METHODS,
-                    "New methods are not allowed",
+                    "No new methods",
                     "You cannot create a new method.")
                     .withVisitor(v -> v.methods.size() > 1).build(),
             new TestRule.Builder(NOT_EMPTY,
@@ -74,20 +72,20 @@ public class TestValidationRules {
                     "The test is empty.")
                     .withVisitor(v -> v.stmtCount == 0).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
-                    "Loops are not allowed",
+                    "No loops",
                     "Loops in the test are not allowed.")
                     .withNode(n ->
                             n instanceof WhileStmt || n instanceof ForEachStmt || n instanceof ForStmt
                                     || n instanceof DoStmt
                     ).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
-                    "If-Statements are not allowed",
-                    "If-like statements are not allowed.")
+                    "No conditional statements (like if, switch etc)",
+                    "Conditional statements are not allowed.")
                     .withNode(n ->
                             n instanceof IfStmt || n instanceof SwitchStmt || n instanceof SwitchExpr
                                     || n instanceof ConditionalExpr).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
-                    "Operators like && or || are not allowed.",
+                    "No logical operators like '&&' or '||'",
                     "You used an illegal binary operator.")
                     .withNode(n ->
                             n instanceof BinaryExpr binaryExpr && (
@@ -96,7 +94,7 @@ public class TestValidationRules {
                             )
                     ).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
-                    "Bitwise operators like &= or |= are not allowed",
+                    "No bitwise operators like &= or |=",
                     "An operator you used is not allowed.")
                     .withNode(
                             n -> n instanceof AssignExpr assignExpr
@@ -107,13 +105,13 @@ public class TestValidationRules {
                                     .anyMatch(op -> assignExpr.getOperator() == op)
                     ).build(),
             new TestRule.Builder("No assert()",
-                    "\"assert()\"-Statements are not allowed.",
+                    "No \"assert()\"-Statements",
                     "\"assert()\"-statements are not allowed. "
                             + "Use the Assertions from your test library!")
                     .withNode(n -> n instanceof AssertStmt).build(),
 
             new TestRule.Builder(NO_SYSTEM_CALLS,
-                    "Calls to these packages are not allowed: " + "System, Random, Thread",
+                    "No calls to any of these packages: System, Random, Thread",
                     "You have called a package you may not call.")
                     .withNode(n ->
                             n instanceof ExpressionStmt
@@ -153,7 +151,7 @@ public class TestValidationRules {
                     ).build(),
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Keep the assertion limit of your game!",
-                    "You used more than ${MAX_ASSERTIONS} assertions.") //TODO Get the number of assertions into the message?
+                    "You used more than ${MAX_ASSERTIONS} assertions.")
                     .withVisitor(v -> v.assertionCount > v.maxNumberOfAssertions)
                     .hidden()
                     .build(),
