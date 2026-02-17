@@ -20,11 +20,11 @@ package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -39,13 +39,9 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
  * While traversing the AST, it checks every node for node test rule violations. It also collects some
  * "result variables", that are checked for visitor test rule violations.
  */
-// Does this really need to short-circuit at the first error?
 class TestValidator {
-    // we can use TypeSolver for the visit to implement a fine grain security mechanism
-    private final List<String> messages = new LinkedList<>();
-
     private final List<TestRule> rules;
-    private final List<ValidationError> failedRules = new ArrayList<>();
+    private final CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.TEST);
 
     //Result variables to be checked by VisitorRules
     List<Node> classes = new ArrayList<>();
@@ -59,83 +55,51 @@ class TestValidator {
     // Per class configuration
     final AssertionLibrary assertionLibrary;
 
-    /**
-     * Returns a list of validation messages. If the list is empty, the validation passed
-     *
-     * <p>
-     * TODO If I'm not mistaken, this can only return a list of either 0 or 1 elements. Either we make use of this
-     * TODO being a list, or this should be an optional.
-     */
-    static Optional<String> validFor(CompilationUnit cu, int maxNumberOfAssertions, AssertionLibrary assertionLibrary,
-                                     List<TestRule> rules) {
-        TestValidator visitor = new TestValidator(maxNumberOfAssertions, assertionLibrary, rules);
-        // Collect the observations first
-        visitor.validate(cu);
-
-
-        List<ValidationRule> violatingRules = new ArrayList<>();
-        for (ValidationError pair : visitor.failedRules) {
-            if (!violatingRules.contains(pair.rule())) {
-                violatingRules.add(pair.rule());
-                String prettyPrintedOffender = ("\n" + pair.node().toString()).replace("\n", "\n\t\t");
-
-
-                visitor.messages.add(pair.rule().getValidationMessage() + prettyPrintedOffender);
-            }
-        }
-
-        for (TestRule r : rules) {
-            if (r.fails(visitor)) {
-                if (!violatingRules.contains(r)) {
-                    violatingRules.add(r);
-                }
-                visitor.messages.add(r.getValidationMessage());
-            }
-        }
-        return visitor.buildValidationMessages();
-    }
-
-    private void validate(CompilationUnit cu) {
-        cu.walk(n -> {
-            for (TestRule rule : rules) {
-                if (rule.fails(n)) {
-                    failedRules.add(new ValidationError(rule, n));
-                }
-            }
-
-            if (n instanceof ClassOrInterfaceDeclaration || n instanceof RecordDeclaration) {
-                classes.add(n);
-            } else if (n instanceof MethodDeclaration) {
-                methods.add(n);
-            } else if (n instanceof MethodCallExpr methodCallExpr) {
-                stmtCount++;
-                handleMethodCalls(methodCallExpr);
-            } else if (n instanceof ExpressionStmt) {
-                stmtCount++;
-            }
-        });
-    }
-
-    private TestValidator(int maxNumberOfAssertions, AssertionLibrary assertionLibrary, List<TestRule> rules) {
+    TestValidator(int maxNumberOfAssertions, AssertionLibrary assertionLibrary, List<TestRule> rules) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
         this.assertionLibrary = assertionLibrary;
         this.rules = rules;
+
+        validationResult.setMaxNumberOfAssertions(maxNumberOfAssertions);
     }
 
-    public Optional<String> buildValidationMessages() {
-        if (messages.isEmpty()) {
-            return Optional.empty();
-        } else {
-            StringBuilder sb = new StringBuilder("The submitted test is not valid:");
-            for (int i = 0; i < messages.size(); i++) {
-                sb.append("\n\t").append(i + 1).append(": ").append(messages.get(i));
+    CodeValidationResult validFor(String testCode) {
+        Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
+        if (parseResult.isPresent()) {
+
+            // Collect the observations first, check NodeRules
+            parseResult.get().walk(n -> {
+                for (TestRule rule : rules) {
+                    if (rule.fails(n)) {
+                        validationResult.add(rule, n);
+                    }
+                }
+
+                if (n instanceof ClassOrInterfaceDeclaration || n instanceof RecordDeclaration) {
+                    classes.add(n);
+                } else if (n instanceof MethodDeclaration) {
+                    methods.add(n);
+                } else if (n instanceof MethodCallExpr methodCallExpr) {
+                    stmtCount++;
+                    handleMethodCalls(methodCallExpr);
+                } else if (n instanceof ExpressionStmt) {
+                    stmtCount++;
+                }
+            });
+
+
+            for (TestRule r : rules) {
+                if (r.fails(this)) {
+                    validationResult.add(r);
+                }
             }
-            return Optional.of(sb.toString().replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions)));
+            return validationResult;
+        } else {
+            return new CodeValidationResult(CodeValidationResult.Type.TEST);
         }
     }
 
-
-    public void handleMethodCalls(MethodCallExpr stmt) {
+    private void handleMethodCalls(MethodCallExpr stmt) {
         //TODO assertThrows is missing? Very hard-coded
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{

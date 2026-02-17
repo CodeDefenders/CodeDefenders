@@ -76,6 +76,7 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
@@ -437,17 +438,17 @@ public class PuzzleGameManager extends HttpServlet {
 
                 final var validationMessage = CodeValidator.validateTestCodeGetMessage(
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-                boolean validationSuccess = validationMessage.isEmpty();
+                boolean validationSuccess = validationMessage.isValid();
 
                 TestValidatedEvent tve = new TestValidatedEvent();
                 tve.setGameId(gameId);
                 tve.setUserId(login.getUserId());
                 tve.setSuccess(validationSuccess);
-                tve.setValidationMessage(validationMessage.orElse(null));
+                tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    messages.add(validationMessage.get()).alert();
+                    messages.add(validationMessage.toString()).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -619,21 +620,21 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        Optional<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessage.isEmpty();
+        boolean validationSuccess = validationMessage.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationMessage.orElse(null));
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.add(validationMessage.get()).alert();
+            messages.add(validationMessage.toString()).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -786,20 +787,20 @@ public class PuzzleGameManager extends HttpServlet {
 
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
-        String validationMessage =
+        CodeValidationResult validationResult =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
-        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
         mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationMessage);
+        mve.setValidationMessage(validationSuccess ? null : validationResult.toString());
         notificationService.post(mve);
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage).alert();
+            messages.add(validationResult.toString()).alert();
             Redirect.redirectBack(request, response);
             return;
         }

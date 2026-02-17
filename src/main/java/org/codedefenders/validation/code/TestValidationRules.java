@@ -75,20 +75,20 @@ public class TestValidationRules {
                     .withVisitor(v -> v.stmtCount == 0).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "Loops are not allowed",
-                    "Loops in the test are not allowed. Offending statement: ")
+                    "Loops in the test are not allowed.")
                     .withNode(n ->
                             n instanceof WhileStmt || n instanceof ForEachStmt || n instanceof ForStmt
                                     || n instanceof DoStmt
                     ).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "If-Statements are not allowed",
-                    "If-like statements are not allowed. Offending statement: ")
+                    "If-like statements are not allowed.")
                     .withNode(n ->
                             n instanceof IfStmt || n instanceof SwitchStmt || n instanceof SwitchExpr
                                     || n instanceof ConditionalExpr).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "Operators like && or || are not allowed.",
-                    "You used an illegal binary operator. Offending statement: ")
+                    "You used an illegal binary operator.")
                     .withNode(n ->
                             n instanceof BinaryExpr binaryExpr && (
                                     binaryExpr.getOperator() == BinaryExpr.Operator.AND
@@ -97,7 +97,7 @@ public class TestValidationRules {
                     ).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "Bitwise operators like &= or |= are not allowed",
-                    "This operator is not allowed:")
+                    "An operator you used is not allowed.")
                     .withNode(
                             n -> n instanceof AssignExpr assignExpr
                                     && Stream.of(
@@ -109,12 +109,12 @@ public class TestValidationRules {
             new TestRule.Builder("No assert()",
                     "\"assert()\"-Statements are not allowed.",
                     "\"assert()\"-statements are not allowed. "
-                            + "Use the Assertions from your test library! Offending statement: ")
+                            + "Use the Assertions from your test library!")
                     .withNode(n -> n instanceof AssertStmt).build(),
 
             new TestRule.Builder(NO_SYSTEM_CALLS,
                     "Calls to these packages are not allowed: " + "System, Random, Thread",
-                    "You have called a package you may not call. Offending statement: ")
+                    "You have called a package you may not call.")
                     .withNode(n ->
                             n instanceof ExpressionStmt
                                     && Arrays.stream(CodeValidator.PROHIBITED_CALLS)
@@ -160,7 +160,7 @@ public class TestValidationRules {
 
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Only use the assertions of the correct test library",
-                    "Your assertion does not belong to the correct test library. Offending statement: ")
+                    "Your assertion does not belong to the correct test library.")
                     .withVisitor(v -> (v.assertionLibrary == HAMCREST
                             || v.assertionLibrary == GOOGLE_TRUTH)
                             && v.junitAssertionCount > 0

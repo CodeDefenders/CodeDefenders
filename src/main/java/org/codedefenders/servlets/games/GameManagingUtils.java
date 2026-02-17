@@ -86,6 +86,7 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
+import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
@@ -314,9 +315,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        String validationMessage =
+        CodeValidationResult validationResult =
                 CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
-        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());
@@ -326,7 +327,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         if (!validationSuccess) {
             return CreateBattlegroundMutantResult.failure(
-                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationMessage, null);
+                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
         }
 
         Mutant existingMutant = existingMutant(game.getId(), code);
@@ -528,23 +529,23 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tse);
 
         // Do the validation even before creating the mutant
-        Optional<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessage.isEmpty();
+        boolean validationSuccess = validationMessage.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationMessage.orElse(null));
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return CreateBattlegroundTestResult.failure(
                     null, CreateBattlegroundTestResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.get(), null, null);
+                    validationMessage.toString(), null, null);
         }
 
         // From this point on we assume that test is valid according to the rules (but it might still not compile)
@@ -750,23 +751,23 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
-        Optional<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessage.isEmpty();
+        boolean validationSuccess = validationMessage.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationMessage.orElse(null));
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return RejectBattlegroundEquivalenceResult.testInvalid(
                     null, RejectBattlegroundEquivalenceResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.get(), null, null);
+                    validationMessage.toString(), null, null);
         }
 
         Test newTest = createTest(game.getId(), game.getClassId(), code, userId, MODE_BATTLEGROUND_DIR);

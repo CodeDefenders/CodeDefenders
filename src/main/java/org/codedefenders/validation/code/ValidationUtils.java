@@ -20,7 +20,6 @@ package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ValidationUtils {
     public static <T extends ValidationRule> List<List<T>> getTieredRules(List<T> rules) {

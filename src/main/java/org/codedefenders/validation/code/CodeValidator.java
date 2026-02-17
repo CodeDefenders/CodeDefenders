@@ -113,24 +113,22 @@ public class CodeValidator {
         return DigestUtils.md5Hex(cleanedCode);
     }
 
-    public static Optional<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
-            AssertionLibrary assertionLibrary) {
-        Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
-        if (parseResult.isPresent()) {
-            return TestValidator.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary,
-                    TestValidationRules.getRules());
-        } else {
-            return Optional.empty(); //TODO Why do we pretend everything is ok if the parser failed?
-        }
+    public static CodeValidationResult validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
+                                                              AssertionLibrary assertionLibrary) {
+        TestValidator validator = new TestValidator(
+                maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
+        return validator.validFor(testCode);
     }
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern
-    public static String validateMutantGetMessage(String originalCode, String mutatedCode,
-            MutantValidationRuleSet ruleSet) {
+    public static CodeValidationResult validateMutantGetMessage(String originalCode, String mutatedCode,
+                                                  MutantValidationRuleSet ruleSet) {
+        CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
+
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
         if (originalParseResult.isEmpty() || mutatedParseResult.isEmpty()) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS; //TODO ERLAUBT!!
+            return result;
         }
         CompilationUnit originalCU = originalParseResult.get();
         CompilationUnit mutatedCU = mutatedParseResult.get();
@@ -138,27 +136,27 @@ public class CodeValidator {
         // line-level diff
         List<List<String>> originalLines = getOriginalLines(originalCode, mutatedCode);
         List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
-        assert (originalLines.size() == changedLines.size());
-
-
+        if (originalLines.size() != changedLines.size()) {
+            throw new RuntimeException("originalLines: " + originalLines + ", changedLines:" + changedLines);
+        }
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCU, mutatedCU)) {
-                return rule.getValidationMessage();
+                result.add(rule);
             }
         }
 
-        // if only string literals were changed TODO ERLAUBT!!!
+        // if only string literals were changed
         if (onlyLiteralsChanged(originalCode, mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+            return result;
         }
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCode, mutatedCode)) {
-                return rule.getValidationMessage();
+                result.add(rule);
             }
             if (rule.fails(originalLines, changedLines)) {
-                return rule.getValidationMessage();
+                result.add(rule);
             }
         }
 
@@ -173,18 +171,15 @@ public class CodeValidator {
             if (d.operation != DiffMatchPatch.Operation.EQUAL) {
                 hasChanges = true;
                 if (d.operation == DiffMatchPatch.Operation.INSERT) {
-                    String insertionValidityMessage = validInsertion(d.text, ruleSet);
-                    if (!insertionValidityMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS)) {
-                        return insertionValidityMessage;
-                    }
+                    result.add(validInsertion(d.text, ruleSet));
                 }
             }
         }
-        if (!hasChanges) {
+        /*if (!hasChanges) {TODO Brauchen wir das?
             return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }
+        }*/
 
-        return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        return result;
     }
 
     /**
@@ -383,8 +378,7 @@ public class CodeValidator {
             if (bd instanceof TypeDeclaration<?> innerClass) {
                 // Inner classes
                 methodNames.addAll(extractMethodNamesByType(innerClass));
-            }
-            else if (bd instanceof NodeWithSimpleName<?> nameNode) {
+            } else if (bd instanceof NodeWithSimpleName<?> nameNode) {
                 methodNames.add(nameNode.getNameAsString());
             }
         }
@@ -481,18 +475,15 @@ public class CodeValidator {
         return !cutFieldNames.equals(mutantFieldNames);
     }
 
-    private static String validInsertion(String diff,
-                                                    MutantValidationRuleSet ruleSet) {
+    private static CodeValidationResult validInsertion(String diff,
+                                         MutantValidationRuleSet ruleSet) {
         String stmtString = String.format("{ %s }", diff);
-
+        CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         Optional<BlockStmt> parseResult = JavaParserUtils.parse(
                 stmtString, JavaParserUtils.defaultParser()::parseBlock);
         if (parseResult.isPresent()) {
             // TODO Should this called always and not only for checking if there's validInsertion ?
-            List<ValidationError> errorMessages = validateInsertionAST(ruleSet, parseResult.get());
-            if (!errorMessages.isEmpty()) {
-                return String.join("\n", errorMessages.stream().map(ValidationError::toString).toList());
-            }
+            result.add(validateInsertionAST(ruleSet, parseResult.get()));
 
         } else {
             // Ignore if we can't parse the diff. It shouldn't compile, so it will fail in the next step.
@@ -503,23 +494,24 @@ public class CodeValidator {
 
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(diff2)) {
-                return rule.getValidationMessage();
+                result.add(rule);
             }
         }
-
-        return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        return result;
+        //return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
     }
 
-    private static List<ValidationError> validateInsertionAST(MutantValidationRuleSet ruleSet, BlockStmt insertionBlock) {
-        List<ValidationError> failedRules = new ArrayList<>();
+    private static CodeValidationResult validateInsertionAST(
+            MutantValidationRuleSet ruleSet, BlockStmt insertionBlock) {
+        CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         insertionBlock.walk(n -> {
             for (MutantRule rule : ruleSet.getRules()) {
                 if (rule.fails(n)) {
-                    failedRules.add(new ValidationError(rule, n));
+                    result.add(rule, n);
                 }
             }
         });
-        return failedRules;
+        return result;
     }
 
     static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {

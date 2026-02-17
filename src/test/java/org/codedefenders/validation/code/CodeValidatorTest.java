@@ -133,9 +133,9 @@ public class CodeValidatorTest {
                                                                          AssertionLibrary assertionLibrary) {
         String testCode = loadTest(test);
 
-        Optional<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        CodeValidationResult actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual.isEmpty()).isTrue();
+        assertThat(actual.isValid()).isTrue();
     }
 
     private static class InvalidTestArgumentSource implements ArgumentsProvider {
@@ -202,11 +202,11 @@ public class CodeValidatorTest {
                                                                       AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
 
-        Optional<String> actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        CodeValidationResult actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual.isEmpty()).isFalse();
+        assertThat(actual.isValid()).isFalse();
         for (String expected : expectedValidationMessages) {
-            assertThat(actual.get()).contains(expected);
+            assertThat(actual.toString()).contains(expected);
         }
 
     }
@@ -441,7 +441,7 @@ public class CodeValidatorTest {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
-            String actual = validateMutantGetMessage(original, mutated, ruleSet);
+            String actual = validateMutantGetMessage(original, mutated, ruleSet).toString();
 
             String expectedRegex = expectedValidationMessages.stream().map(Pattern::quote)
                     .collect(Collectors.joining("|"));

@@ -86,6 +86,7 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.ValidationMessage;
@@ -428,19 +429,19 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
-        Optional<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+        CodeValidationResult validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
                 game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessages.isEmpty();
+        boolean validationSuccess = validationMessages.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(game.getId());
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationMessages.orElse(null));
+        tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.add(validationMessages.get()).alert();
+            messages.add(validationMessages.toString()).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -601,9 +602,9 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        String validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
+        CodeValidationResult validationResult = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
-        boolean validationSuccess = validationMessage.equals(ValidationMessage.MUTANT_VALIDATION_SUCCESS);
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());
@@ -613,7 +614,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage).alert();
+            messages.add(validationResult.toString()).alert();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -863,19 +864,19 @@ public class MeleeGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            Optional<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+            CodeValidationResult validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-            boolean validationSuccess = validationMessages.isEmpty();
+            boolean validationSuccess = validationMessages.isValid();
 
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
             tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
-            tve.setValidationMessage(validationMessages.orElse(null));
+            tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.add(validationMessages.get()).alert();
+                messages.add(validationMessages.toString()).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;

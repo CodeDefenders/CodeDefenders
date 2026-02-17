@@ -126,7 +126,7 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedModifier = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
-            "Contains changes to modifiers that are not allowed",//TODO Was genau?
+            "Changes to modifiers like 'static' or 'public' are not allowed.",//TODO Was genau?
             ValidationMessage.MUTANT_VALIDATION_MODIFIER)
             .withCode(CodeValidator::containsProhibitedModifierChanges)
             .build();
