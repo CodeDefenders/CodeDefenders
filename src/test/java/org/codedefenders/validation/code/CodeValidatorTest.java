@@ -411,7 +411,7 @@ public class CodeValidatorTest {
                     testCase("systemCalls/replacedWithCallToMath_random01", STRICT, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/replacedWithCallToMath_random02", STRICT, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/System_exit01", STRICT, MUTANT_CALL_SYSTEM),
-                    testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM)
+                    testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM),
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
