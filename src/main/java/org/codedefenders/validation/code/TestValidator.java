@@ -37,7 +37,10 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 /**
  * This class checks test code and checks whether the code is valid or not.
  * While traversing the AST, it checks every node for node test rule violations. It also collects some
- * "result variables", that are checked for visitor test rule violations.
+ * "result variables", that can later be checked for visitor test rule violations.
+ *
+ * <p>
+ * One TestValidator should only exist for the validation of a single test.
  */
 class TestValidator {
     private final List<TestRule> rules;

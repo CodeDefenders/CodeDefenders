@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MutantValidationRuleSet {
     private final String name;
     private final List<MutantRule> rules = new ArrayList<>();
@@ -111,5 +113,10 @@ public class MutantValidationRuleSet {
             result.add(i);
         }
         return result;
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "MutantRuleSet:" + name;
     }
 }

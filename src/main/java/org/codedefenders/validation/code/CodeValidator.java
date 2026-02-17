@@ -87,7 +87,9 @@ public class CodeValidator {
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
-    static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+    static final String[] PROHIBITED_CONDITIONALS = {"if", "switch"};
+    static final String[] PROHIBITED_LOOPS = {"while", "for"};
+    //static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
     static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
     static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
     // This is package protected to enable TestValidator to check for prohibited call as well
@@ -434,19 +436,9 @@ public class CodeValidator {
         return !cutImportStatements.equals(mutantImportStatements);
     }
 
-    static boolean mutantAddsOrRenamesMethodOrField(final CompilationUnit orig, final CompilationUnit muta) {
-        Set<String> cutFieldNames = new HashSet<>();
-        Set<String> mutantFieldNames = new HashSet<>();
+    static boolean mutantAddsOrRenamesMethod(final CompilationUnit orig, final CompilationUnit muta) {
         Set<String> cutMethodSignatures = new HashSet<>();
         Set<String> mutantMethodSignatures = new HashSet<>();
-
-        for (TypeDeclaration<?> td : orig.getTypes()) {
-            cutFieldNames.addAll(extractFieldNamesByType(td));
-        }
-
-        for (TypeDeclaration<?> td : muta.getTypes()) {
-            mutantFieldNames.addAll(extractFieldNamesByType(td));
-        }
 
         for (TypeDeclaration<?> td : orig.getTypes()) {
             cutMethodSignatures.addAll(extractMethodNamesByType(td));
@@ -456,10 +448,10 @@ public class CodeValidator {
             mutantMethodSignatures.addAll(extractMethodNamesByType(td));
         }
 
-        return !cutMethodSignatures.containsAll(mutantMethodSignatures) || !cutFieldNames.containsAll(mutantFieldNames);
+        return !cutMethodSignatures.containsAll(mutantMethodSignatures);
     }
 
-    static boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
+    static boolean mutantAddsOrChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
         // Parse original and extract method signatures -> Set of string
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();

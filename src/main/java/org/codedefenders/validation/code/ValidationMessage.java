@@ -29,38 +29,29 @@ public class ValidationMessage {
     // Generic error message.
     public static final String MUTANT_VALIDATION_FAILED = "Invalid mutant. Your mutant does not comply with our rules.";
 
+    public static final String MUTANT_ONLY_COMMENT_CHANGES = "Your mutant only changes comments.";
+    public static final String MUTANT_PACKAGE = "Your mutant changes the package signature.";
+    public static final String MUTANT_CLASS = "Your mutant adds a new class or changes a class signature.";
+    public static final String MUTANT_ADDS_OR_RENAMES_FIELD = "Your mutant adds or renames a field.";
+    public static final String MUTANT_ADDS_OR_RENAMES_METHOD = "Your mutant adds or renames a method.";
+    public static final String MUTANT_METHOD_SIGNATURE = "Your mutant changes one or more method signatures.";
+    public static final String MUTANT_IMPORT_STATEMENT = "Your mutant changes one or more import statements.";
+    public static final String MUTANT_INSTANCEOF = "Your mutant modifies an instanceof condition.";
+    public static final String MUTANT_IDENTICAL = "Your mutant is identical to the CUT.";
+    public static final String MUTANT_COMMENT = "Your mutant adds or modifies a comment.";
+    public static final String MUTANT_MODIFIER = "Your mutant changes a modifier like 'static' or 'private'.";
+    public static final String MUTANT_LOGIC = "Your mutant adds a new logical operator like '&&' or '||'.";
+    public static final String MUTANT_BITWISE = "Your mutant adds new bitwise operators like '&' or '>>'";
+    public static final String MUTANT_CONDITIONALS = "Your mutant adds a new conditional statement like 'if', 'switch' etc.";
+    public static final String MUTANT_LOOPS = "Your mutant adds a new loop.";
+    public static final String MUTANT_CALL_SYSTEM = "Your mutant adds a call to System.*.";
+    public static final String MUTANT_CALL_RANDOM = "Your mutant calls a random number generator.";
+    public static final String MUTANT_CALL_DATE = "Your mutant calls a Date class";
+    public static final String MUTANT_CALL_THREAD = "Your mutant calls a multithreading class";
+    public static final String MUTANT_CALL_IO = "Your mutant calls an IO class";
+
     public static final String MUTANT_VALIDATION_SUCCESS = "SUCCESS"; //Never shown in the UI, only used for tests
-    public static final String MUTANT_VALIDATION_LINES = "Removing or adding lines is not allowed.";
-    public static final String MUTANT_VALIDATION_MODIFIER = "Changing modifiers such as 'static' or 'public' is not allowed.";
-    public static final String MUTANT_VALIDATION_COMMENT = "Adding or modifying comments is not allowed.";
-    public static final String MUTANT_VALIDATION_LOGIC = "Your mutant contains new logical operations";
-
-    public static final String MUTANT_VALIDATION_LOGIC_INSTANCEOF = "Your mutant modifies an instanceof condition";
-
-    public static final String MUTANT_VALIDATION_OPERATORS = "Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line.";
-    public static final String MUTANT_VALIDATION_CALLS = "Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!";
-    public static final String MUTANT_VALIDATION_IDENTICAL = "Your mutant is identical to the CUT";
-
-    public static final String MUTANT_VALIDATION_METHOD_SIGNATURE = "Your mutant changes one or more method signatures";
-    public static final String MUTANT_VALIDATION_FIELD_NAME = "Your mutant changes one or more field names";
-    public static final String MUTANT_VALIDATION_IMPORT_STATEMENT = "Your mutant changes one or more import statements";
-    public static final String MUTANT_VALIDATION_PACKAGE_SIGNATURE = "Your mutant changes the package signature";
-    public static final String MUTANT_VALIDATION_CLASS_SIGNATURE = "Your mutant changes a class signature";
-    public static final String MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED = "Your mutant adds a new method or field, or renames an existing one";
 
     public static final String MUTANT_MISSING_INTENTION = "You must declare your intention.";
-    public static final String MUTATION_CLASS_DECLARATION = "Invalid mutation contains class declaration.";
-    public static final String MUTATION_METHOD_DECLARATION = "Invalid mutation contains method declaration.";
-
-    public static final String MUTATION_SYSTEM_USE = "Invalid mutation contains System uses";
-    public static final String MUTATION_SYSTEM_CALL = "Invalid mutation contains a call to System.*";
-    public static final String MUTATION_SYSTEM_DECLARATION = "Invalid mutation contains variable declaration using System.*";
-
-    public static final String MUTATION_FOR_EACH_STATEMENT = "Invalid mutation contains a ForeachStmt statement";
-    public static final String MUTATION_IF_STATEMENT = "Invalid mutation contains an IfStmt statement";
-    public static final String MUTATION_FOR_STATEMENT = "Invalid mutation contains a ForStmt statement";
-    public static final String MUTATION_WHILE_STATEMENT = "Invalid mutation contains a WhileStmt statement";
-    public static final String MUTATION_DO_STATEMENT = "Invalid mutation contains a DoStmt statement";
-    public static final String MUTATION_SWITCH_STATEMENT = "Invalid mutation contains a SwitchStmt statement";
 
 }

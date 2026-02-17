@@ -38,14 +38,20 @@ public class DefaultRuleSets {
             .addRule(noCommentsEqual)
             .addRule(packageDeclarations)
             .addRule(classDeclarations)
-            .addRule(addOrRenameMethodsOrFields)
+            .addRule(addOrRenameMethods)
+            .addRule(addOrRenameFields)
             .addRule(astEqual)
-            .addRule(prohibitedCalls);
+            .addRule(noSystemCalls)
+            .addRule(noThreading)
+            .addRule(noIO)
+            .addRule(noDate)
+            .addRule(noRandom);
 
     public static final MutantValidationRuleSet MODERATE = new MutantValidationRuleSet("Moderate", RELAXED)
             .addRule(noChangesToComments)
             .addRule(logicalOperator)
-            .addRule(prohibitedControlStructures);
+            .addRule(prohibitedConditionals)
+            .addRule(prohibitedLoops);
 
     public static final MutantValidationRuleSet STRICT = new MutantValidationRuleSet("Strict", MODERATE)
             .addRule(changesMethodSignatures)

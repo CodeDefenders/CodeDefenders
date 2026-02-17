@@ -20,7 +20,6 @@ package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,8 +36,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
-import com.google.common.truth.Correspondence;
-
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
@@ -46,21 +43,26 @@ import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
 import static org.codedefenders.validation.code.CodeValidator.validateTestCodeGetMessage;
-import static org.codedefenders.validation.code.DefaultRuleSets.*;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CALLS;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_OPERATORS;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
+import static org.codedefenders.validation.code.DefaultRuleSets.MODERATE;
+import static org.codedefenders.validation.code.DefaultRuleSets.RELAXED;
+import static org.codedefenders.validation.code.DefaultRuleSets.STRICT;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ADDS_OR_RENAMES_FIELD;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ADDS_OR_RENAMES_METHOD;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_BITWISE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CALL_RANDOM;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CALL_SYSTEM;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CLASS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_COMMENT;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CONDITIONALS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_IDENTICAL;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_IMPORT_STATEMENT;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_INSTANCEOF;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_LOGIC;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_LOOPS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_METHOD_SIGNATURE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ONLY_COMMENT_CHANGES;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_PACKAGE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-import static org.codedefenders.validation.code.ValidationMessage.MUTATION_IF_STATEMENT;
-import static org.codedefenders.validation.code.ValidationMessage.MUTATION_WHILE_STATEMENT;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class CodeValidatorTest {
@@ -285,9 +287,9 @@ public class CodeValidatorTest {
          * {@code expectedValidationMessageOnFailure} nor contained in {@code otherExpectedValidationMessagesOnFailure}.
          *
          * <p>Example:
-         * <br>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTATION_IF_STATEMENT} and
+         * <br>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTANT_CONDITIONALS} and
          * {@code upToIncludingLevel} is {@link DefaultRuleSets#MODERATE} then it will create arguments that expect
-         * {@link ValidationMessage#MUTATION_IF_STATEMENT} for {@link DefaultRuleSets#STRICT} and {@link DefaultRuleSets#MODERATE}
+         * {@link ValidationMessage#MUTANT_CONDITIONALS} for {@link DefaultRuleSets#STRICT} and {@link DefaultRuleSets#MODERATE}
          * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link DefaultRuleSets#RELAXED}.
          */
         private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
@@ -312,38 +314,38 @@ public class CodeValidatorTest {
             // them with their associated directory
             return Stream.of(
                     // MUTANT_VALIDATION_CLASS_SIGNATURE - Is always forbidden
-                    testCase("classSignature/changedClassToFinalClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
-                    testCase("classSignature/changedClassToPublicClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
-                    testCase("classSignature/changedFinalClassToClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
-                    testCase("classSignature/changedInnerPublicClassToInnerProtectedClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
-                    testCase("classSignature/changedPublicClassToClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
-                    testCase("classSignature/changedPublicClassToPublicFinalClass", RELAXED, MUTANT_VALIDATION_CLASS_SIGNATURE),
+                    testCase("classSignature/changedClassToFinalClass", RELAXED, MUTANT_CLASS),
+                    testCase("classSignature/changedClassToPublicClass", RELAXED, MUTANT_CLASS),
+                    testCase("classSignature/changedFinalClassToClass", RELAXED, MUTANT_CLASS),
+                    testCase("classSignature/changedInnerPublicClassToInnerProtectedClass", RELAXED, MUTANT_CLASS),
+                    testCase("classSignature/changedPublicClassToClass", RELAXED, MUTANT_CLASS),
+                    testCase("classSignature/changedPublicClassToPublicFinalClass", RELAXED, MUTANT_CLASS),
 
                     // MUTANT_VALIDATION_COMMENT
-                    testCases("comments/addedAnotherCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedAnotherCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedMultiLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedSingleLineCommentAtEndOfLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/addedSingleLineCommentInNewLine", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedCommentAndChangedCode", MODERATE, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
-                    testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_VALIDATION_IDENTICAL, MUTANT_VALIDATION_COMMENT),
+                    testCases("comments/addedAnotherCommentAtEndOfLine", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/addedAnotherCommentInNewLine", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/addedMultiLineCommentAtEndOfLine", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/addedSingleLineCommentAtEndOfLine", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/addedSingleLineCommentInNewLine", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/modifiedComment", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/modifiedCommentAndChangedCode", MODERATE, MUTANT_COMMENT),
+                    testCases("comments/modifiedCommentInTheLineAfterUnmodifiedComment", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
+                    testCases("comments/modifiedMultiLineComment", RELAXED, MUTANT_IDENTICAL, MUTANT_COMMENT, MUTANT_ONLY_COMMENT_CHANGES),
 
                     // MUTANT_VALIDATION_FIELD_NAME - is only forbidden with STRICT validation
-                    testCases("fields/changedName", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
-                    testCases("fields/changedNameOfNested", RELAXED, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
+                    testCases("fields/changedName", RELAXED, MUTANT_ADDS_OR_RENAMES_FIELD),
+                    testCases("fields/changedNameOfNested", RELAXED, MUTANT_ADDS_OR_RENAMES_FIELD),
 
-                    testCases("identical/newLineAdded", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("identical/same", RELAXED, MUTANT_VALIDATION_IDENTICAL),
-                    testCases("identical/spaceAdded", RELAXED, MUTANT_VALIDATION_IDENTICAL),
+                    testCases("identical/newLineAdded", RELAXED, MUTANT_IDENTICAL),
+                    testCases("identical/same", RELAXED, MUTANT_IDENTICAL),
+                    testCases("identical/spaceAdded", RELAXED, MUTANT_IDENTICAL),
 
                     // MUTANT_VALIDATION_IMPORT_STATEMENT
-                    testCase("imports/importRemoved", STRICT, MUTANT_VALIDATION_IMPORT_STATEMENT),
+                    testCase("imports/importRemoved", STRICT, MUTANT_IMPORT_STATEMENT),
 
                     // Mutating instanceOf is only forbidden with STRICT validation
-                    testCases("instanceOf/changedMultiple", STRICT, MUTANT_VALIDATION_LOGIC_INSTANCEOF),
-                    testCases("instanceOf/changedOne", STRICT, MUTANT_VALIDATION_LOGIC_INSTANCEOF),
+                    testCases("instanceOf/changedMultiple", STRICT, MUTANT_INSTANCEOF),
+                    testCases("instanceOf/changedOne", STRICT, MUTANT_INSTANCEOF),
 
                     // MUTANT_VALIDATION_SUCCESS - Short circuit on only literal changes
                     testCase("literals/addedSpaceToNonEmptyString", STRICT, MUTANT_VALIDATION_SUCCESS),
@@ -359,52 +361,52 @@ public class CodeValidatorTest {
                     testCase("literals/changedSingleCharToSemicolon", STRICT, MUTANT_VALIDATION_SUCCESS),
 
                     // Logical Operator Added 01 - Only forbidden with STRICT and MODERATE validation
-                    testCases("logicalOperators/addedLogicalAnd", MODERATE, MUTANT_VALIDATION_LOGIC),
+                    testCases("logicalOperators/addedLogicalAnd", MODERATE, MUTANT_LOGIC),
                     // Logical Operator Added on Lift Class - Only forbidden with STRICT and MODERATE validation
-                    testCases("logicalOperators/addedLogicalAnd_LiftClass", MODERATE, MUTANT_VALIDATION_LOGIC),
+                    testCases("logicalOperators/addedLogicalAnd_LiftClass", MODERATE, MUTANT_LOGIC),
 
                     // Ternary Operator Added - Only forbidden with STRICT and MODERATE validation
-                    testCases("logicalOperators/addedTernaryOperator01", MODERATE, MUTANT_VALIDATION_OPERATORS),
-                    testCases("logicalOperators/addedTernaryOperator02", MODERATE, MUTANT_VALIDATION_OPERATORS),
+                    testCases("logicalOperators/addedTernaryOperator01", MODERATE, MUTANT_CONDITIONALS),
+                    testCases("logicalOperators/addedTernaryOperator02", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Same as 01, but without newlines
-                    testCases("logicalOperators/addedTernaryOperator03", MODERATE, MUTANT_VALIDATION_OPERATORS),
+                    testCases("logicalOperators/addedTernaryOperator03", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Same as 02, but without newlines
-                    testCases("logicalOperators/addedTernaryOperator04", MODERATE, MUTANT_VALIDATION_OPERATORS),
+                    testCases("logicalOperators/addedTernaryOperator04", MODERATE, MUTANT_CONDITIONALS),
 
                     // MUTANT_VALIDATION_METHOD_SIGNATURE - is only forbidden with STRICT validation
-                    testCases("methodSignature/changedAccessFromPublicToPackagePrivate", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedAccessFromPublicToPrivate", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedAccessFromPublicToProtected", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedConstructor", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedConstructorOfInnerClass", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedPrivateMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
-                    testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_VALIDATION_METHOD_SIGNATURE, MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED),
-                    testCases("methodSignature/changedPublicMethod", STRICT, MUTANT_VALIDATION_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedAccessFromPublicToPackagePrivate", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedAccessFromPublicToPrivate", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedAccessFromPublicToProtected", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedConstructor", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedConstructorOfInnerClass", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedPrivateMethod", STRICT, MUTANT_METHOD_SIGNATURE),
+                    testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_METHOD_SIGNATURE, MUTANT_ADDS_OR_RENAMES_METHOD),
+                    testCases("methodSignature/changedPublicMethod", STRICT, MUTANT_METHOD_SIGNATURE),
 
                     // Bit Shifts are only forbidden with STRICT validation
-                    testCases("otherInvalid/addedBitShift01", STRICT, MUTANT_VALIDATION_OPERATORS),
-                    testCases("otherInvalid/addedBitShift02", STRICT, MUTANT_VALIDATION_OPERATORS),
+                    testCases("otherInvalid/addedBitShift01", STRICT, MUTANT_BITWISE),
+                    testCases("otherInvalid/addedBitShift02", STRICT, MUTANT_BITWISE),
 
                     // Some other strange cases
-                    testCases("otherInvalid/addedIfSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedIfSameLine01", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Same as 01, but without newlines
-                    testCases("otherInvalid/addedIfSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedIfSameLine02", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Look at this one too
-                    testCases("otherInvalid/addedSecondIfSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedSecondIfSameLine01", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Same as 01, but without newlines
-                    testCases("otherInvalid/addedSecondIfSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_IF_STATEMENT),
+                    testCases("otherInvalid/addedSecondIfSameLine02", MODERATE, MUTANT_CONDITIONALS),
                     // TODO: Look at this one again
-                    testCases("otherInvalid/addedWhileSameLine01", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
+                    testCases("otherInvalid/addedWhileSameLine01", MODERATE, MUTANT_LOOPS),
                     // TODO: Same as 01 but without newlines
-                    testCases("otherInvalid/addedWhileSameLine02", MODERATE, MUTANT_VALIDATION_OPERATORS, MUTATION_WHILE_STATEMENT, MUTANT_VALIDATION_CALLS),
+                    testCases("otherInvalid/addedWhileSameLine02", MODERATE, MUTANT_LOOPS),
 
                     // MUTANT_VALIDATION_PACKAGE_SIGNATURE - Is always forbidden
-                    testCase("packageSignature/addedPackage", RELAXED, MUTANT_VALIDATION_PACKAGE_SIGNATURE),
-                    testCase("packageSignature/changedPackage", RELAXED, MUTANT_VALIDATION_PACKAGE_SIGNATURE),
+                    testCase("packageSignature/addedPackage", RELAXED, MUTANT_PACKAGE),
+                    testCase("packageSignature/changedPackage", RELAXED, MUTANT_PACKAGE),
 
                     // MUTANT_VALIDATION_OPERATORS
-                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_VALIDATION_CALLS),
-                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_VALIDATION_CALLS),
+                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_CALL_SYSTEM),
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
