@@ -1,0 +1,5 @@
+public class Test {
+    public int test() {
+        return (int)(Math.random() * 2);
+    }
+}

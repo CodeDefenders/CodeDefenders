@@ -34,6 +34,8 @@ public class CodeValidationResult {
     private final List<ValidationRule> anonymousErrors = new ArrayList<>();
     private int maxNumberOfAssertions = 0;
 
+    private boolean failedParsing = false;
+
     CodeValidationResult(Type type) {
         this.type = type;
     }
@@ -78,11 +80,18 @@ public class CodeValidationResult {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
     }
 
+    /**
+     * Only relevant for tests.
+     */
+    void setFailedParsing() {
+        failedParsing = true;
+    }
+
 
     @Override
     public @NotNull String toString() {
         if (isValid()) {
-            return "SUCCESS";
+            return failedParsing ? "FAILED_PARSING" : "SUCCESS";
         }
 
         StringBuilder sb = new StringBuilder();

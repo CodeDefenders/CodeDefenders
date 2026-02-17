@@ -98,7 +98,8 @@ class TestValidator {
             }
             return validationResult;
         } else {
-            return new CodeValidationResult(CodeValidationResult.Type.TEST);
+            validationResult.setFailedParsing();
+            return validationResult;
         }
     }
 

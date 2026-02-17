@@ -188,7 +188,7 @@ public class CodeValidatorTest {
                     testCase("invalid/assertionsJunitFive", 4, "You used more than 4 assertions"),
                     testCase("invalid/assertionsJunitThree", 2, "You used more than 2 assertions"),
                     testCase("invalid/EmptyTest", "The test is empty."),
-                    testCase("invalid/TestWithIf", "If-like statements are not allowed"),
+                    testCase("invalid/TestWithIf", "Conditional statements are not allowed"),
                     testCase("invalid/TestWithSystemCall", "You have called a package you may not call."),
                     testCase("invalid/TestWithSystemCall2", "You have called a package you may not call."),
                     testCase("invalid/TestWithSystemCall3", "You have called a package you may not call."),
@@ -405,8 +405,13 @@ public class CodeValidatorTest {
                     testCase("packageSignature/changedPackage", RELAXED, MUTANT_PACKAGE),
 
                     // MUTANT_VALIDATION_OPERATORS
+                    testCase("systemCalls/addCallToMath_random_toLine01", STRICT, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/replacedWithCallToMath_random01", STRICT, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/replacedWithCallToMath_random02", STRICT, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/System_exit01", STRICT, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM)
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
