@@ -50,7 +50,9 @@ public class ValidationMessage {
     public static final String MUTANT_CALL_THREAD = "Your mutant calls a multithreading class";
     public static final String MUTANT_CALL_IO = "Your mutant calls an IO class";
 
-    public static final String MUTANT_VALIDATION_SUCCESS = "SUCCESS"; //Never shown in the UI, only used for tests
+    //These are never shown in the UI, only used for tests
+    public static final String VALIDATION_FAILED_PARSING = "PARSING_FAILED";
+    public static final String VALIDATION_SUCCESS = "SUCCESS";
 
     public static final String MUTANT_MISSING_INTENTION = "You must declare your intention.";
 

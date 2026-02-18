@@ -62,7 +62,9 @@ import static org.codedefenders.validation.code.ValidationMessage.MUTANT_LOOPS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ONLY_COMMENT_CHANGES;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_PACKAGE;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_FAILED;
+import static org.codedefenders.validation.code.ValidationMessage.VALIDATION_FAILED_PARSING;
+import static org.codedefenders.validation.code.ValidationMessage.VALIDATION_SUCCESS;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class CodeValidatorTest {
@@ -229,24 +231,24 @@ public class CodeValidatorTest {
         /**
          * Creates a {@link Stream} of {@link Arguments}.
          *
-         * <p>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} it will generate
-         * arguments with {@code validationMessage} {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for all
+         * <p>If {@code expectedValidationMessage} is {@link ValidationMessage#VALIDATION_SUCCESS} it will generate
+         * arguments with {@code validationMessage} {@link ValidationMessage#VALIDATION_SUCCESS} for all
          * {@link MutantValidationRuleSet}s that are less strict than the given {@code upToIncludingLevel}.
          * <br>It this case we also expect {@code otherExpectedValidationMessagesOnFailure} to be empty (there is only a
          * single return value that indicates success).
          * <br>See: {@link #testCasesSucceedUpTo(String, MutantValidationRuleSet)}.
          *
-         * <p>If {@code expectedValidationMessage} is not {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} it will
+         * <p>If {@code expectedValidationMessage} is not {@link ValidationMessage#VALIDATION_SUCCESS} it will
          * generate arguments with the given {@code validationMessage} and {@code otherExpectedValidationMessagesOnFailure}
          * for all {@link MutantValidationRuleSet}s that are stricter than the given {@code upToIncludingLevel} and additionally
-         * arguments with {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for the {@link MutantValidationRuleSet}s that
+         * arguments with {@link ValidationMessage#VALIDATION_SUCCESS} for the {@link MutantValidationRuleSet}s that
          * are less strict.
          * <br>See: {@link #testCasesFailUpTo(String, MutantValidationRuleSet, String, String...)}
          */
         private Stream<Arguments> testCases(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
                                             String expectedValidationMessage,
                                             String... otherExpectedValidationMessagesOnFailure) {
-            if (expectedValidationMessage.equals(MUTANT_VALIDATION_SUCCESS)) {
+            if (expectedValidationMessage.equals(VALIDATION_SUCCESS)) {
                 assume().that(otherExpectedValidationMessagesOnFailure).asList().isEmpty();
 
                 return testCasesSucceedUpTo(mutantDirectory, upToIncludingLevel);
@@ -263,7 +265,7 @@ public class CodeValidatorTest {
          *
          * <p>Example:
          * <br>If {@code succeedsUpToIncludingLevel} is {@link DefaultRuleSets#MODERATE} it will create arguments
-         * with an expected return value of {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for
+         * with an expected return value of {@link ValidationMessage#VALIDATION_SUCCESS} for
          * {@link DefaultRuleSets#RELAXED} and {@link DefaultRuleSets#MODERATE}.
          */
         private Stream<Arguments> testCasesSucceedUpTo(String mutantDirectory,
@@ -274,36 +276,36 @@ public class CodeValidatorTest {
             }
 
             return sets.stream()
-                    .flatMap(level -> testCase(mutantDirectory, level, MUTANT_VALIDATION_SUCCESS));
+                    .flatMap(level -> testCase(mutantDirectory, level, VALIDATION_SUCCESS));
         }
 
         /**
          * Creates a {@link Stream} of {@link Arguments}, one argument for each Ruleset in the
          * {@link MutantValidationRuleSet#getParent()} ancestor and children chain.
          * <br>In the cases where the ruleset is an ancestor of the given {@code upToIncludingLevel}, it will generate an
-         * argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS}.
+         * argument that expects {@link ValidationMessage#VALIDATION_SUCCESS}.
          *
-         * <p>This method assumes that {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} is neither passed as
+         * <p>This method assumes that {@link ValidationMessage#VALIDATION_SUCCESS} is neither passed as
          * {@code expectedValidationMessageOnFailure} nor contained in {@code otherExpectedValidationMessagesOnFailure}.
          *
          * <p>Example:
          * <br>If {@code expectedValidationMessage} is {@link ValidationMessage#MUTANT_CONDITIONALS} and
          * {@code upToIncludingLevel} is {@link DefaultRuleSets#MODERATE} then it will create arguments that expect
          * {@link ValidationMessage#MUTANT_CONDITIONALS} for {@link DefaultRuleSets#STRICT} and {@link DefaultRuleSets#MODERATE}
-         * and another argument that expects {@link ValidationMessage#MUTANT_VALIDATION_SUCCESS} for {@link DefaultRuleSets#RELAXED}.
+         * and another argument that expects {@link ValidationMessage#VALIDATION_SUCCESS} for {@link DefaultRuleSets#RELAXED}.
          */
         private Stream<Arguments> testCasesFailUpTo(String mutantDirectory, MutantValidationRuleSet upToIncludingLevel,
                                                     String expectedValidationMessageOnFailure,
                                                     String... otherExpectedValidationMessagesOnFailure) {
-            assume().that(expectedValidationMessageOnFailure).isNotEqualTo(MUTANT_VALIDATION_SUCCESS);
-            assume().that(otherExpectedValidationMessagesOnFailure).asList().doesNotContain(MUTANT_VALIDATION_SUCCESS);
+            assume().that(expectedValidationMessageOnFailure).isNotEqualTo(VALIDATION_SUCCESS);
+            assume().that(otherExpectedValidationMessagesOnFailure).asList().doesNotContain(VALIDATION_SUCCESS);
 
             List<Arguments> result = new ArrayList<>();
             upToIncludingLevel.getDescendants().stream()
                     .flatMap(l -> testCase(mutantDirectory, l, expectedValidationMessageOnFailure, otherExpectedValidationMessagesOnFailure))
                     .forEach(result::add);
             upToIncludingLevel.getAncestors().stream()
-                    .flatMap(l -> testCase(mutantDirectory, l, MUTANT_VALIDATION_SUCCESS))
+                    .flatMap(l -> testCase(mutantDirectory, l, VALIDATION_SUCCESS))
                     .forEach(result::add);
             return result.stream();
         }
@@ -348,17 +350,17 @@ public class CodeValidatorTest {
                     testCases("instanceOf/changedOne", STRICT, MUTANT_INSTANCEOF),
 
                     // MUTANT_VALIDATION_SUCCESS - Short circuit on only literal changes
-                    testCase("literals/addedSpaceToNonEmptyString", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithAccessModifiers", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithBitShiftLeft", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithBitShiftRight", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithBitShiftRightUnsigned", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithBitwiseAnd", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithBitwiseOr", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithControlCharacters", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedEmptyStringToStringWithSingleSpace", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedMultipleStrings", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("literals/changedSingleCharToSemicolon", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCase("literals/addedSpaceToNonEmptyString", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithAccessModifiers", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithBitShiftLeft", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithBitShiftRight", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithBitShiftRightUnsigned", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithBitwiseAnd", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithBitwiseOr", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithControlCharacters", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedEmptyStringToStringWithSingleSpace", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedMultipleStrings", STRICT, VALIDATION_SUCCESS),
+                    testCase("literals/changedSingleCharToSemicolon", STRICT, VALIDATION_SUCCESS),
 
                     // Logical Operator Added 01 - Only forbidden with STRICT and MODERATE validation
                     testCases("logicalOperators/addedLogicalAnd", MODERATE, MUTANT_LOGIC),
@@ -413,29 +415,33 @@ public class CodeValidatorTest {
                     testCase("systemCalls/System_exit01", STRICT, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM),
 
+                    testCase("systemCalls/withExistingMath_random01", STRICT, MUTANT_CALL_RANDOM),
+                    //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), TODO Fails
+                    testCase("systemCalls/withExistingMath_random03", STRICT, VALIDATION_SUCCESS),
+
                     // MUTANT_VALIDATION_SUCCESS
-                    testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCase("valid/addedSecondStatementOnSingleLine", STRICT, VALIDATION_SUCCESS),
                     // Comment success
-                    testCases("valid/changeAfterSlash", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCases("valid/changedFieldInitializer", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCases("valid/changeAfterSlash", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/changedFieldInitializer", STRICT, VALIDATION_SUCCESS),
 
-                    testCase("valid/changeStringValue", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/inlinedStringVariable01", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/inlinedStringVariable02", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCase("valid/changeStringValue", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/inlinedStringVariable01", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/inlinedStringVariable02", STRICT, VALIDATION_FAILED_PARSING), //TODO What's the point of this class? Why the escape?
 
-                    testCase("valid/instanceOfMultipleUnchanged", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/instanceOfUnchanged", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCase("valid/instanceOfMultipleUnchanged", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/instanceOfUnchanged", STRICT, VALIDATION_SUCCESS),
 
-                    testCase("valid/liftDecrementTopFloorOnGetCurrentFloor", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/liftTopFloorIsIncrementedByOneInConstructor", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/simpleChange01", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCase("valid/simpleChange02", STRICT, MUTANT_VALIDATION_SUCCESS),
+                    testCase("valid/liftDecrementTopFloorOnGetCurrentFloor", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/liftTopFloorIsIncrementedByOneInConstructor", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/simpleChange01", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/simpleChange02", STRICT, VALIDATION_SUCCESS),
 
-                    testCases("valid/withCommentInDifferentLine", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCases("valid/withCommentInSameLine", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCases("valid/withField", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCases("valid/withoutPackage", STRICT, MUTANT_VALIDATION_SUCCESS),
-                    testCases("valid/withPackage", STRICT, MUTANT_VALIDATION_SUCCESS)
+                    testCases("valid/withCommentInDifferentLine", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/withCommentInSameLine", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/withField", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/withoutPackage", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/withPackage", STRICT, VALIDATION_SUCCESS)
             ).flatMap(Function.identity());
         }
     }

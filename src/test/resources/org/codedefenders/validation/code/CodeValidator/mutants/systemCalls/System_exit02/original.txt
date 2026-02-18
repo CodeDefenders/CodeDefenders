@@ -1,7 +1,7 @@
 public class Test {
  	public void addRiders(int numEntering) {
      	if (numRiders + numEntering <= capacity)
-    			x = y + z
+    			x = y + z;
 
     }
 }

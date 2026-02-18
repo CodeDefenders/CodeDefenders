@@ -91,7 +91,7 @@ public class CodeValidationResult {
     @Override
     public @NotNull String toString() {
         if (isValid()) {
-            return failedParsing ? "FAILED_PARSING" : "SUCCESS";
+            return failedParsing ? ValidationMessage.VALIDATION_FAILED_PARSING : ValidationMessage.VALIDATION_SUCCESS;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -127,6 +127,11 @@ public class CodeValidationResult {
         return sb.toString().replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions));
     }
 
+    /**
+     * Returns true in two cases: Either, validation succeeded without issues, or the code could not be parsed.
+     * In both cases, we attempt to compile the code, as the compiler will yield a more useful error message than
+     * what we could create ourselves.
+     */
     public boolean isValid() {
         return nodeErrors.isEmpty() && stringErrors.isEmpty() && anonymousErrors.isEmpty();
     }

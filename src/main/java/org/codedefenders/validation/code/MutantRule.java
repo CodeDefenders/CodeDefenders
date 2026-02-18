@@ -103,14 +103,14 @@ public class MutantRule extends ValidationRule {
             return this;
         }
 
-        Builder withInsertion(String... rule) {
-            insertionRules.add(rule);
-            return this;
-        }
-
         Builder withInsertionNode(Predicate<Node> rule) {
             insertionNodeRules.add(rule);
             return this;
+        }
+
+        Builder withInsertion(String... terms) {
+            insertionRules.add(terms);
+            return this.withLinediff((o, m) -> CodeValidator.anyHasBeenAdded(o, m, terms));
         }
 
         Builder hidden() {

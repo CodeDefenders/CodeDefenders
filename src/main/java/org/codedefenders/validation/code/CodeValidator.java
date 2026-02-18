@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -116,7 +117,7 @@ public class CodeValidator {
     }
 
     public static CodeValidationResult validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
-                                                              AssertionLibrary assertionLibrary) {
+                                                                  AssertionLibrary assertionLibrary) {
         TestValidator validator = new TestValidator(
                 maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
         return validator.validFor(testCode);
@@ -124,7 +125,7 @@ public class CodeValidator {
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern
     public static CodeValidationResult validateMutantGetMessage(String originalCode, String mutatedCode,
-                                                  MutantValidationRuleSet ruleSet) {
+                                                                MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
@@ -469,7 +470,7 @@ public class CodeValidator {
     }
 
     private static CodeValidationResult validInsertion(String diff,
-                                         MutantValidationRuleSet ruleSet) {
+                                                       MutantValidationRuleSet ruleSet) {
         String stmtString = String.format("{ %s }", diff);
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         Optional<BlockStmt> parseResult = JavaParserUtils.parse(
@@ -509,26 +510,29 @@ public class CodeValidator {
 
     static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
         final Pattern pattern = Pattern.compile(TERNARY_OP_REGEX);
-
-        Iterator<List<String>> it1 = orig.iterator();
-        Iterator<List<String>> it2 = muta.iterator();
-        while (it1.hasNext() && it2.hasNext()) {
-            final boolean foundInOriginal = pattern.matcher(it1.next().toString()).find();
-            final boolean foundInMutant = pattern.matcher(it2.next().toString()).find();
-
-            if (!foundInOriginal && foundInMutant) {
-                return true;
-            }
-        }
-        return false;
+        return checkLineDiff(orig, muta, l -> pattern.matcher(l.toString()).find());
     }
 
-    static boolean logicalOpAdded(List<List<String>> orig, List<List<String>> muta) {
+    static boolean anyHasBeenAdded(List<List<String>> orig, List<List<String>> muta, String... forbiddenTerms) {
+        return checkLineDiff(orig, muta, l -> containsAny(l.toString(), forbiddenTerms));
+    }
+
+    /**
+     * Checks if a condition holds false in an original line diff, but true in a mutated one.
+     *
+     * @param orig          A list of line-diffs, which is itself a list of Strings, from the original CuT
+     * @param muta          The equivalent list of line-diffs for the mutant
+     * @param findPredicate A predicate that is checked against every line-diff of original and mutant
+     * @return True if and only if there is at least one line-diff in which the predicate fails for the original
+     * and succeeds for the mutant
+     */
+    static boolean checkLineDiff(List<List<String>> orig, List<List<String>> muta,
+                                 Predicate<List<String>> findPredicate) {
         Iterator<List<String>> it1 = orig.iterator();
         Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
-            final boolean foundInOriginal = containsAny(it1.next().toString(), PROHIBITED_LOGICAL_OPS);
-            final boolean foundInMutant = containsAny(it2.next().toString(), PROHIBITED_LOGICAL_OPS);
+            final boolean foundInOriginal = findPredicate.test(it1.next());
+            final boolean foundInMutant = findPredicate.test(it2.next());
             if (!foundInOriginal && foundInMutant) {
                 return true;
             }

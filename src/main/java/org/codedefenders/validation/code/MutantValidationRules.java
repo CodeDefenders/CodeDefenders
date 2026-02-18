@@ -136,7 +136,7 @@ public class MutantValidationRules {
             CONTROL,
             "No new logical operators like '&&' or '||'",
             ValidationMessage.MUTANT_LOGIC)
-            .withLinediff(CodeValidator::logicalOpAdded)
+            .withInsertion(CodeValidator.PROHIBITED_LOGICAL_OPS)
             .build();
 
     public static MutantRule prohibitedConditionals = new MutantRule.Builder(
