@@ -110,12 +110,15 @@ public class TestValidationRules {
                             + "Use the Assertions from your test library!")
                     .withNode(n -> n instanceof AssertStmt).build(),
 
-            new TestRule.Builder(NO_SYSTEM_CALLS,
+            new TestRule.Builder(NO_SYSTEM_CALLS, //TODO Modularize and standardize, create some tests to check what is
+                    //TODO really necessary
                     "No calls to any of these packages: System, Random, Thread",
                     "You have called a package you may not call.")
                     .withNode(n ->
                             n instanceof ExpressionStmt
-                                    && Arrays.stream(CodeValidator.PROHIBITED_CALLS)
+                                    && Stream.of("Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
+                                                    "java.net", "java.nio", "java.sql", "random(", "randomUUID("
+                                    )
                                     .anyMatch(prohibited -> JavaParserUtils.unparse(n)
                                             .contains(prohibited)))
                     .withNode(

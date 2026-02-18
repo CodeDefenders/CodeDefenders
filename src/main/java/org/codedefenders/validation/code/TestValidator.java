@@ -96,11 +96,10 @@ class TestValidator {
                     validationResult.add(r);
                 }
             }
-            return validationResult;
         } else {
             validationResult.setFailedParsing();
-            return validationResult;
         }
+        return validationResult;
     }
 
     private void handleMethodCalls(MethodCallExpr stmt) {

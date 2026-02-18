@@ -71,7 +71,7 @@ import com.github.javaparser.ast.visitor.Visitable;
 
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
- *
+ * TODO OUTDATED
  * <p>Use {@link #validateTestCodeGetMessage(String, int, AssertionLibrary)} to validate test code with a boolean result value.
  *
  * <p>Use {@link #validateMutantGetMessage(String, String, MutantValidationRuleSet)} to validate
@@ -90,14 +90,9 @@ public class CodeValidator {
     static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
     static final String[] PROHIBITED_CONDITIONALS = {"if", "switch"};
     static final String[] PROHIBITED_LOOPS = {"while", "for"};
-    //static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
     static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
     static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
-    // This is package protected to enable TestValidator to check for prohibited call as well
-    static final String[] PROHIBITED_CALLS = {
-            "Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
-            "java.net", "java.nio", "java.sql", "random(", "randomUUID("
-    };
+
     static final String[] COMMENT_TOKENS = {"//", "/*"};
     static final String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
@@ -169,19 +164,14 @@ public class CodeValidator {
         final String text1 = originalCode.trim().replace("\n", "").replace("\r", "");
         final String text2 = mutatedCode.trim().replace("\n", "").replace("\r", "");
         LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(text1, text2, true);
-        boolean hasChanges = false;
         // check if there is any change
         for (DiffMatchPatch.Diff d : changes) {
             if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-                hasChanges = true;
                 if (d.operation == DiffMatchPatch.Operation.INSERT) {
                     result.add(validInsertion(d.text, ruleSet));
                 }
             }
         }
-        /*if (!hasChanges) {TODO Brauchen wir das?
-            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }*/
 
         return result;
     }
@@ -348,8 +338,8 @@ public class CodeValidator {
 
     //FIXME this will not work if a string contains \"
     static boolean onlyLiteralsChanged(String orig, String muta) {
-        final String originalWithout = removeQuoted(removeQuoted(orig, "\""), "\'");
-        final String mutantWithout = removeQuoted(removeQuoted(muta, "\""), "\'");
+        final String originalWithout = removeQuoted(removeQuoted(orig, "\""), "'");
+        final String mutantWithout = removeQuoted(removeQuoted(muta, "\""), "'");
         return originalWithout.equals(mutantWithout);
     }
 
