@@ -74,7 +74,6 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.util.ZipFileUtils;
-import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -725,7 +724,7 @@ public class ClassUploadManager extends HttpServlet {
             }
 
             int mutantId;
-            final String md5 = CodeValidator.getMD5FromText(fileContent);
+            final String md5 = FileUtils.getMD5FromText(fileContent);
             final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
             try {
                 mutantId = mutantRepo.storeMutant(mutant);

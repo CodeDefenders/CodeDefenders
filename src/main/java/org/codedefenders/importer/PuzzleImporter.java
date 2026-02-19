@@ -61,7 +61,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.SimpleFile;
-import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
@@ -362,7 +361,7 @@ public class PuzzleImporter {
                 String classFilePath = Compiler.compileJavaFileWithDependencies(javaFilePath.toString(), dependencyFiles, true);
 
                 // Store to DB.
-                String md5 = CodeValidator.getMD5FromText(mutantFile.getContentAsString());
+                String md5 = FileUtils.getMD5FromText(mutantFile.getContentAsString());
                 Mutant mutant = new Mutant(javaFilePath.toString(), classFilePath, md5, cut.getId());
                 int mutantId = mutantRepo.storeMutant(mutant);
                 mutant.setId(mutantId);
@@ -449,7 +448,7 @@ public class PuzzleImporter {
 
             // Default values
             // TODO: Don't use default value for puzzles
-            int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
+            int maxAssertionsPerTest = Constants.DEFAULT_NB_ASSERTIONS;
             MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.MODERATE;
 
             // Find the next position in the chapter.

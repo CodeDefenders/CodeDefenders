@@ -77,9 +77,9 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
-import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
-import org.codedefenders.validation.code.ValidationMessage;
+import org.codedefenders.validation.code.MutantValidator;
+import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -436,7 +436,7 @@ public class PuzzleGameManager extends HttpServlet {
                 tse.setUserId(login.getUserId());
                 notificationService.post(tse);
 
-                final var validationMessage = CodeValidator.validateTestCodeGetMessage(
+                final var validationMessage = TestValidator.validateTestCodeGetMessage(
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
                 boolean validationSuccess = validationMessage.isValid();
 
@@ -620,7 +620,7 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -788,7 +788,7 @@ public class PuzzleGameManager extends HttpServlet {
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
         CodeValidationResult validationResult =
-                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+                MutantValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();

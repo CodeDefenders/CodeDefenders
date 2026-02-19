@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -52,11 +51,11 @@ public class MutantRule extends ValidationRule {
         this.compilationUnitRules = compilationUnitRules;
     }
 
-    public boolean fails(CompilationUnit original, CompilationUnit changed) {
+    boolean fails(CompilationUnit original, CompilationUnit changed) {
         return compilationUnitRules.stream().anyMatch(r -> r.test(original, changed));
     }
 
-    public CodeValidationResult fails(List<List<String>> original, List<List<String>> changed) {
+    CodeValidationResult fails(List<List<String>> original, List<List<String>> changed) {
         CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         for (LineDiffRule rule : linediffRules) {
             Optional<List<String>> result = rule.apply(original, changed);
@@ -73,15 +72,15 @@ public class MutantRule extends ValidationRule {
         return validationResult;
     }
 
-    public boolean fails(String original, String changed) {
+    boolean fails(String original, String changed) {
         return codeRules.stream().anyMatch(r -> r.test(original, changed));
     }
 
-    public boolean fails(String diff) {
-        return insertionRules.stream().anyMatch(r -> CodeValidator.containsAny(diff, r));
+    boolean fails(String diff) {
+        return insertionRules.stream().anyMatch(r -> ValidationUtils.containsAny(diff, r));
     }
 
-    public boolean fails(Node node) {
+    boolean fails(Node node) {
         return insertionNodeRules.stream().anyMatch(p -> p.test(node));
     }
 
@@ -125,7 +124,7 @@ public class MutantRule extends ValidationRule {
 
         Builder withInsertion(String... terms) {
             insertionRules.add(terms);
-            return this.withLinediff((o, m) -> CodeValidator.anyHasBeenAdded(o, m, terms));
+            return this.withLinediff((o, m) -> ValidationUtils.anyHasBeenAdded(o, m, terms));
         }
 
         Builder hidden() {

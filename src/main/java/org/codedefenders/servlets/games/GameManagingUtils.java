@@ -87,9 +87,9 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
-import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
-import org.codedefenders.validation.code.ValidationMessage;
+import org.codedefenders.validation.code.MutantValidator;
+import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,7 +186,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      */
     @Override
     public Mutant existingMutant(int gameId, String mutatedCode) {
-        String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
+        String md5Mutant = FileUtils.getMD5FromText(mutatedCode);
         return mutantRepo.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
@@ -230,7 +230,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         Files.write(mutantFilePath, cleanedMutatedCode.getBytes());
 
         // sanity check TODO Phil: Why tho?
-        assert CodeValidator.getMD5FromText(cleanedMutatedCode).equals(CodeValidator.getMD5FromFile(
+        assert FileUtils.getMD5FromText(cleanedMutatedCode).equals(FileUtils.getMD5FromFile(
                 mutantFilePath.toString())) : "MD5 hashes differ between code as text and code from new file";
 
         // Compile the mutant and add it to the game if possible; otherwise,
@@ -316,7 +316,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         CodeValidationResult validationResult =
-                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                MutantValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -529,7 +529,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tse);
 
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -751,7 +751,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
-        CodeValidationResult validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());

@@ -39,7 +39,7 @@ import org.codedefenders.service.game.MultiplayerGameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 
@@ -150,7 +150,7 @@ public class CreateGameAPI extends APIServlet {
                 gameClass.get(),
                 withMutants.orElse(false),
                 withTests.orElse(false),
-                maxAssertionsPerTest.orElse(CodeValidator.DEFAULT_NB_ASSERTIONS),
+                maxAssertionsPerTest.orElse(Constants.DEFAULT_NB_ASSERTIONS),
                 automaticEquivalenceTrigger.orElse(0),
                 mutantValidatorLevel.orElse(DefaultRuleSets.MODERATE),
                 creatorRole.orElse(Role.OBSERVER),

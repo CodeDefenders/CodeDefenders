@@ -18,15 +18,33 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.util.JavaParserUtils;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
@@ -36,7 +54,10 @@ import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.NoCommentEqualsVisitor;
+import com.github.javaparser.ast.visitor.Visitable;
 
 public class MutantValidationRules {
     /**
@@ -60,14 +81,14 @@ public class MutantValidationRules {
             RENAMING,
             "No changes to package signatures",
             ValidationMessage.MUTANT_PACKAGE)
-            .withCompilation(CodeValidator::containsChangesToPackageDeclarations)
+            .withCompilation((o, m) -> !o.getPackageDeclaration().equals(m.getPackageDeclaration()))
             .build();
 
     public static MutantRule classDeclarations = new MutantRule.Builder(
             RENAMING,
             "No changes to class signatures",
             ValidationMessage.MUTANT_CLASS)
-            .withCompilation(CodeValidator::containsChangesToClassDeclarations)
+            .withCompilation(MutantValidationRules::containsChangesToClassDeclarations)
             .withInsertionNode(n -> n instanceof ClassOrInterfaceDeclaration || n instanceof RecordDeclaration)
             .build();
 
@@ -75,7 +96,7 @@ public class MutantValidationRules {
             RENAMING,
             "No new or renamed methods",
             ValidationMessage.MUTANT_ADDS_OR_RENAMES_METHOD)
-            .withCompilation(CodeValidator::mutantAddsOrRenamesMethod)
+            .withCompilation(MutantValidationRules::mutantAddsOrRenamesMethod)
             .withInsertionNode(n ->
                     n instanceof MethodDeclaration
                             || n instanceof ConstructorDeclaration
@@ -86,28 +107,28 @@ public class MutantValidationRules {
             RENAMING,
             "No new or renamed fields",
             ValidationMessage.MUTANT_ADDS_OR_RENAMES_FIELD)
-            .withCompilation(CodeValidator::mutantAddsOrChangesFieldNames)
+            .withCompilation(MutantValidationRules::mutantAddsOrChangesFieldNames)
             .build();
 
     public static MutantRule changesMethodSignatures = new MutantRule.Builder(
             RENAMING,
             "No changes to method signatures",
             ValidationMessage.MUTANT_METHOD_SIGNATURE)
-            .withCompilation(CodeValidator::mutantChangesMethodSignatures)
+            .withCompilation(MutantValidationRules::mutantChangesMethodSignatures)
             .build();
 
     public static MutantRule changesImportStatements = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
             "No changes to import statements",
             ValidationMessage.MUTANT_IMPORT_STATEMENT)
-            .withCompilation(CodeValidator::mutantChangesImportStatements)
+            .withCompilation(MutantValidationRules::mutantChangesImportStatements)
             .build();
 
     public static MutantRule instanceofChanges = new MutantRule.Builder(
             CONTROL,
             "No changes to instanceof statements",
             ValidationMessage.MUTANT_INSTANCEOF)
-            .withCompilation(CodeValidator::containsInstanceOfChanges)
+            .withCompilation(MutantValidationRules::containsInstanceOfChanges)
             .build();
 
     public static MutantRule astEqual = new MutantRule.Builder(
@@ -121,30 +142,30 @@ public class MutantValidationRules {
             IDENTICAL,
             "No changes to comments",
             ValidationMessage.MUTANT_COMMENT)
-            .withCompilation(CodeValidator::containsModifiedComments)
-            .withInsertion(CodeValidator.COMMENT_TOKENS)
+            .withCompilation(MutantValidationRules::containsModifiedComments)
+            .withInsertion("//", "/*")
             .build();
 
     public static MutantRule prohibitedModifier = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
             "No changes to modifiers like 'static' or 'public'",
             ValidationMessage.MUTANT_MODIFIER)
-            .withCode(CodeValidator::containsProhibitedModifierChanges)
+            .withCode(MutantValidationRules::containsProhibitedModifierChanges)
             .build();
 
     public static MutantRule logicalOperator = new MutantRule.Builder(
             CONTROL,
             "No new logical operators like '&&' or '||'",
             ValidationMessage.MUTANT_LOGIC)
-            .withInsertion(CodeValidator.PROHIBITED_LOGICAL_OPS)
+            .withInsertion("&&", "||")
             .build();
 
     public static MutantRule prohibitedConditionals = new MutantRule.Builder(
             CONTROL,
             "No new conditional statements like if, switch etc.",
             ValidationMessage.MUTANT_CONDITIONALS)
-            .withInsertion(CodeValidator.PROHIBITED_CONDITIONALS)
-            .withLinediff(CodeValidator::ternaryAdded)
+            .withInsertion("if", "switch")
+            .withLinediff(MutantValidationRules::ternaryAdded)
             .withInsertionNode(n -> n instanceof ForEachStmt
                     || n instanceof IfStmt
                     || n instanceof SwitchStmt
@@ -156,7 +177,7 @@ public class MutantValidationRules {
             CONTROL,
             "No new loops.",
             ValidationMessage.MUTANT_LOOPS)
-            .withInsertion(CodeValidator.PROHIBITED_LOOPS)
+            .withInsertion("while", "for")
             .withInsertionNode(n -> n instanceof ForEachStmt
                     || n instanceof ForStmt
                     || n instanceof WhileStmt
@@ -183,7 +204,7 @@ public class MutantValidationRules {
             METHOD_CALLS,
             "No use of random number generators",
             ValidationMessage.MUTANT_CALL_RANDOM)
-            .withInsertion("Random.", "Random(", "random(", "randomUUID(") //TODO check against Math.random()
+            .withInsertion("Random.", "Random(", "random(", "randomUUID(")
             .withInsertionNode(n -> n instanceof NameExpr nameExpr
                     && nameExpr.getNameAsString().equals("Random"))
             .build();
@@ -218,6 +239,154 @@ public class MutantValidationRules {
             CONTROL,
             "No new bitwise operators",
             ValidationMessage.MUTANT_BITWISE)
-            .withInsertion(CodeValidator.PROHIBITED_BITWISE_OPERATORS)
+            .withInsertion("<<", ">>", ">>>", "|", "&")
             .build();
+
+    /**
+     * Check if the mutation introduce a change to a class declaration in the mutant.
+     */
+    private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
+        for (TypeDeclaration<?> type : originalCU.getTypes()) {
+            originalTypes.putAll(ValidationUtils.extractTypeDeclaration(type));
+        }
+
+        Map<String, NodeList<Modifier>> mutatedTypes = new HashMap<>();
+        for (TypeDeclaration<?> type : mutatedCU.getTypes()) {
+            mutatedTypes.putAll(ValidationUtils.extractTypeDeclaration(type));
+        }
+
+        return !originalTypes.equals(mutatedTypes);
+    }
+
+    /**
+     * Check if the mutation introduce a change to an instanceof condition.
+     */
+    private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
+        final List<ReferenceType> instanceOfInsideMutated = new ArrayList<>();
+        final AtomicBoolean analyzingMutant = new AtomicBoolean(false);
+
+
+        ModifierVisitor<Void> visitor = new ModifierVisitor<>() {
+
+            @Override
+            public Visitable visit(IfStmt n, Void arg) {
+                // Extract elements from the condition
+                if (n.getCondition() instanceof InstanceOfExpr expr) {
+                    ReferenceType type = expr.getType();
+
+                    // Accumulate instanceOF
+                    if (analyzingMutant.get()) {
+                        instanceOfInsideMutated.add(type);
+                    } else {
+                        instanceOfInsideOriginal.add(type);
+                    }
+
+                }
+                return super.visit(n, arg);
+            }
+        };
+
+        visitor.visit(originalCU, null);
+
+        if (!instanceOfInsideOriginal.isEmpty()) {
+            analyzingMutant.set(true);
+            visitor.visit(mutatedCU, null);
+        }
+
+        return !instanceOfInsideMutated.equals(instanceOfInsideOriginal);
+    }
+
+    private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        // We assume getAllContainedComments() preserves the order of comments
+        Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[]{});
+        Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[]{});
+        if (originalComments.length != mutatedComments.length) {
+            // added comments triggers validation
+            return true;
+        }
+        // We cannot use equality here because inserting empty lines will change the
+        // lineStart attribute of the Comment node.
+        for (int i = 0; i < originalComments.length; i++) {
+            // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
+            // TODO Where those come from? CodeMirror?
+            if (!originalComments[i].getContent().replaceAll("\\r", "")
+                    .equals(mutatedComments[i].getContent().replaceAll("\\r", ""))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean containsProhibitedModifierChanges(String originalCode, String mutatedCode) {
+        List<DiffMatchPatch.Diff> wordChanges = ValidationUtils.tokenDiff(originalCode, mutatedCode);
+        return wordChanges.stream()
+                .anyMatch(diff -> Stream.of("public", "final", "protected", "private", "static")
+                        .anyMatch(operator -> diff.text.contains(operator))
+                );
+    }
+
+    private static boolean mutantChangesMethodSignatures(final CompilationUnit orig, final CompilationUnit muta) {
+        // Parse original and extract method signatures -> Set of string
+        Set<String> cutMethodSignatures = new HashSet<>();
+        Set<String> mutantMethodSignatures = new HashSet<>();
+
+        for (TypeDeclaration<?> td : orig.getTypes()) {
+            cutMethodSignatures.addAll(ValidationUtils.extractMethodSignaturesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : muta.getTypes()) {
+            mutantMethodSignatures.addAll(ValidationUtils.extractMethodSignaturesByType(td));
+        }
+
+        return !cutMethodSignatures.equals(mutantMethodSignatures);
+    }
+
+    private static boolean mutantChangesImportStatements(final CompilationUnit orig, final CompilationUnit muta) {
+        // Parse original and extract method signatures -> Set of string
+
+        Set<String> cutImportStatements = new HashSet<>(ValidationUtils.extractImportStatements(orig));
+        Set<String> mutantImportStatements = new HashSet<>(ValidationUtils.extractImportStatements(muta));
+
+        return !cutImportStatements.equals(mutantImportStatements);
+    }
+
+    private static boolean mutantAddsOrRenamesMethod(final CompilationUnit orig, final CompilationUnit muta) {
+        Set<String> cutMethodSignatures = new HashSet<>();
+        Set<String> mutantMethodSignatures = new HashSet<>();
+
+        for (TypeDeclaration<?> td : orig.getTypes()) {
+            cutMethodSignatures.addAll(ValidationUtils.extractMethodNamesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : muta.getTypes()) {
+            mutantMethodSignatures.addAll(ValidationUtils.extractMethodNamesByType(td));
+        }
+
+        return !cutMethodSignatures.containsAll(mutantMethodSignatures);
+    }
+
+    private static boolean mutantAddsOrChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
+        // Parse original and extract method signatures -> Set of string
+        Set<String> cutFieldNames = new HashSet<>();
+        Set<String> mutantFieldNames = new HashSet<>();
+
+        for (TypeDeclaration<?> td : orig.getTypes()) {
+            cutFieldNames.addAll(ValidationUtils.extractFieldNamesByType(td));
+        }
+
+        for (TypeDeclaration<?> td : muta.getTypes()) {
+            mutantFieldNames.addAll(ValidationUtils.extractFieldNamesByType(td));
+        }
+
+        return !cutFieldNames.equals(mutantFieldNames);
+    }
+
+    private static Optional<List<String>> ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
+        final Pattern pattern = Pattern.compile(".*\\?.*:.*");
+        return ValidationUtils.checkLineDiff(orig, muta, l -> pattern.matcher(l.toString()).find());
+    }
+
 }

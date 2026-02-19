@@ -25,12 +25,12 @@
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.util.Paths" %>
 <%@ tag import="org.codedefenders.game.GameLevel" %>
-<%@ tag import="org.codedefenders.validation.code.CodeValidator" %>
 <%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.util.CDIUtil" %>
 <%@ tag import="org.codedefenders.validation.code.MutantValidationRuleSet" %>
 <%@ tag import="org.codedefenders.validation.code.DefaultRuleSets" %>
+<%@ tag import="org.codedefenders.util.Constants" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -234,7 +234,7 @@
                                 Max. Assertions Per Test
                             </label>
                             <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
-                                   value="<%=CodeValidator.DEFAULT_NB_ASSERTIONS%>" min="1" required>
+                                   value="<%=Constants.DEFAULT_NB_ASSERTIONS%>" min="1" required>
                         </div>
 
                         <div class="col-12">

@@ -42,7 +42,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
  * <p>
  * One TestValidator should only exist for the validation of a single test.
  */
-class TestValidator {
+public class TestValidator {
     private final List<TestRule> rules;
     private final CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.TEST);
 
@@ -64,6 +64,13 @@ class TestValidator {
         this.rules = rules;
 
         validationResult.setMaxNumberOfAssertions(maxNumberOfAssertions);
+    }
+
+    public static CodeValidationResult validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
+                                                                  AssertionLibrary assertionLibrary) {
+        TestValidator validator = new TestValidator(
+                maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
+        return validator.validFor(testCode);
     }
 
     CodeValidationResult validFor(String testCode) {

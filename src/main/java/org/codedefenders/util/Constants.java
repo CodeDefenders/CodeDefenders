@@ -159,4 +159,6 @@ public class Constants {
     public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
 
     public static final String ILLEGAL_ACTION_MESSAGE = "Hey! You're not allowed to do that!";
+    //Default configurations: number of max. allowed assertions for battleground games
+    public static final int DEFAULT_NB_ASSERTIONS = 2;
 }

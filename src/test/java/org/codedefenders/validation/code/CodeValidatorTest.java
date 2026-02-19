@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.misc.WeldInit;
+import org.codedefenders.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,9 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
 import static org.codedefenders.util.ResourceUtils.loadResource;
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
-import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
-import static org.codedefenders.validation.code.CodeValidator.validateTestCodeGetMessage;
+import static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS;
+import static org.codedefenders.validation.code.MutantValidator.validateMutantGetMessage;
+import static org.codedefenders.validation.code.TestValidator.validateTestCodeGetMessage;
 import static org.codedefenders.validation.code.DefaultRuleSets.MODERATE;
 import static org.codedefenders.validation.code.DefaultRuleSets.RELAXED;
 import static org.codedefenders.validation.code.DefaultRuleSets.STRICT;
@@ -62,7 +63,6 @@ import static org.codedefenders.validation.code.ValidationMessage.MUTANT_LOOPS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ONLY_COMMENT_CHANGES;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_PACKAGE;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_FAILED;
 import static org.codedefenders.validation.code.ValidationMessage.VALIDATION_FAILED_PARSING;
 import static org.codedefenders.validation.code.ValidationMessage.VALIDATION_SUCCESS;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -469,8 +469,8 @@ public class CodeValidatorTest {
 
         @Test
         public void customMD5isTheSameForSameInput() {
-            String originalMD5 = CodeValidator.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/same/original.txt");
-            String mutatedMD5 = CodeValidator.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/same/mutated.txt");
+            String originalMD5 = FileUtils.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/same/original.txt");
+            String mutatedMD5 = FileUtils.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/same/mutated.txt");
 
             assume().that(originalMD5).isNotNull();
             assume().that(mutatedMD5).isNotNull();
@@ -480,8 +480,8 @@ public class CodeValidatorTest {
 
         @Test
         public void customMD5ignoresWhitespaceChanges() {
-            String originalMD5 = CodeValidator.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/spaceAdded/original.txt");
-            String mutatedMD5 = CodeValidator.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/spaceAdded/mutated.txt");
+            String originalMD5 = FileUtils.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/spaceAdded/original.txt");
+            String mutatedMD5 = FileUtils.getMD5FromFile("src/test/resources/" + RESOURCE_DIR + "mutants/identical/spaceAdded/mutated.txt");
 
             assume().that(originalMD5).isNotNull();
             assume().that(mutatedMD5).isNotNull();
@@ -491,7 +491,7 @@ public class CodeValidatorTest {
 
         @Test
         public void customMD5returnsNullForMissingFile() {
-            assertThat(CodeValidator.getMD5FromFile("/nonexistent")).isNull();
+            assertThat(FileUtils.getMD5FromFile("/nonexistent")).isNull();
         }
     }
 
@@ -500,49 +500,49 @@ public class CodeValidatorTest {
 
         @Test
         public void noQuotesRemoveSingleQuotes() {
-            assertThat(CodeValidator.removeQuoted("[Prefix][Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix][Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void noQuotesRemoveDoubleQuotes() {
-            assertThat(CodeValidator.removeQuoted("[Prefix][Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix][Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void singleQuotesOnlyRemoveDoubleQuotes() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "\"")).isEqualTo("[Prefix]'T'[Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]'T'[Postfix]", "\"")).isEqualTo("[Prefix]'T'[Postfix]");
         }
 
         @Test
         public void doubleQuotesOnlyRemoveSingleQuotes() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "'")).isEqualTo("[Prefix]\"Text\"[Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]\"Text\"[Postfix]", "'")).isEqualTo("[Prefix]\"Text\"[Postfix]");
         }
 
         @Test
         public void oneSingleQuotedCharacter() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]'T'[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void oneDoubleQuotedText() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void oneSingleQuotedCharacterContainingEscapedSingleQuote() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]'\\''[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]'\\''[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheEnd() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\\\"\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]\"Text\\\"\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheBeginning() is @Disabled\n"
                 + "because removeQuoted can not deal properly with escaped quotes")
         @Test
         public void oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheBeginning() {
-            assertThat(CodeValidator.removeQuoted("[Prefix]\"\\\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
+            assertThat(ValidationUtils.removeQuoted("[Prefix]\"\\\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
     }
 
@@ -551,17 +551,17 @@ public class CodeValidatorTest {
 
         @Test
         public void noQuotes() {
-            assertThat(CodeValidator.onlyLiteralsChanged("public class Test {}", "public class Test {}")).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged("public class Test {}", "public class Test {}")).isTrue();
         }
 
         @Test
         public void simpleString() {
-            assertThat(CodeValidator.onlyLiteralsChanged("public class Test { String var = \"Text\"; }", "public class Test { String var = \"Changed Text\"; }")).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged("public class Test { String var = \"Text\"; }", "public class Test { String var = \"Changed Text\"; }")).isTrue();
         }
 
         @Test
         public void simpleChar() {
-            assertThat(CodeValidator.onlyLiteralsChanged("public class Test { char var = 'A'; }", "public class Test { char var = 'B'; }")).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged("public class Test { char var = 'A'; }", "public class Test { char var = 'B'; }")).isTrue();
         }
 
         @Test
@@ -569,7 +569,7 @@ public class CodeValidatorTest {
             String original = "public class Test { String var = \"Text\"; }";
             String mutated = "public class Test { String var = \"Changed Text\\\"\"; }";
 
-            assertThat(CodeValidator.onlyLiteralsChanged(original, mutated)).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged(original, mutated)).isTrue();
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter02() is @Disabled\n"
@@ -579,7 +579,7 @@ public class CodeValidatorTest {
             String original = "public class Test { String var = \"\\\"Text\"; }";
             String mutated = "public class Test { String var = \"Changed Text\"; }";
 
-            assertThat(CodeValidator.onlyLiteralsChanged(original, mutated)).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged(original, mutated)).isTrue();
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter03() is @Disabled\n"
@@ -589,7 +589,7 @@ public class CodeValidatorTest {
             String original = "public class Test { String var = \"\\\"Text\"; }";
             String mutated = "public class Test { String var = \"Changed\\\" Text\"; }";
 
-            assertThat(CodeValidator.onlyLiteralsChanged(original, mutated)).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged(original, mutated)).isTrue();
         }
 
         @Test
@@ -597,7 +597,7 @@ public class CodeValidatorTest {
             String original = "public class Test { char var = '\"'; }";
             String mutated = "public class Test { char var = '\\''; }";
 
-            assertThat(CodeValidator.onlyLiteralsChanged(original, mutated)).isTrue();
+            assertThat(ValidationUtils.onlyLiteralsChanged(original, mutated)).isTrue();
         }
     }
 }
