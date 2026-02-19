@@ -24,14 +24,24 @@ import java.util.function.Predicate;
 
 import com.github.javaparser.ast.Node;
 
+/**
+ * This rule contains one or more 'sub-rules' that can detect certain features in a test.
+ *
+ * <p>
+ * All sub-rules within a rule should work to detect the same kind of behavior, similar enough that one rule-description
+ * and one error message fit all sub-rules.
+ *
+ * <p>
+ * For explanations of the different sub-rule types see their associated Builder methods.
+ */
 public class TestRule extends ValidationRule {
 
-    private final List<Predicate<TestValidationCounter>> visitorRules;
+    private final List<Predicate<TestValidationDTO>> visitorRules;
     private final List<Predicate<Node>> stmtRules;
 
     private TestRule(String generalDescription, String detailedDescription, String validationMessage,
                      boolean visible,
-                     List<Predicate<TestValidationCounter>> visitorRules,
+                     List<Predicate<TestValidationDTO>> visitorRules,
                      List<Predicate<Node>> stmtRules
     ) {
         super(generalDescription, detailedDescription, validationMessage, visible);
@@ -39,7 +49,7 @@ public class TestRule extends ValidationRule {
         this.stmtRules = stmtRules;
     }
 
-    boolean fails(TestValidationCounter visitor) {
+    boolean fails(TestValidationDTO visitor) {
         return visitorRules.stream().anyMatch(r -> r.test(visitor));
     }
 
@@ -51,7 +61,7 @@ public class TestRule extends ValidationRule {
         private final String generalDescription;
         private final String detailedDescription;
         private final String validationMessage;
-        private final List<Predicate<TestValidationCounter>> visitorRules = new ArrayList<>();
+        private final List<Predicate<TestValidationDTO>> visitorRules = new ArrayList<>();
         private final List<Predicate<Node>> nodeRules = new ArrayList<>();
         private boolean visible = true;
 
@@ -62,11 +72,10 @@ public class TestRule extends ValidationRule {
         }
 
         /**
-         * Adds a rule that takes a {@link TestValidator} as an argument. The predicate will only be checked after
-         * the {@link TestValidator} has walked through the AST. The intended use case for this is to check the
-         * "result variables" that are set during the walk.
+         * Adds a rule that takes a {@link TestValidationDTO} as an argument. The predicate will only be checked
+         * after the {@link TestValidator} has walked through the AST.
          */
-        Builder withVisitor(Predicate<TestValidationCounter> rule) {
+        Builder withVisitor(Predicate<TestValidationDTO> rule) {
             visitorRules.add(rule);
             return this;
         }

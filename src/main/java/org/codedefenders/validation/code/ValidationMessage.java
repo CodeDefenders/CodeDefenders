@@ -26,9 +26,6 @@ package org.codedefenders.validation.code;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class ValidationMessage {
-    // Generic error message.
-    public static final String MUTANT_VALIDATION_FAILED = "Invalid mutant. Your mutant does not comply with our rules.";
-
     public static final String MUTANT_ONLY_COMMENT_CHANGES = "Your mutant only changes comments.";
     public static final String MUTANT_PACKAGE = "Your mutant changes the package signature.";
     public static final String MUTANT_CLASS = "Your mutant adds a new class or changes a class signature.";
@@ -53,7 +50,5 @@ public class ValidationMessage {
     //These are never shown in the UI, only used for tests
     public static final String VALIDATION_FAILED_PARSING = "PARSING_FAILED";
     public static final String VALIDATION_SUCCESS = "SUCCESS";
-
-    public static final String MUTANT_MISSING_INTENTION = "You must declare your intention.";
 
 }

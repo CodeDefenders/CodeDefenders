@@ -172,15 +172,6 @@ public class TestValidationRules {
     private static final List<List<TestRule>> tieredRules = ValidationUtils.getTieredRules(rules);
     private static final List<TestRule> singleRules = ValidationUtils.getSingleRules(rules);
 
-    //No classes
-    //No methods
-    //No loops
-    //No if-statements (incl. ternary, switch)
-    //no asserts
-    //No empty tests
-    //Max number of assertions - independent
-    //No calls to System etc.
-
 
     public static List<TestRule> getRules() {
         return rules;

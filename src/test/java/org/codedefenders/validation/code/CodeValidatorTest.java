@@ -414,6 +414,8 @@ public class CodeValidatorTest {
                     testCase("systemCalls/replacedWithCallToMath_random02", STRICT, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/System_exit01", STRICT, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM),
+                    //testCase("systemCalls/systemCallOnDifferentLines01", STRICT, MUTANT_CALL_SYSTEM), TODO Fails
+                    //testCase("systemCalls/systemCallOnDifferentLines02", STRICT, MUTANT_CALL_SYSTEM), TODO Fails
 
                     testCase("systemCalls/withExistingMath_random01", STRICT, MUTANT_CALL_RANDOM),
                     //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), TODO Fails
@@ -436,6 +438,8 @@ public class CodeValidatorTest {
                     testCase("valid/liftTopFloorIsIncrementedByOneInConstructor", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/simpleChange01", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/simpleChange02", STRICT, VALIDATION_SUCCESS),
+
+                    testCase("valid/variablesNamedWithSystem01", STRICT, VALIDATION_SUCCESS),
 
                     testCases("valid/withCommentInDifferentLine", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/withCommentInSameLine", STRICT, VALIDATION_SUCCESS),

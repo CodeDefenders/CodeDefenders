@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,10 +57,17 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 
+/**
+ * Contains several static methods that are of use in code validation.
+ */
 public class ValidationUtils {
     private static Logger logger = LoggerFactory.getLogger(ValidationUtils.class);
 
-    public static <T extends ValidationRule> List<List<T>> getTieredRules(List<T> rules) {
+    /**
+     * Takes a list of rules and groups them by their {@link ValidationRule#getGeneralDescription()}. Only groups
+     * with more than one member are added to the final list.
+     */
+    static <T extends ValidationRule> List<List<T>> getTieredRules(List<T> rules) {
         List<List<T>> tieredResult = new ArrayList<>();
         outer:
         for (T r : rules) {
@@ -79,7 +87,11 @@ public class ValidationUtils {
         return tieredResult;
     }
 
-    public static <T extends ValidationRule> List<T> getSingleRules(List<T> rules) {
+    /**
+     * Takes a list of rules and filters them to only the ones that have a unique
+     * {@link ValidationRule#getGeneralDescription()}.
+     */
+    static <T extends ValidationRule> List<T> getSingleRules(List<T> rules) {
         List<T> result = new ArrayList<>(rules);
         for (int i = 0; i < result.size(); i++) {
             T r = result.get(i);
@@ -110,13 +122,14 @@ public class ValidationUtils {
     }
 
 
-    /**TODO OUTDATED!!
-     * Checks if a condition holds false in an original line diff, but true in a mutated one.
+    /**
+     * TODO OUTDATED!!
+     * Checks a line diff to see if a condition hold false in the original part, but true in the updated one.
      *
-     * @param diff          A list of line-diffs, which is itself a list of Strings, from the original CuT
-     * @param findPredicate A predicate that is checked against every line-diff of original and mutant
-     * @return True if and only if there is at least one line-diff in which the predicate fails for the original
-     * and succeeds for the mutant
+     * @param diff          A list of Deltas. Every delta consists of one or more lines.
+     * @param findPredicate A predicate that is checked against source and target of every delta
+     * @return An Optional containing the mutated lines if the predicate succeeded for the mutant, but failed for
+     * the original, or an empty Optional if that didn't happen
      */
     static Optional<List<String>> checkLineDiff(List<AbstractDelta<String>> diff,
                                                 Predicate<List<String>> findPredicate) {
@@ -282,21 +295,5 @@ public class ValidationUtils {
                 .collect(Collectors.toList());
 
         return DiffUtils.diff(originalLines, changedLines).getDeltas();
-    }
-
-    static List<List<String>> getChangedLines(String original, String changed) {
-        return getDeltas(original, changed)
-                .stream()
-                .map(AbstractDelta::getTarget)
-                .map(Chunk::getLines)
-                .collect(Collectors.toList());
-    }
-
-    static List<List<String>> getOriginalLines(String original, String changed) {
-        return getDeltas(original, changed)
-                .stream()
-                .map(AbstractDelta::getSource)
-                .map(Chunk::getLines)
-                .collect(Collectors.toList());
     }
 }

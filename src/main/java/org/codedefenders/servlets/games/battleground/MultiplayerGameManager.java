@@ -66,7 +66,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -458,7 +457,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         var intention = ServletUtils.getStringParameter(request, "attacker_intention").map(AttackerIntention::fromString);
         if (game.isCapturePlayersIntention() && intention.isEmpty()) {
-            messages.add(ValidationMessage.MUTANT_MISSING_INTENTION); //TODO Should this be a ValidationMessage? Seems wrong
+            messages.add(Constants.MUTANT_MISSING_INTENTION);
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }

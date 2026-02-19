@@ -25,7 +25,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.persistence.database.GameClassRepository" %>
-<%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
+<%@ page import="static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS" %>
 <%@ page import="org.codedefenders.validation.code.DefaultRuleSets" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>

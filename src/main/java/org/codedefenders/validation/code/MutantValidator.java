@@ -74,9 +74,7 @@ public class MutantValidator {
         CompilationUnit mutatedCU = mutatedParseResult.get();
 
         for (MutantRule rule : ruleSet.getRules()) {
-            if (rule.fails(originalCU, mutatedCU)) {
-                result.add(rule);
-            }
+            result.add(rule.fails(originalCU, mutatedCU));
         }
 
         return result;

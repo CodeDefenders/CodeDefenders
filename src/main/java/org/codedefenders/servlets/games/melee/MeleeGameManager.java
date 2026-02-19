@@ -90,7 +90,6 @@ import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
-import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -733,7 +732,7 @@ public class MeleeGameManager extends HttpServlet {
             AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
             // This parameter is required !
             if (intention == null) {
-                messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
+                messages.add(Constants.MUTANT_MISSING_INTENTION);
                 previousSubmission.setMutantCode(mutantText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;

@@ -146,6 +146,8 @@ public class Constants {
     public static final String MUTANT_ALIVE_N_MESSAGE
             = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
 
+    public static final String MUTANT_MISSING_INTENTION = "You must declare your intention.";
+
     // Message titles
     public static final String TITLE_SUCCESS = "Success!";
 
@@ -161,4 +163,5 @@ public class Constants {
     public static final String ILLEGAL_ACTION_MESSAGE = "Hey! You're not allowed to do that!";
     //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
+
 }

@@ -27,10 +27,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.util.JavaParserUtils;
 
 import com.github.difflib.patch.AbstractDelta;
 import com.github.javaparser.ast.CompilationUnit;
@@ -43,10 +43,8 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
-import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.stmt.DoStmt;
@@ -75,14 +73,14 @@ public class MutantValidationRules {
             IDENTICAL,
             "No mutants that only change comments",
             ValidationMessage.MUTANT_ONLY_COMMENT_CHANGES)
-            .withCompilation(NoCommentEqualsVisitor::equals)
+            .withCompilationPredicate(NoCommentEqualsVisitor::equals)
             .build();
 
     public static MutantRule packageDeclarations = new MutantRule.Builder(
             RENAMING,
             "No changes to package signatures",
             ValidationMessage.MUTANT_PACKAGE)
-            .withCompilation((o, m) -> !o.getPackageDeclaration().equals(m.getPackageDeclaration()))
+            .withCompilationPredicate((o, m) -> !o.getPackageDeclaration().equals(m.getPackageDeclaration()))
             .build();
 
     public static MutantRule classDeclarations = new MutantRule.Builder(
@@ -115,28 +113,28 @@ public class MutantValidationRules {
             RENAMING,
             "No changes to method signatures",
             ValidationMessage.MUTANT_METHOD_SIGNATURE)
-            .withCompilation(MutantValidationRules::mutantChangesMethodSignatures)
+            .withCompilationPredicate(MutantValidationRules::mutantChangesMethodSignatures)
             .build();
 
     public static MutantRule changesImportStatements = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
             "No changes to import statements",
             ValidationMessage.MUTANT_IMPORT_STATEMENT)
-            .withCompilation(MutantValidationRules::mutantChangesImportStatements)
+            .withCompilationPredicate(MutantValidationRules::mutantChangesImportStatements)
             .build();
 
     public static MutantRule instanceofChanges = new MutantRule.Builder(
             CONTROL,
             "No changes to instanceof statements",
             ValidationMessage.MUTANT_INSTANCEOF)
-            .withCompilation(MutantValidationRules::containsInstanceOfChanges)
+            .withCompilationPredicate(MutantValidationRules::containsInstanceOfChanges)
             .build();
 
     public static MutantRule astEqual = new MutantRule.Builder(
             IDENTICAL,
             "No mutants that are identical to the Class under Test",
             ValidationMessage.MUTANT_IDENTICAL)
-            .withCompilation(Node::equals)
+            .withCompilationPredicate(Node::equals)
             .build();
 
     public static MutantRule noChangesToComments = new MutantRule.Builder(
@@ -191,14 +189,17 @@ public class MutantValidationRules {
             "No calls to System.*",
             ValidationMessage.MUTANT_CALL_SYSTEM)
             .withInsertion("System.")
-            .withInsertionNode(n -> n instanceof NameExpr nameExpr
-                    && nameExpr.getNameAsString().equals("System"))
-            //TODO Are the next checks necessary? Why not for the other forbidden packages?
-            .withInsertionNode(n -> n instanceof MethodCallExpr methodCallExpr
-                    && methodCallExpr.getNameAsString().startsWith("System."))
-            .withInsertionNode(n -> n instanceof VariableDeclarator variableDeclarator
-                    && variableDeclarator.getInitializer().isPresent()
-                    && JavaParserUtils.unparse(variableDeclarator.getInitializer().get()).startsWith("System."))
+
+            //The following checks were present in the original validator. The original tests passed without them,
+            // and I haven't found a mutant that they trigger that wouldn't be triggered anyway.
+
+            //.withInsertionNode(n -> n instanceof NameExpr nameExpr
+            //        && nameExpr.getNameAsString().equals("System"))
+            //.withInsertionNode(n -> n instanceof MethodCallExpr methodCallExpr
+            //        && methodCallExpr.getNameAsString().startsWith("System."))
+            //.withInsertionNode(n -> n instanceof VariableDeclarator variableDeclarator
+            //        && variableDeclarator.getInitializer().isPresent()
+            //        && JavaParserUtils.unparse(variableDeclarator.getInitializer().get()).startsWith("System."))
             .build();
 
     public static MutantRule noRandom = new MutantRule.Builder(
@@ -246,7 +247,8 @@ public class MutantValidationRules {
     /**
      * Checks if the mutation introduces a change to a class declaration.
      */
-    private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    private static Optional<String> containsChangesToClassDeclarations(CompilationUnit originalCU,
+                                                                       CompilationUnit mutatedCU) {
         Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
         for (TypeDeclaration<?> type : originalCU.getTypes()) {
             originalTypes.putAll(ValidationUtils.extractTypeDeclaration(type));
@@ -257,7 +259,21 @@ public class MutantValidationRules {
             mutatedTypes.putAll(ValidationUtils.extractTypeDeclaration(type));
         }
 
-        return !originalTypes.equals(mutatedTypes);
+        if (originalTypes.equals(mutatedTypes)) {
+            return Optional.empty();
+        } else if (originalTypes.size() > mutatedTypes.size()) {
+            return Optional.of("You deleted a class declaration.");
+        } else if (originalTypes.size() < mutatedTypes.size()) {
+            return Optional.of("You added a class declaration");
+        } else {
+            for (String k : originalTypes.keySet()) {
+                if (!originalTypes.get(k).equals(mutatedTypes.get(k))) {
+                    return Optional.of("You changed the class declaration for " + k
+                            + " from " + originalTypes.get(k) + " to " + mutatedTypes.get(k));
+                }
+            }
+            return Optional.of("You changed a class name.");
+        }
     }
 
     /**
@@ -299,26 +315,39 @@ public class MutantValidationRules {
         return !instanceOfInsideMutated.equals(instanceOfInsideOriginal);
     }
 
-    private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    /**
+     * Checks compilation units for changes to comments. Returns an empty Optional, if no changes are found, or an
+     * Optional with a String that explains the illegal change.
+     */
+    private static Optional<String> containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         // We assume getAllContainedComments() preserves the order of comments
-        Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[]{});
-        Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[]{});
-        if (originalComments.length != mutatedComments.length) {
-            // added comments triggers validation
-            return true;
-        }
-        // We cannot use equality here because inserting empty lines will change the
-        // lineStart attribute of the Comment node.
-        for (int i = 0; i < originalComments.length; i++) {
-            // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
-            // TODO Where those come from? CodeMirror?
-            if (!originalComments[i].getContent().replaceAll("\\r", "")
-                    .equals(mutatedComments[i].getContent().replaceAll("\\r", ""))) {
-                return true;
-            }
-        }
+        List<Comment> originalComments = originalCU.getAllContainedComments();
+        List<Comment> mutatedComments = mutatedCU.getAllContainedComments();
 
-        return false;
+        if (originalComments.size() == mutatedComments.size()) {
+            for (int i = 0; i < originalComments.size(); i++) {
+                // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
+                String cleanedOriginal = originalComments.get(i).getContent().replaceAll("\\r", "");
+                String cleanedMutated = mutatedComments.get(i).getContent().replaceAll("\\r", "");
+
+                if (!cleanedOriginal.equals(cleanedMutated)) {
+                    return Optional.of("Changed comment " + cleanedOriginal + " to " + cleanedMutated);
+                }
+            }
+            return Optional.empty();
+        } else if (originalComments.size() > mutatedComments.size()) {
+            originalComments.removeAll(mutatedComments);
+            return Optional.of("Removed comments: "
+                    + originalComments.stream()
+                    .map(Comment::getContent)
+                    .collect(Collectors.joining(", ")));
+        } else {
+            mutatedComments.removeAll(originalComments);
+            return Optional.of("Added comments: "
+                    + mutatedComments.stream()
+                    .map(Comment::getContent)
+                    .collect(Collectors.joining(", ")));
+        }
     }
 
     private static boolean containsProhibitedModifierChanges(String originalCode, String mutatedCode) {
@@ -354,7 +383,7 @@ public class MutantValidationRules {
         return !cutImportStatements.equals(mutantImportStatements);
     }
 
-    private static boolean mutantAddsOrRenamesMethod(final CompilationUnit orig, final CompilationUnit muta) {
+    private static Optional<String> mutantAddsOrRenamesMethod(final CompilationUnit orig, final CompilationUnit muta) {
         Set<String> cutMethodSignatures = new HashSet<>();
         Set<String> mutantMethodSignatures = new HashSet<>();
 
@@ -366,10 +395,16 @@ public class MutantValidationRules {
             mutantMethodSignatures.addAll(ValidationUtils.extractMethodNamesByType(td));
         }
 
-        return !cutMethodSignatures.containsAll(mutantMethodSignatures);
+        if (cutMethodSignatures.containsAll(mutantMethodSignatures)) {
+            return Optional.empty();
+        } else {
+            mutantMethodSignatures.removeAll(cutMethodSignatures);
+            return Optional.of(String.join(", ", mutantMethodSignatures));
+        }
     }
 
-    private static boolean mutantAddsOrChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
+    private static Optional<String> mutantAddsOrChangesFieldNames(final CompilationUnit orig,
+                                                                  final CompilationUnit muta) {
         // Parse original and extract method signatures -> Set of string
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();
@@ -382,7 +417,12 @@ public class MutantValidationRules {
             mutantFieldNames.addAll(ValidationUtils.extractFieldNamesByType(td));
         }
 
-        return !cutFieldNames.equals(mutantFieldNames);
+        if (cutFieldNames.containsAll(mutantFieldNames)) {
+            return Optional.empty();
+        } else {
+            mutantFieldNames.removeAll(cutFieldNames);
+            return Optional.of(String.join(", ", mutantFieldNames));
+        }
     }
 
     private static Optional<List<String>> ternaryAdded(List<AbstractDelta<String>> diff) {

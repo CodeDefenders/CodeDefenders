@@ -53,7 +53,7 @@ public class TestValidator {
 
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
         if (parseResult.isPresent()) {
-            TestValidationCounter counter = new TestValidationCounter(maxNumberOfAssertions, library);
+            TestValidationDTO counter = new TestValidationDTO(maxNumberOfAssertions, library);
 
             // Collect the observations first, check NodeRules
             parseResult.get().walk(n -> {
@@ -87,7 +87,7 @@ public class TestValidator {
         return validationResult;
     }
 
-    private void handleMethodCalls(MethodCallExpr stmt, TestValidationCounter counter) {
+    private void handleMethodCalls(MethodCallExpr stmt, TestValidationDTO counter) {
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -42,7 +43,7 @@ import com.github.javaparser.ast.Node;
  */
 public class MutantRule extends ValidationRule {
 
-    private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules;
+    private final List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>> compilationUnitRules;
     private final List<LineDiffRule> lineDiffRules;
     private final List<BiPredicate<String, String>> codeRules;
     private final List<Predicate<Node>> insertionNodeRules;
@@ -54,7 +55,7 @@ public class MutantRule extends ValidationRule {
                        List<Predicate<Node>> insertionNodeRules,
                        List<BiPredicate<String, String>> codeRules,
                        List<LineDiffRule> lineDiffRules,
-                       List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules) {
+                       List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>> compilationUnitRules) {
         super(generalDescription, detailedDescription, message, visible);
         this.insertionRules = insertionRules;
         this.insertionNodeRules = insertionNodeRules;
@@ -63,8 +64,19 @@ public class MutantRule extends ValidationRule {
         this.compilationUnitRules = compilationUnitRules;
     }
 
-    boolean fails(CompilationUnit original, CompilationUnit changed) {
-        return compilationUnitRules.stream().anyMatch(r -> r.test(original, changed));
+    CodeValidationResult fails(CompilationUnit original, CompilationUnit changed) {
+        CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
+        for (var rule : compilationUnitRules) {
+            Optional<String> result = rule.apply(original, changed);
+            if (result.isPresent()) {
+                if (result.get().isEmpty()) {
+                    validationResult.add(this);
+                } else {
+                    validationResult.add(this, result.get());
+                }
+            }
+        }
+        return validationResult;
     }
 
     CodeValidationResult fails(List<AbstractDelta<String>> diff) {
@@ -97,7 +109,8 @@ public class MutantRule extends ValidationRule {
     }
 
     static class Builder {
-        private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules = new ArrayList<>();
+        private final List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>>
+                compilationUnitRules = new ArrayList<>();
         private final List<LineDiffRule> lineDiffRules = new ArrayList<>();
         private final List<BiPredicate<String, String>> codeRules = new ArrayList<>();
         private final List<Predicate<Node>> insertionNodeRules = new ArrayList<>();
@@ -123,11 +136,25 @@ public class MutantRule extends ValidationRule {
 
         /**
          * Adds a compilation rule.
-         * @param rule This predicate takes the {@link CompilationUnit} of the original (first param) and the mutated
-         *             (2nd param) code and returns {@code true} if the rule is violated.
+         * @param rule This function takes the {@link CompilationUnit} of the original (1st param) and of the mutated
+         *             (2nd param) code and should return an Optional with a description of the rule-breaking change.
+         *             If the rule is broken, but you do not want to add a detailed description, the description
+         *             should be an empty String. If the rule has not been broken, the function should return an empty
+         *             Optional.
          */
-        Builder withCompilation(BiPredicate<CompilationUnit, CompilationUnit> rule) {
+        Builder withCompilation(BiFunction<CompilationUnit, CompilationUnit, Optional<String>> rule) {
             compilationUnitRules.add(rule);
+            return this;
+        }
+
+        /**
+         * Shorthand for compilation rules without detailed description.
+         * @param rule The predicate takes the {@link CompilationUnit} of the original (1st param) and the mutated
+         *             (2nd param) code and return true if the change violates this rule.
+         */
+        Builder withCompilationPredicate(BiPredicate<CompilationUnit, CompilationUnit> rule) {
+            compilationUnitRules.add((o,m)
+                    -> rule.test(o, m) ? Optional.of("") : Optional.empty());
             return this;
         }
 

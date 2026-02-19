@@ -24,27 +24,29 @@ import java.util.Set;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A set of different rules, for example, the {@link DefaultRuleSets#STRICT} rules. Each set has a name, and it can
+ * have a relationship with other sets.
+ */
 public class MutantValidationRuleSet {
     private final String name;
     private final List<MutantRule> rules = new ArrayList<>();
     private final MutantValidationRuleSet parent;
     private final List<MutantValidationRuleSet> children = new ArrayList<>();
 
-
-
-    public MutantValidationRuleSet(String name) {
+    MutantValidationRuleSet(String name) {
         this.name = name;
         parent = null;
     }
 
-    public MutantValidationRuleSet(String name, MutantValidationRuleSet from) {
+    MutantValidationRuleSet(String name, MutantValidationRuleSet from) {
         this.name = name;
         parent = from;
         parent.children.add(this);
         rules.addAll(from.rules);
     }
 
-    public MutantValidationRuleSet addRule(MutantRule rule) {
+    MutantValidationRuleSet addRule(MutantRule rule) {
         rules.add(rule);
         return this;
     }
@@ -53,49 +55,30 @@ public class MutantValidationRuleSet {
         return name;
     }
 
-    public boolean contains(MutantRule rule) {
-        return rules.contains(rule);
-    }
-
     public Set<MutantRule> getRules() {
         return Set.copyOf(rules);
     }
 
     public List<List<MutantRule>> getTieredRules() {
         return ValidationUtils.getTieredRules(rules);
-        /*List<List<MutantRule>> result = new ArrayList<>();
-        Set<MutantRule> unordered = getRules();
-        outer:
-        for (MutantRule r : unordered) {
-            for (List<MutantRule> list : result) {
-                if (!list.isEmpty() && list.get(0).getGeneralDescription().equals(r.getGeneralDescription())) {
-                    list.add(r);
-                    continue outer;
-                }
-            }
-            List<MutantRule> newList = new ArrayList<>();
-            newList.add(r);
-            result.add(newList);
-        }
-        return result;*/
     }
 
     public List<MutantRule> getSingleRules() {
         return ValidationUtils.getSingleRules(rules);
     }
 
-    public MutantValidationRuleSet getParent() {
+    MutantValidationRuleSet getParent() {
         return parent;
     }
 
-    public List<MutantValidationRuleSet> getChildren() {
+    List<MutantValidationRuleSet> getChildren() {
         return children;
     }
 
     /**
-     * Returns all descendants of this rule set, including itself
+     * Returns all descendants of this rule set, including itself.
      */
-    public List<MutantValidationRuleSet> getDescendants() {
+    List<MutantValidationRuleSet> getDescendants() {
         List<MutantValidationRuleSet> results = new ArrayList<>();
         results.add(this);
         for (MutantValidationRuleSet child : children) {
@@ -105,9 +88,9 @@ public class MutantValidationRuleSet {
     }
 
     /**
-     * Returns all ancestors of this rule set, <b>not</b> including itself
+     * Returns all ancestors of this rule set, <b>not</b> including itself.
      */
-    public List<MutantValidationRuleSet> getAncestors() {
+    List<MutantValidationRuleSet> getAncestors() {
         List<MutantValidationRuleSet> result = new ArrayList<>();
         for (MutantValidationRuleSet i = parent; i != null; i = i.parent) {
             result.add(i);
