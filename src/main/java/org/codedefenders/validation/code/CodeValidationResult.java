@@ -64,16 +64,22 @@ public class CodeValidationResult {
         }
     }
 
-    void add(CodeValidationResult result) {
-        for (var p : result.nodeErrors) {
+    void add(CodeValidationResult toAdd) {
+        if (type != toAdd.type) {
+            throw new IllegalArgumentException("Trying to add resultType " + toAdd.type + " to resultType " + type);
+        }
+
+        for (var p : toAdd.nodeErrors) {
             add(p.left, p.right);
         }
-        for (var p : result.stringErrors) {
+        for (var p : toAdd.stringErrors) {
             add(p.left, p.right);
         }
-        for (var r : result.anonymousErrors) {
+        for (var r : toAdd.anonymousErrors) {
             add(r);
         }
+
+        failedParsing |= toAdd.failedParsing;
     }
 
     void setMaxNumberOfAssertions(int maxNumberOfAssertions) {

@@ -42,7 +42,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
 import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS;
-import static org.codedefenders.validation.code.MutantValidator.validateMutantGetMessage;
+import static org.codedefenders.validation.code.MutantValidator.validateMutant;
 import static org.codedefenders.validation.code.TestValidator.validateTestCodeGetMessage;
 import static org.codedefenders.validation.code.DefaultRuleSets.MODERATE;
 import static org.codedefenders.validation.code.DefaultRuleSets.RELAXED;
@@ -454,7 +454,7 @@ public class CodeValidatorTest {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
-            String actual = validateMutantGetMessage(original, mutated, ruleSet).toString();
+            String actual = validateMutant(original, mutated, ruleSet).toString();
 
             String expectedRegex = expectedValidationMessages.stream().map(Pattern::quote)
                     .collect(Collectors.joining("|"));

@@ -603,7 +603,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        CodeValidationResult validationResult = MutantValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
+        CodeValidationResult validationResult = MutantValidator.validateMutant(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 

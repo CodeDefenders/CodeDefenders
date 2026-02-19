@@ -316,7 +316,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         CodeValidationResult validationResult =
-                MutantValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                MutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();

@@ -788,7 +788,7 @@ public class PuzzleGameManager extends HttpServlet {
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
         CodeValidationResult validationResult =
-                MutantValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+                MutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
