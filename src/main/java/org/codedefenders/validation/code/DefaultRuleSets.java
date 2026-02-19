@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.validation.code.MutantValidationRules.*;
 
-@Named("defaultRuleSets") //TODO Das muss wahrscheinlich alles woanders hin??
+@Named("defaultRuleSets")
 @ApplicationScoped
 public class DefaultRuleSets {
     private static final Logger logger = LoggerFactory.getLogger(DefaultRuleSets.class);

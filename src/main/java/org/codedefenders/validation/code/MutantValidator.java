@@ -19,7 +19,6 @@
 package org.codedefenders.validation.code;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -98,16 +97,10 @@ public class MutantValidator {
     private CodeValidationResult checkLineDiffRules(String originalCode, String mutatedCode,
                                                            MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
-
+        var lineDiff = ValidationUtils.getDeltas(originalCode, mutatedCode);
         // line-level diff
-        List<List<String>> originalLines = ValidationUtils.getOriginalLines(originalCode, mutatedCode);
-        List<List<String>> changedLines = ValidationUtils.getChangedLines(originalCode, mutatedCode);
-        if (originalLines.size() != changedLines.size()) {
-            throw new RuntimeException("originalLines: " + originalLines + ", changedLines:" + changedLines);
-        }
-
         for (MutantRule rule : ruleSet.getRules()) {
-            result.add(rule.fails(originalLines, changedLines));
+            result.add(rule.fails(lineDiff));
         }
 
         return result;

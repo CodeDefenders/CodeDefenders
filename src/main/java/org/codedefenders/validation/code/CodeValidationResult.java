@@ -142,6 +142,9 @@ public class CodeValidationResult {
         return nodeErrors.isEmpty() && stringErrors.isEmpty() && anonymousErrors.isEmpty();
     }
 
+    /**
+     * Currently not in use, but could be useful for API interaction or something similar.
+     */
     public List<ValidationRule> getViolatingRules() {
         List<ValidationRule> result = new ArrayList<>();
         for (var x : nodeErrors) {

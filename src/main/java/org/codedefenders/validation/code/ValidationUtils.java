@@ -104,31 +104,29 @@ public class ValidationUtils {
         return result;
     }
 
-    static Optional<List<String>> anyHasBeenAdded(List<List<String>> orig, List<List<String>> muta,
+    static Optional<List<String>> anyHasBeenAdded(List<AbstractDelta<String>> diff,
                                                   String... forbiddenTerms) {
-        return checkLineDiff(orig, muta, l -> containsAny(l.toString(), forbiddenTerms));
+        return checkLineDiff(diff, l -> containsAny(l.toString(), forbiddenTerms));
     }
 
-    /**
+
+    /**TODO OUTDATED!!
      * Checks if a condition holds false in an original line diff, but true in a mutated one.
      *
-     * @param orig          A list of line-diffs, which is itself a list of Strings, from the original CuT
-     * @param muta          The equivalent list of line-diffs for the mutant
+     * @param diff          A list of line-diffs, which is itself a list of Strings, from the original CuT
      * @param findPredicate A predicate that is checked against every line-diff of original and mutant
      * @return True if and only if there is at least one line-diff in which the predicate fails for the original
      * and succeeds for the mutant
      */
-    static Optional<List<String>> checkLineDiff(List<List<String>> orig, List<List<String>> muta,
+    static Optional<List<String>> checkLineDiff(List<AbstractDelta<String>> diff,
                                                 Predicate<List<String>> findPredicate) {
-        Iterator<List<String>> it1 = orig.iterator();
-        Iterator<List<String>> it2 = muta.iterator();
-        while (it1.hasNext() && it2.hasNext()) {
-            var originalPiece = it1.next();
-            var mutatedPiece = it2.next();
-            final boolean foundInOriginal = findPredicate.test(originalPiece);
-            final boolean foundInMutant = findPredicate.test(mutatedPiece);
+        for (AbstractDelta<String> delta : diff) {
+            List<String> source = delta.getSource().getLines();
+            List<String> target = delta.getTarget().getLines();
+            final boolean foundInOriginal = findPredicate.test(source);
+            final boolean foundInMutant = findPredicate.test(target);
             if (!foundInOriginal && foundInMutant) {
-                return Optional.of(mutatedPiece);
+                return Optional.of(target);
             }
         }
         return Optional.empty();

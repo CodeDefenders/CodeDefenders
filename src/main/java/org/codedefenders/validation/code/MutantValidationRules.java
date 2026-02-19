@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.util.JavaParserUtils;
 
+import com.github.difflib.patch.AbstractDelta;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
@@ -165,7 +166,7 @@ public class MutantValidationRules {
             "No new conditional statements like if, switch etc.",
             ValidationMessage.MUTANT_CONDITIONALS)
             .withInsertion("if", "switch")
-            .withLinediff(MutantValidationRules::ternaryAdded)
+            .withLineDiff(MutantValidationRules::ternaryAdded)
             .withInsertionNode(n -> n instanceof ForEachStmt
                     || n instanceof IfStmt
                     || n instanceof SwitchStmt
@@ -243,7 +244,7 @@ public class MutantValidationRules {
             .build();
 
     /**
-     * Check if the mutation introduce a change to a class declaration in the mutant.
+     * Checks if the mutation introduces a change to a class declaration.
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
@@ -260,7 +261,7 @@ public class MutantValidationRules {
     }
 
     /**
-     * Check if the mutation introduce a change to an instanceof condition.
+     * Checks if the mutation introduce a change to an instanceof condition.
      */
     private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
@@ -384,9 +385,9 @@ public class MutantValidationRules {
         return !cutFieldNames.equals(mutantFieldNames);
     }
 
-    private static Optional<List<String>> ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
+    private static Optional<List<String>> ternaryAdded(List<AbstractDelta<String>> diff) {
         final Pattern pattern = Pattern.compile(".*\\?.*:.*");
-        return ValidationUtils.checkLineDiff(orig, muta, l -> pattern.matcher(l.toString()).find());
+        return ValidationUtils.checkLineDiff(diff, l -> pattern.matcher(l.toString()).find());
     }
 
 }
