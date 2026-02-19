@@ -21,6 +21,8 @@ package org.codedefenders.validation.code;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -30,7 +32,7 @@ import com.github.javaparser.ast.Node;
 public class MutantRule extends ValidationRule {
 
     private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules;
-    private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules;
+    private final List<LineDiffRule> linediffRules;
     private final List<BiPredicate<String, String>> codeRules;
     private final List<Predicate<Node>> insertionNodeRules;
     private final List<String[]> insertionRules;
@@ -40,7 +42,7 @@ public class MutantRule extends ValidationRule {
                        List<String[]> insertionRules,
                        List<Predicate<Node>> insertionNodeRules,
                        List<BiPredicate<String, String>> codeRules,
-                       List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules,
+                       List<LineDiffRule> linediffRules,
                        List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules) {
         super(generalDescription, detailedDescription, message, visible);
         this.insertionRules = insertionRules;
@@ -54,8 +56,21 @@ public class MutantRule extends ValidationRule {
         return compilationUnitRules.stream().anyMatch(r -> r.test(original, changed));
     }
 
-    public boolean fails(List<List<String>> original, List<List<String>> changed) {
-        return linediffRules.stream().anyMatch(r -> r.test(original, changed));
+    public CodeValidationResult fails(List<List<String>> original, List<List<String>> changed) {
+        CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
+        for (LineDiffRule rule : linediffRules) {
+            Optional<List<String>> result = rule.apply(original, changed);
+            if (result.isPresent()) {
+                if (result.get().isEmpty()) {
+                    validationResult.add(this);
+                } else if (result.get().size() == 1) {
+                    validationResult.add(this, result.get().get(0));
+                } else {
+                    validationResult.add(this, String.join("\n", result.get()));
+                }
+            }
+        }
+        return validationResult;
     }
 
     public boolean fails(String original, String changed) {
@@ -72,7 +87,7 @@ public class MutantRule extends ValidationRule {
 
     static class Builder {
         private final List<BiPredicate<CompilationUnit, CompilationUnit>> compilationUnitRules = new ArrayList<>();
-        private final List<BiPredicate<List<List<String>>, List<List<String>>>> linediffRules = new ArrayList<>();
+        private final List<LineDiffRule> linediffRules = new ArrayList<>();
         private final List<BiPredicate<String, String>> codeRules = new ArrayList<>();
         private final List<Predicate<Node>> insertionNodeRules = new ArrayList<>();
         private final List<String[]> insertionRules = new ArrayList<>();
@@ -93,7 +108,7 @@ public class MutantRule extends ValidationRule {
             return this;
         }
 
-        Builder withLinediff(BiPredicate<List<List<String>>, List<List<String>>> rule) {
+        Builder withLinediff(LineDiffRule rule) {
             linediffRules.add(rule);
             return this;
         }

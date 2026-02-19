@@ -154,9 +154,7 @@ public class CodeValidator {
             if (rule.fails(originalCode, mutatedCode)) {
                 result.add(rule);
             }
-            if (rule.fails(originalLines, changedLines)) {
-                result.add(rule);
-            }
+            result.add(rule.fails(originalLines, changedLines));
         }
 
         // Runs character-level diff match patch between the two Strings to see if there are any differences.
@@ -498,12 +496,13 @@ public class CodeValidator {
         return result;
     }
 
-    static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
+    static Optional<List<String>> ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
         final Pattern pattern = Pattern.compile(TERNARY_OP_REGEX);
         return checkLineDiff(orig, muta, l -> pattern.matcher(l.toString()).find());
     }
 
-    static boolean anyHasBeenAdded(List<List<String>> orig, List<List<String>> muta, String... forbiddenTerms) {
+    static Optional<List<String>> anyHasBeenAdded(List<List<String>> orig, List<List<String>> muta,
+                                                  String... forbiddenTerms) {
         return checkLineDiff(orig, muta, l -> containsAny(l.toString(), forbiddenTerms));
     }
 
@@ -516,18 +515,20 @@ public class CodeValidator {
      * @return True if and only if there is at least one line-diff in which the predicate fails for the original
      * and succeeds for the mutant
      */
-    static boolean checkLineDiff(List<List<String>> orig, List<List<String>> muta,
+    static Optional<List<String>> checkLineDiff(List<List<String>> orig, List<List<String>> muta,
                                  Predicate<List<String>> findPredicate) {
         Iterator<List<String>> it1 = orig.iterator();
         Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
-            final boolean foundInOriginal = findPredicate.test(it1.next());
-            final boolean foundInMutant = findPredicate.test(it2.next());
+            var originalPiece = it1.next();
+            var mutatedPiece = it2.next();
+            final boolean foundInOriginal = findPredicate.test(originalPiece);
+            final boolean foundInMutant = findPredicate.test(mutatedPiece);
             if (!foundInOriginal && foundInMutant) {
-                return true;
+                return Optional.of(mutatedPiece);
             }
         }
-        return false;
+        return Optional.empty();
     }
 
     static boolean containsAny(String str, String[] tokens) {
