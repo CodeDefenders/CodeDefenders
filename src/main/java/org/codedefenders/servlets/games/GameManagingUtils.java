@@ -529,7 +529,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tse);
 
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCode(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -751,7 +751,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
-        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCode(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());

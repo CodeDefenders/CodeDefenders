@@ -26,12 +26,12 @@ import com.github.javaparser.ast.Node;
 
 public class TestRule extends ValidationRule {
 
-    private final List<Predicate<TestValidator>> visitorRules;
+    private final List<Predicate<TestValidationCounter>> visitorRules;
     private final List<Predicate<Node>> stmtRules;
 
     private TestRule(String generalDescription, String detailedDescription, String validationMessage,
                      boolean visible,
-                     List<Predicate<TestValidator>> visitorRules,
+                     List<Predicate<TestValidationCounter>> visitorRules,
                      List<Predicate<Node>> stmtRules
     ) {
         super(generalDescription, detailedDescription, validationMessage, visible);
@@ -39,7 +39,7 @@ public class TestRule extends ValidationRule {
         this.stmtRules = stmtRules;
     }
 
-    boolean fails(TestValidator visitor) {
+    boolean fails(TestValidationCounter visitor) {
         return visitorRules.stream().anyMatch(r -> r.test(visitor));
     }
 
@@ -51,7 +51,7 @@ public class TestRule extends ValidationRule {
         private final String generalDescription;
         private final String detailedDescription;
         private final String validationMessage;
-        private final List<Predicate<TestValidator>> visitorRules = new ArrayList<>();
+        private final List<Predicate<TestValidationCounter>> visitorRules = new ArrayList<>();
         private final List<Predicate<Node>> nodeRules = new ArrayList<>();
         private boolean visible = true;
 
@@ -66,7 +66,7 @@ public class TestRule extends ValidationRule {
          * the {@link TestValidator} has walked through the AST. The intended use case for this is to check the
          * "result variables" that are set during the walk.
          */
-        Builder withVisitor(Predicate<TestValidator> rule) {
+        Builder withVisitor(Predicate<TestValidationCounter> rule) {
             visitorRules.add(rule);
             return this;
         }

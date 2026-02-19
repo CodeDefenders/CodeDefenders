@@ -436,7 +436,7 @@ public class PuzzleGameManager extends HttpServlet {
                 tse.setUserId(login.getUserId());
                 notificationService.post(tse);
 
-                final var validationMessage = TestValidator.validateTestCodeGetMessage(
+                final var validationMessage = TestValidator.validateTestCode(
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
                 boolean validationSuccess = validationMessage.isValid();
 
@@ -620,7 +620,7 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = TestValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = TestValidator.validateTestCode(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());

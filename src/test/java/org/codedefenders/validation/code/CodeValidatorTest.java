@@ -43,7 +43,7 @@ import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
 import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.MutantValidator.validateMutant;
-import static org.codedefenders.validation.code.TestValidator.validateTestCodeGetMessage;
+import static org.codedefenders.validation.code.TestValidator.validateTestCode;
 import static org.codedefenders.validation.code.DefaultRuleSets.MODERATE;
 import static org.codedefenders.validation.code.DefaultRuleSets.RELAXED;
 import static org.codedefenders.validation.code.DefaultRuleSets.STRICT;
@@ -137,7 +137,7 @@ public class CodeValidatorTest {
                                                                          AssertionLibrary assertionLibrary) {
         String testCode = loadTest(test);
 
-        CodeValidationResult actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        CodeValidationResult actual = validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
 
         assertThat(actual.isValid()).isTrue();
     }
@@ -206,7 +206,7 @@ public class CodeValidatorTest {
                                                                       AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
 
-        CodeValidationResult actual = validateTestCodeGetMessage(testCode, maxNumberOfAssertions, assertionLibrary);
+        CodeValidationResult actual = validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
 
         assertThat(actual.isValid()).isFalse();
         for (String expected : expectedValidationMessages) {

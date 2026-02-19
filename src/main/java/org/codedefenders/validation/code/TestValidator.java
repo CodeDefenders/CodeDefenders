@@ -18,7 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,39 +42,20 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
  * One TestValidator should only exist for the validation of a single test.
  */
 public class TestValidator {
-    private final List<TestRule> rules;
-    private final CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.TEST);
 
-    //Result variables to be checked by VisitorRules
-    List<Node> classes = new ArrayList<>();
-    List<Node> methods = new ArrayList<>();
-    int stmtCount = 0;
-    int assertionCount = 0;
-    int junitAssertionCount = 0;
+    public static CodeValidationResult validateTestCode(String testCode, int maxNumberOfAssertions,
+                                                        AssertionLibrary assertionLibrary) {
+        return validFor(testCode, maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
+    }
 
-    // Per game configuration
-    final int maxNumberOfAssertions;
-    // Per class configuration
-    final AssertionLibrary assertionLibrary;
-
-    TestValidator(int maxNumberOfAssertions, AssertionLibrary assertionLibrary, List<TestRule> rules) {
-        this.maxNumberOfAssertions = maxNumberOfAssertions;
-        this.assertionLibrary = assertionLibrary;
-        this.rules = rules;
-
+    static CodeValidationResult validFor(String testCode, int maxNumberOfAssertions, AssertionLibrary library,
+                                  List<TestRule> rules) {
+        CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.TEST);
         validationResult.setMaxNumberOfAssertions(maxNumberOfAssertions);
-    }
 
-    public static CodeValidationResult validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
-                                                                  AssertionLibrary assertionLibrary) {
-        TestValidator validator = new TestValidator(
-                maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
-        return validator.validFor(testCode);
-    }
-
-    CodeValidationResult validFor(String testCode) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
         if (parseResult.isPresent()) {
+            TestValidationCounter counter = new TestValidationCounter(maxNumberOfAssertions, library);
 
             // Collect the observations first, check NodeRules
             parseResult.get().walk(n -> {
@@ -86,20 +66,20 @@ public class TestValidator {
                 }
 
                 if (n instanceof ClassOrInterfaceDeclaration || n instanceof RecordDeclaration) {
-                    classes.add(n);
-                } else if (n instanceof MethodDeclaration) {
-                    methods.add(n);
+                    counter.addClass(n);
+                } else if (n instanceof MethodDeclaration methodDeclaration) {
+                    counter.addMethod(methodDeclaration);
                 } else if (n instanceof MethodCallExpr methodCallExpr) {
-                    stmtCount++;
-                    handleMethodCalls(methodCallExpr);
+                    counter.addStmt();
+                    handleMethodCalls(methodCallExpr, counter);
                 } else if (n instanceof ExpressionStmt) {
-                    stmtCount++;
+                    counter.addStmt();
                 }
             });
 
-
+            //Check the collected stats against validation rules
             for (TestRule r : rules) {
-                if (r.fails(this)) {
+                if (r.fails(counter)) {
                     validationResult.add(r);
                 }
             }
@@ -109,24 +89,23 @@ public class TestValidator {
         return validationResult;
     }
 
-    private void handleMethodCalls(MethodCallExpr stmt) {
-        //TODO assertThrows is missing? Very hard-coded
+    private static void handleMethodCalls(MethodCallExpr stmt, TestValidationCounter counter) {
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",
                 "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-        // TODO This works the same for Hamcrest and Google Truth
+        // This works the same for Hamcrest and Google Truth
         final boolean assertThatMatch = Arrays.stream(new String[]{"assertThat"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
         /*
          * Count assertions
          */
         if (anyJunitAssertionMatch) {
-            junitAssertionCount++;
-            assertionCount++;
+            counter.addJunitAssertion();
+            counter.addAssertion();
         } else if (assertThatMatch) {
-            assertionCount++;
+            counter.addAssertion();
         }
     }
 }

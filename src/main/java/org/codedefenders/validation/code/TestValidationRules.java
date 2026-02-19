@@ -18,7 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -62,15 +61,15 @@ public class TestValidationRules {
             new TestRule.Builder(NO_NEW_CLASSES_OR_METHODS,
                     "No new classes",
                     "You cannot create a second class.")
-                    .withVisitor(v -> v.classes.size() > 1).build(),
+                    .withVisitor(c -> c.getClasses().size() > 1).build(),
             new TestRule.Builder(NO_NEW_CLASSES_OR_METHODS,
                     "No new methods",
                     "You cannot create a new method.")
-                    .withVisitor(v -> v.methods.size() > 1).build(),
+                    .withVisitor(c -> c.getMethods().size() > 1).build(),
             new TestRule.Builder(NOT_EMPTY,
                     NOT_EMPTY,
                     "The test is empty.")
-                    .withVisitor(v -> v.stmtCount == 0).build(),
+                    .withVisitor(c -> c.getStmtCount() == 0).build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "No loops",
                     "Loops in the test are not allowed.")
@@ -155,16 +154,16 @@ public class TestValidationRules {
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Keep the assertion limit of your game!",
                     "You used more than ${MAX_ASSERTIONS} assertions.")
-                    .withVisitor(v -> v.assertionCount > v.maxNumberOfAssertions)
+                    .withVisitor(c -> c.getAssertionCount() > c.getMaxNumberOfAssertions())
                     .hidden()
                     .build(),
 
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Only use the assertions of the correct test library",
                     "Your assertion does not belong to the correct test library.")
-                    .withVisitor(v -> (v.assertionLibrary == HAMCREST
-                            || v.assertionLibrary == GOOGLE_TRUTH)
-                            && v.junitAssertionCount > 0
+                    .withVisitor(c -> (c.getAssertionLibrary() == HAMCREST
+                            || c.getAssertionLibrary() == GOOGLE_TRUTH)
+                            && c.getJunitAssertionCount() > 0
                     ).build()
 
 
@@ -186,8 +185,6 @@ public class TestValidationRules {
     public static List<TestRule> getRules() {
         return rules;
     }
-
-    //TODO This is basically identical to mutantRules, create a common supertype
 
     /**
      * Returns all categories, that is, collections of rules with the same {@link TestRule#getGeneralDescription()},
