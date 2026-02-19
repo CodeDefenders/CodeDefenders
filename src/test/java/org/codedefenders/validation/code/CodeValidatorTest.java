@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.game.AssertionLibrary;
-import org.codedefenders.misc.WeldInit;
 import org.codedefenders.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -40,10 +39,8 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
-import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS;
-import static org.codedefenders.validation.code.MutantValidator.validateMutant;
-import static org.codedefenders.validation.code.TestValidator.validateTestCode;
+import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.validation.code.DefaultRuleSets.MODERATE;
 import static org.codedefenders.validation.code.DefaultRuleSets.RELAXED;
 import static org.codedefenders.validation.code.DefaultRuleSets.STRICT;
@@ -137,9 +134,10 @@ public class CodeValidatorTest {
                                                                          AssertionLibrary assertionLibrary) {
         String testCode = loadTest(test);
 
-        CodeValidationResult actual = validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
+            TestValidator testValidator = new TestValidator();
+            CodeValidationResult actual = testValidator.validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual.isValid()).isTrue();
+            assertThat(actual.isValid()).isTrue();
     }
 
     private static class InvalidTestArgumentSource implements ArgumentsProvider {
@@ -205,13 +203,15 @@ public class CodeValidatorTest {
     public void testValidateTestCodeGetMessageContainsValidationError(String test, int maxNumberOfAssertions,
                                                                       AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
+            TestValidator testValidator = new TestValidator();
 
-        CodeValidationResult actual = validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
+            CodeValidationResult actual = testValidator.validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
 
-        assertThat(actual.isValid()).isFalse();
-        for (String expected : expectedValidationMessages) {
-            assertThat(actual.toString()).contains(expected);
-        }
+
+            assertThat(actual.isValid()).isFalse();
+            for (String expected : expectedValidationMessages) {
+                assertThat(actual.toString()).contains(expected);
+            }
 
     }
 
@@ -450,17 +450,16 @@ public class CodeValidatorTest {
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, MutantValidationRuleSet ruleSet,
                                              List<String> expectedValidationMessages) {
-        try (var ignored = WeldInit.initWeld(new Class[]{}, false)) {
             String original = loadMutantOriginal(mutant);
             String mutated = loadMutantMutated(mutant);
 
-            String actual = validateMutant(original, mutated, ruleSet).toString();
+            MutantValidator mutantValidator = new MutantValidator();
+            String actual = mutantValidator.validateMutant(original, mutated, ruleSet).toString();
 
             String expectedRegex = expectedValidationMessages.stream().map(Pattern::quote)
                     .collect(Collectors.joining("|"));
             //assertThat(actual).isIn(expectedValidationMessages);
             assertThat(actual).containsMatch(expectedRegex);
-        }
     }
 
 

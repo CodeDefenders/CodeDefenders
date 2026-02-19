@@ -1,8 +1,28 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.validation.code;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.util.JavaParserUtils;
@@ -10,6 +30,7 @@ import org.codedefenders.util.JavaParserUtils;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
+@ApplicationScoped
 public class MutantValidator {
 
     /**
@@ -20,7 +41,7 @@ public class MutantValidator {
      * @param ruleSet The ruleset the mutant is validated against
      * @return A {@link CodeValidationResult} containing information on all rules this mutant violated
      */
-    public static CodeValidationResult validateMutant(String originalCode, String mutatedCode,
+    public CodeValidationResult validateMutant(String originalCode, String mutatedCode,
                                                       MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
@@ -38,7 +59,7 @@ public class MutantValidator {
         return result;
     }
 
-    private static CodeValidationResult checkCompilationRules(String originalCode, String mutatedCode,
+    private CodeValidationResult checkCompilationRules(String originalCode, String mutatedCode,
                                                               MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
@@ -62,7 +83,7 @@ public class MutantValidator {
         return result;
     }
 
-    private static CodeValidationResult checkCodeRules(String originalCode, String mutatedCode,
+    private CodeValidationResult checkCodeRules(String originalCode, String mutatedCode,
                                                        MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         for (MutantRule rule : ruleSet.getRules()) {
@@ -74,7 +95,7 @@ public class MutantValidator {
         return result;
     }
 
-    private static CodeValidationResult checkLineDiffRules(String originalCode, String mutatedCode,
+    private CodeValidationResult checkLineDiffRules(String originalCode, String mutatedCode,
                                                            MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
@@ -92,7 +113,7 @@ public class MutantValidator {
         return result;
     }
 
-    private static CodeValidationResult checkInsertionRules(String originalCode, String mutatedCode,
+    private CodeValidationResult checkInsertionRules(String originalCode, String mutatedCode,
                                             MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
@@ -125,7 +146,7 @@ public class MutantValidator {
         return result;
     }
 
-    private static CodeValidationResult validateInsertionAST(
+    private CodeValidationResult validateInsertionAST(
             MutantValidationRuleSet ruleSet, BlockStmt insertionBlock) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         insertionBlock.walk(n -> {

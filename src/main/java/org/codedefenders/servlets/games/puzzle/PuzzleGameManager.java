@@ -167,6 +167,12 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private TestRepository testRepo;
 
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -436,7 +442,7 @@ public class PuzzleGameManager extends HttpServlet {
                 tse.setUserId(login.getUserId());
                 notificationService.post(tse);
 
-                final var validationMessage = TestValidator.validateTestCode(
+                final var validationMessage = testValidator.validateTestCode(
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
                 boolean validationSuccess = validationMessage.isValid();
 
@@ -620,7 +626,7 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = TestValidator.validateTestCode(
+        CodeValidationResult validationMessage = testValidator.validateTestCode(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -788,7 +794,7 @@ public class PuzzleGameManager extends HttpServlet {
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
         CodeValidationResult validationResult =
-                MutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();

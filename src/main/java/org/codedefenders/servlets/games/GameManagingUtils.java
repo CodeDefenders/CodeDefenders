@@ -181,6 +181,12 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private EventDAO eventDAO;
 
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
+
     /**
      * {@inheritDoc}
      */
@@ -316,7 +322,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         CodeValidationResult validationResult =
-                MutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -529,7 +535,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tse);
 
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessage = TestValidator.validateTestCode(
+        CodeValidationResult validationMessage = testValidator.validateTestCode(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
@@ -751,7 +757,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
-        CodeValidationResult validationMessage = TestValidator.validateTestCode(
+        CodeValidationResult validationMessage = testValidator.validateTestCode(
                 code,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());

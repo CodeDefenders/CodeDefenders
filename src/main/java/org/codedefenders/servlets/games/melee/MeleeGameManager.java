@@ -197,6 +197,12 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     GameService gameService;
 
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -430,7 +436,7 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
-        CodeValidationResult validationMessages = TestValidator.validateTestCode(testText,
+        CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                 game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessages.isValid();
 
@@ -603,7 +609,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
-        CodeValidationResult validationResult = MutantValidator.validateMutant(game.getCUT().getSourceCode(),
+        CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
         boolean validationSuccess = validationResult.isValid();
 
@@ -865,7 +871,7 @@ public class MeleeGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            CodeValidationResult validationMessages = TestValidator.validateTestCode(testText,
+            CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessages.isValid();
 

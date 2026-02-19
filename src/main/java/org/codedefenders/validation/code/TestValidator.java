@@ -22,11 +22,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.RecordDeclaration;
@@ -35,21 +36,18 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 
 /**
  * This class checks test code and checks whether the code is valid or not.
- * While traversing the AST, it checks every node for node test rule violations. It also collects some
- * "result variables", that can later be checked for visitor test rule violations.
- *
- * <p>
- * One TestValidator should only exist for the validation of a single test.
+ * While traversing the AST, it checks every node for node test rule violations.
  */
+@ApplicationScoped
 public class TestValidator {
 
-    public static CodeValidationResult validateTestCode(String testCode, int maxNumberOfAssertions,
+    public CodeValidationResult validateTestCode(String testCode, int maxNumberOfAssertions,
                                                         AssertionLibrary assertionLibrary) {
-        return validFor(testCode, maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
+        return validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary, TestValidationRules.getRules());
     }
 
-    static CodeValidationResult validFor(String testCode, int maxNumberOfAssertions, AssertionLibrary library,
-                                  List<TestRule> rules) {
+    CodeValidationResult validateTestCode(String testCode, int maxNumberOfAssertions, AssertionLibrary library,
+                                                 List<TestRule> rules) {
         CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.TEST);
         validationResult.setMaxNumberOfAssertions(maxNumberOfAssertions);
 
@@ -89,7 +87,7 @@ public class TestValidator {
         return validationResult;
     }
 
-    private static void handleMethodCalls(MethodCallExpr stmt, TestValidationCounter counter) {
+    private void handleMethodCalls(MethodCallExpr stmt, TestValidationCounter counter) {
         // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",
