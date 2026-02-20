@@ -24,11 +24,10 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 
+@Strategy(LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT)
 public class TestStrategyFullSuitePlusDefault extends LlmTestService {
     private TestStrategyFullSuite fullSuite;
     private TestStrategyDefault fallback;
-
-    static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
 
     @Override
     protected void run() {

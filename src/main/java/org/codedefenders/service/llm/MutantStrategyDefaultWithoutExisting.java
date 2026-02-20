@@ -29,10 +29,9 @@ import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequestScoped
+@Strategy(LlmStrategy.MUTANT_DEFAULT_WITHOUT_EXISTING)
 public class MutantStrategyDefaultWithoutExisting extends LlmMutantService {
     Logger logger = LoggerFactory.getLogger(MutantStrategyDefaultWithoutExisting.class);
-    static LlmStrategy strategy = LlmStrategy.MUTANT_DEFAULT_WITHOUT_EXISTING;
 
     private static final String systemPrompt = """
             Change the following java class in a way that is difficult to test against.

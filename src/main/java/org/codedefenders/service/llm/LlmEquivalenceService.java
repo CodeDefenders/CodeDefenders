@@ -44,9 +44,9 @@ import org.slf4j.LoggerFactory;
  * to get a better result from the LLM, after that the mutant is accepted as equivalent.
  */
 @RequestScoped
+@Strategy(LlmStrategy.EQUIVALENCE_DEFAULT)
 class LlmEquivalenceService extends LlmSubActionService {
     Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
-    static LlmStrategy strategy = LlmStrategy.EQUIVALENCE_DEFAULT;
 
     private static final String systemPrompt = """
             You are an experienced Java developer.

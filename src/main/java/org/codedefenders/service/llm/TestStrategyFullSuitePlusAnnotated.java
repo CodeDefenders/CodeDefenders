@@ -24,11 +24,10 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 
+@Strategy(LlmStrategy.TEST_FULL_SUITE_PLUS_ANNOTATED)
 public class TestStrategyFullSuitePlusAnnotated extends LlmTestService {
     private TestStrategyFullSuite fullSuite;
     private TestStrategyAnnotatedSingleTest fallback;
-
-    static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE_PLUS_ANNOTATED;
 
     @Override
     protected void run() {

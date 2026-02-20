@@ -39,10 +39,9 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-@RequestScoped
+@Strategy(LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD)
 public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
     private static Logger logger = LoggerFactory.getLogger(MutantStrategyAnnotatedSingleMethod.class);
-    static LlmStrategy strategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
 
     public static final String initialPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.

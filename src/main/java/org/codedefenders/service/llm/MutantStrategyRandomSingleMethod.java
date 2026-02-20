@@ -41,10 +41,9 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-@RequestScoped
+@Strategy(LlmStrategy.MUTANT_RANDOM_SINGLE_METHOD)
 public class MutantStrategyRandomSingleMethod extends LlmMutantService {
     private static Logger logger = LoggerFactory.getLogger(MutantStrategyRandomSingleMethod.class);
-    static LlmStrategy strategy = LlmStrategy.MUTANT_RANDOM_SINGLE_METHOD;
 
     public static final String systemPrompt = """
             Change the following piece of java code in a way that is difficult to test against.

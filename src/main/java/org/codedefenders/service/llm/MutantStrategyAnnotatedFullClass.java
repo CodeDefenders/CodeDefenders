@@ -26,9 +26,8 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
 
+@Strategy(LlmStrategy.MUTANT_ANNOTATED_FULL_CLASS)
 public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
-
-    static LlmStrategy strategy = LlmStrategy.MUTANT_ANNOTATED_FULL_CLASS;
 
     public static final String initialPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.

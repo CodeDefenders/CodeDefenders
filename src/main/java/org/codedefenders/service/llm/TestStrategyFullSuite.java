@@ -30,10 +30,9 @@ import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-@RequestScoped
+@Strategy(LlmStrategy.TEST_FULL_SUITE)
 public class TestStrategyFullSuite extends LlmTestService {
     //private final List<String> tests = new ArrayList<>();
-    static LlmStrategy strategy = LlmStrategy.TEST_FULL_SUITE;
 
     private static final String fullSuitePrompt = """
             You are an experienced Java developer.

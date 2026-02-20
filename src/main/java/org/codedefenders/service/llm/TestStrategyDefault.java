@@ -25,8 +25,8 @@ import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
+@Strategy(LlmStrategy.TEST_DEFAULT)
 public class TestStrategyDefault extends LlmTestService {
-    static LlmStrategy strategy = LlmStrategy.TEST_DEFAULT;
 
     private static final String defaultPrompt = """
             You are an experienced Java developer.

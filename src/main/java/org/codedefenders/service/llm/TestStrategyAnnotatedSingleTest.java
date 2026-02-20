@@ -25,8 +25,8 @@ import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
+@Strategy(LlmStrategy.TEST_ANNOTATED_SINGLE_TEST)
 public class TestStrategyAnnotatedSingleTest extends LlmTestService {
-    static LlmStrategy strategy = LlmStrategy.TEST_ANNOTATED_SINGLE_TEST;
     public static final String systemPrompt = """
             You are a capable java developer playing a game. You want to win by getting as many points as possible.
 

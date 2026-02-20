@@ -18,7 +18,7 @@
  */
 package org.codedefenders.service.llm;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -100,12 +100,10 @@ abstract class LlmSubActionService {
     protected static Class<? extends LlmSubActionService> getServiceClass(
             List<Class<? extends LlmSubActionService>> subclasses, LlmStrategy strategy) {
         for (var c : subclasses) {
-            try {
-                if (c.getDeclaredField("strategy").get(null) == strategy) { //TODO: Replace with annotations
+            for (Annotation a : c.getAnnotations()) {
+                if (a instanceof Strategy strategyAnnotation && strategyAnnotation.value() == strategy) {
                     return c;
                 }
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                throw new RuntimeException(e);
             }
         }
         throw new RuntimeException("Strategy is not supported " + strategy);
