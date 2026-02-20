@@ -49,5 +49,10 @@ public enum PromptType {
      * This should only be used with {@link String#format(String, Object...)} with the method name
      * as the single argument.
      */
-    DEFEND_FOCUS
+    DEFEND_FOCUS,
+
+    /**
+     * Used for Whole-test-suite-strategies.
+     */
+    DEFEND_ONE_FROM_MANY
 }

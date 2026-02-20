@@ -28,7 +28,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="profile" type="org.codedefenders.beans.user.UserProfileBean"--%>
 
-<c:set var="title" value="${profile.self ? 'My Profile' : 'Profile of ' += profile.user.username}"/>
+<c:set var="title" value="${profile.self ? 'My Profile' : 'Profile of ' += profile.user.displayName}"/>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">

@@ -18,8 +18,10 @@
  */
 package org.codedefenders.util;
 
+import java.util.List;
 import java.util.stream.Stream;
 
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -36,6 +38,54 @@ class LlmUtilsTest {
                 assertEquals(42, Constants.answer);
                 assertEquals(21, new Constants().foo());""".stripIndent();
         assertEquals(expectedTestContent, LlmUtils.extractTestContentFromReply(reply).stripIndent());
+    }
+
+    @Test
+    public void extractTestSuiteFromReply() {
+        @Language("java")
+        String reply = """
+                public class Class {
+                    String s = "toIgnore";
+                    //comment to ignore
+                    @Test
+                    public void testA() {
+                        int a = 0;
+                        int b = 1;
+                    }
+
+                    public void testB()
+                    {
+                        if (true) {
+                            int c = 2;
+                        }
+                        int d = 3;
+                    }
+
+                    public void testC()
+                    {int e = 4; int f = 5;}
+                }
+                """;
+        List<String> expectedResults = List.of(
+                """
+                        int a = 0;
+                        int b = 1;
+                        """,
+                """
+                        if (true) {
+                            int c = 2;
+                        }
+                        int d = 3;
+                        """,
+                """
+                        int e = 4;
+                        int f = 5;
+                        """
+        );
+        List<String> results = LlmUtils.multipleTestsFromReply(reply);
+        assertEquals(expectedResults.size(), results.size());
+        for (int i = 0; i < results.size(); i++) {
+            assertEquals(expectedResults.get(i).stripIndent().strip(), results.get(i).stripIndent().strip());
+        }
     }
 
     @ParameterizedTest

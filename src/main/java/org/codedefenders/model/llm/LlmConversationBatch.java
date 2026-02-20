@@ -18,17 +18,11 @@
  */
 package org.codedefenders.model.llm;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
-
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.UserMessage;
 
 /**
  * Contains mutable lists of {@link LlmConversation}s, representing the back and forth
@@ -45,9 +39,17 @@ public class LlmConversationBatch {
     private final AbstractGame game;
     private final SimpleUser user;
 
-    public LlmConversationBatch(AbstractGame game, SimpleUser user) {
+    private final LlmStrategy strategy;
+
+    /**
+     * An undefined item that can be used in any way necessary to transport data between actions.
+     */
+    private Object baggage;
+
+    public LlmConversationBatch(AbstractGame game, SimpleUser user, LlmStrategy strategy) {
         this.game = game;
         this.user = user;
+        this.strategy = strategy;
     }
 
     public void remove(LlmConversation toRemove) {
@@ -71,9 +73,17 @@ public class LlmConversationBatch {
      */
     public LlmConversation getConversation(PromptType type) {
         if (!messageLists.containsKey(type)) {
-            LlmConversation con = new LlmConversation(type, game, user, "ALPHA", true, false);
+            LlmConversation con = new LlmConversation(type, game, user, strategy, true, false, 0, 0);
             messageLists.put(type, con);
         }
         return messageLists.get(type);
+    }
+
+    public Object getBaggage() {
+        return baggage;
+    }
+
+    public void setBaggage(Object baggage) {
+        this.baggage = baggage;
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service.llm;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -30,6 +31,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
@@ -69,15 +71,18 @@ abstract class LlmSubActionService {
     protected LlmConversation conversation = null;
     protected SimpleUser user;
     protected Random random;
-    protected int numberOfRepairAttempts;
+    protected int numberOfRepairAttempts = 3;
+    //protected LlmStrategy strategy;
 
     protected boolean disabled = false;
 
     protected void run() {
         if (!disabled) {
-            String reply = generate();
-            updateGame();
-            submit(reply);
+            Optional<String> reply = generate();
+            if (reply.isPresent()) {
+                updateGame();
+                submit(reply.get());
+            }
 
             if (conversation != null) {
                 conversationRepository.saveConversation(conversation);
@@ -88,12 +93,26 @@ abstract class LlmSubActionService {
         }
     }
 
-    protected abstract String generate();
+    protected abstract Optional<String> generate();
 
     protected abstract void submit(String reply);
 
+    protected static Class<? extends LlmSubActionService> getServiceClass(
+            List<Class<? extends LlmSubActionService>> subclasses, LlmStrategy strategy) {
+        for (var c : subclasses) {
+            try {
+                if (c.getDeclaredField("strategy").get(null) == strategy) { //TODO: Replace with annotations
+                    return c;
+                }
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        throw new RuntimeException("Strategy is not supported " + strategy);
+    }
+
     protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
-                        Random random, int numberOfRepairAttempts) {
+                        Random random) {
         if (model.isPresent()) {
             this.model = model.get();
         } else {
@@ -103,8 +122,9 @@ abstract class LlmSubActionService {
         this.user = user;
         this.game = game;
         this.conversationBatch = conversation;
+        //this.strategy = strategy;
         this.random = random;
-        this.numberOfRepairAttempts = numberOfRepairAttempts;
+        //this.numberOfRepairAttempts = numberOfRepairAttempts;
     }
 
     protected void updateGame() {

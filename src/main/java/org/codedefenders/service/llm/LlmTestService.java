@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 
-import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.analysis.gameclass.MethodDescription;
@@ -33,17 +32,15 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.llm.PromptType;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@RequestScoped
-class LlmTestService extends LlmSubActionService {
+abstract class LlmTestService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
 
     private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)"; //TODO Make this adjustable?
@@ -55,42 +52,19 @@ class LlmTestService extends LlmSubActionService {
     MutantRepository mutantRepository;
 
 
-    @Override
-    protected String generate() {
-
-        PromptType promptType = getCorrectDefendPromptType();
-        setConversationType(promptType);
-        resetConversationAfterTooManyTries();
-        if (conversation.isEmpty()) {
-            String systemMessage = getSystemPrompt(model, promptType);
-            if (promptType == PromptType.DEFEND_FOCUS) {
-                Optional<String> methodName = getRandomMethodWithLivingMutant();
-                if (methodName.isPresent()) {
-                    systemMessage = String.format(systemMessage, methodName.get());
-                }
-            }
-            conversation.addSystemMessage(systemMessage, model);
-
-            conversation.addUserMessage(getSourceCodeForUserMessage(), model);
-        }
-
-        String response = promptService.getResponse(model, conversation);
-        return LlmUtils.testTemplateFromResponse(response, game);
-    }
-
     /**
      * This method submits the generated test code to the game. It should only be called from inside an LLM action,
      * after the test code has been generated and the game has been refreshed.
      *
-     * @param testSrc      The formatted test code. All formatting heuristics should have already been performed.
+     * @param testSrc The formatted test code. All formatting heuristics should have already been performed.
      */
     @Override
     protected void submit(String testSrc) {
         switch (conversation.getType()) {
-            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS -> {
+            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, DEFEND_ONE_FROM_MANY -> {
             }
-            default -> throw new RuntimeException("Conversation during test submission may not be of type " +
-                    conversation.getType());
+            default -> throw new RuntimeException("Conversation during test submission may not be of type "
+                    + conversation.getType());
         }
         try {
             GameManagingUtils.CreateBattlegroundTestResult result;
@@ -101,41 +75,19 @@ class LlmTestService extends LlmSubActionService {
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
-                finishConversation(true);
+                conversation.setTestId(result.test().orElseThrow().getId());
+                onSubmitSuccess();
             } else {
-                StringBuilder correction = new StringBuilder();
-                switch (result.failureReason().orElseThrow()) {
-                    case VALIDATION_FAILED -> {
-                        correction.append("Your test has violated these rules: \n");
-                        result.validationErrorMessages().orElseThrow().forEach(
-                                correction::append
-                        );
-
-                    }
-                    case COMPILATION_FAILED ->
-                            correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
-                    case TEST_DID_NOT_PASS_ON_CUT ->
-                            correction.append("Your test did not pass on the original code for the following reason: ")
-                                    .append(result.testCutError().orElseThrow());
-                }
-                correction.append("\nFix these problems.");
-                conversation.addSystemMessage(correction.toString(), model);
+                onSubmitFailure(result, testSrc);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    protected abstract void onSubmitSuccess();
 
-    private PromptType getCorrectDefendPromptType() {
-        if (model.isDefenderMethodFocus() && hasLivingMutants()) {
-            return PromptType.DEFEND_FOCUS;
-        }
-        if (model.isDefenderDependencies() && !game.getCUT().getDependencyNames().isEmpty()) {
-            return PromptType.DEFEND_DEPENDENCIES;
-        }
-        return PromptType.DEFEND_DEFAULT;
-    }
+    protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc);
 
     /**
      * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
@@ -157,8 +109,8 @@ class LlmTestService extends LlmSubActionService {
                 }
             }
         }
-        mapping.elementsOutsideMethods.stream().
-                map(mutantId -> mutantRepository.getMutantById(mutantId))
+        mapping.elementsOutsideMethods.stream()
+                .map(mutantId -> mutantRepository.getMutantById(mutantId))
                 .filter(mutant -> mutant.isAlive() && mutant.getCreatorId() != user.getId())
                 .forEach(mutant -> listOfPossibilities.add(OUTSIDE_OF_METHOD_DESCRIPTION));
         return listOfPossibilities;
@@ -167,7 +119,7 @@ class LlmTestService extends LlmSubActionService {
     /**
      * Returns if the game has living mutants that are not created by the user.
      */
-    private boolean hasLivingMutants() {
+    protected boolean hasLivingMutants() {
         return gameService.getMutants(user, game).stream().anyMatch(
                 mutantDTO -> mutantDTO.getState() == Mutant.State.ALIVE);
     }
@@ -176,7 +128,7 @@ class LlmTestService extends LlmSubActionService {
      * Returns a random method that contains a living mutant that hasn't been created by the user. The more living
      * mutants there are in a method, the more likely it is to be selected.
      */
-    private Optional<String> getRandomMethodWithLivingMutant() {
+    protected Optional<String> getRandomMethodWithLivingMutant() {
         List<String> methods = getMethodsWithLivingMutants();
         if (!methods.isEmpty()) {
             return Optional.of(methods.get(random.nextInt(methods.size())));
@@ -184,4 +136,37 @@ class LlmTestService extends LlmSubActionService {
             return Optional.empty();
         }
     }
+
+    protected void standardSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+        StringBuilder correction = new StringBuilder("This test could not be submitted: \n" + testSrc);
+        switch (result.failureReason().orElseThrow()) {
+            case VALIDATION_FAILED -> {
+                correction.append("It has violated these rules: \n");
+                result.validationErrorMessages().orElseThrow().forEach(
+                        correction::append
+                );
+
+            }
+            case COMPILATION_FAILED ->
+                    correction.append("It has failed to compile for this reason: ").append(result.compilationError());
+            case TEST_DID_NOT_PASS_ON_CUT ->
+                    correction.append("It did not pass on the original code for the following reason: ")
+                            .append(result.testCutError().orElseThrow());
+            default -> throw new RuntimeException("Checkstyle");
+        }
+        correction.append("\nFix these problems.");
+        conversation.addSystemMessage(correction.toString(), model);
+    }
+
+    static Class<? extends LlmTestService> getService(LlmStrategy strategy) {
+        List<Class<? extends LlmSubActionService>> l = List.of(
+                TestStrategyDefault.class,
+                TestStrategyAnnotatedSingleTest.class,
+                TestStrategyFullSuite.class,
+                TestStrategyFullSuitePlusDefault.class,
+                TestStrategyFullSuitePlusAnnotated.class
+                );
+        return getServiceClass(l, strategy).asSubclass(LlmTestService.class);
+    }
+
 }

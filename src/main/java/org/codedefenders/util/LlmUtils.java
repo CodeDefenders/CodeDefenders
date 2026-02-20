@@ -18,15 +18,22 @@
  */
 package org.codedefenders.util;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
 
 /**
  * Utility class for static methods that can be used for llm players.
@@ -59,7 +66,11 @@ public class LlmUtils {
             String methodContent = ast.get().findAll(MethodDeclaration.class).stream()
                     .flatMap(method -> {
                         var range = method.getRange().orElseThrow();
-                        return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                        if (range.begin.line < range.end.line - 1) {
+                            return lines.subList(range.begin.line + 1, range.end.line - 1).stream();
+                        } else if (range.begin.line <= range.end.line) {
+                            return lines.subList(range.begin.line, range.end.line).stream();
+                        } else return lines.stream();
                     })
                     .collect(Collectors.joining("\n"));
             if (!methodContent.isEmpty()) {
@@ -82,7 +93,7 @@ public class LlmUtils {
         return extractMutantFromReply(reply, firstDependencyName);
     }
 
-    static String extractMutantFromReply(String reply, String firstDependencyName) {
+    public static String extractMutantFromReply(String reply, String firstDependencyName) {
         String formattedResult = reply.replace("```java\n", "")
                 .replace("```java", "")
                 .replace("```\n", "")
@@ -97,9 +108,38 @@ public class LlmUtils {
         return formattedResult;
     }
 
-    public static String testTemplateFromResponse(String response, AbstractGame game) {
-        response = LlmUtils.extractTestContentFromReply(response);
-        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, response);
+    public static String testTemplateFromReply(String reply, AbstractGame game) {
+        reply = LlmUtils.extractTestContentFromReply(reply);
+        return insertIntoTestTemplate(game, reply);
+    }
+
+    public static List<String> suiteOfTestTemplatesFromReply(String reply, AbstractGame game) {
+        List<String> testContents = multipleTestsFromReply(reply);
+        return testContents.stream().map(s -> insertIntoTestTemplate(game, s)).toList();
+    }
+
+    static List<String> multipleTestsFromReply(String reply) {
+        List<String> testContents = new ArrayList<>();
+
+        reply = reply.replace("```java", "").replace("```", "");
+        var ast = JavaParserUtils.parse(reply);
+        if (ast.isEmpty() || ast.get().getParsed() == Node.Parsedness.UNPARSABLE) {
+            return testContents;
+        } else {
+            List<MethodDeclaration> methods = ast.get().findAll(MethodDeclaration.class);
+            for (MethodDeclaration m : methods) {
+                Optional<BlockStmt> body = m.getBody();
+                if (body.isPresent()) {
+                    String lines = body.get().getStatements().stream().map(Node::toString).collect(Collectors.joining("\n"));
+                    testContents.add(lines);
+                }
+            }
+        }
+        return testContents;
+    }
+
+    private static String insertIntoTestTemplate(AbstractGame game, String toInsert) {
+        return game.getCUT().getTestTemplate().replace(Constants.TEST_TEMPLATE_PLACEHOLDER, toInsert);
     }
 
     private static int indexOfDependencyDeclaration(String code, String dependencyName) {
@@ -152,6 +192,88 @@ public class LlmUtils {
     private static boolean containsAnyOf(String line, String... word) {
         for (String w : word) {
             if (containsWord(line, w)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String annotatedCut(AbstractGame game) {
+        String[] lines = game.getCUT().getSourceCode().split("\n");
+        int[] coverage = new int[lines.length];
+        int[] killedLines = new int[lines.length];
+        int[] livingLines = new int[lines.length];
+
+        for (Test t : game.getTests()) {
+            LineCoverage lc = t.getLineCoverage();
+            for (int i : lc.getLinesCovered()) {
+                i = Math.min(i, coverage.length - 1);
+                coverage[i - 1]++;
+            }
+        }
+
+        for (Mutant m : game.getKilledMutants()) {
+            for (int i : m.getLines()) {
+                i = Math.min(i, killedLines.length - 1);
+                killedLines[i - 1]++;
+            }
+        }
+        for (Mutant m : game.getAliveMutants()) {
+            for (int i : m.getLines()) {
+                i = Math.min(i, livingLines.length - 1);
+                livingLines[i - 1]++;
+            }
+        }
+
+        for (int i = 0; i < lines.length; i++) {
+            lines[i] += "//coverage:%d, killed:%d, alive:%d".formatted(coverage[i], killedLines[i], livingLines[i]);
+        }
+
+        return String.join("\n", lines);
+    }
+
+    public static String annotatedMethodDescriptions(AbstractGame game, CompilationUnit cu) {
+        List<MethodDeclaration> declarations = new ArrayList<>();
+        cu.stream().forEach(node -> {
+            if (node instanceof MethodDeclaration decl) {
+                declarations.add(decl);
+            }
+        });
+
+        List<String> resultList = new ArrayList<>();
+
+        for (MethodDeclaration decl : declarations) {
+            int alive = 0;
+            int killed = 0;
+            List<Mutant> mutants = game.getMutants();
+            for (Mutant m : mutants) {
+                if (isInMethod(decl, m.getLines())) {
+                    if (m.isAlive()) {
+                        alive++;
+                    } else {
+                        killed++;
+                    }
+                }
+            }
+            int coverage = 0;
+            for (Test t : game.getTests()) {
+                if (isInMethod(decl, t.getLineCoverage().getLinesCovered())) {
+                    coverage++;
+                }
+            }
+            resultList.add(decl.getDeclarationAsString());
+            resultList.add("coverage: " + coverage);
+            resultList.add("killed: " + killed);
+            resultList.add("alive: " + alive);
+        }
+        return String.join("\n", resultList);
+    }
+
+    private static boolean isInMethod(MethodDeclaration decl, List<Integer> lines) {
+        int begin = decl.getBegin().orElseThrow().line;
+        int end = decl.getEnd().orElseThrow().line;
+        for (int i : lines) {
+            if (i >= begin && i <= end) {
                 return true;
             }
         }

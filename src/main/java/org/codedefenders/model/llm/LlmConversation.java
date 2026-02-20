@@ -32,12 +32,13 @@ import org.codedefenders.util.CDIUtil;
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 
 /**
  * This represents the prompts and responses of an LLM.
  */
 public class LlmConversation {
-    private final String strategy;
+    private final LlmStrategy strategy;
     private final AbstractGame game;
     private final SimpleUser user;
     private final List<ChatMessageDTO> messages = new ArrayList<>();
@@ -49,14 +50,16 @@ public class LlmConversation {
     private int mutantId;
 
 
-    public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, String strategy,
-                           boolean active, boolean success) {
+    public LlmConversation(PromptType type, AbstractGame game, SimpleUser user, LlmStrategy strategy,
+                           boolean active, boolean success, int testId, int mutantId) {
         this.type = type;
         this.game = game;
         this.user = user;
         this.strategy = strategy;
         this.active = active;
         this.success = success;
+        this.testId = testId;
+        this.mutantId = mutantId;
     }
 
     public boolean isEmpty() {
@@ -92,7 +95,7 @@ public class LlmConversation {
     }
 
     public void addUserMessage(String msg, LlModel model) {
-        add(SystemMessage.from(msg), model);
+        add(UserMessage.from(msg), model);
     }
 
     public ChatMessage[] toArray() {
@@ -124,6 +127,18 @@ public class LlmConversation {
         CDIUtil.getBeanFromCDI(LlmConversationRepository.class).saveConversation(this);
     }
 
+    public boolean lastMessageWasError() {
+        if (isEmpty()) {
+            return false;
+        } else {
+            return !(messages.get(messages.size() - 1).msg() instanceof AiMessage);
+        }
+    }
+
+    public boolean hasSystemMessage() {
+        return messages.stream().anyMatch(m -> m.msg() instanceof SystemMessage);
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -132,7 +147,7 @@ public class LlmConversation {
         return String.join("", messages.stream().map(m -> "[" + m + "]").toList());
     }
 
-    public String getStrategy() {
+    public LlmStrategy getStrategy() {
         return strategy;
     }
 

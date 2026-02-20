@@ -29,7 +29,6 @@ import com.google.gson.annotations.Expose;
  * Information about a specific Large Language Model that can be used by an LLM Defender or an LLM Attacker.
  * Prompts can be customized for each model, if not specified they inherit the values of the default model, which is
  * obtained by {@link org.codedefenders.persistence.database.LlmRepository#getDefaultModel()}
- * TODO: This could be made easier by using a {@code Map<PromptType, String>} or something similar
  */
 public class LlModel {
     @Expose

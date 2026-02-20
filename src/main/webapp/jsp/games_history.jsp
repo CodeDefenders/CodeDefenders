@@ -147,7 +147,7 @@
                                                 PlayerScore playerScore = attackerScores.getOrDefault(playerId, zeroDummyScore);
                                     %>
                                         <tr>
-                                            <td><%=attacker.getUser().getUsername()%></td>
+                                            <td><%=attacker.getUser().getDisplayName()%></td>
                                             <td class="text-end"><%=playerScore.getQuantity() %></td>
                                             <td class="text-end"><%=playerScore.getMutantKillInformation().split("/")[0]%></td>
                                             <td class="text-end"><%=playerScore.getTotalScore()%></td>
@@ -179,7 +179,7 @@
                                                 PlayerScore playerScore = defenderScores.getOrDefault(playerId, zeroDummyScore);
                                     %>
                                         <tr>
-                                            <td><%=defender.getUser().getUsername()%></td>
+                                            <td><%=defender.getUser().getDisplayName()%></td>
                                             <td class="text-end"><%=playerScore.getQuantity() %></td>
                                             <td class="text-end"><%=playerScore.getMutantKillInformation()%></td>
                                             <td class="text-end"><%=playerScore.getTotalScore()%></td>
@@ -282,7 +282,7 @@
                                             for (Player player : players) {
                                     %>
                                         <tr>
-                                            <td><%=player.getUser().getUsername()%></td>
+                                            <td><%=player.getUser().getDisplayName()%></td>
                                             <td class="text-end"><%=player.getPoints()%></td>
                                         </tr>
                                     <%

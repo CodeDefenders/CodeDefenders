@@ -26,6 +26,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
@@ -33,6 +34,7 @@ import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +50,7 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
  * technical details of communication with the LLM from outside classes.
  */
 @ApplicationScoped
-class LlmPromptService {
+public class LlmPromptService {
     private static final Logger logger = LoggerFactory.getLogger(LlmPromptService.class);
 
     //Maps model name to ChatModel
@@ -64,7 +66,8 @@ class LlmPromptService {
         for (LlModel m : models) {
             if (m.getType() == LlmType.OPENAI) {
                 openaiModels.put(m, OpenAiChatModel.builder()
-                        .apiKey(config.getOpenaiApiKey())
+                        //.apiKey(config.getOpenaiApiKey())
+                        .apiKey(AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.OPENAI_KEY).getStringValue())
                         .modelName(m.getName())
                         .build());
             }
@@ -82,7 +85,7 @@ class LlmPromptService {
      * This method will block until the LLM has returned a result, or it has timed out
      * (usually after 3 Minutes).
      */
-    String getResponse(LlModel model, LlmConversation conversation) {
+    public String getResponse(LlModel model, LlmConversation conversation) {
         ChatMessage[] chatMessages = conversation.toArray();
 
         int inputLength = 0;

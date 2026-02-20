@@ -100,7 +100,7 @@ class TestAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
+        modal.title.innerText = `Test ${test.id} (by ${"anonymous"/*test.creator.name*/})`;
         modal.body.innerHTML =
                 `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
@@ -216,7 +216,7 @@ class TestAccordion {
 
     /** @private */
     _renderCreator (data) {
-        return data.creator.name;
+        return "anonymous";//data.creator.name;
     }
 
     /** @private */

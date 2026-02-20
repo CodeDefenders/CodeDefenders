@@ -44,6 +44,10 @@ public class SimpleUser {
         return name;
     }
 
+    public String getDisplayName() {
+        return "anonymous"; //TODO WIEDER ENTFERNEN!!
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(id);

@@ -19,8 +19,10 @@
 package org.codedefenders.service.llm;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -36,13 +38,17 @@ import jakarta.inject.Inject;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -86,11 +92,22 @@ public class LlmManagerService {
     private final Map<Integer, String> defenderErrorMessages = new HashMap<>();
     private final Map<Integer, String> attackerErrorMessages = new HashMap<>();
 
+    /*
+        Only for the thesis. Lists all gameIds that are in equivalent-only-mode
+     */
+    private final List<Integer> equivalentOnlyGames = new ArrayList<>();
+
     @Inject
     private GameRepository gameRepository;
 
     @Inject
+    private MutantRepository mutantRepo;
+
+    @Inject
     private UserService userService;
+
+    @Inject
+    private GameService gameService;
 
     @Inject
     public LlmManagerService() {
@@ -104,7 +121,20 @@ public class LlmManagerService {
      * active model.
      */
     public Optional<LlModel> getModelForGame(AbstractGame game, Role role) {
-        return Optional.ofNullable(getCorrectMap(role).get(game.getId()));
+        return getModelForGame(game.getId(), role);
+    }
+
+    public Optional<LlModel> getModelForGame(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectMap(role).get(gameId));
+    }
+
+    public void setEquivalentOnly(int gameId) {
+        if (activeLlmAttackers.containsKey(gameId)) {
+            equivalentOnlyGames.add(gameId);
+        }
+        if (activeLlmDefenders.containsKey(gameId)) {
+            finishPlayer(gameId, Role.DEFENDER);
+        }
     }
 
 
@@ -137,8 +167,8 @@ public class LlmManagerService {
      * Returns the minimum number of seconds between two actions of the same llm thread.
      */
     private int getLlmActionInterval() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
-                .getIntValue();
+        return (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LLM_INTERVAL_SECONDS)
+                .getIntValue());
     }
 
     private boolean isLlmPlayerActive(AbstractGame game, Role role) {
@@ -164,9 +194,23 @@ public class LlmManagerService {
         }
     }
 
-    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
+    public void setPlayerModel(AbstractGame game, Role role, LlModel model, LlmStrategy strategy) {
         Map<Integer, LlModel> m = getCorrectMap(role);
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
+
+        LlmStrategy testStrategy = role == Role.DEFENDER ? strategy : null;
+        LlmStrategy mutantStrategy = role == Role.ATTACKER ? strategy : null;
+        LlmStrategy equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT; //TODO Adjustable
+        LlmStrategy conStrategy;
+        if (strategy != null) {
+            conStrategy = strategy;
+        } else { //TODO Define default strategies elsewhere
+            if (role == Role.DEFENDER) {
+                conStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
+            } else {
+                conStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
+            }
+        }
 
         if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
             m.put(game.getId(), model);
@@ -183,8 +227,14 @@ public class LlmManagerService {
             final Role finalRole = role;
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversationBatch(game, user), new Random())));
+                    new LlmConversationBatch(game, user, conStrategy),
+                    testStrategy, mutantStrategy, equivalenceStrategy,
+                    new Random())));
         }
+    }
+
+    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
+        setPlayerModel(game, role, model, null);
     }
 
     public void finishPlayer(int gameId, Role role) {
@@ -217,8 +267,12 @@ public class LlmManagerService {
         getCorrectErrorMap(role).put(game.getId(), timestamp + ": " + e.toString());
     }
 
+    public Optional<String> getErrorMessage(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectErrorMap(role).get(gameId));
+    }
+
     public Optional<String> getErrorMessage(AbstractGame game, Role role) {
-        return Optional.ofNullable(getCorrectErrorMap(role).get(game.getId()));
+        return getErrorMessage(game.getId(), role);
     }
 
     /**
@@ -227,10 +281,26 @@ public class LlmManagerService {
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
      */
-    public void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
-                             final Random random) {
+    private void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
+                              final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
+                              final LlmStrategy equivalenceStrategy, final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
-        long timeToStartNextThread = getLlmActionInterval() * 1000L + System.currentTimeMillis();
+
+        LlmStrategy timeModStrategy = role == Role.DEFENDER ? testStrategy : mutantStrategy; //TODO melee games
+        double timeModifier = timeModStrategy != null ? timeModStrategy.getTimeModifier() : 1;
+
+
+        long timeToStartNextThread = (int) (getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
+
+        if (equivalentOnlyGames.contains(game.getId())) {
+            game.getAliveMutants().stream()
+                    .filter(m -> m.getCreatorId() == Constants.AI_ATTACKER_USER_ID)
+                    .forEach(m -> {
+                        m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                        mutantRepo.updateMutant(m);
+                        mutantRepo.insertEquivalence(m, Constants.DUMMY_CREATOR_USER_ID);
+                    });
+        }
 
         int userId = switch (role) {
             case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
@@ -242,10 +312,19 @@ public class LlmManagerService {
 
         if (isLlmPlayerActive(game, role)) {
             try {
-                singleLlmAction(game, user, role, conversation, random);
-                long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+                singleLlmAction(game, user, role, conversation,
+                        testStrategy, mutantStrategy, equivalenceStrategy, random);
+                long timeToWait;
+                if (equivalentOnlyGames.contains(game.getId())) {
+                    timeToWait = 0;
+                } else {
+                    timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
+                }
+
                 organizerExecutor.schedule(() -> llmExecutor.execute(
-                                () -> runLlmAction(gameRepository.getGame(game.getId()), role, conversation, random)),
+                                () -> runLlmAction(
+                                        gameRepository.getGame(game.getId()), role, conversation,
+                                        testStrategy, mutantStrategy, equivalenceStrategy, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
@@ -267,7 +346,9 @@ public class LlmManagerService {
         } else if (gameRepository.isGameCreated(game.getId())) {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
-                            () -> runLlmAction(gameRepository.getGame(game.getId()), role, conversation, random)),
+                            () -> runLlmAction(
+                                    gameRepository.getGame(game.getId()), role, conversation,
+                                    testStrategy, mutantStrategy, equivalenceStrategy, random)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
             finishPlayer(game.getId(), role);
@@ -276,15 +357,24 @@ public class LlmManagerService {
 
     private void singleLlmAction(AbstractGame game, final SimpleUser user, final Role role,
                                  final LlmConversationBatch conversation,
+                                 LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
+        if (testStrategy == null) {
+            testStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT; //TODO Define default strategies elsewhere
+        }
+        if (mutantStrategy == null) {
+            mutantStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
+        }
+        if (equivalenceStrategy == null) {
+            equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
+        }
+
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
 
         try {
-            int normalNumberOfTries = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.LLM_NORMAL_PROMPT_NUMBER_OF_TRIES).getIntValue();
-            int equivalenceNumberOfTries = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES).getIntValue();
+            //int normalNumberOfTries = strategy.getNormalNumberOfTries();
+            //int equivalenceNumberOfTries = strategy.getEquivalenceNumberOfTries();
 
             LlmEquivalenceService equivalenceService;
             LlmMutantService mutantService;
@@ -293,21 +383,29 @@ public class LlmManagerService {
             Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
             Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
 
-            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.class);
-            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.class);
-            testService = CDIUtil.getBeanFromCDI(LlmTestService.class);
 
-            equivalenceService.init(game, user, attackModel, conversation, random, equivalenceNumberOfTries);
-            mutantService.init(game, user, attackModel, conversation, random, normalNumberOfTries);
-            testService.init(game, user, defendModel, conversation, random, normalNumberOfTries);
+            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.getService(equivalenceStrategy));
+            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.getService(mutantStrategy));
+            testService = CDIUtil.getBeanFromCDI(LlmTestService.getService(testStrategy));
+
+            equivalenceService.init(game, user, attackModel, conversation, random);
+            mutantService.init(game, user, attackModel, conversation, random);
+            testService.init(game, user, defendModel, conversation, random);
 
             if (role == Role.DEFENDER) {
                 testService.claimEquivalent();
                 testService.run();
             } else {
                 equivalenceService.run();
+                if (equivalentOnlyGames.contains(game.getId()) && gameService.getFlaggedMutants(user, game).isEmpty()) {
+                    equivalentOnlyGames.remove((Integer) game.getId());
+                    finishPlayer(game.getId(), role);
+                    return;
+                }
                 if (role == Role.ATTACKER) {
-                    mutantService.run();
+                    if (!equivalentOnlyGames.contains(game.getId())) {
+                        mutantService.run();
+                    }
                 } else {
                     boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
                     boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;

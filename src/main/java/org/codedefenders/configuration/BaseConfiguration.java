@@ -63,12 +63,9 @@ public abstract class BaseConfiguration {
     protected Integer parallelizeKillmapCount; // TODO(kreismar): is this needed?
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
-    protected String llmOpenaiApiKey;
-    protected String llmOpenaiModels;
-    protected List<String> _llmOpenaiModels;
+    //protected String llmOpenaiModels;
     protected String llmOllamaServer;
-    protected String llmOllamaModels;
-    protected List<String> _llmOllamaModels;
+    //protected String llmOllamaModels;
 
     @Deprecated
     protected String authAdminRole;
@@ -172,20 +169,18 @@ public abstract class BaseConfiguration {
         return mutantCoverage;
     }
 
+    //TODO Make this dynamic via LLM settings!
     public List<String> getLlmOpenaiModels() {
-        return _llmOpenaiModels;
+        return List.of("gpt-4.1-nano", "gpt-5-nano", "gpt-5.2");
     }
 
+    //TODO s.o.
     public List<String> getLlmOllamaModels() {
-        return _llmOllamaModels;
+        return List.of();
     }
 
     public String getLlmLocalServer() {
         return llmOllamaServer;
-    }
-
-    public String getOpenaiApiKey() {
-        return llmOpenaiApiKey;
     }
 
     public int getNumberOfKillmapThreads() {

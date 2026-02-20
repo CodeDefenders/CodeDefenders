@@ -240,6 +240,7 @@ public class Configuration extends BaseConfiguration {
                 }
             }
 
+            /* TODO: Make this dynamic again!! But via Admin settings, not config
             if (_llmOpenaiModels == null && llmOpenaiModels != null && !llmOpenaiModels.isEmpty()) {
                 _llmOpenaiModels = Arrays.stream(llmOpenaiModels.split(";")).toList();
             } else {
@@ -249,7 +250,8 @@ public class Configuration extends BaseConfiguration {
                 _llmOllamaModels = Arrays.stream(llmOllamaModels.split(";")).toList();
             } else {
                 _llmOllamaModels = List.of();
-            }
+            }*/
+
 
             if (JavaVersionUtils.getJavaMajorVersion() < 17) {
                 validationErrors.add("Unsupported java version! CodeDefenders needs at least Java 17.");

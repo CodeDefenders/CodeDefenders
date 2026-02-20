@@ -245,8 +245,13 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The number of attempts the LLM player will make to fix an invalid equivalence duel test.";
             }
-        }
-        ;
+        },
+        OPENAI_KEY {
+            @Override
+            public String toString() {
+                return "The API key for OpenAI to be used by LLM players";
+            }
+        };
 
         public String getReadableName() {
             return Arrays.stream(this.name().split("_"))
