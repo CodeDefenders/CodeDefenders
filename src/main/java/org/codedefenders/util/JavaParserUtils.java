@@ -34,6 +34,7 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.Node.Parsedness;
 import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import com.github.javaparser.printer.Printer;
@@ -53,7 +54,7 @@ public class JavaParserUtils {
         return parser;
     }
 
-    public static <T> Optional<T> parse(String code, Function<String, ParseResult<T>> parseFun) {
+    public static <T extends Node> Optional<T> parse(String code, Function<String, ParseResult<T>> parseFun) {
         ParseResult<T> parseResult = parseFun.apply(code);
         if (!parseResult.isSuccessful()) {
             List<Problem> problems = parseResult.getProblems();
@@ -65,8 +66,10 @@ public class JavaParserUtils {
                         .collect(Collectors.joining(System.lineSeparator()));
                 logger.info("Failed to parse Java code. Problems:{}{}", System.lineSeparator(), problemsMessage);
             }
+            return Optional.empty();
         }
-        return parseResult.getResult();
+        return parseResult.getResult()
+            .filter(node -> node.getParsed() != Parsedness.UNPARSABLE);
     }
 
     public static Optional<CompilationUnit> parse(String code) {

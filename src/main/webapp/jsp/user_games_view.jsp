@@ -746,20 +746,7 @@
     %>
 
     <script type="module">
-        import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
-
-
-        $(document).ready(function () {
-            new DataTable('#tableMPGames', {
-                "paging": false,
-                "searching": false,
-                "order": [[5, "asc"]],
-                "language": {
-                    "info": ""
-                }
-            });
-        });
 
         $('table td.toggle-details').on('click', function () {
             const details = $('.' + $(this).attr('id'));

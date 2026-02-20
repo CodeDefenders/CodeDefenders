@@ -63,14 +63,13 @@
             userId: ${login.userId}
         });
 
-        const achievementNotifications = new AchievementNotifications(
-            "${url.forPath("/images/achievements/")}",
-            "${url.forPath(Paths.USER_PROFILE)}"
-        );
+
 
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);
-            achievementNotifications.showAchievementNotification(event.achievement);
+            AchievementNotifications.showAchievementNotification(event.achievement,
+                    "${url.forPath("/images/achievements/")}",
+                    "${url.forPath(Paths.USER_PROFILE)}");
             socket.send('achievement.ClientAchievementNotificationShownEvent', {
                 achievementId: event.achievement.achievementId
             });

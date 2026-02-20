@@ -220,41 +220,34 @@
             </tr>
             </thead>
             <tbody>
-                <c:choose>
-                    <c:when test="${empty gameClasses}">
+                <c:if test="${not empty gameClasses}">
+                    <c:forEach var="clazz" items="${gameClasses}">
+                        <c:set var="mutationDiff" value="${avgMutationDifficulties.get(clazz.id)}"/>
+                        <c:set var="testingDiff" value="${avgTestDifficulties.get(clazz.id)}"/>
+
+                        <%-- TODO: Remove the DB accesses here --%>
+                        <c:set var="numDeps" value="${gameClassRepo.getMappedDependencyIdsForClassId(clazz.id).size()}"/>
+                        <c:set var="numTests" value="${gameClassRepo.getMappedTestIdsForClassId(clazz.id).size()}"/>
+                        <c:set var="numMutants" value="${gameClassRepo.getMappedMutantIdsForClassId(clazz.id).size()}"/>
+
                         <tr>
-                            <td colspan="100" class="text-center">No classes uploaded.</td>
+                            <td>${clazz.id}</td>
+                            <td>
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-${clazz.id}">
+                                    ${clazz.baseName.equals(clazz.alias)
+                                        ? clazz.baseName
+                                        : clazz.baseName += ' (alias ' += clazz.alias += ')'}
+                                </a>
+                                <t:class_modal classId="${clazz.id}" classAlias="${clazz.alias}" htmlId="class-modal-${clazz.id}"/>
+                            </td>
+                            <td>${numDeps}/${numTests}/${numMutants}</td>
+                            <td>${mutationDiff != null ? String.valueOf(mutationDiff) : ''}</td>
+                            <td>${testingDiff != null ? String.valueOf(testingDiff) : ''}</td>
+                            <td>${clazz.testingFramework.description}</td>
+                            <td>${clazz.assertionLibrary.description}</td>
                         </tr>
-                    </c:when>
-                    <c:otherwise>
-                        <c:forEach var="clazz" items="${gameClasses}">
-                            <c:set var="mutationDiff" value="${avgMutationDifficulties.get(clazz.id)}"/>
-                            <c:set var="testingDiff" value="${avgTestDifficulties.get(clazz.id)}"/>
-
-                            <%-- TODO: Remove the DB accesses here --%>
-                            <c:set var="numDeps" value="${gameClassRepo.getMappedDependencyIdsForClassId(clazz.id).size()}"/>
-                            <c:set var="numTests" value="${gameClassRepo.getMappedTestIdsForClassId(clazz.id).size()}"/>
-                            <c:set var="numMutants" value="${gameClassRepo.getMappedMutantIdsForClassId(clazz.id).size()}"/>
-
-                            <tr>
-                                <td>${clazz.id}</td>
-                                <td>
-                                    <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-${clazz.id}">
-                                        ${clazz.baseName.equals(clazz.alias)
-                                            ? clazz.baseName
-                                            : clazz.baseName += ' (alias ' += clazz.alias += ')'}
-                                    </a>
-                                    <t:class_modal classId="${clazz.id}" classAlias="${clazz.alias}" htmlId="class-modal-${clazz.id}"/>
-                                </td>
-                                <td>${numDeps}/${numTests}/${numMutants}</td>
-                                <td>${mutationDiff != null ? String.valueOf(mutationDiff) : ''}</td>
-                                <td>${testingDiff != null ? String.valueOf(testingDiff) : ''}</td>
-                                <td>${clazz.testingFramework.description}</td>
-                                <td>${clazz.assertionLibrary.description}</td>
-                            </tr>
-                        </c:forEach>
-                    </c:otherwise>
-                </c:choose>
+                    </c:forEach>
+                </c:if>
             </tbody>
         </table>
     </div>
@@ -270,7 +263,10 @@
                 order: [[0, 'desc']],
                 scrollY: '600px',
                 scrollCollapse: true,
-                language: {info: 'Showing _TOTAL_ entries'}
+                language: {
+                    info: 'Showing _TOTAL_ entries',
+                    emptyTable: 'No classes uploaded.'
+                }
             });
         });
     </script>
