@@ -87,7 +87,7 @@ class MutantAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Mutant ${mutant.id} (by anonymous)`//TODO ${mutant.creator.name})`;
+        modal.title.innerText = `Mutant ${mutant.id} (by ${mutant.creator.name})`;
         modal.body.innerHTML =
                 `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
@@ -130,7 +130,7 @@ class MutantAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText =`Test ${mutant.killedByTestId} (by ${"anonymous"/*mutant.killedBy.name*/})`;
+        modal.title.innerText =`Test ${mutant.killedByTestId} (by ${mutant.killedBy.name})`;
         modal.body.innerHTML =
                 `<div class="card mb-3">
                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
@@ -287,13 +287,13 @@ class MutantAccordion {
     /** @private */
     _renderId (data) {
         const killedByText = data.state === 'KILLED' && data.killedBy
-                ? `<span class="ma-column-name mx-2">killed by</span>${"anonymous"/*data.killedBy.name*/}`
+                ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
                 : '';
         const equivDuelResultText = data.state === 'EQUIVALENT' && data.killedByTestId >= 0
             ? `<span class="ma-column-name mx-2">marked as equivalent</span>but is killable`
             : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
-            <span class="ma-column-name mx-2">by</span> ${"anonymous"/*data.creator.name*/}
+            <span class="ma-column-name mx-2">by</span>${data.creator.name}
             ${killedByText}${equivDuelResultText}`;
     }
 
@@ -358,7 +358,7 @@ class MutantAccordion {
                     // In case of no killing test (-1) or the current user being a defender, the test isn't viewable.
                     return '';
                 } else {
-                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip"
+                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
                                     title="This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed."
                             >View Example Killing Test</button>`;
                 }

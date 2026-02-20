@@ -106,7 +106,7 @@
                                                 </span>
                                                 <span class="kta-col">
                                                     <span class="kta-column-name mx-2">by</span>
-                                                    ${"anonymous"}
+                                                    ${test.creator.name}
                                                 </span>
                                                 <span class="kta-col">
                                                     <span class="kta-column-name mx-2">Covered:</span>

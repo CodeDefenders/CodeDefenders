@@ -231,7 +231,7 @@ public class MutationTester implements IMutationTester {
 
     protected void insertDefenderKilledMutantEvent(int gameId, @Nonnull UserEntity user, int killedMutantCount) {
         Event notif = new Event(-1, gameId, user.getId(),
-                user.getDisplayName() + "&#39;s test kills " + killedMutantCount + " " + "mutants.",
+                user.getUsername() + "&#39;s test kills " + killedMutantCount + " " + "mutants.",
                 EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
     }
@@ -294,7 +294,7 @@ public class MutationTester implements IMutationTester {
                 }
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
-                        u.get().getDisplayName() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
+                        u.get().getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
 
@@ -320,7 +320,7 @@ public class MutationTester implements IMutationTester {
             mutantRepo.incrementMutantScore(mutant, score);
         }
 
-        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getDisplayName() + "&#39;s mutant survives the test suite.",
+        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
 
@@ -452,7 +452,7 @@ public class MutationTester implements IMutationTester {
                 //test.incrementScore(Scorer.score(game, test, mlist));
 
                 Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
-                        u.get().getDisplayName() + "&#39;s mutant is killed", EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME,
+                        u.get().getUsername() + "&#39;s mutant is killed", EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
 
@@ -482,7 +482,7 @@ public class MutationTester implements IMutationTester {
                 missedTests.add(t);
             }
         }
-        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getDisplayName() + "&#39;s mutant survives the test suite.",
+        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.PLAYER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
 

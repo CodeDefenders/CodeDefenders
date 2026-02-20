@@ -134,7 +134,7 @@
                                                     String bgClass = player.getRole() == Role.ATTACKER ? "bg-attacker" : "bg-defender";
                                         %>
                                             <tr class="<%=bgClass%> text-white">
-                                                <td><%=player.getUser().getDisplayName()%></td>
+                                                <td><%=player.getUser().getUsername()%></td>
                                                 <%
                                                     for (Type type : Type.TYPES) {
                                                         Integer ratingValue = playerRatings.get(type);

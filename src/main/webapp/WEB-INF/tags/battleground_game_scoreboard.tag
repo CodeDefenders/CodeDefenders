@@ -101,7 +101,7 @@
             PlayerScore testsScore = testScores.getOrDefault(attacker.getId(), zeroDummyScore);
     %>
     <tr class="attacker">
-        <td><%=attackerUser.getDisplayName()%>
+        <td><%=attackerUser.getUsername()%>
         </td>
         <td><%=mutantsScore.getQuantity()%>
         </td>
@@ -151,7 +151,7 @@
             PlayerScore testsScore = testScores.getOrDefault(defender.getId(), zeroDummyScore);
     %>
     <tr class="defender">
-        <td><%=defenderUser.getDisplayName()%>
+        <td><%=defenderUser.getUsername()%>
         </td>
         <td><%=testsScore.getQuantity()%>
         </td>

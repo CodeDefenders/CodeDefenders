@@ -58,7 +58,7 @@
     if (openEquivalenceDuel) {
         mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
                 ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-                : "Mutant " + equivMutant.getId() + " claimed equivalent by anonymous";// + equivDefender.getName();
+                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
         mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
     }
 

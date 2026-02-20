@@ -163,10 +163,10 @@ class KillMapTestAccordion extends KillMapAccordion {
     /** @private */
     _renderId(data) {
         const killedByText = data.killedBy
-            ? `<span class="kta-column-name mx-2">killed by</span>${"anonymous"/*data.killedBy.name*/}`
+            ? `<span class="kta-column-name mx-2">killed by</span>${data.killedBy.name}`
             : '';
         return `<span class="ma-mutant-link">Mutant ${data.id}</span>
-            <span class="kta-column-name mx-2">by</span>${"anonymous"/*data.creator.name*/}
+            <span class="kta-column-name mx-2">by</span>${data.creator.name}
             ${killedByText}`;
     }
 

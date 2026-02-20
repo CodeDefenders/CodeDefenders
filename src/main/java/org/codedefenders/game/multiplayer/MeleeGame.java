@@ -395,7 +395,7 @@ public class MeleeGame extends AbstractGame {
         // TODO: move notifications outside of data objects.
         Optional<UserEntity> u = userRepo.getUserById(userId);
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        Event e = new Event(-1, id, userId, u.map(UserEntity::getDisplayName).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
+        Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
                 EventStatus.GAME, timestamp);
         eventDAO.insert(e);
         Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED, EventStatus.NEW,

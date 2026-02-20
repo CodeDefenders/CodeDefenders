@@ -410,7 +410,7 @@ public class MultiplayerGame extends AbstractGame {
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        Event e = new Event(-1, id, userId, u.map(UserEntity::getDisplayName).orElse("") + " joined the game as " + role, et, EventStatus.GAME,
+        Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined the game as " + role, et, EventStatus.GAME,
                 timestamp);
         eventDAO.insert(e);
 

@@ -194,7 +194,7 @@ class KillMapAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Mutant ${mutant.id} (by anonymous)`//;${mutant.creator.name})`;
+        modal.title.innerText = `Mutant ${mutant.id} (by ${mutant.creator.name})`;
         modal.body.innerHTML =
             `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
@@ -240,8 +240,8 @@ class KillMapAccordion {
         /* Create a new modal. */
         modal = new Modal();
         modal.title.innerHTML =
-            `<span>Mutant ${mutant.id} (by ${"anonymous"/*mutant.creator.name*/})</span>
-            <span>Test ${test.id} (by ${"anonymous"/*test.creator.name*/})</span>`;
+            `<span>Mutant ${mutant.id} (by ${mutant.creator.name})</span>
+            <span>Test ${test.id} (by ${test.creator.name})</span>`;
         modal.body.innerHTML =
             `<div class="card mutant">
                  <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
@@ -303,7 +303,7 @@ class KillMapAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Test ${test.id} (by ${"anonymous"/*test.creator.name*/})`;
+        modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
         modal.body.innerHTML =
             `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
@@ -389,8 +389,7 @@ class KillMapAccordion {
 
     /** @protected */
     _renderCreator(data) {
-        //return data.creator.name;
-        return "anonymous";
+        return data.creator.name;
     }
 
     /** @protected */

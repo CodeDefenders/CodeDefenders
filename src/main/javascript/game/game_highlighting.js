@@ -286,7 +286,7 @@ class GameHighlighting {
         for (const mutant of mutantsOnLine) {
             rows.push(
                     `<tr>
-                        <td>anonymous</td>
+                        <td>${mutant.creatorName}</td>
                         <td class="text-end">${mutant.id}</td>
                         <td class="text-end">${mutant.score}</td>
                         <td class="text-end">${mutant.lines}</td>

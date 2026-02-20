@@ -77,9 +77,9 @@ public class HistoryBean {
         if (e.getUserId() < 100) {
             return null;
         }
-        String userName = "anonymous";//TODO userService.getSimpleUserById(e.getUserId())
-                //.map(SimpleUser::getName)
-                //.orElse("Unknown user");
+        String userName = userService.getSimpleUserById(e.getUserId())
+                .map(SimpleUser::getName)
+                .orElse("Unknown user");
         String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {
