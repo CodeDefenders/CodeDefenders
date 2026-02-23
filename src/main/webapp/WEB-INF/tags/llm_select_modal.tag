@@ -1,4 +1,4 @@
-<%--
+<%@ tag import="org.codedefenders.model.llm.LlmStrategy" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -24,39 +24,75 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
+<%--@elvariable id="LlmStrategy" type="org.codedefenders.model.llm.LlmStrategy--%>
 
 <%@ attribute name="gameType" required="true" %>
 <%@ attribute name="gameId" required="true" %>
 
 <%@ attribute name="htmlId" required="true" %>
+<%
+    request.setAttribute("attackStrategies", LlmStrategy.attackStrategies());
+    request.setAttribute("defendStrategies", LlmStrategy.defendStrategies());
+%>
 
 <div>
 
-    <t:modal title="Manage LLM players" id="${htmlId}">
+    <t:modal title="Manage LLM players" id="${htmlId}" modalDialogClasses="modal-lg">
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-div" class="loading loading-bg-gray loading-height-200">
-                        <div class="mb-3">
-                            <label for="${htmlId}-defenderSelect" class="form-label">Choose defender model</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
-                                    <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
-                                    </option>
-                                </select>
-                                <div>
+                        <div class="mb-3 container">
+
+                            <div class="row mb-4 p-2 border">
+                                <div class="col-6">
+                                    <label for="${htmlId}-defenderSelect" class="form-label">Choose defender
+                                        model</label>
+                                    <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
+                                        <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-5">
+                                    <label class="form-label" for="${htmlId}-defenderStrategySelect">Choose defend
+                                        strategy</label>
+                                    <select class="form-select" id="${htmlId}-defenderStrategySelect"
+                                            name="defenderStrat">
+                                    <c:forEach items="${defendStrategies}" var="strat">
+                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name()}">
+                                                    ${strat.toString()}
+                                            </option>
+                                    </c:forEach>
+                                    </select>
+                                </div>
+
+                                <div class="col-1 align-self-end">
                                     <i id="${htmlId}-defender-error-icon" class="fa fa-exclamation-triangle fa-2x"
                                        hidden="hidden"></i>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker model</label>
-                            <div class="d-flex gap-2 align-items-center">
-                                <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
-                                    <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
-                                    </option>
-                                </select>
-                                <div>
+                            <div class="row p-2 border">
+                                <div class="col-6">
+                                    <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker
+                                        model</label>
+                                    <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
+                                        <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label" for="${htmlId}-attackerStrategySelect">Choose attack
+                                        strategy</label>
+                                    <select class="form-select" id="${htmlId}-attackerStrategySelect"
+                                            name="defenderStrat">
+                                    <c:forEach items="${attackStrategies}" var="strat">
+                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name()}">
+                                                    ${strat.toString()}
+                                            </option>
+                                    </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-1 align-self-end">
                                     <i id="${htmlId}-attacker-error-icon" class="fa fa-exclamation-triangle fa-2x"
                                        hidden="hidden"></i>
                                 </div>
@@ -78,7 +114,6 @@
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-cons-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3" id="${htmlId}-conversation-panel">
-
                         </div>
                     </div>
                 </jsp:attribute>
@@ -117,6 +152,21 @@
                 modelOption.value = m.type + "|" + m.name;
                 modelOption.textContent = m.type + ": " + m.name;
             });
+        }
+
+        function setStrategy(selectElement, selectedStrategy) {
+            console.log("Strategy: " + selectedStrategy);
+            if (selectedStrategy == null) {
+                return;
+            }
+            const options = selectElement.children;
+            for (let i = 0; i < options.length; i++) {
+                console.log("Selected:");
+                console.log(selectedStrategy);
+                console.log("Comparing:");
+                console.log(options[i].value);
+                options[i].selected = options[i].value === selectedStrategy;
+            }
         }
 
         function addConversations(conversations, conversationPanel) {
@@ -186,6 +236,8 @@
             const modal = document.getElementById("${htmlId}")
             const loadingDiv = document.getElementById("${htmlId}-loading-div");
             const defenderSelect = document.getElementById("${htmlId}-defenderSelect");
+            const defenderStrategySelect = document.getElementById("${htmlId}-defenderStrategySelect")
+            const attackerStrategySelect = document.getElementById("${htmlId}-attackerStrategySelect")
             const attackerSelect = document.getElementById("${htmlId}-attackerSelect");
             const submitButton = document.getElementById("${htmlId}-submit-button");
             submitButton.addEventListener('click', async function () {
@@ -193,7 +245,9 @@
                 params.append("formType", "setLlmPlayer");
                 params.append("gameId", "${gameId}");
                 params.append("defenderModel", defenderSelect.value);
+                params.append("defenderStrategy", defenderStrategySelect.value)
                 params.append("attackerModel", attackerSelect.value);
+                params.append("attackerStrategy", attackerStrategySelect.value)
                 await fetch("${url.forPath(gameType.equals("multiplayer") ? "/multiplayergame" : "/meleegame")}", {
                     method: "POST",
                     headers: {
@@ -206,8 +260,12 @@
 
 
             modal.addEventListener('shown.bs.modal', async function () {
-                const defenderModel = await InfoApi.getLlmForGame(${gameId}, "DEFENDER");
-                const attackerModel = await InfoApi.getLlmForGame(${gameId}, "ATTACKER");
+                const defenderInfo = await InfoApi.getLlmForGame(${gameId}, "DEFENDER");
+                const defenderModel = defenderInfo !== null ? defenderInfo.model : null;
+                const defenderStrategy = defenderInfo !== null ? defenderInfo.strategy : null;
+                const attackerInfo = await InfoApi.getLlmForGame(${gameId}, "ATTACKER");
+                const attackerModel = attackerInfo !== null ? attackerInfo.model : null;
+                const attackerStrategy = attackerInfo !== null ? attackerInfo.strategy : null;
                 const activeModels = await InfoApi.getActiveLlms();
                 const defenderError = await getError("DEFENDER");
                 const attackerError = await getError("ATTACKER");
@@ -226,6 +284,9 @@
 
                 addOptions(defenderSelect, activeModels, defenderModel);
                 addOptions(attackerSelect, activeModels, attackerModel);
+
+                setStrategy(defenderStrategySelect, defenderStrategy);
+                setStrategy(attackerStrategySelect, attackerStrategy);
 
                 if (defenderError.length > 0) {
                     const defenderErrorIcon = document.getElementById("${htmlId}-defender-error-icon");

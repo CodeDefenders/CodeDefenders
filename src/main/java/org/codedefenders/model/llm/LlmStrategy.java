@@ -18,6 +18,9 @@
  */
 package org.codedefenders.model.llm;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum LlmStrategy {
     TEST_DEFAULT,
     TEST_ANNOTATED_SINGLE_TEST,
@@ -58,5 +61,22 @@ public enum LlmStrategy {
         } catch (IllegalArgumentException e) {
             return INVALID;
         }
+    }
+
+    public static List<LlmStrategy> attackStrategies() {
+        return Arrays.stream(values()).filter(v -> v.name().startsWith("MUTANT")).toList();
+    }
+
+    public static List<LlmStrategy> defendStrategies() {
+        return Arrays.stream(values()).filter(v -> v.name().startsWith("TEST")).toList();
+    }
+
+    @Override
+    public String toString() {
+        return name()
+                .replaceFirst("TEST", "")
+                .replaceFirst("MUTANT", "")
+                .replace('_', ' ')
+                .toLowerCase();
     }
 }

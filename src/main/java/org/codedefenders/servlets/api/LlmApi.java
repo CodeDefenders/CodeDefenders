@@ -35,6 +35,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
@@ -128,8 +129,9 @@ public class LlmApi extends HttpServlet {
                     if (gameId.isPresent() && role.isPresent()) {
                         AbstractGame game = gameRepository.getGame(gameId.get());
                         Optional<LlModel> model = llmService.getModelForGame(game, role.get());
-                        if (model.isPresent()) {
-                            returnJson = gson.toJson(model.get());
+                        Optional<LlmStrategy> strategy = llmService.getStrategyForGame(game.getId(), role.get());
+                        if (model.isPresent() && strategy.isPresent()) {
+                            returnJson = gson.toJson(new LlmApiDTO(model.get(), strategy.get()));
                         } else {
                             returnJson = gson.toJson(null);
                         }
@@ -231,4 +233,6 @@ public class LlmApi extends HttpServlet {
 
 
     }
+
+    private record LlmApiDTO(LlModel model, LlmStrategy strategy){}
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,6 +36,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -83,8 +86,8 @@ public class LlmManagerService {
     For melee games, attacking and defending can be done using different models, or one side can be disabled.
     The melee player is considered active as long as not both these maps map the game id to null.
  */
-    private final Map<Integer, LlModel> activeLlmDefenders = new HashMap<>();
-    private final Map<Integer, LlModel> activeLlmAttackers = new HashMap<>();
+    private final GameLlmState activeLlmDefenders = new GameLlmState();
+    private final GameLlmState activeLlmAttackers = new GameLlmState();
 
     /*
      * Maps game ids to the last error message of failed llm actions.
@@ -125,20 +128,24 @@ public class LlmManagerService {
     }
 
     public Optional<LlModel> getModelForGame(int gameId, Role role) {
-        return Optional.ofNullable(getCorrectMap(role).get(gameId));
+        return Optional.ofNullable(getCorrectMap(role).getModel(gameId));
+    }
+
+    public Optional<LlmStrategy> getStrategyForGame(int gameId, Role role) {
+        return Optional.ofNullable(getCorrectMap(role).getStrategy(gameId));
     }
 
     public void setEquivalentOnly(int gameId) {
-        if (activeLlmAttackers.containsKey(gameId)) {
+        if (activeLlmAttackers.getState(gameId) != ThreadState.INACTIVE) {
             equivalentOnlyGames.add(gameId);
         }
-        if (activeLlmDefenders.containsKey(gameId)) {
+        if (activeLlmDefenders.getState(gameId) != ThreadState.INACTIVE) {
             finishPlayer(gameId, Role.DEFENDER);
         }
     }
 
 
-    private Map<Integer, LlModel> getCorrectMap(Role r) {
+    private GameLlmState getCorrectMap(Role r) {
         return switch (r) {
             case ATTACKER -> activeLlmAttackers;
             case DEFENDER -> activeLlmDefenders;
@@ -188,14 +195,15 @@ public class LlmManagerService {
      */
     public boolean isLlmPlayerPresent(AbstractGame game, Role role) {
         if (game instanceof MultiplayerGame) {
-            return getCorrectMap(role).containsKey(game.getId());
+            return getCorrectMap(role).getState(game.getId()) != ThreadState.INACTIVE;
         } else {
-            return activeLlmDefenders.containsKey(game.getId()) || activeLlmAttackers.containsKey(game.getId());
+            return activeLlmDefenders.getState(game.getId()) != ThreadState.INACTIVE
+                    || activeLlmAttackers.getState(game.getId()) != ThreadState.INACTIVE;
         }
     }
 
     public void setPlayerModel(AbstractGame game, Role role, LlModel model, LlmStrategy strategy) {
-        Map<Integer, LlModel> m = getCorrectMap(role);
+        GameLlmState m = getCorrectMap(role);
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
         LlmStrategy testStrategy = role == Role.DEFENDER ? strategy : null;
@@ -213,7 +221,7 @@ public class LlmManagerService {
         }
 
         if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
-            m.put(game.getId(), model);
+            m.put(game.getId(), model, strategy);
         }
 
         if (model != null && !alreadyPresent) {
@@ -228,7 +236,7 @@ public class LlmManagerService {
 
             organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
                     new LlmConversationBatch(game, user, conStrategy),
-                    testStrategy, mutantStrategy, equivalenceStrategy,
+                    //testStrategy, mutantStrategy, equivalenceStrategy,
                     new Random())));
         }
     }
@@ -239,10 +247,10 @@ public class LlmManagerService {
 
     public void finishPlayer(int gameId, Role role) {
         if (role == Role.PLAYER) {
-            activeLlmAttackers.remove(gameId);
-            activeLlmDefenders.remove(gameId);
+            activeLlmAttackers.completeFinish(gameId);
+            activeLlmDefenders.completeFinish(gameId);
         } else {
-            getCorrectMap(role).remove(gameId);
+            getCorrectMap(role).completeFinish(gameId);
         }
     }
 
@@ -250,15 +258,8 @@ public class LlmManagerService {
      * Stop all llm players with that model.
      */
     public void closeModel(@NotNull LlModel model) {
-        closeModel(model, Role.ATTACKER);
-        closeModel(model, Role.DEFENDER);
-    }
-
-    private void closeModel(LlModel model, Role role) {
-        new HashSet<>(getCorrectMap(role).entrySet()).stream()
-                .filter(entry -> model.equals(entry.getValue()))
-                .map(Map.Entry::getKey)
-                .forEach(gameId -> finishPlayer(gameId, role));
+        activeLlmAttackers.closeModel(model);
+        activeLlmDefenders.closeModel(model);
     }
 
     private void addErrorMessage(AbstractGame game, Role role, Exception e) {
@@ -282,14 +283,20 @@ public class LlmManagerService {
      * the model has been deactivated, it terminates itself.
      */
     private void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
-                              final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
-                              final LlmStrategy equivalenceStrategy, final Random random) {
+                              //final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
+                              //final LlmStrategy equivalenceStrategy,
+                              final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
+        final int gameId = game.getId();
 
-        LlmStrategy timeModStrategy = role == Role.DEFENDER ? testStrategy : mutantStrategy; //TODO melee games
+        LlmStrategy equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
+        LlmStrategy testStrategy = activeLlmDefenders.getStrategy(gameId);
+        LlmStrategy mutantStrategy = activeLlmAttackers.getStrategy(gameId);
+
+        LlmStrategy timeModStrategy = role == Role.DEFENDER ? testStrategy : mutantStrategy;
         double timeModifier = timeModStrategy != null ? timeModStrategy.getTimeModifier() : 1;
 
-
+        //TODO For melee games, put this after attack/defend has been decided
         long timeToStartNextThread = (int) (getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
         if (equivalentOnlyGames.contains(game.getId())) {
@@ -323,8 +330,8 @@ public class LlmManagerService {
 
                 organizerExecutor.schedule(() -> llmExecutor.execute(
                                 () -> runLlmAction(
-                                        gameRepository.getGame(game.getId()), role, conversation,
-                                        testStrategy, mutantStrategy, equivalenceStrategy, random)),
+                                        gameRepository.getGame(game.getId()), role, conversation, random)),
+                        //testStrategy, mutantStrategy, equivalenceStrategy, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
@@ -347,8 +354,8 @@ public class LlmManagerService {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
                             () -> runLlmAction(
-                                    gameRepository.getGame(game.getId()), role, conversation,
-                                    testStrategy, mutantStrategy, equivalenceStrategy, random)),
+                                    gameRepository.getGame(game.getId()), role, conversation, random)),
+                    //testStrategy, mutantStrategy, equivalenceStrategy, random)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
             finishPlayer(game.getId(), role);
@@ -380,13 +387,12 @@ public class LlmManagerService {
             LlmMutantService mutantService;
             LlmTestService testService;
 
-            Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
-            Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
-
-
             equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.getService(equivalenceStrategy));
             mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.getService(mutantStrategy));
             testService = CDIUtil.getBeanFromCDI(LlmTestService.getService(testStrategy));
+
+            Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
+            Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
 
             equivalenceService.init(game, user, attackModel, conversation, random);
             mutantService.init(game, user, attackModel, conversation, random);
@@ -407,8 +413,8 @@ public class LlmManagerService {
                         mutantService.run();
                     }
                 } else {
-                    boolean attackAvailable = activeLlmAttackers.get(game.getId()) != null;
-                    boolean defendAvailable = activeLlmDefenders.get(game.getId()) != null;
+                    boolean attackAvailable = activeLlmAttackers.getState(game.getId()) == ThreadState.ACTIVE;
+                    boolean defendAvailable = activeLlmDefenders.getState(game.getId()) == ThreadState.ACTIVE;
                     if (!attackAvailable && !defendAvailable) {
                         finishPlayer(game.getId(), role);
                         return;
@@ -426,5 +432,77 @@ public class LlmManagerService {
         } finally {
             requestContextController.deactivate();
         }
+    }
+
+    private static class GameLlmState {
+        private final Map<Integer, ImmutablePair<LlModel, LlmStrategy>> map = new HashMap<>();
+
+        private void put(int gameId, LlModel model, LlmStrategy strategy) {
+            map.put(gameId, ImmutablePair.of(model, strategy));
+        }
+
+        private void setModel(int gameId, LlModel model) {
+            if (map.containsKey(gameId)) {
+                LlmStrategy strategy = map.get(gameId).right;
+                put(gameId, model, strategy);
+            } else {
+                throw new IllegalStateException("No game with id " + gameId + " in this map.");
+            }
+        }
+
+        private void setStrategy(int gameId, LlmStrategy strategy) {
+            if (map.containsKey(gameId)) {
+                LlModel model = map.get(gameId).left;
+                put(gameId, model, strategy);
+            } else {
+                throw new IllegalStateException("No game with id " + gameId + " in this map.");
+            }
+        }
+
+        private LlModel getModel(int gameId) {
+            if (map.get(gameId) == null) {
+                return null;
+            }
+            return map.get(gameId).left;
+        }
+
+        private LlmStrategy getStrategy(int gameId) {
+            if (map.get(gameId) == null) {
+                return null;
+            }
+            return map.get(gameId).right;
+        }
+
+        private ThreadState getState(int gameId) {
+            if (map.containsKey(gameId)) {
+                if (map.get(gameId) != null) {
+                    return ThreadState.ACTIVE;
+                } else {
+                    return ThreadState.FINISHING;
+                }
+            } else {
+                return ThreadState.INACTIVE;
+            }
+        }
+
+        private void completeFinish(int gameId) {
+            map.remove(gameId);
+        }
+
+        private void closeModel(LlModel model) {
+            Set<Integer> toRemove = new HashSet<>();
+            for (var x : map.entrySet()) {
+                if (x.getValue().left.equals(model)) {
+                    toRemove.add(x.getKey());
+                }
+            }
+            for (int k : toRemove) {
+                map.remove(k);
+            }
+        }
+    }
+
+    private enum ThreadState {
+        ACTIVE, FINISHING, INACTIVE
     }
 }

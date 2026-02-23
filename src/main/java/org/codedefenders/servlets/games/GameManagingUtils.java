@@ -62,6 +62,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
@@ -284,7 +285,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         return CanUserSubmitMutantResult.YES;
     }
 
-    public record CreateBattlegroundMutantResult (
+    public record CreateBattlegroundMutantResult(
             boolean isSuccess,
             // on success
             Optional<Mutant> mutant,
@@ -319,6 +320,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public static class MutantCreationException extends Exception {
         private String detailedReason;
+
         public MutantCreationException() {
             super();
         }
@@ -1306,9 +1308,10 @@ public class GameManagingUtils implements IGameManagingUtils {
     /**
      * Returns a model that includes type and name from a single String in the format of 'TYPE|name',
      * for example {@code OPENAI|gpt-4.0}. The model has to exist and be active.
+     *
      * @throws IllegalArgumentException Thrown if the String doesn't follow this format, if there is no such type
-     * defined
-     * @throws NoSuchModelException If there is no such active model in the database.
+     *                                  defined
+     * @throws NoSuchModelException     If there is no such active model in the database.
      */
     public LlModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, NoSuchModelException {
         if (s.equals("NONE")) {
@@ -1319,23 +1322,29 @@ public class GameManagingUtils implements IGameManagingUtils {
                 logger.error("Malformed defender form value: {}", s);
                 throw new IllegalArgumentException("Malformed defender form value: " + s);
             }
-                LlmType type = LlmType.valueOf(split[0]);
-                String name = split[1];
-                return llmRepo.getModelFromName(name, type, true).orElseThrow(
-                        () -> new NoSuchModelException(type, name));
+            LlmType type = LlmType.valueOf(split[0]);
+            String name = split[1];
+            return llmRepo.getModelFromName(name, type, true).orElseThrow(
+                    () -> new NoSuchModelException(type, name));
         }
     }
 
     public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
-        var defenderParam = ServletUtils.getStringParameter(request, "defenderModel");
-        if(defenderParam.isPresent()) {
+        var defenderModelParam = ServletUtils.getStringParameter(request, "defenderModel");
+        Optional<LlmStrategy> defenderStrategy = ServletUtils.getEnumParameter(
+                request, LlmStrategy.class, "defenderStrategy");
+        if (defenderModelParam.isPresent() && defenderStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.DEFENDER,
-                    getLLModelFromSingleValue(defenderParam.get()));
+                    getLLModelFromSingleValue(defenderModelParam.get()), defenderStrategy.get());
+
         }
-        var attackerParam = ServletUtils.getStringParameter(request, "attackerModel");
-        if (attackerParam.isPresent()) {
+        var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
+        Optional<LlmStrategy> attackerStrategy = ServletUtils.getEnumParameter(
+                request, LlmStrategy.class, "attackerStrategy"
+        );
+        if (attackerModelParam.isPresent() && attackerStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.ATTACKER,
-                    getLLModelFromSingleValue(attackerParam.get()));
+                    getLLModelFromSingleValue(attackerModelParam.get()), attackerStrategy.get());
         }
     }
 }
