@@ -1,5 +1,6 @@
 <%@ page import="org.codedefenders.model.llm.LlModel" %>
-<%@ page import="java.util.List" %><%--
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.model.llm.LlmStrategy" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -29,9 +30,16 @@
 <%
     @SuppressWarnings("unchecked")
     List<LlModel> models = (List<LlModel>) request.getAttribute("models");
-    LlModel defaultModel = (LlModel) request.getAttribute("defaultModel");
-    pageContext.setAttribute("defaultModel", defaultModel);
+    @SuppressWarnings("unchecked")
+    List<LlmStrategy> attackStrategies = (List<LlmStrategy>) request.getAttribute("attackStrategies");
+    @SuppressWarnings("unchecked")
+    List<LlmStrategy> defendStrategies = (List<LlmStrategy>) request.getAttribute("defendStrategies");
+    @SuppressWarnings("unchecked")
+    List<LlmStrategy> equivalenceStrategies = (List<LlmStrategy>) request.getAttribute("equivalenceStrategies");
     pageContext.setAttribute("models", models);
+    pageContext.setAttribute("attackStrategies", attackStrategies);
+    pageContext.setAttribute("defendStrategies", defendStrategies);
+    pageContext.setAttribute("equivalenceStrategies", equivalenceStrategies);
 %>
 
 <p:main_page title="LLM Management">
@@ -72,6 +80,10 @@
                 </table>
             </div>
         </div>
+
+        <t:admin_llm_strat_table strategies="${attackStrategies}" title="Attack strategies"/>
+        <t:admin_llm_strat_table strategies="${defendStrategies}" title="Defend strategies"/>
+        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies"/>
 
         <script type="module">
             console.log("MODELS: ${models}");

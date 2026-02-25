@@ -35,8 +35,8 @@
 <%@ attribute name="htmlId" required="true" %>
 <%
     LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
-    request.setAttribute("attackStrategies", llmRepo.getStrategiesForRole(Role.ATTACKER));
-    request.setAttribute("defendStrategies", llmRepo.getStrategiesForRole(Role.DEFENDER));
+    request.setAttribute("attackStrategies", llmRepo.getAttackStrategies());
+    request.setAttribute("defendStrategies", llmRepo.getDefendStrategies());
 %>
 
 <div>

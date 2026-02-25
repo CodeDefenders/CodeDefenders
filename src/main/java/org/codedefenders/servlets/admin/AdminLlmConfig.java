@@ -28,7 +28,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -45,9 +47,13 @@ public class AdminLlmConfig extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<LlModel> models = llmRepo.getAllModels();
-
+        List<LlmStrategy> attackStrategies = llmRepo.getAttackStrategies();
+        List<LlmStrategy> defendStrategies = llmRepo.getDefendStrategies();
+        List<LlmStrategy> equivalenceStrategies = llmRepo.getEquivalenceStrategies();
         request.setAttribute("models", models);
-        //request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());TODO Stattdessen die default strats anzeigen mit ihren Prompts??
+        request.setAttribute("attackStrategies", attackStrategies);
+        request.setAttribute("defendStrategies", defendStrategies);
+        request.setAttribute("equivalenceStrategies", equivalenceStrategies);
         request.getRequestDispatcher(Constants.ADMIN_LLM_CONFIG_JSP).forward(request, response);
     }
 

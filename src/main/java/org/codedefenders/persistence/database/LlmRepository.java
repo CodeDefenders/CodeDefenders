@@ -131,18 +131,27 @@ public class LlmRepository {
         return result;
     }
 
-    public List<LlmStrategy> getStrategiesForRole(Role role) {
-        String prefix = switch (role) {
-            case ATTACKER -> "MUTANT";
-            case DEFENDER -> "TEST";
-            default -> throw new IllegalArgumentException("This role is not supported:" + role);
-        };
+
+
+    public List<LlmStrategy> getAttackStrategies() {
+        return getStrategiesForRole("MUTANT");
+    }
+
+    public List<LlmStrategy> getDefendStrategies() {
+        return getStrategiesForRole("TEST");
+    }
+
+    public List<LlmStrategy> getEquivalenceStrategies() {
+        return getStrategiesForRole("EQUIVALENCE");
+    }
+
+
+    public List<LlmStrategy> getStrategiesForRole(String prefix) {
         return getAllStrategies()
                 .stream()
                 .filter(s -> s.getBase().name().startsWith(prefix))
                 .toList();
     }
-
     private boolean modelIsInConfig(LlModel m) {
         return m.getType() == LlmType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
                 || m.getType() == LlmType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
