@@ -159,16 +159,11 @@
         }
 
         function setStrategy(selectElement, selectedStrategy) {
-            console.log("Strategy: " + selectedStrategy);
             if (selectedStrategy == null) {
                 return;
             }
             const options = selectElement.children;
             for (let i = 0; i < options.length; i++) {
-                console.log("Selected:");
-                console.log(selectedStrategy);
-                console.log("Comparing:");
-                console.log(options[i].value);
                 options[i].selected = options[i].value === selectedStrategy;
             }
         }

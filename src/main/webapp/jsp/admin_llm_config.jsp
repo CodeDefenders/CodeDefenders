@@ -40,36 +40,6 @@
 
         <div class="card m-2">
             <div class="card-body">
-                <h4 class="card-title">Default prompts</h4>
-                <t:llm_prompt_modal type="${defaultModel.type.name()}" name="${defaultModel.name}"
-                                    attackerPrompt="${defaultModel.getPrompt('ATTACK_DEFAULT').orElse(\"\")}"
-                                    attackerDeps="${defaultModel.attackerDependencies}"
-                                    attackerDepsPrompt="${defaultModel.getPrompt('ATTACK_DEPENDENCIES').orElse(\"\")}"
-                                    resolveEquivalencePrompt="${defaultModel.getPrompt('ATTACK_EQUIVALENCE').orElse(\"\")}"
-                                    defenderPrompt="${defaultModel.getPrompt('DEFEND_DEFAULT').orElse(\"\")}"
-                                    defenderDeps="${defaultModel.defenderDependencies}"
-                                    defenderDepsPrompt="${defaultModel.getPrompt('DEFEND_DEPENDENCIES').orElse(\"\")}"
-                                    defenderFocus="${defaultModel.defenderMethodFocus}"
-                                    defenderFocusPrompt="${defaultModel.getPrompt('DEFEND_FOCUS').orElse(\"\")}"
-
-                                    htmlId="default-modal"/>
-                <div class="d-flex gap-4">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#default-modal">
-                        Edit
-                    </button>
-
-                    <form action="${url.forPath("api/llm")}?formType=resetDefault" method="post">
-                        <button type="submit" class="btn btn-outline-dark">
-                            Reset
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="card m-2">
-            <div class="card-body">
                 <h4 class="card-title">Available Large Language Models:</h4>
                 <table id="models" class="table table-v-align-middle table-striped">
                     <thead>
@@ -87,23 +57,8 @@
                         <tr id="model-row-${identifier}">
 
                             <td id="model-type-${identifier}">${model.type}</td>
-                            <td>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#${identifier}"
-                                   id="model-name-${identifier}">
-                                        ${model.name}
-                                </a>
-                                <t:llm_prompt_modal type="${type}" name="${model.name}"
-                                                    attackerPrompt="${model.getPrompt('ATTACK_DEFAULT').orElse(\"\")}"
-                                                    attackerDeps="${model.attackerDependencies}"
-                                                    attackerDepsPrompt="${model.getPrompt('ATTACK_DEPENDENCIES').orElse(\"\")}"
-                                                    resolveEquivalencePrompt="${model.getPrompt('ATTACK_EQUIVALENCE').orElse(\"\")}"
-                                                    defenderPrompt="${model.getPrompt('DEFEND_DEFAULT').orElse(\"\")}"
-                                                    defenderDeps="${model.defenderDependencies}"
-                                                    defenderDepsPrompt="${model.getPrompt('DEFEND_DEPENDENCIES').orElse(\"\")}"
-                                                    defenderFocus="${model.defenderMethodFocus}"
-                                                    defenderFocusPrompt="${model.getPrompt('DEFEND_FOCUS').orElse(\"\")}"
-
-                                                    htmlId="${identifier}"/>
+                            <td id="model-name-${identifier}">
+                                    ${model.name}
                             </td>
                             <td>
                                 <label>
