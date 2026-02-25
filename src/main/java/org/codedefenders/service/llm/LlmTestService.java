@@ -43,7 +43,8 @@ import org.slf4j.LoggerFactory;
 abstract class LlmTestService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
 
-    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)"; //TODO Make this adjustable?
+    //TODO Make this adjustable
+    private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)";
 
     @Inject
     GameService gameService;
@@ -56,38 +57,37 @@ abstract class LlmTestService extends LlmSubActionService {
      * This method submits the generated test code to the game. It should only be called from inside an LLM action,
      * after the test code has been generated and the game has been refreshed.
      *
-     * @param testSrc The formatted test code. All formatting heuristics should have already been performed.
+     * @param testSrc  The formatted test code. All formatting heuristics should have already been performed.
+     * @param strategy The strategy to follow. This will supply the service with custom prompts.
      */
     @Override
-    protected void submit(String testSrc) {
-        switch (conversation.getType()) {
-            case DEFEND_DEFAULT, DEFEND_DEPENDENCIES, DEFEND_FOCUS, DEFEND_ONE_FROM_MANY -> {
-            }
-            default -> throw new RuntimeException("Conversation during test submission may not be of type "
-                    + conversation.getType());
-        }
+    protected void submit(String testSrc, LlmStrategy strategy) {
         try {
             GameManagingUtils.CreateBattlegroundTestResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {
-                result = gameManagingUtils.createBattlegroundTest(multiplayerGame, Constants.AI_DEFENDER_USER_ID, testSrc);
+                result = gameManagingUtils.createBattlegroundTest(multiplayerGame,
+                        Constants.AI_DEFENDER_USER_ID,
+                        testSrc);
             } else {
                 result = gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
                 conversation.setTestId(result.test().orElseThrow().getId());
-                onSubmitSuccess();
+                onSubmitSuccess(strategy);
             } else {
-                onSubmitFailure(result, testSrc);
+                onSubmitFailure(result, testSrc, strategy);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected abstract void onSubmitSuccess();
+    protected abstract void onSubmitSuccess(LlmStrategy strategy);
 
-    protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc);
+    protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
+                                            String testSrc,
+                                            LlmStrategy strategy);
 
     /**
      * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
@@ -157,16 +157,4 @@ abstract class LlmTestService extends LlmSubActionService {
         correction.append("\nFix these problems.");
         conversation.addSystemMessage(correction.toString(), model);
     }
-
-    static Class<? extends LlmTestService> getService(LlmStrategy strategy) {
-        List<Class<? extends LlmSubActionService>> l = List.of(
-                TestStrategyDefault.class,
-                TestStrategyAnnotatedSingleTest.class,
-                TestStrategyFullSuite.class,
-                TestStrategyFullSuitePlusDefault.class,
-                TestStrategyFullSuitePlusAnnotated.class
-                );
-        return getServiceClass(l, strategy).asSubclass(LlmTestService.class);
-    }
-
 }

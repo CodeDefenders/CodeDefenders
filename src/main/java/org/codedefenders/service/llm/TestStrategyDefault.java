@@ -20,72 +20,31 @@ package org.codedefenders.service.llm;
 
 import java.util.Optional;
 
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-@Strategy(LlmStrategy.TEST_DEFAULT)
 public class TestStrategyDefault extends LlmTestService {
 
-    private static final String defaultPrompt = """
-            You are an experienced Java developer.
-
-            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
-            changes to the code. These changes are called 'mutants'.
-            These mutants are difficult to find, so you have to be crafty.
-
-            You will see a class of Java code.
-            The test must target this class.
-
-            There is a strict rule of using at most 2 assertions. Always abide by it.
-
-            Write nothing but the code of the single test.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
-            """;
-    private static final String dependencyPrompt = """
-            Write a single test for the first class of the following Java code using a maximum of 2 assertions.
-            The other classes are dependencies of the first class, you don't need to test them.
-            Write only the content of the test method, without including formatting, comments,
-            the header or the method declaration. Use JUnit 4.""";//TODO Not in use for the experiment
-    private static final String focusPrompt = """
-            You are an experienced Java developer.
-
-            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
-            changes to the code. These changes are called 'mutants'.
-            These mutants are difficult to find, so you have to be crafty.
-
-            You will see a class of Java code.
-            The test must target the method %s.
-
-            There is a strict rule of using at most 2 assertions. Always abide by it.
-
-            Write nothing but the code of the single test.
-
-            Never reply in natural language.
-            """;
-
     @Override
-    public Optional<String> generate() {
-        PromptType promptType = getCorrectDefendPromptType();
-        setConversationType(promptType);
+    public Optional<String> generate(LlmStrategy strategy) {
+        LlmPromptType promptType = getCorrectDefendPromptType();
+        setConversationType(promptType.displayName());
         resetConversationAfterTooManyTries();
         if (!conversation.lastMessageWasError()) {
             {
-                String systemMessage = getSystemPrompt(promptType);
-                if (promptType == PromptType.DEFEND_FOCUS) {
+                String systemMessage = strategy.getPrompt(promptType);
+                if (promptType == LlmPromptType.TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM) {
                     Optional<String> methodName = getRandomMethodWithLivingMutant();
                     if (methodName.isPresent()) {
-                        systemMessage = String.format(systemMessage, methodName.get());
+                        systemMessage = systemMessage.replace("${focused_method}", methodName.get());
                     }
                 }
                 conversation.addSystemMessage(systemMessage, model);
 
                 conversation.addUserMessage(
-                        getSourceCodeForUserMessage(), model);
+                        getSourceCodeForUserMessage(false), model);//TODO dependencies
             }
             String reply = promptService.getResponse(model, conversation);
             return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
@@ -96,32 +55,22 @@ public class TestStrategyDefault extends LlmTestService {
     }
 
     @Override
-    protected void onSubmitSuccess() {
+    protected void onSubmitSuccess(LlmStrategy strategy) {
         finishConversation(true);
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc, LlmStrategy strategy) {
         standardSubmitFailure(result, testSrc);
     }
 
-    private String getSystemPrompt(PromptType promptType) {
-        return switch (promptType) {
-            case DEFEND_DEFAULT -> defaultPrompt;
-            case DEFEND_DEPENDENCIES -> dependencyPrompt;
-            case DEFEND_FOCUS -> focusPrompt;
-            default -> throw new IllegalArgumentException("This prompt type is not allowed in a TestStrategyDefault: "
-                    + promptType);
-        };
-    }
-
-    private PromptType getCorrectDefendPromptType() {
+    private LlmPromptType getCorrectDefendPromptType() {
         if (hasLivingMutants()) {
-            return PromptType.DEFEND_FOCUS;
+            return LlmPromptType.TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM;
         }
         if (!game.getCUT().getDependencyNames().isEmpty()) {
-            return PromptType.DEFEND_DEPENDENCIES;
+            return LlmPromptType.TEST_DEFAULT_DEPENDENCY_SYSTEM;
         }
-        return PromptType.DEFEND_DEFAULT;
+        return LlmPromptType.TEST_DEFAULT_DEFAULT_SYSTEM;
     }
 }

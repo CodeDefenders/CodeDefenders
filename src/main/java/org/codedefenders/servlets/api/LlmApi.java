@@ -131,7 +131,7 @@ public class LlmApi extends HttpServlet {
                         Optional<LlModel> model = llmService.getModelForGame(game, role.get());
                         Optional<LlmStrategy> strategy = llmService.getStrategyForGame(game.getId(), role.get());
                         if (model.isPresent() && strategy.isPresent()) {
-                            returnJson = gson.toJson(new LlmApiDTO(model.get(), strategy.get()));
+                            returnJson = gson.toJson(new LlmApiDTO(model.get(), strategy.get().getName()));
                         } else {
                             returnJson = gson.toJson(null);
                         }
@@ -221,11 +221,11 @@ public class LlmApi extends HttpServlet {
                 }
             }
             case "updatePrompts" -> {
-                llmRepo.updatePrompts(model);
+                //llmRepo.updatePrompts(model);TODO FÜR STRATS STATT PROMPTS
                 resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
             case "resetDefault" -> {
-                llmRepo.resetDefaultModel();
+                //llmRepo.resetDefaultModel(); TODO FÜR STRATS STATT PROMPTS!
                 resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
             default -> logger.error("Unknown formType: {}", action);
@@ -234,5 +234,5 @@ public class LlmApi extends HttpServlet {
 
     }
 
-    private record LlmApiDTO(LlModel model, LlmStrategy strategy){}
+    private record LlmApiDTO(LlModel model, String strategy){}
 }

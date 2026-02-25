@@ -20,59 +20,31 @@ package org.codedefenders.service.llm;
 
 import java.util.Optional;
 
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-@Strategy(LlmStrategy.TEST_ANNOTATED_SINGLE_TEST)
 public class TestStrategyAnnotatedSingleTest extends LlmTestService {
-    public static final String systemPrompt = """
-            You are a capable java developer playing a game. You want to win by getting as many points as possible.
-
-            Your task is to write a single unit test for a specific java class. This unit test should be able to detect
-            changes to the code. These changes are called 'mutants'.
-            These mutants are difficult to find, so you have to be crafty.
-
-            If your test fails on a piece of mutated code, but succeeds on the original code, that mutant is killed.
-            You get points for every mutant your tests kill. If many other tests have already covered this mutant
-            without having killed it, detecting the mutant gets you more points.
-            You get no points by detecting a mutant that has already been killed.
-
-            You will see a java class with specific annotations. Every line has a comment in the format
-            `//coverage: c, killed: k, alive: a`
-            Instead of c, k or a there will be a number.
-            c refers to the number of tests that already cover this line.
-            k refers to the mutants that have already been killed here.
-            a refers to the mutants that are currently alive.
-
-            The test must target this class.
-
-            There is a strict rule of using at most 2 assertions per test. Always abide by it.
-
-            Write nothing but the code of the single test.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
-            """;
 
     @Override
-    protected void onSubmitSuccess() {
+    protected void onSubmitSuccess(LlmStrategy strategy) {
         finishConversation(true);
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
+                                   String testSrc,
+                                   LlmStrategy strategy) {
         standardSubmitFailure(result, testSrc);
     }
 
     @Override
-    protected Optional<String> generate() {
-        setConversationType(PromptType.DEFEND_DEFAULT);
+    protected Optional<String> generate(LlmStrategy strategy) {
+        setConversationType(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
         if (!conversation.lastMessageWasError()) {
-            conversation.addSystemMessage(systemPrompt, model);
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM), model);
             conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
         }
         String reply = promptService.getResponse(model, conversation);

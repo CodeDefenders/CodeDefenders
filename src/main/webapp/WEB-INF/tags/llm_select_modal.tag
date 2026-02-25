@@ -1,4 +1,7 @@
-<%@ tag import="org.codedefenders.model.llm.LlmStrategy" %><%--
+<%@ tag import="org.codedefenders.model.llm.LlmStrategy" %>
+<%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
+<%@ tag import="org.codedefenders.util.CDIUtil" %>
+<%@ tag import="org.codedefenders.game.Role" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -31,8 +34,9 @@
 
 <%@ attribute name="htmlId" required="true" %>
 <%
-    request.setAttribute("attackStrategies", LlmStrategy.attackStrategies());
-    request.setAttribute("defendStrategies", LlmStrategy.defendStrategies());
+    LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
+    request.setAttribute("attackStrategies", llmRepo.getStrategiesForRole(Role.ATTACKER));
+    request.setAttribute("defendStrategies", llmRepo.getStrategiesForRole(Role.DEFENDER));
 %>
 
 <div>
@@ -58,7 +62,7 @@
                                     <select class="form-select" id="${htmlId}-defenderStrategySelect"
                                             name="defenderStrat">
                                     <c:forEach items="${defendStrategies}" var="strat">
-                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name()}">
+                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
                                                     ${strat.toString()}
                                             </option>
                                     </c:forEach>
@@ -86,7 +90,7 @@
                                     <select class="form-select" id="${htmlId}-attackerStrategySelect"
                                             name="defenderStrat">
                                     <c:forEach items="${attackStrategies}" var="strat">
-                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name()}">
+                                            <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
                                                     ${strat.toString()}
                                             </option>
                                     </c:forEach>

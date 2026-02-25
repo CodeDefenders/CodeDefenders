@@ -47,7 +47,7 @@ public class AdminLlmConfig extends HttpServlet {
         List<LlModel> models = llmRepo.getAllModels();
 
         request.setAttribute("models", models);
-        request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());
+        //request.setAttribute("defaultModel", llmRepo.getDefaultModel().orElseThrow());TODO Stattdessen die default strats anzeigen mit ihren Prompts??
         request.getRequestDispatcher(Constants.ADMIN_LLM_CONFIG_JSP).forward(request, response);
     }
 

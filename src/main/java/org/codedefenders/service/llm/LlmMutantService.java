@@ -27,7 +27,6 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ abstract class LlmMutantService extends LlmSubActionService {
     protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundMutantResult result, String testSrc);
 
     @Override
-    protected void submit(String mutantSrc) {
+    protected void submit(String mutantSrc, LlmStrategy strategy) {
         try {
             GameManagingUtils.CreateBattlegroundMutantResult result;
             if (game instanceof MultiplayerGame multiplayerGame) {
@@ -75,27 +74,8 @@ abstract class LlmMutantService extends LlmSubActionService {
         }
     }
 
-
-    protected PromptType getCorrectAttackPromptType() {
-        if (model.isAttackerDependencies() && !game.getCUT().getDependencyNames().isEmpty()) {
-            return PromptType.ATTACK_DEPENDENCIES;
-        } else {
-            return PromptType.ATTACK_DEFAULT;
-        }
-    }
-
     protected String getExistingMutantDiffsMessage() {
         return String.join("\n####\n",
                 gameService.getMutants(user, game).stream().map(MutantDTO::getPatchString).collect(Collectors.toSet()));
-    }
-
-    static Class<? extends LlmMutantService> getService(LlmStrategy strategy) {
-        List<Class<? extends LlmSubActionService>> l = List.of(
-                MutantStrategyDefault.class,
-                MutantStrategyAnnotatedFullClass.class,
-                MutantStrategyAnnotatedSingleMethod.class,
-                MutantStrategyRandomSingleMethod.class,
-                MutantStrategyDefaultWithoutExisting.class);
-        return getServiceClass(l, strategy).asSubclass(LlmMutantService.class);
     }
 }

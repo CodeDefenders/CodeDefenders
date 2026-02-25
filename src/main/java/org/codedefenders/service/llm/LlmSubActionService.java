@@ -32,7 +32,6 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.persistence.database.LlmRepository;
@@ -45,7 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class provides fields and methods common to its subclasses, but is not to be instantiated itself.
  */
-abstract class LlmSubActionService {
+public abstract class LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmSubActionService.class);
 
     private static final int EQUIVALENT_POINT_RESTRICTION = 10; //TODO Als system setting??
@@ -76,12 +75,12 @@ abstract class LlmSubActionService {
 
     protected boolean disabled = false;
 
-    protected void run() {
+    protected void run(LlmStrategy strategy) {
         if (!disabled) {
-            Optional<String> reply = generate();
+            Optional<String> reply = generate(strategy);
             if (reply.isPresent()) {
                 updateGame();
-                submit(reply.get());
+                submit(reply.get(), strategy);
             }
 
             if (conversation != null) {
@@ -93,21 +92,9 @@ abstract class LlmSubActionService {
         }
     }
 
-    protected abstract Optional<String> generate();
+    protected abstract Optional<String> generate(LlmStrategy strategy);
 
-    protected abstract void submit(String reply);
-
-    protected static Class<? extends LlmSubActionService> getServiceClass(
-            List<Class<? extends LlmSubActionService>> subclasses, LlmStrategy strategy) {
-        for (var c : subclasses) {
-            for (Annotation a : c.getAnnotations()) {
-                if (a instanceof Strategy strategyAnnotation && strategyAnnotation.value() == strategy) {
-                    return c;
-                }
-            }
-        }
-        throw new RuntimeException("Strategy is not supported " + strategy);
-    }
+    protected abstract void submit(String reply, LlmStrategy strategy);
 
     protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
                         Random random) {
@@ -130,14 +117,14 @@ abstract class LlmSubActionService {
     }
 
     protected void resetConversationAfterTooManyTries() {
-        PromptType tmp = conversation.getType();
+        String tmp = conversation.getType();
         if (conversation.numberOfTries() > numberOfRepairAttempts) {
             finishConversation(false);
             conversation = conversationBatch.getConversation(tmp);
         }
     }
 
-    protected void setConversationType(PromptType type) {
+    protected void setConversationType(String type) {
         conversation = conversationBatch.getConversation(type);
     }
 
@@ -151,9 +138,8 @@ abstract class LlmSubActionService {
      * Adds the source code of the CuT as the user message. If the prompt specifies that dependencies have to be
      * included, the source code of the dependencies is included as well.
      */
-    protected String getSourceCodeForUserMessage() {
-        if (conversation.getType() == PromptType.DEFEND_DEPENDENCIES
-                || conversation.getType() == PromptType.ATTACK_DEPENDENCIES) {
+    protected String getSourceCodeForUserMessage(boolean withDependencies) {
+        if (withDependencies) {
             return game.getCUT().getSourceCode() + "\n####\n"
                     + String.join("\n####\n", game.getCUT().getDependencyCode());
         } else {
@@ -188,26 +174,6 @@ abstract class LlmSubActionService {
             return Optional.empty();
         } else {
             return Optional.of(candidates.get(random.nextInt(candidates.size())));
-        }
-    }
-
-    /**
-     * Returns the model's system prompt of this type, or the default prompt of this type if the model has no prompt
-     * of its own. The model is <b>not</b> updated before.
-     */
-    protected String getSystemPrompt(LlModel model, PromptType type) {
-        try {
-            LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
-            llmRepo.loadModel(model);
-            Optional<String> specificPrompt = model.getPrompt(type);
-            if (specificPrompt.isPresent()) {
-                return specificPrompt.get();
-            } else {
-                LlModel defaultModel = llmRepo.getDefaultModel().orElseThrow();
-                return defaultModel.getPrompt(type).orElseThrow();
-            }
-        } catch (NoSuchModelException e) {
-            throw new RuntimeException("The model was deactivated:", e);
         }
     }
 }

@@ -20,42 +20,26 @@ package org.codedefenders.service.llm;
 
 import java.util.Optional;
 
-import jakarta.enterprise.context.RequestScoped;
-
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Strategy(LlmStrategy.MUTANT_DEFAULT_WITHOUT_EXISTING)
 public class MutantStrategyDefaultWithoutExisting extends LlmMutantService {
     Logger logger = LoggerFactory.getLogger(MutantStrategyDefaultWithoutExisting.class);
 
-    private static final String systemPrompt = """
-            Change the following java class in a way that is difficult to test against.
-            Your change has to introduce changes to the behaviour, it must not be equivalent to the original code.
-
-            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
-            operators, etc.
-            Comments must remain as they are.
-
-            Reply only with the modified code, nothing else.
-
-            Never reply with natural language.
-            """;
-
     @Override
-    protected Optional<String> generate() {
-        PromptType promptType = getCorrectAttackPromptType();
-        setConversationType(promptType);
+    protected Optional<String> generate(LlmStrategy strategy) {
+        //TODO Dependencies
+        LlmPromptType promptType = LlmPromptType.MUTANT_DEFAULT_WITHOUT_EXISTING_DEFAULT_SYSTEM;
+        setConversationType(promptType.displayName());
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             {
-                //conversation.addSystemMessage(getSystemPrompt(model, promptType), model);TODO Eventually add back
-                conversation.addSystemMessage(systemPrompt, model);
-                String userMessage = getSourceCodeForUserMessage();
+                conversation.addSystemMessage(strategy.getPrompt(promptType), model);
+                String userMessage = getSourceCodeForUserMessage(false);
                 conversation.addUserMessage(userMessage, model);
             }
         }

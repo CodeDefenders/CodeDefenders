@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmDefaultStrategy;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.service.llm.LlmManagerService;
@@ -57,10 +58,10 @@ public class SetLlmAPI extends APIServlet {
                 .map(String::toUpperCase)
                 .map(Role::valueOrNull);
         final Optional<Action> action = ServletUtils.getEnumParameter(request, Action.class, "action");
-        final LlmStrategy strategy = ServletUtils.getStringParameter(request, "strategy")
-                .map(LlmStrategy::of).orElseThrow();
+        final LlmStrategy strategy = ServletUtils.getEnumParameter(request, LlmDefaultStrategy.class, "strategy")
+                        .map(LlmStrategy::of).orElse(null);//TODO unschön
         if (gameId.isEmpty() || modelName.isEmpty() || modelType.isEmpty() || action.isEmpty() || role.isEmpty()
-                || strategy == LlmStrategy.INVALID) {
+                || strategy == null) {
             if (gameId.isEmpty()) {
                 writeResponse(response, HttpServletResponse.SC_BAD_REQUEST,
                         new Common.ErrorResponseDTO("Parameter 'gameId' missing."));

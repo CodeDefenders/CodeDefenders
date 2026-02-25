@@ -18,71 +18,25 @@
  */
 package org.codedefenders.service.llm;
 
-import java.util.Arrays;
 import java.util.Optional;
 
-import jakarta.enterprise.context.RequestScoped;
-
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.codedefenders.util.LlmUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-@Strategy(LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD)
 public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
-    private static Logger logger = LoggerFactory.getLogger(MutantStrategyAnnotatedSingleMethod.class);
 
-    public static final String initialPrompt = """
-            You are a capable java developer playing a game. You want to win by getting as many points as possible.
-            You get points by writing bugs in source code that are difficult to detect by unit tests.
-            These bugs are called mutants.
-            Every unit test that covers your mutant without failing gets you a point.
-            Once your mutant is detected, it will stop gathering points.
-
-
-            You will see the method signatures of all methods in the class.
-            Beneath every signature, there will be an annotation in this format:
-
-            ```
-            coverage: c
-            killed: k
-            alive: a
-            ```
-
-            Instead of c, k or a there will be a number.
-            c refers to the number of tests that already cover this method.
-            k refers to the mutants in this method that have already been killed.
-            a refers to the mutants in this method that are currently alive.
-
-            Select one method which you want to mutate. Reply with the method signature and nothing else.
-            Never reply with natural language.
-            """;
-
-    public static final String initialRepairPrompt = """
-                There is no method with this signature.
-            """;
-
-    public static final String secondaryPrompt = """
-            Change the following piece of java code in a way that is difficult to test against.
-            Your change has to introduce changes to the behaviour, it must not be equivalent to the original code.
-
-            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
-            operators, etc.
-            Comments must remain as they are.
-
-            Reply only with the modified code, nothing else.
-            """;
+    private static final String ASK_FOR_METHOD = "ASK_FOR_METHOD";
+    private static final String FOLLOW_UP = "FOLLOW_UP";
 
     @Override
     protected void onSubmitSuccess() {
@@ -96,37 +50,39 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
     }
 
     @Override
-    protected Optional<String> generate() {
+    protected Optional<String> generate(LlmStrategy strategy) {
         if (baggage().methodDeclaration == null) {
-            setConversationType(PromptType.ATTACK_DEFAULT);
+            setConversationType(ASK_FOR_METHOD);
         } else {
-            setConversationType(PromptType.ATTACK_DEPENDENCIES);
+            setConversationType(FOLLOW_UP);
         }
         resetConversationAfterTooManyTries();
-        if (conversation.getType() == PromptType.ATTACK_DEFAULT) {
+        if (conversation.getType().equals(ASK_FOR_METHOD)) {
             if (conversation.isEmpty()) {
-                conversation.addSystemMessage(initialPrompt, model);
+                conversation.addSystemMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_INITIAL_SYSTEM), model);
                 conversation.addUserMessage(
                         LlmUtils.annotatedMethodDescriptions(game, baggage().compilationUnit), model);
             }
             String reply = promptService.getResponse(model, conversation);
             CallableDeclaration<?> declaration = baggage().getCallableDeclaration(reply);
             if (declaration == null) {
-                conversation.addUserMessage(initialRepairPrompt, model);
+                conversation.addUserMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_NO_SUCH_METHOD_SYSTEM), model);
             } else {
                 baggage().methodDeclaration = declaration;
                 finishConversation(true);
-                setConversationType(PromptType.ATTACK_DEPENDENCIES);
+                setConversationType(FOLLOW_UP); //TODO verstehe den flow hier nicht ganz. Warum hier auf follow_up, und oben wird auch nochmal überprüft`?
             }
             return Optional.empty();
             //baggage().methodSignature = reply;
 
-        } else if (conversation.getType() == PromptType.ATTACK_DEPENDENCIES) {
-            //TODO Define other enum values, dependencies is placeholder
+        } else if (conversation.getType().equals(FOLLOW_UP)) {
             String originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
 
             if (conversation.isEmpty()) {
-                conversation.addSystemMessage(secondaryPrompt, model);
+                conversation.addSystemMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_FOLLOWUP_SYSTEM), model);
                 conversation.addUserMessage(originalMethodCode, model);
             }
 
@@ -159,14 +115,7 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
         }
 
         private String getMethodContent(String source) {
-            Range range =  methodDeclaration.getRange().orElseThrow();
-            int begin = range.begin.line - 1;
-            int end = range.end.line;
-            String[] lines = source.split("\n");
-            String [] methodLines = Arrays.copyOfRange(lines, begin, end);
-            String methodString = String.join("\n", methodLines);
-            logger.info("Original method String: {}", methodString);
-            return methodString;
+            return LlmUtils.getMethodContent(source, methodDeclaration);
         }
     }
 

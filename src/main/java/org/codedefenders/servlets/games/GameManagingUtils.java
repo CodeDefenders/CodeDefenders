@@ -62,6 +62,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmDefaultStrategy;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
@@ -1331,17 +1332,17 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
         var defenderModelParam = ServletUtils.getStringParameter(request, "defenderModel");
-        Optional<LlmStrategy> defenderStrategy = ServletUtils.getEnumParameter(
-                request, LlmStrategy.class, "defenderStrategy");
+        Optional<LlmStrategy> defenderStrategy = ServletUtils.getEnumParameter(//TODO allow for custom strats
+                request, LlmDefaultStrategy.class, "defenderStrategy").map(LlmStrategy::of);
         if (defenderModelParam.isPresent() && defenderStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.DEFENDER,
                     getLLModelFromSingleValue(defenderModelParam.get()), defenderStrategy.get());
 
         }
         var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
-        Optional<LlmStrategy> attackerStrategy = ServletUtils.getEnumParameter(
-                request, LlmStrategy.class, "attackerStrategy"
-        );
+        Optional<LlmStrategy> attackerStrategy = ServletUtils.getEnumParameter(//TODO allow for custom strats
+                request, LlmDefaultStrategy.class, "attackerStrategy"
+        ).map(LlmStrategy::of);
         if (attackerModelParam.isPresent() && attackerStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.ATTACKER,
                     getLLModelFromSingleValue(attackerModelParam.get()), attackerStrategy.get());

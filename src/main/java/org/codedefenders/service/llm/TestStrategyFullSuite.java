@@ -22,59 +22,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.enterprise.context.RequestScoped;
-
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-@Strategy(LlmStrategy.TEST_FULL_SUITE)
 public class TestStrategyFullSuite extends LlmTestService {
-    //private final List<String> tests = new ArrayList<>();
 
-    private static final String fullSuitePrompt = """
-            You are an experienced Java developer.
-
-            You will see a class of java code. Write a complete test suite for it.
-
-            There is a strict rule of using at most 2 assertions per test. Always abide by it.
-
-            Every test must be self-contained, do not use any setup or utility methods.
-
-            Write nothing but the code of the test class.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
-            """;
-
-    private static final String correctionSystemPrompt = """
-            You are an experienced Java developer.
-
-            You will see 3 things:
-            1. The code of a java class under test.
-            2. The code of a test method. This test has at least one issue.
-            3. An explanation of the issue the test has.
-
-            Your task is to fix the issue. The response should consist of nothing but the fixed test code.
-            If the test cannot be fixed, it is acceptable to write a new test.
-
-            There is a strict rule of using at most 2 assertions per test. Always abide by it.
-
-            Write nothing but the test code.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
-            """;
+    private static final String GENERATE_FULL_SUITE = "GENERATE_FULL_SUITE";
+    private static final String CORRECTION = "CORRECTION";
+    private static final String ONE_FROM_MANY = "ONE_FROM_MANY";
 
     private FullSuiteBaggage baggage() {
         if (conversationBatch.getBaggage() == null) {
             conversationBatch.setBaggage(new FullSuiteBaggage());
         }
-        return (FullSuiteBaggage)conversationBatch.getBaggage();
+        return (FullSuiteBaggage) conversationBatch.getBaggage();
     }
 
     public String getOneTest() {
@@ -85,54 +50,49 @@ public class TestStrategyFullSuite extends LlmTestService {
         return baggage().tests.isEmpty();
     }
 
-    public void addTest(String test) {
+    private void addTest(String test) {
         if (test == null) {
             throw new NullPointerException("Test may not be null");
         }
         baggage().tests.add(test);
     }
 
-    public String getCorrectionUserMessage(AbstractGame game, String testCode,
-                                           GameManagingUtils.CreateBattlegroundTestResult result) {
+    private String getCorrectionUserMessage(AbstractGame game,
+                                            String testCode,
+                                            GameManagingUtils.CreateBattlegroundTestResult result,
+                                            LlmStrategy strategy) {
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("1: Class under test:\n");
-        sb.append(game.getCUT().getSourceCode());
-        sb.append("\n\n2: Test method:\n");
-        sb.append(testCode);
-        sb.append("\n\n3: Issues:\n");
+        String userTemplate = strategy.getPrompt(LlmPromptType.TEST_TEMPLATE_FULL_SUITE_USER);
 
-        switch (result.failureReason().orElseThrow()) {
-            case TEST_DID_NOT_PASS_ON_CUT ->
-                    sb.append("It did not pass on the original code for the following reason: ")
-                            .append(result.testCutError().orElseThrow());
-            case COMPILATION_FAILED ->
-                    sb.append("It has failed to compile for this reason: ").append(result.compilationError());
-            case VALIDATION_FAILED -> {
-                sb.append("It has violated these rules: \n");
-                result.validationErrorMessages().orElseThrow().forEach(
-                        sb::append
-                );
+        String issueString = switch (result.failureReason().orElseThrow()) {
+            case TEST_DID_NOT_PASS_ON_CUT -> strategy.getPrompt(LlmPromptType.TEST_PARAMETER_TEMPLATE_DID_NOT_PASS)
+                    .replace("${failure_reason}", result.testCutError().orElseThrow());
+            case COMPILATION_FAILED -> strategy.getPrompt(LlmPromptType.TEST_PARAMETER_TEMPLATE_COMPILATION_FAILED)
+                    .replace("${failure_reason}", result.compilationError().orElseThrow());
+            case VALIDATION_FAILED -> strategy.getPrompt(LlmPromptType.TEST_PARAMETER_TEMPLATE_RULE_VIOLATION)
+                    .replace("{failure_reason}",
+                            String.join("\n", result.validationErrorMessages().orElseThrow()));
+        };
 
-            }
-        }
-        return sb.toString();
+        return StringUtils.replaceEach(userTemplate,
+                new String[]{"${cut_source}", "${test_code}", "${issue}"},
+                new String[]{game.getCUT().getSourceCode(), testCode, issueString});
     }
 
     @Override
-    public Optional<String> generate() {
+    public Optional<String> generate(LlmStrategy strategy) {
         if (isEmpty()) {
-            setConversationType(PromptType.DEFEND_DEFAULT);
+            setConversationType(GENERATE_FULL_SUITE);
         } else {
-            setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
+            setConversationType(CORRECTION);
         }
         if (conversation.numberOfTries() > numberOfRepairAttempts) {
             finishConversation(false);
-            conversation = conversationBatch.getConversation(PromptType.DEFEND_DEFAULT);
+            conversation = conversationBatch.getConversation(GENERATE_FULL_SUITE); //TODO Dependencies
         }
-        if (conversation.getType() == PromptType.DEFEND_DEFAULT) {
-            conversation.addSystemMessage(fullSuitePrompt, model);
-            conversation.addUserMessage(getSourceCodeForUserMessage(), model);
+        if (conversation.getType().equals(GENERATE_FULL_SUITE)) {
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_FULL_SUITE_SYSTEM), model);
+            conversation.addUserMessage(getSourceCodeForUserMessage(false), model); //TODO customize??
             String reply = promptService.getResponse(model, conversation);
             LlmUtils.suiteOfTestTemplatesFromReply(reply, game).forEach(this::addTest);
             if (isEmpty()) {
@@ -141,7 +101,7 @@ public class TestStrategyFullSuite extends LlmTestService {
                 return Optional.empty();
             } else {
                 finishConversation(true);
-                setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
+                setConversationType(ONE_FROM_MANY);
             }
         }
         if (!conversation.isEmpty()) {
@@ -150,30 +110,32 @@ public class TestStrategyFullSuite extends LlmTestService {
             return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
         } else {
             finishConversation(true);
-            setConversationType(PromptType.DEFEND_ONE_FROM_MANY);
+            setConversationType(ONE_FROM_MANY);
             return Optional.of(getOneTest());
         }
     }
 
     @Override
-    protected void onSubmitSuccess() {
-        if (isEmpty()  || !conversation.isEmpty()) {
+    protected void onSubmitSuccess(LlmStrategy strategy) {
+        if (isEmpty() || !conversation.isEmpty()) {
             finishConversation(true);
         }
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc,
+                                   LlmStrategy strategy) {
         if (!conversation.hasSystemMessage()) {
-            conversation.addSystemMessage(correctionSystemPrompt, model);
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_FULL_SUITE_CORRECTION_SYSTEM), model);
         }
         String testContent = LlmUtils.extractTestContentFromReply(testSrc);
-        String userMessage = getCorrectionUserMessage(game, testContent, result);
+        String userMessage = getCorrectionUserMessage(game, testContent, result, strategy);
         conversation.addUserMessage(userMessage, model);
     }
 
     static class FullSuiteBaggage {
         private final List<String> tests = new ArrayList<>();
+
         boolean isEmpty() {
             return tests.isEmpty();
         }

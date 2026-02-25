@@ -18,17 +18,10 @@
  */
 package org.codedefenders.model.llm;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import com.google.gson.annotations.Expose;
 
 /**
  * Information about a specific Large Language Model that can be used by an LLM Defender or an LLM Attacker.
- * Prompts can be customized for each model, if not specified they inherit the values of the default model, which is
- * obtained by {@link org.codedefenders.persistence.database.LlmRepository#getDefaultModel()}
  */
 public class LlModel {
     @Expose
@@ -38,30 +31,14 @@ public class LlModel {
     @Expose
     private boolean active;
 
-    private HashMap<PromptType, String> prompts = new HashMap<>();
-    /**
-     * If true, dependency code will be part of the user message.
-     *
-     */
-    @Expose
-    private boolean attackerDependencies = true;
-
-    /**
-     * If true, dependency code will be part of the user message for defender prompts.
-     */
-    @Expose
-    private boolean defenderDependencies = true;
-
-    /**
-     * If true, the prompt may be replaced with a special prompt that guides the llm to write a test for a
-     * specific method, for example because there are unkilled mutants in this method.
-     */
-    @Expose
-    private boolean defenderMethodFocus = true;
-
     public LlModel(String name, LlmType type) {
         this.name = name;
         this.type = type;
+    }
+
+    public LlModel(String name, LlmType type, boolean active) {
+        this(name, type);
+        this.active = active;
     }
 
     public String getName() {
@@ -70,30 +47,6 @@ public class LlModel {
 
     public LlmType getType() {
         return type;
-    }
-
-    public boolean isAttackerDependencies() {
-        return attackerDependencies;
-    }
-
-    public void setAttackerDependencies(boolean attackerDependencies) {
-        this.attackerDependencies = attackerDependencies;
-    }
-
-    public boolean isDefenderDependencies() {
-        return defenderDependencies;
-    }
-
-    public void setDefenderDependencies(boolean defenderDependencies) {
-        this.defenderDependencies = defenderDependencies;
-    }
-
-    public boolean isDefenderMethodFocus() {
-        return defenderMethodFocus;
-    }
-
-    public void setDefenderMethodFocus(boolean defenderMethodFocus) {
-        this.defenderMethodFocus = defenderMethodFocus;
     }
 
     public boolean isActive() {
@@ -108,7 +61,9 @@ public class LlModel {
     public boolean equals(Object o) {
         if (o instanceof LlModel m) {
             return m.type == type && (m.getName() == null && name == null || m.getName().equals(name));
-        } else return false;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -126,25 +81,5 @@ public class LlModel {
      */
     public void copyValues(LlModel other) {
         active = other.active;
-        attackerDependencies = other.attackerDependencies;
-        defenderDependencies = other.defenderDependencies;
-        defenderMethodFocus = other.defenderMethodFocus;
-
-        prompts = new HashMap<>(other.prompts);
-    }
-
-    public Optional<String> getPrompt(PromptType type) {
-        String prompt = prompts.get(type);
-        if (prompt != null && !prompt.isEmpty()) {
-            return Optional.of(prompt);
-        } else return Optional.empty();
-    }
-
-    public void setPrompt(PromptType type, String prompt) {
-        prompts.put(type, prompt);
-    }
-
-    public Set<PromptType> getCustomPromptTypes() {
-        return prompts.keySet();
     }
 }

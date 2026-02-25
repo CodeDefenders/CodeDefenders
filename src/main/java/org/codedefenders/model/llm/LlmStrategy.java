@@ -18,65 +18,88 @@
  */
 package org.codedefenders.model.llm;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public enum LlmStrategy {
-    TEST_DEFAULT,
-    TEST_ANNOTATED_SINGLE_TEST,
-    TEST_FULL_SUITE,
-    TEST_FULL_SUITE_PLUS_DEFAULT,
-    TEST_FULL_SUITE_PLUS_ANNOTATED,
-    MUTANT_ANNOTATED_FULL_CLASS,
-    MUTANT_ANNOTATED_SINGLE_METHOD(0.5),
-    MUTANT_DEFAULT,
-    MUTANT_RANDOM_SINGLE_METHOD,
-    MUTANT_DEFAULT_WITHOUT_EXISTING,
-    EQUIVALENCE_DEFAULT,
-    INVALID;
+import org.codedefenders.service.llm.LlmSubActionService;
+
+public class LlmStrategy {
 
     /**
      * The time between LLM actions is reduced by this multiplier.
      */
     final double timeModifier;
 
-    LlmStrategy(double timeModifier) {
+    private final String name;
+
+    final Map<LlmPromptType, String> customPrompts;
+
+    final Class<? extends LlmSubActionService> service;
+
+    private final LlmDefaultStrategy base;
+
+    private LlmStrategy(String name, Map<LlmPromptType, String> customPrompts,
+                        Class<? extends LlmSubActionService> service,
+                        double timeModifier, LlmDefaultStrategy base) {
+        this.name = name;
+        this.customPrompts = customPrompts;
+        this.service = service;
         this.timeModifier = timeModifier;
+        this.base = base;
     }
 
-    LlmStrategy() {
-        this(1);
+    //    private LlmStrategy(String name, Map<ImmutablePair<String, String>, String> prompts, Class<LlmSubActionService> service) {
+//        this(name, prompts, service, 1);
+//    }
+//
+    LlmStrategy(String name, LlmDefaultStrategy base) {
+        this(name, new HashMap<>(), base.service, base.timeModifier, base);
+    }
+
+    public static LlmStrategy of(LlmDefaultStrategy base) {
+        return new LlmStrategy(base.name(), base);
     }
 
     public double getTimeModifier() {
         return timeModifier;
     }
 
-    /**
-     * Returns the enum with the specified name, or {@link LlmStrategy#INVALID} if such a name does not exist.
-     */
-    public static LlmStrategy of(String name) {
-        try {
-            return valueOf(name);
-        } catch (IllegalArgumentException e) {
-            return INVALID;
+    public void setPrompt(LlmPromptType promptType, String prompt) {
+        if (prompt != null && !prompt.isEmpty()) {
+        customPrompts.put(promptType, prompt);
         }
     }
 
-    public static List<LlmStrategy> attackStrategies() {
-        return Arrays.stream(values()).filter(v -> v.name().startsWith("MUTANT")).toList();
+    public void removePrompt(LlmPromptType promptType) {
+        customPrompts.remove(promptType);
     }
 
-    public static List<LlmStrategy> defendStrategies() {
-        return Arrays.stream(values()).filter(v -> v.name().startsWith("TEST")).toList();
+    public String getPrompt(LlmPromptType promptType) {
+        if (customPrompts.containsKey(promptType)) {
+            return customPrompts.get(promptType);
+        } else {
+            return promptType.getDefaultPrompt();
+        }
+    }
+
+    public Class<? extends LlmSubActionService> getService() {
+        return service;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
     public String toString() {
-        return name()
+        return name
                 .replaceFirst("TEST", "")
                 .replaceFirst("MUTANT", "")
                 .replace('_', ' ')
                 .toLowerCase();
+    }
+
+    public LlmDefaultStrategy getBase() {
+        return base;
     }
 }

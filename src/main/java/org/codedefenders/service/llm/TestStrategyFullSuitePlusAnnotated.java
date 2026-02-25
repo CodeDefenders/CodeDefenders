@@ -24,28 +24,27 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 
-@Strategy(LlmStrategy.TEST_FULL_SUITE_PLUS_ANNOTATED)
 public class TestStrategyFullSuitePlusAnnotated extends LlmTestService {
     private TestStrategyFullSuite fullSuite;
     private TestStrategyAnnotatedSingleTest fallback;
 
     @Override
-    protected void run() {
+    protected void run(LlmStrategy strategy) {
         if (conversationBatch.getBaggage() == null) { //initial
-            fullSuite().run();
+            fullSuite().run(strategy);
         } else {
             if (conversationBatch.getBaggage() instanceof TestStrategyFullSuite.FullSuiteBaggage baggage) {
                 if (!baggage.isEmpty()) {
-                    fullSuite().run();
+                    fullSuite().run(strategy);
                 } else {
-                    fallback().run();
+                    fallback().run(strategy);
                 }
             }
         }
     }
 
     @Override
-    protected Optional<String> generate() {
+    protected Optional<String> generate(LlmStrategy strategy) {
         throw new IllegalStateException("Must not be called");
     }
 
@@ -67,12 +66,12 @@ public class TestStrategyFullSuitePlusAnnotated extends LlmTestService {
 
 
     @Override
-    protected void onSubmitSuccess() {
+    protected void onSubmitSuccess(LlmStrategy strategy) {
         throw new IllegalStateException("Must not be called");
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc, LlmStrategy strategy) {
         throw new IllegalStateException("Must not be called");
     }
 }

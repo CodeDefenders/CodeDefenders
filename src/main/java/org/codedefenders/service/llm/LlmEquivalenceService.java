@@ -19,7 +19,6 @@
 package org.codedefenders.service.llm;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.context.RequestScoped;
@@ -27,10 +26,9 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.MutantRepository;
-import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
@@ -43,51 +41,28 @@ import org.slf4j.LoggerFactory;
  * test does not validate or compile, there will be {@link LlmEquivalenceService#numberOfRepairAttempts} attempts
  * to get a better result from the LLM, after that the mutant is accepted as equivalent.
  */
-@RequestScoped
-@Strategy(LlmStrategy.EQUIVALENCE_DEFAULT)
-class LlmEquivalenceService extends LlmSubActionService {
+@RequestScoped//TODO nötig??
+public class LlmEquivalenceService extends LlmSubActionService {
     Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
-
-    private static final String systemPrompt = """
-            You are an experienced Java developer.
-
-            You will see two things, separated by "###":
-            1: The code of a java class.
-            2: The git diff of a change to that class.
-
-            Your task is to write a test that succeeds on the class as seen, but fails after the diff is applied.
-
-            There is a strict rule of using at most 2 assertions. Always abide by it.
-
-            Write nothing but the code of the single test.
-
-            Use JUnit 4.
-
-            Never reply in natural language.
-            """;
-
-    @Inject
-    LlmPromptService promptService;
-
-    @Inject
-    GameService gameService;
 
     @Inject
     MutantRepository mutantRepository;
 
     private MutantDTO flagged;
 
+    private static final String EQUIVALENCE = "EQUIVALENCE";
+
     @Override
-    protected void run() {
+    protected void run(LlmStrategy strategy) {
         for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
             this.flagged = flagged;
             do {
                 if (conversation == null) {
-                    setConversationType(PromptType.ATTACK_EQUIVALENCE);
+                    setConversationType(EQUIVALENCE);
                 }
-                super.run();
+                super.run(strategy);
                 if (conversation == null) {
-                    setConversationType(PromptType.ATTACK_EQUIVALENCE);
+                    setConversationType(EQUIVALENCE);
                 }
             } while (!conversation.isEmpty());
 
@@ -100,11 +75,11 @@ class LlmEquivalenceService extends LlmSubActionService {
      * llm is complete.
      */
     @Override
-    protected Optional<String> generate() {
+    protected Optional<String> generate(LlmStrategy strategy) {
         if (conversation.isEmpty()) {
             //conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
-            conversation.addSystemMessage(systemPrompt, model); //TODO Eventually add customizability back in
-            conversation.addUserMessage(game.getCUT().getSourceCode()
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM), model);
+            conversation.addUserMessage(game.getCUT().getSourceCode()//TODO customize
                     + "\n###\n" + flagged.getPatchString(), model);
         }
         String response = promptService.getResponse(model, conversation);
@@ -112,8 +87,8 @@ class LlmEquivalenceService extends LlmSubActionService {
     }
 
     @Override
-    protected void submit(String testSource) {
-        if (conversation.getType() != PromptType.ATTACK_EQUIVALENCE) {
+    protected void submit(String testSource, LlmStrategy strategy) {
+        if (!conversation.getType().equals(EQUIVALENCE)) {
             logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getType());
             throw new RuntimeException("Conversation may not be of type " + conversation.getType()
                     + " in submitEquivalenceTest");
@@ -123,8 +98,8 @@ class LlmEquivalenceService extends LlmSubActionService {
         try {
             GameManagingUtils.RejectBattlegroundEquivalenceResult result =
                     gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
-
-            if (result.testValid()) { //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
+            //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
+            if (result.testValid()) {
                 finishConversation(true);
             } else {
                 if (conversation.numberOfTries() <= numberOfRepairAttempts) {
@@ -137,11 +112,11 @@ class LlmEquivalenceService extends LlmSubActionService {
                             );
 
                         }
-                        case COMPILATION_FAILED ->
-                                correction.append("Your test failed to compile for this reason: ").append(result.compilationError());
-                        case TEST_DID_NOT_PASS_ON_CUT ->
-                                correction.append("Your test did not pass on the original code for the following reason: ")
-                                        .append(result.testCutError().orElseThrow());
+                        case COMPILATION_FAILED -> correction.append("Your test failed to compile for this reason: ")
+                                .append(result.compilationError());
+                        case TEST_DID_NOT_PASS_ON_CUT -> correction.append(
+                                        "Your test did not pass on the original code for the following reason: ")
+                                .append(result.testCutError().orElseThrow());
                     }
                     correction.append("\nFix these problems.");
                     conversation.addSystemMessage(correction.toString(), model);
@@ -155,11 +130,4 @@ class LlmEquivalenceService extends LlmSubActionService {
             throw new RuntimeException(e);
         }
     }
-
-    static Class<? extends LlmEquivalenceService> getService(LlmStrategy strategy) {
-        List<Class<? extends LlmSubActionService>> l = List.of(LlmEquivalenceService.class);
-        return getServiceClass(l, strategy).asSubclass(LlmEquivalenceService.class);
-    }
-
-
 }

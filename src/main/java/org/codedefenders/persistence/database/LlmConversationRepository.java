@@ -34,7 +34,6 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.service.UserService;
@@ -64,12 +63,12 @@ public class LlmConversationRepository {
             @Language("SQL")
             String sql = """
                     INSERT INTO llm_conversations(
-                        Strategy, Type, Game_ID, User_ID, Is_Active, Is_Success, Test_ID, Mutant_ID)
+                        Strategy_Name, Type, Game_ID, User_ID, Is_Active, Is_Success, Test_ID, Mutant_ID)
                         value (?, ?, ?, ?, ?, ?, ?, ?);
                     """;
             conversation.setId(queryRunner.insert(sql, ResultSetUtils.generatedKeyFromRS(),
-                    conversation.getStrategy().name(),
-                    conversation.getType().toString(),
+                    conversation.getStrategyName(),
+                    conversation.getType(),
                     conversation.getGame().getId(),
                     conversation.getUser().getId(),
                     conversation.isActive(),
@@ -132,8 +131,8 @@ public class LlmConversationRepository {
             while (rs.next()) {
                 int id = rs.getInt("Conversation_ID");
                 if (currentConversation == null || currentConversation.getId() != id) {
-                    LlmStrategy strategy = Optional.of(LlmStrategy.valueOf(rs.getString("Strategy"))).orElse(LlmStrategy.INVALID);
-                    PromptType promptType = PromptType.valueOf(rs.getString("Type"));
+                    String strategy = rs.getString("Strategy_Name");
+                    String type = rs.getString("Type");
                     int userId = rs.getInt("User_ID");
                     SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
                     boolean active = rs.getBoolean("Is_active");
@@ -141,7 +140,7 @@ public class LlmConversationRepository {
                     int testId = rs.getInt("TEST_ID");
                     int mutantId = rs.getInt("MUTANT_ID");
                     currentConversation = new LlmConversation(
-                            promptType, game, user, strategy, active, success, testId, mutantId);
+                            type, game, user, strategy, active, success, testId, mutantId);
                     currentConversation.setId(id);
                     result.add(currentConversation);
                 }

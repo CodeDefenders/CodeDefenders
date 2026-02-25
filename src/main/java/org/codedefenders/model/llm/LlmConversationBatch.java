@@ -31,11 +31,11 @@ import org.codedefenders.game.AbstractGame;
  * equivalence duel, for example.
  * <p>
  * Within one LLM action, the prompt type of this conversation should be established in the beginning,
- * before querying the LLM, and remain unchanged thereafter. This prompt type is represented by
+ * before querying the LLM, and remain unchanged thereafter. This prompt type is represented by TODO outdated
  * {@link LlmConversationBatch#currentType}.
  */
 public class LlmConversationBatch {
-    private final Map<PromptType, LlmConversation> messageLists = new HashMap<>();
+    private final Map<String, LlmConversation> messageLists = new HashMap<>();
     private final AbstractGame game;
     private final SimpleUser user;
 
@@ -59,8 +59,8 @@ public class LlmConversationBatch {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("LlmConversationBatch:{");
-        for (PromptType t : messageLists.keySet()) {
-            sb.append(t.name()).append(":{");
+        for (String t : messageLists.keySet()) {
+            sb.append(t).append(":{");
             sb.append(messageLists.get(t));
             sb.append("}");
         }
@@ -71,9 +71,9 @@ public class LlmConversationBatch {
      * Returns the conversation associated with the specified type.
      * If no such conversation exists, a new one is created.
      */
-    public LlmConversation getConversation(PromptType type) {
+    public LlmConversation getConversation(String type) {
         if (!messageLists.containsKey(type)) {
-            LlmConversation con = new LlmConversation(type, game, user, strategy, true, false, 0, 0);
+            LlmConversation con = new LlmConversation(type, game, user, strategy.getName(), true, false, 0, 0);
             messageLists.put(type, con);
         }
         return messageLists.get(type);

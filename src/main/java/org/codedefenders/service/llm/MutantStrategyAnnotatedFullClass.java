@@ -20,43 +20,13 @@ package org.codedefenders.service.llm;
 
 import java.util.Optional;
 
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
 
-@Strategy(LlmStrategy.MUTANT_ANNOTATED_FULL_CLASS)
 public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
-
-    public static final String initialPrompt = """
-            You are a capable java developer playing a game. You want to win by getting as many points as possible.
-            You get points by writing bugs in source code that are difficult to detect by unit tests.
-            Every unit test that covers your bug without failing gets you a point.
-            Once your bug is detected, it will stop gathering points.
-
-            You will see a java class with specific annotations. Every line has a comment in the format
-            `//coverage: c, killed: k, alive: a`
-            Instead of c, k or a there will be a number.
-            c refers to the number of tests that already cover this line.
-            k refers to the mutants that have already been killed here.
-            a refers to the mutants that are currently alive.
-
-            Write a mutated version of this class to get points.
-
-            It is crucial that you do not include these comments with the specific annotations. Your submission
-            will be rejected if any comments of this format are included.
-            Other comments must remain as they are.
-
-            Changing several parts of will only make you more likely to be detected, so keep your changes small.
-
-            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
-            operators, etc. Always abide by it.
-
-            Reply only with the modified code, nothing else.
-
-            Never use natural language.
-            """;
 
     @Override
     protected void onSubmitSuccess() {
@@ -69,11 +39,12 @@ public class MutantStrategyAnnotatedFullClass extends LlmMutantService {
     }
 
     @Override
-    protected Optional<String> generate() {
-        setConversationType(PromptType.ATTACK_DEFAULT);
+    protected Optional<String> generate(LlmStrategy strategy) {
+        setConversationType(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(MutantStrategyAnnotatedFullClass.initialPrompt, model);
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM),
+                    model);
             conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
         }
         String result = promptService.getResponse(model, conversation);

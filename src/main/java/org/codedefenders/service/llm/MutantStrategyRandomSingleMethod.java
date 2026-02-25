@@ -22,12 +22,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import jakarta.enterprise.context.RequestScoped;
-
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.model.llm.PromptType;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.codedefenders.util.LlmUtils;
@@ -41,21 +39,8 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-@Strategy(LlmStrategy.MUTANT_RANDOM_SINGLE_METHOD)
 public class MutantStrategyRandomSingleMethod extends LlmMutantService {
-    private static Logger logger = LoggerFactory.getLogger(MutantStrategyRandomSingleMethod.class);
-
-    public static final String systemPrompt = """
-            Change the following piece of java code in a way that is difficult to test against.
-            Your change has to introduce changes to the output or side effects, \
-            it must not be equivalent to the original code.
-
-            There is a strict rule of not allowing any new control structures, such as if, while, ternary \
-            operators, etc.
-            Comments must remain as they are.
-
-            Reply only with the modified code, nothing else.
-            """;
+    private static final Logger logger = LoggerFactory.getLogger(MutantStrategyRandomSingleMethod.class);
 
     @Override
     protected void onSubmitSuccess() {
@@ -70,8 +55,8 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
     }
 
     @Override
-    protected Optional<String> generate() {
-        setConversationType(PromptType.ATTACK_DEFAULT);
+    protected Optional<String> generate(LlmStrategy strategy) {
+        setConversationType(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
 
         if (conversation.isEmpty()) {
@@ -83,7 +68,7 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
             baggage().originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
 
 
-            conversation.addSystemMessage(systemPrompt, model);
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM), model);
             conversation.addUserMessage(baggage().originalMethodCode, model);
         }
 

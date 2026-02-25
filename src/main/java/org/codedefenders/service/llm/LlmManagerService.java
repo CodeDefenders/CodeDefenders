@@ -37,7 +37,6 @@ import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -47,6 +46,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
+import org.codedefenders.model.llm.LlmDefaultStrategy;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -60,6 +60,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dev.langchain4j.exception.TimeoutException;
+
+import static org.codedefenders.model.llm.LlmDefaultStrategy.EQUIVALENCE_DEFAULT;
+import static org.codedefenders.model.llm.LlmDefaultStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
+import static org.codedefenders.model.llm.LlmDefaultStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
 
 /**
  * This class manages actions of llm players. All information about which llm players are activated in which games
@@ -208,15 +212,15 @@ public class LlmManagerService {
 
         LlmStrategy testStrategy = role == Role.DEFENDER ? strategy : null;
         LlmStrategy mutantStrategy = role == Role.ATTACKER ? strategy : null;
-        LlmStrategy equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT; //TODO Adjustable
+        LlmStrategy equivalenceStrategy = LlmStrategy.of(EQUIVALENCE_DEFAULT); //TODO Adjustable
         LlmStrategy conStrategy;
         if (strategy != null) {
             conStrategy = strategy;
         } else { //TODO Define default strategies elsewhere
             if (role == Role.DEFENDER) {
-                conStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
+                conStrategy = LlmStrategy.of(TEST_FULL_SUITE_PLUS_DEFAULT);
             } else {
-                conStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
+                conStrategy = LlmStrategy.of(MUTANT_ANNOTATED_SINGLE_METHOD);
             }
         }
 
@@ -289,7 +293,7 @@ public class LlmManagerService {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         final int gameId = game.getId();
 
-        LlmStrategy equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
+        LlmStrategy equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategy.EQUIVALENCE_DEFAULT);
         LlmStrategy testStrategy = activeLlmDefenders.getStrategy(gameId);
         LlmStrategy mutantStrategy = activeLlmAttackers.getStrategy(gameId);
 
@@ -367,13 +371,13 @@ public class LlmManagerService {
                                  LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
         if (testStrategy == null) {
-            testStrategy = LlmStrategy.TEST_FULL_SUITE_PLUS_DEFAULT; //TODO Define default strategies elsewhere
+            testStrategy = LlmStrategy.of(TEST_FULL_SUITE_PLUS_DEFAULT); //TODO Define default strategies elsewhere
         }
         if (mutantStrategy == null) {
-            mutantStrategy = LlmStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
+            mutantStrategy = LlmStrategy.of(LlmDefaultStrategy.MUTANT_DEFAULT);
         }
         if (equivalenceStrategy == null) {
-            equivalenceStrategy = LlmStrategy.EQUIVALENCE_DEFAULT;
+            equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategy.EQUIVALENCE_DEFAULT);
         }
 
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
@@ -387,9 +391,9 @@ public class LlmManagerService {
             LlmMutantService mutantService;
             LlmTestService testService;
 
-            equivalenceService = CDIUtil.getBeanFromCDI(LlmEquivalenceService.getService(equivalenceStrategy));
-            mutantService = CDIUtil.getBeanFromCDI(LlmMutantService.getService(mutantStrategy));
-            testService = CDIUtil.getBeanFromCDI(LlmTestService.getService(testStrategy));
+            equivalenceService = (LlmEquivalenceService) CDIUtil.getBeanFromCDI(equivalenceStrategy.getService());
+            mutantService = (LlmMutantService) CDIUtil.getBeanFromCDI(mutantStrategy.getService());
+            testService = (LlmTestService) CDIUtil.getBeanFromCDI(testStrategy.getService());
 
             Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
             Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
@@ -400,9 +404,9 @@ public class LlmManagerService {
 
             if (role == Role.DEFENDER) {
                 testService.claimEquivalent();
-                testService.run();
+                testService.run(testStrategy);
             } else {
-                equivalenceService.run();
+                equivalenceService.run(equivalenceStrategy);
                 if (equivalentOnlyGames.contains(game.getId()) && gameService.getFlaggedMutants(user, game).isEmpty()) {
                     equivalentOnlyGames.remove((Integer) game.getId());
                     finishPlayer(game.getId(), role);
@@ -410,7 +414,7 @@ public class LlmManagerService {
                 }
                 if (role == Role.ATTACKER) {
                     if (!equivalentOnlyGames.contains(game.getId())) {
-                        mutantService.run();
+                        mutantService.run(mutantStrategy);
                     }
                 } else {
                     boolean attackAvailable = activeLlmAttackers.getState(game.getId()) == ThreadState.ACTIVE;
@@ -423,9 +427,9 @@ public class LlmManagerService {
 
                     mutantService.claimEquivalent();
                     if (attack) {
-                        mutantService.run();
+                        mutantService.run(mutantStrategy);
                     } else {
-                        testService.run();
+                        testService.run(testStrategy);
                     }
                 }
             }

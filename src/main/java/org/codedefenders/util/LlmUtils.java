@@ -19,6 +19,7 @@
 package org.codedefenders.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -30,8 +31,10 @@ import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
+import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
@@ -278,5 +281,14 @@ public class LlmUtils {
             }
         }
         return false;
+    }
+
+    public static String getMethodContent(String source, CallableDeclaration<?> methodDeclaration) {
+        Range range =  methodDeclaration.getRange().orElseThrow();
+        int begin = range.begin.line - 1;
+        int end = range.end.line;
+        String[] lines = source.split("\n");
+        String [] methodLines = Arrays.copyOfRange(lines, begin, end);
+        return String.join("\n", methodLines);
     }
 }
