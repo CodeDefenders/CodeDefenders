@@ -99,6 +99,10 @@ public class LlmStrategy {
                 .toLowerCase();
     }
 
+    public boolean isReadOnly() {
+        return base.name().equals(name);
+    }
+
     public LlmDefaultStrategy getBase() {
         return base;
     }

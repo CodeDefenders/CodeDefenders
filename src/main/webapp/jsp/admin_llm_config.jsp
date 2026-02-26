@@ -81,9 +81,9 @@
             </div>
         </div>
 
-        <t:admin_llm_strat_table strategies="${attackStrategies}" title="Attack strategies"/>
-        <t:admin_llm_strat_table strategies="${defendStrategies}" title="Defend strategies"/>
-        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies"/>
+        <t:admin_llm_strat_table strategies="${attackStrategies}" title="Attack strategies" htmlId="attackTable"/>
+        <t:admin_llm_strat_table strategies="${defendStrategies}" title="Defend strategies" htmlId="defendTable"/>
+        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies" htmlId="equivTable"/>
 
         <script type="module">
             console.log("MODELS: ${models}");

@@ -18,6 +18,8 @@
  */
 package org.codedefenders.model.llm;
 
+import java.util.List;
+
 import org.codedefenders.service.llm.LlmEquivalenceService;
 import org.codedefenders.service.llm.LlmSubActionService;
 import org.codedefenders.service.llm.MutantStrategyAnnotatedFullClass;
@@ -55,5 +57,10 @@ public enum LlmDefaultStrategy {
 
     LlmDefaultStrategy(Class<? extends LlmSubActionService> service) {
         this(service, 1);
+    }
+
+    public List<LlmPromptType> getRelevantPrompts() {
+        //TODO Adapt to only show relevant prompts - automatically would be nice, otherwise constructor-supplied
+        return List.of(LlmPromptType.values());
     }
 }
