@@ -21,7 +21,11 @@ package org.codedefenders.servlets.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
@@ -35,6 +39,8 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
+import org.codedefenders.model.llm.LlmDefaultStrategy;
+import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.GameRepository;
@@ -191,25 +197,25 @@ public class LlmApi extends HttpServlet {
     }
 
     /**
-     * Change aspects of a single Large Language Model that is included as a JSON object in the post request.
+     * Change aspects of a single Large Language Model or strategy.
+     *
      * <p>
      * Supported actions (formTypes):
+     *
      * <p>
      * - setActive -> The model identified by type and name is set as active or inactive, depending on the attribute
-     * in the JSON object. Other fields, such as prompts, are ignored.
+     * in the JSON object.
+     *
      * <p>
      * - updatePrompts -> The prompts of the model are adjusted according to the attributes in the JSON object.
      * The 'active' attribute is ignored.
-     * <p>
-     * - resetDefault -> The default model is reset to the hardcoded default prompts. The JSON object is completely
-     * ignored.
      */
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Gson gson = new Gson();
-        LlModel model = gson.fromJson(req.getReader(), LlModel.class);
         String action = ServletUtils.formType(req);
         switch (action) {
             case "setActive" -> {
+                LlModel model = gson.fromJson(req.getReader(), LlModel.class);
                 if (model.getType() != null && model.getName() != null) {
                     llmRepo.setActive(model.getName(), model.getType(), model.isActive());
                     if (!model.isActive()) {
@@ -221,11 +227,36 @@ public class LlmApi extends HttpServlet {
                 }
             }
             case "updatePrompts" -> {
+                Optional<String> customName = ServletUtils.getStringParameter(req, "customName");
+                Optional<LlmDefaultStrategy> baseStrategy = ServletUtils.getEnumParameter(
+                        req,
+                        LlmDefaultStrategy.class,
+                        "baseStrategy");
+                Map<LlmPromptType, String> customPrompts = new HashMap<>();
+                Iterator<String> otherParams = req.getParameterNames().asIterator();
+                while (otherParams.hasNext()) {
+                    String promptName = otherParams.next();
+                    if (promptName.equals("customName") || promptName.equals("baseStrategy")
+                            || promptName.equals("formType")) {
+                        continue;
+                    }
+                    LlmPromptType promptType;
+                    try {
+                        promptType = LlmPromptType.valueOf(promptName);
+                        customPrompts.put(promptType, ServletUtils.getStringParameter(req, promptName).get());
+
+                    } catch (IllegalArgumentException e) {
+                        logger.error("No such prompt type:{}", promptName);
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                        return;
+                    }
+
+                }
+
+                logger.info("Map: {}", customPrompts);
+
                 //llmRepo.updatePrompts(model);TODO FÜR STRATS STATT PROMPTS
-                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
-            }
-            case "resetDefault" -> {
-                //llmRepo.resetDefaultModel(); TODO FÜR STRATS STATT PROMPTS!
                 resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
             default -> logger.error("Unknown formType: {}", action);

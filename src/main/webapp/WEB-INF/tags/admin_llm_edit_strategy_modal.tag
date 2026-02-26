@@ -38,17 +38,30 @@
     //pageContext.setAttribute("namesToContent", namesToContent);
 %>
 
-<t:modal title="Edit strategy" id="${htmlId}">
+<form id="${htmlId}-form" action="${url.forPath("/api/llm")}" method="post">
+    <input type="hidden" name="formType" value="updatePrompts">
+    <input type="hidden" name="baseStrategy" value="${baseStrategy.name()}">
+
+    <t:modal title="Edit strategy" id="${htmlId}">
     <jsp:attribute name="content">
-        <button id="${htmlId}-add-prompt">
+        <label for="${htmlId}-custom-name"></label>
+        <input id="${htmlId}-custom-name" type="text" name="customName">
+        <button id="${htmlId}-add-prompt" type="button">
             Add custom prompt
         </button>
         <div id="${htmlId}-content-pane">
 
         </div>
     </jsp:attribute>
+        <jsp:attribute name="footer">
+            <button type="submit">
+                Create custom strategy
+            </button>
+        </jsp:attribute>
 
-</t:modal>
+    </t:modal>
+
+</form>
 
 <div id="${htmlId}-template" style="display: none">
     <div><!-- TODO style -->
@@ -61,7 +74,7 @@
             </c:forEach>
         </select>
         <label for="${htmlId}-area">Prompt content:</label>
-        <textarea id="${htmlId}-area"></textarea>
+        <textarea id="${htmlId}-area" form="${htmlId}-form"></textarea>
 
     </div>
 </div>
@@ -73,14 +86,14 @@
     let counter = 0;
 
     const namePromptMap = new Map([//TODO This is horrible
-                <% for (Map.Entry<String, String> entry : namesToContent.entrySet()) { %>
-                ["<%= entry.getKey() %>", "<%= entry.getValue()
+        <% for (Map.Entry<String, String> entry : namesToContent.entrySet()) { %>
+        ["<%= entry.getKey() %>", "<%= entry.getValue()
         .replace("\r\n", "\\n")
         .replace("\r", "\\n")
          .replace("\n", "\\n")
          .replace("\"", "\\\"")
          .replace("#", "\\#")%>"],
-            <% } %>]);
+        <% } %>]);
 
 
     addPromptButton.addEventListener("click", evt => {
@@ -96,7 +109,11 @@
         });
 
         clone.querySelector("select").addEventListener("change", e => {
-            clone.querySelector("textarea").textContent = namePromptMap.get(clone.querySelector("select")
+            const select = clone.querySelector("select");
+            const textarea = clone.querySelector("textarea")
+            textarea.name = select.value;
+
+            clone.querySelector("textarea").textContent = namePromptMap.get(select
                     .value.replaceAll("\n", "<b>"));
         });
         document.getElementById("${htmlId}-content-pane").appendChild(clone);
