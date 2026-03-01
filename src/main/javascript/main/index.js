@@ -27,7 +27,8 @@ import PushSocket from './push_socket';
 import PuzzleAPI from './puzzle_api';
 import AchievementNotifications from './achievement_notifications';
 import DynamicClassViewer from "../game/dynamic_class_viewer";
-import ShowToasts from './show_toasts'
+import ShowToasts from './show_toasts';
+import runLandingPageAnimation from './landing_page_animation';
 
 
 export {
@@ -42,7 +43,8 @@ export {
     PuzzleAPI,
     AchievementNotifications,
     DynamicClassViewer,
-    ShowToasts
+    ShowToasts,
+    runLandingPageAnimation,
 }
 
 export * from './utils';
