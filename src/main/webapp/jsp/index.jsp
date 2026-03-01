@@ -45,7 +45,7 @@
 
     <jsp:body>
         <%-- Vertically align content if enough space is available. --%>
-        <div class="container py-4 page">
+        <div class="container py-5 page">
             <div class="d-flex flex-column align-items-center gap-3 mb-3">
                 <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
                     <%-- Make the header break nicely on smaller screens. --%>
@@ -112,50 +112,47 @@
             </div>
         </div>
 
-        <div class="page container py-4">
-            <div class="row g-4">
-                <div class="col-xxl-6 col-12">
-                    <div class="p-5 bg-light rounded-3">
-                        <h2 class="mb-3">Active Battleground Games</h2>
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>Creator</th>
-                                    <th>Class</th>
-                                    <th>Attackers</th>
-                                    <th>Defenders</th>
-                                    <th>Level</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <c:choose>
-                                    <c:when test="${empty openMultiplayerGames}">
-                                        <tr>
-                                            <td colspan="100" class="text-center">
-                                                There are currently no open games.
-                                            </td>
+        <div class="page container bg-light rounded-6-md mb-5">
+            <div class="row">
+                <div class="p-5 col-xxl-6 col-12">
+                    <h2 class="mb-3">Active Battleground Games</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>Creator</th>
+                                <th>Class</th>
+                                <th>Attackers</th>
+                                <th>Defenders</th>
+                                <th>Level</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:choose>
+                                <c:when test="${empty openMultiplayerGames}">
+                                    <tr>
+                                        <td colspan="100" class="text-center">
+                                            There are currently no open games.
+                                        </td>
+                                    </tr>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach items="${openMultiplayerGames}" var="game">
+                                        <tr id="game-${game.id}">
+                                            <td>${gameCreatorNames[game.id]}</td>
+                                            <td><span>${game.CUT.alias}</span></td>
+                                            <td>${game.attackerPlayers.size()}</td>
+                                            <td>${game.defenderPlayers.size()}</td>
+                                            <td>${game.level.formattedString}</td>
                                         </tr>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:forEach items="${openMultiplayerGames}" var="game">
-                                            <tr id="game-${game.id}">
-                                                <td>${gameCreatorNames[game.id]}</td>
-                                                <td><span>${game.CUT.alias}</span></td>
-                                                <td>${game.attackerPlayers.size()}</td>
-                                                <td>${game.defenderPlayers.size()}</td>
-                                                <td>${game.level.formattedString}</td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:otherwise>
-                                </c:choose>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
+                            </tbody>
+                        </table>
                     </div>
-
-
-                    <div class="p-5 bg-light rounded-3">
+                </div>
+                <div class="p-5 col-xxl-6 col-12">
                         <h2 class="mb-3">Active Melee Games</h2>
                         <div class="table-responsive">
                             <table class="table table-striped">
@@ -191,24 +188,25 @@
                             </table>
                         </div>
                     </div>
-                </div>
+            </div>
+        </div>
 
-                <div class="col-xxl-6 col-12">
-                    <div class="p-5 bg-light rounded-3">
-                        <h2 class="mb-3">Research</h2>
-                        <%@ include file="/jsp/research.jsp" %>
-                    </div>
+        <div class="page container bg-light rounded-6-md mb-5">
+            <div class="p-5">
+                <h2 class="mb-3">Research</h2>
+                <div class="two-cols-xxl">
+                    <%@ include file="/jsp/research.jsp" %>
                 </div>
             </div>
         </div>
 
 
-        <div class="page container py-4">
+        <div class="page container py-5">
             <div class="usage">
-                <h2>Use CodeDefenders for your lessons</h2>
+                <h2 class="mb-3">Use CodeDefenders for your lessons</h2>
                 <p>
-                    CodeDefenders is an open source software maintained by the Chair of Software Engineering II at the
-                    University of Passau.
+                    CodeDefenders is an open source software developed and maintained at the Chair of Software
+                    Engineering&nbspII at the University of Passau.
                     The source code is available along with install instructions on
                     <a href="https://github.com/CodeDefenders/CodeDefenders/" rel="noopener" target="_blank"
                        title="CodeDefenders repo on GitHub">GitHub</a>.<br>

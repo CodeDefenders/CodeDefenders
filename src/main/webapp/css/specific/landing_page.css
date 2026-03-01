@@ -39,11 +39,11 @@
 
 .intro, .usage {
     font-size: 16px;
-    text-align: center;
     margin-bottom: 48px;
     line-height: 1.7;
     max-width: 800px;
     margin-inline: auto;
+    padding-inline: 3rem;
 }
 
 .intro {
@@ -63,7 +63,7 @@
 
 .anim .row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 24px;
     align-items: stretch;
     margin-bottom: 24px;
@@ -336,4 +336,25 @@
     opacity: 1;
     transform: scale(1) translateY(0);
     transition: transform 0s 0s ease, opacity .3s .6s ease;
+}
+
+@media (min-width: 768px) {
+    .intro, .usage {
+        text-align: center;
+    }
+
+    .anim .row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .rounded-6-md {
+        border-radius: .6rem !important;
+    }
+}
+
+@media (min-width: 1400px) {
+    .two-cols-xxl {
+        column-count: 2;
+        column-gap: 6rem;
+    }
 }
