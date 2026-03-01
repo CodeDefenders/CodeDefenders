@@ -37,9 +37,8 @@
     letter-spacing: 1px;
 }
 
-.intro {
+.intro, .usage {
     font-size: 16px;
-    color: #64748b;
     text-align: center;
     margin-bottom: 48px;
     line-height: 1.7;
@@ -47,12 +46,18 @@
     margin-inline: auto;
 }
 
-.intro p {
+.intro {
+    color: #64748b;
+}
+
+.intro p,
+.usage p {
     margin: 0 0 12px 0;
     text-wrap: pretty;
 }
 
-.intro p:last-child {
+.intro p:last-child,
+.usage p:last-child {
     margin-bottom: 0;
 }
 

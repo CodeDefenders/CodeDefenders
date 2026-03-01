@@ -202,6 +202,31 @@
             </div>
         </div>
 
+
+        <div class="page container py-4">
+            <div class="usage">
+                <h2>Use CodeDefenders for your lessons</h2>
+                <p>
+                    CodeDefenders is an open source software maintained by the Chair of Software Engineering II at the
+                    University of Passau.
+                    The source code is available along with install instructions on
+                    <a href="https://github.com/CodeDefenders/CodeDefenders/" rel="noopener" target="_blank"
+                       title="CodeDefenders repo on GitHub">GitHub</a>.<br>
+                    We also provide docker containers for all major releases.
+                    You can find links to these containers and more information in our
+                    <a href="https://github.com/CodeDefenders/CodeDefenders/blob/master/docker/README.md"
+                       rel="noopener" target="_blank" title="CodeDefenders Docker README">docker documentation</a>.
+                </p>
+                <p>
+                    While the public instance at
+                    <a href="https://code-defenders.org/" title="Public CodeDefenders instance">code-defenders.org</a>
+                    is available for everyone to try out CodeDefenders, we strongly recommend setting up a private
+                    instance
+                    for use in the classroom to ensure a consistent performance.
+                </p>
+            </div>
+        </div>
+
         <script type="module">
             import {runLandingPageAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
