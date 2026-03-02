@@ -21,6 +21,7 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
@@ -30,7 +31,7 @@
     <div id="keymap-dropdown" class="btn-group" role="group">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle text-nowrap" type="button" id="editor-mode-menu" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-cog"></i>
-            Editor Mode:
+            ${i18n.tr("Editor Mode:")}
             <span id="current-keymap">${login.user.keyMap.CMName}</span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="editor-mode-menu">

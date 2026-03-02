@@ -24,15 +24,14 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-
-<%--<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <div class="card game-component-resize loading">
     <div class="card-body p-0 codemirror-fill">
         <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
     </div>
     <div class="card-footer">
-        <span class="align-content-end me-1">Assertion Library: ${testEditor.assertionLibrary.description}</span>
+        <span class="align-content-end me-1">${i18n.tr('Assertion Library: {0}', testEditor.assertionLibrary.description)}</span>
     </div>
 </div>
 

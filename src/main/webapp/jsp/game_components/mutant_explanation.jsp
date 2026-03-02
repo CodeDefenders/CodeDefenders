@@ -24,6 +24,8 @@
 
 <%@ page import="org.apache.commons.lang3.StringUtils"%>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
@@ -50,26 +52,26 @@
     <div class="mutantCUTLegend">
         <span class="text-nowrap">
             <span class="mutantCUTImage mutantImageAlive align-middle"></span>
-            <span class="mutantCUTLegendDesc align-middle me-1">Live</span>
+            <span class="mutantCUTLegendDesc align-middle me-1">${i18n.tr('Live')}</span>
         </span>
         <span class="text-nowrap">
             <span class="mutantCUTImage mutantImageKilled align-middle"></span>
-            <span class="mutantCUTLegendDesc align-middle me-1">Killed</span>
+            <span class="mutantCUTLegendDesc align-middle me-1">${i18n.tr('Killed')}</span>
         </span>
         <span class="text-nowrap">
             <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
-            <span class="mutantCUTLegendDesc align-middle me-1">Claimed Equivalent</span>
+            <span class="mutantCUTLegendDesc align-middle me-1">${i18n.tr('Claimed Equivalent')}</span>
         </span>
         <span class="text-nowrap">
             <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
-            <span class="mutantCUTLegendDesc align-middle">Equivalent</span>
+            <span class="mutantCUTLegendDesc align-middle">${i18n.tr('Equivalent')}</span>
         </span>
     </div>
 
     <div>
-         <span class="align-middle me-1">Mutant/Test restrictions:</span>
+        <span class="align-middle me-1">${i18n.tr('Mutant/Test restrictions:')}</span>
          <button type="button" data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
-                 title="Click for more information"
+                 title="${i18n.tr('Click for more information')}"
                  class="btn btn-xs <%=levelStyling%> align-middle">
              <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>
              <i class="fa fa-question-circle ms-1"></i>
@@ -79,7 +81,7 @@
 </div>
 
 
-<t:modal id="validator-explanation-modal" title="Validator Explanation">
+<t:modal id="validator-explanation-modal" title="${i18n.tr('Validator Explanation')}">
         <jsp:attribute name="content">
             <t:validator_explanation_mutant/>
             <div class="mt-3"></div> <%-- spacing --%>
