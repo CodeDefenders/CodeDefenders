@@ -21,6 +21,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%@ page import="org.codedefenders.game.GameLevel" %>
@@ -82,7 +83,7 @@
 
         <% if (showTestAccordion) { %>
         <div id="tests-div">
-            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+            <div class="game-component-header"><h3>${i18n.tr('JUnit Tests')}</h3></div>
             <t:test_accordion/>
         </div>
         <% } %>
@@ -92,12 +93,12 @@
         <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
         <div class="game-component-header">
-            <h3>Create a mutant here</h3>
+            <h3>${i18n.tr('Create a mutant here')}</h3>
             <div>
 
                 <form id="reset" action="${url.forPath(Paths.BATTLEGROUND_GAME)}" method="post">
                     <button class="btn btn-warning" id="btnReset">
-                        Reset
+                        ${i18n.tr('Reset')}
                     </button>
                     <input type="hidden" name="formType" value="reset">
                     <input type="hidden" name="gameId" value="${gameProducer.game.id}"/>

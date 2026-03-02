@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="CreateSingleGameBean" type="org.codedefenders.beans.CreateSingleGameBean"--%>
 
@@ -55,23 +56,23 @@
     pageContext.setAttribute("fromAdmin", fromAdmin);
 %>
 
-<p:main_page title="Create Battleground Game">
+<p:main_page title="${i18n.tr('Create Battleground Game')}">
     <div class="container-fluid">
 
-        <h2 class="text-center mb-4">Create Battleground Game</h2>
+        <h2 class="text-center mb-4">${i18n.tr('Create Battleground Game')}</h2>
 
         <c:if test="${empty gameClasses}">
             <c:choose>
                 <c:when test="${isClassUploadEnabled}">
                     <p class="text-center">
-                        Before you can start games, please
+                            ${i18n.tr('Before you can start games, please')}
                         <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.BATTLEGROUND_CREATE}"
-                           class="text-center">upload a class under test</a>.
+                           class="text-center">${i18n.tr('upload a class under test')}</a>.
                     </p>
                 </c:when>
                 <c:otherwise>
                     <p class="text-center">
-                        Games can only be started once at least one class under test has been uploaded.
+                            ${i18n.tr('Games can only be started once at least one class under test has been uploaded.')}
                     </p>
                 </c:otherwise>
             </c:choose>
@@ -88,8 +89,8 @@
                         <input type="hidden" value="${fromAdmin}" name="fromAdmin">
 
                         <div class="row mb-3">
-                            <label class="col-4 col-form-label" id="class-label" for="class-select">Class Under
-                                Test</label>
+                            <label class="col-4 col-form-label" id="class-label"
+                                   for="class-select">${i18n.tr('Class Under Test')}</label>
                             <div class="col-8 mb-3">
                                 <div class="input-group has-validation">
                                     <select class="form-select" id="class-select" name="class" required>
@@ -99,32 +100,30 @@
                                     </select>
                                     <c:if test="${isClassUploadEnabled}">
                                         <span class="input-group-text position-relative cursor-pointer"
-                                              title="Upload a class.">
+                                              title="${i18n.tr('Upload a class.')}">
                                             <a class="stretched-link text-decoration-none"
                                                href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=${Paths.BATTLEGROUND_CREATE}">
                                                 <i class="fa fa-upload"></i>
                                             </a>
                                         </span>
                                     </c:if>
-                                    <div class="invalid-feedback">Please select a class.</div>
+                                    <div class="invalid-feedback">${i18n.tr('Please select a class.')}</div>
                                 </div>
                             </div>
                             <div class="offset-4 col-8">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="predefined-mutants-switch"
                                            name="withMutants">
-                                    <label class="form-check-label" for="predefined-mutants-switch">Include predefined
-                                        mutants
-                                        (if available)</label>
+                                    <label class="form-check-label"
+                                           for="predefined-mutants-switch">${i18n.tr('Include predefined mutants (if available)')}</label>
                                 </div>
                             </div>
                             <div class="offset-4 col-8">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="predefined-tests-switch"
                                            name="withTests">
-                                    <label class="form-check-label" for="predefined-tests-switch">Include predefined
-                                        tests (if
-                                        available)</label>
+                                    <label class="form-check-label"
+                                           for="predefined-tests-switch">${i18n.tr('Include predefined tests (if available)')}</label>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +132,7 @@
                             <legend class="col-4 col-form-label pt-0" id="level-label">
                                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                                    data-bs-toggle="modal" data-bs-target="#levelExplanation">
-                                    Game Level
+                                        ${i18n.tr('Game Level')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </legend>
@@ -142,13 +141,13 @@
                                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
                                            value="${GameLevel.HARD}" required
                                            checked>
-                                    <label class="form-check-label" for="level-radio-hard">Hard</label>
+                                    <label class="form-check-label" for="level-radio-hard">${i18n.tr('Hard')}</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
                                            value="${GameLevel.EASY}" required>
-                                    <label class="form-check-label" for="level-radio-easy">Easy</label>
-                                    <div class="invalid-feedback">Please select a level.</div>
+                                    <label class="form-check-label" for="level-radio-easy">${i18n.tr('Easy')}</label>
+                                    <div class="invalid-feedback">${i18n.tr('Please select a level.')}</div>
                                 </div>
                             </div>
                         </fieldset>
@@ -157,7 +156,7 @@
                             <legend class="col-4 col-form-label pt-0" id="mutant-validator-label">
                                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                                    data-bs-toggle="modal" data-bs-target="#validatorExplanation">
-                                    Mutant Validator Level
+                                        ${i18n.tr('Mutant Validator Level')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </legend>
@@ -174,7 +173,7 @@
                                                 ${level.displayName}
                                         </label>
                                         <c:if test="${s.last}">
-                                            <div class="invalid-feedback">Please select a mutant validator level.</div>
+                                            <div class="invalid-feedback">${i18n.tr('Please select a mutant validator level.')}</div>
                                         </c:if>
                                     </div>
                                 </c:forEach>
@@ -182,16 +181,15 @@
                         </fieldset>
 
                         <div class="row mb-3"
-                             title="Maximum number of assertions per test. Increase this for difficult to test classes.">
+                             title="${i18n.tr('Maximum number of assertions per test. Increase this for difficult to test classes.')}">
                             <label class="col-4 col-form-label" id="max-assertions-label" for="max-assertions-input">
-                                Max. Assertions Per Test
+                                    ${i18n.tr('Max. Assertions Per Test')}
                             </label>
                             <div class="col-8">
                                 <input type="number" class="form-control" id="max-assertions-input"
                                        name="maxAssertionsPerTest"
                                        value="${DEFAULT_NB_ASSERTIONS}" min="1" required>
-                                <div class="invalid-feedback">Please provide a valid number. Must be greater than
-                                    zero.
+                                <div class="invalid-feedback">${i18n.tr('Please provide a valid number. Must be greater than zero.')}
                                 </div>
                             </div>
                         </div>
@@ -200,7 +198,7 @@
                             <label class="col-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
-                                    Auto Equiv. Threshold
+                                        ${i18n.tr('Auto Equiv. Threshold')}
                                     <span class="fa fa-question-circle ms-1"></span>
                                 </a>
                             </label>
@@ -208,64 +206,63 @@
                                 <input class="form-control" type="number" id="equiv-threshold-input"
                                        name="automaticEquivalenceTrigger"
                                        value="0" min="0" required>
-                                <div class="invalid-feedback">Please provide a valid number. Must be positive or zero.
+                                <div class="invalid-feedback">${i18n.tr('Please provide a valid number. Must be positive or zero.')}
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-1"
-                             title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
+                             title="${i18n.tr('Forces players to specify the intentions of their mutants/tests before they can submit them.')}">
                             <label class="col-4 col-form-label" id="capture-intentions-label"
-                                   for="capture-intentions-switch">Capture
-                                Intentions</label>
+                                   for="capture-intentions-switch">${i18n.tr('Capture Intentions')}</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
                                            name="capturePlayersIntention">
-                                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing
-                                        Players'
-                                        Intentions</label>
+                                    <label class="form-check-label"
+                                           for="capture-intentions-switch">${i18n.tr('Enable Capturing Players\' Intentions')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3"
-                             title="Allows players to chat within their team and with the enemy team.">
-                            <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
+                             title="${i18n.tr('Allows players to chat within their team and with the enemy team.')}">
+                            <label class="col-4 col-form-label" id="chat-label"
+                                   for="chat-switch">${i18n.tr('Game Chat')}</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled"
                                            checked>
-                                    <label class="form-check-label" for="chat-switch">Enable Chat</label>
+                                    <label class="form-check-label" for="chat-switch">${i18n.tr('Enable Chat')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3"
-                             title="Allows player to choose their role (attacker or defender) when joining.">
-                            <label class="col-4 col-form-label" id="choose-role-label" for="choose-role-switch">Players
-                                may choose their role</label>
+                             title="${i18n.tr('Allows player to choose their role (attacker or defender) when joining.')}">
+                            <label class="col-4 col-form-label" id="choose-role-label"
+                                   for="choose-role-switch">${i18n.tr('Players may choose their role')}</label>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="choose-role-switch"
                                            name="mayChooseRoles" checked>
-                                    <label class="form-check-label" for="choose-role-switch">Allow players to choose
-                                        their own roles</label>
+                                    <label class="form-check-label"
+                                           for="choose-role-switch">${i18n.tr('Allow players to choose their own roles')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row mb-3"
-                             title="Allows only whitelisted players to join the game.">
+                             title="${i18n.tr('Allows only whitelisted players to join the game.')}">
                             <a class="col-4 col-form-label" type="button" id="whitelist-modal-opener" data-bs-toggle="modal" data-bs-target="#whitelist-modal">
-                                Invite players
+                                    ${i18n.tr('Invite players')}
                             </a>
                             <div class="col-8 d-flex align-items-center">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="invite-only-switch"
                                            name="inviteOnly">
-                                    <label class="form-check-label" for="invite-only-switch">Allow only whitelisted
-                                        players to join</label>
+                                    <label class="form-check-label"
+                                           for="invite-only-switch">${i18n.tr('Allow only whitelisted players to join')}</label>
                                 </div>
                             </div>
                         </div>
@@ -275,8 +272,9 @@
                         <input type="hidden" name="inviteId" id="invite-id" value=""/>
 
                         <div class="row mb-3"
-                             title="Select the role the creator (you) will have in the game.">
-                            <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
+                             title="${i18n.tr('Select the role the creator (you) will have in the game.')}">
+                            <label class="col-4 col-form-label" id="role-label"
+                                   for="role-select">${i18n.tr('Creator Role')}</label>
                             <div class="col-8">
                                 <select class="form-select" id="role-select" name="roleSelection" required>
                                     <c:forEach items="${Role.multiplayerRoles()}" var="role">
@@ -285,25 +283,25 @@
                                         </option>
                                     </c:forEach>
                                 </select>
-                                <div class="invalid-feedback">Please select a role.</div>
+                                <div class="invalid-feedback">${i18n.tr('Please select a role.')}</div>
                             </div>
                         </div>
 
-                        <div class="row mb-3" title="The duration for how long the games will be open.">
+                        <div class="row mb-3" title="${i18n.tr('The duration for how long the games will be open.')}">
                             <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
 
-                            <label class="col-4 col-form-label">Set the game's duration:</label>
+                            <label class="col-4 col-form-label">${i18n.tr('Set the game\'s duration:')}</label>
                             <div class="col-8 input-group input-group-sm has-validation"
                                  style="width: 66.6666666667%;"><!-- col-8 is overridden by input-group -->
                                 <input type="number" name="days" class="form-control" id="days-input" min="0">
-                                <label for="days-input" class="input-group-text">days</label>
+                                <label for="days-input" class="input-group-text">${i18n.tr('days')}</label>
                                 <input type="number" name="hours" class="form-control" id="hours-input" min="0">
-                                <label for="hours-input" class="input-group-text">hours</label>
+                                <label for="hours-input" class="input-group-text">${i18n.tr('hours')}</label>
                                 <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
-                                <label for="minutes-input" class="input-group-text">minutes</label>
+                                <label for="minutes-input" class="input-group-text">${i18n.tr('minutes')}</label>
                                 <div class="invalid-feedback">
-                                    Please input a valid duration.
-                                    Maximum duration: <span id="displayMaxDuration">&hellip;</span>
+                                        ${i18n.tr('Please input a valid duration.')}
+                                        ${i18n.tr('Maximum duration: {0}', '<span id="displayMaxDuration">&hellip;</span>')}
                                 </div>
                             </div>
 
@@ -329,23 +327,26 @@
 
                         <c:choose>
                             <c:when test="${empty param.origin}">
-                                <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
+                                <button type="submit" class="btn btn-primary"
+                                        id="createButton">${i18n.tr('Create Game')}</button>
                             </c:when>
                             <c:otherwise>
-                                <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                                <a href="${url.forPath(param.origin)}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                                <button type="submit" class="btn btn-primary"
+                                        id="createButton">${i18n.tr('Create Game')}</button>
+                                <a href="${url.forPath(param.origin)}" id="cancel"
+                                   class="btn btn-outline-primary">${i18n.tr('Cancel')}</a>
                             </c:otherwise>
                         </c:choose>
 
                     </form>
 
-                    <t:modal id="levelExplanation" title="Level Explanation">
+                    <t:modal id="levelExplanation" title="${i18n.tr('Level Explanation')}">
                 <jsp:attribute name="content">
                     <t:level_explanation_multiplayer/>
                 </jsp:attribute>
                     </t:modal>
 
-                    <t:modal id="validatorExplanation" title="Validator Explanation">
+                    <t:modal id="validatorExplanation" title="${i18n.tr('Validator Explanation')}">
                 <jsp:attribute name="content">
                     <t:validator_explanation_mutant/>
                     <div class="mt-3"></div> <%-- spacing --%>
@@ -354,7 +355,7 @@
                     </t:modal>
 
                     <t:modal id="automaticEquivalenceTriggerExplanation"
-                             title="Auto Equivalence Duel Threshold Explanation">
+                             title="${i18n.tr('Auto Equivalence Duel Threshold Explanation')}">
                 <jsp:attribute name="content">
                     <t:automatic_duels_explanation/>
                 </jsp:attribute>

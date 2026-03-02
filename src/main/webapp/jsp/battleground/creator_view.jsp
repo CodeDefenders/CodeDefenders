@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 
@@ -55,13 +56,13 @@
         <t:mutant_accordion/>
 
         <div id="tests-div">
-            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+            <div class="game-component-header"><h3>${i18n.tr("JUnit Tests")}</h3></div>
             <t:test_accordion/>
         </div>
     </div>
 
     <div class="col-xl-6 col-12" id="cut-div">
-        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr("Class Under Test")}</h3></div>
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>

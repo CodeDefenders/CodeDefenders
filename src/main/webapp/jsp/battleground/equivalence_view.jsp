@@ -20,6 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.util.Constants" %>
@@ -46,10 +47,15 @@
     final GameClass cut = game.getCUT();
     final int mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
 
-    final String mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
-            ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-            : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
+    final String mutantClaimedKey = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
+            ? "Mutant {0} automatically claimed equivalent"
+            : "Mutant {0} claimed equivalent by {1}";
+    final Object[] mutantClaimedArgs = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
+            ? new Object[] {equivMutant.getId()}
+            : new Object[] {equivMutant.getId(), equivDefender.getName()};
 
+    pageContext.setAttribute("mutantClaimedKey", mutantClaimedKey);
+    pageContext.setAttribute("mutantClaimedArgs", mutantClaimedArgs);
     pageContext.setAttribute("mutantLine", mutantLine);
 %>
 
@@ -88,12 +94,12 @@
 
 <div class="row">
     <div class="col-xl-6 col-12" id="equivmut-div">
-        <div class="game-component-header"><h3><%=mutantClaimedMessage%>
+        <div class="game-component-header"><h3>${i18n.tr(mutantClaimedKey, mutantClaimedArgs)}
         </h3></div>
 
         <div class="equivalence-container">
 
-            <h3>Diff</h3>
+            <h3>${i18n.tr("Diff")}</h3>
             <div class="card">
                 <div class="card-body p-0 loading loading-height-200">
                     <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff"
@@ -120,7 +126,7 @@
 
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
-            <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
+            <h3 class="mt-3">${i18n.tr("Not equivalent? Write a killing test here:")}</h3>
             <form id="equivalenceForm" action="${url.forPath(Paths.BATTLEGROUND_GAME)}" method="post">
                 <input type="hidden" name="formType" value="resolveEquivalence">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
@@ -130,9 +136,11 @@
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <div class="d-flex justify-content-between mt-2 mb-2">
-                    <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent
+                    <button class="btn btn-danger" id="accept-equivalent-button"
+                            type="button">${i18n.tr("Accept As Equivalent")}
                     </button>
-                    <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test
+                    <button class="btn btn-primary" id="reject-equivalent-button"
+                            type="button">${i18n.tr("Submit Killing Test")}
                     </button>
 
                     <script type="module">
@@ -142,7 +150,7 @@
 
 
                         document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
-                            if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
+                            if (confirm('${i18n.tr("Accepting Equivalence will lose all mutant points. Are you sure?")}')) {
                                 this.form['resolveAction'].value = 'accept';
                                 this.form.submit();
                                 this.disabled = true;
@@ -158,14 +166,14 @@
 
                 </div>
 
-                <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
+                <span>${i18n.tr("Note: If the game finishes with this equivalence unsolved, you will lose points!")}</span>
             </form>
 
         </div>
     </div>
 
     <div class="col-xl-6 col-12" id="cut-div">
-        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr("Class Under Test")}</h3></div>
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
