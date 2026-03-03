@@ -111,15 +111,15 @@
     window.i18n = {
         data: {
             <c:forEach items="${i18nService.javascriptStrings}" var="s">
-            <c:set var="translation" value="${i18nService.escape(i18n.tr(i18nService.unescape(s)))}" />
-            <c:if test="${s != translation}"> <%-- only add translation mapping if a translation exists --%>
-            "${s}": "${translation}",
-            </c:if>
+                <c:set var="translation" value="${i18nService.escape(i18n.tr(i18nService.unescape(s)))}" />
+                <c:if test="${s != translation}"> <%-- only add translation mapping if a translation exists --%>
+                    "${s}": "${translation}",
+                </c:if>
             </c:forEach>
         },
-        tr: (s, ...a) => {
+        tr (s, ...a) {
             let _s = i18n.data.hasOwnProperty(s) ? i18n.data[s] : s;
-            for (let i = 0, l = a.length; i < l; i++) {
+            for (let i = 0; i < a.length; i++) {
                 _s = _s.replaceAll(`{\${i}}`, a[i]);
             }
             return _s;
