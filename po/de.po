@@ -12,71 +12,106 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.6\n"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:90
-msgid "Win Rates"
-msgstr "Gewinnquoten"
+#: src/main/webapp/jsp/about_page.jsp:26
+msgid "About Code Defenders"
+msgstr "Über CodeDefenders"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:95
-msgid "Attacker Wins:"
-msgstr "Angreifer gewinnt:"
+#: src/main/webapp/jsp/about_page.jsp:34
+msgid "Version"
+msgstr "Version"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:99
-msgid "Defender Wins:"
-msgstr "Defender gewinnt:"
+#: src/main/webapp/jsp/about_page.jsp:38
+msgid "This is Code Defenders version {0}."
+msgstr "Dies ist die Version {0} von Code Defenders."
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:105
-msgid "Feedback"
-msgstr "Feedback"
+#: src/main/webapp/jsp/about_page.jsp:45
+msgid "This is Code Defenders running on git commit {0}."
+msgstr "Dies ist Code Defenders, das auf Git-Commit {0} läuft."
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:110
-msgid "Mutation Difficulty:"
-msgstr "Schwierigkeit der Mutation:"
+#: src/main/webapp/jsp/about_page.jsp:48
+msgid "The git commit hash is {0}."
+msgstr "Der Git-Commit-Hash lautet {0}."
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:112
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:118
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:124
-msgid "Number of votes:"
-msgstr "Anzahl der Stimmen:"
+#: src/main/webapp/jsp/about_page.jsp:54
+msgid ""
+"The version is dirty, i.e., the working directory contains uncommitted "
+"changes."
+msgstr ""
+"Die Version ist schmutzig, d.h. das Arbeitsverzeichnis enthält unübertragene "
+"Änderungen."
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:116
-msgid "Test Difficulty:"
-msgstr "Schwierigkeitsgrad des Tests:"
+#: src/main/webapp/jsp/about_page.jsp:61
+msgid "Source Code"
+msgstr "Quellcode"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:122
-msgid "Game is engaging:"
-msgstr "Das Spiel ist fesselnd:"
+#: src/main/webapp/jsp/about_page.jsp:64
+msgid "CodeDefenders is developed and maintained at the"
+msgstr "CodeDefenders wird betrieben und entwickelt vom"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:130
-#: src/main/webapp/jsp/admin_analytics_users.jsp:98
-#: src/main/webapp/jsp/admin_killmap_management.jsp:558
-#: src/main/webapp/jsp/admin_killmap_management.jsp:610
-#: src/main/webapp/jsp/admin_killmap_management.jsp:659
-#: src/main/webapp/jsp/games_history.jsp:132
-#: src/main/webapp/jsp/leaderboards.jsp:40
-#: src/main/webapp/jsp/user_games_view.jsp:236
-#: src/main/webapp/jsp/user_games_view.jsp:565
-msgid "Mutants"
-msgstr "Mutanten"
+#: src/main/webapp/jsp/about_page.jsp:65
+msgid "Chair of Software Engineering II"
+msgstr "Lehrstuhl für Software Engineering II"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:135
-msgid "Mutants Alive:"
-msgstr "Lebende Mutanten:"
+#: src/main/webapp/jsp/about_page.jsp:66
+msgid "at the University of Passau and the"
+msgstr "an der Universität Passau und der"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:137
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:143
-msgid "Per Game:"
-msgstr "Pro Spiel:"
+#: src/main/webapp/jsp/about_page.jsp:67 src/main/webapp/jsp/about_page.jsp:82
+msgid "University of Leicester"
+msgstr "Universität Leicester"
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:141
-msgid "Mutants Equivalent:"
-msgstr "Äquivalente Mutanten:"
+#: src/main/webapp/jsp/about_page.jsp:70 src/main/webapp/jsp/contact.jsp:169
+msgid "Code Defenders is an open source project."
+msgstr "CodeDefenders ist ein Open Source Projekt."
 
-#: src/main/webapp/jsp/admin_analytics_classes.jsp:189
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:138
-#: src/main/webapp/jsp/admin_analytics_users.jsp:175
-#: src/main/webapp/jsp/upload_class_view.jsp:277
-msgid "Showing _TOTAL_ entries"
-msgstr "Zeige _TOTAL_ Einträge"
+#: src/main/webapp/jsp/about_page.jsp:71
+msgid "See the"
+msgstr "Gehe zur"
+
+#: src/main/webapp/jsp/about_page.jsp:73
+msgid "project page."
+msgstr "Projektseite."
+
+#: src/main/webapp/jsp/about_page.jsp:77
+msgid "Contributors"
+msgstr "Mitwirkende"
+
+#: src/main/webapp/jsp/about_page.jsp:81 src/main/webapp/jsp/about_page.jsp:87
+#: src/main/webapp/jsp/about_page.jsp:88 src/main/webapp/jsp/about_page.jsp:90
+#: src/main/webapp/jsp/about_page.jsp:91 src/main/webapp/jsp/about_page.jsp:92
+#: src/main/webapp/jsp/about_page.jsp:93 src/main/webapp/jsp/about_page.jsp:94
+#: src/main/webapp/jsp/about_page.jsp:96 src/main/webapp/jsp/about_page.jsp:97
+msgid "University of Passau"
+msgstr "Universität Passau"
+
+#: src/main/webapp/jsp/about_page.jsp:86 src/main/webapp/jsp/about_page.jsp:95
+#: src/main/webapp/jsp/about_page.jsp:98
+msgid "The University of Sheffield"
+msgstr "Universität Sheffield"
+
+#: src/main/webapp/jsp/about_page.jsp:102
+msgid "Supporters"
+msgstr "Unterstützer"
+
+#: src/main/webapp/jsp/about_page.jsp:106
+msgid ""
+"Improving Engagement of Students in Software Engineering Courses through "
+"Gamification"
+msgstr ""
+"Verbesserung des Engagements von Studierenden in Software-Engineering-Kursen "
+"durch Gamification"
+
+#: src/main/webapp/jsp/about_page.jsp:109
+msgid "Sheffield Undergraduate Research Experience"
+msgstr "Sheffield Undergraduate Research Experience"
+
+#: src/main/webapp/jsp/about_page.jsp:111
+msgid "Grant RG160969"
+msgstr "Grant RG160969"
+
+#: src/main/webapp/jsp/about_page.jsp:115 src/main/webapp/jsp/index.jsp:143
+msgid "Research"
+msgstr "Forschung"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:33
 msgid "KillMap Analytics"
@@ -181,16 +216,182 @@ msgstr "Nützliche Aktionen:"
 msgid "Sum of useful tests and useful mutants."
 msgstr "Summe der nützlichen Tests und nützlichen Mutanten."
 
-#: src/main/webapp/jsp/admin_analytics_users.jsp:28
-#: src/main/webapp/jsp/admin_analytics_users.jsp:32
-msgid "User Analytics"
-msgstr "Benutzeranalyse"
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:138
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:189
+#: src/main/webapp/jsp/admin_analytics_users.jsp:175
+#: src/main/webapp/jsp/upload_class_view.jsp:277
+msgid "Showing _TOTAL_ entries"
+msgstr "Zeige _TOTAL_ Einträge"
 
-#: src/main/webapp/jsp/admin_analytics_users.jsp:38
-#: src/main/webapp/jsp/admin_class_management.jsp:45
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:90
+msgid "Win Rates"
+msgstr "Gewinnquoten"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:95
+msgid "Attacker Wins:"
+msgstr "Angreifer gewinnt:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:99
+msgid "Defender Wins:"
+msgstr "Defender gewinnt:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:105
+msgid "Feedback"
+msgstr "Feedback"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:110
+msgid "Mutation Difficulty:"
+msgstr "Schwierigkeit der Mutation:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:112
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:118
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:124
+msgid "Number of votes:"
+msgstr "Anzahl der Stimmen:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:116
+msgid "Test Difficulty:"
+msgstr "Schwierigkeitsgrad des Tests:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:122
+msgid "Game is engaging:"
+msgstr "Das Spiel ist fesselnd:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:130
+#: src/main/webapp/jsp/admin_analytics_users.jsp:98
+#: src/main/webapp/jsp/admin_killmap_management.jsp:558
+#: src/main/webapp/jsp/admin_killmap_management.jsp:610
+#: src/main/webapp/jsp/admin_killmap_management.jsp:659
+#: src/main/webapp/jsp/games_history.jsp:132
+#: src/main/webapp/jsp/leaderboards.jsp:40
+#: src/main/webapp/jsp/user_games_view.jsp:236
+#: src/main/webapp/jsp/user_games_view.jsp:565
+msgid "Mutants"
+msgstr "Mutanten"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:135
+msgid "Mutants Alive:"
+msgstr "Lebende Mutanten:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:137
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:143
+msgid "Per Game:"
+msgstr "Pro Spiel:"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:141
+msgid "Mutants Equivalent:"
+msgstr "Äquivalente Mutanten:"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:31
+#: src/main/webapp/jsp/admin_classrooms.jsp:39
+#: src/main/webapp/jsp/admin_killmap_management.jsp:297
+#: src/main/webapp/WEB-INF/tags/navbar.tag:68
+msgid "Classrooms"
+msgstr "Räume"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:43
+#: src/main/webapp/jsp/classrooms_overview.jsp:43
+msgid "New Classroom"
+msgstr "Neuer Raum"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:48
+#: src/main/webapp/jsp/admin_killmap_management.jsp:251
+#: src/main/webapp/jsp/admin_killmap_management.jsp:287
+#: src/main/webapp/jsp/admin_killmap_management.jsp:323
+#: src/main/webapp/jsp/classrooms_overview.jsp:59
+#: src/main/webapp/jsp/classrooms_overview.jsp:69
+#: src/main/webapp/jsp/classroom_page.jsp:111
+#: src/main/webapp/jsp/classroom_page.jsp:125
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:49
+msgid "Search"
+msgstr "Suche"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:57
+#: src/main/webapp/jsp/classrooms_overview.jsp:79
+msgid "Create classroom"
+msgstr "Raum erstellen"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:58
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:80
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:754
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:972
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1020
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1071
+#: src/main/webapp/jsp/admin_system_settings.jsp:145
+#: src/main/webapp/jsp/admin_user_mgmt.jsp:154
+#: src/main/webapp/jsp/classrooms_overview.jsp:80
+#: src/main/webapp/jsp/classroom_page.jsp:296
+#: src/main/webapp/jsp/classroom_page.jsp:325
+#: src/main/webapp/jsp/classroom_page.jsp:387
+#: src/main/webapp/jsp/classroom_page.jsp:406
+#: src/main/webapp/jsp/classroom_page.jsp:425
+#: src/main/webapp/jsp/classroom_page.jsp:444
+#: src/main/webapp/jsp/classroom_page.jsp:463
+#: src/main/webapp/jsp/classroom_page.jsp:482
+#: src/main/webapp/jsp/classroom_page.jsp:501
+#: src/main/webapp/jsp/classroom_page.jsp:540
+#: src/main/webapp/jsp/classroom_page.jsp:560
+#: src/main/webapp/jsp/classroom_page.jsp:580
+#: src/main/webapp/jsp/player_feedback.jsp:112
+#: src/main/webapp/jsp/upload_class_view.jsp:206
+#: src/main/webapp/jsp/melee/details_view.jsp:147
+#: src/main/webapp/jsp/melee/create_game_view.jsp:313
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:337
+#: src/main/webapp/jsp/battleground/details_view.jsp:111
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:60
+#: src/main/webapp/jsp/admin_classrooms.jsp:62
+#: src/main/webapp/jsp/admin_classrooms.jsp:145
+#: src/main/webapp/jsp/admin_monitor_games.jsp:183
+#: src/main/webapp/jsp/admin_monitor_games.jsp:418
+#: src/main/webapp/jsp/admin_class_management.jsp:46
+#: src/main/webapp/jsp/admin_killmap_management.jsp:553
+#: src/main/webapp/jsp/admin_killmap_management.jsp:653
+#: src/main/webapp/jsp/classrooms_overview.jsp:82
+#: src/main/webapp/jsp/classrooms_overview.jsp:84
+#: src/main/webapp/jsp/classrooms_overview.jsp:180
+#: src/main/webapp/jsp/classrooms_overview.jsp:244
+#: src/main/webapp/jsp/classroom_page.jsp:298
+#: src/main/webapp/jsp/classroom_page.jsp:302
+#: src/main/webapp/jsp/contact.jsp:68 src/main/webapp/jsp/contact.jsp:70
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:64
+#: src/main/webapp/jsp/classrooms_overview.jsp:86
+#: src/main/webapp/jsp/classroom_page.jsp:304
+msgid "Please enter a valid name."
+msgstr "Bitte gebe einen gültigen Namen ein."
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:67
+#: src/main/webapp/jsp/classrooms_overview.jsp:89
+#: src/main/webapp/jsp/classroom_page.jsp:307
+#: src/main/webapp/jsp/classroom_page.jsp:343
+msgid "Maximum length: 100 characters."
+msgstr "Maximale Länge: 100 Zeichen."
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:71
+#: src/main/webapp/jsp/classrooms_overview.jsp:93
+msgid "Create Classroom"
+msgstr "Raum erstellen"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:109
+#: src/main/webapp/jsp/admin_classrooms.jsp:152
+#: src/main/webapp/jsp/classrooms_overview.jsp:130
+#: src/main/webapp/jsp/classrooms_overview.jsp:187
+#: src/main/webapp/jsp/classrooms_overview.jsp:251
+#: src/main/webapp/jsp/classroom_page.jsp:124
+msgid "Members"
+msgstr "Mitglieder"
+
 #: src/main/webapp/jsp/admin_classrooms.jsp:140
+#: src/main/webapp/jsp/admin_analytics_users.jsp:38
 #: src/main/webapp/jsp/admin_monitor_games.jsp:75
 #: src/main/webapp/jsp/admin_monitor_games.jsp:313
+#: src/main/webapp/jsp/admin_class_management.jsp:45
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:192
 #: src/main/webapp/jsp/games_history.jsp:65
 #: src/main/webapp/jsp/games_history.jsp:212
@@ -198,6 +399,33 @@ msgstr "Benutzeranalyse"
 #: src/main/webapp/jsp/user_games_view.jsp:84
 msgid "ID"
 msgstr "ID"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:158
+msgid "UID"
+msgstr "UID"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:163
+msgid "Open"
+msgstr "Offen"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:168
+msgid "Visible"
+msgstr "Sichtbar"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:172
+#: src/main/webapp/jsp/classrooms_overview.jsp:192
+#: src/main/webapp/jsp/classrooms_overview.jsp:256
+msgid "Link"
+msgstr "Link"
+
+#: src/main/webapp/jsp/admin_classrooms.jsp:182
+msgid "There aren't any classrooms... yet."
+msgstr "Es gibt noch keine Klassenzimmer... noch kein."
+
+#: src/main/webapp/jsp/admin_analytics_users.jsp:28
+#: src/main/webapp/jsp/admin_analytics_users.jsp:32
+msgid "User Analytics"
+msgstr "Benutzeranalyse"
 
 #: src/main/webapp/jsp/admin_analytics_users.jsp:39
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:89
@@ -287,27 +515,214 @@ msgstr "Getötete Mutanten:"
 msgid "Per Test:"
 msgstr "Pro Test:"
 
+#: src/main/webapp/jsp/admin_monitor_games.jsp:66
+msgid "Multiplayer Games"
+msgstr "Mehrspieler-Spiele"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:77
+#: src/main/webapp/jsp/admin_monitor_games.jsp:315
+#: src/main/webapp/jsp/admin_killmap_management.jsp:94
+#: src/main/webapp/jsp/admin_killmap_management.jsp:547
+#: src/main/webapp/jsp/games_history.jsp:67
+#: src/main/webapp/jsp/games_history.jsp:214 src/main/webapp/jsp/index.jsp:70
+#: src/main/webapp/jsp/index.jsp:110 src/main/webapp/jsp/user_games_view.jsp:86
+#: src/main/webapp/jsp/user_games_view.jsp:450
+#: src/main/webapp/jsp/user_games_view.jsp:650
+msgid "Class"
+msgstr "Klasse"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:78
+#: src/main/webapp/jsp/admin_monitor_games.jsp:316
+#: src/main/webapp/jsp/index.jsp:69 src/main/webapp/jsp/index.jsp:109
+#: src/main/webapp/jsp/user_games_view.jsp:85
+#: src/main/webapp/jsp/user_games_view.jsp:449
+#: src/main/webapp/jsp/user_games_view.jsp:649
+#: src/main/javascript/game/game_highlighting.js:278
+msgid "Creator"
+msgstr "Ersteller"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:79
+#: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/index.jsp:71
+#: src/main/webapp/jsp/scoring_system.jsp:25
+#: src/main/webapp/jsp/user_games_view.jsp:127
+#: src/main/webapp/jsp/user_games_view.jsp:451
+msgid "Attackers"
+msgstr "Angreifer"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:80
+#: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/index.jsp:72
+#: src/main/webapp/jsp/scoring_system.jsp:26
+#: src/main/webapp/jsp/user_games_view.jsp:128
+#: src/main/webapp/jsp/user_games_view.jsp:452
+msgid "Defenders"
+msgstr "Verteidiger"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:81
+#: src/main/webapp/jsp/admin_monitor_games.jsp:318
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:127
+#: src/main/webapp/jsp/games_history.jsp:70
+#: src/main/webapp/jsp/games_history.jsp:216 src/main/webapp/jsp/index.jsp:73
+#: src/main/webapp/jsp/index.jsp:112 src/main/webapp/jsp/user_games_view.jsp:88
+#: src/main/webapp/jsp/user_games_view.jsp:456
+#: src/main/webapp/jsp/user_games_view.jsp:655
+msgid "Level"
+msgstr "Level"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:85
+#: src/main/webapp/jsp/admin_monitor_games.jsp:322
+msgid "Show list of Players for each Game."
+msgstr "Liste der Spieler für jedes Spiel anzeigen."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:97
+msgid "You don't control any unfinished multiplayer games at the moment."
+msgstr "Du kontrollierst derzeit keine unvollendeten Multiplayer-Spiele."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:109
+#: src/main/webapp/jsp/admin_monitor_games.jsp:346
+msgid "Are you sure you want to stop this Game?"
+msgstr "Möchten Sie dieses Spiel wirklich beenden?"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:123
+#: src/main/webapp/jsp/admin_monitor_games.jsp:360
+#: src/main/webapp/jsp/user_games_view.jsp:549
+#: src/main/webapp/jsp/user_games_view.jsp:718
+msgid "Observe"
+msgstr "Beobachten"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:130
+#: src/main/webapp/jsp/admin_monitor_games.jsp:367
+msgid "Join as Observer"
+msgstr "Als Beobachter teilnehmen"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:152
+#: src/main/webapp/jsp/admin_monitor_games.jsp:388
+msgid "Start/Stop Game"
+msgstr "Spiel starten/beenden"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:156
+#: src/main/webapp/jsp/admin_monitor_games.jsp:392
+msgid "Are you sure you want to create a rematch for this game?"
+msgstr "Möchten Sie wirklich eine Revanche für dieses Spiel erstellen?"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:158
+#: src/main/webapp/jsp/admin_monitor_games.jsp:394
+#: src/main/webapp/jsp/melee/details_view.jsp:140
+#: src/main/webapp/jsp/battleground/details_view.jsp:104
+msgid "Rematch"
+msgstr "Revanche"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:171
+msgid "There are no players active in this game."
+msgstr "Es sind keine Spieler in diesem Spiel aktiv."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:182
+#: src/main/webapp/jsp/admin_monitor_games.jsp:417
+msgid "Game Score"
+msgstr "Spielstand"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:184
+#: src/main/webapp/jsp/admin_monitor_games.jsp:419
+msgid "Submissions"
+msgstr "Einreichungen"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:185
+#: src/main/webapp/jsp/admin_monitor_games.jsp:420
+msgid "Last Action"
+msgstr "Letzte Aktion"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:186
+#: src/main/webapp/jsp/admin_monitor_games.jsp:421
+#: src/main/webapp/jsp/games_history.jsp:134
+#: src/main/webapp/jsp/games_history.jsp:167
+#: src/main/webapp/jsp/games_history.jsp:273
+#: src/main/webapp/jsp/user_games_view.jsp:239
+#: src/main/webapp/jsp/user_games_view.jsp:275
+#: src/main/webapp/jsp/user_games_view.jsp:398
+#: src/main/webapp/jsp/user_games_view.jsp:569
+#: src/main/webapp/jsp/user_games_view.jsp:605
+#: src/main/webapp/jsp/user_games_view.jsp:733
+#: src/main/javascript/game/killmap_accordion.js:397
+#: src/main/javascript/game/mutant_accordion.js:302
+#: src/main/javascript/game/test_accordion.js:224
+msgid "Points"
+msgstr "Punkte"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:188
+msgid "Switch Role"
+msgstr "Rolle wechseln"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:189
+#: src/main/webapp/jsp/admin_monitor_games.jsp:423
+msgid "Remove Player"
+msgstr "Spieler entfernen"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:225
+#: src/main/webapp/jsp/admin_monitor_games.jsp:455
+msgid "never"
+msgstr "nie"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:264
+msgid "Are you sure you want to change the role of this player?"
+msgstr "Sind Sie sicher, dass Sie die Rolle dieses Spielers ändern möchten?"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:265
+msgid ""
+"This will keep the score, but deletes ALL of his tests, mutants and claimed "
+"equivalences and might create inconsistencies in the game."
+msgstr ""
+"Dadurch bleibt die Punktzahl erhalten, aber ALLE seine Tests, Mutanten und "
+"beanspruchten Äquivalenzen werden gelöscht, was zu Inkonsistenzen im Spiel "
+"führen kann."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:273
+#: src/main/webapp/jsp/admin_monitor_games.jsp:487
+msgid "Are you sure you want to permanently remove this player?"
+msgstr "Möchten Sie diesen Player wirklich dauerhaft entfernen?"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:274
+msgid ""
+"This will also delete ALL of his tests, mutants and claimed equivalences and "
+"might create inconsistencies in the Game."
+msgstr ""
+"Dadurch werden auch ALLE seine Tests, Mutanten und beanspruchten "
+"Äquivalenzen gelöscht, was zu Inkonsistenzen im Spiel führen kann."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:277
+#: src/main/webapp/jsp/admin_monitor_games.jsp:492
+msgid "Remove"
+msgstr "Entfernen"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:298
+msgid "Melee Games"
+msgstr "Melee-Spiele"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:317
+#: src/main/webapp/jsp/games_history.jsp:215 src/main/webapp/jsp/index.jsp:111
+#: src/main/webapp/jsp/user_games_view.jsp:87
+#: src/main/webapp/jsp/user_games_view.jsp:326
+#: src/main/webapp/jsp/user_games_view.jsp:651
+msgid "Players"
+msgstr "Spieler"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:334
+msgid "You don't control any unfinished melee games at the moment."
+msgstr "Du kontrollierst derzeit keine unvollendeten Melee-Spiele."
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:516
+msgid "Start Games"
+msgstr "Spiele starten"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:521
+msgid "Are you sure you want to stop the selected Games?"
+msgstr "Möchten Sie die ausgewählten Spiele wirklich beenden?"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:523
+msgid "Stop Games"
+msgstr "Spiele beenden"
+
 #: src/main/webapp/jsp/admin_class_management.jsp:38
 msgid "Class Management"
 msgstr "Klassenverwaltung"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:46
-#: src/main/webapp/jsp/admin_classrooms.jsp:60
-#: src/main/webapp/jsp/admin_classrooms.jsp:62
-#: src/main/webapp/jsp/admin_classrooms.jsp:145
-#: src/main/webapp/jsp/admin_killmap_management.jsp:553
-#: src/main/webapp/jsp/admin_killmap_management.jsp:653
-#: src/main/webapp/jsp/admin_monitor_games.jsp:183
-#: src/main/webapp/jsp/admin_monitor_games.jsp:418
-#: src/main/webapp/jsp/classrooms_overview.jsp:82
-#: src/main/webapp/jsp/classrooms_overview.jsp:84
-#: src/main/webapp/jsp/classrooms_overview.jsp:180
-#: src/main/webapp/jsp/classrooms_overview.jsp:244
-#: src/main/webapp/jsp/contact.jsp:68 src/main/webapp/jsp/contact.jsp:70
-#: src/main/webapp/jsp/classroom_page.jsp:298
-#: src/main/webapp/jsp/classroom_page.jsp:302
-msgid "Name"
-msgstr "Name"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:47
 msgid "Alias"
@@ -389,211 +804,6 @@ msgstr ""
 "Die Klasse kann nicht gelöscht werden, da bereits Spiele darauf gespielt "
 "wurden."
 
-#: src/main/webapp/jsp/admin_classrooms.jsp:31
-#: src/main/webapp/jsp/admin_classrooms.jsp:39
-#: src/main/webapp/jsp/admin_killmap_management.jsp:297
-#: src/main/webapp/WEB-INF/tags/navbar.tag:68
-msgid "Classrooms"
-msgstr "Räume"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:43
-#: src/main/webapp/jsp/classrooms_overview.jsp:43
-msgid "New Classroom"
-msgstr "Neuer Raum"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:48
-#: src/main/webapp/jsp/admin_killmap_management.jsp:251
-#: src/main/webapp/jsp/admin_killmap_management.jsp:287
-#: src/main/webapp/jsp/admin_killmap_management.jsp:323
-#: src/main/webapp/jsp/classrooms_overview.jsp:59
-#: src/main/webapp/jsp/classrooms_overview.jsp:69
-#: src/main/webapp/jsp/classroom_page.jsp:111
-#: src/main/webapp/jsp/classroom_page.jsp:125
-msgid "Search"
-msgstr "Suche"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:57
-#: src/main/webapp/jsp/classrooms_overview.jsp:79
-msgid "Create classroom"
-msgstr "Raum erstellen"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:58
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:80
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:754
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:972
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1020
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1071
-#: src/main/webapp/jsp/admin_user_mgmt.jsp:154
-#: src/main/webapp/jsp/admin_system_settings.jsp:145
-#: src/main/webapp/jsp/classrooms_overview.jsp:80
-#: src/main/webapp/jsp/classroom_page.jsp:296
-#: src/main/webapp/jsp/classroom_page.jsp:325
-#: src/main/webapp/jsp/classroom_page.jsp:387
-#: src/main/webapp/jsp/classroom_page.jsp:406
-#: src/main/webapp/jsp/classroom_page.jsp:425
-#: src/main/webapp/jsp/classroom_page.jsp:444
-#: src/main/webapp/jsp/classroom_page.jsp:463
-#: src/main/webapp/jsp/classroom_page.jsp:482
-#: src/main/webapp/jsp/classroom_page.jsp:501
-#: src/main/webapp/jsp/classroom_page.jsp:540
-#: src/main/webapp/jsp/classroom_page.jsp:560
-#: src/main/webapp/jsp/classroom_page.jsp:580
-#: src/main/webapp/jsp/player_feedback.jsp:112
-#: src/main/webapp/jsp/upload_class_view.jsp:206
-msgid "Cancel"
-msgstr "Abbrechen"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:64
-#: src/main/webapp/jsp/classrooms_overview.jsp:86
-#: src/main/webapp/jsp/classroom_page.jsp:304
-msgid "Please enter a valid name."
-msgstr "Bitte gebe einen gültigen Namen ein."
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:67
-#: src/main/webapp/jsp/classrooms_overview.jsp:89
-#: src/main/webapp/jsp/classroom_page.jsp:307
-#: src/main/webapp/jsp/classroom_page.jsp:343
-msgid "Maximum length: 100 characters."
-msgstr "Maximale Länge: 100 Zeichen."
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:71
-#: src/main/webapp/jsp/classrooms_overview.jsp:93
-msgid "Create Classroom"
-msgstr "Raum erstellen"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:109
-#: src/main/webapp/jsp/admin_classrooms.jsp:152
-#: src/main/webapp/jsp/classrooms_overview.jsp:130
-#: src/main/webapp/jsp/classrooms_overview.jsp:187
-#: src/main/webapp/jsp/classrooms_overview.jsp:251
-#: src/main/webapp/jsp/classroom_page.jsp:124
-msgid "Members"
-msgstr "Mitglieder"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:158
-msgid "UID"
-msgstr "UID"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:163
-msgid "Open"
-msgstr "Offen"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:168
-msgid "Visible"
-msgstr "Sichtbar"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:172
-#: src/main/webapp/jsp/classrooms_overview.jsp:192
-#: src/main/webapp/jsp/classrooms_overview.jsp:256
-msgid "Link"
-msgstr "Link"
-
-#: src/main/webapp/jsp/admin_classrooms.jsp:182
-msgid "There aren't any classrooms... yet."
-msgstr "Es gibt noch keine Klassenzimmer... noch kein."
-
-#: src/main/webapp/jsp/about_page.jsp:26
-msgid "About Code Defenders"
-msgstr "Über CodeDefenders"
-
-#: src/main/webapp/jsp/about_page.jsp:34
-msgid "Version"
-msgstr "Version"
-
-#: src/main/webapp/jsp/about_page.jsp:38
-msgid "This is Code Defenders version {0}."
-msgstr "Dies ist die Version {0} von Code Defenders."
-
-#: src/main/webapp/jsp/about_page.jsp:45
-msgid "This is Code Defenders running on git commit {0}."
-msgstr "Dies ist Code Defenders, das auf Git-Commit {0} läuft."
-
-#: src/main/webapp/jsp/about_page.jsp:48
-msgid "The git commit hash is {0}."
-msgstr "Der Git-Commit-Hash lautet {0}."
-
-#: src/main/webapp/jsp/about_page.jsp:54
-msgid ""
-"The version is dirty, i.e., the working directory contains uncommitted "
-"changes."
-msgstr ""
-"Die Version ist schmutzig, d.h. das Arbeitsverzeichnis enthält unübertragene "
-"Änderungen."
-
-#: src/main/webapp/jsp/about_page.jsp:61
-msgid "Source Code"
-msgstr "Quellcode"
-
-#: src/main/webapp/jsp/about_page.jsp:64
-msgid "CodeDefenders is developed and maintained at the"
-msgstr "CodeDefenders wird betrieben und entwickelt vom"
-
-#: src/main/webapp/jsp/about_page.jsp:65
-msgid "Chair of Software Engineering II"
-msgstr "Lehrstuhl für Software Engineering II"
-
-#: src/main/webapp/jsp/about_page.jsp:66
-msgid "at the University of Passau and the"
-msgstr "an der Universität Passau und der"
-
-#: src/main/webapp/jsp/about_page.jsp:67 src/main/webapp/jsp/about_page.jsp:82
-msgid "University of Leicester"
-msgstr "Universität Leicester"
-
-#: src/main/webapp/jsp/about_page.jsp:70 src/main/webapp/jsp/contact.jsp:169
-msgid "Code Defenders is an open source project."
-msgstr "CodeDefenders ist ein Open Source Projekt."
-
-#: src/main/webapp/jsp/about_page.jsp:71
-msgid "See the"
-msgstr "Gehe zur"
-
-#: src/main/webapp/jsp/about_page.jsp:73
-msgid "project page."
-msgstr "Projektseite."
-
-#: src/main/webapp/jsp/about_page.jsp:77
-msgid "Contributors"
-msgstr "Mitwirkende"
-
-#: src/main/webapp/jsp/about_page.jsp:81 src/main/webapp/jsp/about_page.jsp:87
-#: src/main/webapp/jsp/about_page.jsp:88 src/main/webapp/jsp/about_page.jsp:90
-#: src/main/webapp/jsp/about_page.jsp:91 src/main/webapp/jsp/about_page.jsp:92
-#: src/main/webapp/jsp/about_page.jsp:93 src/main/webapp/jsp/about_page.jsp:94
-#: src/main/webapp/jsp/about_page.jsp:96 src/main/webapp/jsp/about_page.jsp:97
-msgid "University of Passau"
-msgstr "Universität Passau"
-
-#: src/main/webapp/jsp/about_page.jsp:86 src/main/webapp/jsp/about_page.jsp:95
-#: src/main/webapp/jsp/about_page.jsp:98
-msgid "The University of Sheffield"
-msgstr "Universität Sheffield"
-
-#: src/main/webapp/jsp/about_page.jsp:102
-msgid "Supporters"
-msgstr "Unterstützer"
-
-#: src/main/webapp/jsp/about_page.jsp:106
-msgid ""
-"Improving Engagement of Students in Software Engineering Courses through "
-"Gamification"
-msgstr ""
-"Verbesserung des Engagements von Studierenden in Software-Engineering-Kursen "
-"durch Gamification"
-
-#: src/main/webapp/jsp/about_page.jsp:109
-msgid "Sheffield Undergraduate Research Experience"
-msgstr "Sheffield Undergraduate Research Experience"
-
-#: src/main/webapp/jsp/about_page.jsp:111
-msgid "Grant RG160969"
-msgstr "Grant RG160969"
-
-#: src/main/webapp/jsp/about_page.jsp:115 src/main/webapp/jsp/index.jsp:143
-msgid "Research"
-msgstr "Forschung"
-
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 #: src/main/webapp/jsp/admin_killmap_management.jsp:95
 #: src/main/webapp/jsp/admin_killmap_management.jsp:600
@@ -615,18 +825,6 @@ msgstr "KillMap-Verwaltung"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:91
 msgid "Killmap Status"
 msgstr "Killmap-Status"
-
-#: src/main/webapp/jsp/admin_killmap_management.jsp:94
-#: src/main/webapp/jsp/admin_killmap_management.jsp:547
-#: src/main/webapp/jsp/admin_monitor_games.jsp:77
-#: src/main/webapp/jsp/admin_monitor_games.jsp:315
-#: src/main/webapp/jsp/games_history.jsp:67
-#: src/main/webapp/jsp/games_history.jsp:214 src/main/webapp/jsp/index.jsp:70
-#: src/main/webapp/jsp/index.jsp:110 src/main/webapp/jsp/user_games_view.jsp:86
-#: src/main/webapp/jsp/user_games_view.jsp:450
-#: src/main/webapp/jsp/user_games_view.jsp:650
-msgid "Class"
-msgstr "Klasse"
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:156
 #: src/main/webapp/jsp/admin_killmap_management.jsp:225
@@ -821,200 +1019,9 @@ msgstr "Modus"
 msgid "Are you sure you want to delete the selected killmaps?"
 msgstr "Sind Sie sicher, dass Sie die ausgewählten Killmaps löschen möchten?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:66
-msgid "Multiplayer Games"
-msgstr "Mehrspieler-Spiele"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:78
-#: src/main/webapp/jsp/admin_monitor_games.jsp:316
-#: src/main/webapp/jsp/index.jsp:69 src/main/webapp/jsp/index.jsp:109
-#: src/main/webapp/jsp/user_games_view.jsp:85
-#: src/main/webapp/jsp/user_games_view.jsp:449
-#: src/main/webapp/jsp/user_games_view.jsp:649
-#: src/main/javascript/game/game_highlighting.js:278
-msgid "Creator"
-msgstr "Ersteller"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:79
-#: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/index.jsp:71
-#: src/main/webapp/jsp/scoring_system.jsp:25
-#: src/main/webapp/jsp/user_games_view.jsp:127
-#: src/main/webapp/jsp/user_games_view.jsp:451
-msgid "Attackers"
-msgstr "Angreifer"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:80
-#: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/index.jsp:72
-#: src/main/webapp/jsp/scoring_system.jsp:26
-#: src/main/webapp/jsp/user_games_view.jsp:128
-#: src/main/webapp/jsp/user_games_view.jsp:452
-msgid "Defenders"
-msgstr "Verteidiger"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:81
-#: src/main/webapp/jsp/admin_monitor_games.jsp:318
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:127
-#: src/main/webapp/jsp/games_history.jsp:70
-#: src/main/webapp/jsp/games_history.jsp:216 src/main/webapp/jsp/index.jsp:73
-#: src/main/webapp/jsp/index.jsp:112 src/main/webapp/jsp/user_games_view.jsp:88
-#: src/main/webapp/jsp/user_games_view.jsp:456
-#: src/main/webapp/jsp/user_games_view.jsp:655
-msgid "Level"
-msgstr "Level"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:85
-#: src/main/webapp/jsp/admin_monitor_games.jsp:322
-msgid "Show list of Players for each Game."
-msgstr "Liste der Spieler für jedes Spiel anzeigen."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:97
-msgid "You don't control any unfinished multiplayer games at the moment."
-msgstr "Du kontrollierst derzeit keine unvollendeten Multiplayer-Spiele."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:109
-#: src/main/webapp/jsp/admin_monitor_games.jsp:346
-msgid "Are you sure you want to stop this Game?"
-msgstr "Möchten Sie dieses Spiel wirklich beenden?"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:123
-#: src/main/webapp/jsp/admin_monitor_games.jsp:360
-#: src/main/webapp/jsp/user_games_view.jsp:549
-#: src/main/webapp/jsp/user_games_view.jsp:718
-msgid "Observe"
-msgstr "Beobachten"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:130
-#: src/main/webapp/jsp/admin_monitor_games.jsp:367
-msgid "Join as Observer"
-msgstr "Als Beobachter teilnehmen"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:152
-#: src/main/webapp/jsp/admin_monitor_games.jsp:388
-msgid "Start/Stop Game"
-msgstr "Spiel starten/beenden"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:156
-#: src/main/webapp/jsp/admin_monitor_games.jsp:392
-msgid "Are you sure you want to create a rematch for this game?"
-msgstr "Möchten Sie wirklich eine Revanche für dieses Spiel erstellen?"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:158
-#: src/main/webapp/jsp/admin_monitor_games.jsp:394
-msgid "Rematch"
-msgstr "Revanche"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:171
-msgid "There are no players active in this game."
-msgstr "Es sind keine Spieler in diesem Spiel aktiv."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:182
-#: src/main/webapp/jsp/admin_monitor_games.jsp:417
-msgid "Game Score"
-msgstr "Spielstand"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:184
-#: src/main/webapp/jsp/admin_monitor_games.jsp:419
-msgid "Submissions"
-msgstr "Einreichungen"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:185
-#: src/main/webapp/jsp/admin_monitor_games.jsp:420
-msgid "Last Action"
-msgstr "Letzte Aktion"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:186
-#: src/main/webapp/jsp/admin_monitor_games.jsp:421
-#: src/main/webapp/jsp/games_history.jsp:134
-#: src/main/webapp/jsp/games_history.jsp:167
-#: src/main/webapp/jsp/games_history.jsp:273
-#: src/main/webapp/jsp/user_games_view.jsp:239
-#: src/main/webapp/jsp/user_games_view.jsp:275
-#: src/main/webapp/jsp/user_games_view.jsp:398
-#: src/main/webapp/jsp/user_games_view.jsp:569
-#: src/main/webapp/jsp/user_games_view.jsp:605
-#: src/main/webapp/jsp/user_games_view.jsp:733
-#: src/main/javascript/game/killmap_accordion.js:397
-#: src/main/javascript/game/mutant_accordion.js:302
-#: src/main/javascript/game/test_accordion.js:224
-msgid "Points"
-msgstr "Punkte"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:188
-msgid "Switch Role"
-msgstr "Rolle wechseln"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:189
-#: src/main/webapp/jsp/admin_monitor_games.jsp:423
-msgid "Remove Player"
-msgstr "Spieler entfernen"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:225
-#: src/main/webapp/jsp/admin_monitor_games.jsp:455
-msgid "never"
-msgstr "nie"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:264
-msgid "Are you sure you want to change the role of this player?"
-msgstr "Sind Sie sicher, dass Sie die Rolle dieses Spielers ändern möchten?"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:265
-msgid ""
-"This will keep the score, but deletes ALL of his tests, mutants and claimed "
-"equivalences and might create inconsistencies in the game."
-msgstr ""
-"Dadurch bleibt die Punktzahl erhalten, aber ALLE seine Tests, Mutanten und "
-"beanspruchten Äquivalenzen werden gelöscht, was zu Inkonsistenzen im Spiel "
-"führen kann."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:273
-#: src/main/webapp/jsp/admin_monitor_games.jsp:487
-msgid "Are you sure you want to permanently remove this player?"
-msgstr "Möchten Sie diesen Player wirklich dauerhaft entfernen?"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:274
-msgid ""
-"This will also delete ALL of his tests, mutants and claimed equivalences and "
-"might create inconsistencies in the Game."
-msgstr ""
-"Dadurch werden auch ALLE seine Tests, Mutanten und beanspruchten "
-"Äquivalenzen gelöscht, was zu Inkonsistenzen im Spiel führen kann."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:277
-#: src/main/webapp/jsp/admin_monitor_games.jsp:492
-msgid "Remove"
-msgstr "Entfernen"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:298
-msgid "Melee Games"
-msgstr "Melee-Spiele"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:317
-#: src/main/webapp/jsp/games_history.jsp:215 src/main/webapp/jsp/index.jsp:111
-#: src/main/webapp/jsp/user_games_view.jsp:87
-#: src/main/webapp/jsp/user_games_view.jsp:326
-#: src/main/webapp/jsp/user_games_view.jsp:651
-msgid "Players"
-msgstr "Spieler"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:334
-msgid "You don't control any unfinished melee games at the moment."
-msgstr "Du kontrollierst derzeit keine unvollendeten Melee-Spiele."
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:516
-msgid "Start Games"
-msgstr "Spiele starten"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:521
-msgid "Are you sure you want to stop the selected Games?"
-msgstr "Möchten Sie die ausgewählten Spiele wirklich beenden?"
-
-#: src/main/webapp/jsp/admin_monitor_games.jsp:523
-msgid "Stop Games"
-msgstr "Spiele beenden"
-
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:32
 msgid "Puzzle Management"
-msgstr "Puzzle-Verwaltung"
+msgstr "Rätsel-Verwaltung"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:43
 msgid "Upload chapters"
@@ -1032,8 +1039,8 @@ msgstr "Leeres Kapitel hinzufügen"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:86
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1218
-#: src/main/webapp/jsp/admin_user_mgmt.jsp:156
 #: src/main/webapp/jsp/admin_system_settings.jsp:141
+#: src/main/webapp/jsp/admin_user_mgmt.jsp:156
 msgid "Save"
 msgstr "Speichern"
 
@@ -1057,7 +1064,7 @@ msgstr "Sie haben ungespeicherte Änderungen. Bitte speichern Sie diese zuerst."
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:367
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1245
 msgid "Upload Puzzles"
-msgstr "Puzzles hochladen"
+msgstr "Rätsel hochladen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:102
 msgid ""
@@ -1065,19 +1072,19 @@ msgid ""
 "puzzle archives at once by selecting multiple in the file dialog. For "
 "details on the convention, please expand the explanations."
 msgstr ""
-"Puzzles werden in ZIP-Archiven hochgeladen. Sie können mehrere Puzzle-"
-"Archive gleichzeitig hochladen, indem Sie im Dateidialog mehrere auswählen. "
-"Für Details zur Konvention klicken Sie bitte auf die Erläuterungen."
+"Rätsel werden in ZIP-Archiven hochgeladen. Sie können mehrere Rätsel-Archive "
+"gleichzeitig hochladen, indem Sie im Dateidialog mehrere auswählen. Für "
+"Details zur Konvention klicken Sie bitte auf die Erläuterungen."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:109
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:194
 msgid "Puzzle Format Explanation"
-msgstr "Erklärung zum Puzzle-Format"
+msgstr "Erklärung zum Rätsel-Format"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:115
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:200
 msgid "Puzzle Properties Explanation"
-msgstr "Erklärung der Puzzle-Eigenschaften"
+msgstr "Erklärung der Rätsel-Eigenschaften"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:121
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:206
@@ -1154,7 +1161,7 @@ msgstr "Leere Kapitelvorlage:"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:228
 msgid "Puzzle Downloads:"
-msgstr "Puzzle-Downloads:"
+msgstr "Rätsel-Downloads:"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:364
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:458
@@ -1171,11 +1178,11 @@ msgstr "Bewege zur Position"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:450
 msgid "Number of games with the puzzle"
-msgstr "Anzahl der Spiele mit dem Puzzle"
+msgstr "Anzahl der Spiele mit dem Rätsel"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:451
 msgid "Puzzle level"
-msgstr "Puzzle-Level"
+msgstr "Rätsel-Level"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:452
 msgid "Mutant is equivalent"
@@ -1275,19 +1282,27 @@ msgid "Last Editable Line"
 msgstr "Letzte bearbeitbare Zeile"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:850
+#: src/main/webapp/jsp/melee/create_game_view.jsp:132
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:135
 msgid "Game Level"
 msgstr "Spiellevel"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:854
+#: src/main/webapp/jsp/melee/create_game_view.jsp:146
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:149
 #: src/main/java/org/codedefenders/game/GameLevel.java:27
 msgid "Easy"
 msgstr "Einfach"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:855
+#: src/main/webapp/jsp/melee/create_game_view.jsp:147
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:150
 msgid "Please select a level."
 msgstr "Bitte wählen Sie ein Level aus."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:861
+#: src/main/webapp/jsp/melee/create_game_view.jsp:141
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:144
 #: src/main/java/org/codedefenders/game/GameLevel.java:29
 msgid "Hard"
 msgstr "Schwer"
@@ -1303,7 +1318,7 @@ msgstr "Mutant äquivalent"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:878
 msgid "Edit Puzzle"
-msgstr "Puzzle bearbeiten"
+msgstr "Rätsel bearbeiten"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:965
 msgid "Are you sure you want to delete chapter"
@@ -1323,11 +1338,11 @@ msgstr "Kapitel löschen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
 msgid "Are you sure you want to permanently delete puzzle"
-msgstr "Möchten Sie das Puzzle wirklich dauerhaft löschen?"
+msgstr "Möchten Sie das Rätsel wirklich dauerhaft löschen?"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1019
 msgid "Delete Puzzle"
-msgstr "Puzzle löschen"
+msgstr "Rätsel löschen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1070
 msgid "Create New Chapter"
@@ -1340,6 +1355,11 @@ msgstr "Neues Kapitel erstellen"
 #: src/main/webapp/jsp/player_feedback.jsp:39
 #: src/main/webapp/jsp/player_feedback.jsp:211
 #: src/main/webapp/jsp/user_settings.jsp:197
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:30
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:83
+#: src/main/webapp/jsp/battleground/game_history.jsp:38
+#: src/main/webapp/jsp/battleground/game_scoreboard.jsp:32
+#: src/main/webapp/jsp/battleground/game_scoreboard.jsp:38
 #: src/main/javascript/main/achievement_notifications.js:112
 msgid "Close"
 msgstr "Schließen"
@@ -1352,83 +1372,19 @@ msgstr "Speichern..."
 msgid "Could not save changes."
 msgstr "Änderungen konnten nicht gespeichert werden."
 
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:52
-msgid "Puzzle Preview"
-msgstr "Puzzle-Vorschau"
+#: src/main/webapp/jsp/admin_system_settings.jsp:53
+msgid "System Settings"
+msgstr "Systemeinstellungen"
 
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:75
-msgid "no description"
-msgstr "keine Beschreibung"
+#: src/main/webapp/jsp/admin_system_settings.jsp:96
+#: src/main/webapp/jsp/admin_system_settings.jsp:127
+msgid "This setting is required for sending emails."
+msgstr "Diese Einstellung ist für den Versand von E-Mails erforderlich."
 
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:87
-msgid "JUnit Tests"
-msgstr "JUnit-Tests"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:92
-msgid "Class Under Test"
-msgstr "Zu testende Klasse"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:99
-msgid "Properties"
-msgstr "Eigenschaften"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:112
-msgid "Type"
-msgstr "Typ"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:116
-msgid "Mutant Equivalent"
-msgstr "Mutant äquivalent"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:119
-msgid "yes"
-msgstr "ja"
-
-msgid "no"
-msgstr "nein"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:122
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:132
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:136
-msgid "N/A"
-msgstr "N/A"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:131
-msgid "Editable lines start"
-msgstr "Bearbeitbare Zeilen beginnen"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:135
-msgid "Editable lines end"
-msgstr "Bearbeitbare Zeilen enden"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:139
-msgid "Max. assertions per test"
-msgstr "Max. Assertions pro Test"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:143
-msgid "Mutant validator level"
-msgstr "Mutanten-Validator-Level"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:147
-msgid "Puzzle ID"
-msgstr "Puzzle-ID"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:155
-msgid "Chapter ID"
-msgstr "Kapitel-ID"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:159
-msgid "Position"
-msgstr "Position"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:208
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:214
-msgid "Editable lines start below"
-msgstr "Bearbeitbare Zeilen beginnen unter"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:216
-msgid "Editable lines end above"
-msgstr "Bearbeitbare Zeilen enden oberhalb"
+#: src/main/webapp/jsp/admin_system_settings.jsp:97
+#: src/main/webapp/jsp/admin_system_settings.jsp:128
+msgid "Please provide a valid value, or disable emails."
+msgstr "Bitte geben Sie einen gültigen Wert ein oder deaktivieren Sie E-Mails."
 
 #: src/main/webapp/jsp/classroom_create_games.jsp:38
 msgid "Back to Classroom"
@@ -1617,125 +1573,6 @@ msgstr ""
 msgid "Valid input format examples:"
 msgstr "Beispiele für gültige Eingabeformate:"
 
-#: src/main/webapp/jsp/closing_game_view.jsp:40
-#: src/main/webapp/jsp/index.jsp:47
-msgid "Code Defenders Logo"
-msgstr "CodeDefenders Logo"
-
-#: src/main/webapp/jsp/closing_game_view.jsp:45
-msgid ""
-"The game is currently closing&hellip;<br>User interactions are no longer "
-"possible while open equivalence duels are automatically resolved."
-msgstr ""
-"Das Spiel wird gerade beendet&hellip;<br>Benutzerinteraktionen sind nicht "
-"mehr möglich, während offene Äquivalenzduelle automatisch gelöst werden."
-
-#: src/main/webapp/jsp/admin_system_settings.jsp:53
-msgid "System Settings"
-msgstr "Systemeinstellungen"
-
-#: src/main/webapp/jsp/admin_system_settings.jsp:96
-#: src/main/webapp/jsp/admin_system_settings.jsp:127
-msgid "This setting is required for sending emails."
-msgstr "Diese Einstellung ist für den Versand von E-Mails erforderlich."
-
-#: src/main/webapp/jsp/admin_system_settings.jsp:97
-#: src/main/webapp/jsp/admin_system_settings.jsp:128
-msgid "Please provide a valid value, or disable emails."
-msgstr "Bitte geben Sie einen gültigen Wert ein oder deaktivieren Sie E-Mails."
-
-#: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don't have permission to perform this request (403)"
-msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen (403)."
-
-#: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don't have permission to perform this request."
-msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen."
-
-#: src/main/webapp/jsp/error_page_403.jsp:31
-msgid ""
-"Your accounts permissions do not include the accessed page or performed "
-"action."
-msgstr ""
-"Ihre Kontoberechtigungen umfassen nicht die aufgerufene Seite oder die "
-"durchgeführte Aktion."
-
-#: src/main/webapp/jsp/error_page_403.jsp:33
-#: src/main/webapp/jsp/error_page_404.jsp:35
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:36
-msgid "Please contact your administrator if you think this is a mistake."
-msgstr ""
-"Bitte wenden Sie sich an den Administrator, wenn Sie glauben, dass dies ein "
-"Fehler ist."
-
-#: src/main/webapp/jsp/error_page_404.jsp:27
-msgid "The page you're looking for could not be found (404)"
-msgstr "Die gesuchte Seite konnte nicht gefunden werden (404)"
-
-#: src/main/webapp/jsp/error_page_404.jsp:29
-msgid "The page could not be found, or you don't have permission to view it."
-msgstr ""
-"Die Seite konnte nicht gefunden werden oder Sie haben keine Berechtigung, "
-"sie anzuzeigen."
-
-#: src/main/webapp/jsp/error_page_404.jsp:32
-msgid ""
-"The resource that you are attempting to access does not exist, or you don't "
-"have the necessary permissions to view it."
-msgstr ""
-"Die Ressource, auf die Sie zugreifen möchten, existiert nicht oder Sie "
-"verfügen nicht über die erforderlichen Berechtigungen, um sie anzuzeigen."
-
-#: src/main/webapp/jsp/error_page_404.jsp:34
-msgid "Make sure the address is correct and that the page hasn't moved."
-msgstr ""
-"Vergewissern Sie sich, dass die Adresse korrekt ist und dass die Seite nicht "
-"verschoben wurde."
-
-#: src/main/webapp/jsp/error_page_500.jsp:26
-msgid "Internal Server Error (500)"
-msgstr "Internal Server Error (500)"
-
-#: src/main/webapp/jsp/error_page_500.jsp:28
-msgid "Internal Server Error"
-msgstr "Interner Server-Fehler"
-
-#: src/main/webapp/jsp/error_page_500.jsp:30
-msgid "There has been a problem on our side. Sorry about that."
-msgstr "Es gab ein Problem auf unserer Seite. Das tut uns leid."
-
-#: src/main/webapp/jsp/error_page_500.jsp:31
-msgid ""
-"Please try again and contact your administrator if this keeps happening."
-msgstr ""
-"Bitte versuchen Sie es erneut und wenden Sie sich an Ihren Administrator, "
-"wenn dieses Problem weiterhin auftritt."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:31
-msgid "User not found (404)"
-msgstr "Benutzer nicht gefunden (404)"
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:33
-msgid "The user with the name \\\"{0}\\\" does not exist."
-msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:35
-msgid ""
-"Make sure the address and the username are correct and that the page hasn't "
-"moved."
-msgstr "Vergewissern Sie sich, dass die URL und der Benutzername korrekt sind."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:38
-msgid "Looking for your own profile?"
-msgstr "Suchen Sie Ihr eigenes Profil?"
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:39
-msgid "your profile"
-msgstr "Ihr Profil"
-
-msgid "Click here."
-msgstr "Hier klicken."
-
 #: src/main/webapp/jsp/classrooms_overview.jsp:32
 #: src/main/webapp/jsp/classrooms_overview.jsp:38
 msgid "My Classrooms"
@@ -1778,186 +1615,6 @@ msgstr "Es gibt aktuell keine öffentlichen Räume."
 #: src/main/webapp/jsp/classrooms_overview.jsp:268
 msgid "No Classrooms found."
 msgstr "Keine Räume gefunden."
-
-#: src/main/webapp/jsp/contact.jsp:43
-#: src/main/webapp/WEB-INF/tags/footer.tag:42
-msgid "Contact Us"
-msgstr "Kontakt"
-
-#: src/main/webapp/jsp/contact.jsp:56
-msgid "You can use the form below to contact the site owners."
-msgstr ""
-"Sie können das untenstehende Formular verwenden, um die Betreiber der "
-"Website zu kontaktieren."
-
-#: src/main/webapp/jsp/contact.jsp:57
-msgid ""
-"For technical questions about Code Defenders, please contact the developers."
-msgstr ""
-"Bei technischen Fragen zu Code Defenders wenden Sie sich bitte an die "
-"Entwickler."
-
-#: src/main/webapp/jsp/contact.jsp:80 src/main/webapp/jsp/contact.jsp:82
-msgid "Subject"
-msgstr "Betreff"
-
-#: src/main/webapp/jsp/contact.jsp:85 src/main/webapp/jsp/contact.jsp:87
-msgid "Message"
-msgstr "Nachricht"
-
-#: src/main/webapp/jsp/contact.jsp:92
-msgid "Send"
-msgstr "Senden"
-
-#: src/main/webapp/jsp/contact.jsp:100
-msgid "Teacher Account Applications"
-msgstr "Anträge Lehrerkonto"
-
-#: src/main/webapp/jsp/contact.jsp:103
-msgid ""
-"Error: No email address was configured for teacher account applications."
-msgstr ""
-"Fehler: Für Lehrerkontoanmeldungen wurde keine E-Mail-Adresse konfiguriert."
-
-#: src/main/webapp/jsp/contact.jsp:107
-msgid ""
-"A teacher account lets you create classrooms for your students, so you can "
-"manage games more easily. Being logged-in is required to apply for a teacher "
-"account. Please log in to your account and come back to this page."
-msgstr ""
-"Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um Spiele "
-"einfacher zu verwalten. Um ein Lehrerkonto zu beantragen, müssen Sie "
-"angemeldet sein. Bitte melden Sie sich bei Ihrem Konto an und kehren Sie "
-"dann zu dieser Seite zurück."
-
-#: src/main/webapp/jsp/contact.jsp:112
-msgid ""
-"A teacher account lets you create classrooms for your students, so you can "
-"manage games more easily. If you're interested in turning your account into "
-"a teacher account, please use the template below to email us. You can also "
-"use this <a href='{0}'>mailto link</a> to automatically create an email with "
-"the template."
-msgstr ""
-"Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um Spiele "
-"einfacher zu verwalten. Wenn Sie Ihr Konto in ein Lehrerkonto umwandeln "
-"möchten, senden Sie uns bitte eine E-Mail mit der unten stehenden Vorlage. "
-"Sie können auch diesen <a href='{0}'>Mailto-Link</a> verwenden, um "
-"automatisch eine E-Mail mit der Vorlage zu erstellen."
-
-#: src/main/webapp/jsp/contact.jsp:116
-msgid "Show template"
-msgstr "Vorlage anzeigen"
-
-#: src/main/webapp/jsp/contact.jsp:132
-msgid "To:"
-msgstr "Bis:"
-
-#: src/main/webapp/jsp/contact.jsp:136
-msgid "Subject:"
-msgstr "Betreff:"
-
-#: src/main/webapp/jsp/contact.jsp:140
-msgid "Body:"
-msgstr "Body:"
-
-#: src/main/webapp/jsp/contact.jsp:167
-msgid "Contact the Developers"
-msgstr "Kontaktieren Sie die Entwickler"
-
-#: src/main/webapp/jsp/contact.jsp:170
-msgid "Please check out the"
-msgstr "Bitte sehen Sie sich die"
-
-#: src/main/webapp/jsp/contact.jsp:171
-msgid "project page for more details."
-msgstr "Projektseite für weitere Details an."
-
-#: src/main/webapp/jsp/games_history.jsp:58
-msgid "Game History"
-msgstr "Spielverlauf"
-
-#: src/main/webapp/jsp/games_history.jsp:60
-msgid "Battlegrounds"
-msgstr "Battlegrounds"
-
-#: src/main/webapp/jsp/games_history.jsp:66
-#: src/main/webapp/jsp/games_history.jsp:213
-#: src/main/webapp/jsp/classroom_page.jsp:761
-msgid "Owner"
-msgstr "Eigentümer"
-
-#: src/main/webapp/jsp/games_history.jsp:71
-#: src/main/webapp/jsp/games_history.jsp:217
-msgid "Actions"
-msgstr "Aktionen"
-
-#: src/main/webapp/jsp/games_history.jsp:82
-msgid "Your battleground game history is empty."
-msgstr "Deine Battleground-Spielhistorie ist leer."
-
-#: src/main/webapp/jsp/games_history.jsp:120
-#: src/main/webapp/jsp/games_history.jsp:261
-msgid "View Results"
-msgstr "Ergebnisse anzeigen"
-
-#: src/main/webapp/jsp/games_history.jsp:131
-#: src/main/webapp/jsp/classroom_page.jsp:927
-#: src/main/webapp/jsp/user_profile.jsp:237
-#: src/main/webapp/jsp/user_games_view.jsp:235
-#: src/main/webapp/jsp/user_games_view.jsp:563
-msgid "Attacker"
-msgstr "Angreifer"
-
-#: src/main/webapp/jsp/games_history.jsp:133
-#: src/main/webapp/jsp/user_games_view.jsp:238
-#: src/main/webapp/jsp/user_games_view.jsp:567
-#: src/main/javascript/game/game_highlighting.js:127
-msgid "Alive Mutants"
-msgstr "Lebende Mutanten"
-
-#: src/main/webapp/jsp/games_history.jsp:143
-#: src/main/webapp/jsp/user_games_view.jsp:248
-msgid "There are no Attackers."
-msgstr "Es gibt keine Angreifer."
-
-#: src/main/webapp/jsp/games_history.jsp:164
-#: src/main/webapp/jsp/classroom_page.jsp:929
-#: src/main/webapp/jsp/user_games_view.jsp:271
-#: src/main/webapp/jsp/user_games_view.jsp:599
-msgid "Defender"
-msgstr "Abwehr"
-
-#: src/main/webapp/jsp/games_history.jsp:166
-#: src/main/webapp/jsp/leaderboards.jsp:44
-#: src/main/webapp/jsp/user_games_view.jsp:274
-#: src/main/webapp/jsp/user_games_view.jsp:603
-msgid "Mutants Killed"
-msgstr "Getötete Mutanten"
-
-#: src/main/webapp/jsp/games_history.jsp:176
-#: src/main/webapp/jsp/user_games_view.jsp:284
-msgid "There are no Defenders."
-msgstr "Es gibt keine Verteidiger."
-
-#: src/main/webapp/jsp/games_history.jsp:207
-msgid "Melee games"
-msgstr "Melee-Spiele"
-
-#: src/main/webapp/jsp/games_history.jsp:228
-msgid "Your melee game history is empty."
-msgstr "Deine Melee-Spielhistorie ist leer."
-
-#: src/main/webapp/jsp/games_history.jsp:272
-#: src/main/webapp/jsp/classroom_page.jsp:931
-#: src/main/webapp/jsp/player_feedback.jsp:130
-#: src/main/webapp/jsp/user_games_view.jsp:397
-#: src/main/webapp/jsp/user_games_view.jsp:732
-msgid "Player"
-msgstr "Spieler"
-
-#: src/main/webapp/jsp/games_history.jsp:282
-msgid "There are no Players."
-msgstr "Es gibt keine Spieler."
 
 #: src/main/webapp/jsp/classroom_page.jsp:71
 msgid ""
@@ -2267,6 +1924,12 @@ msgstr "Teilnehmer"
 msgid "Moderator"
 msgstr "Moderator"
 
+#: src/main/webapp/jsp/classroom_page.jsp:761
+#: src/main/webapp/jsp/games_history.jsp:66
+#: src/main/webapp/jsp/games_history.jsp:213
+msgid "Owner"
+msgstr "Eigentümer"
+
 #: src/main/webapp/jsp/classroom_page.jsp:879
 msgid "This classroom has no members... yet."
 msgstr "Dieser Raum hat noch keine Mitglieder..."
@@ -2286,6 +1949,29 @@ msgstr "Melee"
 #: src/main/webapp/jsp/classroom_page.jsp:908
 msgid "unknown"
 msgstr "unbekannt"
+
+#: src/main/webapp/jsp/classroom_page.jsp:927
+#: src/main/webapp/jsp/games_history.jsp:131
+#: src/main/webapp/jsp/user_profile.jsp:237
+#: src/main/webapp/jsp/user_games_view.jsp:235
+#: src/main/webapp/jsp/user_games_view.jsp:563
+msgid "Attacker"
+msgstr "Angreifer"
+
+#: src/main/webapp/jsp/classroom_page.jsp:929
+#: src/main/webapp/jsp/games_history.jsp:164
+#: src/main/webapp/jsp/user_games_view.jsp:271
+#: src/main/webapp/jsp/user_games_view.jsp:599
+msgid "Defender"
+msgstr "Abwehr"
+
+#: src/main/webapp/jsp/classroom_page.jsp:931
+#: src/main/webapp/jsp/games_history.jsp:272
+#: src/main/webapp/jsp/player_feedback.jsp:130
+#: src/main/webapp/jsp/user_games_view.jsp:397
+#: src/main/webapp/jsp/user_games_view.jsp:732
+msgid "Player"
+msgstr "Spieler"
 
 #: src/main/webapp/jsp/classroom_page.jsp:933
 msgid "Observer"
@@ -2311,6 +1997,357 @@ msgstr "Keine Spiele gefunden."
 msgid "copied"
 msgstr "Kopiert"
 
+#: src/main/webapp/jsp/error_page_403.jsp:27
+msgid "You don't have permission to perform this request (403)"
+msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen (403)."
+
+#: src/main/webapp/jsp/error_page_403.jsp:29
+msgid "You don't have permission to perform this request."
+msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen."
+
+#: src/main/webapp/jsp/error_page_403.jsp:31
+msgid ""
+"Your accounts permissions do not include the accessed page or performed "
+"action."
+msgstr ""
+"Ihre Kontoberechtigungen umfassen nicht die aufgerufene Seite oder die "
+"durchgeführte Aktion."
+
+#: src/main/webapp/jsp/error_page_403.jsp:33
+#: src/main/webapp/jsp/error_page_404.jsp:35
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:36
+msgid "Please contact your administrator if you think this is a mistake."
+msgstr ""
+"Bitte wenden Sie sich an den Administrator, wenn Sie glauben, dass dies ein "
+"Fehler ist."
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:52
+msgid "Puzzle Preview"
+msgstr "Rätsel-Vorschau"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:75
+msgid "no description"
+msgstr "keine Beschreibung"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:87
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:154
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:187
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:244
+#: src/main/webapp/jsp/melee/creator_view.jsp:58
+#: src/main/webapp/jsp/melee/player_view.jsp:358
+#: src/main/webapp/jsp/battleground/attacker_view.jsp:86
+#: src/main/webapp/jsp/battleground/creator_view.jsp:59
+#: src/main/webapp/jsp/battleground/defender_view.jsp:134
+msgid "JUnit Tests"
+msgstr "JUnit-Tests"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:92
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:126
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:226
+#: src/main/webapp/jsp/melee/creator_view.jsp:64
+#: src/main/webapp/jsp/melee/create_game_view.jsp:90
+#: src/main/webapp/jsp/melee/player_view.jsp:223
+#: src/main/webapp/jsp/battleground/creator_view.jsp:65
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:93
+#: src/main/webapp/jsp/battleground/defender_view.jsp:80
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:176
+msgid "Class Under Test"
+msgstr "Zu testende Klasse"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:99
+msgid "Properties"
+msgstr "Eigenschaften"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:112
+msgid "Type"
+msgstr "Typ"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:116
+msgid "Mutant Equivalent"
+msgstr "Mutant äquivalent"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:119
+msgid "yes"
+msgstr "ja"
+
+msgid "no"
+msgstr "nein"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:122
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:132
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:136
+msgid "N/A"
+msgstr "N/A"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:131
+msgid "Editable lines start"
+msgstr "Bearbeitbare Zeilen beginnen"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:135
+msgid "Editable lines end"
+msgstr "Bearbeitbare Zeilen enden"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:139
+msgid "Max. assertions per test"
+msgstr "Max. Assertions pro Test"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:143
+msgid "Mutant validator level"
+msgstr "Mutanten-Validator-Level"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:147
+msgid "Puzzle ID"
+msgstr "Rätsel-ID"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:155
+msgid "Chapter ID"
+msgstr "Kapitel-ID"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:159
+msgid "Position"
+msgstr "Position"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:208
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:214
+msgid "Editable lines start below"
+msgstr "Bearbeitbare Zeilen beginnen unter"
+
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:216
+msgid "Editable lines end above"
+msgstr "Bearbeitbare Zeilen enden oberhalb"
+
+#: src/main/webapp/jsp/closing_game_view.jsp:40
+#: src/main/webapp/jsp/index.jsp:47
+msgid "Code Defenders Logo"
+msgstr "CodeDefenders Logo"
+
+#: src/main/webapp/jsp/closing_game_view.jsp:45
+msgid ""
+"The game is currently closing&hellip;<br>User interactions are no longer "
+"possible while open equivalence duels are automatically resolved."
+msgstr ""
+"Das Spiel wird gerade beendet&hellip;<br>Benutzerinteraktionen sind nicht "
+"mehr möglich, während offene Äquivalenzduelle automatisch gelöst werden."
+
+#: src/main/webapp/jsp/contact.jsp:43
+#: src/main/webapp/WEB-INF/tags/footer.tag:42
+msgid "Contact Us"
+msgstr "Kontakt"
+
+#: src/main/webapp/jsp/contact.jsp:56
+msgid "You can use the form below to contact the site owners."
+msgstr ""
+"Sie können das untenstehende Formular verwenden, um die Betreiber der "
+"Website zu kontaktieren."
+
+#: src/main/webapp/jsp/contact.jsp:57
+msgid ""
+"For technical questions about Code Defenders, please contact the developers."
+msgstr ""
+"Bei technischen Fragen zu Code Defenders wenden Sie sich bitte an die "
+"Entwickler."
+
+#: src/main/webapp/jsp/contact.jsp:80 src/main/webapp/jsp/contact.jsp:82
+msgid "Subject"
+msgstr "Betreff"
+
+#: src/main/webapp/jsp/contact.jsp:85 src/main/webapp/jsp/contact.jsp:87
+msgid "Message"
+msgstr "Nachricht"
+
+#: src/main/webapp/jsp/contact.jsp:92
+msgid "Send"
+msgstr "Senden"
+
+#: src/main/webapp/jsp/contact.jsp:100
+msgid "Teacher Account Applications"
+msgstr "Anträge Lehrerkonto"
+
+#: src/main/webapp/jsp/contact.jsp:103
+msgid ""
+"Error: No email address was configured for teacher account applications."
+msgstr ""
+"Fehler: Für Lehrerkontoanmeldungen wurde keine E-Mail-Adresse konfiguriert."
+
+#: src/main/webapp/jsp/contact.jsp:107
+msgid ""
+"A teacher account lets you create classrooms for your students, so you can "
+"manage games more easily. Being logged-in is required to apply for a teacher "
+"account. Please log in to your account and come back to this page."
+msgstr ""
+"Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um Spiele "
+"einfacher zu verwalten. Um ein Lehrerkonto zu beantragen, müssen Sie "
+"angemeldet sein. Bitte melden Sie sich bei Ihrem Konto an und kehren Sie "
+"dann zu dieser Seite zurück."
+
+#: src/main/webapp/jsp/contact.jsp:112
+msgid ""
+"A teacher account lets you create classrooms for your students, so you can "
+"manage games more easily. If you're interested in turning your account into "
+"a teacher account, please use the template below to email us. You can also "
+"use this <a href='{0}'>mailto link</a> to automatically create an email with "
+"the template."
+msgstr ""
+"Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um Spiele "
+"einfacher zu verwalten. Wenn Sie Ihr Konto in ein Lehrerkonto umwandeln "
+"möchten, senden Sie uns bitte eine E-Mail mit der unten stehenden Vorlage. "
+"Sie können auch diesen <a href='{0}'>Mailto-Link</a> verwenden, um "
+"automatisch eine E-Mail mit der Vorlage zu erstellen."
+
+#: src/main/webapp/jsp/contact.jsp:116
+msgid "Show template"
+msgstr "Vorlage anzeigen"
+
+#: src/main/webapp/jsp/contact.jsp:132
+msgid "To:"
+msgstr "Bis:"
+
+#: src/main/webapp/jsp/contact.jsp:136
+msgid "Subject:"
+msgstr "Betreff:"
+
+#: src/main/webapp/jsp/contact.jsp:140
+msgid "Body:"
+msgstr "Body:"
+
+#: src/main/webapp/jsp/contact.jsp:167
+msgid "Contact the Developers"
+msgstr "Kontaktieren Sie die Entwickler"
+
+#: src/main/webapp/jsp/contact.jsp:170
+msgid "Please check out the"
+msgstr "Bitte sehen Sie sich die"
+
+#: src/main/webapp/jsp/contact.jsp:171
+msgid "project page for more details."
+msgstr "Projektseite für weitere Details an."
+
+#: src/main/webapp/jsp/error_page_404.jsp:27
+msgid "The page you're looking for could not be found (404)"
+msgstr "Die gesuchte Seite konnte nicht gefunden werden (404)"
+
+#: src/main/webapp/jsp/error_page_404.jsp:29
+msgid "The page could not be found, or you don't have permission to view it."
+msgstr ""
+"Die Seite konnte nicht gefunden werden oder Sie haben keine Berechtigung, "
+"sie anzuzeigen."
+
+#: src/main/webapp/jsp/error_page_404.jsp:32
+msgid ""
+"The resource that you are attempting to access does not exist, or you don't "
+"have the necessary permissions to view it."
+msgstr ""
+"Die Ressource, auf die Sie zugreifen möchten, existiert nicht oder Sie "
+"verfügen nicht über die erforderlichen Berechtigungen, um sie anzuzeigen."
+
+#: src/main/webapp/jsp/error_page_404.jsp:34
+msgid "Make sure the address is correct and that the page hasn't moved."
+msgstr ""
+"Vergewissern Sie sich, dass die Adresse korrekt ist und dass die Seite nicht "
+"verschoben wurde."
+
+#: src/main/webapp/jsp/error_page_500.jsp:26
+msgid "Internal Server Error (500)"
+msgstr "Internal Server Error (500)"
+
+#: src/main/webapp/jsp/error_page_500.jsp:28
+msgid "Internal Server Error"
+msgstr "Interner Server-Fehler"
+
+#: src/main/webapp/jsp/error_page_500.jsp:30
+msgid "There has been a problem on our side. Sorry about that."
+msgstr "Es gab ein Problem auf unserer Seite. Das tut uns leid."
+
+#: src/main/webapp/jsp/error_page_500.jsp:31
+msgid ""
+"Please try again and contact your administrator if this keeps happening."
+msgstr ""
+"Bitte versuchen Sie es erneut und wenden Sie sich an Ihren Administrator, "
+"wenn dieses Problem weiterhin auftritt."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:31
+msgid "User not found (404)"
+msgstr "Benutzer nicht gefunden (404)"
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:33
+msgid "The user with the name \\\"{0}\\\" does not exist."
+msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:35
+msgid ""
+"Make sure the address and the username are correct and that the page hasn't "
+"moved."
+msgstr "Vergewissern Sie sich, dass die URL und der Benutzername korrekt sind."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:38
+msgid "Looking for your own profile?"
+msgstr "Suchen Sie Ihr eigenes Profil?"
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:39
+msgid "your profile"
+msgstr "Ihr Profil"
+
+msgid "Click here."
+msgstr "Hier klicken."
+
+#: src/main/webapp/jsp/games_history.jsp:58
+msgid "Game History"
+msgstr "Spielverlauf"
+
+#: src/main/webapp/jsp/games_history.jsp:60
+msgid "Battlegrounds"
+msgstr "Battlegrounds"
+
+#: src/main/webapp/jsp/games_history.jsp:71
+#: src/main/webapp/jsp/games_history.jsp:217
+msgid "Actions"
+msgstr "Aktionen"
+
+#: src/main/webapp/jsp/games_history.jsp:82
+msgid "Your battleground game history is empty."
+msgstr "Deine Battleground-Spielhistorie ist leer."
+
+#: src/main/webapp/jsp/games_history.jsp:120
+#: src/main/webapp/jsp/games_history.jsp:261
+msgid "View Results"
+msgstr "Ergebnisse anzeigen"
+
+#: src/main/webapp/jsp/games_history.jsp:133
+#: src/main/webapp/jsp/user_games_view.jsp:238
+#: src/main/webapp/jsp/user_games_view.jsp:567
+#: src/main/javascript/game/game_highlighting.js:127
+msgid "Alive Mutants"
+msgstr "Lebende Mutanten"
+
+#: src/main/webapp/jsp/games_history.jsp:143
+#: src/main/webapp/jsp/user_games_view.jsp:248
+msgid "There are no Attackers."
+msgstr "Es gibt keine Angreifer."
+
+#: src/main/webapp/jsp/games_history.jsp:166
+#: src/main/webapp/jsp/leaderboards.jsp:44
+#: src/main/webapp/jsp/user_games_view.jsp:274
+#: src/main/webapp/jsp/user_games_view.jsp:603
+msgid "Mutants Killed"
+msgstr "Getötete Mutanten"
+
+#: src/main/webapp/jsp/games_history.jsp:176
+#: src/main/webapp/jsp/user_games_view.jsp:284
+msgid "There are no Defenders."
+msgstr "Es gibt keine Verteidiger."
+
+#: src/main/webapp/jsp/games_history.jsp:207
+msgid "Melee games"
+msgstr "Melee-Spiele"
+
+#: src/main/webapp/jsp/games_history.jsp:228
+msgid "Your melee game history is empty."
+msgstr "Deine Melee-Spielhistorie ist leer."
+
+#: src/main/webapp/jsp/games_history.jsp:282
+msgid "There are no Players."
+msgstr "Es gibt keine Spieler."
+
 #: src/main/webapp/jsp/imprint.jsp:36
 msgid "Imprint & Privacy Policy"
 msgstr "Impressum & Datenschutzerklärung"
@@ -2335,6 +2372,34 @@ msgstr ""
 #: src/main/webapp/jsp/leaderboards.jsp:30
 msgid "Battlegrounds Leaderboard"
 msgstr "Battleground Rangliste"
+
+#: src/main/webapp/jsp/index.jsp:42
+msgid "Welcome to Code Defenders"
+msgstr "Willkommen bei CodeDefenders"
+
+#: src/main/webapp/jsp/index.jsp:50
+msgid "Code Defenders:"
+msgstr "CodeDefenders:"
+
+#: src/main/webapp/jsp/index.jsp:51
+msgid "A Mutation Testing Game"
+msgstr "Ein Mutation-Testing Spiel"
+
+#: src/main/webapp/jsp/index.jsp:58
+msgid "Log in or Sign up"
+msgstr "Anmelden oder Regisitrieren"
+
+#: src/main/webapp/jsp/index.jsp:64
+msgid "Active Battleground Games"
+msgstr "Laufende Battleground-Spiele"
+
+#: src/main/webapp/jsp/index.jsp:81 src/main/webapp/jsp/index.jsp:120
+msgid "There are currently no open games."
+msgstr "Es gibt aktuell keine laufenden Spiele."
+
+#: src/main/webapp/jsp/index.jsp:104
+msgid "Active Melee Games"
+msgstr "Laufende Melee-Spiele"
 
 #: src/main/webapp/jsp/login_view.jsp:43
 #: src/main/webapp/WEB-INF/tags/navbar.tag:136
@@ -2468,65 +2533,6 @@ msgstr "Durchschnittlich"
 msgid "No player has provided feedback for this game yet."
 msgstr "Bisher hat noch kein Spieler Feedback zu diesem Spiel abgegeben."
 
-#: src/main/webapp/jsp/index.jsp:42
-msgid "Welcome to Code Defenders"
-msgstr "Willkommen bei CodeDefenders"
-
-#: src/main/webapp/jsp/index.jsp:50
-msgid "Code Defenders:"
-msgstr "CodeDefenders:"
-
-#: src/main/webapp/jsp/index.jsp:51
-msgid "A Mutation Testing Game"
-msgstr "Ein Mutation-Testing Spiel"
-
-#: src/main/webapp/jsp/index.jsp:58
-msgid "Log in or Sign up"
-msgstr "Anmelden oder Regisitrieren"
-
-#: src/main/webapp/jsp/index.jsp:64
-msgid "Active Battleground Games"
-msgstr "Laufende Battleground-Spiele"
-
-#: src/main/webapp/jsp/index.jsp:81 src/main/webapp/jsp/index.jsp:120
-msgid "There are currently no open games."
-msgstr "Es gibt aktuell keine laufenden Spiele."
-
-#: src/main/webapp/jsp/index.jsp:104
-msgid "Active Melee Games"
-msgstr "Laufende Melee-Spiele"
-
-#: src/main/webapp/jsp/research.jsp:26 src/main/webapp/jsp/research.jsp:48
-#: src/main/webapp/jsp/research.jsp:71 src/main/webapp/jsp/research.jsp:95
-#: src/main/webapp/jsp/research.jsp:117 src/main/webapp/jsp/research.jsp:137
-#: src/main/webapp/jsp/research.jsp:159
-msgid "Download PDF"
-msgstr "PDF herunterladen"
-
-#: src/main/webapp/jsp/research.jsp:28 src/main/webapp/jsp/research.jsp:50
-#: src/main/webapp/jsp/research.jsp:73 src/main/webapp/jsp/research.jsp:118
-#: src/main/webapp/jsp/research.jsp:138 src/main/webapp/jsp/research.jsp:160
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:33 src/main/webapp/jsp/research.jsp:55
-#: src/main/webapp/jsp/research.jsp:78 src/main/webapp/jsp/research.jsp:101
-#: src/main/webapp/jsp/research.jsp:123 src/main/webapp/jsp/research.jsp:143
-#: src/main/webapp/jsp/research.jsp:165
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:44 src/main/webapp/jsp/research.jsp:67
-#: src/main/webapp/jsp/research.jsp:90 src/main/webapp/jsp/research.jsp:112
-#: src/main/webapp/jsp/research.jsp:132 src/main/webapp/jsp/research.jsp:154
-#: src/main/webapp/jsp/research.jsp:176 src/main/webapp/jsp/research.jsp:191
-msgid "Copy"
-msgstr "Kopieren"
-
-#: src/main/webapp/jsp/research.jsp:189
-msgid "Copied."
-msgstr "Kopiert."
-
 #: src/main/webapp/jsp/scoring_system.jsp:29
 msgid "Get one point for:"
 msgstr "Erhalten Sie einen Punkt für:"
@@ -2580,6 +2586,37 @@ msgstr "Verliere die Punkte des Mutanten"
 #: src/main/webapp/jsp/scoring_system.jsp:96
 msgid "Gain one additional point"
 msgstr "Erhalte einen zusätzlichen Punkt"
+
+#: src/main/webapp/jsp/research.jsp:26 src/main/webapp/jsp/research.jsp:48
+#: src/main/webapp/jsp/research.jsp:71 src/main/webapp/jsp/research.jsp:95
+#: src/main/webapp/jsp/research.jsp:117 src/main/webapp/jsp/research.jsp:137
+#: src/main/webapp/jsp/research.jsp:159
+msgid "Download PDF"
+msgstr "PDF herunterladen"
+
+#: src/main/webapp/jsp/research.jsp:28 src/main/webapp/jsp/research.jsp:50
+#: src/main/webapp/jsp/research.jsp:73 src/main/webapp/jsp/research.jsp:118
+#: src/main/webapp/jsp/research.jsp:138 src/main/webapp/jsp/research.jsp:160
+msgid "[PDF]"
+msgstr "[PDF]"
+
+#: src/main/webapp/jsp/research.jsp:33 src/main/webapp/jsp/research.jsp:55
+#: src/main/webapp/jsp/research.jsp:78 src/main/webapp/jsp/research.jsp:101
+#: src/main/webapp/jsp/research.jsp:123 src/main/webapp/jsp/research.jsp:143
+#: src/main/webapp/jsp/research.jsp:165
+msgid "[Bibtex]"
+msgstr "[Bibtex]"
+
+#: src/main/webapp/jsp/research.jsp:44 src/main/webapp/jsp/research.jsp:67
+#: src/main/webapp/jsp/research.jsp:90 src/main/webapp/jsp/research.jsp:112
+#: src/main/webapp/jsp/research.jsp:132 src/main/webapp/jsp/research.jsp:154
+#: src/main/webapp/jsp/research.jsp:176 src/main/webapp/jsp/research.jsp:191
+msgid "Copy"
+msgstr "Kopieren"
+
+#: src/main/webapp/jsp/research.jsp:189
+msgid "Copied."
+msgstr "Kopiert."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:51
 msgid "Upload Class"
@@ -2734,6 +2771,81 @@ msgstr "Schwierigkeitsgrad des Tests"
 msgid "No classes uploaded."
 msgstr "Keine Klassen hochgeladen."
 
+#: src/main/webapp/jsp/user_settings.jsp:39
+msgid "Account Settings"
+msgstr "Kontoeinstellungen"
+
+#: src/main/webapp/jsp/user_settings.jsp:48
+msgid "Language Settings"
+msgstr "Spracheinstellungen"
+
+#: src/main/webapp/jsp/user_settings.jsp:55
+msgid "Select a language"
+msgstr "Wähle eine Sprache"
+
+#: src/main/webapp/jsp/user_settings.jsp:75
+msgid "Change Language"
+msgstr "Sprache wechseln"
+
+#: src/main/webapp/jsp/user_settings.jsp:83
+msgid "Email Settings"
+msgstr "E-Mail Einstellungen"
+
+#: src/main/webapp/jsp/user_settings.jsp:101
+msgid "Allow us to contact your email address."
+msgstr "Erlaube uns die Kontaktaufnahme per E-Mail."
+
+#: src/main/webapp/jsp/user_settings.jsp:108
+msgid "Update Email Preferences"
+msgstr "Aktualisiere E-Mail Einstellungen"
+
+#: src/main/webapp/jsp/user_settings.jsp:115
+msgid "Update Password"
+msgstr "Aktualisiere Passwort"
+
+#: src/main/webapp/jsp/user_settings.jsp:124
+msgid "New password"
+msgstr "Neues Passwort"
+
+#: src/main/webapp/jsp/user_settings.jsp:140
+msgid ""
+"Password requirements: {0}-20 alphanumeric characters, no whitespace or "
+"special characters."
+msgstr ""
+"Passwortanforderungen: {0}-20 alphanumerische Zeichen, keine Leerzeichen "
+"oder Sonderzeichen."
+
+#: src/main/webapp/jsp/user_settings.jsp:172
+msgid "Account Deletion"
+msgstr "Konto löschen"
+
+#: src/main/webapp/jsp/user_settings.jsp:174
+msgid "Delete all personalized information related to your account."
+msgstr "Lösche alle mit deinem Account verbundenen persönlichen Daten."
+
+#: src/main/webapp/jsp/user_settings.jsp:176
+#: src/main/webapp/jsp/user_settings.jsp:198
+msgid "Delete Account"
+msgstr "Konto löschen"
+
+#: src/main/webapp/jsp/user_settings.jsp:186
+msgid "Confirm Account Deletion"
+msgstr "Bestätige Konotlöschung"
+
+#: src/main/webapp/jsp/user_settings.jsp:190
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
+#: src/main/webapp/jsp/user_settings.jsp:192
+msgid ""
+"We will delete all personalized information related to your account. Please "
+"be aware that you will no longer be able to log in again. To play further "
+"games, you will have to create a new account."
+msgstr ""
+"Wir werden alle personenbezogenen Daten zu Ihrem Konto löschen. Bitte "
+"beachten Sie, dass Sie sich danach nicht mehr anmelden können. Um weitere "
+"Spiele zu spielen, müssen Sie ein neues Konto erstellen."
+
 #: src/main/webapp/jsp/user_profile.jsp:32
 msgid "My Profile"
 msgstr "Mein Profil"
@@ -2880,7 +2992,7 @@ msgstr "Falsch beanspruchte Mutanten:"
 
 #: src/main/webapp/jsp/user_profile.jsp:201
 msgid "Statistics for Puzzle Games"
-msgstr "Statistiken für Puzzlespiele"
+msgstr "Statistiken für Rätselspiele"
 
 #: src/main/webapp/jsp/user_profile.jsp:205
 msgid "Chapter {0} - {1}"
@@ -3033,80 +3145,671 @@ msgstr "Offene Melee-Spiele"
 msgid "There are currently no open melee games."
 msgstr "Derzeit sind keine Melee-Spiele verfügbar."
 
-#: src/main/webapp/jsp/user_settings.jsp:39
-msgid "Account Settings"
-msgstr "Kontoeinstellungen"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:53
+msgid "Puzzle: "
+msgstr "Rätsel: "
 
-#: src/main/webapp/jsp/user_settings.jsp:48
-msgid "Language Settings"
-msgstr "Spracheinstellungen"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:97
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:104
+msgid "Puzzle: {0}"
+msgstr "Rätsel: {0}"
 
-#: src/main/webapp/jsp/user_settings.jsp:55
-msgid "Select a language"
-msgstr "Wähle eine Sprache"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:118
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:118
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:121
+msgid "Congratulations!"
+msgstr "Glückwunsch!"
 
-#: src/main/webapp/jsp/user_settings.jsp:75
-msgid "Change Language"
-msgstr "Sprache wechseln"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:119
+msgid "Your mutant solved the puzzle. {0}"
+msgstr "Dein Mutant hat das Rätsel gelöst. {0}"
 
-#: src/main/webapp/jsp/user_settings.jsp:83
-msgid "Email Settings"
-msgstr "E-Mail Einstellungen"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:127
+msgid "Solving mutant"
+msgstr "Lösender Mutant"
 
-#: src/main/webapp/jsp/user_settings.jsp:101
-msgid "Allow us to contact your email address."
-msgstr "Erlaube uns die Kontaktaufnahme per E-Mail."
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:131
+msgid "solving mutant"
+msgstr "Lösender Mutant"
 
-#: src/main/webapp/jsp/user_settings.jsp:108
-msgid "Update Email Preferences"
-msgstr "Aktualisiere E-Mail Einstellungen"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:166
+#: src/main/webapp/jsp/melee/details_view.jsp:235
+#: src/main/webapp/jsp/battleground/details_view.jsp:201
+msgid "Class under test"
+msgstr "Zu testende Klasse"
 
-#: src/main/webapp/jsp/user_settings.jsp:115
-msgid "Update Password"
-msgstr "Aktualisiere Passwort"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:169
+#: src/main/webapp/jsp/melee/player_view.jsp:246
+#: src/main/webapp/jsp/battleground/attacker_view.jsp:96
+msgid "Create a mutant here"
+msgstr "Erstelle hier einen Mutanten"
 
-#: src/main/webapp/jsp/user_settings.jsp:124
-msgid "New password"
-msgstr "Neues Passwort"
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:178
+#: src/main/webapp/jsp/melee/player_view.jsp:279
+#: src/main/webapp/jsp/battleground/attacker_view.jsp:101
+msgid "Reset"
+msgstr "Zurücksetzen"
 
-#: src/main/webapp/jsp/user_settings.jsp:140
-msgid ""
-"Password requirements: {0}-20 alphanumeric characters, no whitespace or "
-"special characters."
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:51
+msgid "Puzzle: {0} - {1}"
+msgstr "Rätsel: {0} – {1}"
+
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:119
+msgid "Your test solved the puzzle. {0}"
+msgstr "Ihr Test hat das Rätsel gelöst. {0}"
+
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:139
+msgid "Solving JUnit Test"
+msgstr "Lösender JUnit-Test"
+
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:142
+#: src/main/webapp/jsp/melee/player_view.jsp:311
+#: src/main/webapp/jsp/battleground/defender_view.jsp:91
+msgid "Write a new JUnit test here"
+msgstr "Schreiben Sie hier einen neuen JUnit-Test."
+
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:148
+#: src/main/webapp/jsp/melee/player_view.jsp:318
+#: src/main/webapp/jsp/battleground/defender_view.jsp:97
+#: src/main/javascript/game/defender_intention_collection.js:111
+msgid "Defend"
+msgstr "Verteidige"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:124
+msgid "This mutant is equivalent to the class under test."
+msgstr "Dieser Mutant entspricht der zu testenden Klasse."
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:127
+msgid "Your test killed the mutant flagged as equivalent."
+msgstr "Ihr Test hat den als gleichwertig markierten Mutanten getötet."
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:138
+#: src/main/webapp/jsp/melee/player_view.jsp:62
+msgid "Mutant {0} automatically claimed equivalent"
+msgstr "Mutant {0} automatisch als äquivalent beansprucht"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:143
+#: src/main/webapp/jsp/melee/player_view.jsp:149
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:102
+msgid "Diff"
+msgstr "Diff"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:171
+msgid "The mutant is equivalent!"
+msgstr "Der Mutant ist äquivalent!"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:172
+msgid "The mutant was accepted as equivalent"
+msgstr "Der Mutant wurde als äquivalent akzeptiert."
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:175
+msgid "Not equivalent! Your killing test:"
+msgstr "Nicht äquivalent! Ihr tötender Test:"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:181
+#: src/main/webapp/jsp/melee/player_view.jsp:176
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:129
+msgid "Not equivalent? Write a killing test here:"
+msgstr "Nicht äquivalent? Schreiben Sie hier einen Kill-Test:"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:193
+#: src/main/webapp/jsp/melee/player_view.jsp:187
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:140
+msgid "Accept As Equivalent"
+msgstr "Als äquivalent akzeptieren"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:196
+#: src/main/webapp/jsp/melee/player_view.jsp:190
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:143
+msgid "Submit Killing Test"
+msgstr "Tötenden Test einreichen"
+
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:205
+msgid "Are you sure that this mutant is equivalent and cannot be killed?"
 msgstr ""
-"Passwortanforderungen: {0}-20 alphanumerische Zeichen, keine Leerzeichen "
-"oder Sonderzeichen."
+"Sind Sie sicher, dass dieser Mutant äquivalent ist und nicht getötet werden "
+"kann?"
 
-#: src/main/webapp/jsp/user_settings.jsp:172
-msgid "Account Deletion"
-msgstr "Konto löschen"
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:37
+msgid "Puzzles"
+msgstr "Rätsel"
 
-#: src/main/webapp/jsp/user_settings.jsp:174
-msgid "Delete all personalized information related to your account."
-msgstr "Lösche alle mit deinem Account verbundenen persönlichen Daten."
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:54
+msgid "Preview Image Puzzle Game"
+msgstr "Vorschau-Bild: Rätselspiel"
 
-#: src/main/webapp/jsp/user_settings.jsp:176
-#: src/main/webapp/jsp/user_settings.jsp:198
-msgid "Delete Account"
-msgstr "Konto löschen"
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:73
+msgid "Next puzzle:"
+msgstr "Nächstes Rätsel:"
 
-#: src/main/webapp/jsp/user_settings.jsp:186
-msgid "Confirm Account Deletion"
-msgstr "Bestätige Konotlöschung"
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:82
+msgid "There are currently no puzzles available."
+msgstr "Derzeit sind keine Rätsel verfügbar."
 
-#: src/main/webapp/jsp/user_settings.jsp:190
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:104
+msgid "This puzzle is locked."
+msgstr "Dieses Rätsel ist gesperrt."
 
-#: src/main/webapp/jsp/user_settings.jsp:192
-msgid ""
-"We will delete all personalized information related to your account. Please "
-"be aware that you will no longer be able to log in again. To play further "
-"games, you will have to create a new account."
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
+msgid "Puzzle solved in {0} attempt."
+msgstr "Rätsel in {0} Versuch gelöst."
+
+msgid "Puzzle solved in {0} attempts."
+msgstr "Rätsel in {0} Versuchen gelöst."
+
+#: src/main/webapp/jsp/melee/details_view.jsp:117
+#: src/main/webapp/jsp/battleground/details_view.jsp:81
+msgid "Details of Game {0} ({1})"
+msgstr "Details zum Spiel {0} ({1})"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:137
+#: src/main/webapp/jsp/battleground/details_view.jsp:101
+msgid "Start a new game with the same settings and opposite roles."
 msgstr ""
-"Wir werden alle personenbezogenen Daten zu Ihrem Konto löschen. Bitte "
-"beachten Sie, dass Sie sich danach nicht mehr anmelden können. Um weitere "
-"Spiele zu spielen, müssen Sie ein neues Konto erstellen."
+"Beginne ein neues Spiel mit denselben Einstellungen und umgekehrten Rollen."
+
+#: src/main/webapp/jsp/melee/details_view.jsp:146
+#: src/main/webapp/jsp/melee/details_view.jsp:152
+#: src/main/webapp/jsp/battleground/details_view.jsp:110
+#: src/main/webapp/jsp/battleground/details_view.jsp:116
+msgid "Confirm Rematch"
+msgstr "Revanche bestätigen"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:149
+#: src/main/webapp/jsp/battleground/details_view.jsp:113
+msgid "Are you sure you want to create a new game with opposite roles?"
+msgstr ""
+"Sind Sie sicher, dass Sie ein neues Spiel mit vertauschten Rollen erstellen "
+"möchten?"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:161
+#: src/main/webapp/jsp/battleground/details_view.jsp:125
+msgid "Export as a Gradle project to import into an IDE."
+msgstr "Als Gradle-Projekt exportieren, um es in eine IDE zu importieren."
+
+#: src/main/webapp/jsp/melee/details_view.jsp:163
+#: src/main/webapp/jsp/battleground/details_view.jsp:127
+msgid "Gradle Export"
+msgstr "Gradle-Export"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:172
+#: src/main/webapp/jsp/battleground/details_view.jsp:136
+#: src/main/webapp/jsp/battleground/game_scoreboard.jsp:30
+msgid "Scoreboard"
+msgstr "Scoreboard"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:175
+#: src/main/webapp/jsp/battleground/details_view.jsp:139
+msgid "Info"
+msgstr "Info"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:179
+#: src/main/webapp/jsp/battleground/details_view.jsp:143
+msgid "Scoring System"
+msgstr "Punktesystem"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:188
+#: src/main/webapp/jsp/battleground/details_view.jsp:155
+msgid "The game's duration"
+msgstr "Die Spieldauer"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:207
+#: src/main/webapp/jsp/battleground/details_view.jsp:174
+msgid "Total Duration"
+msgstr "Gesamtdauer"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:216
+#: src/main/webapp/jsp/battleground/details_view.jsp:183
+msgid "End date of the game"
+msgstr "Enddatum des Spiels"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:239
+msgid "You are an observer in this game."
+msgstr "Du bist ein Beobachter in diesem Spiel."
+
+msgid "The coverage of all player tests is shown."
+msgstr "Die Coverage aller Spielertests wird angezeigt."
+
+#: src/main/webapp/jsp/melee/details_view.jsp:246
+msgid ""
+"Switch between showing coverage of your tests (off) and enemy tests (on)."
+msgstr ""
+"Wechseln Sie zwischen der Anzeige von Coverage Ihrer Tests (aus) und der "
+"Tests des Gegners (ein)."
+
+#: src/main/webapp/jsp/melee/details_view.jsp:250
+#: src/main/webapp/jsp/melee/player_view.jsp:253
+msgid "Enemy Coverage"
+msgstr "Gegnerische Coverage"
+
+#: src/main/webapp/jsp/melee/details_view.jsp:281
+#: src/main/webapp/jsp/battleground/details_view.jsp:207
+msgid "Timeline"
+msgstr "Zeitachse"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:57
+#: src/main/webapp/jsp/melee/create_game_view.jsp:60
+msgid "Create Melee Game"
+msgstr "Erstelle Melee-Spiel"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:66
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:68
+msgid "Before you can start games, please"
+msgstr "Bevor Sie mit den Spielen beginnen können, bitte"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:68
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:70
+msgid "upload a class under test"
+msgstr "Eine zu testende Klasse hochladen"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:73
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:75
+msgid ""
+"Games can only be started once at least one class under test has been "
+"uploaded."
+msgstr ""
+"Spiele können erst gestartet werden, wenn mindestens eine zu testende Klasse "
+"hochgeladen wurde."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:100
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:103
+msgid "Upload a class."
+msgstr "Eine Klasse hochladen."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:107
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:110
+msgid "Please select a class."
+msgstr "Bitte wählen Sie eine Klasse aus."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:115
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:118
+msgid "Include predefined mutants (if available)"
+msgstr "Vordefinierte Mutanten einbeziehen (falls verfügbar)"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:123
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:126
+msgid "Include predefined tests (if available)"
+msgstr "Vordefinierte Tests einbeziehen (falls verfügbar)"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:156
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:159
+msgid "Mutant Validator Level"
+msgstr "Mutanten-Validator-Level"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:173
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:176
+msgid "Please select a mutant validator level."
+msgstr "Bitte wählen Sie eine Mutanten-Validierungsstufe aus."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:181
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:184
+msgid ""
+"Maximum number of assertions per test. Increase this for difficult to test "
+"classes."
+msgstr ""
+"Maximale Anzahl von Assertions pro Test. Erhöhen Sie diesen Wert für schwer "
+"zu testende Klassen."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:183
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:186
+msgid "Max. Assertions Per Test"
+msgstr "Max. Assertions pro Test"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:188
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:192
+msgid "Please provide a valid number. Must be greater than zero."
+msgstr "Bitte geben Sie eine gültige Zahl ein. Muss größer als Null sein."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:196
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:201
+msgid "Auto Equiv. Threshold"
+msgstr "Auto-Äquivalent-Schwellenwert"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:204
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:209
+msgid "Please provide a valid number. Must be positive or zero."
+msgstr "Bitte geben Sie eine gültige Zahl ein. Muss positiv oder Null sein."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:209
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:215
+msgid ""
+"Forces players to specify the intentions of their mutants/tests before they "
+"can submit them."
+msgstr ""
+"Zwingt die Spieler dazu, die Intentions ihrer Mutanten/Tests anzugeben, "
+"bevor sie diese einreichen können."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:211
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:217
+msgid "Capture Intentions"
+msgstr "Intentions erfassen"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:217
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:223
+msgid "Enable Capturing Players' Intentions"
+msgstr "Erfassen der Intentions der Spieler aktivieren"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:223
+msgid "Allows players to chat with each other."
+msgstr "Ermöglicht es den Spielern, miteinander zu chatten."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:225
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:231
+msgid "Game Chat"
+msgstr "Spiel-Chat"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:229
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:236
+msgid "Enable Chat"
+msgstr "Chat aktivieren"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:235
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:256
+msgid "Allows only whitelisted players to join the game."
+msgstr ""
+"Erlaubt nur Spielern, die auf der Whitelist stehen, am Spiel teilzunehmen."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:237
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:258
+msgid "Invite players"
+msgstr "Spieler einladen"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:244
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:265
+msgid "Allow only whitelisted players to join"
+msgstr "Nur Spielern auf der Whitelist den Beitritt erlauben"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:254
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:275
+msgid "Select the role the creator (you) will have in the game."
+msgstr ""
+"Wählen Sie die Rolle aus, die der Ersteller (Sie) im Spiel einnehmen wird."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:256
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:277
+msgid "Creator Role"
+msgstr "Rolle des Erstellers"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:265
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:286
+msgid "Please select a role."
+msgstr "Bitte wähle eine Rolle aus."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:269
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:290
+msgid "The duration for how long the games will be open."
+msgstr "Die Dauer, für die die Spiele geöffnet sein werden."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:272
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:293
+msgid "Set the game's duration:"
+msgstr "Legen Sie die Spieldauer fest:"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:276
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:297
+msgid "days"
+msgstr "Tage"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:278
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:299
+msgid "hours"
+msgstr "Stunden"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:280
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:301
+msgid "minutes"
+msgstr "Minuten"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:282
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:303
+msgid "Please input a valid duration."
+msgstr "Bitte geben Sie eine gültige Dauer ein."
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:283
+msgid "Maximum duration:"
+msgstr "Maximale Dauer:"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:307
+#: src/main/webapp/jsp/melee/create_game_view.jsp:311
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:331
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:335
+msgid "Create Game"
+msgstr "Spiel erstellen"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:319
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:343
+msgid "Level Explanation"
+msgstr "Erklärung der Level"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:325
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:84
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:349
+msgid "Validator Explanation"
+msgstr "Erläuterung zum Validator"
+
+#: src/main/webapp/jsp/melee/create_game_view.jsp:334
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:358
+msgid "Auto Equivalence Duel Threshold Explanation"
+msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalenz"
+
+#: src/main/webapp/jsp/melee/player_view.jsp:63
+msgid "Mutant {0} claimed equivalent by {1}"
+msgstr "Mutant {0} wurde von {1} als äquivalent beansprucht."
+
+#: src/main/webapp/jsp/melee/player_view.jsp:200
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:153
+msgid "Accepting Equivalence will lose all mutant points. Are you sure?"
+msgstr ""
+"Wenn Sie die Äquivalenz anerkennen, gehen alle Punkte des Mutanten verloren. "
+"Sind Sie sicher?"
+
+#: src/main/webapp/jsp/melee/player_view.jsp:216
+#: src/main/webapp/jsp/battleground/equivalence_view.jsp:169
+msgid ""
+"Note: If the game finishes with this equivalence unsolved, you will lose "
+"points!"
+msgstr ""
+"Hinweis: Wenn das Spiel endet, ohne dass dieses Äquivalenzduell gelöst "
+"wurde, verlierst du Punkte!"
+
+#: src/main/webapp/jsp/melee/player_view.jsp:250
+msgid ""
+"<p>Switch between showing coverage of your tests (off) and enemy tests (on)."
+"</p><p class=\"mb-0\"><i>Note: If you add/remove lines while creating a "
+"mutant the coverage highlighting may be misaligned until you submit the "
+"mutant.</i></p>"
+msgstr ""
+"<p>Wechseln Sie zwischen der Anzeige der Abdeckung Ihrer Tests (aus) und der "
+"Tests des Gegners (ein).</p><p class=\"mb-0\"><i>Hinweis: Wenn Sie beim "
+"Erstellen eines Mutanten Zeilen hinzufügen/entfernen, kann es zu einer "
+"Fehlausrichtung der Coverage-Kennzeichnung kommen, bis Sie den Mutanten "
+"übermitteln.</i></p>"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:28
+msgid "Editor Keyboard Shortcuts"
+msgstr "Tastaturkürzel für den Editor"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:37
+msgid "Action"
+msgstr "Aktion"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:38
+msgid "Key"
+msgstr "Taste"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:39
+msgid "Key (Mac)"
+msgstr "Taste (Mac)"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:44
+msgid "Autocomplete"
+msgstr "Autovervollständigung"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:45
+msgid "Ctrl + Space"
+msgstr "Strg + Leertaste"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:46
+msgid "Cmd + Space"
+msgstr "Befehlstaste + Leertaste"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:50
+msgid "Ctrl + F"
+msgstr "Strg + F"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:51
+msgid "Cmd + F"
+msgstr "Befehlstaste + F"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:54
+msgid "Find Next"
+msgstr "Weitersuchen"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:55
+msgid "Ctrl + G"
+msgstr "Strg + G"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:56
+msgid "Cmd + G"
+msgstr "Strg + G"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:59
+msgid "Find Previous"
+msgstr "Finde Vorherige"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:60
+msgid "Ctrl + Shift + G"
+msgstr "Strg + Umschalt + G"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:61
+msgid "Cmd + Shift + G"
+msgstr "Befehlstaste + Umschalttaste + G"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:64
+msgid "Search and Replace"
+msgstr "Suchen und Ersetzen"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:65
+msgid "Ctrl + Shift + F"
+msgstr "Strg + Umschalt + F"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:66
+msgid "Cmd + Shift + F"
+msgstr "Befehlstaste + Umschalttaste + F"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:69
+msgid "Search and Replace All"
+msgstr "Suchen und alles ersetzen"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:70
+msgid "Ctrl + Shift + R"
+msgstr "Strg + Umschalt + R"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:71
+msgid "Cmd + Shift + R"
+msgstr "Befehlstaste + Umschalttaste + R"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:74
+msgid "Jump to Line"
+msgstr "Zur Zeile springen"
+
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:75
+#: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:76
+msgid "Alt + R"
+msgstr "Alt + R"
+
+#: src/main/webapp/jsp/game_components/keymap_config.jsp:34
+msgid "Editor Mode:"
+msgstr "Editor-Modus:"
+
+#: src/main/webapp/jsp/game_components/mutant_editor.jsp:38
+#: src/main/webapp/jsp/game_components/mutant_editor.jsp:76
+msgid "mutant"
+msgstr "Mutant"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:55
+msgid "Live"
+msgstr "Live"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:59
+#: src/main/javascript/game/killmap_mutant_accordion.js:194
+#: src/main/javascript/game/test_accordion.js:234
+msgid "Killed"
+msgstr "Getötet"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:63
+msgid "Claimed Equivalent"
+msgstr "Als äquivalent markiert"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:67
+msgid "Equivalent"
+msgstr "Äquivalent"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:72
+msgid "Mutant/Test restrictions:"
+msgstr "Mutanten-/Testbeschränkungen:"
+
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:74
+msgid "Click for more information"
+msgstr "Für weitere Informationen hier klicken"
+
+#: src/main/webapp/jsp/game_components/test_editor.jsp:34
+msgid "Assertion Library: {0}"
+msgstr "Assertion-Library: {0}"
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:59
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:62
+msgid "Create Battleground Game"
+msgstr "Erstelle Battleground-Spiel"
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:229
+msgid "Allows players to chat within their team and with the enemy team."
+msgstr ""
+"Ermöglicht es den Spielern, innerhalb ihres Teams und mit dem gegnerischen "
+"Team zu chatten."
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:242
+msgid "Allows player to choose their role (attacker or defender) when joining."
+msgstr ""
+"Ermöglicht es dem Spieler, bei der Teilnahme seine Rolle (Angreifer oder "
+"Verteidiger) zu wählen."
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:244
+msgid "Players may choose their role"
+msgstr "Die Spieler können ihre Rolle wählen."
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:250
+msgid "Allow players to choose their own roles"
+msgstr "Spielern die Wahl ihrer eigenen Rollen ermöglichen"
+
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:304
+msgid "Maximum duration: {0}"
+msgstr "Maximale Dauer: {0}"
+
+#: src/main/webapp/jsp/battleground/game_history.jsp:31
+#: src/main/webapp/WEB-INF/tags/navbar.tag:71
+msgid "History"
+msgstr "Historie"
+
+#: src/main/webapp/jsp/battleground/role_selection.jsp:38
+msgid "Select a role"
+msgstr "Wählen Sie eine Rolle aus"
+
+#: src/main/webapp/jsp/battleground/role_selection.jsp:40
+msgid "You have been invited to game #{0}"
+msgstr "Sie wurden zum Spiel Nr. {0} eingeladen."
+
+#: src/main/webapp/jsp/battleground/role_selection.jsp:44
+msgid "Join as attacker"
+msgstr "Als Angreifer beitreten"
+
+#: src/main/webapp/jsp/battleground/role_selection.jsp:47
+msgid "Balance teams"
+msgstr "Teams ausgleichen"
+
+#: src/main/webapp/jsp/battleground/role_selection.jsp:50
+msgid "Join as defender"
+msgstr "Als Verteidiger beitreten"
 
 #: src/main/webapp/WEB-INF/tags/footer.tag:38
 msgid "About CodeDefenders"
@@ -3114,7 +3817,7 @@ msgstr "Über CodeDefenders"
 
 #: src/main/webapp/WEB-INF/tags/footer.tag:45
 #: src/main/webapp/WEB-INF/tags/navbar.tag:100
-#: src/main/java/org/codedefenders/servlets/HelpPage.java:46
+#: src/main/java/org/codedefenders/servlets/HelpPage.java:43
 msgid "Help"
 msgstr "Hilfe"
 
@@ -3129,10 +3832,6 @@ msgstr "CodeDefenders"
 #: src/main/webapp/WEB-INF/tags/navbar.tag:62
 msgid "Multiplayer"
 msgstr "Mehrspieler"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:71
-msgid "History"
-msgstr "Historie"
 
 #: src/main/webapp/WEB-INF/tags/navbar.tag:73
 msgid "Leaderboard"
@@ -3195,10 +3894,6 @@ msgstr ""
 "Der Test konnte nicht abgerufen werden.\n"
 "Bitte versuchen Sie es später erneut."
 
-#: src/main/javascript/game/defender_intention_collection.js:111
-msgid "Defend"
-msgstr "Verteidige"
-
 #: src/main/javascript/game/game_chat.js:270
 msgid "Connected to chat."
 msgstr "Mit dem Chat verbunden."
@@ -3239,78 +3934,6 @@ msgstr "Veränderte Zeilen"
 #: src/main/javascript/game/mutant_accordion.js:350
 msgid "Claim Equivalent"
 msgstr "Als äquivalent markieren"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:96
-#: src/main/javascript/game/test_accordion.js:174
-msgid "No tests."
-msgstr "Keine Tests."
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:97
-msgid "This mutant isn't covered by any tests"
-msgstr "Dieser Mutant wird von keinem Test abgedeckt"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:98
-msgid "No tests match the selected category and filter."
-msgstr ""
-"Es gibt keine Tests, die der ausgewählten Kategorie und dem Filter "
-"entsprechen."
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:189
-#: src/main/javascript/game/test_accordion.js:229
-msgid "Covered"
-msgstr "Covered"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:194
-#: src/main/javascript/game/test_accordion.js:234
-msgid "Killed"
-msgstr "Getötet"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:200
-#: src/main/javascript/game/killmap_test_accordion.js:195
-#: src/main/javascript/game/mutant_accordion.js:327
-#: src/main/javascript/game/test_accordion.js:240
-msgid "View"
-msgstr "Betrachten"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:210
-#: src/main/javascript/game/test_accordion.js:250
-msgid "Bad"
-msgstr "Schlecht"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:213
-#: src/main/javascript/game/test_accordion.js:253
-msgid "Fishy"
-msgstr "Fishy"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:216
-#: src/main/javascript/game/test_accordion.js:256
-msgid "Good"
-msgstr "Gut"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:225
-#: src/main/javascript/game/test_accordion.js:265
-msgid "Covered Mutants"
-msgstr "Abgedeckte Mutanten"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:233
-#: src/main/javascript/game/test_accordion.js:273
-msgid "No mutants are covered by this test."
-msgstr "Dieser Test deckt keine Mutanten ab."
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:247
-#: src/main/javascript/game/test_accordion.js:287
-msgid "No mutants were killed by this test."
-msgstr "Von diesem Test wurden keine Mutanten getötet."
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:253
-#: src/main/javascript/game/test_accordion.js:293
-msgid "Test Smells"
-msgstr "Test-Smells"
-
-#: src/main/javascript/game/killmap_mutant_accordion.js:261
-#: src/main/javascript/game/test_accordion.js:301
-msgid "This test does not have any smells."
-msgstr "Dieser Test hat keine Test-Smells."
 
 #: src/main/javascript/game/killmap_accordion.js:345
 #: src/main/javascript/game/killmap_accordion.js:361
@@ -3384,10 +4007,77 @@ msgstr "Mutant"
 msgid "by"
 msgstr "von"
 
+#: src/main/javascript/game/killmap_test_accordion.js:195
+#: src/main/javascript/game/killmap_mutant_accordion.js:200
+#: src/main/javascript/game/mutant_accordion.js:327
+#: src/main/javascript/game/test_accordion.js:240
+msgid "View"
+msgstr "Betrachten"
+
 #: src/main/javascript/game/killmap_test_accordion.js:203
 #: src/main/javascript/game/mutant_accordion.js:366
 msgid "View Killing Test"
 msgstr "Betrachte tötenden Test"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:96
+#: src/main/javascript/game/test_accordion.js:174
+msgid "No tests."
+msgstr "Keine Tests."
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:97
+msgid "This mutant isn't covered by any tests"
+msgstr "Dieser Mutant wird von keinem Test abgedeckt"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:98
+msgid "No tests match the selected category and filter."
+msgstr ""
+"Es gibt keine Tests, die der ausgewählten Kategorie und dem Filter "
+"entsprechen."
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:189
+#: src/main/javascript/game/test_accordion.js:229
+msgid "Covered"
+msgstr "Covered"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:210
+#: src/main/javascript/game/test_accordion.js:250
+msgid "Bad"
+msgstr "Schlecht"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:213
+#: src/main/javascript/game/test_accordion.js:253
+msgid "Fishy"
+msgstr "Fishy"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:216
+#: src/main/javascript/game/test_accordion.js:256
+msgid "Good"
+msgstr "Gut"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:225
+#: src/main/javascript/game/test_accordion.js:265
+msgid "Covered Mutants"
+msgstr "Abgedeckte Mutanten"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:233
+#: src/main/javascript/game/test_accordion.js:273
+msgid "No mutants are covered by this test."
+msgstr "Dieser Test deckt keine Mutanten ab."
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:247
+#: src/main/javascript/game/test_accordion.js:287
+msgid "No mutants were killed by this test."
+msgstr "Von diesem Test wurden keine Mutanten getötet."
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:253
+#: src/main/javascript/game/test_accordion.js:293
+msgid "Test Smells"
+msgstr "Test-Smells"
+
+#: src/main/javascript/game/killmap_mutant_accordion.js:261
+#: src/main/javascript/game/test_accordion.js:301
+msgid "This test does not have any smells."
+msgstr "Dieser Test hat keine Test-Smells."
 
 #: src/main/javascript/game/mutant_accordion.js:197
 msgid "No mutants in this method."
@@ -3425,6 +4115,43 @@ msgstr ""
 msgid "View Example Killing Test"
 msgstr "Betrachte beispielhaften tötenden Test"
 
+#: src/main/javascript/game/test_progress_bar.js:40
+msgid "Submitting Test"
+msgstr "Reiche Test ein"
+
+#: src/main/javascript/game/test_progress_bar.js:68
+msgid "Validating Test"
+msgstr "Validiere Test"
+
+#: src/main/javascript/game/test_progress_bar.js:73
+msgid "Compiling Test"
+msgstr "Kompiliere Test"
+
+#: src/main/javascript/game/test_progress_bar.js:75
+msgid "Test Is Not Valid"
+msgstr "Test ist ungültig"
+
+#: src/main/javascript/game/test_progress_bar.js:81
+msgid "Running Test Against Original"
+msgstr "Test gegen Original ausführen"
+
+#: src/main/javascript/game/test_progress_bar.js:83
+msgid "Test Did Not Compile"
+msgstr "Test konnte nicht kompiliert werden"
+
+#: src/main/javascript/game/test_progress_bar.js:89
+msgid "Running Test Against Mutants"
+msgstr "Test gegen Mutanten ausführen"
+
+#: src/main/javascript/game/test_progress_bar.js:91
+msgid "Test Failed Against Original"
+msgstr "Testausführung gegenüber Original fehlgeschlagen"
+
+#: src/main/javascript/game/test_progress_bar.js:96
+#: src/main/javascript/game/mutant_progress_bar.js:96
+msgid "Done"
+msgstr "Fertig"
+
 #: src/main/javascript/game/mutant_progress_bar.js:40
 msgid "Submitting Mutant"
 msgstr "Mutant einreichen"
@@ -3457,11 +4184,6 @@ msgstr "Tests gegen Mutanten ausführen"
 msgid "Mutant Did Not Compile"
 msgstr "Mutant konnte nicht kompiliert werden"
 
-#: src/main/javascript/game/mutant_progress_bar.js:96
-#: src/main/javascript/game/test_progress_bar.js:96
-msgid "Done"
-msgstr "Fertig"
-
 #: src/main/javascript/game/test_accordion.js:103
 msgid "Test"
 msgstr "Test"
@@ -3473,38 +4195,6 @@ msgstr "In den Editor kopieren"
 #: src/main/javascript/game/test_accordion.js:175
 msgid "No tests cover this method."
 msgstr "Es gibt keine Tests, die diese Methode abdecken."
-
-#: src/main/javascript/game/test_progress_bar.js:40
-msgid "Submitting Test"
-msgstr "Reiche Test ein"
-
-#: src/main/javascript/game/test_progress_bar.js:68
-msgid "Validating Test"
-msgstr "Validiere Test"
-
-#: src/main/javascript/game/test_progress_bar.js:73
-msgid "Compiling Test"
-msgstr "Kompiliere Test"
-
-#: src/main/javascript/game/test_progress_bar.js:75
-msgid "Test Is Not Valid"
-msgstr "Test ist ungültig"
-
-#: src/main/javascript/game/test_progress_bar.js:81
-msgid "Running Test Against Original"
-msgstr "Test gegen Original ausführen"
-
-#: src/main/javascript/game/test_progress_bar.js:83
-msgid "Test Did Not Compile"
-msgstr "Test konnte nicht kompiliert werden"
-
-#: src/main/javascript/game/test_progress_bar.js:89
-msgid "Running Test Against Mutants"
-msgstr "Test gegen Mutanten ausführen"
-
-#: src/main/javascript/game/test_progress_bar.js:91
-msgid "Test Failed Against Original"
-msgstr "Testausführung gegenüber Original fehlgeschlagen"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:28
 msgid "Medium"
@@ -3627,9 +4317,6 @@ msgstr "Mittel"
 #~ "hat. Ähnlich wie beim Einreichen eines Tests wird ein Fehler angezeigt, "
 #~ "wenn die mutierte Klasse nicht kompiliert werden konnte."
 
-#~ msgid "Equivalents"
-#~ msgstr "Äquivalente"
-
 #~ msgid ""
 #~ "It is possible to create a mutant which is identical in functionality to "
 #~ "the CUT, so no test can pass on the CUT and fail on the mutated class."
@@ -3668,9 +4355,6 @@ msgstr "Mittel"
 #~ msgstr ""
 #~ "Wenn der Mutant jedoch nicht äquivalent ist, kann der Angreifer dies "
 #~ "beweisen, indem er einen Test schreibt, der ihn tötet."
-
-#~ msgid "Scoring System"
-#~ msgstr "Punktesystem"
 
 #~ msgid ""
 #~ "For every test a mutant passes where the test executes the mutated line, "
@@ -3719,84 +4403,3 @@ msgstr "Mittel"
 #~ "Spiel abläuft, verliert er die Punkte dieses Mutanten, und der "
 #~ "Verteidiger, der behauptet hat, dass er äquivalent ist, erhält einen "
 #~ "Punkt."
-
-#~ msgid "Code Editor Keyboard Shortcuts"
-#~ msgstr "Tastaturkürzel für den Code-Editor"
-
-#~ msgid "Key"
-#~ msgstr "Taste"
-
-#~ msgid "Key (Mac)"
-#~ msgstr "Taste (Mac)"
-
-#~ msgid "Autocomplete"
-#~ msgstr "Autovervollständigung"
-
-#, fuzzy
-#~ msgid "Ctrl + Space"
-#~ msgstr "Strg + Leertaste"
-
-#, fuzzy
-#~ msgid "Cmd + Space"
-#~ msgstr "Befehlstaste + Leertaste"
-
-#, fuzzy
-#~ msgid "Ctrl + F"
-#~ msgstr "Strg + F"
-
-#, fuzzy
-#~ msgid "Cmd + F"
-#~ msgstr "Befehlstaste + F"
-
-#~ msgid "Find Next"
-#~ msgstr "Weitersuchen"
-
-#, fuzzy
-#~ msgid "Ctrl + G"
-#~ msgstr "Strg + G"
-
-#, fuzzy
-#~ msgid "Cmd + G"
-#~ msgstr "Befehlstaste + G"
-
-#~ msgid "Find Previous"
-#~ msgstr "Finde Vorherige"
-
-#, fuzzy
-#~ msgid "Ctrl + Shift + G"
-#~ msgstr "Strg + Umschalt + G"
-
-#, fuzzy
-#~ msgid "Cmd + Shift + G"
-#~ msgstr "Befehlstaste + Umschalttaste + G"
-
-#~ msgid "Search and Replace"
-#~ msgstr "Suchen und Ersetzen"
-
-#, fuzzy
-#~ msgid "Ctrl + Shift + F"
-#~ msgstr "Strg + Umschalt + F"
-
-#, fuzzy
-#~ msgid "Cmd + Shift + F"
-#~ msgstr "Befehlstaste + Umschalttaste + F"
-
-#, fuzzy
-#~ msgid "Search and Replace All"
-#~ msgstr "Suchen und alles ersetzen"
-
-#, fuzzy
-#~ msgid "Ctrl + Shift + R"
-#~ msgstr "Strg + Umschalt + R"
-
-#, fuzzy
-#~ msgid "Cmd + Shift + R"
-#~ msgstr "Befehlstaste + Umschalttaste + R"
-
-#, fuzzy
-#~ msgid "Jump to Line"
-#~ msgstr "Zur Zeile springen"
-
-#, fuzzy
-#~ msgid "Alt + R"
-#~ msgstr "Alt + R"
