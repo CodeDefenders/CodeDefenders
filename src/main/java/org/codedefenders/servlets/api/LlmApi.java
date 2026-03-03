@@ -227,7 +227,8 @@ public class LlmApi extends HttpServlet {
                 }
             }
             case "updatePrompts" -> {
-                Optional<String> customName = ServletUtils.getStringParameter(req, "customName");
+                Optional<String> oldCustomName = ServletUtils.getStringParameter(req, "oldCustomName");
+                Optional<String> newCustomName = ServletUtils.getStringParameter(req, "newCustomName");
                 Optional<LlmDefaultStrategy> baseStrategy = ServletUtils.getEnumParameter(
                         req,
                         LlmDefaultStrategy.class,
@@ -236,7 +237,9 @@ public class LlmApi extends HttpServlet {
                 Iterator<String> otherParams = req.getParameterNames().asIterator();
                 while (otherParams.hasNext()) {
                     String promptName = otherParams.next();
-                    if (promptName.equals("customName") || promptName.equals("baseStrategy")
+                    if (promptName.equals("oldCustomName")
+                            || promptName.equals("newCustomName")
+                            || promptName.equals("baseStrategy")
                             || promptName.equals("formType")) {
                         continue;
                     }
@@ -246,13 +249,45 @@ public class LlmApi extends HttpServlet {
                         customPrompts.put(promptType, ServletUtils.getStringParameter(req, promptName).get());
 
                     } catch (IllegalArgumentException e) {
-                        logger.error("No such prompt type:{}", promptName);
+                        logger.error("No such prompt type: {}", promptName);
                         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                         resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
                         return;
                     }
 
                 }
+
+                if (baseStrategy.isEmpty() || newCustomName.isEmpty()) {
+                    logger.error("Missing base strategy {} or newCustomName {}", baseStrategy, newCustomName);
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                    return;
+                }
+
+                LlmStrategy customStrategy;
+                if (oldCustomName.isPresent()) {
+                    var customStrategyOpt = llmRepo.getCustomStrategy(oldCustomName.get());
+                    if (customStrategyOpt.isPresent()) {
+                        customStrategy = customStrategyOpt.get();
+                    } else {
+                        logger.error("No strategy exists with name {}", oldCustomName);
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                        return;
+                    }
+                    if (customStrategy.getBase() != baseStrategy.get()) {
+                        logger.error("Base strategy {} in request, but strategy with name {} has baseStrategy {}",
+                                baseStrategy.get(), oldCustomName.get(), customStrategy.getBase());
+                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                        return;
+                    }
+                } else {
+                    customStrategy = new LlmStrategy(newCustomName.get(), baseStrategy.get());
+                }
+                customStrategy.setCustomPrompts(customPrompts);
+                llmRepo.saveCustomStrategy(customStrategy);
+                resp.setStatus(HttpServletResponse.SC_OK);
 
                 logger.info("Map: {}", customPrompts);
 

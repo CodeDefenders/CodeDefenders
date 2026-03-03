@@ -32,7 +32,7 @@ public class LlmStrategy {
 
     private final String name;
 
-    final Map<LlmPromptType, String> customPrompts;
+    Map<LlmPromptType, String> customPrompts;
 
     final Class<? extends LlmSubActionService> service;
 
@@ -52,7 +52,7 @@ public class LlmStrategy {
 //        this(name, prompts, service, 1);
 //    }
 //
-    LlmStrategy(String name, LlmDefaultStrategy base) {
+    public LlmStrategy(String name, LlmDefaultStrategy base) {
         this(name, new HashMap<>(), base.service, base.timeModifier, base);
     }
 
@@ -64,9 +64,13 @@ public class LlmStrategy {
         return timeModifier;
     }
 
+    public void setCustomPrompts(Map<LlmPromptType, String> customPrompts) {
+        this.customPrompts = customPrompts;
+    }
+
     public void setPrompt(LlmPromptType promptType, String prompt) {
         if (prompt != null && !prompt.isEmpty()) {
-        customPrompts.put(promptType, prompt);
+            customPrompts.put(promptType, prompt);
         }
     }
 
@@ -80,6 +84,10 @@ public class LlmStrategy {
         } else {
             return promptType.getDefaultPrompt();
         }
+    }
+
+    public Map<LlmPromptType, String> getCustomPrompts() {
+        return customPrompts;
     }
 
     public Class<? extends LlmSubActionService> getService() {

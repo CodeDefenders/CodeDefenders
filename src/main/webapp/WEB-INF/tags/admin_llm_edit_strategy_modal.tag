@@ -27,6 +27,7 @@
 
 <%@ attribute name="htmlId" required="true" %>
 <%@ attribute name="baseStrategy" required="true" type="org.codedefenders.model.llm.LlmDefaultStrategy" %>
+<%@ attribute name="oldCustomName" required="false" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -41,11 +42,14 @@
 <form id="${htmlId}-form" action="${url.forPath("/api/llm")}" method="post">
     <input type="hidden" name="formType" value="updatePrompts">
     <input type="hidden" name="baseStrategy" value="${baseStrategy.name()}">
+    <c:if test="${oldCustomName}">
+        <input type="hidden" name="oldCustomName" value="${oldCustomName}">
+    </c:if>
 
     <t:modal title="Edit strategy" id="${htmlId}">
     <jsp:attribute name="content">
-        <label for="${htmlId}-custom-name"></label>
-        <input id="${htmlId}-custom-name" type="text" name="customName">
+        <label for="${htmlId}-new-custom-name"></label>
+        <input id="${htmlId}-new-custom-name" type="text" name="newCustomName">
         <button id="${htmlId}-add-prompt" type="button">
             Add custom prompt
         </button>
