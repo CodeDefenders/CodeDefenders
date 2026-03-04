@@ -4931,7 +4931,7 @@ msgstr "Dies ist Ihr {0}. Versuch."
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:63
 msgid "My mutant is killable"
-msgstr "Mein Mutant ist tötbar."
+msgstr "Mein Mutant ist tötbar"
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:68
 msgid "My mutant is equivalent"
@@ -4939,7 +4939,7 @@ msgstr "Mein Mutant ist äquivalent"
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
 msgid "I don't know if my mutant is killable"
-msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann."
+msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
 #: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:24
 msgid "Mutation rules"
