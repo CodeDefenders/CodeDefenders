@@ -407,82 +407,6 @@ msgstr "Per Test:"
 msgid "Showing _TOTAL_ entries"
 msgstr "Showing _TOTAL_ entries"
 
-#: src/main/webapp/jsp/admin_class_management.jsp:38
-msgid "Class Management"
-msgstr "Class Management"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:45
-msgid "ID"
-msgstr "ID"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:46
-msgid "Name"
-msgstr "Name"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:47
-msgid "Alias"
-msgstr "Alias"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:48
-msgid "Assertion Library"
-msgstr "Assertion Library"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:49
-msgid "#Games"
-msgstr "#Games"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:50
-msgid "Manage Class"
-msgstr "Manage Class"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:58
-msgid "There are no classes yet."
-msgstr "There are no classes yet."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:59
-msgid "Click here"
-msgstr "Click here"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:60
-msgid "to upload a new class."
-msgstr "to upload a new class."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:87
-msgid "Set class as inactive. This class won't be available for games afterwards."
-msgstr "Set class as inactive. This class won't be available for games afterwards."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to inactive?"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:97
-msgid "Set class as active. This class will be available for games afterwards again."
-msgstr "Set class as active. This class will be available for games afterwards again."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to active?"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:109
-msgid "Delete class from the system. This class won't be available for games afterwards."
-msgstr "Delete class from the system. This class won't be available for games afterwards."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:110
-msgid "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
-msgstr "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:114
-msgid "Class can't be deleted, since games were already played on it."
-msgstr "Class can't be deleted, since games were already played on it."
-
-#: src/main/webapp/jsp/admin_class_management.jsp:131
-msgid "Click here"
-msgstr "Click here"
-
-#: src/main/webapp/jsp/admin_class_management.jsp:132
-msgid "to upload a new class."
-msgstr "to upload a new class."
-
 #: src/main/webapp/jsp/admin_classrooms.jsp:31
 msgid "Classrooms"
 msgstr "Classrooms"
@@ -563,6 +487,82 @@ msgstr "Link"
 msgid "There aren't any classrooms... yet."
 msgstr "There aren't any classrooms... yet."
 
+#: src/main/webapp/jsp/admin_class_management.jsp:38
+msgid "Class Management"
+msgstr "Class Management"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:45
+msgid "ID"
+msgstr "ID"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:46
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:47
+msgid "Alias"
+msgstr "Alias"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:48
+msgid "Assertion Library"
+msgstr "Assertion Library"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:49
+msgid "#Games"
+msgstr "#Games"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:50
+msgid "Manage Class"
+msgstr "Manage Class"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:58
+msgid "There are no classes yet."
+msgstr "There are no classes yet."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:59
+msgid "Click here"
+msgstr "Click here"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:60
+msgid "to upload a new class."
+msgstr "to upload a new class."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:87
+msgid "Set class as inactive. This class won't be available for games afterwards."
+msgstr "Set class as inactive. This class won't be available for games afterwards."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:88
+msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
+msgstr "Are you sure you want to set class '${gameClass.name}' to inactive?"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:97
+msgid "Set class as active. This class will be available for games afterwards again."
+msgstr "Set class as active. This class will be available for games afterwards again."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:98
+msgid "Are you sure you want to set class '${gameClass.name}' to active?"
+msgstr "Are you sure you want to set class '${gameClass.name}' to active?"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:109
+msgid "Delete class from the system. This class won't be available for games afterwards."
+msgstr "Delete class from the system. This class won't be available for games afterwards."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:110
+msgid "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
+msgstr "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:114
+msgid "Class can't be deleted, since games were already played on it."
+msgstr "Class can't be deleted, since games were already played on it."
+
+#: src/main/webapp/jsp/admin_class_management.jsp:131
+msgid "Click here"
+msgstr "Click here"
+
+#: src/main/webapp/jsp/admin_class_management.jsp:132
+msgid "to upload a new class."
+msgstr "to upload a new class."
+
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 msgid "Game"
 msgstr "Game"
@@ -587,9 +587,11 @@ msgstr "Killmap Status"
 msgid "Class"
 msgstr "Class"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:94
 msgid "Classes"
 msgstr "Classes"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:94
 msgid "and"
 msgstr "and"
 
@@ -597,9 +599,11 @@ msgstr "and"
 msgid "Game"
 msgstr "Game"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:95
 msgid "Games"
 msgstr "Games"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:95
 msgid "currently queued."
 msgstr "currently queued."
 
@@ -607,6 +611,7 @@ msgstr "currently queued."
 msgid "Killmap Processing is"
 msgstr "Killmap Processing is"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:101
 msgid "enabled"
 msgstr "enabled"
 
@@ -614,6 +619,7 @@ msgstr "enabled"
 msgid "Killmap Processing is"
 msgstr "Killmap Processing is"
 
+#: src/main/webapp/jsp/admin_killmap_management.jsp:104
 msgid "disabled"
 msgstr "disabled"
 
@@ -1157,454 +1163,6 @@ msgstr "Are you sure you want to stop the selected Games?"
 msgid "Stop Games"
 msgstr "Stop Games"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:32
-msgid "Puzzle Management"
-msgstr "Puzzle Management"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:43
-msgid "Upload chapters"
-msgstr "Upload chapters"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:47
-msgid "Upload puzzles"
-msgstr "Upload puzzles"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:51
-msgid "Add empty chapter"
-msgstr "Add empty chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:56
-msgid "Save"
-msgstr "Save"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:63
-msgid "Unassigned Puzzles"
-msgstr "Unassigned Puzzles"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:72
-msgid "Archived Puzzles"
-msgstr "Archived Puzzles"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:79
-msgid "Unsaved changes"
-msgstr "Unsaved changes"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:80
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:82
-msgid "You have unsaved changes. Please save first."
-msgstr "You have unsaved changes. Please save first."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:86
-msgid "Save"
-msgstr "Save"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:97
-msgid "Upload Puzzles"
-msgstr "Upload Puzzles"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:102
-msgid "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
-msgstr "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:109
-msgid "Puzzle Format Explanation"
-msgstr "Puzzle Format Explanation"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:115
-msgid "Puzzle Properties Explanation"
-msgstr "Puzzle Properties Explanation"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:121
-msgid "Downloads"
-msgstr "Downloads"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:125
-msgid "Empty puzzle template:"
-msgstr "Empty puzzle template:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:131
-msgid "Example properties file:"
-msgstr "Example properties file:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:137
-msgid "Example attacker puzzle:"
-msgstr "Example attacker puzzle:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:143
-msgid "Example defender puzzle:"
-msgstr "Example defender puzzle:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:149
-msgid "Example puzzle with dependencies:"
-msgstr "Example puzzle with dependencies:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:161
-msgid "Uploading..."
-msgstr "Uploading..."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:162
-msgid "Upload"
-msgstr "Upload"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:172
-msgid "Upload Chapters"
-msgstr "Upload Chapters"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:177
-msgid "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
-msgstr "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:181
-msgid "Uploading large chapters may take several minutes."
-msgstr "Uploading large chapters may take several minutes."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:188
-msgid "Chapter Format Explanation"
-msgstr "Chapter Format Explanation"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:194
-msgid "Puzzle Format Explanation"
-msgstr "Puzzle Format Explanation"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:200
-msgid "Puzzle Properties Explanation"
-msgstr "Puzzle Properties Explanation"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:206
-msgid "Downloads"
-msgstr "Downloads"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:210
-msgid "Example chapter:"
-msgstr "Example chapter:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:216
-msgid "Example properties file:"
-msgstr "Example properties file:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:222
-msgid "Empty chapter template:"
-msgstr "Empty chapter template:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:228
-msgid "Puzzle Downloads:"
-msgstr "Puzzle Downloads:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:231
-msgid "Empty puzzle template:"
-msgstr "Empty puzzle template:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:237
-msgid "Example properties file:"
-msgstr "Example properties file:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:243
-msgid "Example attacker puzzle:"
-msgstr "Example attacker puzzle:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:249
-msgid "Example defender puzzle:"
-msgstr "Example defender puzzle:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:255
-msgid "Example puzzle with dependencies:"
-msgstr "Example puzzle with dependencies:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:267
-msgid "Uploading..."
-msgstr "Uploading..."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:268
-msgid "Upload"
-msgstr "Upload"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:364
-msgid "Edit"
-msgstr "Edit"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:367
-msgid "Upload Puzzles"
-msgstr "Upload Puzzles"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:370
-msgid "Delete"
-msgstr "Delete"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:379
-msgid "Move to position:"
-msgstr "Move to position:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:380
-msgid "Move to position"
-msgstr "Move to position"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:450
-msgid "Number of games with the puzzle"
-msgstr "Number of games with the puzzle"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:451
-msgid "Puzzle level"
-msgstr "Puzzle level"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:452
-msgid "Mutant is equivalent"
-msgstr "Mutant is equivalent"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:458
-msgid "Edit"
-msgstr "Edit"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:462
-msgid "Unassign"
-msgstr "Unassign"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:466
-msgid "Archive"
-msgstr "Archive"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:470
-msgid "Delete"
-msgstr "Delete"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:478
-msgid "Move to chapter:"
-msgstr "Move to chapter:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:479
-msgid "Move to chapter"
-msgstr "Move to chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:508
-msgid "Puzzles with existing games can't be deleted"
-msgstr "Puzzles with existing games can't be deleted"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:539
-msgid "Move to chapter:"
-msgstr "Move to chapter:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:639
-msgid "Scroll to chapter"
-msgstr "Scroll to chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:640
-msgid "Scroll to chapter:"
-msgstr "Scroll to chapter:"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:641
-msgid "Go"
-msgstr "Go"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:740
-msgid "Please enter a title."
-msgstr "Please enter a title."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:748
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:753
-msgid "Edit Chapter"
-msgstr "Edit Chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:754
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:783
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:785
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:810
-msgid "Title"
-msgstr "Title"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:812
-msgid "Title"
-msgstr "Title"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:814
-msgid "Please enter a title."
-msgstr "Please enter a title."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:820
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:822
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:829
-msgid "Max. Assertions"
-msgstr "Max. Assertions"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:837
-msgid "First Editable Line"
-msgstr "First Editable Line"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:842
-msgid "Last Editable Line"
-msgstr "Last Editable Line"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:850
-msgid "Game Level"
-msgstr "Game Level"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:854
-msgid "Easy"
-msgstr "Easy"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:855
-msgid "Please select a level."
-msgstr "Please select a level."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:861
-msgid "Hard"
-msgstr "Hard"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:868
-msgid "Equivalence"
-msgstr "Equivalence"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:872
-msgid "Mutant equivalent"
-msgstr "Mutant equivalent"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:878
-msgid "Edit Puzzle"
-msgstr "Edit Puzzle"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:940
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:942
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:965
-msgid "Are you sure you want to delete chapter"
-msgstr "Are you sure you want to delete chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:967
-msgid "Any puzzles left in the chapter will be moved to"
-msgstr "Any puzzles left in the chapter will be moved to"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:968
-msgid "Unassigned"
-msgstr "Unassigned"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:971
-msgid "Delete Chapter"
-msgstr "Delete Chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:972
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:990
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:992
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
-msgid "Are you sure you want to permanently delete puzzle"
-msgstr "Are you sure you want to permanently delete puzzle"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1019
-msgid "Delete Puzzle"
-msgstr "Delete Puzzle"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1020
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1027
-msgid "Delete"
-msgstr "Delete"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1034
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1036
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1055
-msgid "Title"
-msgstr "Title"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1057
-msgid "Please enter a title."
-msgstr "Please enter a title."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1063
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1070
-msgid "Create New Chapter"
-msgstr "Create New Chapter"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1071
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
-msgid "Save"
-msgstr "Save"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1101
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1124
-msgid "Close"
-msgstr "Close"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1205
-msgid "Saving..."
-msgstr "Saving..."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1210
-msgid "Success"
-msgstr "Success"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1212
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1213
-msgid "Could not save changes."
-msgstr "Could not save changes."
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1218
-msgid "Save"
-msgstr "Save"
-
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:52
 msgid "Puzzle Preview"
 msgstr "Puzzle Preview"
@@ -1649,6 +1207,7 @@ msgstr "Mutant Equivalent"
 msgid "yes"
 msgstr "yes"
 
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:119
 msgid "no"
 msgstr "no"
 
@@ -1739,10 +1298,6 @@ msgstr "Save"
 #: src/main/webapp/jsp/admin_system_settings.jsp:145
 msgid "Cancel"
 msgstr "Cancel"
-
-#: src/main/webapp/jsp/classroom_create_games.jsp:38
-msgid "Back to Classroom"
-msgstr "Back to Classroom"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:74
 msgid "User Management"
@@ -1912,6 +1467,10 @@ msgstr "Please consider that you can't reuse a username from an inactive user."
 msgid "Valid input format examples:"
 msgstr "Valid input format examples:"
 
+#: src/main/webapp/jsp/classroom_create_games.jsp:38
+msgid "Back to Classroom"
+msgstr "Back to Classroom"
+
 #: src/main/webapp/jsp/classroom_page.jsp:61
 msgid "Archived"
 msgstr "Archived"
@@ -1972,6 +1531,7 @@ msgstr "Join Settings"
 msgid "Joining is"
 msgstr "Joining is"
 
+#: src/main/webapp/jsp/classroom_page.jsp:143
 msgid "enabled"
 msgstr "enabled"
 
@@ -1983,6 +1543,7 @@ msgstr "Disable Joining"
 msgid "Joining is"
 msgstr "Joining is"
 
+#: src/main/webapp/jsp/classroom_page.jsp:153
 msgid "disabled"
 msgstr "disabled"
 
@@ -1994,6 +1555,7 @@ msgstr "Enable Joining"
 msgid "Visibility is"
 msgstr "Visibility is"
 
+#: src/main/webapp/jsp/classroom_page.jsp:168
 msgid "public"
 msgstr "public"
 
@@ -2005,6 +1567,7 @@ msgstr "Make Private"
 msgid "Visibility is"
 msgstr "Visibility is"
 
+#: src/main/webapp/jsp/classroom_page.jsp:178
 msgid "private"
 msgstr "private"
 
@@ -2024,6 +1587,7 @@ msgstr "set"
 msgid "Password is"
 msgstr "Password is"
 
+#: src/main/webapp/jsp/classroom_page.jsp:197
 msgid "not set"
 msgstr "not set"
 
@@ -2259,6 +1823,7 @@ msgstr "Restore"
 msgid "Leave classroom"
 msgstr "Leave classroom"
 
+#: src/main/webapp/jsp/classroom_page.jsp:519
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -2322,6 +1887,7 @@ msgstr "Kick"
 msgid "Join Classroom"
 msgstr "Join Classroom"
 
+#: src/main/webapp/jsp/classroom_page.jsp:598
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -2485,6 +2051,7 @@ msgstr "Create Classroom"
 msgid "Members"
 msgstr "Members"
 
+#: src/main/webapp/jsp/classrooms_overview.jsp:130
 msgid "Member"
 msgstr "Member"
 
@@ -2636,22 +2203,6 @@ msgstr "Please check out the"
 msgid "project page for more details."
 msgstr "project page for more details."
 
-#: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don't have permission to perform this request (403)"
-msgstr "You don't have permission to perform this request (403)"
-
-#: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don't have permission to perform this request."
-msgstr "You don't have permission to perform this request."
-
-#: src/main/webapp/jsp/error_page_403.jsp:31
-msgid "Your accounts permissions do not include the accessed page or performed action."
-msgstr "Your accounts permissions do not include the accessed page or performed action."
-
-#: src/main/webapp/jsp/error_page_403.jsp:33
-msgid "Please contact your administrator if you think this is a mistake."
-msgstr "Please contact your administrator if you think this is a mistake."
-
 #: src/main/webapp/jsp/error_page_404.jsp:27
 msgid "The page you're looking for could not be found (404)"
 msgstr "The page you're looking for could not be found (404)"
@@ -2687,33 +2238,6 @@ msgstr "There has been a problem on our side. Sorry about that."
 #: src/main/webapp/jsp/error_page_500.jsp:31
 msgid "Please try again and contact your administrator if this keeps happening."
 msgstr "Please try again and contact your administrator if this keeps happening."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:31
-msgid "User not found (404)"
-msgstr "User not found (404)"
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:33
-msgid "The user with the name \\"{0}\\" does not exist."
-msgstr "The user with the name \\"{0}\\" does not exist."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:35
-msgid "Make sure the address and the username are correct and that the page hasn't moved."
-msgstr "Make sure the address and the username are correct and that the page hasn't moved."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:36
-msgid "Please contact your administrator if you think this is a mistake."
-msgstr "Please contact your administrator if you think this is a mistake."
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:38
-msgid "Looking for your own profile?"
-msgstr "Looking for your own profile?"
-
-#: src/main/webapp/jsp/error_page_user_not_found.jsp:39
-msgid "your profile"
-msgstr "your profile"
-
-msgid "Click here."
-msgstr "Click here."
 
 #: src/main/webapp/jsp/games_history.jsp:58
 msgid "Game History"
@@ -2846,6 +2370,50 @@ msgstr "Points"
 #: src/main/webapp/jsp/games_history.jsp:282
 msgid "There are no Players."
 msgstr "There are no Players."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:31
+msgid "User not found (404)"
+msgstr "User not found (404)"
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:33
+msgid "The user with the name \\"{0}\\" does not exist."
+msgstr "The user with the name \\"{0}\\" does not exist."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:35
+msgid "Make sure the address and the username are correct and that the page hasn't moved."
+msgstr "Make sure the address and the username are correct and that the page hasn't moved."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:36
+msgid "Please contact your administrator if you think this is a mistake."
+msgstr "Please contact your administrator if you think this is a mistake."
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:38
+msgid "Looking for your own profile?"
+msgstr "Looking for your own profile?"
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:39
+msgid "your profile"
+msgstr "your profile"
+
+#: src/main/webapp/jsp/error_page_user_not_found.jsp:39
+msgid "Click here."
+msgstr "Click here."
+
+#: src/main/webapp/jsp/error_page_403.jsp:27
+msgid "You don't have permission to perform this request (403)"
+msgstr "You don't have permission to perform this request (403)"
+
+#: src/main/webapp/jsp/error_page_403.jsp:29
+msgid "You don't have permission to perform this request."
+msgstr "You don't have permission to perform this request."
+
+#: src/main/webapp/jsp/error_page_403.jsp:31
+msgid "Your accounts permissions do not include the accessed page or performed action."
+msgstr "Your accounts permissions do not include the accessed page or performed action."
+
+#: src/main/webapp/jsp/error_page_403.jsp:33
+msgid "Please contact your administrator if you think this is a mistake."
+msgstr "Please contact your administrator if you think this is a mistake."
 
 #: src/main/webapp/jsp/imprint.jsp:36
 msgid "Imprint & Privacy Policy"
@@ -3599,257 +3167,6 @@ msgstr "No classes uploaded."
 msgid "Showing _TOTAL_ entries"
 msgstr "Showing _TOTAL_ entries"
 
-#: src/main/webapp/jsp/user_profile.jsp:32
-msgid "My Profile"
-msgstr "My Profile"
-
-msgid "Profile of {0}"
-msgstr "Profile of {0}"
-
-#: src/main/webapp/jsp/user_profile.jsp:44
-msgid "Achievements"
-msgstr "Achievements"
-
-#: src/main/webapp/jsp/user_profile.jsp:48
-msgid "No achievement unlocked yet."
-msgstr "No achievement unlocked yet."
-
-#: src/main/webapp/jsp/user_profile.jsp:56
-msgid "Show all achievements"
-msgstr "Show all achievements"
-
-#: src/main/webapp/jsp/user_profile.jsp:62
-msgid "Show all achievements"
-msgstr "Show all achievements"
-
-#: src/main/webapp/jsp/user_profile.jsp:63
-msgid "Hide locked achievements"
-msgstr "Hide locked achievements"
-
-#: src/main/webapp/jsp/user_profile.jsp:64
-msgid "Show all achievements"
-msgstr "Show all achievements"
-
-#: src/main/webapp/jsp/user_profile.jsp:76
-msgid "Statistics for Multiplayer Games"
-msgstr "Statistics for Multiplayer Games"
-
-#: src/main/webapp/jsp/user_profile.jsp:83
-msgid "Mutants created"
-msgstr "Mutants created"
-
-#: src/main/webapp/jsp/user_profile.jsp:86
-msgid "Mutants still alive:"
-msgstr "Mutants still alive:"
-
-#: src/main/webapp/jsp/user_profile.jsp:87
-msgid "Killed mutants:"
-msgstr "Killed mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:91
-msgid "Tests written"
-msgstr "Tests written"
-
-#: src/main/webapp/jsp/user_profile.jsp:94
-msgid "Tests that killed mutants:"
-msgstr "Tests that killed mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:95
-msgid "Non-killing tests:"
-msgstr "Non-killing tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:99
-msgid "Points earned"
-msgstr "Points earned"
-
-#: src/main/webapp/jsp/user_profile.jsp:102
-msgid "By writing tests:"
-msgstr "By writing tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:103
-msgid "By creating mutants:"
-msgstr "By creating mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:107
-msgid "Games played"
-msgstr "Games played"
-
-#: src/main/webapp/jsp/user_profile.jsp:110
-msgid "As defender:"
-msgstr "As defender:"
-
-#: src/main/webapp/jsp/user_profile.jsp:111
-msgid "As attacker:"
-msgstr "As attacker:"
-
-#: src/main/webapp/jsp/user_profile.jsp:116
-msgid "Average points per tests:"
-msgstr "Average points per tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:119
-msgid "Average points per mutant:"
-msgstr "Average points per mutant:"
-
-#: src/main/webapp/jsp/user_profile.jsp:125
-msgid "Statistics for Melee Games"
-msgstr "Statistics for Melee Games"
-
-#: src/main/webapp/jsp/user_profile.jsp:131
-msgid "Mutants created"
-msgstr "Mutants created"
-
-#: src/main/webapp/jsp/user_profile.jsp:134
-msgid "Mutants still alive:"
-msgstr "Mutants still alive:"
-
-#: src/main/webapp/jsp/user_profile.jsp:135
-msgid "Killed mutants:"
-msgstr "Killed mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:139
-msgid "Tests written"
-msgstr "Tests written"
-
-#: src/main/webapp/jsp/user_profile.jsp:142
-msgid "Tests that killed mutants:"
-msgstr "Tests that killed mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:143
-msgid "Non-killing tests:"
-msgstr "Non-killing tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:147
-msgid "Points earned"
-msgstr "Points earned"
-
-#: src/main/webapp/jsp/user_profile.jsp:150
-msgid "By writing tests:"
-msgstr "By writing tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:151
-msgid "By creating mutants:"
-msgstr "By creating mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:156
-msgid "Total melee games played:"
-msgstr "Total melee games played:"
-
-#: src/main/webapp/jsp/user_profile.jsp:159
-msgid "Average points per tests:"
-msgstr "Average points per tests:"
-
-#: src/main/webapp/jsp/user_profile.jsp:162
-msgid "Average points per mutant:"
-msgstr "Average points per mutant:"
-
-#: src/main/webapp/jsp/user_profile.jsp:168
-msgid "Statistics for Equivalence Duels"
-msgstr "Statistics for Equivalence Duels"
-
-#: src/main/webapp/jsp/user_profile.jsp:173
-msgid "All duels"
-msgstr "All duels"
-
-#: src/main/webapp/jsp/user_profile.jsp:176
-msgid "Equivalence duels won:"
-msgstr "Equivalence duels won:"
-
-#: src/main/webapp/jsp/user_profile.jsp:177
-msgid "Equivalence duels lost:"
-msgstr "Equivalence duels lost:"
-
-#: src/main/webapp/jsp/user_profile.jsp:182
-msgid "Duels as attacker"
-msgstr "Duels as attacker"
-
-#: src/main/webapp/jsp/user_profile.jsp:185
-msgid "Rejected equivalence claim:"
-msgstr "Rejected equivalence claim:"
-
-#: src/main/webapp/jsp/user_profile.jsp:186
-msgid "Failed to reject claim:"
-msgstr "Failed to reject claim:"
-
-#: src/main/webapp/jsp/user_profile.jsp:191
-msgid "Duels as defender"
-msgstr "Duels as defender"
-
-#: src/main/webapp/jsp/user_profile.jsp:194
-msgid "Successfully claimed as equivalent:"
-msgstr "Successfully claimed as equivalent:"
-
-#: src/main/webapp/jsp/user_profile.jsp:195
-msgid "Incorrectly claimed mutants:"
-msgstr "Incorrectly claimed mutants:"
-
-#: src/main/webapp/jsp/user_profile.jsp:201
-msgid "Statistics for Puzzle Games"
-msgstr "Statistics for Puzzle Games"
-
-#: src/main/webapp/jsp/user_profile.jsp:205
-msgid "Chapter {0} - {1}"
-msgstr "Chapter {0} - {1}"
-
-#: src/main/webapp/jsp/user_profile.jsp:231
-msgid "attempt"
-msgstr "attempt"
-
-msgid "attempts"
-msgstr "attempts"
-
-#: src/main/webapp/jsp/user_profile.jsp:236
-msgid "Equivalence"
-msgstr "Equivalence"
-
-#: src/main/webapp/jsp/user_profile.jsp:237
-msgid "Attacker"
-msgstr "Attacker"
-
-msgid "Defender"
-msgstr "Defender"
-
-#: src/main/webapp/jsp/user_profile.jsp:238
-msgid "puzzle"
-msgstr "puzzle"
-
-#: src/main/webapp/jsp/user_profile.jsp:251
-msgid "puzzle"
-msgstr "puzzle"
-
-msgid "puzzles"
-msgstr "puzzles"
-
-#: src/main/webapp/jsp/user_profile.jsp:263
-msgid "Played games"
-msgstr "Played games"
-
-#: src/main/webapp/jsp/user_profile.jsp:265
-msgid "You can find a list of your past games in the"
-msgstr "You can find a list of your past games in the"
-
-#: src/main/webapp/jsp/user_profile.jsp:266
-msgid "games history"
-msgstr "games history"
-
-#: src/main/webapp/jsp/user_profile.jsp:271
-msgid "Account Information"
-msgstr "Account Information"
-
-#: src/main/webapp/jsp/user_profile.jsp:273
-msgid "Your current email:"
-msgstr "Your current email:"
-
-#: src/main/webapp/jsp/user_profile.jsp:277
-msgid "Change your account information, password or delete your account in the"
-msgstr "Change your account information, password or delete your account in the"
-
-#: src/main/webapp/jsp/user_profile.jsp:279
-msgid "Edit or delete your CodeDefenders account."
-msgstr "Edit or delete your CodeDefenders account."
-
-msgid "account settings"
-msgstr "account settings"
-
 #: src/main/webapp/jsp/user_games_view.jsp:79
 msgid "My Games"
 msgstr "My Games"
@@ -4126,6 +3443,262 @@ msgstr "Points"
 msgid "There are no Players. Go Join!"
 msgstr "There are no Players. Go Join!"
 
+#: src/main/webapp/jsp/user_profile.jsp:32
+msgid "My Profile"
+msgstr "My Profile"
+
+#: src/main/webapp/jsp/user_profile.jsp:32
+msgid "Profile of {0}"
+msgstr "Profile of {0}"
+
+#: src/main/webapp/jsp/user_profile.jsp:44
+msgid "Achievements"
+msgstr "Achievements"
+
+#: src/main/webapp/jsp/user_profile.jsp:48
+msgid "No achievement unlocked yet."
+msgstr "No achievement unlocked yet."
+
+#: src/main/webapp/jsp/user_profile.jsp:56
+msgid "Show all achievements"
+msgstr "Show all achievements"
+
+#: src/main/webapp/jsp/user_profile.jsp:62
+msgid "Show all achievements"
+msgstr "Show all achievements"
+
+#: src/main/webapp/jsp/user_profile.jsp:63
+msgid "Hide locked achievements"
+msgstr "Hide locked achievements"
+
+#: src/main/webapp/jsp/user_profile.jsp:64
+msgid "Show all achievements"
+msgstr "Show all achievements"
+
+#: src/main/webapp/jsp/user_profile.jsp:76
+msgid "Statistics for Multiplayer Games"
+msgstr "Statistics for Multiplayer Games"
+
+#: src/main/webapp/jsp/user_profile.jsp:83
+msgid "Mutants created"
+msgstr "Mutants created"
+
+#: src/main/webapp/jsp/user_profile.jsp:86
+msgid "Mutants still alive:"
+msgstr "Mutants still alive:"
+
+#: src/main/webapp/jsp/user_profile.jsp:87
+msgid "Killed mutants:"
+msgstr "Killed mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:91
+msgid "Tests written"
+msgstr "Tests written"
+
+#: src/main/webapp/jsp/user_profile.jsp:94
+msgid "Tests that killed mutants:"
+msgstr "Tests that killed mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:95
+msgid "Non-killing tests:"
+msgstr "Non-killing tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:99
+msgid "Points earned"
+msgstr "Points earned"
+
+#: src/main/webapp/jsp/user_profile.jsp:102
+msgid "By writing tests:"
+msgstr "By writing tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:103
+msgid "By creating mutants:"
+msgstr "By creating mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:107
+msgid "Games played"
+msgstr "Games played"
+
+#: src/main/webapp/jsp/user_profile.jsp:110
+msgid "As defender:"
+msgstr "As defender:"
+
+#: src/main/webapp/jsp/user_profile.jsp:111
+msgid "As attacker:"
+msgstr "As attacker:"
+
+#: src/main/webapp/jsp/user_profile.jsp:116
+msgid "Average points per tests:"
+msgstr "Average points per tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:119
+msgid "Average points per mutant:"
+msgstr "Average points per mutant:"
+
+#: src/main/webapp/jsp/user_profile.jsp:125
+msgid "Statistics for Melee Games"
+msgstr "Statistics for Melee Games"
+
+#: src/main/webapp/jsp/user_profile.jsp:131
+msgid "Mutants created"
+msgstr "Mutants created"
+
+#: src/main/webapp/jsp/user_profile.jsp:134
+msgid "Mutants still alive:"
+msgstr "Mutants still alive:"
+
+#: src/main/webapp/jsp/user_profile.jsp:135
+msgid "Killed mutants:"
+msgstr "Killed mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:139
+msgid "Tests written"
+msgstr "Tests written"
+
+#: src/main/webapp/jsp/user_profile.jsp:142
+msgid "Tests that killed mutants:"
+msgstr "Tests that killed mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:143
+msgid "Non-killing tests:"
+msgstr "Non-killing tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:147
+msgid "Points earned"
+msgstr "Points earned"
+
+#: src/main/webapp/jsp/user_profile.jsp:150
+msgid "By writing tests:"
+msgstr "By writing tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:151
+msgid "By creating mutants:"
+msgstr "By creating mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:156
+msgid "Total melee games played:"
+msgstr "Total melee games played:"
+
+#: src/main/webapp/jsp/user_profile.jsp:159
+msgid "Average points per tests:"
+msgstr "Average points per tests:"
+
+#: src/main/webapp/jsp/user_profile.jsp:162
+msgid "Average points per mutant:"
+msgstr "Average points per mutant:"
+
+#: src/main/webapp/jsp/user_profile.jsp:168
+msgid "Statistics for Equivalence Duels"
+msgstr "Statistics for Equivalence Duels"
+
+#: src/main/webapp/jsp/user_profile.jsp:173
+msgid "All duels"
+msgstr "All duels"
+
+#: src/main/webapp/jsp/user_profile.jsp:176
+msgid "Equivalence duels won:"
+msgstr "Equivalence duels won:"
+
+#: src/main/webapp/jsp/user_profile.jsp:177
+msgid "Equivalence duels lost:"
+msgstr "Equivalence duels lost:"
+
+#: src/main/webapp/jsp/user_profile.jsp:182
+msgid "Duels as attacker"
+msgstr "Duels as attacker"
+
+#: src/main/webapp/jsp/user_profile.jsp:185
+msgid "Rejected equivalence claim:"
+msgstr "Rejected equivalence claim:"
+
+#: src/main/webapp/jsp/user_profile.jsp:186
+msgid "Failed to reject claim:"
+msgstr "Failed to reject claim:"
+
+#: src/main/webapp/jsp/user_profile.jsp:191
+msgid "Duels as defender"
+msgstr "Duels as defender"
+
+#: src/main/webapp/jsp/user_profile.jsp:194
+msgid "Successfully claimed as equivalent:"
+msgstr "Successfully claimed as equivalent:"
+
+#: src/main/webapp/jsp/user_profile.jsp:195
+msgid "Incorrectly claimed mutants:"
+msgstr "Incorrectly claimed mutants:"
+
+#: src/main/webapp/jsp/user_profile.jsp:201
+msgid "Statistics for Puzzle Games"
+msgstr "Statistics for Puzzle Games"
+
+#: src/main/webapp/jsp/user_profile.jsp:205
+msgid "Chapter {0} - {1}"
+msgstr "Chapter {0} - {1}"
+
+#: src/main/webapp/jsp/user_profile.jsp:231
+msgid "attempt"
+msgstr "attempt"
+
+#: src/main/webapp/jsp/user_profile.jsp:231
+msgid "attempts"
+msgstr "attempts"
+
+#: src/main/webapp/jsp/user_profile.jsp:236
+msgid "Equivalence"
+msgstr "Equivalence"
+
+#: src/main/webapp/jsp/user_profile.jsp:237
+msgid "Attacker"
+msgstr "Attacker"
+
+#: src/main/webapp/jsp/user_profile.jsp:237
+msgid "Defender"
+msgstr "Defender"
+
+#: src/main/webapp/jsp/user_profile.jsp:238
+msgid "puzzle"
+msgstr "puzzle"
+
+#: src/main/webapp/jsp/user_profile.jsp:251
+msgid "puzzle"
+msgstr "puzzle"
+
+#: src/main/webapp/jsp/user_profile.jsp:251
+msgid "puzzles"
+msgstr "puzzles"
+
+#: src/main/webapp/jsp/user_profile.jsp:263
+msgid "Played games"
+msgstr "Played games"
+
+#: src/main/webapp/jsp/user_profile.jsp:265
+msgid "You can find a list of your past games in the"
+msgstr "You can find a list of your past games in the"
+
+#: src/main/webapp/jsp/user_profile.jsp:266
+msgid "games history"
+msgstr "games history"
+
+#: src/main/webapp/jsp/user_profile.jsp:271
+msgid "Account Information"
+msgstr "Account Information"
+
+#: src/main/webapp/jsp/user_profile.jsp:273
+msgid "Your current email:"
+msgstr "Your current email:"
+
+#: src/main/webapp/jsp/user_profile.jsp:277
+msgid "Change your account information, password or delete your account in the"
+msgstr "Change your account information, password or delete your account in the"
+
+#: src/main/webapp/jsp/user_profile.jsp:279
+msgid "Edit or delete your CodeDefenders account."
+msgstr "Edit or delete your CodeDefenders account."
+
+#: src/main/webapp/jsp/user_profile.jsp:279
+msgid "account settings"
+msgstr "account settings"
+
 #: src/main/webapp/jsp/user_settings.jsp:39
 msgid "Account Settings"
 msgstr "Account Settings"
@@ -4182,6 +3755,7 @@ msgstr "Please enter a valid password."
 msgid "Confirm Password"
 msgstr "Confirm Password"
 
+#: src/main/webapp/jsp/user_settings.jsp:135
 msgid "Confirm Password"
 msgstr "Confirm Password"
 
@@ -4389,6 +3963,7 @@ msgstr "This puzzle is locked."
 msgid "Puzzle solved in {0} attempt."
 msgstr "Puzzle solved in {0} attempt."
 
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
 msgid "Puzzle solved in {0} attempts."
 msgstr "Puzzle solved in {0} attempts."
 
@@ -4652,6 +4227,7 @@ msgstr "Class under test"
 msgid "You are an observer in this game."
 msgstr "You are an observer in this game."
 
+#: src/main/webapp/jsp/melee/details_view.jsp:239
 msgid "The coverage of all player tests is shown."
 msgstr "The coverage of all player tests is shown."
 
@@ -5251,6 +4827,454 @@ msgstr "Balance teams"
 msgid "Join as defender"
 msgstr "Join as defender"
 
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:32
+msgid "Puzzle Management"
+msgstr "Puzzle Management"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:43
+msgid "Upload chapters"
+msgstr "Upload chapters"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:47
+msgid "Upload puzzles"
+msgstr "Upload puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:51
+msgid "Add empty chapter"
+msgstr "Add empty chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:56
+msgid "Save"
+msgstr "Save"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:63
+msgid "Unassigned Puzzles"
+msgstr "Unassigned Puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:72
+msgid "Archived Puzzles"
+msgstr "Archived Puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:79
+msgid "Unsaved changes"
+msgstr "Unsaved changes"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:80
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:82
+msgid "You have unsaved changes. Please save first."
+msgstr "You have unsaved changes. Please save first."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:86
+msgid "Save"
+msgstr "Save"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:97
+msgid "Upload Puzzles"
+msgstr "Upload Puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:102
+msgid "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
+msgstr "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:109
+msgid "Puzzle Format Explanation"
+msgstr "Puzzle Format Explanation"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:115
+msgid "Puzzle Properties Explanation"
+msgstr "Puzzle Properties Explanation"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:121
+msgid "Downloads"
+msgstr "Downloads"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:125
+msgid "Empty puzzle template:"
+msgstr "Empty puzzle template:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:131
+msgid "Example properties file:"
+msgstr "Example properties file:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:137
+msgid "Example attacker puzzle:"
+msgstr "Example attacker puzzle:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:143
+msgid "Example defender puzzle:"
+msgstr "Example defender puzzle:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:149
+msgid "Example puzzle with dependencies:"
+msgstr "Example puzzle with dependencies:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:161
+msgid "Uploading..."
+msgstr "Uploading..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:162
+msgid "Upload"
+msgstr "Upload"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:172
+msgid "Upload Chapters"
+msgstr "Upload Chapters"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:177
+msgid "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
+msgstr "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:181
+msgid "Uploading large chapters may take several minutes."
+msgstr "Uploading large chapters may take several minutes."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:188
+msgid "Chapter Format Explanation"
+msgstr "Chapter Format Explanation"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:194
+msgid "Puzzle Format Explanation"
+msgstr "Puzzle Format Explanation"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:200
+msgid "Puzzle Properties Explanation"
+msgstr "Puzzle Properties Explanation"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:206
+msgid "Downloads"
+msgstr "Downloads"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:210
+msgid "Example chapter:"
+msgstr "Example chapter:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:216
+msgid "Example properties file:"
+msgstr "Example properties file:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:222
+msgid "Empty chapter template:"
+msgstr "Empty chapter template:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:228
+msgid "Puzzle Downloads:"
+msgstr "Puzzle Downloads:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:231
+msgid "Empty puzzle template:"
+msgstr "Empty puzzle template:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:237
+msgid "Example properties file:"
+msgstr "Example properties file:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:243
+msgid "Example attacker puzzle:"
+msgstr "Example attacker puzzle:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:249
+msgid "Example defender puzzle:"
+msgstr "Example defender puzzle:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:255
+msgid "Example puzzle with dependencies:"
+msgstr "Example puzzle with dependencies:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:267
+msgid "Uploading..."
+msgstr "Uploading..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:268
+msgid "Upload"
+msgstr "Upload"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:364
+msgid "Edit"
+msgstr "Edit"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:367
+msgid "Upload Puzzles"
+msgstr "Upload Puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:370
+msgid "Delete"
+msgstr "Delete"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:379
+msgid "Move to position:"
+msgstr "Move to position:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:380
+msgid "Move to position"
+msgstr "Move to position"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:450
+msgid "Number of games with the puzzle"
+msgstr "Number of games with the puzzle"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:451
+msgid "Puzzle level"
+msgstr "Puzzle level"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:452
+msgid "Mutant is equivalent"
+msgstr "Mutant is equivalent"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:458
+msgid "Edit"
+msgstr "Edit"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:462
+msgid "Unassign"
+msgstr "Unassign"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:466
+msgid "Archive"
+msgstr "Archive"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:470
+msgid "Delete"
+msgstr "Delete"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:478
+msgid "Move to chapter:"
+msgstr "Move to chapter:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:479
+msgid "Move to chapter"
+msgstr "Move to chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:508
+msgid "Puzzles with existing games can't be deleted"
+msgstr "Puzzles with existing games can't be deleted"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:539
+msgid "Move to chapter:"
+msgstr "Move to chapter:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:639
+msgid "Scroll to chapter"
+msgstr "Scroll to chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:640
+msgid "Scroll to chapter:"
+msgstr "Scroll to chapter:"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:641
+msgid "Go"
+msgstr "Go"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:740
+msgid "Please enter a title."
+msgstr "Please enter a title."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:748
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:753
+msgid "Edit Chapter"
+msgstr "Edit Chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:754
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:783
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:785
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:810
+msgid "Title"
+msgstr "Title"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:812
+msgid "Title"
+msgstr "Title"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:814
+msgid "Please enter a title."
+msgstr "Please enter a title."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:820
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:822
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:829
+msgid "Max. Assertions"
+msgstr "Max. Assertions"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:837
+msgid "First Editable Line"
+msgstr "First Editable Line"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:842
+msgid "Last Editable Line"
+msgstr "Last Editable Line"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:850
+msgid "Game Level"
+msgstr "Game Level"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:854
+msgid "Easy"
+msgstr "Easy"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:855
+msgid "Please select a level."
+msgstr "Please select a level."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:861
+msgid "Hard"
+msgstr "Hard"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:868
+msgid "Equivalence"
+msgstr "Equivalence"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:872
+msgid "Mutant equivalent"
+msgstr "Mutant equivalent"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:878
+msgid "Edit Puzzle"
+msgstr "Edit Puzzle"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:940
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:942
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:965
+msgid "Are you sure you want to delete chapter"
+msgstr "Are you sure you want to delete chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:967
+msgid "Any puzzles left in the chapter will be moved to"
+msgstr "Any puzzles left in the chapter will be moved to"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:968
+msgid "Unassigned"
+msgstr "Unassigned"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:971
+msgid "Delete Chapter"
+msgstr "Delete Chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:972
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:990
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:992
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
+msgid "Are you sure you want to permanently delete puzzle"
+msgstr "Are you sure you want to permanently delete puzzle"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1019
+msgid "Delete Puzzle"
+msgstr "Delete Puzzle"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1020
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1027
+msgid "Delete"
+msgstr "Delete"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1034
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1036
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1055
+msgid "Title"
+msgstr "Title"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1057
+msgid "Please enter a title."
+msgstr "Please enter a title."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1063
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1070
+msgid "Create New Chapter"
+msgstr "Create New Chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1071
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
+msgid "Save"
+msgstr "Save"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1101
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1124
+msgid "Close"
+msgstr "Close"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1205
+msgid "Saving..."
+msgstr "Saving..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1210
+msgid "Success"
+msgstr "Success"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1212
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1213
+msgid "Could not save changes."
+msgstr "Could not save changes."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1218
+msgid "Save"
+msgstr "Save"
+
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1245
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
@@ -5262,54 +5286,6 @@ msgstr "{0} (Level {1})"
 #: src/main/webapp/WEB-INF/tags/achievement_badge.tag:39
 msgid "Level {0}"
 msgstr "Level {0}"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
-msgid "Create Games"
-msgstr "Create Games"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:32
-msgid "Monitor Games"
-msgstr "Monitor Games"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:35
-msgid "Users"
-msgstr "Users"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:38
-msgid "Classrooms"
-msgstr "Classrooms"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:41
-msgid "Classes"
-msgstr "Classes"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:44
-msgid "Puzzles"
-msgstr "Puzzles"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:47
-msgid "Analysis"
-msgstr "Analysis"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:50
-msgid "Analytics"
-msgstr "Analytics"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:52
-msgid "Users"
-msgstr "Users"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:53
-msgid "Classes"
-msgstr "Classes"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:54
-msgid "KillMaps"
-msgstr "KillMaps"
-
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
-msgid "System Settings"
-msgstr "System Settings"
 
 #: src/main/webapp/WEB-INF/tags/automatic_duels_explanation.tag:23
 msgid "This value refers to the number of tests which cover, but do not kill, mutants and controls if and when equivalence duels are automatically triggered."
@@ -5415,6 +5391,7 @@ msgstr "Keep previous test in editor"
 msgid "Clone previous test"
 msgstr "Clone previous test"
 
+#: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:53
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -5434,6 +5411,7 @@ msgstr "Confirm Clone"
 msgid "Change \"Keep previous test in editor\" setting"
 msgstr "Change \"Keep previous test in editor\" setting"
 
+#: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:63
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -5444,6 +5422,894 @@ msgstr "Changing this setting will reload the page and therefore overwrite your 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:68
 msgid "Confirm"
 msgstr "Confirm"
+
+#: src/main/webapp/WEB-INF/tags/defender_intention_collection_note.tag:27
+msgid "Indicate which line you are defending to enable the test editor. Click on a line number."
+msgstr "Indicate which line you are defending to enable the test editor. Click on a line number."
+
+#: src/main/webapp/WEB-INF/tags/error_page.tag:51
+msgid "Go back"
+msgstr "Go back"
+
+#: src/main/webapp/WEB-INF/tags/footer.tag:38
+msgid "About CodeDefenders"
+msgstr "About CodeDefenders"
+
+#: src/main/webapp/WEB-INF/tags/footer.tag:42
+msgid "Contact Us"
+msgstr "Contact Us"
+
+#: src/main/webapp/WEB-INF/tags/footer.tag:45
+msgid "Help"
+msgstr "Help"
+
+#: src/main/webapp/WEB-INF/tags/footer.tag:49
+msgid "Imprint and Privacy Policy"
+msgstr "Imprint and Privacy Policy"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
+msgid "Create Games"
+msgstr "Create Games"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:32
+msgid "Monitor Games"
+msgstr "Monitor Games"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:35
+msgid "Users"
+msgstr "Users"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:38
+msgid "Classrooms"
+msgstr "Classrooms"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:41
+msgid "Classes"
+msgstr "Classes"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:44
+msgid "Puzzles"
+msgstr "Puzzles"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:47
+msgid "Analysis"
+msgstr "Analysis"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:50
+msgid "Analytics"
+msgstr "Analytics"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:52
+msgid "Users"
+msgstr "Users"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:53
+msgid "Classes"
+msgstr "Classes"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:54
+msgid "KillMaps"
+msgstr "KillMaps"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
+msgid "System Settings"
+msgstr "System Settings"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:38
+msgid "Show all messages."
+msgstr "Show all messages."
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:38
+msgid "All"
+msgstr "All"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:40
+msgid "Show messages from the perspective of the attacker team."
+msgstr "Show messages from the perspective of the attacker team."
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:40
+msgid "Attackers"
+msgstr "Attackers"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:42
+msgid "Show messages from the perspective of the defender team."
+msgstr "Show messages from the perspective of the defender team."
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:42
+msgid "Defenders"
+msgstr "Defenders"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:63
+msgid "Switch between sending messages to your own team or all players."
+msgstr "Switch between sending messages to your own team or all players."
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:64
+msgid "Team"
+msgstr "Team"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:66
+msgid "Message"
+msgstr "Message"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:69
+msgid "Message"
+msgstr "Message"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:76
+msgid "Team"
+msgstr "Team"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:78
+msgid "Message"
+msgstr "Message"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:81
+msgid "Message"
+msgstr "Message"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:90
+msgid "Chat"
+msgstr "Chat"
+
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:92
+msgid "Chat"
+msgstr "Chat"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:89
+msgid "Battleground"
+msgstr "Battleground"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:93
+msgid "Melee"
+msgstr "Melee"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:119
+msgid "Game"
+msgstr "Game"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:122
+msgid "Game Mode: {0}"
+msgstr "Game Mode: {0}"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:126
+msgid "Your Role: {0}"
+msgstr "Your Role: {0}"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:141
+msgid "End Game"
+msgstr "End Game"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:146
+msgid "Confirm End Game"
+msgstr "Confirm End Game"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:146
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:148
+msgid "Are you sure you want to end the game?"
+msgstr "Are you sure you want to end the game?"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:151
+msgid "Confirm"
+msgstr "Confirm"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:165
+msgid "Start Game"
+msgstr "Start Game"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:175
+msgid "Start a new game with the same settings and opposite roles."
+msgstr "Start a new game with the same settings and opposite roles."
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:178
+msgid "Rematch"
+msgstr "Rematch"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:184
+msgid "Confirm Rematch"
+msgstr "Confirm Rematch"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:184
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:186
+msgid "Are you sure you want to create a new game with opposite roles?"
+msgstr "Are you sure you want to create a new game with opposite roles?"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:189
+msgid "Confirm Rematch"
+msgstr "Confirm Rematch"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:225
+msgid "Scoreboard"
+msgstr "Scoreboard"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:232
+msgid "Scoring System"
+msgstr "Scoring System"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:241
+msgid "Timeline"
+msgstr "Timeline"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:246
+msgid "Export as a Gradle project to import into an IDE."
+msgstr "Export as a Gradle project to import into an IDE."
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:248
+msgid "Gradle Export"
+msgstr "Gradle Export"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:254
+msgid "Feedback"
+msgstr "Feedback"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:268
+msgid "Invitations"
+msgstr "Invitations"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:42
+msgid "Change"
+msgstr "Change"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:42
+msgid "View"
+msgstr "View"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:42
+msgid "the game duration."
+msgstr "the game duration."
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:53
+msgid "Game Duration"
+msgstr "Game Duration"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:58
+msgid "Game Duration"
+msgstr "Game Duration"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:76
+msgid "Total Duration"
+msgstr "Total Duration"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:84
+msgid "Remaining Duration"
+msgstr "Remaining Duration"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:93
+msgid "This game would end at"
+msgstr "This game would end at"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:93
+msgid "This game will end at"
+msgstr "This game will end at"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:106
+msgid "Set the game's new remaining duration:"
+msgstr "Set the game's new remaining duration:"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:109
+msgid "days"
+msgstr "days"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:111
+msgid "hours"
+msgstr "hours"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:113
+msgid "minutes"
+msgstr "minutes"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:115
+msgid "Please input a valid duration."
+msgstr "Please input a valid duration."
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:116
+msgid "Maximum duration:"
+msgstr "Maximum duration:"
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:131
+msgid "Change Game Duration"
+msgstr "Change Game Duration"
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:26
+msgid "The file-tree below shows the file structure for a chapter:"
+msgstr "The file-tree below shows the file structure for a chapter:"
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:48
+msgid "A chapter file can contain any number of puzzles."
+msgstr "A chapter file can contain any number of puzzles."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:49
+msgid "Each puzzle is stored inside a sub-folder of the root."
+msgstr "Each puzzle is stored inside a sub-folder of the root."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:50
+msgid "The alphabetical order of the folder names determines the order of the puzzles."
+msgstr "The alphabetical order of the folder names determines the order of the puzzles."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:51
+msgid "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
+msgstr "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:55
+msgid "A chapter also contains a single chapter.properties file with the chapter title and description:"
+msgstr "A chapter also contains a single chapter.properties file with the chapter title and description:"
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:58
+msgid "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
+msgstr "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:25
+msgid "The file tree below shows the file structure for a puzzle."
+msgstr "The file tree below shows the file structure for a puzzle."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:52
+msgid "Contains a single .java file to be used as the CUT (class under test)."
+msgstr "Contains a single .java file to be used as the CUT (class under test)."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:56
+msgid "Contains any dependencies of the CUT as plain .java files."
+msgstr "Contains any dependencies of the CUT as plain .java files."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:57
+msgid "This folder is allowed to have arbitrary sub-folders."
+msgstr "This folder is allowed to have arbitrary sub-folders."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:61
+msgid "Contains the mutants, each in its separate sub-folder."
+msgstr "Contains the mutants, each in its separate sub-folder."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:62
+msgid "All mutants should have the same name as the CUT."
+msgstr "All mutants should have the same name as the CUT."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:66
+msgid "Contains the tests, each in its separate sub-folder."
+msgstr "Contains the tests, each in its separate sub-folder."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:67
+msgid "Tests can have any name, except the name of the CUT."
+msgstr "Tests can have any name, except the name of the CUT."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:71
+msgid "The configuration file of the puzzle."
+msgstr "The configuration file of the puzzle."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:25
+msgid "The <code>puzzle.properties</code> file contains the configuration of the puzzle."
+msgstr "The <code>puzzle.properties</code> file contains the configuration of the puzzle."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:26
+msgid "The text area below shows the supported properties for puzzles:"
+msgstr "The text area below shows the supported properties for puzzles:"
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:29
+msgid "# Type of the puzzle. Can be ATTACKER or DEFENDER."
+msgstr "# Type of the puzzle. Can be ATTACKER or DEFENDER."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:32
+msgid "# Title of the puzzle."
+msgstr "# Title of the puzzle."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:35
+msgid "# Description of the puzzle."
+msgstr "# Description of the puzzle."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:38
+msgid "# The level at which the puzzle games will be played at."
+msgstr "# The level at which the puzzle games will be played at."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:39
+msgid "# EASY allows players to see all tests and mutants in the game."
+msgstr "# EASY allows players to see all tests and mutants in the game."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:40
+msgid "# HARD hides tests from attacker players and hides mutants from defender players."
+msgstr "# HARD hides tests from attacker players and hides mutants from defender players."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:43
+msgid "# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive)."
+msgstr "# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive)."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:44
+msgid "# This is ignored for DEFENDER puzzles."
+msgstr "# This is ignored for DEFENDER puzzles."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:47
+msgid "# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive)."
+msgstr "# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive)."
+
+#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:48
+msgid "# This is ignored for DEFENDER puzzles."
+msgstr "# This is ignored for DEFENDER puzzles."
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:32
+msgid "Kill-maps by Mutants"
+msgstr "Kill-maps by Mutants"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:36
+msgid "All"
+msgstr "All"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:41
+msgid "No Kill"
+msgstr "No Kill"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:46
+msgid "Kill"
+msgstr "Kill"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:51
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:56
+msgid "No Coverage"
+msgstr "No Coverage"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:61
+msgid "Unknown"
+msgstr "Unknown"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:94
+msgid "No mutants in this category."
+msgstr "No mutants in this category."
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:123
+msgid "Mutant {0}"
+msgstr "Mutant {0}"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:126
+msgid "by"
+msgstr "by"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:133
+msgid "Points:"
+msgstr "Points:"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:138
+msgid "View"
+msgstr "View"
+
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:142
+msgid "View Killing Test"
+msgstr "View Killing Test"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:32
+msgid "Kill-maps by Tests"
+msgstr "Kill-maps by Tests"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:36
+msgid "All"
+msgstr "All"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:41
+msgid "No Kill"
+msgstr "No Kill"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:46
+msgid "Kill"
+msgstr "Kill"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:51
+msgid "Error"
+msgstr "Error"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:56
+msgid "No Coverage"
+msgstr "No Coverage"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:61
+msgid "Unknown"
+msgstr "Unknown"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:92
+msgid "No tests in this category."
+msgstr "No tests in this category."
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:106
+msgid "Test {0}"
+msgstr "Test {0}"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:109
+msgid "by"
+msgstr "by"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:113
+msgid "Covered:"
+msgstr "Covered:"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:117
+msgid "Killed:"
+msgstr "Killed:"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:121
+msgid "Points:"
+msgstr "Points:"
+
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:126
+msgid "View"
+msgstr "View"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:24
+msgid "Easy"
+msgstr "Easy"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:26
+msgid "Players are allowed to view other players' submissions."
+msgstr "Players are allowed to view other players' submissions."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
+msgid "Hard"
+msgstr "Hard"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
+msgid "Players are not allowed to view other players' submissions."
+msgstr "Players are not allowed to view other players' submissions."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
+msgid "not"
+msgstr "not"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:32
+msgid "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
+msgstr "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
+msgid "Easy"
+msgstr "Easy"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:28
+msgid "Teams are allowed to view the other team's submissions."
+msgstr "Teams are allowed to view the other team's submissions."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:30
+msgid "Attackers are allowed to view the defender team's tests."
+msgstr "Attackers are allowed to view the defender team's tests."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:31
+msgid "Defenders are allowed to view the attacker team's mutants."
+msgstr "Defenders are allowed to view the attacker team's mutants."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:36
+msgid "Hard"
+msgstr "Hard"
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:38
+msgid "Teams are <b>not</b> allowed to view the other team's submissions."
+msgstr "Teams are <b>not</b> allowed to view the other team's submissions."
+
+#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:39
+msgid "But: Defenders can still view mutants after they are killed or accepted as equivalent."
+msgstr "But: Defenders can still view mutants after they are killed or accepted as equivalent."
+
+#: src/main/webapp/WEB-INF/tags/modal.tag:38
+msgid "Close"
+msgstr "Close"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:30
+msgid "User"
+msgstr "User"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:31
+msgid "Mutants"
+msgstr "Mutants"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:32
+msgid "Tests"
+msgstr "Tests"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:33
+msgid "Attack"
+msgstr "Attack"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:34
+msgid "Defense"
+msgstr "Defense"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:35
+msgid "Duels"
+msgstr "Duels"
+
+#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:36
+msgid "Total Points"
+msgstr "Total Points"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:48
+msgid "Code Defenders"
+msgstr "Code Defenders"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:63
+msgid "Multiplayer"
+msgstr "Multiplayer"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:67
+msgid "Games"
+msgstr "Games"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:69
+msgid "Classrooms"
+msgstr "Classrooms"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:72
+msgid "History"
+msgstr "History"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:74
+msgid "Leaderboard"
+msgstr "Leaderboard"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:83
+msgid "Admin"
+msgstr "Admin"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:97
+msgid "Profile"
+msgstr "Profile"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:99
+msgid "Account"
+msgstr "Account"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:101
+msgid "Help"
+msgstr "Help"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:103
+msgid "Logout"
+msgstr "Logout"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:120
+msgid "Language"
+msgstr "Language"
+
+#: src/main/webapp/WEB-INF/tags/navbar.tag:137
+msgid "Login"
+msgstr "Login"
+
+#: src/main/webapp/WEB-INF/tags/round_counter.tag:32
+msgid "Puzzle solved in {0} attempt."
+msgstr "Puzzle solved in {0} attempt."
+
+#: src/main/webapp/WEB-INF/tags/round_counter.tag:32
+msgid "Puzzle solved in {0} attempts."
+msgstr "Puzzle solved in {0} attempts."
+
+#: src/main/webapp/WEB-INF/tags/round_counter.tag:35
+msgid "This is your {0}{1} attempt."
+msgstr "This is your {0}{1} attempt."
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:42
+msgid "Puzzles"
+msgstr "Puzzles"
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:45
+msgid "Puzzle Overview: See all puzzles and your progress."
+msgstr "Puzzle Overview: See all puzzles and your progress."
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:46
+msgid "Overview"
+msgstr "Overview"
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:52
+msgid "Next puzzle: {0}, {1}"
+msgstr "Next puzzle: {0}, {1}"
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:54
+msgid "Play next puzzle"
+msgstr "Play next puzzle"
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:59
+msgid "There are currently no puzzles available."
+msgstr "There are currently no puzzles available."
+
+#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:86
+msgid "This puzzle is locked."
+msgstr "This puzzle is locked."
+
+#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:37
+msgid "Attack"
+msgstr "Attack"
+
+#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:58
+msgid "Attack"
+msgstr "Attack"
+
+#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:63
+msgid "My mutant is killable"
+msgstr "My mutant is killable"
+
+#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:68
+msgid "My mutant is equivalent"
+msgstr "My mutant is equivalent"
+
+#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
+msgid "I don\'t know if my mutant is killable"
+msgstr "I don\'t know if my mutant is killable"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:32
+msgid "Existing Mutants"
+msgstr "Existing Mutants"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:36
+msgid "All"
+msgstr "All"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:41
+msgid "Alive"
+msgstr "Alive"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:46
+msgid "Killed"
+msgstr "Killed"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:51
+msgid "Claimed Equivalent"
+msgstr "Claimed Equivalent"
+
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:56
+msgid "Equivalent"
+msgstr "Equivalent"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:24
+msgid "Mutation rules"
+msgstr "Mutation rules"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:25
+msgid "Relaxed"
+msgstr "Relaxed"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:27
+msgid "No calls to {0},{1}"
+msgstr "No calls to {0},{1}"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:28
+msgid "No mutants with only changes to comments or formatting"
+msgstr "No mutants with only changes to comments or formatting"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:29
+msgid "No renaming of methods or fields, no additional methods or fields"
+msgstr "No renaming of methods or fields, no additional methods or fields"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:31
+msgid "Moderate"
+msgstr "Moderate"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:33
+msgid "No changes to comments"
+msgstr "No changes to comments"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:34
+msgid "No additional logical operators ({0}, {1})"
+msgstr "No additional logical operators ({0}, {1})"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
+msgid "No ternary operators"
+msgstr "No ternary operators"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:36
+msgid "No new control structures ({0}, {1}, {2}, ...)"
+msgstr "No new control structures ({0}, {1}, {2}, ...)"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:38
+msgid "Strict"
+msgstr "Strict"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:40
+msgid "No reflection"
+msgstr "No reflection"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:41
+msgid "No bitwise operators (bitshifts and logical)"
+msgstr "No bitwise operators (bitshifts and logical)"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:42
+msgid "No signature changes"
+msgstr "No signature changes"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:38
+msgid "Only {0} assertion per test"
+msgstr "Only {0} assertion per test"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:39
+msgid "Only {0} assertions per test"
+msgstr "Only {0} assertions per test"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:44
+msgid "Only the configured number of assertions per test (default: {0})"
+msgstr "Only the configured number of assertions per test (default: {0})"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:47
+msgid "Test rules"
+msgstr "Test rules"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:49
+msgid "No loops"
+msgstr "No loops"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
+msgid "No calls to System.*"
+msgstr "No calls to System.*"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:51
+msgid "No new methods or conditionals"
+msgstr "No new methods or conditionals"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:38
+msgid "Invite players"
+msgstr "Invite players"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:44
+msgid "Search"
+msgstr "Search"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:47
+msgid "Invite users"
+msgstr "Invite users"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:53
+msgid "Users to invite"
+msgstr "Users to invite"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:63
+msgid "Already invited users"
+msgstr "Already invited users"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:75
+msgid "Copy invite link"
+msgstr "Copy invite link"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:79
+msgid "Save changes"
+msgstr "Save changes"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:364
+msgid "Invite as defender"
+msgstr "Invite as defender"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:377
+msgid "Invite"
+msgstr "Invite"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:377
+msgid "Balance teams"
+msgstr "Balance teams"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:379
+msgid "Player will join the team with fewer players."
+msgstr "Player will join the team with fewer players."
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:393
+msgid "Add as attacker"
+msgstr "Add as attacker"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:473
+msgid "Copied!"
+msgstr "Copied!"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:475
+msgid "Copy invite link"
+msgstr "Copy invite link"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:479
+msgid "Failed to copy"
+msgstr "Failed to copy"
+
+#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
+msgid "Error updating whitelist"
+msgstr "Error updating whitelist"
+
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:57
+msgid "no role"
+msgstr "no role"
+
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:60
+msgid "Game {0} ({1})"
+msgstr "Game {0} ({1})"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:47
 msgid "Staged Games"
@@ -5925,6 +6791,7 @@ msgstr "Add player to selected game"
 msgid "unknown"
 msgstr "unknown"
 
+#: src/main/webapp/WEB-INF/tags/create_games.tag:833
 msgid "unknown"
 msgstr "unknown"
 
@@ -6064,827 +6931,6 @@ msgstr "There are currently no staged games."
 msgid "No matching staged games found."
 msgstr "No matching staged games found."
 
-#: src/main/webapp/WEB-INF/tags/defender_intention_collection_note.tag:27
-msgid "Indicate which line you are defending to enable the test editor. Click on a line number."
-msgstr "Indicate which line you are defending to enable the test editor. Click on a line number."
-
-#: src/main/webapp/WEB-INF/tags/error_page.tag:51
-msgid "Go back"
-msgstr "Go back"
-
-#: src/main/webapp/WEB-INF/tags/footer.tag:38
-msgid "About CodeDefenders"
-msgstr "About CodeDefenders"
-
-#: src/main/webapp/WEB-INF/tags/footer.tag:42
-msgid "Contact Us"
-msgstr "Contact Us"
-
-#: src/main/webapp/WEB-INF/tags/footer.tag:45
-msgid "Help"
-msgstr "Help"
-
-#: src/main/webapp/WEB-INF/tags/footer.tag:49
-msgid "Imprint and Privacy Policy"
-msgstr "Imprint and Privacy Policy"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:38
-msgid "Show all messages."
-msgstr "Show all messages."
-
-msgid "All"
-msgstr "All"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:40
-msgid "Show messages from the perspective of the attacker team."
-msgstr "Show messages from the perspective of the attacker team."
-
-msgid "Attackers"
-msgstr "Attackers"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:42
-msgid "Show messages from the perspective of the defender team."
-msgstr "Show messages from the perspective of the defender team."
-
-msgid "Defenders"
-msgstr "Defenders"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:63
-msgid "Switch between sending messages to your own team or all players."
-msgstr "Switch between sending messages to your own team or all players."
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:64
-msgid "Team"
-msgstr "Team"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:66
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:69
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:76
-msgid "Team"
-msgstr "Team"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:78
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:81
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:90
-msgid "Chat"
-msgstr "Chat"
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:92
-msgid "Chat"
-msgstr "Chat"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:89
-msgid "Battleground"
-msgstr "Battleground"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:93
-msgid "Melee"
-msgstr "Melee"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:119
-msgid "Game"
-msgstr "Game"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:122
-msgid "Game Mode: {0}"
-msgstr "Game Mode: {0}"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:126
-msgid "Your Role: {0}"
-msgstr "Your Role: {0}"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:141
-msgid "End Game"
-msgstr "End Game"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:146
-msgid "Confirm End Game"
-msgstr "Confirm End Game"
-
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:148
-msgid "Are you sure you want to end the game?"
-msgstr "Are you sure you want to end the game?"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:151
-msgid "Confirm"
-msgstr "Confirm"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:165
-msgid "Start Game"
-msgstr "Start Game"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:175
-msgid "Start a new game with the same settings and opposite roles."
-msgstr "Start a new game with the same settings and opposite roles."
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:178
-msgid "Rematch"
-msgstr "Rematch"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:184
-msgid "Confirm Rematch"
-msgstr "Confirm Rematch"
-
-msgid "Cancel"
-msgstr "Cancel"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:186
-msgid "Are you sure you want to create a new game with opposite roles?"
-msgstr "Are you sure you want to create a new game with opposite roles?"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:189
-msgid "Confirm Rematch"
-msgstr "Confirm Rematch"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:225
-msgid "Scoreboard"
-msgstr "Scoreboard"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:232
-msgid "Scoring System"
-msgstr "Scoring System"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:241
-msgid "Timeline"
-msgstr "Timeline"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:246
-msgid "Export as a Gradle project to import into an IDE."
-msgstr "Export as a Gradle project to import into an IDE."
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:248
-msgid "Gradle Export"
-msgstr "Gradle Export"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:254
-msgid "Feedback"
-msgstr "Feedback"
-
-#: src/main/webapp/WEB-INF/tags/game_header.tag:268
-msgid "Invitations"
-msgstr "Invitations"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:42
-msgid "Change"
-msgstr "Change"
-
-msgid "View"
-msgstr "View"
-
-msgid "the game duration."
-msgstr "the game duration."
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:53
-msgid "Game Duration"
-msgstr "Game Duration"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:58
-msgid "Game Duration"
-msgstr "Game Duration"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:76
-msgid "Total Duration"
-msgstr "Total Duration"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:84
-msgid "Remaining Duration"
-msgstr "Remaining Duration"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:93
-msgid "This game would end at"
-msgstr "This game would end at"
-
-msgid "This game will end at"
-msgstr "This game will end at"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:106
-msgid "Set the game's new remaining duration:"
-msgstr "Set the game's new remaining duration:"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:109
-msgid "days"
-msgstr "days"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:111
-msgid "hours"
-msgstr "hours"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:113
-msgid "minutes"
-msgstr "minutes"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:115
-msgid "Please input a valid duration."
-msgstr "Please input a valid duration."
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:116
-msgid "Maximum duration:"
-msgstr "Maximum duration:"
-
-#: src/main/webapp/WEB-INF/tags/game_time.tag:131
-msgid "Change Game Duration"
-msgstr "Change Game Duration"
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:25
-msgid "The file tree below shows the file structure for a puzzle."
-msgstr "The file tree below shows the file structure for a puzzle."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:52
-msgid "Contains a single .java file to be used as the CUT (class under test)."
-msgstr "Contains a single .java file to be used as the CUT (class under test)."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:56
-msgid "Contains any dependencies of the CUT as plain .java files."
-msgstr "Contains any dependencies of the CUT as plain .java files."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:57
-msgid "This folder is allowed to have arbitrary sub-folders."
-msgstr "This folder is allowed to have arbitrary sub-folders."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:61
-msgid "Contains the mutants, each in its separate sub-folder."
-msgstr "Contains the mutants, each in its separate sub-folder."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:62
-msgid "All mutants should have the same name as the CUT."
-msgstr "All mutants should have the same name as the CUT."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:66
-msgid "Contains the tests, each in its separate sub-folder."
-msgstr "Contains the tests, each in its separate sub-folder."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:67
-msgid "Tests can have any name, except the name of the CUT."
-msgstr "Tests can have any name, except the name of the CUT."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_explanation.tag:71
-msgid "The configuration file of the puzzle."
-msgstr "The configuration file of the puzzle."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:26
-msgid "The file-tree below shows the file structure for a chapter:"
-msgstr "The file-tree below shows the file structure for a chapter:"
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:48
-msgid "A chapter file can contain any number of puzzles."
-msgstr "A chapter file can contain any number of puzzles."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:49
-msgid "Each puzzle is stored inside a sub-folder of the root."
-msgstr "Each puzzle is stored inside a sub-folder of the root."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:50
-msgid "The alphabetical order of the folder names determines the order of the puzzles."
-msgstr "The alphabetical order of the folder names determines the order of the puzzles."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:51
-msgid "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
-msgstr "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:55
-msgid "A chapter also contains a single chapter.properties file with the chapter title and description:"
-msgstr "A chapter also contains a single chapter.properties file with the chapter title and description:"
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:58
-msgid "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
-msgstr "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:25
-msgid "The <code>puzzle.properties</code> file contains the configuration of the puzzle."
-msgstr "The <code>puzzle.properties</code> file contains the configuration of the puzzle."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:26
-msgid "The text area below shows the supported properties for puzzles:"
-msgstr "The text area below shows the supported properties for puzzles:"
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:29
-msgid "# Type of the puzzle. Can be ATTACKER or DEFENDER."
-msgstr "# Type of the puzzle. Can be ATTACKER or DEFENDER."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:32
-msgid "# Title of the puzzle."
-msgstr "# Title of the puzzle."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:35
-msgid "# Description of the puzzle."
-msgstr "# Description of the puzzle."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:38
-msgid "# The level at which the puzzle games will be played at."
-msgstr "# The level at which the puzzle games will be played at."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:39
-msgid "# EASY allows players to see all tests and mutants in the game."
-msgstr "# EASY allows players to see all tests and mutants in the game."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:40
-msgid "# HARD hides tests from attacker players and hides mutants from defender players."
-msgstr "# HARD hides tests from attacker players and hides mutants from defender players."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:43
-msgid "# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive)."
-msgstr "# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive)."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:44
-msgid "# This is ignored for DEFENDER puzzles."
-msgstr "# This is ignored for DEFENDER puzzles."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:47
-msgid "# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive)."
-msgstr "# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive)."
-
-#: src/main/webapp/WEB-INF/tags/import_puzzle_properties_explanation.tag:48
-msgid "# This is ignored for DEFENDER puzzles."
-msgstr "# This is ignored for DEFENDER puzzles."
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:32
-msgid "Kill-maps by Mutants"
-msgstr "Kill-maps by Mutants"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:36
-msgid "All"
-msgstr "All"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:41
-msgid "No Kill"
-msgstr "No Kill"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:46
-msgid "Kill"
-msgstr "Kill"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:51
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:56
-msgid "No Coverage"
-msgstr "No Coverage"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:61
-msgid "Unknown"
-msgstr "Unknown"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:94
-msgid "No mutants in this category."
-msgstr "No mutants in this category."
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:123
-msgid "Mutant {0}"
-msgstr "Mutant {0}"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:126
-msgid "by"
-msgstr "by"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:133
-msgid "Points:"
-msgstr "Points:"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:138
-msgid "View"
-msgstr "View"
-
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:142
-msgid "View Killing Test"
-msgstr "View Killing Test"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:32
-msgid "Kill-maps by Tests"
-msgstr "Kill-maps by Tests"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:36
-msgid "All"
-msgstr "All"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:41
-msgid "No Kill"
-msgstr "No Kill"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:46
-msgid "Kill"
-msgstr "Kill"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:51
-msgid "Error"
-msgstr "Error"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:56
-msgid "No Coverage"
-msgstr "No Coverage"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:61
-msgid "Unknown"
-msgstr "Unknown"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:92
-msgid "No tests in this category."
-msgstr "No tests in this category."
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:106
-msgid "Test {0}"
-msgstr "Test {0}"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:109
-msgid "by"
-msgstr "by"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:113
-msgid "Covered:"
-msgstr "Covered:"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:117
-msgid "Killed:"
-msgstr "Killed:"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:121
-msgid "Points:"
-msgstr "Points:"
-
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:126
-msgid "View"
-msgstr "View"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:24
-msgid "Easy"
-msgstr "Easy"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:26
-msgid "Players are allowed to view other players' submissions."
-msgstr "Players are allowed to view other players' submissions."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
-msgid "Hard"
-msgstr "Hard"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
-msgid "Players are not allowed to view other players' submissions."
-msgstr "Players are not allowed to view other players' submissions."
-
-msgid "not"
-msgstr "not"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:32
-msgid "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
-msgstr "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
-msgid "Easy"
-msgstr "Easy"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:28
-msgid "Teams are allowed to view the other team's submissions."
-msgstr "Teams are allowed to view the other team's submissions."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:30
-msgid "Attackers are allowed to view the defender team's tests."
-msgstr "Attackers are allowed to view the defender team's tests."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:31
-msgid "Defenders are allowed to view the attacker team's mutants."
-msgstr "Defenders are allowed to view the attacker team's mutants."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:36
-msgid "Hard"
-msgstr "Hard"
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:38
-msgid "Teams are <b>not</b> allowed to view the other team's submissions."
-msgstr "Teams are <b>not</b> allowed to view the other team's submissions."
-
-#: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:39
-msgid "But: Defenders can still view mutants after they are killed or accepted as equivalent."
-msgstr "But: Defenders can still view mutants after they are killed or accepted as equivalent."
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:30
-msgid "User"
-msgstr "User"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:31
-msgid "Mutants"
-msgstr "Mutants"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:32
-msgid "Tests"
-msgstr "Tests"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:33
-msgid "Attack"
-msgstr "Attack"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:34
-msgid "Defense"
-msgstr "Defense"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:35
-msgid "Duels"
-msgstr "Duels"
-
-#: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:36
-msgid "Total Points"
-msgstr "Total Points"
-
-#: src/main/webapp/WEB-INF/tags/modal.tag:38
-msgid "Close"
-msgstr "Close"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:32
-msgid "Existing Mutants"
-msgstr "Existing Mutants"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:36
-msgid "All"
-msgstr "All"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:41
-msgid "Alive"
-msgstr "Alive"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:46
-msgid "Killed"
-msgstr "Killed"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:51
-msgid "Claimed Equivalent"
-msgstr "Claimed Equivalent"
-
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:56
-msgid "Equivalent"
-msgstr "Equivalent"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:48
-msgid "Code Defenders"
-msgstr "Code Defenders"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:63
-msgid "Multiplayer"
-msgstr "Multiplayer"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:67
-msgid "Games"
-msgstr "Games"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:69
-msgid "Classrooms"
-msgstr "Classrooms"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:72
-msgid "History"
-msgstr "History"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:74
-msgid "Leaderboard"
-msgstr "Leaderboard"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:83
-msgid "Admin"
-msgstr "Admin"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:97
-msgid "Profile"
-msgstr "Profile"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:99
-msgid "Account"
-msgstr "Account"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:101
-msgid "Help"
-msgstr "Help"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:103
-msgid "Logout"
-msgstr "Logout"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:120
-msgid "Language"
-msgstr "Language"
-
-#: src/main/webapp/WEB-INF/tags/navbar.tag:137
-msgid "Login"
-msgstr "Login"
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:42
-msgid "Puzzles"
-msgstr "Puzzles"
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:45
-msgid "Puzzle Overview: See all puzzles and your progress."
-msgstr "Puzzle Overview: See all puzzles and your progress."
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:46
-msgid "Overview"
-msgstr "Overview"
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:52
-msgid "Next puzzle: {0}, {1}"
-msgstr "Next puzzle: {0}, {1}"
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:54
-msgid "Play next puzzle"
-msgstr "Play next puzzle"
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:59
-msgid "There are currently no puzzles available."
-msgstr "There are currently no puzzles available."
-
-#: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:86
-msgid "This puzzle is locked."
-msgstr "This puzzle is locked."
-
-#: src/main/webapp/WEB-INF/tags/round_counter.tag:32
-msgid "Puzzle solved in {0} attempt."
-msgstr "Puzzle solved in {0} attempt."
-
-msgid "Puzzle solved in {0} attempts."
-msgstr "Puzzle solved in {0} attempts."
-
-#: src/main/webapp/WEB-INF/tags/round_counter.tag:35
-msgid "This is your {0}{1} attempt."
-msgstr "This is your {0}{1} attempt."
-
-#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:37
-msgid "Attack"
-msgstr "Attack"
-
-#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:58
-msgid "Attack"
-msgstr "Attack"
-
-#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:63
-msgid "My mutant is killable"
-msgstr "My mutant is killable"
-
-#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:68
-msgid "My mutant is equivalent"
-msgstr "My mutant is equivalent"
-
-#: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
-msgid "I don\'t know if my mutant is killable"
-msgstr "I don\'t know if my mutant is killable"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:24
-msgid "Mutation rules"
-msgstr "Mutation rules"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:25
-msgid "Relaxed"
-msgstr "Relaxed"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:27
-msgid "No calls to {0},{1}"
-msgstr "No calls to {0},{1}"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:28
-msgid "No mutants with only changes to comments or formatting"
-msgstr "No mutants with only changes to comments or formatting"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:29
-msgid "No renaming of methods or fields, no additional methods or fields"
-msgstr "No renaming of methods or fields, no additional methods or fields"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:31
-msgid "Moderate"
-msgstr "Moderate"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:33
-msgid "No changes to comments"
-msgstr "No changes to comments"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:34
-msgid "No additional logical operators ({0}, {1})"
-msgstr "No additional logical operators ({0}, {1})"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
-msgid "No ternary operators"
-msgstr "No ternary operators"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:36
-msgid "No new control structures ({0}, {1}, {2}, ...)"
-msgstr "No new control structures ({0}, {1}, {2}, ...)"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:38
-msgid "Strict"
-msgstr "Strict"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:40
-msgid "No reflection"
-msgstr "No reflection"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:41
-msgid "No bitwise operators (bitshifts and logical)"
-msgstr "No bitwise operators (bitshifts and logical)"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:42
-msgid "No signature changes"
-msgstr "No signature changes"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:44
-msgid "Only the configured number of assertions per test (default: {0})"
-msgstr "Only the configured number of assertions per test (default: {0})"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:47
-msgid "Test rules"
-msgstr "Test rules"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:49
-msgid "No loops"
-msgstr "No loops"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
-msgid "No calls to System.*"
-msgstr "No calls to System.*"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:51
-msgid "No new methods or conditionals"
-msgstr "No new methods or conditionals"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:38
-msgid "Invite players"
-msgstr "Invite players"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:44
-msgid "Search"
-msgstr "Search"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:47
-msgid "Invite users"
-msgstr "Invite users"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:53
-msgid "Users to invite"
-msgstr "Users to invite"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:63
-msgid "Already invited users"
-msgstr "Already invited users"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:75
-msgid "Copy invite link"
-msgstr "Copy invite link"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:79
-msgid "Save changes"
-msgstr "Save changes"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:364
-msgid "Invite as defender"
-msgstr "Invite as defender"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:377
-msgid "Invite"
-msgstr "Invite"
-
-msgid "Balance teams"
-msgstr "Balance teams"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:379
-msgid "Player will join the team with fewer players."
-msgstr "Player will join the team with fewer players."
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:393
-msgid "Add as attacker"
-msgstr "Add as attacker"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:473
-msgid "Copied!"
-msgstr "Copied!"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:475
-msgid "Copy invite link"
-msgstr "Copy invite link"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:479
-msgid "Failed to copy"
-msgstr "Failed to copy"
-
-#: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
-msgid "Error updating whitelist"
-msgstr "Error updating whitelist"
-
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:57
-msgid "no role"
-msgstr "no role"
-
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:60
-msgid "Game {0} ({1})"
-msgstr "Game {0} ({1})"
-
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1475
 msgid "Select"
 msgstr "Select"
@@ -6941,6 +6987,7 @@ msgstr "Show all achievements on the profile page"
 msgid "New Achievement Unlocked"
 msgstr "New Achievement Unlocked"
 
+#: src/main/javascript/main/achievement_notifications.js:107
 msgid "Level"
 msgstr "Level"
 
@@ -7192,6 +7239,7 @@ msgstr "killed by"
 msgid "marked as equivalent"
 msgstr "marked as equivalent"
 
+#: src/main/javascript/game/mutant_accordion.js:293
 msgid "but is killable"
 msgstr "but is killable"
 
@@ -7271,6 +7319,7 @@ msgstr "Done"
 msgid "Test"
 msgstr "Test"
 
+#: src/main/javascript/game/test_accordion.js:103
 msgid "by"
 msgstr "by"
 
