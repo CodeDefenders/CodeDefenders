@@ -31,6 +31,7 @@
 <%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 <%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%--
     Provides the navigation bar.

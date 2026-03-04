@@ -18,31 +18,32 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%@ tag pageEncoding="UTF-8" %>
 
 <p>
-    The <code>puzzle.properties</code> file contains the configuration of the puzzle.
-    The text area below shows the supported properties for puzzles:
+    ${i18n.tr('The <code>puzzle.properties</code> file contains the configuration of the puzzle.')}
+    ${i18n.tr('The text area below shows the supported properties for puzzles:')}
 </p>
 
-<pre class="mb-0 p-3 bg-light" style="line-height: 1.15;"># Type of the puzzle. Can be ATTACKER or DEFENDER.
+<pre class="mb-0 p-3 bg-light" style="line-height: 1.15;">${i18n.tr('# Type of the puzzle. Can be ATTACKER or DEFENDER.')}
 type=ATTACKER
 
-# Title of the puzzle.
+${i18n.tr('# Title of the puzzle.')}
 title=Puzzle 1
 
-# Description of the puzzle.
+${i18n.tr('# Description of the puzzle.')}
 description=Write a mutant which evades all the tests.
 
-# The level at which the puzzle games will be played at.
-# EASY allows players to see all tests and mutants in the game.
-# HARD hides tests from attacker players and hides mutants from defender players.
+${i18n.tr('# The level at which the puzzle games will be played at.')}
+${i18n.tr('# EASY allows players to see all tests and mutants in the game.')}
+${i18n.tr('# HARD hides tests from attacker players and hides mutants from defender players.')}
 gameLevel=EASY
 
-# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive).
-# This is ignored for DEFENDER puzzles.
+${i18n.tr('# (Optional) The fist line of the CUT that attackers are allowed to edit (inclusive).')}
+${i18n.tr('# This is ignored for DEFENDER puzzles.')}
 editableLinesStart=4
 
-# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive).
-# This is ignored for DEFENDER puzzles.
+${i18n.tr('# (Optional) The fist last of the CUT, that attackers are allowed to edit (inclusive).')}
+${i18n.tr('# This is ignored for DEFENDER puzzles.')}
 editableLinesEnd=4</pre>

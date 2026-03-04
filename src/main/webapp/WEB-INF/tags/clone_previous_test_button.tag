@@ -24,6 +24,7 @@
 
 <%@ tag import="org.codedefenders.util.Paths" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
@@ -33,38 +34,38 @@
 <div class="btn-group" style="gap: 2px">
     <button class="btn btn-warning" id="load-previous-test"
     ${(game.state != 'ACTIVE' || previousTest == null) ? 'disabled' : ''}>
-        Clone previous test
+        ${i18n.tr('Clone previous test')}
     </button>
     <button class="btn btn-warning dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"
             data-bs-target="#keep-prev-test-dropdown" aria-expanded="false" ${game.state != 'ACTIVE' ? 'disabled' : ''}>
-        <span class="visually-hidden">Toggle Dropdown</span>
+        <span class="visually-hidden">${i18n.tr('Toggle Dropdown')}</span>
     </button>
     <form class="dropdown-menu" id="keep-prev-test-dropdown" action="${url.forPath(Paths.USER_SETTINGS)}" method="post">
         <input type="hidden" class="form-control" name="formType" value="updateKeepPreviousTest">
         <input type="hidden" class="form-control" name="keepPreviousTest" value="">
         <div class="dropdown-item cursor-pointer">
             <i class="fa fa-check me-1"></i>
-            <span>Keep previous test in editor</span>
+            <span>${i18n.tr('Keep previous test in editor')}</span>
         </div>
     </form>
 </div>
 
-<t:modal title="Clone previous test" id="clone-previous-test-modal" closeButtonText="Cancel">
+<t:modal title="${i18n.tr('Clone previous test')}" id="clone-previous-test-modal" closeButtonText="${i18n.tr('Cancel')}">
     <jsp:attribute name="content">
-        Are you sure you want to copy the previous test?
-        This will overwrite your current code and replace it with your last submission.
+        ${i18n.tr('Are you sure you want to copy the previous test?')}
+        ${i18n.tr('This will overwrite your current code and replace it with your last submission.')}
     </jsp:attribute>
     <jsp:attribute name="footer">
-        <button class="btn btn-primary" id="confirm-clone-previous-test-btn">Confirm Clone</button>
+        <button class="btn btn-primary" id="confirm-clone-previous-test-btn">${i18n.tr('Confirm Clone')}</button>
     </jsp:attribute>
 </t:modal>
 
-<t:modal title='Change "Keep previous test in editor" setting' id="keep-previous-test-modal" closeButtonText="Cancel">
+<t:modal title='${i18n.tr("Change \"Keep previous test in editor\" setting")}' id="keep-previous-test-modal" closeButtonText="${i18n.tr('Cancel')}">
     <jsp:attribute name="content">
-        Changing this setting will reload the page and therefore overwrite your current code.
+        ${i18n.tr('Changing this setting will reload the page and therefore overwrite your current code.')}
     </jsp:attribute>
     <jsp:attribute name="footer">
-        <button class="btn btn-primary" id="confirm-keep-previous-test-btn">Confirm</button>
+        <button class="btn btn-primary" id="confirm-keep-previous-test-btn">${i18n.tr('Confirm')}</button>
     </jsp:attribute>
 </t:modal>
 

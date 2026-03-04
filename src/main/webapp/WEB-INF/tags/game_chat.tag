@@ -21,6 +21,7 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="gameChat" type="org.codedefenders.beans.game.GameChatBean"--%>
 
@@ -34,11 +35,11 @@
             <c:when test="${gameChat.showTabs}">
                 <div id="chat-handle" class="card-header p-1 ps-2 d-flex align-items-center gap-2">
                     <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-outline-success active"
-                            title="Show all messages.">All</button>
+                            title="${i18n.tr('Show all messages.')}">${i18n.tr('All')}</button>
                     <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-outline-danger"
-                            title="Show messages from the perspective of the attacker team.">Attackers</button>
+                            title="${i18n.tr('Show messages from the perspective of the attacker team.')}">${i18n.tr('Attackers')}</button>
                     <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-outline-primary"
-                            title="Show messages from the perspective of the defender team.">Defenders</button>
+                            title="${i18n.tr('Show messages from the perspective of the defender team.')}">${i18n.tr('Defenders')}</button>
                     <button id="chat-close" type="button" class="btn-close m-1 ms-auto"></button>
                 </div>
             </c:when>
@@ -59,25 +60,25 @@
                     <div class="input-group">
                         <div id="chat-channel" class="input-group-text d-flex justify-content-center"
                              style="min-width: 4.5rem; cursor: pointer;"
-                             title="Switch between sending messages to your own team or all players.">
-                            Team
+                             title="${i18n.tr('Switch between sending messages to your own team or all players.')}">
+                            ${i18n.tr('Team')}
                         </div>
-                        <label class="visually-hidden" for="chat-input">Message</label>
+                        <label class="visually-hidden" for="chat-input">${i18n.tr('Message')}</label>
                         <textarea type="text" id="chat-input" class="form-control"
                                   maxlength="${gameChat.maxMessageLength}"
-                                  placeholder="Message"
+                                  placeholder="${i18n.tr('Message')}"
                                   style="resize: none;"></textarea>
                     </div>
                 </c:when>
                 <c:otherwise>
                     <div>
                         <div id="chat-channel" hidden>
-                            Team
+                            ${i18n.tr('Team')}
                         </div>
-                        <label class="visually-hidden" for="chat-input">Message</label>
+                        <label class="visually-hidden" for="chat-input">${i18n.tr('Message')}</label>
                         <textarea type="text" id="chat-input" class="form-control"
                                   maxlength="${gameChat.maxMessageLength}"
-                                  placeholder="Message"
+                                  placeholder="${i18n.tr('Message')}"
                                   style="resize: none;"></textarea>
                     </div>
                 </c:otherwise>
@@ -86,9 +87,9 @@
     </div>
 </div>
 
-<button type="button" id="chat-indicator" class="btn btn-sm btn-outline-secondary">
+<button type="button" id="chat-indicator" class="btn btn-sm btn-outline-secondary" aria-label="${i18n.tr('Chat')}">
     <i class="fa fa-comments"></i>
-    Chat
+    ${i18n.tr('Chat')}
     <span id="chat-count" class="badge bg-secondary">0</span>
 </button>
 

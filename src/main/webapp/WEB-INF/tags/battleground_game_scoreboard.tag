@@ -28,6 +28,8 @@
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ attribute name="playerId" required="false" type="java.lang.Integer" %>
 <%@ attribute name="gameFinished" required="false" type="java.lang.Boolean" %>
 
@@ -54,23 +56,23 @@
         <c:if test="${gameFinished}">
             <span class="player-message">
                 <c:choose>
-                    <c:when test="${playerStatus == 'WINNING_ATTACKER'}">Your team won!</c:when>
-                    <c:when test="${playerStatus == 'LOSING_ATTACKER'}">Your team lost!</c:when>
-                    <c:when test="${playerStatus == 'TIE_ATTACKER'}">Tie!</c:when>
+                    <c:when test="${playerStatus == 'WINNING_ATTACKER'}">${i18n.tr('Your team won!')}</c:when>
+                    <c:when test="${playerStatus == 'LOSING_ATTACKER'}">${i18n.tr('Your team lost!')}</c:when>
+                    <c:when test="${playerStatus == 'TIE_ATTACKER'}">${i18n.tr('Tie!')}</c:when>
                 </c:choose>
             </span>
         </c:if>
         ${scoreboard.totalAttackerScore}
     </span>
-    <img alt="Code Defenders Logo" style="width: 4rem;" src="${pageContext.request.contextPath}/images/logo.png"/>
+    <img alt="${i18n.tr('Code Defenders Logo')}" style="width: 4rem;" src="${pageContext.request.contextPath}/images/logo.png"/>
     <span class="fg-defender fs-1 text-start total-defender-score">
         ${scoreboard.totalDefenderScore}
         <c:if test="${gameFinished}">
             <span class="player-message">
                 <c:choose>
-                    <c:when test="${playerStatus == 'WINNING_DEFENDER'}">Your team won!</c:when>
-                    <c:when test="${playerStatus == 'LOSING_DEFENDER'}">Your team lost!</c:when>
-                    <c:when test="${playerStatus == 'TIE_DEFENDER'}">Tie!</c:when>
+                    <c:when test="${playerStatus == 'WINNING_DEFENDER'}">${i18n.tr('Your team won!')}</c:when>
+                    <c:when test="${playerStatus == 'LOSING_DEFENDER'}">${i18n.tr('Your team lost!')}</c:when>
+                    <c:when test="${playerStatus == 'TIE_DEFENDER'}">${i18n.tr('Tie!')}</c:when>
                 </c:choose>
             </span>
         </c:if>
@@ -79,11 +81,11 @@
 <table class="scoreboard table m-0 text-white">
 
     <tr class="attacker header">
-        <th>Attackers</th>
-        <th>Mutants</th>
-        <th>Alive / Killed / Equivalent</th>
-        <th>Duels Won / Lost / Ongoing</th>
-        <th>Total Points</th>
+        <th>${i18n.tr('Attackers')}</th>
+        <th>${i18n.tr('Mutants')}</th>
+        <th>${i18n.tr('Alive / Killed / Equivalent')}</th>
+        <th>${i18n.tr('Duels Won / Lost / Ongoing')}</th>
+        <th>${i18n.tr('Total Points')}</th>
     </tr>
     <%
         for (Player attacker : attackers) {
@@ -118,7 +120,7 @@
         }
     %>
     <tr class="attacker total">
-        <td>Attacking Team</td>
+        <td>${i18n.tr('Attacking Team')}</td>
         <td><%=mutantScores.getOrDefault(-1, zeroDummyScore).getQuantity()%>
         </td>
         <td><%=mutantScores.getOrDefault(-1, zeroDummyScore).getMutantKillInformation()%>
@@ -134,11 +136,11 @@
     </tr>
 
     <tr class="defender header">
-        <th>Defenders</th>
-        <th>Tests</th>
-        <th>Mutants Killed</th>
-        <th>Duels Won / Lost / Ongoing</th>
-        <th>Total Points</th>
+        <th>${i18n.tr('Defenders')}</th>
+        <th>${i18n.tr('Tests')}</th>
+        <th>${i18n.tr('Mutants Killed')}</th>
+        <th>${i18n.tr('Duels Won / Lost / Ongoing')}</th>
+        <th>${i18n.tr('Total Points')}</th>
     </tr>
     <%
         for (Player defender : defenders) {
@@ -167,7 +169,7 @@
         }
     %>
     <tr class="defender total">
-        <td>Defending Team</td>
+        <td>${i18n.tr('Defending Team')}</td>
         <td><%=testScores.getOrDefault(-1, zeroDummyScore).getQuantity()%>
         </td>
         <td><%=testScores.getOrDefault(-1, zeroDummyScore).getMutantKillInformation()%>

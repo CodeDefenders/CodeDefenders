@@ -22,6 +22,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
@@ -37,24 +39,24 @@
 <c:if test="${auth.loggedIn && puzzleRepo.checkPuzzlesEnabled() && puzzleRepo.checkActivePuzzlesExist()}">
     <li class="nav-item nav-item-highlight dropdown me-3">
         <a class="nav-link dropdown-toggle" id="header-puzzle" role="button"
-           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Puzzles</a>
+           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${i18n.tr('Puzzles')}</a>
         <ul class="dropdown-menu header-puzzle-menu" aria-labelledby="header-puzzle">
             <li><a class="dropdown-item" id="header-puzzle-overview"
-                   title="Puzzle Overview: See all puzzles and your progress."
-                   href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Overview</a></li>
+                   title="${i18n.tr('Puzzle Overview: See all puzzles and your progress.')}"
+                   href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">${i18n.tr('Overview')}</a></li>
             <c:if test="${puzzleNavigation.hasNextPuzzle()}">
                 <%--@elvariable id="nextPuzzleObj" type="org.codedefenders.model.PuzzleEntry"--%>
                 <c:set var="nextPuzzleObj" value="${puzzleNavigation.nextPuzzle.get()}"/>
                 <li><a class="dropdown-item" id="header-puzzle-next"
                        href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}"
-                       title="Next puzzle: ${nextPuzzleObj.puzzle.chapter.title}, ${nextPuzzleObj.puzzle.title}"
+                       title="${i18n.tr('Next puzzle: {0}, {1}', nextPuzzleObj.puzzle.chapter.title, nextPuzzleObj.puzzle.title)}"
                        data-bs-toggle="tooltip"
-                >Play next puzzle</a></li>
+                >${i18n.tr('Play next puzzle')}</a></li>
             </c:if>
             <li class="dropdown-divider"></li>
             <c:if test="${puzzleNavigation.puzzleChapters.size() == 0}">
                 <%-- shouldn't happen --%>
-                <li class="dropdown-item">There are currently no puzzles available.</li>
+                <li class="dropdown-item">${i18n.tr('There are currently no puzzles available.')}</li>
             </c:if>
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
@@ -81,7 +83,7 @@
                                         <c:otherwise>
                                             disabled="disabled"
                                             data-bs-toggle="tooltip"
-                                            title="This puzzle is locked."
+                                            title="${i18n.tr('This puzzle is locked.')}"
                                         </c:otherwise>
                                     </c:choose>
                             ><i class="fa ${icon}"></i> ${puzzle.title}</a></li>

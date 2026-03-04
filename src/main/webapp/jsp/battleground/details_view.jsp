@@ -78,7 +78,7 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<c:set var="title" value="${i18n.tr('Details of Game {0} ({1})', game.id, role.formattedString)}"/>
+<c:set var="title" value="${i18n.tr('Details of Game {0} ({1})', game.id, i18n.tr(role.formattedString))}"/>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">

@@ -19,24 +19,25 @@
 
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
-<h3>Mutation rules</h3>
-<b>Relaxed</b> <br>
+<h3>${i18n.tr('Mutation rules')}</h3>
+<b>${i18n.tr('Relaxed')}</b> <br>
 <ul>
-    <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-    <li>No mutants with only changes to comments or formatting</li>
-    <li>No renaming of methods or fields, no additional methods or fields</li>
+    <li>${i18n.tr('No calls to {0},{1}', '<i>System.*</i>', '<i>Random.*</i>')}</li>
+    <li>${i18n.tr('No mutants with only changes to comments or formatting')}</li>
+    <li>${i18n.tr('No renaming of methods or fields, no additional methods or fields')}</li>
 </ul>
-<b>Moderate</b> <br>
+<b>${i18n.tr('Moderate')}</b> <br>
 <ul>
-    <li>No changes to comments</li>
-    <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-    <li>No ternary operators</li>
-    <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
+    <li>${i18n.tr('No changes to comments')}</li>
+    <li>${i18n.tr('No additional logical operators ({0}, {1})', '<i>&&</i>', '<i>||</i>')}</li>
+    <li>${i18n.tr('No ternary operators')}</li>
+    <li>${i18n.tr('No new control structures ({0}, {1}, {2}, ...)', '<i>switch</i>', '<i>if</i>', '<i>for</i>')}</li>
 </ul>
-<b>Strict</b> <br>
+<b>${i18n.tr('Strict')}</b> <br>
 <ul class="mb-0">
-    <li>No reflection</li>
-    <li>No bitwise operators (bitshifts and logical)</li>
-    <li>No signature changes</li>
+    <li>${i18n.tr('No reflection')}</li>
+    <li>${i18n.tr('No bitwise operators (bitshifts and logical)')}</li>
+    <li>${i18n.tr('No signature changes')}</li>
 </ul>

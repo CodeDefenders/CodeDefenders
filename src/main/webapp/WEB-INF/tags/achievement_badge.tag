@@ -22,6 +22,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ attribute name="achievement" required="true" type="org.codedefenders.model.Achievement" %>
@@ -29,13 +30,13 @@
 <div class="achievement-card achievement-level-${achievement.level}">
     <div class="pie animate" style="--percentage: ${achievement.progress.orElse(100)}">
         <img src="${url.forPath("/images/achievements/")}codedefenders_achievements_${achievement.id.asInt}_lvl_${achievement.level}.png"
-             alt="${achievement.name} (Level ${achievement.level})">
+             alt="${i18n.tr('{0} (Level {1})', achievement.name, achievement.level)}">
     </div>
     <p>
         <strong>
             ${achievement.name}
             <c:if test="${achievement.level > 0}">
-                (Level ${achievement.level})
+                (${i18n.tr('Level {0}', achievement.level)})
             </c:if>
         </strong>
         <br>

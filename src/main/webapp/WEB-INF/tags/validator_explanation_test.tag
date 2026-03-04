@@ -20,29 +20,34 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="org.codedefenders.game.AbstractGame" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
-<%@ tag import="org.codedefenders.util.MessageUtils" %>
 <%@ tag import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ tag import="java.util.Objects" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 <%
+    I18n i18n = (I18n) request.getAttribute("i18n");
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     game = Objects.nonNull(game) ? game : (AbstractGame) request.getAttribute(Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     String maxAssertionsText;
     if (Objects.nonNull(game)) {
-        maxAssertionsText = String.format("Only %d %s per test",
+        maxAssertionsText = i18n.trn(
+                "Only {0} assertion per test",
+                "Only {0} assertions per test",
                 game.getMaxAssertionsPerTest(),
-                MessageUtils.pluralize(game.getMaxAssertionsPerTest(), "assertion", "assertions"));
+                game.getMaxAssertionsPerTest()
+        );
     } else {
-        maxAssertionsText = String.format("Only the configured number of assertions per test (default: %d)",
-                DEFAULT_NB_ASSERTIONS);
+        maxAssertionsText = i18n.tr("Only the configured number of assertions per test (default: {0})", DEFAULT_NB_ASSERTIONS);
     }
 %>
-<h3>Test rules</h3>
+<h3>${i18n.tr('Test rules')}</h3>
 <ul class="mb-0">
-    <li>No loops</li>
-    <li>No calls to System.*</li>
-    <li>No new methods or conditionals</li>
+    <li>${i18n.tr('No loops')}</li>
+    <li>${i18n.tr('No calls to System.*')}</li>
+    <li>${i18n.tr('No new methods or conditionals')}</li>
     <li><%=maxAssertionsText%></li>
 </ul>

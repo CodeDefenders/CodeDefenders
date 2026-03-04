@@ -20,6 +20,7 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="killMapAccordion" type="org.codedefenders.beans.game.KillMapAccordionBean"--%>
 
@@ -28,36 +29,36 @@
 <div id="mutants-div">
 
     <div class="game-component-header">
-        <h2>Kill-maps by Mutants</h2>
+        <h2>${i18n.tr('Kill-maps by Mutants')}</h2>
         <div id="kma-filter">
             <input type="radio" class="btn-check" name="kma-filter" id="km-all" value="ALL" checked>
             <label class="btn btn-xs btn-outline-secondary" for="km-all">
-                <span class="align-middle">All</span>
+                <span class="align-middle">${i18n.tr('All')}</span>
             </label>
             <input type="radio" class="btn-check" name="kma-filter" id="km-no-kill" value="NO_KILL">
             <label class="btn btn-xs btn-outline-secondary" for="km-no-kill">
                 <span class="killMapImage killMapImageNoKill align-middle"></span>
-                <span class="align-middle">No Kill</span>
+                <span class="align-middle">${i18n.tr('No Kill')}</span>
             </label>
             <input type="radio" class="btn-check" name="kma-filter" id="km-kill" value="KILL">
             <label class="btn btn-xs btn-outline-secondary" for="km-kill">
                 <span class="killMapImage killMapImageKill align-middle"></span>
-                <span class="align-middle">Kill</span>
+                <span class="align-middle">${i18n.tr('Kill')}</span>
             </label>
             <input type="radio" class="btn-check" name="kma-filter" id="km-error" value="ERROR">
             <label class="btn btn-xs btn-outline-secondary" for="km-error">
                 <span class="killMapImage killMapImageError align-middle"></span>
-                <span class="align-middle">Error</span>
+                <span class="align-middle">${i18n.tr('Error')}</span>
             </label>
             <input type="radio" class="btn-check" name="kma-filter" id="km-no-cov" value="NO_COVERAGE">
             <label class="btn btn-xs btn-outline-secondary" for="km-no-cov">
                 <span class="killMapImage killMapImageNoCoverage align-middle"></span>
-                <span class="align-middle">No Coverage</span>
+                <span class="align-middle">${i18n.tr('No Coverage')}</span>
             </label>
             <input type="radio" class="btn-check" name="kma-filter" id="km-unknown" value="UNKNOWN">
             <label class="btn btn-xs btn-outline-secondary" for="km-unknown">
                 <span class="killMapImage killMapImageUnknown align-middle"></span>
-                <span class="align-middle">Unknown</span>
+                <span class="align-middle">${i18n.tr('Unknown')}</span>
             </label>
         </div>
     </div>
@@ -90,7 +91,7 @@
                             <c:if test="${category.mutantIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
-                                        <p class="text-center m-0 py-1">No mutants in this category.</p>
+                                        <p class="text-center m-0 py-1">${i18n.tr('No mutants in this category.')}</p>
                                     </div>
                                 </div>
                             </c:if>
@@ -119,26 +120,26 @@
                                                     </c:when>
                                                 </c:choose>
                                                 <span class="kma-mutant-link">
-                                                    Mutant ${mutant.id}
+                                                    ${i18n.tr('Mutant {0}', mutant.id)}
                                                 </span>
                                                 <span class="kma-col">
-                                                    <span class="kma-column-name mx-2">by</span>
+                                                    <span class="kma-column-name mx-2">${i18n.tr('by')}</span>
                                                     ${mutant.creator.name}
                                                 </span>
                                                 <span class="kma-col">
                                                     ${mutant.description}
                                                 </span>
                                                 <span class="kma-col">
-                                                    <span class="kma-column-name mx-2">Points:</span>
+                                                    <span class="kma-column-name mx-2">${i18n.tr('Points:')}</span>
                                                     ${mutant.points}
                                                 </span>
                                                 <span class="kta-col ms-auto me-3 text-end">
                                                     <span class="kta-view-mutant-button btn btn-xs btn-primary">
-                                                        View
+                                                        ${i18n.tr('View')}
                                                     </span>
                                                     <c:if test="${state == 'KILLED'}">
                                                         <span class="kta-view-killing-test-button btn btn-xs btn-secondary ms-2">
-                                                            View Killing Test
+                                                            ${i18n.tr('View Killing Test')}
                                                         </span>
                                                     </c:if>
                                                 </span>

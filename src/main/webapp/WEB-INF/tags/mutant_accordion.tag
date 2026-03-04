@@ -20,6 +20,7 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="mutantAccordion" type="org.codedefenders.beans.game.MutantAccordionBean"--%>
 
@@ -28,31 +29,31 @@
 <div id="mutants-div">
 
     <div class="game-component-header">
-        <h3>Existing Mutants</h3>
+        <h3>${i18n.tr('Existing Mutants')}</h3>
         <div id="ma-filter">
             <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="all">
-                <span class="align-middle">All</span>
+                <span class="align-middle">${i18n.tr('All')}</span>
             </label>
             <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="alive">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
-                <span class="align-middle">Alive</span>
+                <span class="align-middle">${i18n.tr('Alive')}</span>
             </label>
             <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="killed">
                 <span class="mutantCUTImage mutantImageKilled align-middle"></span>
-                <span class="align-middle">Killed</span>
+                <span class="align-middle">${i18n.tr('Killed')}</span>
             </label>
             <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="marked">
                 <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
-                <span class="align-middle">Claimed Equivalent</span>
+                <span class="align-middle">${i18n.tr('Claimed Equivalent')}</span>
             </label>
             <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT" autocomplete="off">
             <label class="btn btn-xs btn-outline-secondary" for="equivalent">
                 <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
-                <span class="align-middle">Equivalent</span>
+                <span class="align-middle">${i18n.tr('Equivalent')}</span>
             </label>
         </div>
     </div>
@@ -91,16 +92,11 @@
         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import {MutantAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
-
         const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
         const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
         const gameId = ${mutantAccordion.gameId};
 
-        const mutantAccordion = new MutantAccordion(
-                categories,
-                mutants,
-                gameId);
-
+        const mutantAccordion = new MutantAccordion(categories, mutants, gameId);
 
         objects.register('mutantAccordion', mutantAccordion);
     </script>

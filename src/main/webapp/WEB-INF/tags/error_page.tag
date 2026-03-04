@@ -26,6 +26,7 @@
 <%@ attribute name="message" required="true" fragment="true" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <head>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
@@ -47,7 +48,7 @@
     <hr/>
     <jsp:invoke fragment="message"/>
     <div class="go-back" hidden>
-        <a href="javascript:history.back()">Go back</a>
+        <a href="javascript:history.back()">${i18n.tr("Go back")}</a>
     </div>
     <script>
         if (history.length > 1) {

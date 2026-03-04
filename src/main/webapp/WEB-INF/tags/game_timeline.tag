@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.beans.game.HistoryBean" %>
 
@@ -37,13 +39,12 @@
             <div class="timeline-entry-inner">
                 <time datetime="${event.format}" class="timeline-time">
                     <span>${event.time}</span>
-                    <span>${event.date}</span>
+                    <span>${i18n.tr(event.date)}</span>
                 </time>
 
                 <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i>
-                </div>
                 <div class="timeline-label bg-${event.colour}">
-                    <span class="h5 timeline-title">${event.userMessage}</span>
+                    <span class="h5 timeline-title">${i18n.tr(event.userMessage)}</span>
                         <%--
                             If events ever have a body message:
                             <c:if test="${not empty event.message}">

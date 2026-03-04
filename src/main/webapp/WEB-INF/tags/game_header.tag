@@ -21,6 +21,8 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="org.codedefenders.util.Paths" %>
 <%@ tag import="org.codedefenders.util.CDIUtil" %>
 <%@ tag import="org.codedefenders.game.AbstractGame" %>
@@ -32,6 +34,7 @@
 <%@ tag import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
@@ -78,20 +81,21 @@
 
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
     <%
+        I18n i18n = (I18n) request.getAttribute("i18n");
         String modeText = "Unknown Mode";
         String modeBg = "bg-secondary";
         switch (game.getMode()) {
             case PARTY:
-                modeText = "Battleground";
+                modeText = i18n.tr("Battleground");
                 modeBg = "bg-battleground";
                 break;
             case MELEE:
-                modeText = "Melee";
+                modeText = i18n.tr("Melee");
                 modeBg = "bg-player";
                 break;
         }
 
-        String roleText = role.getFormattedString();
+        String roleText = i18n.tr(role.getFormattedString());
         String roleBg = "bg-secondary";
         switch (role) {
             case ATTACKER:
@@ -104,19 +108,24 @@
                 roleBg = "bg-player";
                 break;
         }
+
+        request.setAttribute("modeText", modeText);
+        request.setAttribute("roleText", roleText);
+        request.setAttribute("modeBg", modeBg);
+        request.setAttribute("roleBg", roleBg);
     %>
     <div class="d-flex gap-1 align-items-center">
         <h2 class="m-0 me-2 mt-1">
-            Game
+            ${i18n.tr('Game')}
             <span class="font-monospace text-muted">#<%=game.getId()%></span>
         </h2>
-        <span class="badge fs-5 rounded-pill <%=modeBg%>" title="Game Mode: <%=modeText%>">
+        <span class="badge fs-5 rounded-pill ${modeBg}" title="${i18n.tr('Game Mode: {0}', modeText)}">
             <i class="fa fa-play-circle"></i>
-            <%=modeText%>
+            ${modeText}
         </span>
-        <span class="badge fs-5 rounded-pill <%=roleBg%>" title="Your Role: <%=roleText%>">
+        <span class="badge fs-5 rounded-pill ${roleBg}" title="${i18n.tr('Your Role: {0}', roleText)}">
             <i class="fa fa-user-circle"></i>
-            <%=roleText%>
+            ${roleText}
         </span>
     </div>
 
@@ -129,18 +138,18 @@
         <div>
             <button type="button" class="btn btn-sm btn-danger" id="endGame"
                     data-bs-toggle="modal" data-bs-target="#end-game-modal">
-                End Game
+                ${i18n.tr('End Game')}
             </button>
             <form id="adminEndBtn" action="<%=selectionManagerUrl%>" method="post">
                 <input type="hidden" name="formType" value="endGame">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                <t:modal title="Confirm End Game" id="end-game-modal" closeButtonText="Cancel">
-                            <jsp:attribute name="content">
-                                Are you sure you want to end the game?
-                            </jsp:attribute>
+                <t:modal title="${i18n.tr('Confirm End Game')}" id="end-game-modal" closeButtonText="${i18n.tr('Cancel')}">
+                    <jsp:attribute name="content">
+                        ${i18n.tr('Are you sure you want to end the game?')}
+                    </jsp:attribute>
                     <jsp:attribute name="footer">
-                                <button type="submit" class="btn btn-primary">Confirm</button>
-                            </jsp:attribute>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Confirm')}</button>
+                    </jsp:attribute>
                 </t:modal>
             </form>
         </div>
@@ -153,7 +162,7 @@
             <input type="hidden" name="formType" value="startGame">
             <input type="hidden" name="gameId" value="<%=game.getId()%>">
             <button type="submit" class="btn btn-sm btn-success" id="startGame" form="adminStartBtn">
-                Start Game
+                ${i18n.tr('Start Game')}
             </button>
         </form>
         <%
@@ -163,21 +172,21 @@
         %>
         <div>
             <div data-bs-toggle="tooltip"
-                 title="Start a new game with the same settings and opposite roles.">
+                 title="${i18n.tr('Start a new game with the same settings and opposite roles.')}">
                 <button type="submit" class="btn btn-sm btn-warning" id="rematch"
                         data-bs-toggle="modal" data-bs-target="#rematch-modal">
-                    Rematch
+                    ${i18n.tr('Rematch')}
                 </button>
             </div>
             <form id="rematch-form" action="<%=selectionManagerUrl%>" method="post">
                 <input type="hidden" name="formType" value="rematch">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                <t:modal title="Confirm Rematch" id="rematch-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Confirm Rematch')}" id="rematch-modal" closeButtonText="${i18n.tr('Cancel')}">
                         <jsp:attribute name="content">
-                            Are you sure you want to create a new game with opposite roles?
+                            ${i18n.tr('Are you sure you want to create a new game with opposite roles?')}
                         </jsp:attribute>
                     <jsp:attribute name="footer">
-                            <button type="submit" class="btn btn-primary">Confirm Rematch</button>
+                            <button type="submit" class="btn btn-primary">${i18n.tr('Confirm Rematch')}</button>
                         </jsp:attribute>
                 </t:modal>
             </form>
@@ -213,14 +222,14 @@
             <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
                     data-bs-toggle="modal" data-bs-target="#scoreboard">
                 <i class="fa fa-book"></i>
-                Scoreboard
+                ${i18n.tr('Scoreboard')}
             </button>
             <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
                     data-bs-toggle="modal" data-bs-target="#scoringModal">
                 <i class="fa fa-question-circle"></i>
             </button>
         </div>
-        <t:modal title="Scoring System" id="scoringModal" modalBodyClasses="bg-light">
+        <t:modal title="${i18n.tr('Scoring System')}" id="scoringModal" modalBodyClasses="bg-light">
             <jsp:attribute name="content">
                 <jsp:include page="/jsp/scoring_system.jsp"/>
             </jsp:attribute>
@@ -229,20 +238,20 @@
         <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnHistory"
                 data-bs-toggle="modal" data-bs-target="#history">
             <i class="fa fa-history"></i>
-            Timeline
+            ${i18n.tr('Timeline')}
         </button>
 
         <a href="${url.forPath(Paths.PROJECT_EXPORT)}?gameId=<%=gameId%>"
            class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
-           title="Export as a Gradle project to import into an IDE.">
+           title="${i18n.tr('Export as a Gradle project to import into an IDE.')}">
             <i class="fa fa-download"></i>
-            Gradle Export
+            ${i18n.tr('Gradle Export')}
         </a>
 
         <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnFeedback"
                 data-bs-toggle="modal" data-bs-target="#playerFeedback">
             <i class="fa fa-comment"></i>
-            Feedback
+            ${i18n.tr('Feedback')}
         </button>
 
         <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
@@ -256,7 +265,7 @@
             <button class="btn btn-sm btn-outline-primary" id="whitelist-modal-opener" type="button"
                     data-bs-toggle="modal" data-bs-target="#whitelist-modal">
                 <i class="fa fa-paper-plane"></i>
-                Invitations
+                ${i18n.tr('Invitations')}
             </button>
         </div>
         <% } %>
