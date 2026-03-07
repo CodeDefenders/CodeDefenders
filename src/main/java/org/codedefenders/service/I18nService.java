@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -124,7 +125,7 @@ public class I18nService {
     /**
      * @return Array of locales set in the admin settings. Always contains at least one fallback locale.
      */
-    public Locale[] getSupportedLocales() {
+    public Locale [] getSupportedLocales() {
         var supportedLanguageSetting = getSystemSetting(SUPPORTED_LANGUAGES).getStringValue();
         var locales = Arrays.stream(supportedLanguageSetting.split("[,;]"))
                 .filter(not(String::isBlank)).map(Locale::new).toArray(Locale[]::new);
@@ -185,10 +186,26 @@ public class I18nService {
      * @param request The current HttpServletRequest
      * @return The locale
      */
-    public Locale getSessionLocale(ServletRequest request) {
+    public static Locale getSessionLocale(ServletRequest request) {
         var httpReq = (HttpServletRequest) request;
         var session = httpReq.getSession();
         var locale = session.getAttribute("locale");
         return locale != null ? (Locale) locale : request.getLocale();
+    }
+
+    /**
+     * Translates the given text using the provided i18n instance.
+     * This method is safe to use with empty strings, as it doesn't follow the standard of returning the header
+     * key/value pairs for empty strings.
+     *
+     * @param i18n The i18n instance to use for translation.
+     * @param text The text to translate.
+     * @return The translated text, or an empty string if the text is empty.
+     */
+    public static String safeTr(I18n i18n, String text) {
+        if (Objects.equals(text, "")) {
+            return "";
+        }
+        return i18n.tr(text);
     }
 }

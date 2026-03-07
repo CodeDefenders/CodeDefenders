@@ -34,6 +34,7 @@ import org.codedefenders.service.I18nService;
 public class I18nFilter implements Filter {
 
     private static final String i18nAttrName = "i18n";
+
     @Inject
     private I18nService i18nService;
 

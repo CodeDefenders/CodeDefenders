@@ -45,9 +45,6 @@ public class UserServlet extends HttpServlet {
     private UserService userService;
 
     @Inject
-    private I18nService i18nService;
-
-    @Inject
     private URLUtils url;
 
     @Override
@@ -63,7 +60,7 @@ public class UserServlet extends HttpServlet {
                 // This check should be performed in the user interface too.
                 messages.add("Could not create user. Password entries did not match.");
             } else {
-                var locale = i18nService.getSessionLocale(request); // init with session/request locale
+                var locale = I18nService.getSessionLocale(request); // init with session/request locale
                 Optional<String> result = userService.registerUser(username, password, email, locale);
                 if (result.isEmpty()) {
                     messages.add("Your user has been created. You can login now.");

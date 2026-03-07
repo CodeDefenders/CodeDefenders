@@ -27,7 +27,7 @@ import org.apache.commons.text.StringEscapeUtils;
  * few seconds, this can be changed by using the builder-style setter methods.
  */
 public class Message implements Serializable {
-    private long id;
+    private final long id;
     private String text;
     private boolean alert;
     private boolean escape;
@@ -130,6 +130,11 @@ public class Message implements Serializable {
 
     public Message setSecondary(String secondary) {
         this.secondary = secondary;
+        return this;
+    }
+
+    public Message setText(String text) {
+        this.text = text;
         return this;
     }
 }
