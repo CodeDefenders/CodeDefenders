@@ -68,6 +68,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -77,6 +78,7 @@ import org.codedefenders.util.ZipFileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
@@ -135,7 +137,7 @@ public class ClassUploadManager extends HttpServlet {
             RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
             dispatcher.forward(request, response);
         } else {
-            messages.add("Class upload is disabled.");
+            messages.add(I18n.marktr("Class upload is disabled."));
             response.sendRedirect(url.forPath(org.codedefenders.util.Paths.GAMES_OVERVIEW));
         }
     }
@@ -206,7 +208,7 @@ public class ClassUploadManager extends HttpServlet {
                     if (!validateAlias(classAlias)) {
                         logger.error("Class upload failed. Provided alias '{}' contained whitespaces or special "
                                 + "characters. Aborting.", classAlias);
-                        messages.add("Class upload failed. Alias must not contain whitespaces or special characters.")
+                        messages.add(I18n.marktr("Class upload failed. Alias must not contain whitespaces or special characters."))
                                 .alert();
                         abortRequestAndCleanUp(request, response);
                         return;
@@ -253,8 +255,8 @@ public class ClassUploadManager extends HttpServlet {
             byte[] fileContentBytes = fileParameter.get();
             if (fileContentBytes.length == 0) {
                 logger.error("Class upload failed. Given file {} was empty", fileName);
-                messages.add("Class upload failed. File content for " + fileName
-                        + " could not be read. Please try again.").alert();
+                messages.add(I18nService.marktrf("Class upload failed. File content for {0} could not be read. Please try again.", fileName))
+                        .alert();
                 abortRequestAndCleanUp(request, response);
                 return;
             }

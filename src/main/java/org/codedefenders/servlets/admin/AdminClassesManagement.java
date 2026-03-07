@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.persistence.database.GameClassRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -76,7 +77,7 @@ public class AdminClassesManagement extends HttpServlet {
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
                 if (classId.isEmpty()) {
                     logger.warn("Setting class as " + newState + " failed. Missing request parameter 'classId'.");
-                    messages.add("Failed to set class as " + newState + ".");
+                    messages.add(I18nService.marktrf("Failed to set class as {0}.", newState));
                     break;
                 }
 

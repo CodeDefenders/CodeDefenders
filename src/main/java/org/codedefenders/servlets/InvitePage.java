@@ -40,12 +40,14 @@ import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 
 @WebServlet({Paths.INVITE})
@@ -81,7 +83,7 @@ public class InvitePage extends HttpServlet {
         String inviteId = req.getParameter("inviteId");
         if (inviteId == null) {
             logger.warn("No invite ID in invite link.");
-            messages.add("Your link is malformed, you could not join the game.").alert();
+            messages.add(I18n.marktr("Your link is malformed, you could not join the game.")).alert();
             return;
         } else {
             try {
@@ -91,14 +93,14 @@ public class InvitePage extends HttpServlet {
                 } else {
                     logger.warn("User {} tried to join game with invite id {}, but no such game exists.",
                             login.getUserId(), inviteId);
-                    messages.add("The game you are trying to join doesn't exist. " +
-                            "Your invite link might have been malformed.").alert();
+                    messages.add(I18n.marktr("The game you are trying to join doesn't exist. Your invite link might have been malformed."))
+                            .alert();
                     resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                     return;
                 }
             } catch (NumberFormatException e) {
                 logger.warn("Invalid invite ID: {}", inviteId);
-                messages.add("Your link is malformed, you could not join the game.").alert();
+                messages.add(I18n.marktr("Your link is malformed, you could not join the game.")).alert();
                 resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
@@ -114,7 +116,7 @@ public class InvitePage extends HttpServlet {
                 case "flex" -> flexIsDesired = true;
                 default -> {
                     logger.warn("Invalid role parameter in invite link: {}", roleParameter);
-                    messages.add("Your invite link was malformed: Your role may not be " + roleParameter)
+                    messages.add(I18nService.marktrf("Your invite link was malformed: Your role may not be {0}", roleParameter))
                             .alert();
                     resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                     return;
@@ -125,13 +127,13 @@ public class InvitePage extends HttpServlet {
         if (game == null) {
             logger.warn("User {} tried to join game with invite link {}, but the game does not exist.",
                     login.getUserId(), req.getParameter("inviteId"));
-            messages.add("The game you were invited to no longer exists, or it has not been created yet.").alert();
+            messages.add(I18n.marktr("The game you were invited to no longer exists, or it has not been created yet.")).alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
         if (game.isFinished()) {
             logger.warn("User {} tried to join game {}, but it is already finished.", login.getUserId(), game.getId());
-            messages.add("The game you were invited to has already finished!").alert();
+            messages.add(I18n.marktr("The game you were invited to has already finished!")).alert();
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
@@ -143,7 +145,7 @@ public class InvitePage extends HttpServlet {
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
             if (!AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) {
                 logger.warn("User {} tried to join game {}, but game joining is disabled.", userId, gameId);
-                messages.add("Joining games is disabled.").alert();
+                messages.add(I18n.marktr("Joining games is disabled.")).alert();
             }
 
             if (!flexIsDesired
@@ -169,7 +171,7 @@ public class InvitePage extends HttpServlet {
                 success = game.addPlayer(userId, Role.PLAYER);
             } else {
                 logger.warn("User {} tried to join puzzle game {}.", userId, gameId);
-                messages.add("You cannot join puzzle games with an invite link.").alert();
+                messages.add(I18n.marktr("You cannot join puzzle games with an invite link.")).alert();
                 resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
@@ -180,19 +182,19 @@ public class InvitePage extends HttpServlet {
                 if (game.isInviteOnly() && !whitelistRepo.isWhitelisted(gameId, userId)) {
                     logger.info("User {} tried to join the game {} he was not whitelisted for" +
                             " with in invite link.", userId, gameId);
-                    messages.add("You could not join the game because you have not been added to the whitelist.")
+                    messages.add(I18n.marktr("You could not join the game because you have not been added to the whitelist."))
                             .alert();
                 } else {
                     logger.warn("User {} tried to join game {}, but was rejected for an unknown reason.",
                             userId, gameId);
-                    messages.add("You could not join the game.").alert();
+                    messages.add(I18n.marktr("You could not join the game.")).alert();
                 }
                 resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
         } else {
             logger.warn("User {} tried to join game {}, but is already in the game.", userId, gameId);
-            messages.add("You had already joined this game.");
+            messages.add(I18n.marktr("You had already joined this game."));
         }
         String redirectPath;
         if (game instanceof MultiplayerGame) {

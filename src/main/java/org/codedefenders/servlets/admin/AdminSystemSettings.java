@@ -36,6 +36,7 @@ import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.xnap.commons.i18n.I18n;
 
 @WebServlet(Paths.ADMIN_SETTINGS)
 // TODO Does this enable CDI using @Property@Inject ?
@@ -361,7 +362,7 @@ public class AdminSystemSettings extends HttpServlet {
                 success = success && AdminDAO.updateSystemSetting(setting);
             }
         }
-        messages.add(success ? "Updated Settings." : "There was a problem. Please consult the logs");
+        messages.add(success ? I18n.marktr("Updated Settings.") : I18n.marktr("There was a problem. Please consult the logs"));
     }
 
 }

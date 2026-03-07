@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
@@ -193,6 +194,8 @@ public class I18nService {
         return locale != null ? (Locale) locale : request.getLocale();
     }
 
+    // i18n utils
+
     /**
      * Translates the given text using the provided i18n instance.
      * This method is safe to use with empty strings, as it doesn't follow the standard of returning the header
@@ -207,5 +210,9 @@ public class I18nService {
             return "";
         }
         return i18n.tr(text);
+    }
+
+    public static String marktrf(String text, Object... args) {
+        return MessageFormat.format(text, args);
     }
 }

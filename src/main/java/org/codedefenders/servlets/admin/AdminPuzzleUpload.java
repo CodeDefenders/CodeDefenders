@@ -41,12 +41,12 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.importer.PuzzleImporter;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.SimpleFile;
 import org.codedefenders.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
@@ -72,7 +72,7 @@ public class AdminPuzzleUpload extends HttpServlet {
             parameters = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to get file upload parameters.", e);
-            messages.add("Failed to get file upload parameters.");
+            messages.add(I18n.marktr("Failed to get file upload parameters."));
             Redirect.redirectBack(request, response);
             return;
         }

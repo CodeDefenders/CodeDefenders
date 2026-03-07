@@ -44,7 +44,6 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 
-import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
 import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
@@ -162,14 +161,14 @@ public class CreateGamesService {
                     .classroomId(gameSettings.getClassroomId().orElse(null))
                     .build();
         } else {
-            messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
+            messages.add(I18nService.marktrf("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
                     stagedGame.getFormattedId(), gameSettings.getGameType().getName()));
             return false;
         }
 
         /* Insert the game. */
         if (!game.insert()) {
-            messages.add(format("ERROR: Could not create game for staged game {0}.",
+            messages.add(I18nService.marktrf("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));
             return false;
         }
@@ -178,14 +177,14 @@ public class CreateGamesService {
         if (gameSettings.getGameType() != MELEE) {
             if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
                     || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-                messages.add(format("ERROR: Could not add system players to game {0}.",
+                messages.add(I18nService.marktrf("ERROR: Could not add system players to game {0}.",
                         stagedGame.getFormattedId()));
                 return false;
             }
         } else {
             if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER)
                     || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER)) {
-                messages.add(format("ERROR: Could not add system players to game {0}.",
+                messages.add(I18nService.marktrf("ERROR: Could not add system players to game {0}.",
                         stagedGame.getFormattedId()));
                 return false;
             }

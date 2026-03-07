@@ -130,7 +130,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
             ServletResponse response) {
 
-        messages.add("Username not found or password incorrect.");
+        messages.add(I18n.marktr("Username not found or password incorrect."));
 
         if (request instanceof HttpServletRequest httpRequest
                 && response instanceof HttpServletResponse httpResponse) {

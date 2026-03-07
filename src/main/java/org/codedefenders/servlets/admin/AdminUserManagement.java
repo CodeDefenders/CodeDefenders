@@ -35,6 +35,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.RoleService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -46,6 +47,7 @@ import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
@@ -130,10 +132,10 @@ public class AdminUserManagement extends HttpServlet {
                 if (userId.isPresent()) {
                     final boolean success = setUserInactive(userId.get());
                     if (success) {
-                        messages.add("Successfully set user with id " + userId.get() + " as inactive.");
+                        messages.add(I18nService.marktrf("Successfully set user with id {0} as inactive.", userId.get()));
                     } else {
                         logger.warn("Setting user as inactive failed.");
-                        messages.add("Failed to set user as inactive.");
+                        messages.add(I18n.marktr("Failed to set user as inactive."));
                     }
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");

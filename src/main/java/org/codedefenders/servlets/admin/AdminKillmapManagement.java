@@ -54,6 +54,7 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -128,7 +129,7 @@ public class AdminKillmapManagement extends HttpServlet {
 
         KillmapPage page = setPage(request);
         if (page == null || page == KillmapPage.NONE) {
-            messages.add("Invalid request. Invalid URL.");
+            messages.add(I18n.marktr("Invalid request. Invalid URL."));
             response.sendRedirect(url.forPath(Paths.ADMIN_KILLMAPS));
             return;
         }
@@ -136,7 +137,7 @@ public class AdminKillmapManagement extends HttpServlet {
         /* Handle parameter "formType" */
         String formType = request.getParameter("formType");
         if (formType == null) {
-            messages.add("Invalid request. Missing form type.");
+            messages.add(I18n.marktr("Invalid request. Missing form type."));
             request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
             return;
         }
@@ -147,7 +148,7 @@ public class AdminKillmapManagement extends HttpServlet {
                 /* Handle parameter "enable" */
                 String enableString = request.getParameter("enable");
                 if (enableString == null) {
-                    messages.add("Invalid request. Missing parameter \"enable\".");
+                    messages.add(I18n.marktr("Invalid request. Missing parameter \"enable\"."));
                     break;
                 }
                 if (enableString.equals("true")) {
@@ -155,7 +156,7 @@ public class AdminKillmapManagement extends HttpServlet {
                 } else if (enableString.equals("false")) {
                     toggleProcessing(false);
                 } else {
-                    messages.add("Invalid request. Invalid parameter \"enable\".");
+                    messages.add(I18n.marktr("Invalid request. Invalid parameter \"enable\"."));
                 }
                 break;
 
@@ -166,13 +167,13 @@ public class AdminKillmapManagement extends HttpServlet {
                 String killmapTypeString = request.getParameter("killmapType");
                 KillMapType killmapType;
                 if (killmapTypeString == null) {
-                    messages.add("Invalid request. Missing job type.");
+                    messages.add(I18n.marktr("Invalid request. Missing job type."));
                     break;
                 }
                 try {
                     killmapType = KillMapType.valueOf(killmapTypeString.toUpperCase());
                 } catch (IllegalArgumentException e) {
-                    messages.add("Invalid request. Invalid job type.");
+                    messages.add(I18n.marktr("Invalid request. Invalid job type."));
                     break;
                 }
 
@@ -180,7 +181,7 @@ public class AdminKillmapManagement extends HttpServlet {
                 String idsString = request.getParameter("ids");
                 List<Integer> ids;
                 if (idsString == null) {
-                    messages.add("Invalid request. Missing IDs.");
+                    messages.add(I18n.marktr("Invalid request. Missing IDs."));
                     break;
                 }
                 try {
@@ -193,7 +194,7 @@ public class AdminKillmapManagement extends HttpServlet {
                     ids = gson.fromJson(idsString, new TypeToken<List<Integer>>() {
                     }.getType());
                 } catch (JsonSyntaxException e) {
-                    messages.add("Invalid request. Invalid IDs.");
+                    messages.add(I18n.marktr("Invalid request. Invalid IDs."));
                     break;
                 }
 

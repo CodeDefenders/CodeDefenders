@@ -38,11 +38,13 @@ import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.service.ClassroomService;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
 @WebServlet(Paths.CLASSROOM)
 public class ClassroomServlet extends HttpServlet {
@@ -70,7 +72,7 @@ public class ClassroomServlet extends HttpServlet {
             throws ServletException, IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (classroom.isEmpty()) {
-            messages.add("Classroom not found.");
+            messages.add(I18n.marktr("Classroom not found."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -99,14 +101,14 @@ public class ClassroomServlet extends HttpServlet {
             throws ServletException, IOException {
         Optional<String> action = ServletUtils.getStringParameter(request, "action");
         if (action.isEmpty()) {
-            messages.add("Missing required parameter: action.");
+            messages.add(I18n.marktr("Missing required parameter: action."));
             Redirect.redirectBack(request, response);
             return;
         }
 
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!action.get().equals("create-classroom") && classroom.isEmpty()) {
-            messages.add("Classroom not found.");
+            messages.add(I18n.marktr("Classroom not found."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -162,17 +164,17 @@ public class ClassroomServlet extends HttpServlet {
                     setArchived(request, response, classroom.get(), member.orElse(null), false);
                     break;
                 default:
-                    messages.add("Invalid action: " + action);
+                    messages.add(I18nService.marktrf("Invalid action: {0}", action));
                     Redirect.redirectBack(request, response);
             }
         } catch (ValidationException e) {
-            messages.add("Validation failed: " + e.getMessage());
+            messages.add(I18nService.marktrf("Validation failed: {0}", e.getMessage()));
             Redirect.redirectBack(request, response);
         } catch (PermissionDeniedException e) {
-            messages.add("You're not allowed to do that.");
+            messages.add(I18n.marktr("You're not allowed to do that."));
             Redirect.redirectBack(request, response);
         } catch (NoSuchElementException e) {
-            messages.add("Missing or invalid parameter.");
+            messages.add(I18n.marktr("Missing or invalid parameter."));
             Redirect.redirectBack(request, response);
         }
     }
@@ -210,7 +212,10 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.setOpen(classroom.getId(), open);
 
-        messages.add("Successfully set classroom to " + (open ? "open" : "closed") + ".");
+        messages.add(open
+                ? I18n.marktr("Successfully set classroom to open.")
+                : I18n.marktr("Successfully set classroom to closed.")
+        );
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -219,7 +224,10 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.setVisible(classroom.getId(), visible);
 
-        messages.add("Successfully set classroom to " + (visible ? "public" : "private") + ".");
+        messages.add(visible
+                ? I18n.marktr("Successfully set classroom to public.")
+                : I18n.marktr("Successfully set classroom to private.")
+        );
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -228,7 +236,10 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.setArchived(classroom.getId(), archived);
 
-        messages.add("Successfully " + (archived ? "archived" : "restored") + " classroom.");
+        messages.add(archived
+                ? I18n.marktr("Successfully archived classroom.")
+                : I18n.marktr("Successfully restored classroom.")
+        );
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -239,7 +250,7 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.changeName(classroom.getId(), name);
 
-        messages.add("Successfully changed the name to: " + name);
+        messages.add(I18nService.marktrf("Successfully changed the name to: {0}", name));
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -250,7 +261,7 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.setPassword(classroom.getId(), password);
 
-        messages.add("Successfully set the password.");
+        messages.add(I18n.marktr("Successfully set the password."));
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -259,7 +270,7 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.removePassword(classroom.getId());
 
-        messages.add("Successfully removed the password.");
+        messages.add(I18n.marktr("Successfully removed the password."));
         redirectToClassroomPage(response, classroom.getUUID());
     }
 

@@ -19,7 +19,6 @@
 package org.codedefenders.beans.game;
 
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +34,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.xnap.commons.i18n.I18n;
@@ -125,7 +125,7 @@ public class HistoryBean {
                 break;
             case PLAYER_TEST_READY:
             case DEFENDER_TEST_ERROR:
-                userMessage = MessageFormat.format(I18n.marktr("Test by {0} is ready"), userMessage);
+                userMessage = I18nService.marktrf("Test by {0} is ready", userMessage);
                 colour = "green";
                 break;
             case PLAYER_MUTANT_ERROR:
