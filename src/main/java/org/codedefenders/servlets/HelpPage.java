@@ -28,7 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.util.I18nUtils;
+import org.codedefenders.service.I18nService;
 import org.xnap.commons.i18n.I18n;
 
 @WebServlet("/help")
@@ -39,7 +39,7 @@ public class HelpPage extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        I18n i18n = I18nUtils.getI18n(req.getLocale());
+        I18n i18n = I18nService.getI18n(req.getLocale());
         pageInfo.setPageTitle(i18n.tr("Help"));
         req.getRequestDispatcher("/jsp/help.jsp").forward(req, resp);
     }
