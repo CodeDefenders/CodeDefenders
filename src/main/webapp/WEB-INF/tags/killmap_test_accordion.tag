@@ -24,7 +24,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="killMapAccordion" type="org.codedefenders.beans.game.KillMapAccordionBean"--%>
 
-<link href="${url.forPath(\"/css/specific/killmap_test_accordion.css\")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/killmap_test_accordion.css")}" rel="stylesheet">
 
 <div id="mutants-div">
 
@@ -67,7 +67,7 @@
         <c:forEach items="${killMapAccordion.categoriesForTests}" var="category">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="kta-heading-${category.id}">
-                    <button class="${category.testIds.size() == 0 ? \"\" : 'kta-covered'} accordion-button collapsed"
+                    <button class="${category.testIds.size() == 0 ? '' : 'kta-covered'} accordion-button collapsed"
                             type="button" data-bs-toggle="collapse"
                             data-bs-target="#kta-collapse-${category.id}"
                             aria-controls="kta-collapse-${category.id}">

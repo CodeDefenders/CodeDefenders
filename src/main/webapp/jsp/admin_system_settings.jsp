@@ -86,7 +86,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <div class="col-8">
-                                            <input type="${settingId.contains(\"PASSWORD\") ? 'password' : 'text'}"
+                                            <input type="${settingId.contains('PASSWORD') ? 'password' : 'text'}"
                                                    class="form-control"
                                                    name="${settingId}"
                                                    id="${settingId}"

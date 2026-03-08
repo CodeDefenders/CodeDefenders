@@ -42,7 +42,7 @@
                     <span>${i18n.tr(event.date)}</span>
                 </time>
 
-                <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i>
+                <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i></div>
                 <div class="timeline-label bg-${event.colour}">
                     <span class="h5 timeline-title">${i18n.tr(event.userMessage)}</span>
                         <%--

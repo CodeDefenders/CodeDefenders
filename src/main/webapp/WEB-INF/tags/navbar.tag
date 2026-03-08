@@ -110,7 +110,7 @@
 
                     <ul class="navbar-nav me-auto">
                     </ul>
-                    <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
+                    <c:if test="${!pageContext.request.requestURI.contains('login')}">
                         <ul class="navbar-nav ms-auto gap-4">
                             <c:set var="supportedLocales" value="${i18nService.supportedLocales}"/>
                             <c:if test="${fn:length(supportedLocales) > 1}">
