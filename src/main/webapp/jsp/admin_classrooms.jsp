@@ -75,6 +75,7 @@
 
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
@@ -179,7 +180,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: "${i18n.tr('There aren\'t any classrooms... yet.')}"}
+                language: DataTablesUtils.language({emptyTable: "${i18n.tr('There aren\'t any classrooms... yet.')}"})
             });
             LoadingAnimation.hideAnimation(classroomsTable.table().container());
 

@@ -17,6 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import DataTable from '../thirdparty/datatables';
+import {DataTablesUtils} from '../main';
 import {Popover} from '../thirdparty/bootstrap';
 import {InfoApi, LoadingAnimation, Modal} from '../main';
 
@@ -169,11 +170,11 @@ class TestAccordion {
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {
+                language: DataTablesUtils.language({
                     emptyTable: category.id === 'all'
                         ? i18n.tr('No tests.')
                         : i18n.tr('No tests cover this method.')
-                },
+                }),
                 createdRow: function (row, data, index) {
                     self._setupPopover(
                             row.querySelector('.ta-covered-link'),

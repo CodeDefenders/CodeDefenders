@@ -135,7 +135,7 @@
                 "scrollY": '600px',
                 "scrollCollapse": true,
                 "paging": false,
-                "language": {"info": "${i18n.tr('Showing _TOTAL_ entries')}"}
+                "language": DataTablesUtils.language({"info": "${i18n.tr('Showing _TOTAL_ entries')}"})
             });
         });
     </script>

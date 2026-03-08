@@ -619,6 +619,7 @@
 
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {Tooltip, Modal} from '${url.forPath("/js/bootstrap.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
@@ -875,10 +876,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: '${i18n.tr('This classroom has no members... yet.')}',
                         zeroRecords: '${i18n.tr('No members found.')}'
-                    }
+                    })
                 });
                 LoadingAnimation.hideAnimation(membersTable.table().container());
 
@@ -1100,10 +1101,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: '${i18n.tr('This classroom has no games... yet.')}',
                         zeroRecords: '${i18n.tr('No games found.')}'
-                    }
+                    })
                 });
                 LoadingAnimation.hideAnimation(gamesTable.table().container());
 

@@ -265,6 +265,7 @@
 
     <script type="module">
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
@@ -274,7 +275,7 @@
                 order: [[0, 'desc']],
                 scrollY: '600px',
                 scrollCollapse: true,
-                language: {info: `${i18n.tr('Showing _TOTAL_ entries')}`}
+                language: DataTablesUtils.language({info: `${i18n.tr('Showing _TOTAL_ entries')}`})
             });
         });
     </script>

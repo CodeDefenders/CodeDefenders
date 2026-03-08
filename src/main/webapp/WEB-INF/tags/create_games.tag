@@ -559,6 +559,7 @@
 <script type="module">
     import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
     import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
     import {parseHTML} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
@@ -1310,10 +1311,10 @@
         scrollCollapse: true,
         paging: false,
         dom: 't',
-        language: {
+        language: DataTablesUtils.language({
             emptyTable: '${i18n.tr("There are currently no staged games.")}',
             zeroRecords: '${i18n.tr("No matching staged games found.")}'
-        }
+        })
     });
 
     /* Search bar. */
@@ -1540,10 +1541,10 @@
         scrollCollapse: true,
         paging: false,
         dom: 't',
-        language: {
+        language: DataTablesUtils.language({
             emptyTable: '${i18n.tr("No users found.")}',
             zeroRecords: '${i18n.tr("No matching users found.")}'
-        }
+        })
     });
 
     /* Search bar. */

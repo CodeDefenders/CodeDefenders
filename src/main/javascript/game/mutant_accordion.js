@@ -17,6 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import DataTable from '../thirdparty/datatables';
+import {DataTablesUtils} from '../main';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 
 
@@ -191,12 +192,12 @@ class MutantAccordion {
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {
+                language: DataTablesUtils.language({
                     emptyTable: category.id === 'all'
                         ? i18n.tr('No mutants.')
                         : i18n.tr('No mutants in this method.'),
                     zeroRecords: i18n.tr('No mutants match the selected category.')
-                },
+                }),
                 createdRow: function (row, data, index) {
                     /* Assign function to the "View" buttons. */
                     let element = row.querySelector('.ma-view-button');

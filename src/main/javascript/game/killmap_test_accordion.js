@@ -18,6 +18,7 @@
  */
 import {Collapse} from '../thirdparty/bootstrap';
 import DataTable from '../thirdparty/datatables';
+import {DataTablesUtils} from '../main';
 import {LoadingAnimation} from '../main';
 import KillMapAccordion from "./killmap_accordion";
 
@@ -86,12 +87,12 @@ class KillMapTestAccordion extends KillMapAccordion {
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: category.id === 'all'
                             ? i18n.tr('No mutants.')
                             : i18n.tr("This test doesn't cover any mutants."),
                         zeroRecords: i18n.tr('No mutants match the selected category and filter.')
-                    },
+                    }),
                     createdRow: function (row, data, index) {
                         self._setupPopover(
                             row.querySelector('.killMapImage'),

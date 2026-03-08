@@ -578,7 +578,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: emptyClassTableMessage}
+                language: DataTablesUtils.language({emptyTable: emptyClassTableMessage})
             });
 
             const gameTable = new DataTable(document.getElementById('table-games'), {
@@ -630,7 +630,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: emptyGameTableMessage}
+                language: DataTablesUtils.language({emptyTable: emptyGameTableMessage})
             });
 
             const classroomTable = new DataTable(document.getElementById('table-classrooms'), {
@@ -679,7 +679,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: emptyClassroomTableMessage}
+                language: DataTablesUtils.language({emptyTable: emptyClassroomTableMessage})
             });
 
             document.getElementById('toggle-progress-classes').addEventListener('change', event => {

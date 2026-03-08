@@ -62,14 +62,15 @@
 
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
-
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             new DataTable('#tableMPLeaderboard', {
                 "order": [[6, "desc"]],
                 "columnDefs": [
                     {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
                 ],
-                "pageLength": 50
+                "pageLength": 50,
+                language: DataTablesUtils.language()
             });
         </script>
     </div>

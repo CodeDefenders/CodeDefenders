@@ -179,6 +179,42 @@ class DataTablesUtils {
             });
         };
     }
+
+    /**
+     * Returns the default language settings for DataTables with the given overrides applied.
+     *
+     * @param overrides An object containing language settings that should override the default values.
+     * @return {{decimal: string, emptyTable, info, infoEmpty, infoFiltered, infoPostFix: string, thousands, lengthMenu,
+     * loadingRecords, processing: string, search, zeroRecords, paginate: {first, last, next, previous},
+     * aria: {orderable, orderableReverse}}}
+     */
+    static language(overrides = {}) {
+        const defaultLanguages = {
+            "decimal":        "", // changes read format, not output
+            "emptyTable":     i18n.tr("No data available in table"),
+            "info":           i18n.tr("Showing _START_ to _END_ of _TOTAL_ entries"),
+            "infoEmpty":      i18n.tr("Showing 0 to 0 of 0 entries"),
+            "infoFiltered":   i18n.tr("(filtered from _MAX_ total entries)"),
+            "infoPostFix":    "",
+            "thousands":      i18n.tr(","),
+            "lengthMenu":     i18n.tr("Show _MENU_ entries"),
+            "loadingRecords": i18n.tr("Loading..."),
+            "processing":     "", // replaced by CSS animation in v1.12
+            "search":         i18n.tr("Search:"),
+            "zeroRecords":    i18n.tr("No matching records found"),
+            "paginate": {
+                "first":      i18n.tr("First"),
+                "last":       i18n.tr("Last"),
+                "next":       i18n.tr("Next"),
+                "previous":   i18n.tr("Previous")
+            },
+            "aria": {
+                "orderable":  i18n.tr("Order by this column"),
+                "orderableReverse": i18n.tr("Reverse order this column")
+            }
+        }
+        return Object.assign(defaultLanguages, overrides);
+    }
 }
 
 

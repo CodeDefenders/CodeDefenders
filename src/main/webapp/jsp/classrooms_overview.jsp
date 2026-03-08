@@ -98,6 +98,7 @@
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
             const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
@@ -199,10 +200,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: '${i18n.tr('You\'re not part of any classrooms.')}',
                         zeroRecords: '${i18n.tr('No classrooms found.')}'
-                    }
+                    })
                 });
 
                 LoadingAnimation.hideAnimation(userTable.table().container());
@@ -263,10 +264,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: '${i18n.tr('There are currently no public classrooms.')}',
                         zeroRecords: '${i18n.tr('No Classrooms found.')}'
-                    }
+                    })
                 });
 
                 LoadingAnimation.hideAnimation(publicTable.table().container());
