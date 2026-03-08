@@ -281,8 +281,7 @@ public abstract class CreateGamesBean implements Serializable {
             return true;
         } else {
             messages.add(I18nService.marktrf(
-                    "ERROR: Cannot remove user {0} from staged game {1}. "
-                    + "User is not assigned to the staged game.",
+                    "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game.",
                     userId, stagedGame.getFormattedId()));
             return false;
         }
@@ -350,8 +349,7 @@ public abstract class CreateGamesBean implements Serializable {
                                                 int userId, Role role) {
         if (!stagedGameFrom.removePlayer(userId)) {
             messages.add(I18nService.marktrf(
-                    "ERROR: Cannot move user {0} from staged game {1}. "
-                    + "User is not assigned to the staged game.",
+                    "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game.",
                     userId, stagedGameFrom.getFormattedId())
             );
             return false;

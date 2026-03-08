@@ -485,8 +485,7 @@
                                                     <td>
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
                                                                 onclick="return confirm('${i18n.tr('Are you sure you want to permanently remove this player?')}\n' +
-                                                                        '${i18n.tr('This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                        'and might create inconsistencies in the Game.')}');"
+                                                                        '${i18n.tr('This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game.')}');"
                                                                 id="<%="remove_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserRemoveButton">
                                                             ${i18n.tr('Remove')}

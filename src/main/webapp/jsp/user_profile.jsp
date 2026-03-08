@@ -228,7 +228,7 @@
                                                 </svg>
                                                 <span class="puzzle-attempt-counter"
                                                       data-bs-toggle="tooltip"
-                                                      title="${i18n.tr('Puzzle solved in {0} {1}.', puzzle.rounds, i18n.trn("attempt", "attempts", puzzle.rounds))}"
+                                                      title="${i18n.trn('Puzzle solved in {0} attempt.', 'Puzzle solved in {0} attempts.', puzzle.rounds, puzzle.rounds)}"
                                                 >${puzzle.rounds}</span>
                                             </div>
                                             <div class="chapter__level__title">
@@ -248,7 +248,7 @@
                                             </svg>
                                         </div>
                                         <div class="chapter__level__title">
-                                            <h3>${i18n.tr('{0} {1} unsolved', unsolvedPuzzles, i18n.trn("puzzle", "puzzles", unsolvedPuzzles))}</h3>
+                                            <h3>${i18n.trn("{0} puzzle unsolved", "{0} puzzles unsolved", unsolvedPuzzles, unsolvedPuzzles)}</h3>
                                         </div>
                                     </div>
                                 </c:if>

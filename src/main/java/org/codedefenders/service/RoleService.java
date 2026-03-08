@@ -193,8 +193,7 @@ public class RoleService {
         boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
 
         if (missingUser) {
-            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the \
-                    accounts and restart the application."));
+            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."));
         }
 
         logger.warn(messages.toString());
