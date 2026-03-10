@@ -24,7 +24,6 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%@ attribute name="htmlId" required="true" %>
 <%@ attribute name="strategy" required="false" type="org.codedefenders.model.llm.LlmStrategy" %>
@@ -55,29 +54,18 @@
             Add custom prompt
         </button>
         <div id="${htmlId}-content-pane">
-                <%--            <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">--%>
-                <%--                <c:set var="prompt" value="${strategy.getPrompt(prompt_type)}"/>--%>
-                <%--                <div class="border rounded bg-light mt-2 mb-2 p-2">--%>
-                <%--                    <label class="form-label" for="${htmlId}-select">Prompt type:</label>--%>
-                <%--                    <select class="form-select" id="${htmlId}-select">--%>
-                <%--                        <c:forEach items="${strategy.base.relevantPrompts}" var="possible_prompt_type">--%>
-                <%--                            <option value="${possible_prompt_type.name()}"--%>
-                <%--                                ${possible_prompt_type == prompt_type ? "selected=\"selected\"" : ""}>--%>
-                <%--                                    ${possible_prompt_type.displayName()}--%>
-                <%--                            </option>--%>
-                <%--                        </c:forEach>--%>
-                <%--                    </select>--%>
-                <%--                    <label class="form-label" for="${htmlId}-area">Prompt content:</label>--%>
-                <%--                    <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}--%>
-                <%--                    </textarea>--%>
-
-                <%--                </div>--%>
-                <%--            </c:forEach>--%>
+            <!--Populated by JS with clones of the template-->
         </div>
     </jsp:attribute>
         <jsp:attribute name="footer">
+            <c:if test="${!strategy.readOnly}">
+                <button id="${htmlId}-remove-strat-btn" class="btn btn-danger" type="button">
+                    Delete this strategy
+                </button>
+                <div class="flex-fill"></div>
+            </c:if>
             <button class="btn btn-primary" type="submit">
-                Create custom strategy
+                Save custom strategy
             </button>
         </jsp:attribute>
 
@@ -90,7 +78,7 @@
     <div class="border rounded bg-light mt-2 mb-2 p-2">
         <div class="pb-2 d-flex justify-content-between align-items-center">
             <label class="form-label" for="${htmlId}-select">Prompt type:</label>
-            <button id="${htmlId}-remove-btn" class="btn btn-danger">
+            <button id="${htmlId}-remove-prompt-btn" class="btn btn-danger">
                 <i class="fa fa-trash"></i>
             </button>
         </div>
@@ -140,8 +128,6 @@
         if (prompt_type != null && prompt != null) {
             clone.querySelectorAll("option").forEach(o => {
                 if (o.value === prompt_type) {
-                    console.log("Found match: " + o.value);
-                    console.log(o);
                     o.selected = true;
                 }
             })
@@ -160,11 +146,28 @@
         document.getElementById("${htmlId}-content-pane").appendChild(clone);
     }
 
-    //This feel illegal, but there's nothing really wrong about it?
     <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
         addPromptElement("${prompt_type.name()}", "${strategy.getHtmlPrompt(prompt_type)}")
     </c:forEach>
 
     addPromptButton.addEventListener("click", _ => addPromptElement(null, null))
+
+    if (!${strategy.readOnly}) {
+        console.log("Adding event listener for delete button on ${strategy.name}")
+        const deleteStratButton = document.getElementById("${htmlId}-remove-strat-btn");
+        deleteStratButton.addEventListener("click", async _ => {
+            const params = new URLSearchParams();
+            params.append("formType", "deleteCustomStrat");
+            params.append("stratName", "${strategy.name}")
+            await fetch("${url.forPath("/api/llm")}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: params.toString()
+            });
+            location.reload();
+        })
+    }
 
 </script>

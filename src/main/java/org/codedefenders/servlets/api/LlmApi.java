@@ -274,6 +274,12 @@ public class LlmApi extends HttpServlet {
                 //llmRepo.updatePrompts(model);TODO FÜR STRATS STATT PROMPTS
                 resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
             }
+            case "deleteCustomStrat" -> {
+                Optional<String> stratName = ServletUtils.getStringParameter(req, "stratName");
+                stratName.ifPresent(llmRepo::deleteCustomStrategy);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+            }
             default -> logger.error("Unknown formType: {}", action);
         }
 

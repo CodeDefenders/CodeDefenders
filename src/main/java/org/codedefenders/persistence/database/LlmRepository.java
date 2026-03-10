@@ -323,4 +323,19 @@ public class LlmRepository {
         }
 
     }
+
+    public void deleteCustomStrategy(String strategyName) {
+        @Language("SQL")
+        String promptSql = """
+                DELETE FROM llm_custom_prompts WHERE Strategy_ID IN (
+                    SELECT Strategy_ID FROM llm_custom_strategies
+                        WHERE Strategy_Name = ?
+                )
+                """;
+        queryRunner.execute(promptSql, strategyName);
+
+        @Language("SQL")
+        String stratSql = "DELETE FROM llm_custom_strategies WHERE Strategy_Name = ?";
+        queryRunner.execute(stratSql, strategyName);
+    }
 }
