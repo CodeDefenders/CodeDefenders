@@ -45,17 +45,19 @@
 
     <t:modal title="Edit strategy" id="${htmlId}">
     <jsp:attribute name="content">
-        <label for="${htmlId}-new-custom-name">Strategy name</label>
-        <input id="${htmlId}-new-custom-name" type="text" name="newCustomName" value="${strategy.name}">
-        <button id="${htmlId}-add-prompt" type="button">
+        <div class="d-flex flex-row border-bottom border-2 border-secondary p-2 mb-2">
+            <label class="form-label flex-fill" for="${htmlId}-new-custom-name">Strategy name:</label>
+            <input class="form-control" id="${htmlId}-new-custom-name" type="text" name="newCustomName" value="${strategy.name}">
+        </div>
+        <button class="btn btn-primary" id="${htmlId}-add-prompt" type="button">
             Add custom prompt
         </button>
         <div id="${htmlId}-content-pane">
             <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
                 <c:set var="prompt" value="${strategy.getPrompt(prompt_type)}"/>
-                <div><!-- TODO style -->
-                    <label for="${htmlId}-select">Prompt type:</label>
-                    <select id="${htmlId}-select">
+                <div class="border rounded bg-light mt-2 mb-2 p-2">
+                    <label class="form-label" for="${htmlId}-select">Prompt type:</label>
+                    <select class="form-select" id="${htmlId}-select">
                         <c:forEach items="${strategy.base.relevantPrompts}" var="possible_prompt_type">
                             <option value="${possible_prompt_type.name()}"
                                 ${possible_prompt_type == prompt_type ? "selected=\"selected\"" : ""}>
@@ -63,8 +65,8 @@
                             </option>
                         </c:forEach>
                     </select>
-                    <label for="${htmlId}-area">Prompt content:</label>
-                    <textarea id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}
+                    <label class="form-label" for="${htmlId}-area">Prompt content:</label>
+                    <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}
                     </textarea>
 
                 </div>
@@ -72,7 +74,7 @@
         </div>
     </jsp:attribute>
         <jsp:attribute name="footer">
-            <button type="submit">
+            <button class="btn btn-primary" type="submit">
                 Create custom strategy
             </button>
         </jsp:attribute>
@@ -82,17 +84,17 @@
 </form>
 
 <div id="${htmlId}-template" style="display: none">
-    <div><!-- TODO style -->
-        <label for="${htmlId}-select">Prompt type:</label>
-        <select id="${htmlId}-select">
+    <div class="border rounded bg-light mt-2 mb-2 p-2">
+        <label class="form-label" for="${htmlId}-select">Prompt type:</label>
+        <select class="form-select" id="${htmlId}-select">
             <c:forEach items="${strategy.base.relevantPrompts}" var="prompt_type">
                 <option value="${prompt_type.name()}">
                         ${prompt_type.displayName()}
                 </option>
             </c:forEach>
         </select>
-        <label for="${htmlId}-area">Prompt content:</label>
-        <textarea id="${htmlId}-area" form="${htmlId}-form"></textarea>
+        <label class="form-label" for="${htmlId}-area">Prompt content:</label>
+        <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form"></textarea>
 
     </div>
 </div>
