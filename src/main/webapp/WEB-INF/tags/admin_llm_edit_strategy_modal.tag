@@ -38,7 +38,7 @@
     //pageContext.setAttribute("namesToContent", namesToContent);
 %>
 
-<form id="${htmlId}-form" action="${url.forPath("/api/llm")}" method="post">
+<form id="${htmlId}-form" action="${url.forPath("/api/llm")}" method="post" >
     <input type="hidden" name="formType" value="updatePrompts">
     <input type="hidden" name="baseStrategy" value="${strategy.base.name()}">
     <input type="hidden" name="oldCustomName" value="${strategy.name}">
@@ -147,7 +147,7 @@
     }
 
     <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
-        addPromptElement("${prompt_type.name()}", "${strategy.getHtmlPrompt(prompt_type)}")
+    addPromptElement("${prompt_type.name()}", "${strategy.getHtmlPrompt(prompt_type)}")
     </c:forEach>
 
     addPromptButton.addEventListener("click", _ => addPromptElement(null, null))
@@ -169,5 +169,21 @@
             location.reload();
         })
     }
+
+    const form = document.getElementById("${htmlId}-form");
+    form.addEventListener("submit", (event) => {
+        const selects = contentPane.querySelectorAll("select");
+        const names = [];
+        for (let i = 0; i < selects.length; i++) {
+            const v = selects[i].value;
+            if (names.includes(v)) {
+                alert("You defined the same prompt twice.")
+                event.preventDefault();
+                break;
+            }
+            names.push(selects[i].value);
+        }
+    })
+
 
 </script>
