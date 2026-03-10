@@ -26,8 +26,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%@ attribute name="htmlId" required="true" %>
-<%@ attribute name="baseStrategy" required="true" type="org.codedefenders.model.llm.LlmDefaultStrategy" %>
-<%@ attribute name="oldCustomName" required="false" %>
+<%@ attribute name="strategy" required="false" type="org.codedefenders.model.llm.LlmStrategy" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -41,20 +40,35 @@
 
 <form id="${htmlId}-form" action="${url.forPath("/api/llm")}" method="post">
     <input type="hidden" name="formType" value="updatePrompts">
-    <input type="hidden" name="baseStrategy" value="${baseStrategy.name()}">
-    <c:if test="${oldCustomName}">
-        <input type="hidden" name="oldCustomName" value="${oldCustomName}">
-    </c:if>
+    <input type="hidden" name="baseStrategy" value="${strategy.base.name()}">
+    <input type="hidden" name="oldCustomName" value="${strategy.name}">
 
     <t:modal title="Edit strategy" id="${htmlId}">
     <jsp:attribute name="content">
-        <label for="${htmlId}-new-custom-name"></label>
-        <input id="${htmlId}-new-custom-name" type="text" name="newCustomName">
+        <label for="${htmlId}-new-custom-name">Strategy name</label>
+        <input id="${htmlId}-new-custom-name" type="text" name="newCustomName" value="${strategy.name}">
         <button id="${htmlId}-add-prompt" type="button">
             Add custom prompt
         </button>
         <div id="${htmlId}-content-pane">
+            <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
+                <c:set var="prompt" value="${strategy.getPrompt(prompt_type)}"/>
+                <div><!-- TODO style -->
+                    <label for="${htmlId}-select">Prompt type:</label>
+                    <select id="${htmlId}-select">
+                        <c:forEach items="${strategy.base.relevantPrompts}" var="possible_prompt_type">
+                            <option value="${possible_prompt_type.name()}"
+                                ${possible_prompt_type == prompt_type ? "selected=\"selected\"" : ""}>
+                                    ${possible_prompt_type.displayName()}
+                            </option>
+                        </c:forEach>
+                    </select>
+                    <label for="${htmlId}-area">Prompt content:</label>
+                    <textarea id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}
+                    </textarea>
 
+                </div>
+            </c:forEach>
         </div>
     </jsp:attribute>
         <jsp:attribute name="footer">
@@ -71,9 +85,9 @@
     <div><!-- TODO style -->
         <label for="${htmlId}-select">Prompt type:</label>
         <select id="${htmlId}-select">
-            <c:forEach items="${baseStrategy.relevantPrompts}" var="prompt">
-                <option value="${prompt.name()}">
-                        ${prompt.displayName()}
+            <c:forEach items="${strategy.base.relevantPrompts}" var="prompt_type">
+                <option value="${prompt_type.name()}">
+                        ${prompt_type.displayName()}
                 </option>
             </c:forEach>
         </select>

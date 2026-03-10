@@ -38,25 +38,26 @@
             </tr>
             </thead>
             <c:forEach items="${strategies}" var="strat">
-                <tr>
-                    <td>${strat.name}</td>
-                    <td>${!strat.readOnly ? strat.base.name() : ""}</td>
-                    <td>
-                        <c:choose>
-                        <c:when test="${strat.readOnly}">
-                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
-                                Create custom variant
-                            </button>
-                        </c:when>
-                        <c:otherwise>
-                            <button class="btn btn-secondary">
+            <tr>
+                <td>${strat.name}</td>
+                <td>${!strat.readOnly ? strat.base.name() : ""}</td>
+                <td>
+                    <c:choose>
+                    <c:when test="${strat.readOnly}">
+                    <button class="btn btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#${htmlId}-${strat.name}-modal">
+                        Create custom variant
+                    </button>
+                    </c:when>
+                    <c:otherwise>
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
                                 Edit TODO
                             </button>
                         </c:otherwise>
                         </c:choose>
 
                 </tr>
-                <t:admin_llm_edit_strategy_modal htmlId="${htmlId}-${strat.name}-modal" baseStrategy="${strat.base}"/>
+                <t:admin_llm_edit_strategy_modal htmlId="${htmlId}-${strat.name}-modal" strategy="${strat}"/>
             </c:forEach>
         </table>
     </div>

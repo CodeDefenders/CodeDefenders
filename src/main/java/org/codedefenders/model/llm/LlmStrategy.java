@@ -28,7 +28,7 @@ public class LlmStrategy {
     /**
      * The time between LLM actions is reduced by this multiplier.
      */
-    final double timeModifier;
+    double timeModifier;
 
     private final String name;
 
@@ -58,6 +58,10 @@ public class LlmStrategy {
 
     public static LlmStrategy of(LlmDefaultStrategy base) {
         return new LlmStrategy(base.name(), base);
+    }
+
+    public void setTimeModifier(double timeModifier) {
+        this.timeModifier = timeModifier;
     }
 
     public double getTimeModifier() {

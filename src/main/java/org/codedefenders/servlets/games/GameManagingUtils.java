@@ -1332,17 +1332,16 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
         var defenderModelParam = ServletUtils.getStringParameter(request, "defenderModel");
-        Optional<LlmStrategy> defenderStrategy = ServletUtils.getEnumParameter(//TODO allow for custom strats
-                request, LlmDefaultStrategy.class, "defenderStrategy").map(LlmStrategy::of);
+        Optional<LlmStrategy> defenderStrategy = ServletUtils.getStringParameter(
+                request, "defenderStrategy").flatMap(llmRepo::getStrategyByName);
         if (defenderModelParam.isPresent() && defenderStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.DEFENDER,
                     getLLModelFromSingleValue(defenderModelParam.get()), defenderStrategy.get());
 
         }
         var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
-        Optional<LlmStrategy> attackerStrategy = ServletUtils.getEnumParameter(//TODO allow for custom strats
-                request, LlmDefaultStrategy.class, "attackerStrategy"
-        ).map(LlmStrategy::of);
+        Optional<LlmStrategy> attackerStrategy = ServletUtils.getStringParameter(
+                request, "attackerStrategy").flatMap(llmRepo::getStrategyByName);
         if (attackerModelParam.isPresent() && attackerStrategy.isPresent()) {
             llmService.setPlayerModel(game, Role.ATTACKER,
                     getLLModelFromSingleValue(attackerModelParam.get()), attackerStrategy.get());

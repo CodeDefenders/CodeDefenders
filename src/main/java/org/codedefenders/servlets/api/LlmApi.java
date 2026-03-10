@@ -264,27 +264,7 @@ public class LlmApi extends HttpServlet {
                     return;
                 }
 
-                LlmStrategy customStrategy;
-                if (oldCustomName.isPresent()) {
-                    var customStrategyOpt = llmRepo.getCustomStrategy(oldCustomName.get());
-                    if (customStrategyOpt.isPresent()) {
-                        customStrategy = customStrategyOpt.get();
-                    } else {
-                        logger.error("No strategy exists with name {}", oldCustomName);
-                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
-                        return;
-                    }
-                    if (customStrategy.getBase() != baseStrategy.get()) {
-                        logger.error("Base strategy {} in request, but strategy with name {} has baseStrategy {}",
-                                baseStrategy.get(), oldCustomName.get(), customStrategy.getBase());
-                        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
-                        return;
-                    }
-                } else {
-                    customStrategy = new LlmStrategy(newCustomName.get(), baseStrategy.get());
-                }
+                LlmStrategy customStrategy = new LlmStrategy(newCustomName.get(), baseStrategy.get());
                 customStrategy.setCustomPrompts(customPrompts);
                 llmRepo.saveCustomStrategy(customStrategy);
                 resp.setStatus(HttpServletResponse.SC_OK);

@@ -21,6 +21,8 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -121,8 +123,16 @@ public class LlmRepository {
         if (ArrayUtils.contains(LlmDefaultStrategy.values(), name)) {
             return Optional.of(LlmStrategy.of(LlmDefaultStrategy.valueOf(name)));
         } else {
-            //TODO Custom strategies!!
-            throw new RuntimeException("NOT IMPLEMENTED");
+            return getCustomStrategy(name);
+            /*@Language("SQL")
+            String sql = """
+                    SELECT Strategy_Name, Base_name, Time_modifier, Prompt_type, Prompt
+                    FROM llm_custom_strategies
+                    JOIN llm_custom_prompts
+                    ON llm_custom_strategies.Strategy_ID = llm_custom_prompts.Strategy_ID
+                    WHERE Strategy_Name = ?;
+                    """;
+            return queryRunner.query(sql, LlmRepository::strategyFromRs, name);*/
         }
     }
 
@@ -131,7 +141,40 @@ public class LlmRepository {
         for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
             result.add(LlmStrategy.of(s));
         }
-        //TODO Custom strategies!!
+        @Language("SQL")
+        String customSql = """
+                SELECT Strategy_Name, Base_name, Time_modifier, Prompt_type, Prompt
+                FROM llm_custom_strategies
+                LEFT JOIN llm_custom_prompts
+                ON llm_custom_strategies.Strategy_ID = llm_custom_prompts.Strategy_ID;
+
+                """;
+
+
+        Collection<LlmStrategy> customStrats = queryRunner.query(customSql,
+                rs -> {
+                    Map<String, LlmStrategy> strats = new HashMap<>();
+                    while (rs.next()) {
+                        String name = rs.getString("Strategy_Name");
+                        LlmDefaultStrategy base = LlmDefaultStrategy.valueOf(rs.getString("Base_name"));
+                        if (!strats.containsKey(name)) {
+                            LlmStrategy s = new LlmStrategy(name, base);
+                            s.setTimeModifier(rs.getDouble("Time_modifier"));
+                            strats.put(name, s);
+                        }
+                        LlmStrategy strat = strats.get(name);
+                        String typeName = rs.getString("Prompt_type");
+                        String prompt = rs.getString("Prompt");
+                        if (typeName != null && prompt != null) {
+                            LlmPromptType type = LlmPromptType.valueOf(rs.getString("Prompt_type"));
+                            strat.setPrompt(type, prompt);
+                        }
+                    }
+                    return strats.values();
+                }
+        );
+        result.addAll(customStrats);
+
         return result;
     }
 
@@ -247,8 +290,8 @@ public class LlmRepository {
 
         @Language("SQL")
         String getIdSql = """
-            SELECT Strategy_ID from llm_custom_strategies where Strategy_Name = ?;
-            """;
+                SELECT Strategy_ID from llm_custom_strategies where Strategy_Name = ?;
+                """;
         int newId = queryRunner.query(getIdSql,
                 ResultSetUtils.oneFromRS(rs -> rs.getInt("Strategy_ID")),
                 customStrategy.getName()).orElseThrow();
@@ -261,21 +304,23 @@ public class LlmRepository {
                 """;
         queryRunner.execute(deletePromptSql, newId);
 
-        @Language("SQL")
-        String insertNewPromptsSql = """
-                INSERT INTO llm_custom_prompts(Strategy_ID, Prompt_type, Prompt) values
-                """ + Stream.generate(() -> ("(?,?,?)"))
-                .limit(customStrategy.getCustomPrompts().size())
-                .collect(Collectors.joining(","));
+        if (!customStrategy.getCustomPrompts().isEmpty()) {
+            @Language("SQL")
+            String insertNewPromptsSql = """
+                        INSERT INTO llm_custom_prompts(Strategy_ID, Prompt_type, Prompt) values
+                    """ + Stream.generate(() -> ("(?,?,?)"))
+                    .limit(customStrategy.getCustomPrompts().size())
+                    .collect(Collectors.joining(","));
 
-        List<Object> params = new ArrayList<>();
-        for (Map.Entry<LlmPromptType, String> entry : customStrategy.getCustomPrompts().entrySet()) {
-            params.add(newId);
-            params.add(entry.getKey().name());
-            params.add(entry.getValue());
+            List<Object> params = new ArrayList<>();
+            for (Map.Entry<LlmPromptType, String> entry : customStrategy.getCustomPrompts().entrySet()) {
+                params.add(newId);
+                params.add(entry.getKey().name());
+                params.add(entry.getValue());
+            }
+
+            queryRunner.execute(insertNewPromptsSql, params.toArray());
         }
-
-        queryRunner.execute(insertNewPromptsSql, params.toArray());
 
     }
 }
