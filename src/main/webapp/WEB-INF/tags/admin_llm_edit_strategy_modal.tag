@@ -48,30 +48,31 @@
     <jsp:attribute name="content">
         <div class="d-flex flex-row border-bottom border-2 border-secondary p-2 mb-2">
             <label class="form-label flex-fill" for="${htmlId}-new-custom-name">Strategy name:</label>
-            <input class="form-control" id="${htmlId}-new-custom-name" type="text" name="newCustomName" value="${strategy.name}">
+            <input class="form-control" id="${htmlId}-new-custom-name" type="text" name="newCustomName"
+                   value="${strategy.name}">
         </div>
         <button class="btn btn-primary" id="${htmlId}-add-prompt" type="button">
             Add custom prompt
         </button>
         <div id="${htmlId}-content-pane">
-<%--            <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">--%>
-<%--                <c:set var="prompt" value="${strategy.getPrompt(prompt_type)}"/>--%>
-<%--                <div class="border rounded bg-light mt-2 mb-2 p-2">--%>
-<%--                    <label class="form-label" for="${htmlId}-select">Prompt type:</label>--%>
-<%--                    <select class="form-select" id="${htmlId}-select">--%>
-<%--                        <c:forEach items="${strategy.base.relevantPrompts}" var="possible_prompt_type">--%>
-<%--                            <option value="${possible_prompt_type.name()}"--%>
-<%--                                ${possible_prompt_type == prompt_type ? "selected=\"selected\"" : ""}>--%>
-<%--                                    ${possible_prompt_type.displayName()}--%>
-<%--                            </option>--%>
-<%--                        </c:forEach>--%>
-<%--                    </select>--%>
-<%--                    <label class="form-label" for="${htmlId}-area">Prompt content:</label>--%>
-<%--                    <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}--%>
-<%--                    </textarea>--%>
+                <%--            <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">--%>
+                <%--                <c:set var="prompt" value="${strategy.getPrompt(prompt_type)}"/>--%>
+                <%--                <div class="border rounded bg-light mt-2 mb-2 p-2">--%>
+                <%--                    <label class="form-label" for="${htmlId}-select">Prompt type:</label>--%>
+                <%--                    <select class="form-select" id="${htmlId}-select">--%>
+                <%--                        <c:forEach items="${strategy.base.relevantPrompts}" var="possible_prompt_type">--%>
+                <%--                            <option value="${possible_prompt_type.name()}"--%>
+                <%--                                ${possible_prompt_type == prompt_type ? "selected=\"selected\"" : ""}>--%>
+                <%--                                    ${possible_prompt_type.displayName()}--%>
+                <%--                            </option>--%>
+                <%--                        </c:forEach>--%>
+                <%--                    </select>--%>
+                <%--                    <label class="form-label" for="${htmlId}-area">Prompt content:</label>--%>
+                <%--                    <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form" name="${prompt_type}">${prompt}--%>
+                <%--                    </textarea>--%>
 
-<%--                </div>--%>
-<%--            </c:forEach>--%>
+                <%--                </div>--%>
+                <%--            </c:forEach>--%>
         </div>
     </jsp:attribute>
         <jsp:attribute name="footer">
@@ -87,7 +88,12 @@
 <!-- This is the template to be cloned -->
 <div id="${htmlId}-template" style="display: none">
     <div class="border rounded bg-light mt-2 mb-2 p-2">
-        <label class="form-label" for="${htmlId}-select">Prompt type:</label>
+        <div class="pb-2 d-flex justify-content-between align-items-center">
+            <label class="form-label" for="${htmlId}-select">Prompt type:</label>
+            <button id="${htmlId}-remove-btn" class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
         <select class="form-select" id="${htmlId}-select">
             <c:forEach items="${strategy.base.relevantPrompts}" var="prompt_type">
                 <option value="${prompt_type.name()}">
@@ -95,8 +101,10 @@
                 </option>
             </c:forEach>
         </select>
-        <label class="form-label" for="${htmlId}-area">Prompt content:</label>
-        <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form"></textarea>
+        <div class="pt-2">
+            <label class="form-label" for="${htmlId}-area">Prompt content:</label>
+            <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form"></textarea>
+        </div>
 
     </div>
 </div>
@@ -117,11 +125,7 @@
          .replace("#", "\\#")%>"],
         <% } %>]);
 
-    //This feel illegal, but there's nothing really wrong about it?
-    <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
-        <c:set var="prompt" value="${strategy.getHtmlPrompt(prompt_type)}"/>
-    {
-        //console.log("${prompt_type}");
+    function addPromptElement(prompt_type, prompt) {
         counter++;
         const clone = document.getElementById("${htmlId}-template").firstElementChild.cloneNode(true);
         clone.querySelectorAll("[id]").forEach(el => {
@@ -133,19 +137,22 @@
         });
         const select = clone.querySelector("select");
         const textarea = clone.querySelector("textarea");
-        clone.querySelectorAll("option").forEach(o => {
-            if (o.value === "${prompt_type.name()}") {
-                console.log("Found match: " + o.value);
-                console.log(o);
-                o.selected = true;
-            }
-        })
-        textarea.textContent = "${prompt}"
-        textarea.name = "${prompt_type.name()}"
-        //textarea.textContent = namePromptMap.get(select
-          //      .value.replaceAll("\n", "<b>"));
+        if (prompt_type != null && prompt != null) {
+            clone.querySelectorAll("option").forEach(o => {
+                if (o.value === prompt_type) {
+                    console.log("Found match: " + o.value);
+                    console.log(o);
+                    o.selected = true;
+                }
+            })
+            textarea.textContent = prompt
+            textarea.name = prompt_type
+        }
 
-        select.addEventListener("change", e => {
+        const removeBtn = clone.querySelector("button");
+        removeBtn.addEventListener("click", _ => clone.remove())
+
+        select.addEventListener("change", _ => {
             textarea.name = select.value;
             textarea.textContent = namePromptMap.get(select
                     .value.replaceAll("\n", "<b>"));
@@ -153,28 +160,11 @@
         document.getElementById("${htmlId}-content-pane").appendChild(clone);
     }
 
+    //This feel illegal, but there's nothing really wrong about it?
+    <c:forEach items="${strategy.customPrompts.keySet()}" var="prompt_type">
+        addPromptElement("${prompt_type.name()}", "${strategy.getHtmlPrompt(prompt_type)}")
     </c:forEach>
 
-    addPromptButton.addEventListener("click", evt => {
-        counter++;
-        const clone = document.getElementById("${htmlId}-template").firstElementChild.cloneNode(true);
-        clone.querySelectorAll("[id]").forEach(el => {
-            el.id = el.id + "_" + counter;
-        });
-
-        clone.querySelectorAll("label[for]").forEach(label => {
-            label.htmlFor = label.htmlFor + "_" + counter;
-        });
-
-        clone.querySelector("select").addEventListener("change", e => {
-            const select = clone.querySelector("select");
-            const textarea = clone.querySelector("textarea")
-            textarea.name = select.value;
-
-            clone.querySelector("textarea").textContent = namePromptMap.get(select
-                    .value.replaceAll("\n", "<b>"));
-        });
-        document.getElementById("${htmlId}-content-pane").appendChild(clone);
-    })
+    addPromptButton.addEventListener("click", _ => addPromptElement(null, null))
 
 </script>
