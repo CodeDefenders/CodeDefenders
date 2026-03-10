@@ -21,6 +21,7 @@ package org.codedefenders.model.llm;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.service.llm.LlmSubActionService;
 
 public class LlmStrategy {
@@ -88,6 +89,10 @@ public class LlmStrategy {
         } else {
             return promptType.getDefaultPrompt();
         }
+    }
+
+    public String getHtmlPrompt(LlmPromptType promptType) {
+        return getPrompt(promptType).replace("\r\n", "\n").replace("\n", "\\n");
     }
 
     public Map<LlmPromptType, String> getCustomPrompts() {
