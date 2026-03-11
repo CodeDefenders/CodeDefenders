@@ -25,7 +25,7 @@
 <%@ tag import="org.codedefenders.util.Constants" %>
 <%@ tag import="org.codedefenders.util.MessageUtils" %>
 <%@ tag import="org.codedefenders.validation.code.TestValidationRules" %>
-<%@ tag import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
+<%@ tag import="static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS" %>
 <%@ tag import="java.util.Objects" %>
 <%
     request.setAttribute("ruleset", new TestValidationRules());
