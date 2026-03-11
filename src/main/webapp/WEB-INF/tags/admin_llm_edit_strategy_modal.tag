@@ -1,7 +1,31 @@
+<%--
+
+    Copyright (C) 2016-2025 Code Defenders contributors
+
+    This file is part of Code Defenders.
+
+    Code Defenders is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    Code Defenders is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ tag import="java.util.Map" %>
 <%@ tag import="org.codedefenders.model.llm.LlmPromptType" %>
 <%@ tag import="java.util.Arrays" %>
-<%@ tag import="java.util.HashMap" %><%--
+<%@ tag import="java.util.HashMap" %>
+<%@ tag import="org.codedefenders.model.llm.LlmDefaultStrategy" %>
+<%@ tag import="org.codedefenders.model.llm.LlmStrategy" %>
+<%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
+<%@ tag import="org.codedefenders.util.CDIUtil" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -35,6 +59,9 @@
     for (LlmPromptType promptType : LlmPromptType.values()) {
         namesToContent.put(promptType.name(), promptType.getDefaultPrompt());
     }
+    request.setAttribute("defaultStrategyNames", LlmDefaultStrategy.values());
+    LlmRepository llmRepository = CDIUtil.getBeanFromCDI(LlmRepository.class);
+    request.setAttribute("allStrategies", llmRepository.getAllStrategies());
     //pageContext.setAttribute("namesToContent", namesToContent);
 %>
 
@@ -172,6 +199,17 @@
 
     const form = document.getElementById("${htmlId}-form");
     form.addEventListener("submit", (event) => {
+        const chosenName = document.getElementById("${htmlId}-new-custom-name").value;
+
+        <c:forEach items="${allStrategies}" var="n">
+        console.log("Chosen: " + chosenName + "; ${n.name}")
+        if (chosenName === "${n.name}") {
+            alert("The strategy already exists.")
+            event.preventDefault();
+            return;
+        }
+        </c:forEach>
+
         const selects = contentPane.querySelectorAll("select");
         const names = [];
         for (let i = 0; i < selects.length; i++) {
