@@ -116,7 +116,7 @@ public class GameReplayer {
                 System.out.println("GameReplayer.parse() FOUND ATTACKER " + userID);
                 actors.put(userID,
                         new HelperUser(
-                                new UserEntity("Attacker" + userID, passwordEncoder.encode("test"), "Attacker" + userID + "@test.com"),
+                                new UserEntity("Attacker" + userID, passwordEncoder.encode("test"), "Attacker" + userID + "@test.com", null),
                                 org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
             }
             System.out.println("GameReplayer.parse() Attack " + userID);
@@ -144,7 +144,7 @@ public class GameReplayer {
                 if (!actors.containsKey(userID)) {
                     System.out.println("GameReplayer.parse() FOUND DEFENDER " + userID);
                     actors.put(userID,
-                            new HelperUser(new UserEntity("Defender" + userID, passwordEncoder.encode("test"), "Defender" + userID + "@test.com"),
+                            new HelperUser(new UserEntity("Defender" + userID, passwordEncoder.encode("test"), "Defender" + userID + "@test.com", null),
                                     org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
                 }
             }
@@ -229,7 +229,7 @@ public class GameReplayer {
     // Raise assertions ?
     public void replay(int speedUp) throws FailingHttpStatusCodeException, IOException, InterruptedException {
         // Create a game -> we need the game ID
-        UserEntity creatorUser = new UserEntity("creator", passwordEncoder.encode("test"), "creator@test.com");
+        UserEntity creatorUser = new UserEntity("creator", passwordEncoder.encode("test"), "creator@test.com", null);
         HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 
         // This fails if the user exists ?

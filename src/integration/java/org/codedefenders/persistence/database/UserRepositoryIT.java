@@ -19,6 +19,7 @@
 package org.codedefenders.persistence.database;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.codedefenders.auth.PasswordEncoderProvider;
@@ -80,7 +81,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertAndQueryUserById() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
 
         Integer userId = userRepo.insert(user).get();
         assertNotNull(userId, "Couldn't store user to the database");
@@ -95,7 +96,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertAndQueryUserByName() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
 
         Optional<Integer> userId = userRepo.insert(user);
         assertTrue(userId.isPresent(), "Couldn't store user to the database");
@@ -110,7 +111,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertAndQueryUserByEmail() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assertNotNull(userId, "Couldn't store user to the database");
@@ -130,7 +131,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertUserTwice() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
@@ -140,7 +141,7 @@ public class UserRepositoryIT {
 
     @Test
     public void insertUserWithValidId() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
         user.setId(1);
 
         assertThrows(IllegalArgumentException.class, () -> userRepo.insert(user));
@@ -148,7 +149,7 @@ public class UserRepositoryIT {
 
     @Test
     public void updateUser() {
-        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
 
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
@@ -168,11 +169,11 @@ public class UserRepositoryIT {
 
     @Test
     public void updateUserViolatesDBConstraint() {
-        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
         Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
         user1.setId(userId1);
-        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2);
+        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2, Locale.ENGLISH);
         Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
         user2.setId(userId2);
@@ -184,10 +185,10 @@ public class UserRepositoryIT {
 
     @Test
     public void queryUserList() {
-        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1);
+        UserEntity user1 = new UserEntity(username1, passwordEncoder.encode(password1), email1, Locale.ENGLISH);
         Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
-        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2);
+        UserEntity user2 = new UserEntity(username2, passwordEncoder.encode(password2), email2, Locale.ENGLISH);
         Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
 
