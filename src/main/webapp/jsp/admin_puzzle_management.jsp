@@ -376,8 +376,8 @@
 
                     const controls = container.querySelector('.chapter__controls');
                     controls.firstElementChild.insertAdjacentElement('afterend', createChapterSelectDropdown({
-        label: ${i18n.tr('Move to position:')},
-        tooltip: ${i18n.tr('Move to position')}
+                        label: '${i18n.tr("Move to position:")}',
+                        tooltip: '${i18n.tr("Move to position")}'
                     }));
 
                     return container;
@@ -475,8 +475,8 @@
                     container.appendChild(watermark);
                     container.querySelector('.puzzle__controls').firstElementChild
                             .insertAdjacentElement('afterend', createChapterSelectDropdown({
-        label: ${i18n.tr('Move to chapter:')},
-        tooltip: ${i18n.tr('Move to chapter')}
+                                label: '${i18n.tr("Move to chapter:")}',
+                                tooltip: '${i18n.tr("Move to chapter")}'
                             }));
                     return container;
                 }
@@ -505,7 +505,7 @@
                     if (puzzle.gameCount > 0) {
                         const deleteButton = this.container.querySelector('.puzzle__button__delete');
                         deleteButton.disabled = true;
-        deleteButton.title = ${i18n.tr("Puzzles with existing games can't be deleted")};
+                        deleteButton.title = '${i18n.tr("Puzzles with existing games can't be deleted")}';
                     }
                 }
 
@@ -536,7 +536,7 @@
              */
             function createChapterSelectDropdown({
                      tooltip = 'Move',
-                            label = ${i18n.tr('Move to chapter:')},
+                     label = '${i18n.tr("Move to chapter:")}',
                      showButtonClasses = 'btn btn-xs btn-primary btn-fixed',
                      showButtonContent = '<i class="fa fa-arrow-right"></i>',
                      moveButtonContent = 'Move'
@@ -636,9 +636,9 @@
                 // --- Init 'Scroll to chapter' ------------------------------------------------------------------------
 
                 const scrollDropdown = createChapterSelectDropdown({
-                            tooltip: ${i18n.tr('Scroll to chapter')},
-                            label: ${i18n.tr('Scroll to chapter:')},
-                            moveButtonContent: ${i18n.tr('Go')},
+                            tooltip: '${i18n.tr("Scroll to chapter")}',
+                            label: '${i18n.tr("Scroll to chapter:")}',
+                            moveButtonContent: '${i18n.tr("Go")}',
                     showButtonClasses: 'btn btn-sm btn-outline-secondary',
                     showButtonContent: 'Scroll to chapter <i class="fa fa-arrow-down ms-1"></i>',
                 });
@@ -750,8 +750,8 @@
                                 </div>
                             </div>
                         </form>`;
-            modal.title.innerText = ${i18n.tr('Edit Chapter')};
-            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
+                    modal.title.innerText = '${i18n.tr("Edit Chapter")}';
+                    modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = chapter.id;
                     modal.body.querySelector('input[name="title"]').value = chapter.title;
                     modal.body.querySelector('input[name="description"]').value = chapter.description;
@@ -780,9 +780,9 @@
                             chapter.description = response.chapter.description;
                             chapterComp.title.innerText = response.chapter.title;
                             chapterComp.description.innerText = response.chapter.description;
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+                            ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -875,8 +875,8 @@
                                 </div>
                             </div>
                         </form>`;
-            modal.title.innerText = ${i18n.tr('Edit Puzzle')};
-            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
+                    modal.title.innerText = '${i18n.tr("Edit Puzzle")}';
+                    modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = puzzle.id;
 
                     const form = modal.body.querySelector("form");
@@ -937,9 +937,9 @@
                             puzzle.editableLinesEnd = response.puzzle.editableLinesEnd;
                             puzzle.isEquivalent = response.puzzle.isEquivalent;
                             puzzleComp.setPuzzle(puzzle);
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+                            ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -968,8 +968,8 @@
                     <span class="px-1 border rounded-1">${i18n.tr('Unassigned')}</span>.
                         </div>`;
 
-            modal.title.innerText = ${i18n.tr('Delete Chapter')};
-            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
+                    modal.title.innerText = '${i18n.tr("Delete Chapter")}';
+                    modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = chapter.id;
                     modal.body.querySelector('.edit-chapter-title').innerText = chapter.title;
 
@@ -987,9 +987,9 @@
                                         unassignedChapter.addPuzzle(PuzzleComponent.fromChild(puzzleElem));
                                     }
                                     chapterComp.container.remove();
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+                                    ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                                 }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+                                    ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1016,24 +1016,24 @@
                             <span class="px-1 border rounded-1 edit-puzzle-title"></span>?
                         </div>`;
 
-            modal.title.innerText = ${i18n.tr('Delete Puzzle')};
-            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
+                    modal.title.innerText = '${i18n.tr("Delete Puzzle")}';
+                    modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = puzzle.id;
                     modal.body.querySelector('.edit-puzzle-title').innerText = puzzle.title;
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-danger');
                     saveButton.role = 'button';
-            saveButton.innerText = ${i18n.tr('Delete')};
+                    saveButton.innerText = '${i18n.tr("Delete")}';
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
                         PuzzleAPI.deletePuzzle(puzzle.id)
                                 .then(response => {
                                     puzzleComp.container.remove();
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+            ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                                 }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+            ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1067,13 +1067,13 @@
                                     </div>
                                 </div>
                             </form>`;
-            modal.title.innerText = ${i18n.tr('Create New Chapter')};
-            modal.footerCloseButton.innerText = ${i18n.tr('Cancel')};
+                    modal.title.innerText = '${i18n.tr("Create New Chapter")}';
+                    modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
                     saveButton.role = 'button';
-            saveButton.innerText = ${i18n.tr('Save')};
+                    saveButton.innerText = '${i18n.tr("Save")}';
                     modal.footer.insertAdjacentElement('beforeend', saveButton);
 
                     saveButton.addEventListener('click', function(event) {
@@ -1096,9 +1096,9 @@
                                 description: response.chapter.description
                             });
                             chaptersContainer.appendChild(chapterComp.container);
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+                            ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
+                            ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                         }).finally(() => {
                             modal.controls.hide();
                             setTimeout(() => modal.modal.remove(), 1000);
@@ -1121,7 +1121,7 @@
                     const modal = new Modal();
                     modal.title.innerText = puzzle.title;
                     modal.title.classList.add('d-flex', 'align-items-center', 'gap-2');
-            modal.footerCloseButton.innerText = ${i18n.tr('Close')};
+                    modal.footerCloseButton.innerText = '${i18n.tr("Close")}';
                     modal.modal.dataset.id = puzzle.id;
                     modal.dialog.classList.add('modal-dialog-responsive');
                     modal.body.classList.add('d-flex', 'p-0');
@@ -1202,20 +1202,20 @@
                     saveButton.addEventListener('click', function (event) {
                         for (const btn of saveButtons) {
                             btn.disabled = true;
-            btn.innerText = ${i18n.tr('Saving...')};
+                            btn.innerText = '${i18n.tr("Saving...")}';
                         }
                         PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
                                 .then(response => {
                                     isUnsavedChanges = false
-            ShowToasts.showToast({title: ${i18n.tr('Success')}, body: response.message});
+                                    ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                                 }).catch(async response => {
-            ShowToasts.showToast({title: ${i18n.tr('Error')}, body: (await response).message, colorClass: 'bg-danger'});
-            alert(${i18n.tr('Could not save changes.')});
+                                    ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
+                                    alert('${i18n.tr("Could not save changes.")}');
                                 }).finally(function() {
                                     unsavedChangesModal.hide();
                                     for (const btn of saveButtons) {
                                         btn.disabled = false;
-            btn.innerText = ${i18n.tr('Save')};
+                                        btn.innerText = '${i18n.tr("Save")}';
                                     }
                                 });
                     });
@@ -1242,7 +1242,7 @@
                     if (isUnsavedChanges) {
                         unsavedChangesModal.show();
                     } else {
-            uploadPuzzleTitle.innerText = ${i18n.tr('Upload Puzzles')};
+                        uploadPuzzleTitle.innerText = '${i18n.tr("Upload Puzzles")}';
                         uploadPuzzleChapterId.value = '';
                         uploadPuzzleModal.show();
                     }

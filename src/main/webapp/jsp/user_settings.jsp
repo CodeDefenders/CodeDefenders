@@ -158,7 +158,7 @@
                             confirmPasswordFeedback.innerText = '';
                         } else {
                             confirmPasswordInput.setCustomValidity('password-mismatch');
-                            confirmPasswordFeedback.innerText = `${i18n.tr('Passwords don\'t match.')}`;
+                            confirmPasswordFeedback.innerText = `${i18n.tr('Passwords don\\\'t match.')}`;
                         }
                     };
 

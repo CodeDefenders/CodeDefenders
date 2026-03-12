@@ -61,7 +61,7 @@
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>${i18n.tr('Keep the mutant\'s points and get an extra point')}</li>
+                    <li>${i18n.tr('Keep the mutant\\\'s points and get an extra point')}</li>
                 </ul>
             </div>
         </div>
@@ -84,7 +84,7 @@
         <div class="card">
             <div class="card-body">
                 <ul class="m-0 ps-3">
-                    <li>${i18n.tr('Lose the mutant\'s points')}</li>
+                    <li>${i18n.tr('Lose the mutant\\\'s points')}</li>
                 </ul>
             </div>
         </div>

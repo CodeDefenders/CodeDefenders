@@ -168,7 +168,7 @@
                             <p>${i18n.tr('Tests uploaded with a class under test can be used to initialize games with existing tests.')}</p>
                             <ul>
                                 <li>${i18n.tr('The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant.', '<code>zip</code>')}</li>
-                                <li>${i18n.tr('Multiple tests can have the same name, but they don\'t have to.')}</li>
+                                <li>${i18n.tr('Multiple tests can have the same name, but they don\\\'t have to.')}</li>
                             </ul>
                             <p>${i18n.tr('Example:')}</p>
                             <pre class="mb-0 p-3 bg-light">tests

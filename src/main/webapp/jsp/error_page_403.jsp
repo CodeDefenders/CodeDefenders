@@ -24,9 +24,9 @@
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <t:error_page
-        title="${i18n.tr('You don\'t have permission to perform this request (403)')}"
+        title="${i18n.tr('You don\\\'t have permission to perform this request (403)')}"
         statusCode="403"
-        shortDescription="${i18n.tr('You don\'t have permission to perform this request.')}">
+        shortDescription="${i18n.tr('You don\\\'t have permission to perform this request.')}">
     <jsp:attribute name="message">
         <p>${i18n.tr('Your accounts permissions do not include the accessed page or performed action.')}</p>
         <%-- TODO: Info about appyling for teacher roles here? --%>

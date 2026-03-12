@@ -180,7 +180,7 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: DataTablesUtils.language({emptyTable: "${i18n.tr('There aren\'t any classrooms... yet.')}"})
+                language: DataTablesUtils.language({emptyTable: "${i18n.tr('There aren\\\'t any classrooms... yet.')}"})
             });
             LoadingAnimation.hideAnimation(classroomsTable.table().container());
 

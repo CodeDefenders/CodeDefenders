@@ -19,6 +19,7 @@
 
 --%>
 <%@ tag pageEncoding="UTF-8" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
@@ -54,5 +55,5 @@
 <p>
     ${i18n.tr('A chapter also contains a single chapter.properties file with the chapter title and description:')}
 </p>
-
-<pre class="mb-0 p-3 bg-light">${i18n.tr('# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty')}</pre>
+<% I18n i18n = (I18n) request.getAttribute("i18n"); %>
+<pre class="mb-0 p-3 bg-light"><%=i18n.tr("# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty")%></pre>

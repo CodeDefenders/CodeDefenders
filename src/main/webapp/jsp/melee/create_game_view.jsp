@@ -214,7 +214,7 @@
                                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
                                            name="capturePlayersIntention">
                                     <label class="form-check-label"
-                                           for="capture-intentions-switch">${i18n.tr('Enable Capturing Players\' Intentions')}</label>
+                                           for="capture-intentions-switch">${i18n.tr('Enable Capturing Players\\\' Intentions')}</label>
                                 </div>
                             </div>
                         </div>
@@ -269,7 +269,7 @@
                         <div class="row mb-3" title="${i18n.tr('The duration for how long the games will be open.')}">
                             <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
 
-                            <label class="col-4 col-form-label">${i18n.tr('Set the game\'s duration:')}</label>
+                            <label class="col-4 col-form-label">${i18n.tr('Set the game\\\'s duration:')}</label>
                             <div class="col-8 input-group input-group-sm has-validation"
                                  style="width: 66.6666666667%;"><!-- col-8 is overridden by input-group -->
                                 <input type="number" name="days" class="form-control" id="days-input" min="0">

@@ -35,6 +35,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
@@ -43,6 +44,7 @@
     Map<Integer, String> multiplayerGameCreatorNames = (Map<Integer, String>) request.getAttribute("multiplayerGameCreatorNames");
     Map<Integer, List<List<String>>> multiplayerPlayerInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("multiplayerPlayersInfoForGame");
     Map<Integer, Integer> multiplayerUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("multiplayerUserIdForPlayerIds");
+    I18n i18n = (I18n) request.getAttribute("i18n");
 %>
 
 <%!
@@ -94,7 +96,7 @@
                 <% if (multiplayerGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            ${i18n.tr("You don't control any unfinished multiplayer games at the moment.")}
+                            ${i18n.tr("You don\\\'t control any unfinished multiplayer games at the moment.")}
                         </td>
                     </tr>
                 <% } %>
@@ -331,7 +333,7 @@
                 <% if (meleeGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            ${i18n.tr("You don't control any unfinished melee games at the moment.")}
+                            ${i18n.tr("You don\\\'t control any unfinished melee games at the moment.")}
                         </td>
                     </tr>
                 <% } %>

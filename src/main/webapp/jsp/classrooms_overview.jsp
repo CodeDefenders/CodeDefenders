@@ -201,7 +201,7 @@
                     paging: false,
                     dom: 't',
                     language: DataTablesUtils.language({
-                        emptyTable: '${i18n.tr('You\'re not part of any classrooms.')}',
+                        emptyTable: '${i18n.tr('You\\\'re not part of any classrooms.')}',
                         zeroRecords: '${i18n.tr('No classrooms found.')}'
                     })
                 });

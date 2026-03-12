@@ -93,11 +93,11 @@
                         <tbody>
                             <tr>
                                 <td>${i18n.tr('Attacker Wins:')}</td>
-                                <td>${valPercent(data.attackerWins, data.nrGames)}</td>
+                                <td>\${valPercent(data.attackerWins, data.nrGames)}</td>
                             </tr>
                             <tr>
                                 <td>${i18n.tr('Defender Wins:')}</td>
-                                <td>${valPercent(data.defenderWins, data.nrGames)}</td>
+                                <td>\${valPercent(data.defenderWins, data.nrGames)}</td>
                             </tr>
                         </tbody>
                         <thead>
@@ -110,7 +110,7 @@
                                 <td>${i18n.tr('Mutation Difficulty:')}</td>
                                 <td>\${div(rating1.sum, rating1.count, 'NA')}</td>
                                 <td>${i18n.tr('Number of votes:')}</td>
-                                <td>${rating1.count}</td>
+                                <td>\${rating1.count}</td>
                             </tr>
                             <tr>
                                 <td>${i18n.tr('Test Difficulty:')}</td>

@@ -60,7 +60,7 @@
     </jsp:attribute>
 </t:modal>
 
-<t:modal title='${i18n.tr("Change \"Keep previous test in editor\" setting")}' id="keep-previous-test-modal" closeButtonText="${i18n.tr('Cancel')}">
+<t:modal title='${i18n.tr("Change \\\"Keep previous test in editor\\\" setting")}' id="keep-previous-test-modal" closeButtonText="${i18n.tr('Cancel')}">
     <jsp:attribute name="content">
         ${i18n.tr('Changing this setting will reload the page and therefore overwrite your current code.')}
     </jsp:attribute>
