@@ -21,6 +21,7 @@ package org.codedefenders.validation.code;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
@@ -112,7 +113,7 @@ public class CodeValidationResult {
                     .append(error.left.getValidationMessage())
                     .append(" - Offending statement:\n\t\t")
                     .append(error.right.toString().replace("\n", "\n\t\t"))
-                    .append('\n');
+                    .append("\n\n");
         }
 
         for (ImmutablePair<ValidationRule, String> error : stringErrors) {
@@ -121,16 +122,18 @@ public class CodeValidationResult {
                     .append(error.left.getValidationMessage())
                     .append(" - Offending statement:\n\t\t")
                     .append(error.right.replace("\n", "\n\t\t"))
-                    .append('\n');
+                    .append("\n\n");
         }
 
         for (ValidationRule error : anonymousErrors) {
             sb.append(counter++)
                     .append(":\t")
                     .append(error.getValidationMessage())
-                    .append('\n');
+                    .append("\n\n");
         }
-        return sb.toString().replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions));
+        return StringUtils.removeEnd(sb.toString()
+                .replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions)),
+                "\n\n");
     }
 
     /**
