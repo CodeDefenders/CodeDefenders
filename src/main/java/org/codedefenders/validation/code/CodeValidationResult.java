@@ -103,7 +103,7 @@ public class CodeValidationResult {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Your ").append(type == Type.TEST ? "test" : "mutant")
-                .append(" is not valid, sorry! It failed for the following reasons:\n");
+                .append(" is not valid, sorry! It failed for the following reasons:\n\n");
 
         int counter = 1;
 

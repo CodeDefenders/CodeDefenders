@@ -69,7 +69,9 @@ public class TestValidationRules {
             new TestRule.Builder(NOT_EMPTY,
                     NOT_EMPTY,
                     "The test is empty.")
-                    .withVisitor(c -> c.getStmtCount() == 0).build(),
+                    .withVisitor(c -> c.getStmtCount() == 0)
+                    .hidden()
+                    .build(),
             new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "No loops",
                     "Loops in the test are not allowed.")
@@ -103,29 +105,24 @@ public class TestValidationRules {
                                             AssignExpr.Operator.XOR)
                                     .anyMatch(op -> assignExpr.getOperator() == op)
                     ).build(),
-            new TestRule.Builder("No assert()",
+            new TestRule.Builder(NO_CONTROL_STRUCTURES,
                     "No \"assert()\"-Statements",
                     "\"assert()\"-statements are not allowed. "
                             + "Use the Assertions from your test library!")
                     .withNode(n -> n instanceof AssertStmt).build(),
 
-            new TestRule.Builder(NO_SYSTEM_CALLS, //TODO Modularize and standardize, create some tests to check what is
-                    //TODO really necessary
-                    "No calls to any of these packages: System, Random, Thread",
-                    "You have called a package you may not call.")
+
+            new TestRule.Builder(NO_SYSTEM_CALLS,
+                    "No calls to System.*",
+                    "You have called System.*")
                     .withNode(n ->
-                            n instanceof ExpressionStmt
-                                    && Stream.of("Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
-                                                    "java.net", "java.nio", "java.sql", "random(", "randomUUID("
-                                    )
-                                    .anyMatch(prohibited -> JavaParserUtils.unparse(n)
-                                            .contains(prohibited)))
+                            n instanceof ExpressionStmt && JavaParserUtils.unparse(n).contains("System."))
                     .withNode(
                             n -> { //TODO Is this necessary? Adapted it from the old code, but seems to be handled
                                 //TODO already by the code above and below
                                 if (n instanceof MethodCallExpr methodCallExpr) {
                                     String stmtString = JavaParserUtils.unparse(methodCallExpr);
-                                    return stmtString.startsWith("System.") || stmtString.startsWith("Random.");
+                                    return stmtString.startsWith("System.");
                                 } else {
                                     return false;
                                 }
@@ -137,9 +134,7 @@ public class TestValidationRules {
                                     Optional<Expression> initializer = variableDeclarator.getInitializer();
                                     if (initializer.isPresent()) {
                                         String initString = JavaParserUtils.unparse(initializer.get());
-                                        return initString.startsWith("System.")
-                                                || initString.startsWith("Random.")
-                                                || initString.contains("Thread");
+                                        return initString.startsWith("System.");
                                     }
                                 }
                                 return false;
@@ -147,10 +142,89 @@ public class TestValidationRules {
                     )
                     .withNode(n ->
                             n instanceof NameExpr name && (
-                                    name.getNameAsString().equals("System")
-                                            || name.getNameAsString().equals("Random")
-                                            || name.getNameAsString().equals("Thread"))
+                                    name.getNameAsString().equals("System"))
                     ).build(),
+
+            new TestRule.Builder(NO_SYSTEM_CALLS,
+                    "No use of random number generators",
+                    "You have used a random number generator.")
+                    .withNode(n ->
+                            n instanceof ExpressionStmt && Stream.of("Random(", "Random.",
+                                            "random(", "randomUUID("
+                                    )
+                                    .anyMatch(prohibited -> JavaParserUtils.unparse(n)
+                                            .contains(prohibited)))
+                    .withNode(
+                            n -> { //TODO Is this necessary? Adapted it from the old code, but seems to be handled
+                                //TODO already by the code above and below
+                                if (n instanceof MethodCallExpr methodCallExpr) {
+                                    String stmtString = JavaParserUtils.unparse(methodCallExpr);
+                                    return stmtString.startsWith("Random.");
+                                } else {
+                                    return false;
+                                }
+                            }
+                    )
+                    .withNode(
+                            n -> {
+                                if (n instanceof VariableDeclarator variableDeclarator) {
+                                    Optional<Expression> initializer = variableDeclarator.getInitializer();
+                                    if (initializer.isPresent()) {
+                                        String initString = JavaParserUtils.unparse(initializer.get());
+                                        return initString.startsWith("Random.");
+                                    }
+                                }
+                                return false;
+                            }
+                    )
+                    .withNode(n ->
+                            n instanceof NameExpr name && (
+                                    name.getNameAsString().equals("Random"))
+                    ).build(),
+
+            new TestRule.Builder(NO_SYSTEM_CALLS,
+                    "No multithreading",
+                    "You called a multithreading class.")
+                    .withNode(n ->
+                            n instanceof ExpressionStmt && JavaParserUtils.unparse(n).contains("Thread.")
+                    )
+                    .withNode(
+                            n -> {
+                                if (n instanceof VariableDeclarator variableDeclarator) {
+                                    Optional<Expression> initializer = variableDeclarator.getInitializer();
+                                    if (initializer.isPresent()) {
+                                        String initString = JavaParserUtils.unparse(initializer.get());
+                                        return initString.contains("Thread");
+                                    }
+                                }
+                                return false;
+                            }
+                    )
+                    .withNode(n ->
+                            n instanceof NameExpr name && (
+                                    name.getNameAsString().equals("Thread"))
+                    ).build(),
+
+            new TestRule.Builder(NO_SYSTEM_CALLS,
+                    "No calls to Date classes",
+                    "You have called a Date class.")
+                    .withNode(n ->
+                            n instanceof ExpressionStmt
+                                    && JavaParserUtils.unparse(n)
+                                            .contains("Date("))
+                    .build(),
+
+            new TestRule.Builder(NO_SYSTEM_CALLS,
+                    "No IO calls",
+                    "You have called an IO package.")
+                    .withNode(n ->
+                            n instanceof ExpressionStmt
+                                    && Stream.of("java.io", "java.net", "java.nio", "java.sql")
+                                    .anyMatch(prohibited -> JavaParserUtils.unparse(n)
+                                            .contains(prohibited)))
+                    .build(),
+
+
             new TestRule.Builder(ASSERTION_LIMITS,
                     "Keep the assertion limit of your game!",
                     "You used more than ${MAX_ASSERTIONS} assertions.")
