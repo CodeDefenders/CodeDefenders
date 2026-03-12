@@ -138,7 +138,7 @@
                                 <div class="form-check">
                                     <input type="radio" class="form-check-input" id="gameType-radio-battleground"
                                            name="gameType"
-                                           value="<%=GameType.MULTIPLAYER%>"
+                                           value="${GameType.MULTIPLAYER}"
                                            checked>
                                     <label class="form-check-label"
                                            for="gameType-radio-battleground">${i18n.tr('Battleground')}</label>
@@ -146,7 +146,7 @@
                                 <div class="form-check">
                                     <input type="radio" class="form-check-input" id="gameType-radio-melee"
                                            name="gameType"
-                                           value="<%=GameType.MELEE%>">
+                                           value="${GameType.MELEE}">
                                     <label class="form-check-label" for="gameType-radio-melee">${i18n.tr('Melee')}</label>
                                 </div>
                             </div>

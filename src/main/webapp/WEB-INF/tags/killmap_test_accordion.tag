@@ -76,7 +76,7 @@
                               <c:if test="${category.testIds.size() == 0}">hidden</c:if>>
                                 ${category.testIds.size()}
                         </span>
-                            ${category.description}
+                            ${i18n.tr(category.description)}
                     </button>
                 </h2>
                 <div class="accordion-collapse collapse"

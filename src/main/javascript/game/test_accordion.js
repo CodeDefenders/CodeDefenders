@@ -101,7 +101,7 @@ class TestAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `${i18n.tr("Test")} ${test.id} (${i18n.tr("by")} ${test.creator.name})`;
+        modal.title.innerText = i18n.tr('Test {0} (by {1})', test.id, test.creator.name);
         modal.body.innerHTML =
                 `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">

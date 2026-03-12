@@ -45,6 +45,7 @@ import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -89,13 +90,13 @@ public class KillMapAccordionBean {
 
         categories.add(
                 new KillMapAccordionCategory(
-                        "All Mutants and Tests",
+                        I18n.marktr("All Mutants and Tests"),
                         GameAccordionMapping.ALL_CATEGORY_ID,
                         testsMapping.allElements,
                         mutantsMapping.allElements));
         categories.add(
                 new KillMapAccordionCategory(
-                        "Mutants outside methods",
+                        I18n.marktr("Mutants outside methods"),
                         GameAccordionMapping.OUTSIDE_METHODS_CATEGORY_ID,
                         testsMapping.allElements,
                         mutantsMapping.elementsOutsideMethods));

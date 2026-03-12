@@ -3,6 +3,14 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:58
+msgid "Teacher Account Application for {0}"
+msgstr "Teacher Account Application for {0}"
+
+#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:63
+msgid "Greetings,\nI would like to request a teacher account for %s on %s.\nRegards,\n%s\n"
+msgstr "Greetings,\nI would like to request a teacher account for %s on %s.\nRegards,\n%s\n"
+
 #: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:225
 msgid "Created {0} staged games."
 msgstr "Created {0} staged games."
@@ -99,6 +107,10 @@ msgstr "started game"
 msgid "finished game"
 msgstr "finished game"
 
+#: src/main/java/org/codedefenders/beans/game/HistoryBean.java:101
+msgid "joined"
+msgstr "joined"
+
 #: src/main/java/org/codedefenders/beans/game/HistoryBean.java:108
 msgid "joined as attacker"
 msgstr "joined as attacker"
@@ -162,6 +174,22 @@ msgstr "Today"
 #: src/main/java/org/codedefenders/beans/game/HistoryBean.java:280
 msgid "Yesterday"
 msgstr "Yesterday"
+
+#: src/main/java/org/codedefenders/beans/game/KillMapAccordionBean.java:93
+msgid "All Mutants and Tests"
+msgstr "All Mutants and Tests"
+
+#: src/main/java/org/codedefenders/beans/game/KillMapAccordionBean.java:99
+msgid "Mutants outside methods"
+msgstr "Mutants outside methods"
+
+#: src/main/java/org/codedefenders/beans/game/MutantAccordionBean.java:121
+msgid "All Mutants"
+msgstr "All Mutants"
+
+#: src/main/java/org/codedefenders/beans/game/MutantAccordionBean.java:126
+msgid "Mutants outside methods"
+msgstr "Mutants outside methods"
 
 #: src/main/java/org/codedefenders/beans/game/TestAccordionBean.java:89
 msgid "All Tests"

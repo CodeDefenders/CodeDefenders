@@ -73,7 +73,7 @@
                               <c:if test="${category.mutantIds.size() == 0}">hidden</c:if>>
                             ${category.mutantIds.size()}
                         </span>
-                        ${category.description}
+                        ${i18n.tr(category.description)}
                     </button>
                 </h2>
                 <div class="accordion-collapse collapse"

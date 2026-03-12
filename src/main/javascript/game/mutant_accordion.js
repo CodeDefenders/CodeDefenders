@@ -88,7 +88,7 @@ class MutantAccordion {
 
         /* Create a new modal. */
         modal = new Modal();
-        modal.title.innerText = `Mutant ${mutant.id} (by ${mutant.creator.name})`;
+        modal.title.innerText = i18n.tr('Mutant {0} (by {1})', mutant.id, mutant.creator.name);
         modal.body.innerHTML =
                 `<div class="card">
                     <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
