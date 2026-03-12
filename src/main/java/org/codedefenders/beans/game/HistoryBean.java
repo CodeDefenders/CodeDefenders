@@ -34,7 +34,6 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.xnap.commons.i18n.I18n;
@@ -66,86 +65,87 @@ public class HistoryBean {
         this.login = login;
     }
 
-    public List<HistoryBeanEventDTO> getEvents() {
+    public List<HistoryBeanEventDTO> getEvents(I18n i18n) {
         if (events == null) {
             events = eventDAO.getEventsForGame(gameId).stream()
-                    .map(this::createHistoryBeanEvent).filter(Objects::nonNull)
+                    .map(e -> createHistoryBeanEvent(e, i18n))
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
         return events;
     }
 
-    private HistoryBeanEventDTO createHistoryBeanEvent(Event e) {
+    private HistoryBeanEventDTO createHistoryBeanEvent(Event e, I18n i18n) {
         if (e.getUserId() < 100) {
             return null;
         }
         String userName = userService.getSimpleUserById(e.getUserId())
                 .map(SimpleUser::getName)
-                .orElse(I18n.marktr("Unknown user"));
+                .orElse(i18n.tr("Unknown user"));
         String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {
             case GAME_CREATED:
-                userMessage += I18n.marktr("created game");
+                userMessage += i18n.tr("created game");
                 break;
             case GAME_STARTED:
-                userMessage += I18n.marktr("started game");
+                userMessage += i18n.tr("started game");
                 break;
             case GAME_FINISHED:
-                userMessage += I18n.marktr("finished game");
+                userMessage += i18n.tr("finished game");
                 break;
             case PLAYER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "joined";
+                userMessage += i18n.tr("joined");
                 colour = "blue";
                 break;
             case ATTACKER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += I18n.marktr("joined as attacker");
+                userMessage += i18n.tr("joined as attacker");
                 colour = "blue";
                 break;
             case DEFENDER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += I18n.marktr("joined as defender");
+                userMessage += i18n.tr("joined as defender");
                 colour = "blue";
                 break;
             case GAME_PLAYER_LEFT:
-                userMessage += I18n.marktr("left the game");
+                userMessage += i18n.tr("left the game");
                 break;
             case PLAYER_TEST_ERROR:
             case DEFENDER_TEST_READY:
-                userMessage += I18n.marktr("created a test that errored");
+                userMessage += i18n.tr("created a test that errored");
                 colour = "red";
                 break;
             case PLAYER_TEST_READY:
             case DEFENDER_TEST_ERROR:
-                userMessage = I18nService.marktrf("Test by {0} is ready", userMessage);
+                userMessage = i18n.tr("Test by {0} is ready", userMessage);
                 colour = "green";
                 break;
             case PLAYER_MUTANT_ERROR:
             case ATTACKER_MUTANT_ERROR:
-                userMessage += I18n.marktr("created a mutant that errored");
+                userMessage += i18n.tr("created a mutant that errored");
                 colour = "red";
                 break;
             case PLAYER_TEST_CREATED:
             case DEFENDER_TEST_CREATED:
-                userMessage += I18n.marktr("created a test");
+                userMessage += i18n.tr("created a test");
                 colour = "green";
                 break;
             case PLAYER_KILLED_MUTANT:
             case DEFENDER_KILLED_MUTANT:
-                userMessage += I18n.marktr("killed a mutant");
+                userMessage += i18n.tr("killed a mutant");
                 colour = "red";
                 break;
             case PLAYER_MUTANT_CREATED:
             case ATTACKER_MUTANT_CREATED:
-                userMessage += I18n.marktr("created a mutant");
+                userMessage += i18n.tr("created a mutant");
                 colour = "green";
                 break;
                 /*
@@ -162,27 +162,27 @@ public class HistoryBean {
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += I18n.marktr("caught an equivalence");
+                userMessage += i18n.tr("caught an equivalence");
                 colour = "yellow";
                 break;
             case PLAYER_WON_EQUIVALENT_DUEL:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += I18n.marktr("won an equivalence duel");
+                userMessage += i18n.tr("won an equivalence duel");
                 colour = "green";
                 break;
             case PLAYER_LOST_EQUIVALENT_DUEL:
-                userMessage += I18n.marktr("lost an equivalence duel");
+                userMessage += i18n.tr("lost an equivalence duel");
                 colour = "red";
                 break;
             case PLAYER_MUTANT_CLAIMED_EQUIVALENT:
             case DEFENDER_MUTANT_CLAIMED_EQUIVALENT:
-                userMessage += I18n.marktr("claimed a mutant equivalent");
+                userMessage += i18n.tr("claimed a mutant equivalent");
                 colour = "yellow";
                 break;
             case ATTACKER_MUTANT_KILLED_EQUIVALENT:
-                userMessage += I18n.marktr("proved a mutant non-equivalent");
+                userMessage += i18n.tr("proved a mutant non-equivalent");
                 colour = "yellow";
                 break;
             case GAME_MESSAGE:

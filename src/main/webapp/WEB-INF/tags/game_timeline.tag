@@ -28,13 +28,9 @@
 <%--@elvariable id="history" type="org.codedefenders.beans.game.HistoryBean"--%>
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
-<%
-    // Those return the PlayerID not the UserID
-    final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
-%>
 
 <div class="timeline-centered timeline-sm">
-    <c:forEach items="${history.events}" var="event">
+    <c:forEach items="${history.getEvents(i18n)}" var="event">
         <article class="timeline-entry ${event.alignment}-aligned">
             <div class="timeline-entry-inner">
                 <time datetime="${event.format}" class="timeline-time">
@@ -44,7 +40,7 @@
 
                 <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i></div>
                 <div class="timeline-label bg-${event.colour}">
-                    <span class="h5 timeline-title">${i18n.tr(event.userMessage)}</span>
+                    <span class="h5 timeline-title">${event.userMessage}</span>
                         <%--
                             If events ever have a body message:
                             <c:if test="${not empty event.message}">
