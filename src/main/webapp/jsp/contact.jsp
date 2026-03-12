@@ -109,7 +109,7 @@
                 </c:when>
                 <c:otherwise>
                     <p>
-                            ${i18n.tr('A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\'{0}\'>mailto link</a> to automatically create an email with the template.', teacherApplicationTemplate.mailtoLink)}
+                            ${i18n.tr('A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\'{0}\'>mailto link</a> to automatically create an email with the template.', teacherApplicationTemplate.getMailtoLink(i18n))}
                     </p>
                     <a id="show-email-template" class="btn btn-sm btn-outline-secondary" role="button">
                         <i class="fa fa-envelope me-2" aria-hidden="true"></i>
@@ -134,12 +134,12 @@
                                 </tr>
                                 <tr>
                                     <td>${i18n.tr('Subject:')}</td>
-                                    <td>${teacherApplicationTemplate.subject}</td>
+                                    <td>${teacherApplicationTemplate.getSubject(i18n)}</td>
                                 </tr>
                                 <tr>
                                     <td>${i18n.tr('Body:')}</td>
                                     <td>
-                                        <p class="mb-0" style="white-space: pre-wrap;">${teacherApplicationTemplate.body}</p>
+                                        <p class="mb-0" style="white-space: pre-wrap;">${teacherApplicationTemplate.getBody(i18n)}</p>
                                     </td>
                                 </tr>
                             </table>

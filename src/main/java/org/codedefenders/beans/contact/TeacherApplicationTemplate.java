@@ -27,6 +27,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.LinkUtils;
 import org.codedefenders.util.URLUtils;
+import org.xnap.commons.i18n.I18n;
 
 @RequestScoped
 @Named("teacherApplicationTemplate")
@@ -40,11 +41,11 @@ public class TeacherApplicationTemplate {
         this.url = url;
     }
 
-    public String getMailtoLink() {
+    public String getMailtoLink(I18n i18n) {
         String urlEncodedLink = "mailto:%s?subject=%s&body=%s".formatted(
                 LinkUtils.urlEncode(getAddress()),
-                LinkUtils.urlEncode(getSubject()),
-                LinkUtils.urlEncode(getBody())
+                LinkUtils.urlEncode(getSubject(i18n)),
+                LinkUtils.urlEncode(getBody(i18n))
         );
         return urlEncodedLink.replaceAll("\\+", "%20");
     }
@@ -53,22 +54,25 @@ public class TeacherApplicationTemplate {
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_EMAIL).getStringValue();
     }
 
-    public String getSubject() {
-        return "Teacher Account Application for " + login.getSimpleUser().getName();
+    public String getSubject(I18n i18n) {
+        return i18n.tr("Teacher Account Application for {0}", login.getSimpleUser().getName());
     }
 
-    public String getBody() {
-        return """
+    public String getBody(I18n i18n) {
+        return i18n.tr(
+                """
                 Greetings,
 
                 I would like to request a teacher account for %s on %s.
 
                 Regards,
                 %s
-                """.stripIndent().formatted(
-                        login.getSimpleUser().getName(),
-                        getShortAbsoluteUri(),
-                        login.getSimpleUser().getName());
+                """
+        ).stripIndent().formatted(
+                login.getSimpleUser().getName(),
+                getShortAbsoluteUri(),
+                login.getSimpleUser().getName()
+        );
     }
 
     private String getShortAbsoluteUri() {
