@@ -189,9 +189,9 @@ public class CodeValidatorTest {
                     testCase("invalid/assertionsJunitThree", 2, "You used more than 2 assertions"),
                     testCase("invalid/EmptyTest", "The test is empty."),
                     testCase("invalid/TestWithIf", "Conditional statements are not allowed"),
-                    testCase("invalid/TestWithSystemCall", "You have called a package you may not call."),
-                    testCase("invalid/TestWithSystemCall2", "You have called a package you may not call."),
-                    testCase("invalid/TestWithSystemCall3", "You have called a package you may not call."),
+                    testCase("invalid/TestWithSystemCall", "You have called System.*"),
+                    testCase("invalid/TestWithSystemCall2", "You have called an IO package"),
+                    testCase("invalid/TestWithSystemCall3", "You have called System.*"),
                     testCase("invalid/TwoClasses", "You cannot create a second class."),
                     testCase("invalid/TwoTests", "You cannot create a new method.")
             ).flatMap(Function.identity());
