@@ -62,7 +62,7 @@
         <div class="bg-light rounded-3 p-3 mb-3">
             <p class="mb-0">
                     ${i18n.tr('CodeDefenders is developed and maintained at the')}
-                        <a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">${i18n.tr('Chair of Software Engineering&nbspII')}</a>
+                        <a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">${i18n.tr('Chair of Software Engineering&nbsp;II')}</a>
                     ${i18n.tr('at the University of Passau.')}
             </p>
             <p class="mb-0">

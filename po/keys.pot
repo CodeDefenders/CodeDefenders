@@ -255,19 +255,19 @@ msgstr "Creating games is currently not enabled."
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:150
+#: src/main/java/org/codedefenders/service/RoleService.java:151
 msgid "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
 msgstr "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:156
+#: src/main/java/org/codedefenders/service/RoleService.java:157
 msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:187
+#: src/main/java/org/codedefenders/service/RoleService.java:188
 msgid "Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now migrate your existing admin users from the Tomcat user database to our new system. You can safely remove auth.admin.role after this is done."
 msgstr "Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now migrate your existing admin users from the Tomcat user database to our new system. You can safely remove auth.admin.role after this is done."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:196
+#: src/main/java/org/codedefenders/service/RoleService.java:197
 msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 
@@ -515,135 +515,135 @@ msgstr "No or invalid password provided."
 msgid "Failed to set your account as inactive. Please contact the page administrator."
 msgstr "Failed to set your account as inactive. Please contact the page administrator."
 
-#: src/main/java/org/codedefenders/util/Constants.java:60
+#: src/main/java/org/codedefenders/util/Constants.java:56
 msgid "Game is now in grace period."
 msgstr "Game is now in grace period."
 
-#: src/main/java/org/codedefenders/util/Constants.java:103
+#: src/main/java/org/codedefenders/util/Constants.java:99
 msgid "You won!"
 msgstr "You won!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:104
+#: src/main/java/org/codedefenders/util/Constants.java:100
 msgid "You lost!"
 msgstr "You lost!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:105
+#: src/main/java/org/codedefenders/util/Constants.java:101
 msgid "It was a draw!"
 msgstr "It was a draw!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:107
+#: src/main/java/org/codedefenders/util/Constants.java:103
 msgid "Sorry! An error on the server prevented the compilation of your test."
 msgstr "Sorry! An error on the server prevented the compilation of your test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:108
+#: src/main/java/org/codedefenders/util/Constants.java:104
 msgid "Your test did not compile. Try again, but with compilable code."
 msgstr "Your test did not compile. Try again, but with compilable code."
 
-#: src/main/java/org/codedefenders/util/Constants.java:109
+#: src/main/java/org/codedefenders/util/Constants.java:105
 msgid "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!"
 msgstr "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:110
+#: src/main/java/org/codedefenders/util/Constants.java:106
 msgid "Great! Your test compiled and passed on the original class under test."
 msgstr "Great! Your test compiled and passed on the original class under test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:111
+#: src/main/java/org/codedefenders/util/Constants.java:107
 msgid "Your test did not pass on the original class under test. Try again."
 msgstr "Your test did not pass on the original class under test. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:112
+#: src/main/java/org/codedefenders/util/Constants.java:108
 msgid "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 msgstr "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:113
+#: src/main/java/org/codedefenders/util/Constants.java:109
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 
-#: src/main/java/org/codedefenders/util/Constants.java:114
+#: src/main/java/org/codedefenders/util/Constants.java:110
 msgid "Test submitted and ready to kill mutants!"
 msgstr "Test submitted and ready to kill mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:115
+#: src/main/java/org/codedefenders/util/Constants.java:111
 msgid "Your test has not killed any mutants, just yet."
 msgstr "Your test has not killed any mutants, just yet."
 
-#: src/main/java/org/codedefenders/util/Constants.java:116
+#: src/main/java/org/codedefenders/util/Constants.java:112
 msgid "Great, your test killed the last mutant!"
 msgstr "Great, your test killed the last mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:117
+#: src/main/java/org/codedefenders/util/Constants.java:113
 msgid "Great, your test killed a mutant!"
 msgstr "Great, your test killed a mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:118
+#: src/main/java/org/codedefenders/util/Constants.java:114
 msgid "Awesome! Your test killed %d mutants!"
 msgstr "Awesome! Your test killed %d mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:120
+#: src/main/java/org/codedefenders/util/Constants.java:116
 msgid "Your mutant was compiled successfully."
 msgstr "Your mutant was compiled successfully."
 
-#: src/main/java/org/codedefenders/util/Constants.java:121
+#: src/main/java/org/codedefenders/util/Constants.java:117
 msgid "The mutant was accepted as equivalent."
 msgstr "The mutant was accepted as equivalent."
 
-#: src/main/java/org/codedefenders/util/Constants.java:122
+#: src/main/java/org/codedefenders/util/Constants.java:118
 msgid "Your mutant failed to compile. Try again."
 msgstr "Your mutant failed to compile. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:123
+#: src/main/java/org/codedefenders/util/Constants.java:119
 msgid "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 msgstr "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 
-#: src/main/java/org/codedefenders/util/Constants.java:124
+#: src/main/java/org/codedefenders/util/Constants.java:120
 msgid "Oops! Something went wrong and the mutant was not created."
 msgstr "Oops! Something went wrong and the mutant was not created."
 
-#: src/main/java/org/codedefenders/util/Constants.java:125
+#: src/main/java/org/codedefenders/util/Constants.java:121
 msgid "Sorry, your mutant already exists in this game!"
 msgstr "Sorry, your mutant already exists in this game!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:126
+#: src/main/java/org/codedefenders/util/Constants.java:122
 msgid "Mutant claimed as equivalent, waiting for attacker to respond."
 msgstr "Mutant claimed as equivalent, waiting for attacker to respond."
 
-#: src/main/java/org/codedefenders/util/Constants.java:127
+#: src/main/java/org/codedefenders/util/Constants.java:123
 msgid "Something went wrong claiming an equivalent mutant"
 msgstr "Something went wrong claiming an equivalent mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:128
+#: src/main/java/org/codedefenders/util/Constants.java:124
 msgid "Cheeky! You cannot claim equivalence on untested lines!"
 msgstr "Cheeky! You cannot claim equivalence on untested lines!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:129
+#: src/main/java/org/codedefenders/util/Constants.java:125
 msgid "Test %d killed your mutant. Better luck with the next one!"
 msgstr "Test %d killed your mutant. Better luck with the next one!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:130
+#: src/main/java/org/codedefenders/util/Constants.java:126
 msgid "Mutant submitted, may the force be with it."
 msgstr "Mutant submitted, may the force be with it."
 
-#: src/main/java/org/codedefenders/util/Constants.java:131
+#: src/main/java/org/codedefenders/util/Constants.java:127
 msgid "Cool, your mutant survived its first test."
 msgstr "Cool, your mutant survived its first test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:132
+#: src/main/java/org/codedefenders/util/Constants.java:128
 msgid "Awesome, your mutant survived %d tests!"
 msgstr "Awesome, your mutant survived %d tests!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:135
+#: src/main/java/org/codedefenders/util/Constants.java:131
 msgid "Success!"
 msgstr "Success!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:140
+#: src/main/java/org/codedefenders/util/Constants.java:136
 msgid "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 msgstr "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 
-#: src/main/java/org/codedefenders/util/Constants.java:142
+#: src/main/java/org/codedefenders/util/Constants.java:138
 msgid "Sorry, no kill message available for this mutant"
 msgstr "Sorry, no kill message available for this mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:144
+#: src/main/java/org/codedefenders/util/Constants.java:140
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
@@ -702,6 +702,14 @@ msgstr "Claim Equivalent"
 #: src/main/javascript/game/game_highlighting.js:357
 msgid "Claim Equivalent"
 msgstr "Claim Equivalent"
+
+#: src/main/javascript/game/killmap_accordion.js:197
+msgid "Mutant {0} (by {1})"
+msgstr "Mutant {0} (by {1})"
+
+#: src/main/javascript/game/killmap_accordion.js:306
+msgid "Test {0} (by {1})"
+msgstr "Test {0} (by {1})"
 
 #: src/main/javascript/game/killmap_accordion.js:345
 msgid "Kill"
@@ -855,6 +863,10 @@ msgstr "View"
 msgid "View Killing Test"
 msgstr "View Killing Test"
 
+#: src/main/javascript/game/mutant_accordion.js:91
+msgid "Mutant {0} (by {1})"
+msgstr "Mutant {0} (by {1})"
+
 #: src/main/javascript/game/mutant_accordion.js:197
 msgid "No mutants."
 msgstr "No mutants."
@@ -952,12 +964,8 @@ msgid "Done"
 msgstr "Done"
 
 #: src/main/javascript/game/test_accordion.js:104
-msgid "Test"
-msgstr "Test"
-
-#: src/main/javascript/game/test_accordion.js:104
-msgid "by"
-msgstr "by"
+msgid "Test {0} (by {1})"
+msgstr "Test {0} (by {1})"
 
 #: src/main/javascript/game/test_accordion.js:130
 msgid "Clone to editor"
@@ -1059,21 +1067,9 @@ msgstr "Test Failed Against Original"
 msgid "Done"
 msgstr "Done"
 
-#: src/main/javascript/main/achievement_notifications.js:101
-msgid "Show all achievements on the profile page"
-msgstr "Show all achievements on the profile page"
-
-#: src/main/javascript/main/achievement_notifications.js:107
-msgid "New Achievement Unlocked"
-msgstr "New Achievement Unlocked"
-
-#: src/main/javascript/main/achievement_notifications.js:107
-msgid "Level"
-msgstr "Level"
-
-#: src/main/javascript/main/achievement_notifications.js:112
-msgid "Close"
-msgstr "Close"
+#: src/main/javascript/main/achievement_notifications.js:58
+msgid "New Achievement Unlocked:"
+msgstr "New Achievement Unlocked:"
 
 #: src/main/javascript/main/datatables_utils.js:194
 msgid "No data available in table"
@@ -1151,6 +1147,82 @@ msgstr "Could not fetch mutant.\nPlease try again later."
 msgid "Could not fetch test.\nPlease try again later."
 msgstr "Could not fetch test.\nPlease try again later."
 
+#: src/main/javascript/main/landing_page_animation.js:79
+msgid "Class Under Test (CUT)"
+msgstr "Class Under Test (CUT)"
+
+#: src/main/javascript/main/landing_page_animation.js:81
+msgid "Defender: Test Editor"
+msgstr "Defender: Test Editor"
+
+#: src/main/javascript/main/landing_page_animation.js:88
+msgid "Defender writes a test"
+msgstr "Defender writes a test"
+
+#: src/main/javascript/main/landing_page_animation.js:100
+msgid "Executing test..."
+msgstr "Executing test..."
+
+#: src/main/javascript/main/landing_page_animation.js:206
+msgid "Test passes!"
+msgstr "Test passes!"
+
+#: src/main/javascript/main/landing_page_animation.js:212
+msgid "Class Under Test (CUT)"
+msgstr "Class Under Test (CUT)"
+
+#: src/main/javascript/main/landing_page_animation.js:213
+msgid "Defender's test"
+msgstr "Defender's test"
+
+#: src/main/javascript/main/landing_page_animation.js:224
+msgid "Attacker mutates the CUT"
+msgstr "Attacker mutates the CUT"
+
+#: src/main/javascript/main/landing_page_animation.js:227
+msgid "Attacker's mutant"
+msgstr "Attacker's mutant"
+
+#: src/main/javascript/main/landing_page_animation.js:241
+msgid "Executing test on mutant..."
+msgstr "Executing test on mutant..."
+
+#: src/main/javascript/main/landing_page_animation.js:335
+msgid "Test fails! Mutant killed!"
+msgstr "Test fails! Mutant killed!"
+
+#: src/main/javascript/main/landing_page_animation.js:335
+msgid "The defender gains one point for killing a mutant."
+msgstr "The defender gains one point for killing a mutant."
+
+#: src/main/javascript/main/landing_page_animation.js:343
+msgid "Class Under Test (CUT)"
+msgstr "Class Under Test (CUT)"
+
+#: src/main/javascript/main/landing_page_animation.js:344
+msgid "Attacker tries again..."
+msgstr "Attacker tries again..."
+
+#: src/main/javascript/main/landing_page_animation.js:352
+msgid "Attacker creates a subtler mutant"
+msgstr "Attacker creates a subtler mutant"
+
+#: src/main/javascript/main/landing_page_animation.js:354
+msgid "Attacker's mutant"
+msgstr "Attacker's mutant"
+
+#: src/main/javascript/main/landing_page_animation.js:368
+msgid "Executing test on mutant..."
+msgstr "Executing test on mutant..."
+
+#: src/main/javascript/main/landing_page_animation.js:476
+msgid "All current tests pass. The mutant survives!"
+msgstr "All current tests pass. The mutant survives!"
+
+#: src/main/javascript/main/landing_page_animation.js:478
+msgid "The attacker gains one point for creating a mutant that survives one test."
+msgstr "The attacker gains one point for creating a mutant that survives one test."
+
 #: src/main/webapp/jsp/about_page.jsp:26
 msgid "About Code Defenders"
 msgstr "About Code Defenders"
@@ -1184,52 +1256,68 @@ msgid "CodeDefenders is developed and maintained at the"
 msgstr "CodeDefenders is developed and maintained at the"
 
 #: src/main/webapp/jsp/about_page.jsp:65
-msgid "Chair of Software Engineering II"
-msgstr "Chair of Software Engineering II"
+msgid "Chair of Software Engineering&nbsp;II"
+msgstr "Chair of Software Engineering&nbsp;II"
 
 #: src/main/webapp/jsp/about_page.jsp:66
-msgid "at the University of Passau and the"
-msgstr "at the University of Passau and the"
+msgid "at the University of Passau."
+msgstr "at the University of Passau."
 
-#: src/main/webapp/jsp/about_page.jsp:67
-msgid "University of Leicester"
-msgstr "University of Leicester"
-
-#: src/main/webapp/jsp/about_page.jsp:70
+#: src/main/webapp/jsp/about_page.jsp:69
 msgid "Code Defenders is an open source project."
 msgstr "Code Defenders is an open source project."
 
-#: src/main/webapp/jsp/about_page.jsp:71
+#: src/main/webapp/jsp/about_page.jsp:70
 msgid "See the"
 msgstr "See the"
 
-#: src/main/webapp/jsp/about_page.jsp:73
+#: src/main/webapp/jsp/about_page.jsp:72
 msgid "project page."
 msgstr "project page."
 
-#: src/main/webapp/jsp/about_page.jsp:77
+#: src/main/webapp/jsp/about_page.jsp:76
 msgid "Contributors"
 msgstr "Contributors"
+
+#: src/main/webapp/jsp/about_page.jsp:79
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
+
+#: src/main/webapp/jsp/about_page.jsp:80
+msgid "University of Passau"
+msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:81
 msgid "University of Passau"
 msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:82
-msgid "University of Leicester"
-msgstr "University of Leicester"
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: src/main/webapp/jsp/about_page.jsp:84
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: src/main/webapp/jsp/about_page.jsp:85
+msgid "University of Passau"
+msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:86
-msgid "The University of Sheffield"
-msgstr "The University of Sheffield"
+msgid "University of Passau"
+msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:87
 msgid "University of Passau"
 msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:88
-msgid "University of Passau"
-msgstr "University of Passau"
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
+
+#: src/main/webapp/jsp/about_page.jsp:89
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
 
 #: src/main/webapp/jsp/about_page.jsp:90
 msgid "University of Passau"
@@ -1244,46 +1332,26 @@ msgid "University of Passau"
 msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:93
-msgid "University of Passau"
-msgstr "University of Passau"
-
-#: src/main/webapp/jsp/about_page.jsp:94
-msgid "University of Passau"
-msgstr "University of Passau"
-
-#: src/main/webapp/jsp/about_page.jsp:95
 msgid "The University of Sheffield"
 msgstr "The University of Sheffield"
-
-#: src/main/webapp/jsp/about_page.jsp:96
-msgid "University of Passau"
-msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:97
-msgid "University of Passau"
-msgstr "University of Passau"
-
-#: src/main/webapp/jsp/about_page.jsp:98
-msgid "The University of Sheffield"
-msgstr "The University of Sheffield"
-
-#: src/main/webapp/jsp/about_page.jsp:102
 msgid "Supporters"
 msgstr "Supporters"
 
-#: src/main/webapp/jsp/about_page.jsp:106
+#: src/main/webapp/jsp/about_page.jsp:101
 msgid "Improving Engagement of Students in Software Engineering Courses through Gamification"
 msgstr "Improving Engagement of Students in Software Engineering Courses through Gamification"
 
-#: src/main/webapp/jsp/about_page.jsp:109
+#: src/main/webapp/jsp/about_page.jsp:104
 msgid "Sheffield Undergraduate Research Experience"
 msgstr "Sheffield Undergraduate Research Experience"
 
-#: src/main/webapp/jsp/about_page.jsp:111
+#: src/main/webapp/jsp/about_page.jsp:106
 msgid "Grant RG160969"
 msgstr "Grant RG160969"
 
-#: src/main/webapp/jsp/about_page.jsp:115
+#: src/main/webapp/jsp/about_page.jsp:110
 msgid "Research"
 msgstr "Research"
 
@@ -1596,32 +1664,32 @@ msgid "to upload a new class."
 msgstr "to upload a new class."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:87
-msgid "Set class as inactive. This class won't be available for games afterwards."
-msgstr "Set class as inactive. This class won't be available for games afterwards."
+msgid "Set class as inactive. This class won\\'t be available for games afterwards."
+msgstr "Set class as inactive. This class won\\'t be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to inactive?"
+msgid "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
+msgstr "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:97
 msgid "Set class as active. This class will be available for games afterwards again."
 msgstr "Set class as active. This class will be available for games afterwards again."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to active?"
+msgid "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
+msgstr "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:109
-msgid "Delete class from the system. This class won't be available for games afterwards."
-msgstr "Delete class from the system. This class won't be available for games afterwards."
+msgid "Delete class from the system. This class won\\'t be available for games afterwards."
+msgstr "Delete class from the system. This class won\\'t be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:110
-msgid "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
-msgstr "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
+msgid "Are you sure you want to delete class \\'${gameClass.name}\\' forever? This cannot be undone."
+msgstr "Are you sure you want to delete class \\'${gameClass.name}\\' forever? This cannot be undone."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:114
-msgid "Class can't be deleted, since games were already played on it."
-msgstr "Class can't be deleted, since games were already played on it."
+msgid "Class can\\'t be deleted, since games were already played on it."
+msgstr "Class can\\'t be deleted, since games were already played on it."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:131
 msgid "Click here"
@@ -1708,8 +1776,8 @@ msgid "Link"
 msgstr "Link"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:183
-msgid "There aren't any classrooms... yet."
-msgstr "There aren't any classrooms... yet."
+msgid "There aren\\'t any classrooms... yet."
+msgstr "There aren\\'t any classrooms... yet."
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 msgid "Game"
@@ -2083,235 +2151,235 @@ msgstr "Are you sure you want to delete the selected killmaps?"
 msgid "Are you sure you want to delete the selected killmaps?"
 msgstr "Are you sure you want to delete the selected killmaps?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:66
+#: src/main/webapp/jsp/admin_monitor_games.jsp:68
 msgid "Multiplayer Games"
 msgstr "Multiplayer Games"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:75
+#: src/main/webapp/jsp/admin_monitor_games.jsp:77
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:77
+#: src/main/webapp/jsp/admin_monitor_games.jsp:79
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:78
+#: src/main/webapp/jsp/admin_monitor_games.jsp:80
 msgid "Creator"
 msgstr "Creator"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:79
+#: src/main/webapp/jsp/admin_monitor_games.jsp:81
 msgid "Attackers"
 msgstr "Attackers"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:80
+#: src/main/webapp/jsp/admin_monitor_games.jsp:82
 msgid "Defenders"
 msgstr "Defenders"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:81
+#: src/main/webapp/jsp/admin_monitor_games.jsp:83
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:85
+#: src/main/webapp/jsp/admin_monitor_games.jsp:87
 msgid "Show list of Players for each Game."
 msgstr "Show list of Players for each Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:97
-msgid "You don't control any unfinished multiplayer games at the moment."
-msgstr "You don't control any unfinished multiplayer games at the moment."
+#: src/main/webapp/jsp/admin_monitor_games.jsp:99
+msgid "You don\\\'t control any unfinished multiplayer games at the moment."
+msgstr "You don\\\'t control any unfinished multiplayer games at the moment."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:109
+#: src/main/webapp/jsp/admin_monitor_games.jsp:111
 msgid "Are you sure you want to stop this Game?"
 msgstr "Are you sure you want to stop this Game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:123
+#: src/main/webapp/jsp/admin_monitor_games.jsp:125
 msgid "Observe"
 msgstr "Observe"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:130
+#: src/main/webapp/jsp/admin_monitor_games.jsp:132
 msgid "Join as Observer"
 msgstr "Join as Observer"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:152
+#: src/main/webapp/jsp/admin_monitor_games.jsp:154
 msgid "Start/Stop Game"
 msgstr "Start/Stop Game"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:156
+#: src/main/webapp/jsp/admin_monitor_games.jsp:158
 msgid "Are you sure you want to create a rematch for this game?"
 msgstr "Are you sure you want to create a rematch for this game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:158
+#: src/main/webapp/jsp/admin_monitor_games.jsp:160
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:171
+#: src/main/webapp/jsp/admin_monitor_games.jsp:173
 msgid "There are no players active in this game."
 msgstr "There are no players active in this game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:182
+#: src/main/webapp/jsp/admin_monitor_games.jsp:184
 msgid "Game Score"
 msgstr "Game Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:183
+#: src/main/webapp/jsp/admin_monitor_games.jsp:185
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:184
+#: src/main/webapp/jsp/admin_monitor_games.jsp:186
 msgid "Submissions"
 msgstr "Submissions"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:185
+#: src/main/webapp/jsp/admin_monitor_games.jsp:187
 msgid "Last Action"
 msgstr "Last Action"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:186
+#: src/main/webapp/jsp/admin_monitor_games.jsp:188
 msgid "Points"
 msgstr "Points"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:187
+#: src/main/webapp/jsp/admin_monitor_games.jsp:189
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:188
+#: src/main/webapp/jsp/admin_monitor_games.jsp:190
 msgid "Switch Role"
 msgstr "Switch Role"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:189
+#: src/main/webapp/jsp/admin_monitor_games.jsp:191
 msgid "Remove Player"
 msgstr "Remove Player"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:225
+#: src/main/webapp/jsp/admin_monitor_games.jsp:227
 msgid "never"
 msgstr "never"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:264
+#: src/main/webapp/jsp/admin_monitor_games.jsp:266
 msgid "Are you sure you want to change the role of this player?"
 msgstr "Are you sure you want to change the role of this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:265
+#: src/main/webapp/jsp/admin_monitor_games.jsp:267
 msgid "This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the game."
 msgstr "This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:273
+#: src/main/webapp/jsp/admin_monitor_games.jsp:275
 msgid "Are you sure you want to permanently remove this player?"
 msgstr "Are you sure you want to permanently remove this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:274
+#: src/main/webapp/jsp/admin_monitor_games.jsp:276
 msgid "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 msgstr "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:277
+#: src/main/webapp/jsp/admin_monitor_games.jsp:279
 msgid "Remove"
 msgstr "Remove"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:298
+#: src/main/webapp/jsp/admin_monitor_games.jsp:300
 msgid "Melee Games"
 msgstr "Melee Games"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:313
+#: src/main/webapp/jsp/admin_monitor_games.jsp:315
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:315
+#: src/main/webapp/jsp/admin_monitor_games.jsp:317
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:316
+#: src/main/webapp/jsp/admin_monitor_games.jsp:318
 msgid "Creator"
 msgstr "Creator"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:317
+#: src/main/webapp/jsp/admin_monitor_games.jsp:319
 msgid "Players"
 msgstr "Players"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:318
+#: src/main/webapp/jsp/admin_monitor_games.jsp:320
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:322
+#: src/main/webapp/jsp/admin_monitor_games.jsp:324
 msgid "Show list of Players for each Game."
 msgstr "Show list of Players for each Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:334
-msgid "You don't control any unfinished melee games at the moment."
-msgstr "You don't control any unfinished melee games at the moment."
+#: src/main/webapp/jsp/admin_monitor_games.jsp:336
+msgid "You don\\\'t control any unfinished melee games at the moment."
+msgstr "You don\\\'t control any unfinished melee games at the moment."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:346
+#: src/main/webapp/jsp/admin_monitor_games.jsp:348
 msgid "Are you sure you want to stop this Game?"
 msgstr "Are you sure you want to stop this Game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:360
+#: src/main/webapp/jsp/admin_monitor_games.jsp:362
 msgid "Observe"
 msgstr "Observe"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:367
+#: src/main/webapp/jsp/admin_monitor_games.jsp:369
 msgid "Join as Observer"
 msgstr "Join as Observer"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:388
+#: src/main/webapp/jsp/admin_monitor_games.jsp:390
 msgid "Start/Stop Game"
 msgstr "Start/Stop Game"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:392
+#: src/main/webapp/jsp/admin_monitor_games.jsp:394
 msgid "Are you sure you want to create a rematch for this game?"
 msgstr "Are you sure you want to create a rematch for this game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:394
+#: src/main/webapp/jsp/admin_monitor_games.jsp:396
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:417
+#: src/main/webapp/jsp/admin_monitor_games.jsp:419
 msgid "Game Score"
 msgstr "Game Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:418
+#: src/main/webapp/jsp/admin_monitor_games.jsp:420
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:419
+#: src/main/webapp/jsp/admin_monitor_games.jsp:421
 msgid "Submissions"
 msgstr "Submissions"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:420
+#: src/main/webapp/jsp/admin_monitor_games.jsp:422
 msgid "Last Action"
 msgstr "Last Action"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:421
+#: src/main/webapp/jsp/admin_monitor_games.jsp:423
 msgid "Points"
 msgstr "Points"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:422
+#: src/main/webapp/jsp/admin_monitor_games.jsp:424
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:423
+#: src/main/webapp/jsp/admin_monitor_games.jsp:425
 msgid "Remove Player"
 msgstr "Remove Player"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:455
+#: src/main/webapp/jsp/admin_monitor_games.jsp:457
 msgid "never"
 msgstr "never"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:487
+#: src/main/webapp/jsp/admin_monitor_games.jsp:489
 msgid "Are you sure you want to permanently remove this player?"
 msgstr "Are you sure you want to permanently remove this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:488
+#: src/main/webapp/jsp/admin_monitor_games.jsp:490
 msgid "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 msgstr "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:491
+#: src/main/webapp/jsp/admin_monitor_games.jsp:493
 msgid "Remove"
 msgstr "Remove"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:515
+#: src/main/webapp/jsp/admin_monitor_games.jsp:517
 msgid "Start Games"
 msgstr "Start Games"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:520
+#: src/main/webapp/jsp/admin_monitor_games.jsp:522
 msgid "Are you sure you want to stop the selected Games?"
 msgstr "Are you sure you want to stop the selected Games?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:522
+#: src/main/webapp/jsp/admin_monitor_games.jsp:524
 msgid "Stop Games"
 msgstr "Stop Games"
 
@@ -3024,8 +3092,8 @@ msgid "User is already set inactive."
 msgstr "User is already set inactive."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:231
-msgid "Are you sure you want to set {0}\'s account to inactive?"
-msgstr "Are you sure you want to set {0}\'s account to inactive?"
+msgid "Are you sure you want to set {0}\\\'s account to inactive?"
+msgstr "Are you sure you want to set {0}\\\'s account to inactive?"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:267
 msgid "Create Accounts"
@@ -3064,8 +3132,8 @@ msgid "The password rules are: At least {0} alphanumeric characters (a-z, A-Z, 0
 msgstr "The password rules are: At least {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:302
-msgid "Please consider that you can't reuse a username from an inactive user."
-msgstr "Please consider that you can't reuse a username from an inactive user."
+msgid "Please consider that you can\\'t reuse a username from an inactive user."
+msgstr "Please consider that you can\\'t reuse a username from an inactive user."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:304
 msgid "Valid input format examples:"
@@ -3176,8 +3244,8 @@ msgid "Capture Intentions"
 msgstr "Capture Intentions"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:223
-msgid "Enable Capturing Players' Intentions"
-msgstr "Enable Capturing Players' Intentions"
+msgid "Enable Capturing Players\\' Intentions"
+msgstr "Enable Capturing Players\\' Intentions"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:229
 msgid "Allows players to chat within their team and with the enemy team."
@@ -3232,8 +3300,8 @@ msgid "The duration for how long the games will be open."
 msgstr "The duration for how long the games will be open."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:293
-msgid "Set the game's duration:"
-msgstr "Set the game's duration:"
+msgid "Set the game\\'s duration:"
+msgstr "Set the game\\'s duration:"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:297
 msgid "days"
@@ -3672,8 +3740,8 @@ msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
 #: src/main/webapp/jsp/classroom_page.jsp:363
-msgid "Passwords don't match."
-msgstr "Passwords don't match."
+msgid "Passwords don\\'t match."
+msgstr "Passwords don\\'t match."
 
 #: src/main/webapp/jsp/classroom_page.jsp:373
 msgid "Set password"
@@ -3720,8 +3788,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:427
-msgid "Are you sure you want to disable joining? Students won't be able to join the classroom via invite link or from the public list."
-msgstr "Are you sure you want to disable joining? Students won't be able to join the classroom via invite link or from the public list."
+msgid "Are you sure you want to disable joining? Students won\\'t be able to join the classroom via invite link or from the public list."
+msgstr "Are you sure you want to disable joining? Students won\\'t be able to join the classroom via invite link or from the public list."
 
 #: src/main/webapp/jsp/classroom_page.jsp:430
 msgid "Disable joining"
@@ -3752,8 +3820,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:465
-msgid "Are you sure you want to change the classroom's visibility to private? The classroom will no longer be shown in the public list and players won't be able to join from there."
-msgstr "Are you sure you want to change the classroom's visibility to private? The classroom will no longer be shown in the public list and players won't be able to join from there."
+msgid "Are you sure you want to change the classroom\\'s visibility to private? The classroom will no longer be shown in the public list and players won\\'t be able to join from there."
+msgstr "Are you sure you want to change the classroom\\'s visibility to private? The classroom will no longer be shown in the public list and players won\\'t be able to join from there."
 
 #: src/main/webapp/jsp/classroom_page.jsp:468
 msgid "Make Private"
@@ -3832,8 +3900,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:562
-msgid "Are you sure you want to make {0} the owner of this classroom? This will change the current owner's role to Moderator."
-msgstr "Are you sure you want to make {0} the owner of this classroom? This will change the current owner's role to Moderator."
+msgid "Are you sure you want to make {0} the owner of this classroom? This will change the current owner\\'s role to Moderator."
+msgstr "Are you sure you want to make {0} the owner of this classroom? This will change the current owner\\'s role to Moderator."
 
 #: src/main/webapp/jsp/classroom_page.jsp:565
 msgid "Change owner"
@@ -4044,8 +4112,8 @@ msgid "Link"
 msgstr "Link"
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:204
-msgid "You're not part of any classrooms."
-msgstr "You're not part of any classrooms."
+msgid "You\\'re not part of any classrooms."
+msgstr "You\\'re not part of any classrooms."
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:205
 msgid "No classrooms found."
@@ -4140,8 +4208,8 @@ msgid "A teacher account lets you create classrooms for your students, so you ca
 msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page."
 
 #: src/main/webapp/jsp/contact.jsp:112
-msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
-msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
+msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\\'{0}\\'>mailto link</a> to automatically create an email with the template."
+msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\\'{0}\\'>mailto link</a> to automatically create an email with the template."
 
 #: src/main/webapp/jsp/contact.jsp:116
 msgid "Show template"
@@ -4176,12 +4244,12 @@ msgid "project page for more details."
 msgstr "project page for more details."
 
 #: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don't have permission to perform this request (403)"
-msgstr "You don't have permission to perform this request (403)"
+msgid "You don\\'t have permission to perform this request (403)"
+msgstr "You don\\'t have permission to perform this request (403)"
 
 #: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don't have permission to perform this request."
-msgstr "You don't have permission to perform this request."
+msgid "You don\\'t have permission to perform this request."
+msgstr "You don\\'t have permission to perform this request."
 
 #: src/main/webapp/jsp/error_page_403.jsp:31
 msgid "Your accounts permissions do not include the accessed page or performed action."
@@ -4192,20 +4260,20 @@ msgid "Please contact your administrator if you think this is a mistake."
 msgstr "Please contact your administrator if you think this is a mistake."
 
 #: src/main/webapp/jsp/error_page_404.jsp:27
-msgid "The page you're looking for could not be found (404)"
-msgstr "The page you're looking for could not be found (404)"
+msgid "The page you\\'re looking for could not be found (404)"
+msgstr "The page you\\'re looking for could not be found (404)"
 
 #: src/main/webapp/jsp/error_page_404.jsp:29
-msgid "The page could not be found, or you don't have permission to view it."
-msgstr "The page could not be found, or you don't have permission to view it."
+msgid "The page could not be found, or you don\\'t have permission to view it."
+msgstr "The page could not be found, or you don\\'t have permission to view it."
 
 #: src/main/webapp/jsp/error_page_404.jsp:32
-msgid "The resource that you are attempting to access does not exist, or you don't have the necessary permissions to view it."
-msgstr "The resource that you are attempting to access does not exist, or you don't have the necessary permissions to view it."
+msgid "The resource that you are attempting to access does not exist, or you don\\\'t have the necessary permissions to view it."
+msgstr "The resource that you are attempting to access does not exist, or you don\\\'t have the necessary permissions to view it."
 
 #: src/main/webapp/jsp/error_page_404.jsp:34
-msgid "Make sure the address is correct and that the page hasn't moved."
-msgstr "Make sure the address is correct and that the page hasn't moved."
+msgid "Make sure the address is correct and that the page hasn\\\'t moved."
+msgstr "Make sure the address is correct and that the page hasn\\\'t moved."
 
 #: src/main/webapp/jsp/error_page_404.jsp:35
 msgid "Please contact your administrator if you think this is a mistake."
@@ -4544,8 +4612,8 @@ msgid "Imprint & Privacy Policy"
 msgstr "Imprint & Privacy Policy"
 
 #: src/main/webapp/jsp/imprint.jsp:39
-msgid "Imprint"
-msgstr "Imprint"
+msgid "Site Notice"
+msgstr "Site Notice"
 
 #: src/main/webapp/jsp/imprint.jsp:44
 msgid "Please add an imprint in the system settings."
@@ -4563,77 +4631,113 @@ msgstr "Please add a privacy policy in the system settings."
 msgid "Welcome to Code Defenders"
 msgstr "Welcome to Code Defenders"
 
-#: src/main/webapp/jsp/index.jsp:47
+#: src/main/webapp/jsp/index.jsp:51
 msgid "Code Defenders Logo"
 msgstr "Code Defenders Logo"
 
-#: src/main/webapp/jsp/index.jsp:50
-msgid "Code Defenders:"
-msgstr "Code Defenders:"
+#: src/main/webapp/jsp/index.jsp:54
+msgid "Code Defenders"
+msgstr "Code Defenders"
 
-#: src/main/webapp/jsp/index.jsp:51
+#: src/main/webapp/jsp/index.jsp:55
 msgid "A Mutation Testing Game"
 msgstr "A Mutation Testing Game"
 
-#: src/main/webapp/jsp/index.jsp:58
+#: src/main/webapp/jsp/index.jsp:63
 msgid "Log in or Sign up"
 msgstr "Log in or Sign up"
 
-#: src/main/webapp/jsp/index.jsp:64
+#: src/main/webapp/jsp/index.jsp:105
+msgid "Can you kill the mutant?"
+msgstr "Can you kill the mutant?"
+
+#: src/main/webapp/jsp/index.jsp:108
+msgid "CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple, competitive challenge between two roles: defenders and attackers."
+msgstr "CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple, competitive challenge between two roles: defenders and attackers."
+
+#: src/main/webapp/jsp/index.jsp:109
+msgid "Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all tests still pass, the mutant survives and scores for the attacker."
+msgstr "Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all tests still pass, the mutant survives and scores for the attacker."
+
+#: src/main/webapp/jsp/index.jsp:116
 msgid "Active Battleground Games"
 msgstr "Active Battleground Games"
 
-#: src/main/webapp/jsp/index.jsp:69
+#: src/main/webapp/jsp/index.jsp:121
 msgid "Creator"
 msgstr "Creator"
 
-#: src/main/webapp/jsp/index.jsp:70
+#: src/main/webapp/jsp/index.jsp:122
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/jsp/index.jsp:71
+#: src/main/webapp/jsp/index.jsp:123
 msgid "Attackers"
 msgstr "Attackers"
 
-#: src/main/webapp/jsp/index.jsp:72
+#: src/main/webapp/jsp/index.jsp:124
 msgid "Defenders"
 msgstr "Defenders"
 
-#: src/main/webapp/jsp/index.jsp:73
+#: src/main/webapp/jsp/index.jsp:125
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/jsp/index.jsp:81
+#: src/main/webapp/jsp/index.jsp:133
 msgid "There are currently no open games."
 msgstr "There are currently no open games."
 
-#: src/main/webapp/jsp/index.jsp:104
+#: src/main/webapp/jsp/index.jsp:154
 msgid "Active Melee Games"
 msgstr "Active Melee Games"
 
-#: src/main/webapp/jsp/index.jsp:109
+#: src/main/webapp/jsp/index.jsp:159
 msgid "Creator"
 msgstr "Creator"
 
-#: src/main/webapp/jsp/index.jsp:110
+#: src/main/webapp/jsp/index.jsp:160
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/jsp/index.jsp:111
+#: src/main/webapp/jsp/index.jsp:161
 msgid "Players"
 msgstr "Players"
 
-#: src/main/webapp/jsp/index.jsp:112
+#: src/main/webapp/jsp/index.jsp:162
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/jsp/index.jsp:120
+#: src/main/webapp/jsp/index.jsp:170
 msgid "There are currently no open games."
 msgstr "There are currently no open games."
 
-#: src/main/webapp/jsp/index.jsp:143
+#: src/main/webapp/jsp/index.jsp:194
 msgid "Research"
 msgstr "Research"
+
+#: src/main/webapp/jsp/index.jsp:204
+msgid "Use CodeDefenders for your lessons"
+msgstr "Use CodeDefenders for your lessons"
+
+#: src/main/webapp/jsp/index.jsp:206
+msgid "CodeDefenders is an open source software developed and maintained at the Chair of Software Engineering&nbsp;II at the University of Passau."
+msgstr "CodeDefenders is an open source software developed and maintained at the Chair of Software Engineering&nbsp;II at the University of Passau."
+
+#: src/main/webapp/jsp/index.jsp:207
+msgid "The source code is available along with install instructions on <a href=\"{0}\" rel=\"noopener\" target=\"_blank\" title=\"CodeDefenders repo on GitHub\">GitHub</a>."
+msgstr "The source code is available along with install instructions on <a href=\"{0}\" rel=\"noopener\" target=\"_blank\" title=\"CodeDefenders repo on GitHub\">GitHub</a>."
+
+#: src/main/webapp/jsp/index.jsp:210
+msgid "We also provide docker containers for all major releases."
+msgstr "We also provide docker containers for all major releases."
+
+#: src/main/webapp/jsp/index.jsp:211
+msgid "You can find links to these containers and more information in our <a href=\"{0}\" rel=\"noopener\" target=\"_blank\" title=\"CodeDefenders Docker README\">docker documentation</a>."
+msgstr "You can find links to these containers and more information in our <a href=\"{0}\" rel=\"noopener\" target=\"_blank\" title=\"CodeDefenders Docker README\">docker documentation</a>."
+
+#: src/main/webapp/jsp/index.jsp:215
+msgid "While the public instance at <a href=\"{0}\" title=\"Public CodeDefenders instance\">code-defenders.org</a> is available for everyone to try out CodeDefenders, we strongly recommend setting up a private instance for use in the classroom to ensure a consistent performance."
+msgstr "While the public instance at <a href=\"{0}\" title=\"Public CodeDefenders instance\">code-defenders.org</a> is available for everyone to try out CodeDefenders, we strongly recommend setting up a private instance for use in the classroom to ensure a consistent performance."
 
 #: src/main/webapp/jsp/leaderboards.jsp:30
 msgid "Battlegrounds Leaderboard"
@@ -4768,8 +4872,8 @@ msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
 #: src/main/webapp/jsp/login_view.jsp:156
-msgid "{0}-20 alphanumeric characters, no whitespace or special characters."
-msgstr "{0}-20 alphanumeric characters, no whitespace or special characters."
+msgid "min. {0} alphanumeric characters, no whitespace or special characters."
+msgstr "min. {0} alphanumeric characters, no whitespace or special characters."
 
 #: src/main/webapp/jsp/login_view.jsp:165
 msgid "Close"
@@ -4948,8 +5052,8 @@ msgid "Capture Intentions"
 msgstr "Capture Intentions"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:217
-msgid "Enable Capturing Players' Intentions"
-msgstr "Enable Capturing Players' Intentions"
+msgid "Enable Capturing Players\\' Intentions"
+msgstr "Enable Capturing Players\\' Intentions"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:223
 msgid "Allows players to chat with each other."
@@ -4992,8 +5096,8 @@ msgid "The duration for how long the games will be open."
 msgstr "The duration for how long the games will be open."
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:272
-msgid "Set the game's duration:"
-msgstr "Set the game's duration:"
+msgid "Set the game\\'s duration:"
+msgstr "Set the game\\'s duration:"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:276
 msgid "days"
@@ -5096,8 +5200,8 @@ msgid "Scoring System"
 msgstr "Scoring System"
 
 #: src/main/webapp/jsp/melee/details_view.jsp:188
-msgid "The game's duration"
-msgstr "The game's duration"
+msgid "The game\\'s duration"
+msgstr "The game\\'s duration"
 
 #: src/main/webapp/jsp/melee/details_view.jsp:207
 msgid "Total Duration"
@@ -5172,8 +5276,8 @@ msgid "Create a mutant here"
 msgstr "Create a mutant here"
 
 #: src/main/webapp/jsp/melee/player_view.jsp:250
-msgid "<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class=\"mb-0\"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>"
-msgstr "<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class=\"mb-0\"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>"
+msgid "<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class=\\\"mb-0\\\"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>"
+msgstr "<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class=\\\"mb-0\\\"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>"
 
 #: src/main/webapp/jsp/melee/player_view.jsp:253
 msgid "Enemy Coverage"
@@ -5439,73 +5543,29 @@ msgstr "Puzzle solved in {0} attempts."
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:28
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:33
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:44
+#: src/main/webapp/jsp/research.jsp:64
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:48
+#: src/main/webapp/jsp/research.jsp:68
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:50
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:55
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:67
+#: src/main/webapp/jsp/research.jsp:87
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:71
+#: src/main/webapp/jsp/research.jsp:91
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:73
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:78
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:90
+#: src/main/webapp/jsp/research.jsp:110
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:95
+#: src/main/webapp/jsp/research.jsp:115
 msgid "Download PDF"
 msgstr "Download PDF"
-
-#: src/main/webapp/jsp/research.jsp:101
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:112
-msgid "Copy"
-msgstr "Copy"
-
-#: src/main/webapp/jsp/research.jsp:117
-msgid "Download PDF"
-msgstr "Download PDF"
-
-#: src/main/webapp/jsp/research.jsp:118
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:123
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
 
 #: src/main/webapp/jsp/research.jsp:132
 msgid "Copy"
@@ -5515,39 +5575,31 @@ msgstr "Copy"
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:138
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:143
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:154
+#: src/main/webapp/jsp/research.jsp:152
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:159
+#: src/main/webapp/jsp/research.jsp:157
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:160
-msgid "[PDF]"
-msgstr "[PDF]"
-
-#: src/main/webapp/jsp/research.jsp:165
-msgid "[Bibtex]"
-msgstr "[Bibtex]"
-
-#: src/main/webapp/jsp/research.jsp:176
+#: src/main/webapp/jsp/research.jsp:174
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:189
+#: src/main/webapp/jsp/research.jsp:179
+msgid "Download PDF"
+msgstr "Download PDF"
+
+#: src/main/webapp/jsp/research.jsp:196
+msgid "Copy"
+msgstr "Copy"
+
+#: src/main/webapp/jsp/research.jsp:209
 msgid "Copied."
 msgstr "Copied."
 
-#: src/main/webapp/jsp/research.jsp:191
+#: src/main/webapp/jsp/research.jsp:211
 msgid "Copy"
 msgstr "Copy"
 
@@ -5592,8 +5644,8 @@ msgid "Mutant is proven to <b>not</b> be equivalent:"
 msgstr "Mutant is proven to <b>not</b> be equivalent:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:64
-msgid "Keep the mutant's points and get an extra point"
-msgstr "Keep the mutant's points and get an extra point"
+msgid "Keep the mutant\\'s points and get an extra point"
+msgstr "Keep the mutant\\'s points and get an extra point"
 
 #: src/main/webapp/jsp/scoring_system.jsp:73
 msgid "Your score does not change"
@@ -5604,8 +5656,8 @@ msgid "Equivalence is accepted or no killing test is provided in time:"
 msgstr "Equivalence is accepted or no killing test is provided in time:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:87
-msgid "Lose the mutant's points"
-msgstr "Lose the mutant's points"
+msgid "Lose the mutant\\'s points"
+msgstr "Lose the mutant\\'s points"
 
 #: src/main/webapp/jsp/scoring_system.jsp:96
 msgid "Gain one additional point"
@@ -5728,8 +5780,8 @@ msgid "The dependencies are uploaded inside of a {0} file, the folder structure 
 msgstr "The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:171
-msgid "Multiple tests can have the same name, but they don't have to."
-msgstr "Multiple tests can have the same name, but they don't have to."
+msgid "Multiple tests can have the same name, but they don\\'t have to."
+msgstr "Multiple tests can have the same name, but they don\\'t have to."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:173
 msgid "Example:"
@@ -5783,13 +5835,13 @@ msgstr "Testing Framework"
 msgid "Assertion Library"
 msgstr "Assertion Library"
 
-#: src/main/webapp/jsp/upload_class_view.jsp:230
-msgid "No classes uploaded."
-msgstr "No classes uploaded."
-
-#: src/main/webapp/jsp/upload_class_view.jsp:278
+#: src/main/webapp/jsp/upload_class_view.jsp:272
 msgid "Showing _TOTAL_ entries"
 msgstr "Showing _TOTAL_ entries"
+
+#: src/main/webapp/jsp/upload_class_view.jsp:273
+msgid "No classes uploaded."
+msgstr "No classes uploaded."
 
 #: src/main/webapp/jsp/user_games_view.jsp:79
 msgid "My Games"
@@ -6388,16 +6440,16 @@ msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
 #: src/main/webapp/jsp/user_settings.jsp:140
-msgid "Password requirements: {0}-20 alphanumeric characters, no whitespace or special characters."
-msgstr "Password requirements: {0}-20 alphanumeric characters, no whitespace or special characters."
+msgid "min. {0} alphanumeric characters, no whitespace or special characters."
+msgstr "min. {0} alphanumeric characters, no whitespace or special characters."
 
 #: src/main/webapp/jsp/user_settings.jsp:147
 msgid "Change Password"
 msgstr "Change Password"
 
 #: src/main/webapp/jsp/user_settings.jsp:161
-msgid "Passwords don't match."
-msgstr "Passwords don't match."
+msgid "Passwords don\\'t match."
+msgstr "Passwords don\\'t match."
 
 #: src/main/webapp/jsp/user_settings.jsp:172
 msgid "Account Deletion"
@@ -6608,8 +6660,8 @@ msgid "Confirm Clone"
 msgstr "Confirm Clone"
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:63
-msgid "Change \"Keep previous test in editor\" setting"
-msgstr "Change \"Keep previous test in editor\" setting"
+msgid "Change \\\"Keep previous test in editor\\\" setting"
+msgstr "Change \\\"Keep previous test in editor\\\" setting"
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:63
 msgid "Cancel"
@@ -7508,8 +7560,8 @@ msgid "This game will end at"
 msgstr "This game will end at"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:106
-msgid "Set the game's new remaining duration:"
-msgstr "Set the game's new remaining duration:"
+msgid "Set the game\\'s new remaining duration:"
+msgstr "Set the game\\'s new remaining duration:"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:109
 msgid "days"
@@ -7535,31 +7587,31 @@ msgstr "Maximum duration:"
 msgid "Change Game Duration"
 msgstr "Change Game Duration"
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:26
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:27
 msgid "The file-tree below shows the file structure for a chapter:"
 msgstr "The file-tree below shows the file structure for a chapter:"
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:48
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:49
 msgid "A chapter file can contain any number of puzzles."
 msgstr "A chapter file can contain any number of puzzles."
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:49
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:50
 msgid "Each puzzle is stored inside a sub-folder of the root."
 msgstr "Each puzzle is stored inside a sub-folder of the root."
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:50
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:51
 msgid "The alphabetical order of the folder names determines the order of the puzzles."
 msgstr "The alphabetical order of the folder names determines the order of the puzzles."
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:51
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:52
 msgid "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
 msgstr "A puzzle can also be stored in a nested .zip file instead of a sub-folder."
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:55
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:56
 msgid "A chapter also contains a single chapter.properties file with the chapter title and description:"
 msgstr "A chapter also contains a single chapter.properties file with the chapter title and description:"
 
-#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:58
+#: src/main/webapp/WEB-INF/tags/import_puzzle_chapter_explanation.tag:59
 msgid "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
 msgstr "# Title of the chapter.\ntitle=Puzzle 1\n\n# Description of the chapter.\ndescription=Puzzles of easy difficulty"
 
@@ -7760,24 +7812,24 @@ msgid "Easy"
 msgstr "Easy"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:26
-msgid "Players are allowed to view other players' submissions."
-msgstr "Players are allowed to view other players' submissions."
+msgid "Players are allowed to view other players\\' submissions."
+msgstr "Players are allowed to view other players\\' submissions."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
 msgid "Hard"
 msgstr "Hard"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
-msgid "Players are not allowed to view other players' submissions."
-msgstr "Players are not allowed to view other players' submissions."
+msgid "Players are not allowed to view other players\\' submissions."
+msgstr "Players are not allowed to view other players\\' submissions."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
 msgid "not"
 msgstr "not"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:32
-msgid "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
-msgstr "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
+msgid "But: Players can still view others\\' mutants after they have been killed or accepted as equivalent."
+msgstr "But: Players can still view others\\' mutants after they have been killed or accepted as equivalent."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
 msgid "Easy"
@@ -7980,8 +8032,8 @@ msgid "My mutant is equivalent"
 msgstr "My mutant is equivalent"
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
-msgid "I don\'t know if my mutant is killable"
-msgstr "I don\'t know if my mutant is killable"
+msgid "I don\\\'t know if my mutant is killable"
+msgstr "I don\\\'t know if my mutant is killable"
 
 #: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:24
 msgid "Mutation rules"

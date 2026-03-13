@@ -113,7 +113,7 @@
         <div class="page container bg-light rounded-6-md mb-5">
             <div class="row">
                 <div class="p-5 col-xxl-6 col-12">
-                    <h2 class="mb-3">Active Battleground Games</h2>
+                    <h2 class="mb-3">${i18n.tr('Active Battleground Games')}</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -201,24 +201,19 @@
 
         <div class="page container py-5">
             <div class="usage">
-                <h2 class="mb-3">Use CodeDefenders for your lessons</h2>
+                <h2 class="mb-3">${i18n.tr('Use CodeDefenders for your lessons')}</h2>
                 <p>
-                    CodeDefenders is an open source software developed and maintained at the Chair of Software
-                    Engineering&nbspII at the University of Passau.
-                    The source code is available along with install instructions on
-                    <a href="https://github.com/CodeDefenders/CodeDefenders/" rel="noopener" target="_blank"
-                       title="CodeDefenders repo on GitHub">GitHub</a>.<br>
-                    We also provide docker containers for all major releases.
-                    You can find links to these containers and more information in our
-                    <a href="https://github.com/CodeDefenders/CodeDefenders/blob/master/docker/README.md"
-                       rel="noopener" target="_blank" title="CodeDefenders Docker README">docker documentation</a>.
+                    ${i18n.tr('CodeDefenders is an open source software developed and maintained at the Chair of Software Engineering&nbsp;II at the University of Passau.')}
+                    ${i18n.tr('The source code is available along with install instructions on <a href="{0}" rel="noopener" target="_blank" title="CodeDefenders repo on GitHub">GitHub</a>.',
+                        'https://github.com/CodeDefenders/CodeDefenders/')}
+                    <br>
+                    ${i18n.tr('We also provide docker containers for all major releases.')}
+                    ${i18n.tr('You can find links to these containers and more information in our <a href="{0}" rel="noopener" target="_blank" title="CodeDefenders Docker README">docker documentation</a>.',
+                        'https://github.com/CodeDefenders/CodeDefenders/blob/master/docker/README.md')}
                 </p>
                 <p>
-                    While the public instance at
-                    <a href="https://code-defenders.org/" title="Public CodeDefenders instance">code-defenders.org</a>
-                    is available for everyone to try out CodeDefenders, we strongly recommend setting up a private
-                    instance
-                    for use in the classroom to ensure a consistent performance.
+                    ${i18n.tr('While the public instance at <a href="{0}" title="Public CodeDefenders instance">code-defenders.org</a> is available for everyone to try out CodeDefenders, we strongly recommend setting up a private instance for use in the classroom to ensure a consistent performance.',
+                        'https://code-defenders.org/')}
                 </p>
             </div>
         </div>
