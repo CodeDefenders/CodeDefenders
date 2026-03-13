@@ -124,7 +124,7 @@
                         <label for="updatedPassword" class="form-label">${i18n.tr('New password')}</label>
                         <input type="password" class="form-control" id="updatedPassword" required
                                name="updatedPassword" placeholder="${i18n.tr('Password')}"
-                               minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
+                               minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
                         <div class="invalid-feedback">
                                 ${i18n.tr('Please enter a valid password.')}
                         </div>
@@ -137,7 +137,7 @@
                                 ${i18n.tr('Please confirm your password.')}
                         </div>
                         <div class="form-text">
-                                ${i18n.tr('Password requirements: {0}-20 alphanumeric characters, no whitespace or special characters.', pwMinLength)}
+                                ${i18n.tr('min. {0} alphanumeric characters, no whitespace or special characters.', pwMinLength)}
                         </div>
                     </div>
                 </div>

@@ -62,9 +62,8 @@
         <div class="bg-light rounded-3 p-3 mb-3">
             <p class="mb-0">
                     ${i18n.tr('CodeDefenders is developed and maintained at the')}
-                        <a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">${i18n.tr('Chair of Software Engineering II')}</a>
-                    ${i18n.tr('at the University of Passau and the')}
-                <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">${i18n.tr('University of Leicester')}</a>.
+                        <a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">${i18n.tr('Chair of Software Engineering&nbspII')}</a>
+                    ${i18n.tr('at the University of Passau.')}
             </p>
             <p class="mb-0">
                     ${i18n.tr('Code Defenders is an open source project.')}
@@ -76,23 +75,19 @@
 
         <h3 class="mt-4 mb-3">${i18n.tr('Contributors')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
-            <ul>
-                <li><a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser
-                    (${i18n.tr('University of Passau')})</a></li>
-                <li><a href="https://jmrojas.github.io/">Jose Miguel Rojas (${i18n.tr('University of Leicester')})</a>
-                </li>
-            </ul>
             <ul class="mb-0">
                 <li>Ben Clegg (${i18n.tr('The University of Sheffield')})</li>
                 <li>Alexander Degenhart (${i18n.tr('University of Passau')})</li>
+                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (${i18n.tr('University of Passau')})</a></li>
                 <li>Sabina Galdobin (${i18n.tr('University of Passau')})</li>
-                <li><a href="https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi
-                    (${i18n.tr('University of Passau')})</a></li>
+                <li><a href="https://publications.ait.ac.at/de/persons/alessio-gambi/">Alessio Gambi (AIT)</a></li>
+                <li>Tim Greller (${i18n.tr('University of Passau')})</li>
                 <li>Marvin Kreis (${i18n.tr('University of Passau')})</li>
-                <li><a href="https://tim-greller.de">Tim Greller</a> (${i18n.tr('University of Passau')})</li>
-                <li>Aaron Prott (${i18n.tr('University of Passau')})</li>
                 <li>Kassian K&ouml;ck (${i18n.tr('University of Passau')})</li>
+                <li>Aaron Prott (${i18n.tr('University of Passau')})</li>
+                <li><a href="https://jmrojas.github.io/">Jose Miguel Rojas (${i18n.tr('The University of Sheffield')})</a></li>
                 <li>Rob Sharp (${i18n.tr('The University of Sheffield')})</li>
+                <li>Philipp Straubinger (${i18n.tr('University of Passau')})</li>
                 <li>Lorenz Wendlinger (${i18n.tr('University of Passau')})</li>
                 <li><a href="https://github.com/werli">Phil Werli</a> (${i18n.tr('University of Passau')})</li>
                 <li>Thomas White (${i18n.tr('The University of Sheffield')})</li>
@@ -102,8 +97,8 @@
         <h3 class="mt-4 mb-3">${i18n.tr('Supporters')}</h3>
         <div class="bg-light rounded-3 p-3 mb-3">
             <ul class="mb-0">
-                <li><a href="https://impress-project.eu/">IMPRESS Project</a>
-                    (${i18n.tr('Improving Engagement of Students in Software Engineering Courses through Gamification')})
+                <li><a href="https://www.dfg.de">DFG Project</a> FR 2955/2-1 (QuestWare: Gamifying the Quest for Software Tests)</li>
+                <li><a href="https://impress-project.eu/">IMPRESS Project</a> (${i18n.tr('Improving Engagement of Students in Software Engineering Courses through Gamification')})
                 </li>
                 <li><a href="https://www.sheffield.ac.uk/sure">SURE
                     (${i18n.tr('Sheffield Undergraduate Research Experience')})</a>

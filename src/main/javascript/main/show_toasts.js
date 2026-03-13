@@ -17,19 +17,78 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Toast} from 'bootstrap';
+
 class ShowToasts {
-    static showToast({colorClass = 'bg-primary', title = '', secondary = '', body = '', extraElements = [], timeout = true}) {
+    static showToast({
+                         colorClass = 'bg-primary',
+                         title = '',
+                         secondary = '',
+                         bodyTitle = '',
+                         body = '',
+                         link = '',
+                         icon = '',
+                         extraElements = [],
+                         timeout = true,
+                         longTimeout = false
+                     }) {
+
+        if (extraElements.length > 0 && link !== '') {
+            console.log("show_toast.js WARNING: Combining extraElements and links is not allowed.");
+            return;
+        }
+
         const toastElem = document.createElement('div');
-        toastElem.classList.add('toast', 'bg-white');
+        toastElem.classList.add('text-decoration-none', 'text-reset', 'toast', 'bg-white', 'd-flex');
         toastElem.role = 'alert';
 
         if (!timeout) {
             toastElem.setAttribute('data-bs-autohide', 'false');
+        } else if (longTimeout) {
+            toastElem.setAttribute("data-bs-delay", "8000");
         }
 
-        const toastBody = document.createElement('div');
-        toastBody.classList.add('toast-body', 'me-auto');
-        toastBody.innerText = body;
+        if (icon !== '') {
+            const iconAnchor = document.createElement('a');
+            iconAnchor.classList.add('d-flex',
+                    'align-items-center',
+                    'align-self-stretch',
+                    'justify-content-center');
+
+            iconAnchor.setAttribute('target', '_blank');
+            iconAnchor.setAttribute('rel', 'noopener');
+            if (link !== '') {
+                iconAnchor.setAttribute('href', link);
+            }
+
+            const iconElement = document.createElement("img");
+            iconElement.classList.add("me-2", "w-75");
+            iconElement.src = icon;
+
+            iconAnchor.appendChild(iconElement);
+            toastElem.appendChild(iconAnchor);
+        }
+
+        const toastBody = document.createElement('a');
+        if (link !== '') {
+            toastBody.setAttribute('href', link);
+            toastBody.setAttribute('target', '_blank');
+            toastBody.setAttribute('rel', 'noopener');
+        }
+        toastBody.classList.add('toast-body', 'me-auto', 'd-flex', 'flex-column', 'justify-content-between',
+                'text-decoration-none', 'text-reset');
+
+
+        if (bodyTitle !== '') {
+            const bodyTitleHeading = document.createElement('h5');
+            bodyTitleHeading.innerHTML = '<b>' + bodyTitle + '</b>';
+            toastBody.appendChild(bodyTitleHeading);
+        }
+
+
+        const bodySpan = document.createElement("span");
+        bodySpan.innerText = body;
+        toastBody.appendChild(bodySpan);
+
         if (extraElements.length > 0) {
             const extraContainer = document.createElement('div');
             extraContainer.classList.add('d-flex', 'flex-row', 'justify-content-between');
@@ -49,14 +108,21 @@ class ShowToasts {
         closeButton.setAttribute('data-bs-dismiss', 'toast');
         closeButton.ariaLabel = 'Close';
 
-        const toastColor = document.createElement('div');
-        toastColor.classList.add('toast-color', 'p-2', 'ms-2', 'me-2', 'rounded-1', colorClass);
+        let toastColor;
+        if (colorClass !== '') {
+            toastColor = document.createElement('div');
+            toastColor.classList.add('toast-color', 'p-2', 'ms-2', 'me-2', 'rounded-1', colorClass);
+        }
 
+        const intermediate = document.createElement('div');
+        intermediate.classList.add('flex-fill');
         if (title !== '' || secondary !== '') {
             const toastHeader = document.createElement('div');
             toastHeader.classList.add('toast-header');
 
-            toastHeader.appendChild(toastColor);
+            if (toastColor) {
+                toastHeader.appendChild(toastColor);
+            }
 
             const toastTitle = document.createElement('strong');
             toastTitle.classList.add('toast-title', 'me-auto');
@@ -69,23 +135,23 @@ class ShowToasts {
             toastHeader.appendChild(toastSecondary);
 
             toastHeader.appendChild(closeButton);
-            toastElem.appendChild(toastHeader);
-            toastElem.appendChild(toastBody);
+            intermediate.appendChild(toastHeader);
+            intermediate.appendChild(toastBody);
 
         } else {
-            console.log('No title or secondary text provided');
-            const intermediate = document.createElement('div');
             intermediate.classList.add("d-flex", "align-items-center", "justify-content-around");
             closeButton.classList.add('me-2');
-            intermediate.appendChild(toastColor);
+            if (toastColor) {
+                intermediate.appendChild(toastColor);
+            }
             intermediate.appendChild(toastBody);
             intermediate.appendChild(closeButton);
-            toastElem.appendChild(intermediate);
         }
+        toastElem.appendChild(intermediate);
 
         document.getElementById('toasts').appendChild(toastElem);
         new Toast(toastElem).show();
-        
+
         toastElem.addEventListener('hidden.bs.toast', () => {
             setTimeout(() => toastElem.remove(), 1000);
         });

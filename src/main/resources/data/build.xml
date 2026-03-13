@@ -109,7 +109,7 @@
 	<target name="recompile-test-with-mutant" description="compile a single test including the mutant in the classpath"
 			depends="compile-mutant, compile-test">
 		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.release.version}"
-			   classpathref="sources.cp" classpath="${mutant.file}"
+			   classpath="${mutant.file}" classpathref="sources.cp"
 			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 

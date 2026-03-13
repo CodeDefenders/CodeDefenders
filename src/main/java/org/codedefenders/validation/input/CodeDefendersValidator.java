@@ -61,11 +61,11 @@ public class CodeDefendersValidator {
      */
     // TODO extract that method to a util class
     public boolean validPassword(String password) {
-        // MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no
-        // whitespaces)
+        // MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
         int minLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
-        // TODO(Alex): Check for password max length (Currently set to 20 in the frontend)!!
-        String pattern = "^[a-zA-Z0-9]{" + minLength + ",}$";
-        return password != null && password.matches(pattern);
+        int maxLength = 1000;
+        String pattern = "^[a-zA-Z0-9]*$";
+        return password != null && password.matches(pattern)
+            && password.length() >= minLength && password.length() <= maxLength;
     }
 }

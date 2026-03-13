@@ -40,7 +40,7 @@ public class V13__FixFilePrefixes extends BaseJavaMigration {
     private final String dataDir;
 
     @Inject
-    public V13__FixFilePrefixes(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+    public V13__FixFilePrefixes(Configuration config) {
         String dataDirPath = config.getDataDir().toString();
         if (!dataDirPath.endsWith("/")) {
             dataDir = dataDirPath + "/";

@@ -46,7 +46,7 @@ public class URLUtils {
     private Optional<URI> appURI = Optional.empty();
 
     @Inject
-    public URLUtils(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+    public URLUtils(Configuration config,
                     ServletContext servletContext) {
         config.getApplicationURL().ifPresent(this::setAppURI);
         this.servletContext = servletContext;

@@ -19,80 +19,66 @@
 package org.codedefenders.configuration.implementation;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
+import org.codedefenders.configuration.source.PropertiesFileSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class PropertiesFileConfigurationTest {
+public class PropertiesFileSourceTest {
 
-    private PropertiesFileConfiguration config1;
-    private PropertiesFileConfiguration config2;
-    private PropertiesFileConfiguration configMerged;
+    private PropertiesFileSource source1;
+    private PropertiesFileSource source2;
+    private PropertiesFileSource sourceMerged;
 
     @BeforeEach
     public void prepareObjects() {
-        StubConfigFileResolver mCfgFileResolver1 = new StubConfigFileResolver();
+        StubConfigFileResolver mCfgFileResolver1 = new StubConfigFileResolver() {
+            @Override
+            public int getPriority() {
+                return 1;
+            }
+        };
         mCfgFileResolver1.setConfigFileContent("""
                 cluster.timeout = 2
                 db.username = testDatabaseUser
                 block.attacker = true
                 mutant.coverage = false""".stripIndent()
         );
-        StubConfigFileResolver mCfgFileResolver2 = new StubConfigFileResolver();
+        StubConfigFileResolver mCfgFileResolver2 = new StubConfigFileResolver() {
+            @Override
+            public int getPriority() {
+                return 2;
+            }
+        };
         mCfgFileResolver2.setConfigFileContent("""
                 cluster.timeout = 4
                 db.password = 123456789
                 block.attacker = disabled
                 mutant.coverage = enabled""".stripIndent());
 
-        config1 = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver1));
-        config1.init();
-
-        config2 = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver2));
-        config2.init();
-
-        configMerged = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver1, mCfgFileResolver2));
-        configMerged.init();
+        source1 = new PropertiesFileSource(Arrays.asList(mCfgFileResolver1));
+        source2 = new PropertiesFileSource(Arrays.asList(mCfgFileResolver2));
+        sourceMerged = new PropertiesFileSource(Arrays.asList(mCfgFileResolver1, mCfgFileResolver2));
     }
 
     @Test
     public void lowerOnlyPropertyAccess() {
-        assertEquals("testDatabaseUser", configMerged.getDbUsername());
+        assertEquals("testDatabaseUser", sourceMerged.resolveAttribute("dbUsername").orElse(null));
     }
 
     @Test
     public void upperOnlyPropertyAccess() {
-        assertEquals("123456789", configMerged.getDbPassword());
+        assertEquals("123456789", sourceMerged.resolveAttribute("dbPassword").orElse(null));
     }
 
     @Test
     public void overwrittenPropertyAccess() {
-        assertEquals(4, configMerged.getClusterTimeout());
-    }
-
-    @Test
-    public void simpleBooleanParsingTrue() {
-        assertTrue(config1.isBlockAttacker());
-    }
-
-    @Test
-    public void simpleBooleanParsingFalse() {
-        assertFalse(config1.isMutantCoverage());
-    }
-
-    @Test
-    public void legacyBooleanParsingTrue() {
-        assertTrue(config2.isMutantCoverage());
-    }
-
-    @Test
-    public void legacyBooleanParsingFalse() {
-        assertFalse(config2.isBlockAttacker());
+        assertEquals("4", sourceMerged.resolveAttribute("clusterTimeout").orElse(null));
     }
 
     @Test
@@ -105,9 +91,8 @@ public class PropertiesFileConfigurationTest {
         mCfgFileResolverUnsetProp.setConfigFileContent(
                 "cluster.timeout=\n");
 
-        PropertiesFileConfiguration configWithOverWritten = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolverSetProp, mCfgFileResolverUnsetProp));
-        configWithOverWritten.init();
-
-        assertEquals(-1, configWithOverWritten.getClusterTimeout());
+        PropertiesFileSource source = new PropertiesFileSource(
+                List.of(mCfgFileResolverSetProp, mCfgFileResolverUnsetProp));
+        assertEquals("", source.resolveAttribute("clusterTimeout").orElse(null));
     }
 }

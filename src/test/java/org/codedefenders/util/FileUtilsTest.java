@@ -25,16 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import jakarta.enterprise.inject.Produces;
-
-import org.codedefenders.configuration.Configuration;
-import org.jboss.weld.junit5.WeldInitiator;
-import org.jboss.weld.junit5.WeldJunit5Extension;
-import org.jboss.weld.junit5.WeldSetup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,22 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-/**
- * Testing {@link FileUtils}.
- */
-@ExtendWith(WeldJunit5Extension.class)
 public class FileUtilsTest {
-
-    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
-    @WeldSetup
-    public WeldInitiator weld =WeldInitiator.of(FileUtilsTest.class);
-
-    @Produces
-    public Configuration produceConfiguration() {
-        return new Configuration() {};
-    }
-
-
     @Test
     public void testCreateJavaTestFile() {
         String name = "Printer";
@@ -322,7 +300,8 @@ public class FileUtilsTest {
         assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingDeclaration));
 
         final String missingSemicolon = "package top" + System.lineSeparator() + "public class Test {}";
-        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(missingSemicolon));
+        assertThrows(IllegalArgumentException.class,
+            () -> FileUtils.getPackagePathFromJavaFile(missingSemicolon));
     }
 
     @Test
@@ -351,7 +330,8 @@ public class FileUtilsTest {
                         public class Test {
                         }
                         """;
-        assertEquals(emptyPath, FileUtils.getPackagePathFromJavaFile(packageJustSlash));
+        assertThrows(IllegalArgumentException.class,
+            () -> FileUtils.getPackagePathFromJavaFile(packageJustSlash));
     }
 
     @Test

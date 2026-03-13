@@ -32,7 +32,7 @@
 <nav class="navbar navbar-expand-md navbar-cd py-0" id="footer">
     <div class="container-fluid justify-content-center">
         <div id="footer-navbar-controls">
-            <ul class="navbar-nav mx-auto">
+            <ul class="navbar-nav align-items-center">
                 <li class="nav-item mx-2">
                     <a class="nav-link" id="footer-about"
                        href="${url.forPath(Paths.ABOUT_PAGE)}">${i18n.tr("About CodeDefenders")}</a>

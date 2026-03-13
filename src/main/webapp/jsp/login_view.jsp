@@ -139,7 +139,7 @@
                                            class="form-label">${i18n.tr('Password')}</label>
                                     <input type="password" class="form-control" id="createacc-password-input"
                                            name="password" placeholder="${i18n.tr('Password')}"
-                                           required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
+                                           required minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
                                     <div class="invalid-feedback">
                                             ${i18n.tr('Please enter a valid password.')}
                                     </div>
@@ -153,7 +153,7 @@
                                             ${i18n.tr('Please confirm your password.')}
                                     </div>
                                     <div class="form-text">
-                                            ${i18n.tr('{0}-20 alphanumeric characters, no whitespace or special characters.', pwMinLength)}
+    ${i18n.tr('min. {0} alphanumeric characters, no whitespace or special characters.', pwMinLength)}
                                     </div>
                                 </div>
                             </div>

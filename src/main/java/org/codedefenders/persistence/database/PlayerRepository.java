@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Locale;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.database.UncheckedSQLException;
@@ -43,6 +44,7 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Player
  */
+@ApplicationScoped
 public class PlayerRepository {
     private static final Logger logger = LoggerFactory.getLogger(PlayerRepository.class);
 

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.Test;
@@ -33,6 +35,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingInt;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
 
+@ApplicationScoped
 public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
 
     private static final Logger logger = LoggerFactory.getLogger(KillCountTestCaseSelector.class);

@@ -21,14 +21,13 @@ package org.codedefenders.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -36,15 +35,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import jakarta.enterprise.inject.Alternative;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.inject.Instance;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import org.codedefenders.configuration.source.ConfigurationSource;
+import org.codedefenders.configuration.source.TieredSource;
 import org.codedefenders.util.JavaVersionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,85 +57,79 @@ import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 
 /**
- * This class is the central place for accessing and defining the configuration for this application.<br><br>
- *
- * <p>It forms an adapter between the internal accessible configuration and the values configured by the user.
- * This provides us a typesafe way to access the configuration and also allows us to easily change the internal api
- * while keeping the external API (the user configured values) stable.
- * This can additionally be used to provide internal configuration or feature switches which shouldn't be accessible to
- * the user at the moment, but could be published for usage at a later point in time. (This would be implemented by a
- * method which has no baking variable and returns a constant value.)<br><br>
- *
- * <h3>Usage</h3>
- *
- * <p>To add configuration values which can be set by the end user simply add one ore more attributes and one ore more
- * access methods which return/use the attributes to this class.<br>
- * All class attributes <b>must be null initialized</b> objects and <b>must not be</b> primitives.<br>
- * <b>Do not</b> add default values to the class attributes! If you want to provide a default value, set it through the
- * `src/main/resources/codedefenders.properties` file.<br><br>
- *
- * <p>Attribute names have to be in camelCase format, as most implementations reformat the attribute name and split the
- * name on the capitalized letters.
- * So the {@link org.codedefenders.configuration.implementation.EnvironmentVariableConfiguration} would try to resolve
- * the {@code dbName} variable by looking for the environment variable {@code CODEDEFENDERS_DB_NAME}.
- *
- * @author degenhart
+ * Eagerly loads the configuration values into {@link BaseConfiguration} and validates the values.
  */
-@Alternative
+// TODO(kreismar): Move validation into BaseConfiguration
+// TODO(kreismar): Move directory and file setup elsewhere
 @Singleton
-public class Configuration {
+public class Configuration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
+    private final ConfigurationSource _source;
     private boolean _validated;
     private ConfigurationValidationException _configurationValidationException;
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
-    protected String appUrl;
-    protected Optional<URL> _appUrl;
-    protected String dataDir;
-    protected String libDir;
-    protected String antHome;
-    protected String antJavaHome;
-    protected Integer antJavaVersion;
-    protected String dbHost;
-    protected Integer dbPort;
-    protected String dbName;
-    protected String dbUsername;
-    protected String dbPassword;
-    protected Integer dbConnectionsMax;
-    protected Integer dbConnectionsTimeout;
-    protected Boolean clusterMode;
-    protected String clusterJavaHome;
-    protected String clusterReservationName;
-    protected Integer clusterTimeout;
-    protected Boolean forceLocalExecution;
-    protected Boolean parallelize;
-    protected Integer parallelizeCount;
-    protected Integer parallelizeKillmapCount;
-    protected Boolean blockAttacker;
-    protected Boolean mutantCoverage;
+    private Optional<URL> _appUrl;
+    private boolean _appUrlCached;
 
-    @Deprecated
-    protected String authAdminRole;
-    protected String authAdminUsers;
+    @Inject
+    public Configuration(Instance<ConfigurationSource> sources) {
+        this(new TieredSource(sources.stream()
+                .sorted(Comparator.comparing(ConfigurationSource::getPriority))
+                .toList()));
+    }
 
-    protected Boolean metrics;
+    public Configuration(ConfigurationSource source) {
+        this._source = source;
+    }
 
-    protected Boolean javamelody;
+    protected Optional<?> coerceType(String fieldName, Class<?> fieldType, @Nonnull String prop) {
+        if (prop.isEmpty()) {
+            return Optional.empty();
+        } else if (fieldType == String.class) {
+            return Optional.of(prop);
+        } else if (fieldType == Boolean.class) {
+            return Optional.of(Boolean.parseBoolean(prop) || prop.equals("enabled"));
+        } else if (fieldType == Integer.class) {
+            return Optional.of(Integer.parseInt(prop));
+        }
+        logger.warn("Couldn't match property {} to field {} with type {}",
+            prop, fieldName, fieldType.getTypeName());
+        return Optional.empty();
+    }
+
+    @PostConstruct
+    public void init() {
+        Field[] fields = BaseConfiguration.class.getDeclaredFields();
+        for (Field field : fields) {
+            Optional<String> value = _source.resolveAttribute(field.getName());
+            if (value.isPresent()) {
+                Optional<?> coercedValue = coerceType(field.getName(), field.getType(), value.get());
+                if (coercedValue.isPresent()) {
+                    try {
+                        field.set(this, coercedValue.get());
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Validates the currently configured Configuration.
      *
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
-    public final void validate() throws ConfigurationValidationException {
+    public void validate() throws ConfigurationValidationException {
         if (!_validated) {
             List<String> validationErrors = new ArrayList<>();
 
             if (appUrl != null) {
                 Optional<URL> realAppUrlOpt = getApplicationURL();
                 if (realAppUrlOpt.isEmpty()) {
-                    validationErrors.add("Property " + resolveAttributeName("appUrl") + " has invalid format");
+                    validationErrors.add("Property appUrl has invalid format");
                 } else {
                     URL realAppUrl = realAppUrlOpt.get();
                     if (realAppUrl.getProtocol() == null
@@ -144,8 +142,8 @@ public class Configuration {
                 }
             }
 
-            if (dataDir == null || dataDir.equals("")) {
-                validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
+            if (dataDir == null || dataDir.isEmpty()) {
+                validationErrors.add("Property dataDir is missing");
             } else {
                 File dataDir = getDataDir();
                 String dataDirCreate = setupDirectory(dataDir);
@@ -165,12 +163,12 @@ public class Configuration {
                 }
             }
 
-            if (antHome == null || antHome.equals("")) {
-                validationErrors.add("Property " + resolveAttributeName("antHome") + " is missing");
+            if (antHome == null || antHome.isEmpty()) {
+                validationErrors.add("Property antHome is missing");
             } else {
                 File antExecutable = new File(getAntHome(), "/bin/ant");
                 if (!antExecutable.exists() || !antExecutable.isFile()) {
-                    validationErrors.add(resolveAttributeName("antHome") + " doesn't contain the ant executable "
+                    validationErrors.add("antHome doesn't contain the ant executable "
                             + antExecutable);
                 }
             }
@@ -181,42 +179,43 @@ public class Configuration {
             if (antJavaHome != null) {
                 File javaExecutable = new File(antJavaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
-                    validationErrors.add(resolveAttributeName("antJavaHome") + " doesn't contain the java executable "
+                    validationErrors.add("antJavaHome doesn't contain the java executable "
                             + javaExecutable);
                 }
                 Optional<Integer> antMajorJavaVersion = JavaVersionUtils.getMajorJavaVersionFromExecutable(
                         javaExecutable.toPath());
                 if (antMajorJavaVersion.isEmpty()) {
-                    validationErrors.add(String.format("%s: got an error while running the java executable '%s'. Please check the logs.",
-                                    resolveAttributeName("antJavaHome"), javaExecutable));
+                    validationErrors.add(String.format(
+                        "%s: got an error while running the java executable '%s'. Please check the logs.",
+                                    "antJavaHome", javaExecutable));
                 } else {
                     antJavaVersion = antMajorJavaVersion.get();
                     if (antMajorJavaVersion.get() < 17) {
-                        validationErrors.add(resolveAttributeName("antJavaHome") + ": Ant Java version must be >= 17");
+                        validationErrors.add("antJavaHome: Ant Java version must be >= 17");
                     }
                 }
             }
 
             boolean dbvalid = true;
-            if (dbHost == null || dbHost.equals("")) {
-                validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
+            if (dbHost == null || dbHost.isEmpty()) {
+                validationErrors.add("Property dbHost is missing");
                 dbvalid = false;
             } else {
                 if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
-                    validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
+                    validationErrors.add("dbHost: " + dbHost
                             + " is neither a valid ip nor a valid hostname");
                     dbvalid = false;
                 }
             }
             if (dbPort == null) {
-                validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
+                validationErrors.add("Property dbPort is missing");
                 dbvalid = false;
             } else if (dbPort <= 0 || dbPort > 65535) {
-                validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
+                validationErrors.add("dbPort: " + dbPort + " is not a valid port number");
                 dbvalid = false;
             }
-            if (dbName == null || dbName.equals("")) {
-                validationErrors.add("Property " + resolveAttributeName("dbName") + " is missing");
+            if (dbName == null || dbName.isEmpty()) {
+                validationErrors.add("Property dbName is missing");
                 dbvalid = false;
             }
             if (dbvalid) {
@@ -265,13 +264,13 @@ public class Configuration {
     }
 
     /**
-     * Checks if the given file exists and we can read it.
+     * Checks if the given file exists, and if we can read it.
      * If the file doesn't exist, try to create it with the produceFile content.
      *
      * @param directory   The directory we write to.
      * @param filename    The name of the file we write.
      * @param produceFile A function which returns the content of the file.
-     * @return Either a error message or null if the operation was successful.
+     * @return Either an error message or null if the operation was successful.
      */
     private String setupFile(File directory, String filename, Supplier<InputStream> produceFile) {
         File file = new File(directory, filename);
@@ -327,156 +326,11 @@ public class Configuration {
         return true;
     }
 
-
-    /**
-     * @return A URL that has a protocol, host, path, and optional a port.
-     */
     public Optional<URL> getApplicationURL() {
-        //noinspection OptionalAssignedToNull
-        if (_appUrl == null) {
-            _appUrl = Optional.ofNullable(appUrl)
-                    .filter(s -> !s.trim().isEmpty())
-                    .map(s -> {
-                        try {
-                            return new URL(s);
-                        } catch (MalformedURLException ignored) {
-                            return null;
-                        }
-                    });
+        if (!_appUrlCached) {
+            _appUrl = super.getApplicationURL();
+            _appUrlCached = true;
         }
         return _appUrl;
-    }
-
-    public File getDataDir() {
-        return new File(dataDir);
-    }
-
-    public File getMutantDir() {
-        return new File(getDataDir(), "mutants");
-    }
-
-    public File getTestsDir() {
-        return new File(getDataDir(), "tests");
-    }
-
-    public File getSourcesDir() {
-        return new File(getDataDir(), "sources");
-    }
-
-    public File getLibraryDir() {
-        return getDataDir().toPath().resolve(libDir).toFile();
-    }
-
-    public File getAntHome() {
-        return new File(antHome);
-    }
-
-    public Optional<File> getAntJavaHome() {
-        return antJavaHome == null
-                ? Optional.empty()
-                : Optional.of(new File(antJavaHome));
-    }
-
-    public Optional<Integer> getAntJavaVersion() {
-        return Optional.ofNullable(antJavaVersion);
-    }
-
-    public String getDbUrl() {
-        return "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
-    }
-
-    public String getDbName() {
-        return dbName;
-    }
-
-    public String getDbUsername() {
-        return dbUsername;
-    }
-
-    public String getDbPassword() {
-        return dbPassword;
-    }
-
-    public Integer getMaximumTotalDatabaseConnections() {
-        return dbConnectionsMax;
-    }
-
-    public Integer getDatabaseConnectionTimeout() {
-        return dbConnectionsTimeout;
-    }
-
-    public boolean isClusterModeEnabled() {
-        return clusterMode;
-    }
-
-    public String getClusterJavaHome() {
-        return clusterJavaHome;
-    }
-
-    public String getClusterReservationName() {
-        return clusterReservationName;
-    }
-
-    public int getClusterTimeout() {
-        return Objects.requireNonNullElse(clusterTimeout, -1);
-    }
-
-    public boolean isForceLocalExecution() {
-        return forceLocalExecution;
-    }
-
-    public boolean isParallelize() {
-        return parallelize;
-    }
-
-    public int getNumberOfParallelAntExecutions() {
-        return parallelizeCount;
-    }
-
-    public boolean isBlockAttacker() {
-        return blockAttacker;
-    }
-
-    public boolean isMutantCoverage() {
-        return mutantCoverage;
-    }
-
-    public int getNumberOfKillmapThreads() {
-        return Objects.requireNonNullElseGet(clusterTimeout,
-                () -> Runtime.getRuntime().availableProcessors());
-    }
-
-    public boolean isMetricsCollectionEnabled() {
-        return metrics != null ? metrics : false;
-    }
-
-    public boolean isJavaMelodyEnabled() {
-        return javamelody != null ? javamelody : false;
-    }
-
-    @Deprecated
-    public String getAuthAdminRole() {
-        return authAdminRole;
-    }
-
-    public List<String> getAuthAdminUsers() {
-        if (authAdminUsers == null || authAdminUsers.trim().isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.stream(authAdminUsers.split(","))
-                    .map(String::trim)
-                    .filter(name -> !name.isEmpty())
-                    .toList();
-        }
-    }
-
-    /**
-     * This transforms an attribute name from camelCase to the format in which its actually looked up.
-     *
-     * @param camelCaseName The attribute name in camelCaseFormat
-     * @return The attribute name in the format it is looked up.
-     */
-    protected String resolveAttributeName(String camelCaseName) {
-        return camelCaseName;
     }
 }

@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration.source;
 
-import jakarta.annotation.Priority;
-import jakarta.enterprise.inject.Alternative;
+import java.util.Optional;
+
 import jakarta.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -28,24 +28,29 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.CaseFormat;
 
 /**
- * Reads configuration values from system properties after converting the attribute name to lower.dot.separated format.
+ * Reads configuration values from environment variables after converting the attribute name to UPPER_UNDERSCORE format
+ * and prefixing them with {@code CODEDEFENDERS_}.
  *
  * @author degenhart
  */
-@Priority(10)
-@Alternative
 @Singleton
-class SystemPropertyConfiguration extends BaseConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfiguration.class);
+public class EnvironmentVariableSource implements ConfigurationSource {
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableSource.class);
+    public static final int PRIORITY = 50;
 
-    @Override
-    protected String resolveAttributeName(String camelCaseName) {
-        return "codedefenders." + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
+    public String resolveAttributeName(String camelCaseName) {
+        return "CODEDEFENDERS_" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
     }
 
     @Override
-    protected String resolveAttribute(String camelCaseName) {
-        return System.getProperty(resolveAttributeName(camelCaseName));
+    public Optional<String> resolveAttribute(String camelCaseName) {
+        return Optional.ofNullable(
+            System.getenv(resolveAttributeName(camelCaseName)));
+    }
+
+    @Override
+    public int getPriority() {
+        return PRIORITY;
     }
 }
 

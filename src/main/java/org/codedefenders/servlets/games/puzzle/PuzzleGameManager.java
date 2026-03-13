@@ -447,7 +447,9 @@ public class PuzzleGameManager extends HttpServlet {
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    messages.addAll(validationMessage);
+                    for (var error : validationMessage) {
+                        messages.add(error).alert();
+                    }
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -633,7 +635,9 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.addAll(validationMessage);
+            for (var error : validationMessage) {
+                messages.add(error).alert();
+            }
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -799,7 +803,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get());
+            messages.add(validationMessage.get()).alert();
             Redirect.redirectBack(request, response);
             return;
         }

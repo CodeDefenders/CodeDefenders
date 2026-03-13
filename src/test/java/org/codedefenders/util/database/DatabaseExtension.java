@@ -16,20 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.util;
+package org.codedefenders.util.database;
 
-import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
+import java.util.Optional;
 
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.TransactionAwareQueryRunner;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -42,49 +41,89 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 /**
- * Injects QueryRunner, Connection and ConnectionFactory parameters.
+ * Injects {@link QueryRunner}, {@link Connection} and, {@link ConnectionFactory} parameters.
  *
- * <p>The injected database objects connect to the DB specified in 'src/integration/resources/database.properties'.
- * <p>The database is cleaned and has all migrations applied before each test.
+ * <p> If used with the default configuration, the injected database objects connect
+ * to the DB specified in "src/integration/resources/database.properties".
+ * <p> The database is cleaned and has all migrations applied before each test.
+ * <p> This behavior can be changed with {@link DatabaseExtensionConfig}.
  */
-public class DatabaseExtension implements ParameterResolver, BeforeAllCallback, BeforeEachCallback {
+public class DatabaseExtension implements ParameterResolver, BeforeEachCallback {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseExtension.class);
 
-    private String dbConnectionUrl;
-    private String username;
-    private String password;
+    private DatabaseExtensionConfig config;
 
-    @Override
-    public void beforeAll(ExtensionContext extensionContext) throws Exception {
-        Properties props = new Properties();
-        try {
-            props.load(getClass().getClassLoader().getResourceAsStream("database.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public Optional<DatabaseExtensionConfig> findConfig(Object testInstance) {
+        for (Class<?> clazz = testInstance.getClass(); clazz != null; clazz = clazz.getSuperclass()) {
+            for (Field field : clazz.getDeclaredFields()) {
+                if (field.isAnnotationPresent(DatabaseSetup.class)) {
+                    Object fieldInstance;
+                    try {
+                        field.setAccessible(true);
+                        fieldInstance = field.get(testInstance);
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (fieldInstance instanceof DatabaseExtensionConfig c) {
+                        return Optional.of(c);
+                    } else {
+                        throw new IllegalStateException(
+                            "@DatabaseSetup can only be used with DatabaseExtensionConfig");
+                    }
+                }
+            }
         }
-
-        dbConnectionUrl = "jdbc:mysql://" + props.getProperty("url");
-        username = props.getProperty("username");
-        password = props.getProperty("password");
+        return Optional.empty();
     }
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) throws Exception {
-        logger.debug("Started Database Migrations");
+        config = extensionContext.getTestInstance().flatMap(this::findConfig)
+            .orElseGet(DatabaseExtensionConfig::defaultConfig);
 
         // Load the Database Driver
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         FluentConfiguration flywayConfig = Flyway.configure();
-        flywayConfig.dataSource(dbConnectionUrl, username, password);
+        flywayConfig.dataSource(config.getUrl(), config.getUsername(), config.getPassword());
         flywayConfig.locations("classpath:db/migrations");
         flywayConfig.cleanDisabled(false);
 
         Flyway flyway = flywayConfig.load();
+
         // For the Tests we always clean the database
-        flyway.clean();
-        flyway.migrate();
-        logger.debug("Finished Database Migrations");
+        if (config.isPerformClean()) {
+            logger.debug("Cleaning Database");
+            flyway.clean();
+        }
+
+        var preMigrationCallback = config.getPreMigrationCallback().orElse(null);
+        if (preMigrationCallback != null) {
+            logger.debug("Started Executing Pre-Migration Callback");
+            try {
+                preMigrationCallback.execute(getQueryRunner());
+            } catch (SQLException e) {
+                throw new SQLException("SQL Exception during pre-migration callback.", e);
+            }
+            logger.debug("Finished Executing Pre-Migration Callback");
+        }
+
+        if (config.isPerformMigrations()) {
+            logger.debug("Started Database Migrations");
+            flyway.migrate();
+            logger.debug("Finished Database Migrations");
+        }
+
+        var postMigrationCallback = config.getPostMigrationCallback().orElse(null);
+        if (postMigrationCallback != null) {
+            logger.debug("Started Executing Post-Migration Callback");
+            try {
+                postMigrationCallback.execute(getQueryRunner());
+            } catch (SQLException e) {
+                throw new SQLException("SQL Exception during post-migration callback.", e);
+            }
+            logger.debug("Finished Executing Post-Migration Callback");
+        }
     }
 
     public QueryRunner getQueryRunner() throws SQLException {
@@ -100,7 +139,7 @@ public class DatabaseExtension implements ParameterResolver, BeforeAllCallback, 
     }
 
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(dbConnectionUrl, username, password);
+        return DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
     }
 
     @Override

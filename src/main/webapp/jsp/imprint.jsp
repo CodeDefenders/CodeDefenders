@@ -36,7 +36,7 @@
 <p:main_page title="${i18n.tr('Imprint & Privacy Policy')}">
     <div class="container">
 
-        <h3 class="mb-3">${i18n.tr('Imprint')}</h3>
+        <h3 class="mb-3">${i18n.tr('Site Notice')}</h3>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>
@@ -49,7 +49,7 @@
             </c:choose>
         </div>
 
-        <h3 class="mt-4 mb-3">${i18n.tr('Privacy Policy')}</h3>
+        <h2 class="mt-4 mb-3 h1">${i18n.tr('Privacy Policy')}</h2>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>

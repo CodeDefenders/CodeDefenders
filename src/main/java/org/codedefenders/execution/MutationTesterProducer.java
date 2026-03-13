@@ -32,7 +32,7 @@ public class MutationTesterProducer {
 
     @Produces
     @ApplicationScoped
-    public IMutationTester getMutationTester(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+    public IMutationTester getMutationTester(Configuration config,
                                              BackendExecutorService backend, EventDAO eventDAO, UserRepository userRepo,
                                              ExecutorServiceProvider executorServiceProvider,
                                              TestRepository testRepo, MutantRepository mutantRepo) {

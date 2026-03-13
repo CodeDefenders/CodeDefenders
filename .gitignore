@@ -10,6 +10,7 @@ config.properties
 docker.properties
 docker/.env
 database.properties
+.env
 
 ### Logs ###
 *.log
