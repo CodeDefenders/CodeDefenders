@@ -82,7 +82,6 @@ public class DefaultRuleSets {
     }
 
     public static MutantValidationRuleSet getRulesetFromName(String name) {
-        logger.info("getRuleSet: {}", name);
         name = name.toLowerCase();
         return switch (name) {
             case "relaxed" -> RELAXED;
