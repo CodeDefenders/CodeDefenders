@@ -51,6 +51,10 @@ public class MutantValidationRuleSet {
         return this;
     }
 
+    void removeRule(MutantRule rule) {
+        rules.remove(rule);
+    }
+
     public String getName() {
         return name;
     }

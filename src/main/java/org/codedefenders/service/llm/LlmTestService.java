@@ -142,9 +142,7 @@ abstract class LlmTestService extends LlmSubActionService {
         switch (result.failureReason().orElseThrow()) {
             case VALIDATION_FAILED -> {
                 correction.append("It has violated these rules: \n");
-                result.validationErrorMessages().orElseThrow().forEach(
-                        correction::append
-                );
+                result.validationErrorMessages().ifPresent(correction::append);
 
             }
             case COMPILATION_FAILED ->

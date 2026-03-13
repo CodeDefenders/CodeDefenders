@@ -31,6 +31,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlmConversation;
 import org.codedefenders.persistence.database.LlmConversationRepository;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -67,6 +68,14 @@ public class LlmInspectionService {
             msgDtoObject.addProperty("messageType", src.msg().type().toString());
             return msgDtoObject;
         });
+
+        gsonBuilder.registerTypeAdapter(MutantValidationRuleSet.class, (JsonSerializer<MutantValidationRuleSet>)
+                (src, typeOfSrc, context) -> {
+                    JsonObject ruleSetObject = new JsonObject();
+                    ruleSetObject.addProperty("ruleSetName", src.getName());
+                    return ruleSetObject;
+                });
+
         return gsonBuilder.create().toJson(conversations);
     }
 }

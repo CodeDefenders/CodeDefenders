@@ -120,10 +120,12 @@ public class LlmRepository {
     }
 
     public Optional<LlmStrategy> getStrategyByName(String name) {
-        if (ArrayUtils.contains(LlmDefaultStrategy.values(), name)) {
-            return Optional.of(LlmStrategy.of(LlmDefaultStrategy.valueOf(name)));
-        } else {
-            return getCustomStrategy(name);
+        for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
+            if (s.name().equals(name)) {
+                return Optional.of(LlmStrategy.of(s));
+            }
+        }
+        return getCustomStrategy(name);
             /*@Language("SQL")
             String sql = """
                     SELECT Strategy_Name, Base_name, Time_modifier, Prompt_type, Prompt
@@ -133,7 +135,6 @@ public class LlmRepository {
                     WHERE Strategy_Name = ?;
                     """;
             return queryRunner.query(sql, LlmRepository::strategyFromRs, name);*/
-        }
     }
 
     public List<LlmStrategy> getAllStrategies() {

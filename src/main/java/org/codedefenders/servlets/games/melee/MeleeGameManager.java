@@ -709,7 +709,7 @@ public class MeleeGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error).alert());
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);

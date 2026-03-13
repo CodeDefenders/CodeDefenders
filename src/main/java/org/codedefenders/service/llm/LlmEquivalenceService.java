@@ -107,9 +107,7 @@ public class LlmEquivalenceService extends LlmSubActionService {
                     switch (result.failureReason().orElseThrow()) {
                         case VALIDATION_FAILED -> {
                             correction.append("Your test has violated these rules: \n");
-                            result.validationErrorMessages().orElseThrow().forEach(
-                                    correction::append
-                            );
+                            result.validationErrorMessages().ifPresent(correction::append);
 
                         }
                         case COMPILATION_FAILED -> correction.append("Your test failed to compile for this reason: ")

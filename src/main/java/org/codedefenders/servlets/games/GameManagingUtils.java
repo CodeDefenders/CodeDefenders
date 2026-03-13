@@ -62,7 +62,6 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmDefaultStrategy;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
@@ -98,7 +97,9 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
+import org.codedefenders.validation.code.MutantRule;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.codedefenders.validation.code.MutantValidationRules;
 import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
@@ -350,9 +351,16 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
-        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel().removeCommentsIf(userId <= 10);
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+
+        MutantRule[] ignoredRules = new MutantRule[0];
+        if (userId <= 10) {
+            ignoredRules = new MutantRule[]{MutantValidationRules.noChangesToComments};
+        }
+
+
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, ignoredRules);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -447,10 +455,15 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
-                mutantText, codeValidatorLevel, userId <= 10);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+
+        MutantRule[] ignoredRules = new MutantRule[0];
+        if (userId <= 10) {
+            ignoredRules = new MutantRule[]{MutantValidationRules.noChangesToComments};
+        }
+        CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
+                mutantText, codeValidatorLevel, ignoredRules);
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());
@@ -460,7 +473,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationMessage, null);
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
         }
 
         Mutant existingMutant = existingMutant(game.getId(), mutantText);

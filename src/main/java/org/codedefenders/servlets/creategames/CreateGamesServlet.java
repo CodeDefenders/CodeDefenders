@@ -54,7 +54,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;

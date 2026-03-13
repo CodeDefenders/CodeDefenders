@@ -25,7 +25,6 @@ import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.annotations.Expose;
