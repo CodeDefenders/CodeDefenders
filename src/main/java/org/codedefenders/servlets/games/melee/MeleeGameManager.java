@@ -83,7 +83,10 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidationResult;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.codedefenders.validation.code.MutantValidator;
+import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,6 +193,12 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     GameService gameService;
+
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
 
 
     @Override
@@ -451,21 +460,19 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
-        List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+        CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                 game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessages.isEmpty();
+        boolean validationSuccess = validationMessages.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(game.getId());
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
+        tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            for (var error : validationMessages) {
-                messages.add(error).alert();
-            }
+            messages.add(validationMessages.toString()).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -589,7 +596,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
-            int playerId) throws IOException {
+                              int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -621,6 +628,64 @@ public class MeleeGameManager extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
+
+        /*
+                MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(game.getId());
+        mse.setUserId(login.getUserId());
+        notificationService.post(mse);
+
+        // Do the validation even before creating the mutant
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+        CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
+                mutantText, codeValidatorLevel);
+        boolean validationSuccess = validationResult.isValid();
+
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(game.getId());
+        mve.setUserId(login.getUserId());
+        mve.setSuccess(validationSuccess);
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
+            // Mutant is either the same as the CUT or it contains invalid code
+            messages.add(validationResult.toString()).alert();
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+            return;
+        }
+
+        Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
+        boolean duplicateCheckSuccess = existingMutant == null; // || existingMutant.getPlayerId() != playerId;
+        // TODO: Why allow duplicate mutants from different creators?
+        // Currently not possible because of database constraint
+        // See also: Issue #675
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(game.getId());
+        mdce.setUserId(login.getUserId());
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
+            messages.add(MUTANT_DUPLICATED_MESSAGE);
+            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
+                    TargetExecution.Target.COMPILE_MUTANT);
+            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
+                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
+                // We escape the content of the message for new tests since user can embed there
+                // anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false);
+            }
+            previousSubmission.setMutantCode(mutantText);
+         */
 
         GameManagingUtils.CreateBattlegroundMutantResult result;
         try {
@@ -672,12 +737,47 @@ public class MeleeGameManager extends HttpServlet {
 
         messages.add(decorate).escape(false).alert();
     }
+/*
+        messages.add(MUTANT_COMPILED_MESSAGE);
+        final String notificationMsg = user.getName() + " created a mutant.";
+        // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
+        Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.PLAYER_MUTANT_CREATED,
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
+        eventDAO.insert(notif);
+
+        messages.add(mutationTester.runAllTestsOnMeleeMutant(game, newMutant));
+        game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(game.getId());
+        mte.setUserId(login.getUserId());
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
+
+        if (game.isCapturePlayersIntention()) {
+            AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
+            // This parameter is required !
+            if (intention == null) {
+                messages.add(Constants.MUTANT_MISSING_INTENTION);
+                previousSubmission.setMutantCode(mutantText);
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+                return;
+            }
+            collectAttackerIntentions(newMutant, intention);
+        }
+        // Clean the mutated code only if mutant is accepted
+        previousSubmission.clear();
+        logger.info("Successfully created mutant {} ", newMutant.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+    }
+ */
+
 
 
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
-            int gameId, MeleeGame game,
-            int playerId) throws IOException {
+                                    int gameId, MeleeGame game,
+                                    int playerId) throws IOException {
         final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
         if (equivMutantId.isEmpty()) {
             logger.debug("Missing equivMutantId parameter.");
@@ -799,27 +899,25 @@ public class MeleeGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+            CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-            boolean validationSuccess = validationMessages.isEmpty();
+            boolean validationSuccess = validationMessages.isValid();
 
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
             tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
-            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
+            tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                for (var error : validationMessages) {
-                    messages.add(error).alert();
-                }
+                messages.add(validationMessages.toString()).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
 
-            // If it can be written to file and compiled, end turn. Otherwise, dont.
+            // If it can be written to file and compiled, end turn. Otherwise, don't.
             Test newTest;
             try {
                 newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(),
@@ -982,8 +1080,8 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
-            int gameId, MeleeGame game,
-            int playerId) throws IOException {
+                                 int gameId, MeleeGame game,
+                                 int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add("You cannot claim mutants as equivalent in this game anymore.");

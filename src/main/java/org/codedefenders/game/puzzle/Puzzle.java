@@ -19,10 +19,9 @@
 package org.codedefenders.game.puzzle;
 
 import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 /**
  * Represents the blueprint for a puzzle, which can be instantiated into a {@link PuzzleGame}.
@@ -65,7 +64,7 @@ public class Puzzle {
     /**
      * Validation level used to check submitted mutants.
      */
-    private CodeValidatorLevel mutantValidatorLevel;
+    private MutantValidationRuleSet mutantValidatorLevel;
 
     /**
      * First editable line of the class or test. Can be null.
@@ -126,7 +125,7 @@ public class Puzzle {
                   boolean isEquivalent,
                   GameLevel level,
                   int maxAssertionsPerTest,
-                  CodeValidatorLevel mutantValidatorLevel,
+                  MutantValidationRuleSet mutantValidatorLevel,
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
                   Integer chapterId,
@@ -201,11 +200,11 @@ public class Puzzle {
         this.maxAssertionsPerTest = maxAssertionsPerTest;
     }
 
-    public CodeValidatorLevel getMutantValidatorLevel() {
+    public MutantValidationRuleSet getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
 
-    public void setMutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+    public void setMutantValidatorLevel(MutantValidationRuleSet mutantValidatorLevel) {
         this.mutantValidatorLevel = mutantValidatorLevel;
     }
 

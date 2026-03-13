@@ -36,7 +36,6 @@ import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
-import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -273,7 +272,7 @@ public class Mutant implements Serializable {
 
     public String getMd5() {
         if (this.md5 == null) {
-            this.md5 = CodeValidator.getMD5FromFile(getJavaFile()); // TODO: This may be null
+            this.md5 = FileUtils.getMD5FromFile(getJavaFile()); // TODO: This may be null
         }
         return md5;
     }

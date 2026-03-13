@@ -126,7 +126,7 @@ public class TestAPI extends APIServlet {
         } else {
             var failureReason = result.failureReason().orElseThrow();
             switch (failureReason) {
-                case VALIDATION_FAILED -> result.validationErrorMessages().ifPresent(messages::addAll);
+                case VALIDATION_FAILED -> result.validationErrorMessages().ifPresent(messages::add);
                 case COMPILATION_FAILED -> {
                     messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
                     result.compilationError().ifPresent(messages::add);

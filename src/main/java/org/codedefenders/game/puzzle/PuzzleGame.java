@@ -33,7 +33,7 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +111,7 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-                      int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state,
+                      int maxAssertionsPerTest, MutantValidationRuleSet mutantValidatorLevel, GameState state,
                       int currentRound, PuzzleType type) {
         /* AbstractGame attributes */
         this.cut = cut;

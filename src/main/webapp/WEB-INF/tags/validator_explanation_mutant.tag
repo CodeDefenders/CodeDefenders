@@ -18,25 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
-<h3>Mutation rules</h3>
-<b>Relaxed</b> <br>
-<ul>
-    <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-    <li>No mutants with only changes to comments or formatting</li>
-    <li>No renaming of methods or fields, no additional methods or fields</li>
-</ul>
-<b>Moderate</b> <br>
-<ul>
-    <li>No changes to comments</li>
-    <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-    <li>No ternary operators</li>
-    <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
-</ul>
-<b>Strict</b> <br>
-<ul class="mb-0">
-    <li>No reflection</li>
-    <li>No bitwise operators (bitshifts and logical)</li>
-    <li>No signature changes</li>
-</ul>
+<%@ tag pageEncoding="UTF-8" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ attribute name="ruleset" required="false" type="java.lang.String" %>
+
+
+<%--@elvariable id="defaultRuleSets" type="org.codedefenders.validation.code.DefaultRuleSets"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
+
+<c:forEach items="${defaultRuleSets.getValues()}" var="set">
+    <div id="rule-div-${set.getName()}" ${ruleset != null && !set.getName().equals(ruleset) ? "hidden" : ""}>
+        <t:mutant_ruleset_explanation ruleset="${set}"/>
+    </div>
+</c:forEach>
+

@@ -63,7 +63,8 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,7 +171,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int classId;
         int maxAssertionsPerTest;
         int automaticEquivalenceTrigger;
-        CodeValidatorLevel mutantValidatorLevel;
+        MutantValidationRuleSet mutantValidatorLevel;
         Role selectedRole;
         int duration;
 
@@ -179,7 +180,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
-                    .map(CodeValidatorLevel::valueOrNull).get();
+                    .map(DefaultRuleSets::getRulesetFromName).get();
             // If we select "player in the UI this should not result in a null value
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).orElse(Role.NONE);
             duration = getIntParameter(request, "gameDurationMinutes").get();

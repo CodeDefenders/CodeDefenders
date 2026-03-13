@@ -1,0 +1,6 @@
+public class Test {
+ 	public void addRiders(int numEntering) {
+     	if (numRiders + numEntering <= capacity)
+    		System.exit(0);
+    }
+}

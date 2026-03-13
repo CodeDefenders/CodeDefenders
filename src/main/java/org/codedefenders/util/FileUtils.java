@@ -31,9 +31,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.slf4j.Logger;
@@ -614,5 +613,20 @@ public class FileUtils {
                 Files.delete(archive);
             }
         }
+    }
+
+    public static String getMD5FromFile(String filePath) {
+        try {
+            String code = Files.readString(Paths.get(filePath));
+            return getMD5FromText(code);
+        } catch (IOException e) {
+            logger.error("Could not get MD5 hash for given file.", e);
+            return null; // TODO: This error should be handled
+        }
+    }
+
+    public static String getMD5FromText(String code) {
+        String cleanedCode = code.replaceAll("\\s+", "");
+        return DigestUtils.md5Hex(cleanedCode);
     }
 }
