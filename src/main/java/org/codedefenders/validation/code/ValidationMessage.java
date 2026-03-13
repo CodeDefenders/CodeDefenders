@@ -22,60 +22,33 @@ package org.codedefenders.validation.code;
  * This enumeration represents states and their
  * message during code validation.
  *
- * <p>Use {@link #get()} to retrieve the message as a {@link String}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-public enum ValidationMessage {
-    // Generic error message.
-    MUTANT_VALIDATION_FAILED("Invalid mutant. Your mutant does not comply with our rules."),
+public class ValidationMessage {
+    public static final String MUTANT_ONLY_COMMENT_CHANGES = "Your mutant only changes comments.";
+    public static final String MUTANT_PACKAGE = "Your mutant changes the package signature.";
+    public static final String MUTANT_CLASS = "Your mutant adds a new class or changes a class signature.";
+    public static final String MUTANT_ADDS_OR_RENAMES_FIELD = "Your mutant adds or renames a field.";
+    public static final String MUTANT_ADDS_OR_RENAMES_METHOD = "Your mutant adds or renames a method.";
+    public static final String MUTANT_METHOD_SIGNATURE = "Your mutant changes one or more method signatures.";
+    public static final String MUTANT_IMPORT_STATEMENT = "Your mutant changes one or more import statements.";
+    public static final String MUTANT_INSTANCEOF = "Your mutant modifies an instanceof condition.";
+    public static final String MUTANT_IDENTICAL = "Your mutant is identical to the CUT.";
+    public static final String MUTANT_COMMENT = "Your mutant adds or modifies a comment.";
+    public static final String MUTANT_MODIFIER = "Your mutant changes a modifier like 'static' or 'private'.";
+    public static final String MUTANT_LOGIC = "Your mutant adds a new logical operator like '&&' or '||'.";
+    public static final String MUTANT_BITWISE = "Your mutant adds new bitwise operators like '&' or '>>'";
+    public static final String MUTANT_CONDITIONALS = "Your mutant adds a new conditional statement like 'if', 'switch' etc.";
+    public static final String MUTANT_LOOPS = "Your mutant adds a new loop.";
+    public static final String MUTANT_CALL_SYSTEM = "Your mutant adds a call to System.*.";
+    public static final String MUTANT_CALL_RANDOM = "Your mutant calls a random number generator.";
+    public static final String MUTANT_CALL_DATE = "Your mutant calls a Date class";
+    public static final String MUTANT_CALL_THREAD = "Your mutant calls a multithreading class";
+    public static final String MUTANT_CALL_IO = "Your mutant calls an IO class";
 
-    MUTANT_VALIDATION_SUCCESS("Your mutant complies with our rules."),
-    MUTANT_VALIDATION_LINES("Invalid mutant, sorry! Removing or adding lines is not allowed."),
-    MUTANT_VALIDATION_MODIFIER("Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed."),
-    MUTANT_VALIDATION_COMMENT("Invalid mutant, sorry! Adding or modifying comments is not allowed."),
-    MUTANT_VALIDATION_LOGIC("Invalid mutant, sorry! Your mutant contains new logical operations"),
+    //These are never shown in the UI, only used for tests
+    public static final String VALIDATION_FAILED_PARSING = "PARSING_FAILED";
+    public static final String VALIDATION_SUCCESS = "SUCCESS";
 
-    MUTANT_VALIDATION_LOGIC_INSTANCEOF("Invalid mutant, sorry! Your mutant modifies an instanceof condition"),
-
-    MUTANT_VALIDATION_OPERATORS("Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line."),
-    MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
-    MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
-
-    MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures"),
-    MUTANT_VALIDATION_FIELD_NAME("Invalid mutant, sorry! Your mutant changes one or more field names"),
-    MUTANT_VALIDATION_IMPORT_STATEMENT("Invalid mutant, sorry! Your mutant changes one or more import statements"),
-    MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
-    MUTANT_VALIDATION_CLASS_SIGNATURE("Invalid mutant, sorry! Your mutant changes a class signature"),
-    MUTANT_VALIDATION_METHOD_OR_FIELD_ADDED("Invalid mutant, sorry! Your mutant adds a new method or field, or renames an existing one"),
-
-    MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
-    MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
-    MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
-
-    MUTATION_SYSTEM_USE("Invalid mutation contains System uses"),
-    MUTATION_SYSTEM_CALL("Invalid mutation contains a call to System.*"),
-    MUTATION_SYSTEM_DECLARATION("Invalid mutation contains variable declaration using System.*"),
-
-    MUTATION_FOR_EACH_STATEMENT("Invalid mutation contains a ForeachStmt statement"),
-    MUTATION_IF_STATEMENT("Invalid mutation contains an IfStmt statement"),
-    MUTATION_FOR_STATEMENT("Invalid mutation contains a ForStmt statement"),
-    MUTATION_WHILE_STATEMENT("Invalid mutation contains a WhileStmt statement"),
-    MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
-    MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
-
-    private final String message;
-
-    ValidationMessage(String message) {
-        this.message = message;
-    }
-
-    public String get() {
-        return message;
-    }
-
-    @Override
-    public String toString() {
-        return get();
-    }
 }

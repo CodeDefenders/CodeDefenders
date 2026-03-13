@@ -76,9 +76,10 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
+import org.codedefenders.validation.code.CodeValidationResult;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.codedefenders.validation.code.MutantValidator;
+import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +166,12 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private TestRepository testRepo;
+
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -435,21 +442,19 @@ public class PuzzleGameManager extends HttpServlet {
                 tse.setUserId(login.getUserId());
                 notificationService.post(tse);
 
-                final var validationMessage = CodeValidator.validateTestCodeGetMessage(
+                final var validationMessage = testValidator.validateTestCode(
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-                boolean validationSuccess = validationMessage.isEmpty();
+                boolean validationSuccess = validationMessage.isValid();
 
                 TestValidatedEvent tve = new TestValidatedEvent();
                 tve.setGameId(gameId);
                 tve.setUserId(login.getUserId());
                 tve.setSuccess(validationSuccess);
-                tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+                tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    for (var error : validationMessage) {
-                        messages.add(error).alert();
-                    }
+                    messages.add(validationMessage.toString()).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -621,23 +626,21 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+        CodeValidationResult validationMessage = testValidator.validateTestCode(
                 testText,
                 game.getMaxAssertionsPerTest(),
                 game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessage.isEmpty();
+        boolean validationSuccess = validationMessage.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            for (var error : validationMessage) {
-                messages.add(error).alert();
-            }
+            messages.add(validationMessage.toString()).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -788,22 +791,22 @@ public class PuzzleGameManager extends HttpServlet {
         mse.setUserId(login.getUserId());
         notificationService.post(mse);
 
-        final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
+        final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
 
-        ValidationMessage validationMessage =
-                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        CodeValidationResult validationResult =
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
         mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationMessage.get());
+        mve.setValidationMessage(validationSuccess ? null : validationResult.toString());
         notificationService.post(mve);
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get()).alert();
+            messages.add(validationResult.toString()).alert();
             Redirect.redirectBack(request, response);
             return;
         }

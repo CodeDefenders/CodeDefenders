@@ -44,7 +44,7 @@ import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -65,7 +65,7 @@ import static org.mockito.ArgumentMatchers.eq;
 
 public class CreateGamesBeanTest {
     private final GameSettings defaultSettings = new GameSettings(GameType.MULTIPLAYER, -1, false, false, 3,
-            CodeValidatorLevel.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
+            DefaultRuleSets.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null);
 
     private AdminCreateGamesBean createGamesBean;
     private StagedGameList stagedGameList;

@@ -86,9 +86,10 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
+import org.codedefenders.validation.code.CodeValidationResult;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.codedefenders.validation.code.MutantValidator;
+import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -194,6 +195,12 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     GameService gameService;
+
+    @Inject
+    private TestValidator testValidator;
+
+    @Inject
+    private MutantValidator mutantValidator;
 
 
     @Override
@@ -428,21 +435,19 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
-        List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+        CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                 game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-        boolean validationSuccess = validationMessages.isEmpty();
+        boolean validationSuccess = validationMessages.isValid();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(game.getId());
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
+        tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            for (var error : validationMessages) {
-                messages.add(error).alert();
-            }
+            messages.add(validationMessages.toString()).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -563,7 +568,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
-            int playerId) throws IOException {
+                              int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -602,10 +607,10 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
-        CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+        CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
-        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(game.getId());
@@ -615,7 +620,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationMessage.get()).alert();
+            messages.add(validationResult.toString()).alert();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -727,7 +732,7 @@ public class MeleeGameManager extends HttpServlet {
             AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
             // This parameter is required !
             if (intention == null) {
-                messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
+                messages.add(Constants.MUTANT_MISSING_INTENTION);
                 previousSubmission.setMutantCode(mutantText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
@@ -742,8 +747,8 @@ public class MeleeGameManager extends HttpServlet {
 
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
-            int gameId, MeleeGame game,
-            int playerId) throws IOException {
+                                    int gameId, MeleeGame game,
+                                    int playerId) throws IOException {
         final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
         if (equivMutantId.isEmpty()) {
             logger.debug("Missing equivMutantId parameter.");
@@ -865,27 +870,25 @@ public class MeleeGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
+            CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
-            boolean validationSuccess = validationMessages.isEmpty();
+            boolean validationSuccess = validationMessages.isValid();
 
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
             tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
-            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
+            tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                for (var error : validationMessages) {
-                    messages.add(error).alert();
-                }
+                messages.add(validationMessages.toString()).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
 
-            // If it can be written to file and compiled, end turn. Otherwise, dont.
+            // If it can be written to file and compiled, end turn. Otherwise, don't.
             Test newTest;
             try {
                 newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(),
@@ -1045,8 +1048,8 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
-            int gameId, MeleeGame game,
-            int playerId) throws IOException {
+                                 int gameId, MeleeGame game,
+                                 int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add("You cannot claim mutants as equivalent in this game anymore.");

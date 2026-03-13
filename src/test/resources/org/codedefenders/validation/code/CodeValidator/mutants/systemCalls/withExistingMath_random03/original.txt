@@ -1,0 +1,5 @@
+public class A {
+    int x = 5;
+    double r = Math.random();
+    boolean b = true;
+}

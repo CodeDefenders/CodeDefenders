@@ -42,7 +42,7 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.FileUtils;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 @WebServlet("/llm-api/battleground/game")
 public class GameAPI extends APIServlet {
@@ -193,7 +193,7 @@ public class GameAPI extends APIServlet {
             int duration,
 
             GameLevel level,
-            CodeValidatorLevel mutantValidatorLevel,
+            MutantValidationRuleSet mutantValidatorLevel,
             int maxAssertionsPerTest,
             int automaticEquivalenceThreshold
     ) {

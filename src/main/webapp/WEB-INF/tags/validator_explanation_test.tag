@@ -18,14 +18,17 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
 <%@ tag import="org.codedefenders.game.AbstractGame" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
 <%@ tag import="org.codedefenders.util.MessageUtils" %>
-<%@ tag import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
+<%@ tag import="org.codedefenders.validation.code.TestValidationRules" %>
+<%@ tag import="static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS" %>
 <%@ tag import="java.util.Objects" %>
 <%
+    request.setAttribute("ruleset", new TestValidationRules());
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     game = Objects.nonNull(game) ? game : (AbstractGame) request.getAttribute(Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
@@ -39,10 +42,43 @@
                 DEFAULT_NB_ASSERTIONS);
     }
 %>
+
+<%--@elvariable id="ruleset" type="org.codedefenders.validation.code.TestValidationRules" --%>
+
 <h3>Test rules</h3>
-<ul class="mb-0">
-    <li>No loops</li>
-    <li>No calls to System.*</li>
-    <li>No new methods or conditionals</li>
-    <li><%=maxAssertionsText%></li>
-</ul>
+<div class="accordion" id="rule-accordion-test">
+    <c:forEach items="${ruleset.tieredRules}" var="group" varStatus="groupStatus">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="rule-heading-${groupStatus.index}">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#rule-collapse-${groupStatus.index}"
+                        aria-expanded="false" aria-controls="rule-collapse-${groupStatus.index}">
+                        ${group.get(0).generalDescription}
+                </button>
+            </h2>
+            <div id="rule-collapse-${groupStatus.index}" class="accordion-collapse collapse"
+                 aria-labelledby="rule-heading-${groupStatus.index}"
+                 data-bs-parent="#rule-accordion-test">
+                <div class="accordion-body">
+                    <ul>
+                        <c:forEach items="${group}" var="rule">
+                            <li>${rule.detailedDescription}</li>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </c:forEach>
+    <div class="accordion-item pt-2">
+        <ul>
+            <c:forEach items="${ruleset.singleRules}" var="rule">
+                <li>
+                        ${rule.detailedDescription}
+                </li>
+            </c:forEach>
+            <li><%=maxAssertionsText%>
+            </li>
+        </ul>
+    </div>
+</div>
+

@@ -1,0 +1,4 @@
+public class Foo {
+    int soundSystem = 3;
+    int y = 5;
+}

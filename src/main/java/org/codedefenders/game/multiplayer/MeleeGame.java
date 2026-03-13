@@ -45,7 +45,8 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 public class MeleeGame extends AbstractGame {
 
@@ -125,7 +126,7 @@ public class MeleeGame extends AbstractGame {
         // private int attackerValue = 100;
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
-        private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+        private MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.STRICT;
 
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
@@ -197,7 +198,7 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
-        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+        public Builder mutantValidatorLevel(MutantValidationRuleSet mutantValidatorLevel) {
             this.mutantValidatorLevel = mutantValidatorLevel;
             return this;
         }
