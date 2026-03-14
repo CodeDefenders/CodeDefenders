@@ -294,6 +294,10 @@ msgstr "Beobachter"
 msgid "Player"
 msgstr "Spieler"
 
+#: src/main/java/org/codedefenders/model/KeyMap.java:29
+msgid "default"
+msgstr "Standard"
+
 #: src/main/java/org/codedefenders/service/CreateGamesService.java:164
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr ""
@@ -4152,7 +4156,7 @@ msgstr "Zur Zeile springen"
 msgid "Alt + R"
 msgstr "Alt + R"
 
-#: src/main/webapp/jsp/game_components/keymap_config.jsp:34
+#: src/main/webapp/jsp/game_components/keymap_config.jsp:36
 msgid "Editor Mode:"
 msgstr "Editor-Modus:"
 
