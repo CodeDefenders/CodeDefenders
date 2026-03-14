@@ -1,12 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
-import {terser} from 'rollup-plugin-terser';
-import replace from '@rollup/plugin-replace';
-
+import { defineConfig } from 'rolldown';
 
 /* Constants.
 ----------------------------------------------------------------------------- */
@@ -20,61 +14,7 @@ const FORCE_BUILD = false;
 
 const SRC_DIR = 'src/main/javascript';
 /* WARNING: This directory is deleted before build. */
-const BUILD_DIR = 'target/rollup/js';
-
-const PLUGINS = [
-    /* Resolve imports to npm dependencies. */
-    resolve(),
-    /* Needed to make Popper (Bootstrap dependency) work. Taken from Bootstrap's rollup config. */
-    replace({
-        'process.env.NODE_ENV': '"production"',
-        preventAssignment: true
-    }),
-    /* Interface with other JS module types (CommonJS, AMD, UMD). */
-    commonjs(),
-    /* Transpile to browser-friendly JS. */
-    babel({
-        babelHelpers: 'bundled',
-        presets: ['@babel/preset-env']
-    }),
-    /* Minimize output. */
-    MINIMIZE_OUTPUT && terser()
-];
-
-
-/* Module Config.
------------------------------------------------------------------------------ */
-
-const moduleConfig = {
-    input: [
-        `${SRC_DIR}/game/index.js`,
-        `${SRC_DIR}/main/index.js`,
-        `${SRC_DIR}/init/index.js`,
-        ...fs.readdirSync(`${SRC_DIR}/thirdparty`)
-                .map(name => `${SRC_DIR}/thirdparty/${name}`)
-    ],
-    plugins: PLUGINS,
-    output: {
-        dir: BUILD_DIR,
-        format: 'esm',
-        sourcemap: true,
-        extend: true,
-        entryFileNames: function (chunkInfo) {
-            const manualChunkNames = {
-                [path.resolve(__dirname, `${SRC_DIR}/game/index.js`)]: 'codedefenders_game',
-                [path.resolve(__dirname, `${SRC_DIR}/main/index.js`)]: 'codedefenders_main',
-                [path.resolve(__dirname, `${SRC_DIR}/init/index.js`)]: 'codedefenders_init'
-            };
-            if (manualChunkNames.hasOwnProperty(chunkInfo.facadeModuleId)) {
-                return `${manualChunkNames[chunkInfo.facadeModuleId]}.mjs`;
-            } else {
-                return `${chunkInfo.name}.mjs`;
-            }
-        },
-        chunkFileNames: 'chunk-[hash].mjs',
-    }
-};
-
+const BUILD_DIR = 'target/rolldown/js';
 
 /* Check timestamps to avoid unnecessary builds.
 ----------------------------------------------------------------------------- */
@@ -98,7 +38,7 @@ const shouldSkipBuild = function () {
 
     /* Get latest timestamp of source files, this config file and the package.json. */
     let latestSrcTimestamp = null;
-    for (const sourceFile of [...walkSync(SRC_DIR), __filename, 'package.json']) {
+    for (const sourceFile of [...walkSync(SRC_DIR), 'rolldown.config.js', 'package.json']) {
         let stats = fs.statSync(sourceFile);
         if (latestSrcTimestamp === null
                 || stats.mtime.getTime() > latestSrcTimestamp.getTime())  {
@@ -129,12 +69,42 @@ if (!FORCE_BUILD && shouldSkipBuild()) {
     process.exit(0);
 }
 
-
 /* Delete build folder. */
 if (CLEAN_BUILD) {
     console.log(`Deleting build folder '${BUILD_DIR}'.`);
     fs.rmSync(BUILD_DIR, { recursive: true, force: true });
 }
 
+/* Module Config.
+----------------------------------------------------------------------------- */
 
-export default moduleConfig;
+export default defineConfig({
+    input: [
+        `${SRC_DIR}/game/index.js`,
+        `${SRC_DIR}/main/index.js`,
+        `${SRC_DIR}/init/index.js`,
+        ...fs.readdirSync(`${SRC_DIR}/thirdparty`)
+                .map(name => `${SRC_DIR}/thirdparty/${name}`)
+    ],
+    platform: 'browser',
+    output: {
+        dir: BUILD_DIR,
+        format: 'esm',
+        sourcemap: true,
+        extend: true,
+        entryFileNames: function (chunkInfo) {
+            const manualChunkNames = {
+                [`${SRC_DIR}/game/index.js`]: 'codedefenders_game',
+                [`${SRC_DIR}/main/index.js`]: 'codedefenders_main',
+                [`${SRC_DIR}/init/index.js`]: 'codedefenders_init'
+            };
+            if (manualChunkNames.hasOwnProperty(chunkInfo.facadeModuleId)) {
+                return `${manualChunkNames[chunkInfo.facadeModuleId]}.mjs`;
+            } else {
+                return `${chunkInfo.name}.mjs`;
+            }
+        },
+        chunkFileNames: 'chunk-[hash].mjs',
+        minify: MINIMIZE_OUTPUT
+    }
+})

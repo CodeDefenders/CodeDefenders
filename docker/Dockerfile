@@ -4,7 +4,7 @@ COPY ./local-repo ./local-repo/
 COPY pom.xml .
 COPY package.json .
 COPY package-lock.json .
-COPY rollup.config.js .
+COPY rolldown.config.js .
 COPY ./.git ./.git/
 COPY ./src ./src/
 RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
