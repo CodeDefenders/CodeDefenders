@@ -125,7 +125,7 @@
                         </tr>
                         <tr>
                             <td>${i18n.tr('Level')}</td>
-                            <td>${puzzle.level}</td>
+                            <td>${i18n.tr(puzzle.level.formattedString)}</td>
                         </tr>
                         <tr>
                             <td>${i18n.tr('Editable lines start')}</td>

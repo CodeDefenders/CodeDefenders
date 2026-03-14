@@ -146,7 +146,7 @@
                         <td><%=multiplayerGameCreatorNames.get(gid)%></td>
                         <td><%=g.getAttackerPlayers().size()%></td>
                         <td><%=g.getDefenderPlayers().size()%></td>
-                        <td><%=g.getLevel()%></td>
+                        <td><%=i18n.tr(g.getLevel().getFormattedString())%></td>
                         <td>
                             <div class="d-flex gap-1">
                                 <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
@@ -382,7 +382,7 @@
                         </td>
                         <td><%=meleeGameCreatorNames.get(gid)%></td>
                         <td><%=g.getPlayers().size()%></td>
-                        <td><%=g.getLevel()%></td>
+                        <td><%=i18n.tr(g.getLevel().getFormattedString())%></td>
                         <td>
                             <div class="d-flex gap-1">
                                 <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
