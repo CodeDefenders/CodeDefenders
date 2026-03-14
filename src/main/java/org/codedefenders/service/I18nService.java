@@ -166,7 +166,7 @@ public class I18nService {
 
     /**
      * Get the i18n instance for one of the supported locales.
-     * Considers user preference and browser locale, falls back to the default locale.
+     * Considers user preference, session and browser locale, falls back to the default locale.
      *
      * @param request The request is used to determine the browser locale transmitted via the Accept-Language header.
      * @return The i18n instance.
@@ -183,6 +183,7 @@ public class I18nService {
 
     /**
      * Tries to get the session locale if set, or uses the request locale as fallback else.
+     * Does not consider the user's language settings, use {@link #getI18n(ServletRequest)} for that.
      *
      * @param request The current HttpServletRequest
      * @return The locale

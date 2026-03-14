@@ -497,6 +497,42 @@ msgstr ""
 "Dein Feedback konnte nicht gespeichert werden. Versuch's bitte später "
 "nochmal!"
 
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:986
+msgid ""
+"<br>\n"
+"You solved all the puzzles of the current chapter!\n"
+"Start with the\n"
+"<a href=\"{0}?puzzleId={1,number,#}\">first puzzle</a>\n"
+"of the next chapter \"{2}\", or go back to the\n"
+"<a href=\"{0}\">Puzzle Overview</a>.\n"
+msgstr ""
+"<br>\n"
+"Du hast alle Rätsel des aktuellen Kapitels gelöst!\n"
+"Beginne mit dem\n"
+"<a href=\"{0}?puzzleId={1,number,#}\">ersten</a>Rätsel\n"
+"des nächsten Kapitels „{2}“ oder kehre zur\n"
+"<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:999
+msgid ""
+"Try to solve the\n"
+"<a href=\"{0}?puzzleId={1,number,#}\">next Puzzle</a>,\n"
+"or go back to the\n"
+"<a href=\"{0}\">Puzzle Overview</a>.\n"
+msgstr ""
+"Versuche, das\n"
+"<a href=\"{0}?puzzleId={1,number,#}\">nächste Rätsel</a> zu lösen,\n"
+"oder kehre zur\n"
+"<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1020
+msgid ""
+"You solved all the puzzles of the current chapter, go back to the <a "
+"href=\"{0}\">Puzzle Overview</a>."
+msgstr ""
+"Du hast alle Rätsel des aktuellen Kapitels gelöst, kehre zur <a "
+"href=\"{0}\">Rätselübersicht</a> zurück."
+
 #: src/main/java/org/codedefenders/servlets/HelpPage.java:43
 #: src/main/webapp/WEB-INF/tags/footer.tag:45
 #: src/main/webapp/WEB-INF/tags/navbar.tag:101

@@ -20,7 +20,6 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +68,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -81,6 +81,7 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -166,6 +167,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private TestRepository testRepo;
 
+    @Inject
+    private I18nService i18nService;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -218,7 +222,8 @@ public class PuzzleGameManager extends HttpServlet {
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
         if (game.getState() == GameState.SOLVED) {
-            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder()));
+            final I18n i18n = i18nService.getI18n(request);
+            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
         }
 
         switch (game.getType()) {
@@ -946,7 +951,7 @@ public class PuzzleGameManager extends HttpServlet {
         return Optional.empty();
     }
 
-    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message) {
+    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n) {
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
@@ -978,24 +983,24 @@ public class PuzzleGameManager extends HttpServlet {
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
                         if (puzzleChapter.getChapterId() > currentChapter) {
-                            message.append(MessageFormat.format("""
-                                                <br>
-                                                You solved all the puzzles of the current chapter!
-                                                Start with the
-                                                <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
-                                                of the next chapter "{2}", or go back to the
-                                                <a href="{0}">Puzzle Overview</a>.
-                                            """.stripIndent(),
+                            message.append(i18n.tr("""
+                                            <br>
+                                            You solved all the puzzles of the current chapter!
+                                            Start with the
+                                            <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
+                                            of the next chapter "{2}", or go back to the
+                                            <a href="{0}">Puzzle Overview</a>.
+                                            """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId(),
                                     puzzleChapter.getTitle()
                             ));
                         } else {
-                            message.append(MessageFormat.format("""
-                                                Try to solve the
-                                                <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
-                                                or go back to the
-                                                <a href="{0}">Puzzle Overview</a>.
+                            message.append(i18n.tr("""
+                                            Try to solve the
+                                            <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
+                                            or go back to the
+                                            <a href="{0}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId()
@@ -1010,10 +1015,12 @@ public class PuzzleGameManager extends HttpServlet {
         /*
          * If we got here, the user has solved all the puzzles in a chapter
          */
-        message.append(" ")
-                .append("You solved all the puzzles of the current chapter, go back to the <a href=")
-                .append(url.forPath(Paths.PUZZLE_GAME))
-                .append(">Puzzle Overview</a>.");
+        message.append(" ").append(
+                i18n.tr(
+                        "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>.",
+                        url.forPath(Paths.PUZZLE_GAME)
+                )
+        );
         return message.toString();
     }
 }

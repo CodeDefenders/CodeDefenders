@@ -411,6 +411,18 @@ msgstr "Class upload failed. File content for {0} could not be read. Please try 
 msgid "Could not save your feedback. Please try again later!"
 msgstr "Could not save your feedback. Please try again later!"
 
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:986
+msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:999
+msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1020
+msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
+msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
+
 #: src/main/java/org/codedefenders/servlets/HelpPage.java:43
 msgid "Help"
 msgstr "Help"
