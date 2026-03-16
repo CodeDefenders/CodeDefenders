@@ -691,7 +691,7 @@ msgstr ""
 #: src/main/java/org/codedefenders/util/Constants.java:104
 msgid "Your test did not compile. Try again, but with compilable code."
 msgstr ""
-"Ihr Test konnte nicht kompiliert werden. Versuchen Sie es erneut, aber mit "
+"Dein Test konnte nicht kompiliert werden. Versuch es nochmal, aber mit "
 "kompilierbarem Code."
 
 #: src/main/java/org/codedefenders/util/Constants.java:105
@@ -842,7 +842,7 @@ msgid ""
 "Please try again later."
 msgstr ""
 "Klasse konnte nicht abgerufen werden.\n"
-"Bitte versuchen Sie es später erneut."
+"Bitte versuch es später nochmal."
 
 #: src/main/javascript/game/game_chat.js:270
 msgid "Connected to chat."
@@ -1129,7 +1129,7 @@ msgid ""
 "you sure?"
 msgstr ""
 "Dadurch werden alle vom Spieler erstellten Mutanten in Zeile(n) {0} als "
-"gleichwertig markiert. Sind Sie sicher?"
+"äquivalent markiert. Bist du sicher?"
 
 #: src/main/javascript/game/mutant_accordion.js:363
 msgid ""
@@ -1137,7 +1137,7 @@ msgid ""
 "different game as an example for how the mutant could have been killed."
 msgstr ""
 "Dieser Mutant wurde nicht getötet, war aber tötbar. Als Beispiel dafür, wie "
-"der Mutant hätte getötet werden können, können Sie sich einen Test aus einem "
+"der Mutant hätte getötet werden können, kannst du dir einen Test aus einem "
 "anderen Spiel ansehen."
 
 #: src/main/javascript/game/mutant_accordion.js:364
@@ -1291,7 +1291,7 @@ msgid ""
 "Please try again later."
 msgstr ""
 "Dependency konnte nicht abgerufen werden.\n"
-"Bitte versuchen Sie es später erneut."
+"Bitte versuch es später nochmal."
 
 #: src/main/javascript/main/info_api.js:75
 msgid ""
@@ -1299,7 +1299,7 @@ msgid ""
 "Please try again later."
 msgstr ""
 "Der Mutant konnte nicht abgerufen werden.\n"
-"Bitte versuchen Sie es später erneut."
+"Bitte versuch es später nochmal."
 
 #: src/main/javascript/main/info_api.js:84
 msgid ""
@@ -1307,7 +1307,7 @@ msgid ""
 "Please try again later."
 msgstr ""
 "Der Test konnte nicht abgerufen werden.\n"
-"Bitte versuchen Sie es später erneut."
+"Bitte versuch es später nochmal."
 
 #: src/main/javascript/main/landing_page_animation.js:79
 #: src/main/javascript/main/landing_page_animation.js:212
@@ -2175,7 +2175,7 @@ msgstr "Klassenzimmer-Tabelle herunterladen"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:421
 #: src/main/webapp/jsp/admin_killmap_management.jsp:431
 msgid "Are you sure you want to delete the specified killmaps?"
-msgstr "Sind Sie sicher, dass Sie die angegebenen Killmaps löschen möchten?"
+msgstr "Bist du sicher, dass du die angegebenen Killmaps löschen möchtest?"
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:520
 msgid "No classes available."
@@ -2223,7 +2223,7 @@ msgstr "Modus"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:751
 #: src/main/webapp/jsp/admin_killmap_management.jsp:760
 msgid "Are you sure you want to delete the selected killmaps?"
-msgstr "Sind Sie sicher, dass Sie die ausgewählten Killmaps löschen möchten?"
+msgstr "Bist du sicher, dass du die ausgewählten Killmaps löschen möchtest?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:68
 msgid "Multiplayer Games"
@@ -2275,7 +2275,7 @@ msgstr ""
 #: src/main/webapp/jsp/admin_monitor_games.jsp:111
 #: src/main/webapp/jsp/admin_monitor_games.jsp:348
 msgid "Are you sure you want to stop this Game?"
-msgstr "Möchten Sie dieses Spiel wirklich beenden?"
+msgstr "Möchtest du dieses Spiel wirklich beenden?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:125
 #: src/main/webapp/jsp/admin_monitor_games.jsp:362
@@ -2297,7 +2297,7 @@ msgstr "Spiel starten/beenden"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:158
 #: src/main/webapp/jsp/admin_monitor_games.jsp:394
 msgid "Are you sure you want to create a rematch for this game?"
-msgstr "Möchten Sie wirklich eine Revanche für dieses Spiel erstellen?"
+msgstr "Möchtest du wirklich eine Revanche für dieses Spiel erstellen?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:160
 #: src/main/webapp/jsp/admin_monitor_games.jsp:396
@@ -2343,7 +2343,7 @@ msgstr "nie"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:266
 msgid "Are you sure you want to change the role of this player?"
-msgstr "Sind Sie sicher, dass Sie die Rolle dieses Spielers ändern möchten?"
+msgstr "Bist du sicher, dass du die Rolle dieses Spielers ändern möchtest?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:267
 msgid ""
@@ -2357,7 +2357,7 @@ msgstr ""
 #: src/main/webapp/jsp/admin_monitor_games.jsp:275
 #: src/main/webapp/jsp/admin_monitor_games.jsp:489
 msgid "Are you sure you want to permanently remove this player?"
-msgstr "Möchten Sie diesen Player wirklich dauerhaft entfernen?"
+msgstr "Möchtest du diesen Spieler wirklich dauerhaft entfernen?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:276
 #: src/main/webapp/jsp/admin_monitor_games.jsp:490
@@ -2397,7 +2397,7 @@ msgstr "Spiele starten"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:522
 msgid "Are you sure you want to stop the selected Games?"
-msgstr "Möchten Sie die ausgewählten Spiele wirklich beenden?"
+msgstr "Möchtest du die ausgewählten Spiele wirklich beenden?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:524
 msgid "Stop Games"
@@ -2438,11 +2438,11 @@ msgstr "Archivierte Rätsel"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:79
 msgid "Unsaved changes"
-msgstr "Sie haben nicht gespeicherte Änderungen"
+msgstr "Du hast nicht gespeicherte Änderungen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:82
 msgid "You have unsaved changes. Please save first."
-msgstr "Sie haben ungespeicherte Änderungen. Bitte speichern Sie diese zuerst."
+msgstr "Du hast ungespeicherte Änderungen. Bitte speichere zuerst."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:97
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:367
@@ -2456,9 +2456,9 @@ msgid ""
 "puzzle archives at once by selecting multiple in the file dialog. For "
 "details on the convention, please expand the explanations."
 msgstr ""
-"Rätsel werden in ZIP-Archiven hochgeladen. Sie können mehrere Rätsel-Archive "
-"gleichzeitig hochladen, indem Sie im Dateidialog mehrere auswählen. Für "
-"Details zur Konvention klicken Sie bitte auf die Erläuterungen."
+"Rätsel werden in ZIP-Archiven hochgeladen. Du kannst mehrere Rätsel-Archive "
+"gleichzeitig hochladen, indem du im Dateidialog mehrere auswählst. Für "
+"Details zur Konvention klicke bitte auf die Erläuterungen."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:109
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:194
@@ -2523,9 +2523,9 @@ msgid ""
 "chapter archives at once by selecting multiple in the file dialog. For "
 "details on the convention, please expand the explanation."
 msgstr ""
-"Kapitel werden in ZIP-Archiven hochgeladen. Sie können mehrere "
-"Kapitelarchive gleichzeitig hochladen, indem Sie im Dateidialog mehrere "
-"auswählen. Für Details zur Konvention klicken Sie bitte auf die Erklärung."
+"Kapitel werden in ZIP-Archiven hochgeladen. Du kannst mehrere "
+"Kapitelarchive gleichzeitig hochladen, indem du im Dateidialog mehrere "
+"auswählst. Für Details zur Konvention klicke bitte auf die Erklärung."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:181
 msgid "Uploading large chapters may take several minutes."
@@ -2610,7 +2610,7 @@ msgstr "Los"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:814
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1057
 msgid "Please enter a title."
-msgstr "Bitte geben Sie einen Titel ein."
+msgstr "Bitte gib einen Titel ein."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:748
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:820
@@ -2665,7 +2665,7 @@ msgstr "Spiellevel"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:150
 #: src/main/webapp/jsp/melee/create_game_view.jsp:147
 msgid "Please select a level."
-msgstr "Bitte wählen Sie ein Level aus."
+msgstr "Bitte wähle ein Level aus."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:868
 #: src/main/webapp/jsp/user_profile.jsp:236
@@ -2682,7 +2682,7 @@ msgstr "Rätsel bearbeiten"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:965
 msgid "Are you sure you want to delete chapter"
-msgstr "Sind Sie sicher, dass Sie das Kapitel löschen möchten?"
+msgstr "Bist du sicher, dass du das Kapitel löschen möchtest?"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:967
 msgid "Any puzzles left in the chapter will be moved to"
@@ -2698,7 +2698,7 @@ msgstr "Kapitel löschen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
 msgid "Are you sure you want to permanently delete puzzle"
-msgstr "Möchten Sie das Rätsel wirklich dauerhaft löschen"
+msgstr "Möchtest du das Rätsel wirklich dauerhaft löschen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1019
 msgid "Delete Puzzle"
@@ -2842,7 +2842,7 @@ msgstr "Diese Einstellung ist für den Versand von E-Mails erforderlich."
 #: src/main/webapp/jsp/admin_system_settings.jsp:97
 #: src/main/webapp/jsp/admin_system_settings.jsp:128
 msgid "Please provide a valid value, or disable emails."
-msgstr "Bitte geben Sie einen gültigen Wert ein oder deaktivieren Sie E-Mails."
+msgstr "Bitte gib einen gültigen Wert ein oder deaktiviere E-Mails."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:74
 msgid "User Management"
@@ -2855,7 +2855,7 @@ msgstr "Benutzer {0} bearbeiten"
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:94
 #: src/main/webapp/jsp/login_view.jsp:119
 msgid "Please enter a valid username."
-msgstr "Bitte geben Sie einen gültigen Benutzernamen ein."
+msgstr "Bitte gib einen gültigen Benutzernamen ein."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:97
 #: src/main/webapp/jsp/login_view.jsp:122
@@ -2882,7 +2882,7 @@ msgstr "E-Mail"
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:107
 #: src/main/webapp/jsp/login_view.jsp:132
 msgid "Please enter a valid email address."
-msgstr "Bitte geben Sie eine gültige E-Mail-Adresse ein."
+msgstr "Bitte gib eine gültige E-Mail-Adresse ein."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:112
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:195
@@ -2918,7 +2918,7 @@ msgstr "Passwort"
 #: src/main/webapp/jsp/login_view.jsp:283
 #: src/main/webapp/jsp/user_settings.jsp:129
 msgid "Please enter a valid password."
-msgstr "Bitte geben Sie ein gültiges Passwort ein."
+msgstr "Bitte gib ein gültiges Passwort ein."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:139
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:140
@@ -3046,12 +3046,12 @@ msgstr "Erstelle Battleground-Spiel"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:68
 #: src/main/webapp/jsp/melee/create_game_view.jsp:66
 msgid "Before you can start games, please"
-msgstr "Bevor Sie mit den Spielen beginnen können, bitte"
+msgstr "Bevor du mit den Spielen beginnen kannst, bitte"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:70
 #: src/main/webapp/jsp/melee/create_game_view.jsp:68
 msgid "upload a class under test"
-msgstr "Eine zu testende Klasse hochladen"
+msgstr "eine zu testende Klasse hochladen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:75
 #: src/main/webapp/jsp/melee/create_game_view.jsp:73
@@ -3071,7 +3071,7 @@ msgstr "Eine Klasse hochladen."
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:110
 #: src/main/webapp/jsp/melee/create_game_view.jsp:107
 msgid "Please select a class."
-msgstr "Bitte wählen Sie eine Klasse aus."
+msgstr "Bitte wähle eine Klasse aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:118
 #: src/main/webapp/jsp/melee/create_game_view.jsp:115
@@ -3095,7 +3095,7 @@ msgstr "Mutanten-Validator-Level"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:176
 #: src/main/webapp/jsp/melee/create_game_view.jsp:173
 msgid "Please select a mutant validator level."
-msgstr "Bitte wählen Sie eine Mutanten-Validierungsstufe aus."
+msgstr "Bitte wähle eine Mutanten-Validierungsstufe aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:184
 #: src/main/webapp/jsp/melee/create_game_view.jsp:181
@@ -3104,7 +3104,7 @@ msgid ""
 "Maximum number of assertions per test. Increase this for difficult to test "
 "classes."
 msgstr ""
-"Maximale Anzahl von Assertions pro Test. Erhöhen Sie diesen Wert für schwer "
+"Maximale Anzahl von Assertions pro Test. Erhöhe diesen Wert für schwer "
 "zu testende Klassen."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:186
@@ -3116,7 +3116,7 @@ msgstr "Max. Assertions pro Test"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:192
 #: src/main/webapp/jsp/melee/create_game_view.jsp:188
 msgid "Please provide a valid number. Must be greater than zero."
-msgstr "Bitte geben Sie eine gültige Zahl ein. Muss größer als Null sein."
+msgstr "Bitte gib eine gültige Zahl ein. Muss größer als Null sein."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:201
 #: src/main/webapp/jsp/melee/create_game_view.jsp:196
@@ -3127,7 +3127,7 @@ msgstr "Auto-Äquivalent-Schwellenwert"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:209
 #: src/main/webapp/jsp/melee/create_game_view.jsp:204
 msgid "Please provide a valid number. Must be positive or zero."
-msgstr "Bitte geben Sie eine gültige Zahl ein. Muss positiv oder Null sein."
+msgstr "Bitte gib eine gültige Zahl ein. Muss positiv oder Null sein."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:215
 #: src/main/webapp/jsp/melee/create_game_view.jsp:209
@@ -3202,7 +3202,7 @@ msgstr "Nur Spielern auf der Whitelist den Beitritt erlauben"
 #: src/main/webapp/jsp/melee/create_game_view.jsp:254
 msgid "Select the role the creator (you) will have in the game."
 msgstr ""
-"Wählen Sie die Rolle aus, die der Ersteller (Sie) im Spiel einnehmen wird."
+"Wähle die Rolle aus, die der Ersteller (du) im Spiel einnehmen wird."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:277
 #: src/main/webapp/jsp/melee/create_game_view.jsp:256
@@ -3251,7 +3251,7 @@ msgstr "Minuten"
 #: src/main/webapp/jsp/melee/create_game_view.jsp:282
 #: src/main/webapp/WEB-INF/tags/game_time.tag:115
 msgid "Please input a valid duration."
-msgstr "Bitte geben Sie eine gültige Dauer ein."
+msgstr "Bitte gib eine gültige Dauer ein."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:304
 msgid "Maximum duration: {0}"
@@ -3287,7 +3287,7 @@ msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalen
 #: src/main/webapp/jsp/melee/player_view.jsp:311
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:142
 msgid "Write a new JUnit test here"
-msgstr "Schreiben Sie hier einen neuen JUnit-Test"
+msgstr "Schreibe hier einen neuen JUnit-Test"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:81
 #: src/main/webapp/jsp/melee/details_view.jsp:117
@@ -3315,8 +3315,8 @@ msgstr "Revanche bestätigen"
 #: src/main/webapp/WEB-INF/tags/game_header.tag:186
 msgid "Are you sure you want to create a new game with opposite roles?"
 msgstr ""
-"Sind Sie sicher, dass Sie ein neues Spiel mit vertauschten Rollen erstellen "
-"möchten?"
+"Bist du sicher, dass du ein neues Spiel mit vertauschten Rollen erstellen "
+"möchtest?"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:125
 #: src/main/webapp/jsp/melee/details_view.jsp:161
@@ -3385,7 +3385,7 @@ msgstr "Diff"
 #: src/main/webapp/jsp/melee/player_view.jsp:176
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:181
 msgid "Not equivalent? Write a killing test here:"
-msgstr "Nicht äquivalent? Schreiben Sie hier einen Kill-Test:"
+msgstr "Nicht äquivalent? Schreibe hier einen Test, der den Mutanten tötet:"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:140
 #: src/main/webapp/jsp/melee/player_view.jsp:187
@@ -3403,8 +3403,8 @@ msgstr "Tötenden Test einreichen"
 #: src/main/webapp/jsp/melee/player_view.jsp:200
 msgid "Accepting Equivalence will lose all mutant points. Are you sure?"
 msgstr ""
-"Wenn Sie die Äquivalenz anerkennen, gehen alle Punkte des Mutanten verloren. "
-"Sind Sie sicher?"
+"Wenn du die Äquivalenz anerkennst, gehen alle Punkte des Mutanten verloren. "
+"Bist du sicher?"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:169
 #: src/main/webapp/jsp/melee/player_view.jsp:216
@@ -3422,11 +3422,11 @@ msgstr "Historie"
 
 #: src/main/webapp/jsp/battleground/role_selection.jsp:38
 msgid "Select a role"
-msgstr "Wählen Sie eine Rolle aus"
+msgstr "Wähle eine Rolle aus"
 
 #: src/main/webapp/jsp/battleground/role_selection.jsp:40
 msgid "You have been invited to game #{0}"
-msgstr "Sie wurden zum Spiel Nr. {0} eingeladen."
+msgstr "Du wurdest zum Spiel Nr. {0} eingeladen."
 
 #: src/main/webapp/jsp/battleground/role_selection.jsp:44
 msgid "Join as attacker"
@@ -3456,24 +3456,24 @@ msgid ""
 "You are able to fully view and edit this classroom without joining, because "
 "you are logged in as admin."
 msgstr ""
-"Sie können diesen Raum vollständig anzeigen und bearbeiten, ohne "
-"beizutreten, da Sie als Administrator angemeldet sind."
+"Du kannst diesen Raum vollständig anzeigen und bearbeiten, ohne "
+"beizutreten, da du als Administrator angemeldet bist."
 
 #: src/main/webapp/jsp/classroom_page.jsp:74
 msgid ""
 "You are able to fully view and edit this classroom without being the owner, "
 "because you are logged in as admin."
 msgstr ""
-"Sie können diesen Raum vollständig anzeigen und bearbeiten, ohne dessen "
-"Eigentümer zu sein, da Sie als Administrator angemeldet sind."
+"Du kannst diesen Raum vollständig anzeigen und bearbeiten, ohne dessen "
+"Eigentümer zu sein, da du als Administrator angemeldet bist."
 
 #: src/main/webapp/jsp/classroom_page.jsp:77
 msgid "You are viewing this classroom as a guest."
-msgstr "Sie sehen diesen Raum als Gast."
+msgstr "Du siehst diesen Raum als Gast."
 
 #: src/main/webapp/jsp/classroom_page.jsp:82
 msgid "If you would like to join the classroom, you can do so here:"
-msgstr "Wenn Sie dem Raum beitreten möchten, können Sie dies hier tun:"
+msgstr "Wenn du dem Raum beitreten möchtest, kannst du das hier tun:"
 
 #: src/main/webapp/jsp/classroom_page.jsp:85
 #: src/main/webapp/jsp/classroom_page.jsp:613
@@ -3614,7 +3614,7 @@ msgstr "Passwort des Raumes entfernen"
 
 #: src/main/webapp/jsp/classroom_page.jsp:389
 msgid "Are you sure you want to remove the password?"
-msgstr "Sind Sie sicher, dass Sie das Passwort entfernen möchten?"
+msgstr "Bist du sicher, dass du das Passwort entfernen möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:392
 msgid "Remove password"
@@ -3630,7 +3630,7 @@ msgid ""
 "Are you sure you want to enable joining? Students will be able to join via "
 "invite link or from the public list (if the classroom is public)."
 msgstr ""
-"Möchten Sie wirklich den Beitritt aktivieren? Die Schüler können über einen "
+"Möchtest du wirklich den Beitritt aktivieren? Die Schüler können über einen "
 "Einladungslink oder über die öffentliche Liste (wenn der Raum öffentlich "
 "ist) teilnehmen."
 
@@ -3659,7 +3659,7 @@ msgid ""
 "will be shown in the public list. If the classroom is open, players will be "
 "able to join from there."
 msgstr ""
-"Möchten Sie den Raum wirklich öffentlich sichtbar machen? Der Raum wird dann "
+"Möchtest du den Raum wirklich öffentlich sichtbar machen? Der Raum wird dann "
 "in der öffentlichen Liste angezeigt. Wenn der Raum geöffnet ist, können "
 "Spieler von dort aus beitreten."
 
@@ -3683,9 +3683,9 @@ msgid ""
 "read-only and prevent players from joining. You can undo this later by "
 "restoring the classroom."
 msgstr ""
-"Möchten Sie den Raum wirklich archivieren? Dadurch wird der Raum "
-"schreibgeschützt und Spieler können nicht mehr beitreten. Sie können dies "
-"später rückgängig machen, indem Sie den Raum wiederherstellen."
+"Möchtest du den Raum wirklich archivieren? Dadurch wird der Raum "
+"schreibgeschützt und Spieler können nicht mehr beitreten. Du kannst dies "
+"später rückgängig machen, indem du den Raum wiederherstellst."
 
 #: src/main/webapp/jsp/classroom_page.jsp:500
 msgid "Restore classroom"
@@ -3693,7 +3693,7 @@ msgstr "Raum wiederherstellen"
 
 #: src/main/webapp/jsp/classroom_page.jsp:503
 msgid "Are you sure you want to restore the classroom?"
-msgstr "Sind Sie sicher, dass Sie den Raum wiederherstellen möchten?"
+msgstr "Bist du sicher, dass du den Raum wiederherstellen möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:506
 msgid "Restore"
@@ -3705,7 +3705,7 @@ msgstr "Raum verlassen"
 
 #: src/main/webapp/jsp/classroom_page.jsp:521
 msgid "Are you sure you want to leave the classroom?"
-msgstr "Sind Sie sicher, dass Sie den Raum verlassen möchten?"
+msgstr "Bist du sicher, dass du den Raum verlassen möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:524
 msgid "Leave"
@@ -3719,7 +3719,7 @@ msgstr "Rolle wechseln"
 
 #: src/main/webapp/jsp/classroom_page.jsp:542
 msgid "Are you sure you want to make {0} a {1}?"
-msgstr "Sind Sie sicher, dass Sie {0} zu {1} machen möchten?"
+msgstr "Bist du sicher, dass du {0} zu {1} machen möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:562
 msgid ""
@@ -3740,7 +3740,7 @@ msgstr "Entferne Mitglied"
 #: src/main/webapp/jsp/classroom_page.jsp:582
 msgid "Are you sure you want kick {0} from this classroom?"
 msgstr ""
-"Sind Sie sicher, dass Sie {0} aus diesem Klassenzimmer ausschließen möchten?"
+"Bist du sicher, dass du {0} aus diesem Klassenzimmer ausschließen möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:585
 #: src/main/webapp/jsp/classroom_page.jsp:769
@@ -3757,11 +3757,11 @@ msgstr "Um diesem Raum beizutreten, ist ein Passwort erforderlich:"
 
 #: src/main/webapp/jsp/classroom_page.jsp:605
 msgid "Please enter the password."
-msgstr "Bitte geben Sie ein neues Passwort ein."
+msgstr "Bitte gib das Passwort ein."
 
 #: src/main/webapp/jsp/classroom_page.jsp:608
 msgid "Are you sure you want to join this classroom?"
-msgstr "Sind Sie sicher, dass Sie diesem Raum beitreten möchten?"
+msgstr "Bist du sicher, dass du diesem Raum beitreten möchtest?"
 
 #: src/main/webapp/jsp/classroom_page.jsp:750
 msgid "Change Role to ..."
@@ -3883,14 +3883,14 @@ msgstr "Kontakt"
 #: src/main/webapp/jsp/contact.jsp:56
 msgid "You can use the form below to contact the site owners."
 msgstr ""
-"Sie können das untenstehende Formular verwenden, um die Betreiber der "
+"Du kannst das untenstehende Formular verwenden, um die Betreiber der "
 "Website zu kontaktieren."
 
 #: src/main/webapp/jsp/contact.jsp:57
 msgid ""
 "For technical questions about Code Defenders, please contact the developers."
 msgstr ""
-"Bei technischen Fragen zu Code Defenders wenden Sie sich bitte an die "
+"Bei technischen Fragen zu Code Defenders wende dich bitte an die "
 "Entwickler."
 
 #: src/main/webapp/jsp/contact.jsp:80 src/main/webapp/jsp/contact.jsp:82
@@ -3925,9 +3925,9 @@ msgid ""
 "manage games more easily. Being logged-in is required to apply for a teacher "
 "account. Please log in to your account and come back to this page."
 msgstr ""
-"Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um Spiele "
-"einfacher zu verwalten. Um ein Lehrerkonto zu beantragen, müssen Sie "
-"angemeldet sein. Bitte melden Sie sich bei Ihrem Konto an und kehren Sie "
+"Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um Spiele "
+"einfacher zu verwalten. Um ein Lehrerkonto zu beantragen, musst du "
+"angemeldet sein. Bitte melde dich bei deinem Konto an und kehre "
 "dann zu dieser Seite zurück."
 
 #: src/main/webapp/jsp/contact.jsp:112
@@ -3962,11 +3962,11 @@ msgstr "Body:"
 
 #: src/main/webapp/jsp/contact.jsp:167
 msgid "Contact the Developers"
-msgstr "Kontaktieren Sie die Entwickler"
+msgstr "Kontaktiere die Entwickler"
 
 #: src/main/webapp/jsp/contact.jsp:170
 msgid "Please check out the"
-msgstr "Bitte sehen Sie sich die"
+msgstr "Bitte sieh dir die"
 
 #: src/main/webapp/jsp/contact.jsp:171
 msgid "project page for more details."
@@ -3985,7 +3985,7 @@ msgid ""
 "Your accounts permissions do not include the accessed page or performed "
 "action."
 msgstr ""
-"Ihre Kontoberechtigungen umfassen nicht die aufgerufene Seite oder die "
+"Deine Kontoberechtigungen umfassen nicht die aufgerufene Seite oder die "
 "durchgeführte Aktion."
 
 #: src/main/webapp/jsp/error_page_403.jsp:33
@@ -3993,7 +3993,7 @@ msgstr ""
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:36
 msgid "Please contact your administrator if you think this is a mistake."
 msgstr ""
-"Bitte wenden Sie sich an den Administrator, wenn Sie glauben, dass dies ein "
+"Bitte wende dich an den Administrator, wenn du glaubst, dass dies ein "
 "Fehler ist."
 
 #: src/main/webapp/jsp/error_page_404.jsp:27
@@ -4034,8 +4034,8 @@ msgstr "Es gab ein Problem auf unserer Seite. Das tut uns leid."
 msgid ""
 "Please try again and contact your administrator if this keeps happening."
 msgstr ""
-"Bitte versuchen Sie es erneut und wenden Sie sich an Ihren Administrator, "
-"wenn dieses Problem weiterhin auftritt."
+"Bitte versuch es nochmal und wende dich an deinen Administrator, "
+"wenn das Problem weiterhin auftritt."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:31
 msgid "User not found (404)"
@@ -4049,15 +4049,15 @@ msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."
 msgid ""
 "Make sure the address and the username are correct and that the page hasn't "
 "moved."
-msgstr "Vergewissern Sie sich, dass die URL und der Benutzername korrekt sind."
+msgstr "Vergewissere dich, dass die URL und der Benutzername korrekt sind."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:38
 msgid "Looking for your own profile?"
-msgstr "Suchen Sie Ihr eigenes Profil?"
+msgstr "Suchst du dein eigenes Profil?"
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:39
 msgid "your profile"
-msgstr "Ihr Profil"
+msgstr "Dein Profil"
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:39
 msgid "Click here."
@@ -4383,11 +4383,11 @@ msgstr "Anmelden"
 
 #: src/main/webapp/jsp/login_view.jsp:55 src/main/webapp/jsp/login_view.jsp:215
 msgid "Please enter your username."
-msgstr "Bitte geben Sie Ihren Benutzernamen ein."
+msgstr "Bitte gib deinen Benutzernamen ein."
 
 #: src/main/webapp/jsp/login_view.jsp:65
 msgid "Please enter your password."
-msgstr "Bitte geben Sie Ihr Passwort ein."
+msgstr "Bitte gib dein Passwort ein."
 
 #: src/main/webapp/jsp/login_view.jsp:74
 msgid ""
@@ -4426,14 +4426,14 @@ msgstr "Passwort zurücksetzen"
 
 #: src/main/webapp/jsp/login_view.jsp:225
 msgid "Please enter your email address."
-msgstr "Bitte geben Sie Ihre E-Mail-Adresse ein."
+msgstr "Bitte gib deine E-Mail-Adresse ein."
 
 #: src/main/webapp/jsp/login_view.jsp:231
 msgid ""
 "This will send a mail with a link to change your password to your email "
 "account."
 msgstr ""
-"Dadurch wird eine E-Mail mit einem Link zum Ändern Ihres Passworts an Ihr E-"
+"Dadurch wird eine E-Mail mit einem Link zum Ändern deines Passworts an dein E-"
 "Mail-Konto gesendet."
 
 #: src/main/webapp/jsp/login_view.jsp:240
@@ -4476,7 +4476,7 @@ msgstr "Die Coverage aller Spielertests wird angezeigt."
 msgid ""
 "Switch between showing coverage of your tests (off) and enemy tests (on)."
 msgstr ""
-"Wechseln Sie zwischen der Anzeige von Coverage Ihrer Tests (aus) und der "
+"Wechsle zwischen der Anzeige von Coverage deiner Tests (aus) und der "
 "Tests des Gegners (ein)."
 
 #: src/main/webapp/jsp/melee/details_view.jsp:250
@@ -4520,7 +4520,7 @@ msgstr "Feedback ansehen"
 
 #: src/main/webapp/jsp/player_feedback.jsp:64
 msgid "How much do you agree with the following statements?"
-msgstr "Inwieweit stimmen Sie den folgenden Aussagen zu?"
+msgstr "Inwieweit stimmst du den folgenden Aussagen zu?"
 
 #: src/main/webapp/jsp/player_feedback.jsp:80
 msgid "very much"
@@ -4544,7 +4544,7 @@ msgstr "überhaupt nicht"
 
 #: src/main/webapp/jsp/player_feedback.jsp:104
 msgid "In providing feedback you help us improve gameplay mechanics,"
-msgstr "Durch Ihr Feedback helfen Sie uns, die Spielmechanik,"
+msgstr "Durch dein Feedback hilfst du uns, die Spielmechanik,"
 
 #: src/main/webapp/jsp/player_feedback.jsp:105
 msgid "hone match making and select classes that are engaging and fun."
@@ -4553,11 +4553,11 @@ msgstr ""
 
 #: src/main/webapp/jsp/player_feedback.jsp:106
 msgid "You can change your feedback even after the game finishes."
-msgstr "Sie können Ihr Feedback auch nach Spielende noch ändern."
+msgstr "Du kannst dein Feedback auch nach Spielende noch ändern."
 
 #: src/main/webapp/jsp/player_feedback.jsp:107
 msgid "Thank you for your time."
-msgstr "Vielen Dank für Ihre Zeit."
+msgstr "Vielen Dank für deine Zeit."
 
 #: src/main/webapp/jsp/player_feedback.jsp:115
 msgid "Save Feedback"
@@ -4604,7 +4604,7 @@ msgstr "Rätsel: {0} – {1}"
 
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:119
 msgid "Your test solved the puzzle. {0}"
-msgstr "Ihr Test hat das Rätsel gelöst. {0}"
+msgstr "Dein Test hat das Rätsel gelöst. {0}"
 
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:139
 msgid "Solving JUnit Test"
@@ -4616,7 +4616,7 @@ msgstr "Dieser Mutant entspricht der zu testenden Klasse."
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:127
 msgid "Your test killed the mutant flagged as equivalent."
-msgstr "Ihr Test hat den als gleichwertig markierten Mutanten getötet."
+msgstr "Dein Test hat den als gleichwertig markierten Mutanten getötet."
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:171
 msgid "The mutant is equivalent!"
@@ -4628,12 +4628,12 @@ msgstr "Der Mutant wurde als äquivalent akzeptiert"
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:175
 msgid "Not equivalent! Your killing test:"
-msgstr "Nicht äquivalent! Ihr tötender Test:"
+msgstr "Nicht äquivalent! Dein tötender Test:"
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:205
 msgid "Are you sure that this mutant is equivalent and cannot be killed?"
 msgstr ""
-"Sind Sie sicher, dass dieser Mutant äquivalent ist und nicht getötet werden "
+"Bist du sicher, dass dieser Mutant äquivalent ist und nicht getötet werden "
 "kann?"
 
 #: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:37
@@ -4692,7 +4692,7 @@ msgstr "Kopiert."
 
 #: src/main/webapp/jsp/scoring_system.jsp:29
 msgid "Get one point for:"
-msgstr "Erhalten Sie einen Punkt für:"
+msgstr "Erhalte einen Punkt für:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:36
 msgid "Creating a mutant that survives one test"
@@ -4704,7 +4704,7 @@ msgstr "Jeder zusätzliche Test, der den Mutanten ausführt und ihn nicht tötet
 
 #: src/main/webapp/jsp/scoring_system.jsp:46
 msgid "Each mutant your test kills"
-msgstr "Jeder Mutant, den Ihr Test tötet"
+msgstr "Jeder Mutant, den dein Test tötet"
 
 #: src/main/webapp/jsp/scoring_system.jsp:47
 msgid "Each point that mutant had accumulated"
@@ -4712,7 +4712,7 @@ msgstr "Jeder Punkt, den der Mutant gesammelt hatte"
 
 #: src/main/webapp/jsp/scoring_system.jsp:48
 msgid "Each previously untouched mutant your test kills"
-msgstr "Jeder zuvor unberührte Mutant, den Ihr Test tötet"
+msgstr "Jeder zuvor unberührte Mutant, den dein Test tötet"
 
 #: src/main/webapp/jsp/scoring_system.jsp:55
 msgid "Equivalence Duels:"
@@ -4728,7 +4728,7 @@ msgstr "Behalte die Punkte des Mutanten und hol dir einen Extrapunkt"
 
 #: src/main/webapp/jsp/scoring_system.jsp:73
 msgid "Your score does not change"
-msgstr "Ihre Punktzahl ändert sich nicht"
+msgstr "Deine Punktzahl ändert sich nicht"
 
 #: src/main/webapp/jsp/scoring_system.jsp:80
 msgid "Equivalence is accepted or no killing test is provided in time:"
@@ -4756,7 +4756,7 @@ msgstr "Klassenalias"
 #: src/main/webapp/jsp/upload_class_view.jsp:69
 msgid "Please provide a valid alias (or leave empty)."
 msgstr ""
-"Bitte geben Sie einen gültigen Alias ein (oder lassen Sie das Feld leer)."
+"Bitte gib einen gültigen Alias ein (oder lass das Feld leer)."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:71
 msgid "Optional class alias."
@@ -4776,7 +4776,7 @@ msgstr "Java-Datei"
 
 #: src/main/webapp/jsp/upload_class_view.jsp:80
 msgid "Please provide a {0} file."
-msgstr "Bitte stellen Sie eine {0}-Datei bereit."
+msgstr "Bitte stell eine {0}-Datei bereit."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:81
 msgid "The .java file of the class."
@@ -4813,7 +4813,7 @@ msgstr "Abhängigkeiten hochladen (optional)"
 #: src/main/webapp/jsp/upload_class_view.jsp:128
 msgid "If the class under test has dependencies, you can upload them here."
 msgstr ""
-"Wenn die zu testende Klasse Dependencies hat, können Sie diese hier "
+"Wenn die zu testende Klasse Dependencies hat, kannst du diese hier "
 "hochladen."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:130
@@ -4903,7 +4903,7 @@ msgstr "Meine Spiele"
 
 #: src/main/webapp/jsp/user_games_view.jsp:98
 msgid "You are currently not active in any games."
-msgstr "Sie sind derzeit in keinem Spiel aktiv."
+msgstr "Du bist derzeit in keinem Spiel aktiv."
 
 #: src/main/webapp/jsp/user_games_view.jsp:142
 msgid "Start battleground game"
@@ -5167,7 +5167,7 @@ msgstr "Gespielte Spiele"
 
 #: src/main/webapp/jsp/user_profile.jsp:265
 msgid "You can find a list of your past games in the"
-msgstr "Eine Liste Ihrer bisherigen Spiele finden Sie in der"
+msgstr "Eine Liste deiner bisherigen Spiele findest du in der"
 
 #: src/main/webapp/jsp/user_profile.jsp:266
 msgid "games history"
@@ -5179,17 +5179,17 @@ msgstr "Kontoinformationen"
 
 #: src/main/webapp/jsp/user_profile.jsp:273
 msgid "Your current email:"
-msgstr "Ihre aktuelle E-Mail-Adresse:"
+msgstr "Deine aktuelle E-Mail-Adresse:"
 
 #: src/main/webapp/jsp/user_profile.jsp:277
 msgid "Change your account information, password or delete your account in the"
 msgstr ""
-"Ändern Sie Ihre Kontoinformationen, Ihr Passwort oder löschen Sie Ihr Konto "
+"Ändere deine Kontoinformationen, dein Passwort oder lösche dein Konto "
 "in den"
 
 #: src/main/webapp/jsp/user_profile.jsp:279
 msgid "Edit or delete your CodeDefenders account."
-msgstr "Bearbeiten oder löschen Sie Ihr CodeDefenders-Konto."
+msgstr "Bearbeite oder lösche dein CodeDefenders-Konto."
 
 #: src/main/webapp/jsp/user_profile.jsp:279
 msgid "account settings"
@@ -5258,9 +5258,9 @@ msgid ""
 "be aware that you will no longer be able to log in again. To play further "
 "games, you will have to create a new account."
 msgstr ""
-"Wir werden alle personenbezogenen Daten zu Ihrem Konto löschen. Bitte "
-"beachten Sie, dass Sie sich danach nicht mehr anmelden können. Um weitere "
-"Spiele zu spielen, müssen Sie ein neues Konto erstellen."
+"Wir werden alle personenbezogenen Daten zu deinem Konto löschen. Bitte "
+"beachte, dass du dich danach nicht mehr anmelden kannst. Um weitere "
+"Spiele zu spielen, musst du ein neues Konto erstellen."
 
 #: src/main/webapp/WEB-INF/tags/achievement_badge.tag:33
 msgid "{0} (Level {1})"
@@ -5363,14 +5363,14 @@ msgstr "Vorherigen Test im Editor behalten"
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:55
 msgid "Are you sure you want to copy the previous test?"
-msgstr "Sind Sie sicher, dass Sie den vorherigen Test kopieren möchten?"
+msgstr "Bist du sicher, dass du den vorherigen Test kopieren möchtest?"
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:56
 msgid ""
 "This will overwrite your current code and replace it with your last "
 "submission."
 msgstr ""
-"Dadurch wird Ihr aktueller Code überschrieben und durch Ihre letzte "
+"Dadurch wird dein aktueller Code überschrieben und durch deine letzte "
 "Einreichung ersetzt."
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:59
@@ -5386,7 +5386,7 @@ msgid ""
 "Changing this setting will reload the page and therefore overwrite your "
 "current code."
 msgstr ""
-"Wenn Sie diese Einstellung ändern, wird die Seite neu geladen und Ihr "
+"Wenn du diese Einstellung änderst, wird die Seite neu geladen und dein "
 "aktueller Code überschrieben."
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:68
@@ -5400,7 +5400,7 @@ msgstr "Spielentwürfe"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:50
 msgid "Select all games (that your search applies to)"
-msgstr "Alle Spiele auswählen (auf die Ihre Suche zutrifft)"
+msgstr "Alle Spiele auswählen (auf die deine Suche zutrifft)"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:51
 #: src/main/webapp/WEB-INF/tags/create_games.tag:95
@@ -5409,7 +5409,7 @@ msgstr "Alle auswählen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:54
 msgid "Deselect all games (that your search applies to)"
-msgstr "Alle Spiele (auf die sich Ihre Suche bezieht) abwählen"
+msgstr "Alle Spiele (auf die sich deine Suche bezieht) abwählen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:55
 #: src/main/webapp/WEB-INF/tags/create_games.tag:99
@@ -5430,11 +5430,11 @@ msgstr "Nicht zugewiesene Benutzer"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:94
 msgid "Select all users (that your search applies to)"
-msgstr "Alle Benutzer auswählen (auf die Ihre Suche zutrifft)"
+msgstr "Alle Benutzer auswählen (auf die deine Suche zutrifft)"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:98
 msgid "Deselect all users (that your search applies to)"
-msgstr "Alle Benutzer (auf die Ihre Suche zutrifft) abwählen"
+msgstr "Alle Benutzer (auf die deine Suche zutrifft) abwählen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:106
 msgid "Show users that are part of an existing active game."
@@ -5461,11 +5461,11 @@ msgstr "Mutanten, die zusammen mit der Klasse hochgeladen wurden, einbeziehen."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:254
 msgid "Select the role you will have in the game."
-msgstr "Wählen Sie die Rolle, die Sie im Spiel übernehmen möchten."
+msgstr "Wähle die Rolle aus, die du im Spiel übernehmen möchtest."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:255
 msgid "Your Role"
-msgstr "Ihre Rolle"
+msgstr "Deine Rolle"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:270
 msgid "Enable Capture Players' Intentions"
@@ -5477,7 +5477,7 @@ msgstr "Spiele automatisch starten, sobald sie erstellt wurden."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:297
 msgid "Set the game's duration:"
-msgstr "Legen Sie die Spieldauer fest:"
+msgstr "Leg die Spieldauer fest:"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:308
 msgid "If the value is greater, it will be limited to this maximum."
@@ -5485,7 +5485,7 @@ msgstr "Wenn der Wert größer ist, wird er auf diesen Höchstwert begrenzt."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:346
 msgid "Create Staged Games With Users"
-msgstr "Erstellen Sie inszenierte Spiele mit Benutzern"
+msgstr "Inszenierte Spiele mit Benutzern erstellen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:357
 msgid "User Names"
@@ -5513,7 +5513,7 @@ msgid ""
 "Method of assigning players to teams. Click the question mark for more "
 "information."
 msgstr ""
-"Verfahren zur Zuweisung von Spielern zu Teams. Klicken Sie auf das "
+"Verfahren zur Zuweisung von Spielern zu Teams. Klicke auf das "
 "Fragezeichen, um weitere Informationen zu erhalten."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:395
@@ -5679,7 +5679,7 @@ msgstr "Erklärung: Spielentwürfe ohne Spieler"
 #: src/main/webapp/WEB-INF/tags/create_games.tag:554
 msgid "Create a number staged games without users assigned to them."
 msgstr ""
-"Erstellen Sie eine Reihe von Spielen, denen keine Benutzer zugewiesen sind."
+"Erstelle eine Reihe von Spielen, denen keine Benutzer zugewiesen sind."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:641
 #: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:25
@@ -5706,7 +5706,7 @@ msgstr "keine"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:760
 msgid "Dates are converted to you local timezone: {0}"
-msgstr "Die Daten werden in Ihre lokale Zeitzone umgerechnet: {0}"
+msgstr "Die Daten werden in deine lokale Zeitzone umgerechnet: {0}"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:813
 msgid "Add player to selected game"
@@ -5722,7 +5722,7 @@ msgstr "versteckt"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:958
 msgid "Switch your role"
-msgstr "Wechseln Sie Ihre Rolle"
+msgstr "Wechsle deine Rolle"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:970
 msgid "Change to Observer"
@@ -6228,7 +6228,7 @@ msgstr "Spiel {0} ({1})"
 
 #: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:45
 msgid "Puzzle Overview: See all puzzles and your progress."
-msgstr "Puzzle-Übersicht: Alle Puzzles und Ihren Fortschritt anzeigen."
+msgstr "Puzzle-Übersicht: Alle Puzzles und deinen Fortschritt anzeigen."
 
 #: src/main/webapp/WEB-INF/tags/puzzle-navigation.tag:46
 msgid "Overview"
@@ -6244,7 +6244,7 @@ msgstr "Nächstes Rätsel spielen"
 
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:35
 msgid "This is your {0}{1} attempt."
-msgstr "Dies ist Ihr {0}. Versuch."
+msgstr "Dies ist dein {0}. Versuch."
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:63
 msgid "My mutant is killable"
