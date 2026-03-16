@@ -18,10 +18,12 @@
  */
 package org.codedefenders.validation.code;
 
+import org.xnap.commons.i18n.I18n;
+
 public enum CodeValidatorLevel {
-    RELAXED("Relaxed"),
-    MODERATE("Moderate"),
-    STRICT("Strict");
+    RELAXED(I18n.marktr("Relaxed")),
+    MODERATE(I18n.marktr("Moderate")),
+    STRICT(I18n.marktr("Strict"));
 
     private final String displayName;
 

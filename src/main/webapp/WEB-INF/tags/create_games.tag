@@ -215,17 +215,17 @@
                                 </a>
                             </label>
                             <div id="mutant-validator-group">
-                                <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio"
-                                           id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="mutantValidatorLevel"
-                                           value="<%=level.name()%>"
-                                        <%=level == CodeValidatorLevel.MODERATE ? "checked" : ""%>>
-                                    <label class="form-check-label" for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
-                                        <%=level.getDisplayName()%>
-                                    </label>
-                                </div>
-                                <% } %>
+                                <c:forEach var="level" items="${CodeValidatorLevel.values()}">
+                                    <%--@elvariable id="level" type="org.codedefenders.validation.code.CodeValidatorLevel"--%>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               id="mutant-validator-radio-${level.name().toLowerCase()}" name="mutantValidatorLevel"
+                                               value="${level.name()}" ${level == CodeValidatorLevel.RELAXED ? "checked" : ""}>
+                                        <label class="form-check-label" for="mutant-validator-radio-${level.name().toLowerCase()}">
+                                            ${i18n.tr(level.displayName)}
+                                        </label>
+                                    </div>
+                                </c:forEach>
                             </div>
                         </div>
 
@@ -1060,7 +1060,6 @@
 
         const roleSelect = document.createElement('select');
         roleSelect.classList.add('move-player-role', 'form-select', 'form-select-sm');
-        roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         controlsContainer.appendChild(roleSelect);
 

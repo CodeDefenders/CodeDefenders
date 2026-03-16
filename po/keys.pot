@@ -663,6 +663,18 @@ msgstr "Sorry, no kill message available for this mutant"
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
+#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:24
+msgid "Relaxed"
+msgstr "Relaxed"
+
+#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:25
+msgid "Moderate"
+msgstr "Moderate"
+
+#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:26
+msgid "Strict"
+msgstr "Strict"
+
 #: src/main/javascript/game/defender_intention_collection.js:111
 msgid "Defend"
 msgstr "Defend"
@@ -2736,118 +2748,114 @@ msgid "Error"
 msgstr "Error"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:965
-msgid "Are you sure you want to delete chapter"
-msgstr "Are you sure you want to delete chapter"
+msgid "Are you sure you want to delete chapter {0}?"
+msgstr "Are you sure you want to delete chapter {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:967
-msgid "Any puzzles left in the chapter will be moved to"
-msgstr "Any puzzles left in the chapter will be moved to"
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:966
+msgid "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
+msgstr "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:968
-msgid "Unassigned"
-msgstr "Unassigned"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:971
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:969
 msgid "Delete Chapter"
 msgstr "Delete Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:972
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:970
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:990
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:988
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:992
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:990
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
-msgid "Are you sure you want to permanently delete puzzle"
-msgstr "Are you sure you want to permanently delete puzzle"
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1013
+msgid "Are you sure you want to permanently delete puzzle {0}?"
+msgstr "Are you sure you want to permanently delete puzzle {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1019
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1017
 msgid "Delete Puzzle"
 msgstr "Delete Puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1020
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1018
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1027
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1025
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1034
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1032
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1036
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1034
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1055
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1053
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1057
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1055
 msgid "Please enter a title."
 msgstr "Please enter a title."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1061
+msgid "Description"
+msgstr "Description"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1063
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1070
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1068
 msgid "Create New Chapter"
 msgstr "Create New Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1071
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1069
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1074
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1097
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1101
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1124
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1122
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1205
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1203
 msgid "Saving..."
 msgstr "Saving..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1210
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1208
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1212
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1210
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1213
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1211
 msgid "Could not save changes."
 msgstr "Could not save changes."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1218
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1216
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1245
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1243
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
@@ -7203,159 +7211,159 @@ msgstr "Remove player from game"
 msgid "Game"
 msgstr "Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1068
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1067
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1074
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1073
 msgid "Move player to selected game"
 msgstr "Move player to selected game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1106
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1105
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1166
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1165
 msgid "Game Type"
 msgstr "Game Type"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1170
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1169
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1174
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1173
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1178
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1177
 msgid "Include Predefined Mutants"
 msgstr "Include Predefined Mutants"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1182
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1181
 msgid "Include Predefined Tests"
 msgstr "Include Predefined Tests"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1186
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1185
 msgid "Max Assertions Per Test"
 msgstr "Max Assertions Per Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1190
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1189
 msgid "Mutant Validator Level"
 msgstr "Mutant Validator Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1194
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1193
 msgid "Creator Role"
 msgstr "Creator Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1198
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1197
 msgid "Chat Enabled"
 msgstr "Chat Enabled"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1202
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1201
 msgid "Capture Player Intentions"
 msgstr "Capture Player Intentions"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1206
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1205
 msgid "Equivalence Threshold"
 msgstr "Equivalence Threshold"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1210
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1209
 msgid "Start Game"
 msgstr "Start Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1214
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1213
 msgid "Game Duration"
 msgstr "Game Duration"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1239
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1238
 msgid "Select"
 msgstr "Select"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1249
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1248
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1255
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1254
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1261
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1260
 msgid "Game Type"
 msgstr "Game Type"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1266
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1265
 msgid "Show"
 msgstr "Show"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1268
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1267
 msgid "Settings"
 msgstr "Settings"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1276
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1275
 msgid "Players (Username, Classroom Role, Last Game Role, Total Score)"
 msgstr "Players (Username, Classroom Role, Last Game Role, Total Score)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1277
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1276
 msgid "Players (Username, Last Game Role, Total Score)"
 msgstr "Players (Username, Last Game Role, Total Score)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1299
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1298
 msgid "Game Settings"
 msgstr "Game Settings"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1314
 msgid "There are currently no staged games."
 msgstr "There are currently no staged games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1316
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
 msgid "No matching staged games found."
 msgstr "No matching staged games found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1476
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1475
 msgid "Select"
 msgstr "Select"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1485
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1484
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1490
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1489
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1496
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1495
 msgid "Classroom Role"
 msgstr "Classroom Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1503
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1502
 msgid "Last Game Role"
 msgstr "Last Game Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1508
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1507
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1514
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1513
 msgid "Last Login"
 msgstr "Last Login"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1521
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1520
 msgid "Add to existing game"
 msgstr "Add to existing game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1545
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1544
 msgid "No users found."
 msgstr "No users found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1546
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1545
 msgid "No matching users found."
 msgstr "No matching users found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1693
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1692
 msgid "You have users selected. Are you sure you want to stage empty games?"
 msgstr "You have users selected. Are you sure you want to stage empty games?"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1697
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1696
 msgid "You entered user names/emails. Are you sure you want to stage empty games?"
 msgstr "You entered user names/emails. Are you sure you want to stage empty games?"
 

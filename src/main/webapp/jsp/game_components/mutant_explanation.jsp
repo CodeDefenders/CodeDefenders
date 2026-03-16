@@ -73,7 +73,7 @@
          <button type="button" data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
                  title="${i18n.tr('Click for more information')}"
                  class="btn btn-xs <%=levelStyling%> align-middle">
-             <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>
+             ${i18n.tr(mutantExplanation.codeValidatorLevel.displayName)}
              <i class="fa fa-question-circle ms-1"></i>
          </button>
     </div>

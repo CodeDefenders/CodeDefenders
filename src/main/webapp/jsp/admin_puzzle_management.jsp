@@ -737,7 +737,7 @@
                                     <input type="text" name="title" class="form-control" value=""
                                         placeholder="Title"
                                         required minlength="1" maxlength="100">
-            <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
+                                    <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                 </div>
                             </div>
 
@@ -745,7 +745,7 @@
                                 <div class="form-group">
                                     <label class="form-label">Description</label>
                                     <input type="text" name="description" class="form-control" value=""
-            placeholder="${i18n.tr('Description')}"
+                                        placeholder="${i18n.tr('Description')}"
                                         maxlength="1000">
                                 </div>
                             </div>
@@ -807,9 +807,9 @@
                         <form class="" novalidate>
                             <div class="row mb-3">
                                 <div class="col-12">
-            <label class="form-label">${i18n.tr('Title')}</label>
+                                    <label class="form-label">${i18n.tr('Title')}</label>
                                     <input type="text" class="form-control" value="" name="title"
-            placeholder="${i18n.tr('Title')}"
+                                        placeholder="${i18n.tr('Title')}"
                                         required minlength="1" maxlength="100">
                                                 <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                 </div>
@@ -826,7 +826,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-            <label class="form-label">${i18n.tr('Max. Assertions')}</label>
+                                    <label class="form-label">${i18n.tr('Max. Assertions')}</label>
                                     <input type="number" class="form-control" value="" name="maxAssertionsPerTest"
                                         min="1">
                                 </div>
@@ -834,12 +834,12 @@
 
                             <div class="row g-3 mb-2 editable-lines">
                                 <div class="col-6">
-            <label class="form-label">${i18n.tr('First Editable Line')}</label>
+                                    <label class="form-label">${i18n.tr('First Editable Line')}</label>
                                     <input type="number" class="form-control" value="" name="editableLinesStart"
                                         min="1">
                                 </div>
                                 <div class="col-6">
-            <label class="form-label">${i18n.tr('Last Editable Line')}</label>
+                                    <label class="form-label">${i18n.tr('Last Editable Line')}</label>
                                     <input type="number" class="form-control" value="" name="editableLinesEnd"
                                         min="1">
                                 </div>
@@ -847,29 +847,29 @@
 
                             <div class="row g-3 mb-2 difficulty-level">
                                 <div class="col-12">
-            <label class="form-label">${i18n.tr('Game Level')}</label>
+                                    <label class="form-label">${i18n.tr('Game Level')}</label>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
                                                value="${GameLevel.EASY}" required>
-            <label class="form-check-label" for="level-radio-easy">${i18n.tr('Easy')}</label>
-            <div class="invalid-feedback">${i18n.tr('Please select a level.')}</div>
+                                        <label class="form-check-label" for="level-radio-easy">${i18n.tr('Easy')}</label>
+                                        <div class="invalid-feedback">${i18n.tr('Please select a level.')}</div>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
                                                value="${GameLevel.HARD}" required
                                                checked>
-            <label class="form-check-label" for="level-radio-hard">${i18n.tr('Hard')}</label>
+                                        <label class="form-check-label" for="level-radio-hard">${i18n.tr('Hard')}</label>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row g-3 mb-2 mutant-equivalent">
                                 <div class="col-12">
-            <label class="form-label">${i18n.tr('Equivalence')}</label>
+                                    <label class="form-label">${i18n.tr('Equivalence')}</label>
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="" name="mutantEquivalent" id="mutantEquivalent">
                                         <label class="form-check-label" for="mutantEquivalent">
-            ${i18n.tr('Mutant equivalent')}
+                                            ${i18n.tr('Mutant equivalent')}
                                         </label>
                                     </div>
                                 </div>
@@ -962,10 +962,8 @@
                     const modal = new Modal();
                     modal.body.innerHTML = `
                         <div>
-            ${i18n.tr('Are you sure you want to delete chapter')}
-                            <span class="px-1 border rounded-1 edit-chapter-title"></span>?
-            ${i18n.tr('Any puzzles left in the chapter will be moved to')}
-                    <span class="px-1 border rounded-1">${i18n.tr('Unassigned')}</span>.
+                            ${i18n.tr('Are you sure you want to delete chapter {0}?', '<span class="px-1 border rounded-1 edit-chapter-title"></span>')}
+                            ${i18n.tr('Any puzzles left in the chapter will be moved to <span class="px-1 border rounded-1">Unassigned</span>.')}
                         </div>`;
 
                     modal.title.innerText = '${i18n.tr("Delete Chapter")}';
@@ -1012,8 +1010,8 @@
                     const modal = new Modal();
                     modal.body.innerHTML = `
                         <div>
-            ${i18n.tr('Are you sure you want to permanently delete puzzle')}
-                            <span class="px-1 border rounded-1 edit-puzzle-title"></span>?
+                            ${i18n.tr('Are you sure you want to permanently delete puzzle {0}?',
+                            '<span class="px-1 border rounded-1 edit-puzzle-title"></span>')}
                         </div>`;
 
                     modal.title.innerText = '${i18n.tr("Delete Puzzle")}';
@@ -1031,9 +1029,9 @@
                         PuzzleAPI.deletePuzzle(puzzle.id)
                                 .then(response => {
                                     puzzleComp.container.remove();
-            ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
+                                    ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                                 }).catch(async response => {
-            ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
+                                    ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
                                 }).finally(() => {
                                     modal.controls.hide();
                                     setTimeout(() => modal.modal.remove(), 1000);
@@ -1052,17 +1050,17 @@
                                     <div class="form-group">
                                         <label class="form-label">Title</label>
                                         <input type="text" name="title" class="form-control" value=""
-            placeholder="${i18n.tr('Title')}"
+                                            placeholder="${i18n.tr('Title')}"
                                             required minlength="1" maxlength="100">
-            <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
+                                        <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-2">
                                     <div class="form-group">
-            <label class="form-label">${i18n.tr('Description')}</label>
+                                        <label class="form-label">${i18n.tr('Description')}</label>
                                         <input type="text" name="description" class="form-control" value=""
-            placeholder="${i18n.tr('Description')}"
+                                            placeholder="${i18n.tr('Description')}"
                                             maxlength="1000">
                                     </div>
                                 </div>
