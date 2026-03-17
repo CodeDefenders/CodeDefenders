@@ -71,10 +71,10 @@ or are locked for the logged in user.
                         />
                         <h2>
                             <span class="next-puzzle__title__next-puzzle">${i18n.tr('Next puzzle:')}</span><br>
-                            <span class="next-puzzle__title__chapter">${nextPuzzleObj.puzzle.chapter.title},</span>
-                            <span class="next-puzzle__title__title">${nextPuzzleObj.puzzle.title}</span>
+                            <span class="next-puzzle__title__chapter">${nextPuzzleObj.chapterTitle},</span>
+                            <span class="next-puzzle__title__title">${nextPuzzleObj.title}</span>
                         </h2>
-                        <p>${nextPuzzleObj.puzzle.description}</p>
+                        <p>${nextPuzzleObj.description}</p>
                     </div>
                 </a>
             </c:if>
@@ -86,7 +86,7 @@ or are locked for the logged in user.
                 <c:set var="chapter" value="${ChapterEntry.chapter}"/>
                 <div class="chapter">
                     <div class="chapter__title">
-                        <h2>${chapter.title}</h2>
+                        <h2>${ChapterEntry.title}</h2>
                     </div>
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
@@ -137,8 +137,8 @@ or are locked for the logged in user.
                                     </c:if>
                                 </div>
                                 <div class="chapter__level__title">
-                                    <h3>${puzzle.title}</h3>
-                                    <p>${puzzle.description}</p>
+                                    <h3>${puzzleEntry.title}</h3>
+                                    <p>${puzzleEntry.description}</p>
                                 </div>
                             </a>
                         </c:forEach>

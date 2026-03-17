@@ -31,6 +31,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.ClassViewerBean;
 import org.codedefenders.beans.game.MutantAccordionBean;
 import org.codedefenders.beans.game.TestAccordionBean;
@@ -41,10 +42,12 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 
@@ -91,6 +94,12 @@ public class AdminPuzzleManagement extends HttpServlet {
     @Inject
     private ClassViewerBean classViewer;
 
+    @Inject
+    private I18nService i18nService;
+
+    @Inject
+    private CodeDefendersAuth login;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -133,6 +142,13 @@ public class AdminPuzzleManagement extends HttpServlet {
         classViewer.init(cut);
         testAccordion.init(cut, testDTOs);
         mutantAccordion.init(cut, mutantDTOs, -1);
+
+        // Resolve the puzzle text for the admin's locale
+        String userLang = login.getUser().getLocale().getLanguage();
+        String defaultLang = i18nService.getDefaultLocale().getLanguage();
+        PuzzleText puzzleText = puzzleRepo.getPuzzleTextWithFallback(puzzleId, userLang, defaultLang);
+        request.setAttribute("puzzleTitle", puzzleText != null ? puzzleText.title() : "");
+        request.setAttribute("puzzleDescription", puzzleText != null ? puzzleText.description() : "");
 
         request.setAttribute("puzzle", puzzle);
         request.setAttribute("mutants", mutants);

@@ -53,8 +53,8 @@
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
-    pageContext.setAttribute("title", puzzle.getTitle());
-    pageContext.setAttribute("description", puzzle.getDescription());
+    pageContext.setAttribute("title", request.getAttribute("puzzleTitle"));
+    pageContext.setAttribute("description", request.getAttribute("puzzleDescription"));
     pageContext.setAttribute("equivMutant", equivMutant);
     pageContext.setAttribute("mutantClaimedMessage", mutantClaimedMessage);
     pageContext.setAttribute("showTestAccordion", showTestAccordion);
@@ -96,6 +96,9 @@
 
 
 <%-- -------------------------------------------------------------------------------- --%>
+
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">

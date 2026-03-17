@@ -202,7 +202,7 @@
 
                 <dl class="puzzle-stats">
                     <c:forEach items="${profile.puzzleGames}" var="chapter">
-                        <dt>${i18n.tr('Chapter {0} - {1}', chapter.chapter.position, chapter.chapter.title)}</dt>
+                        <dt>${i18n.tr('Chapter {0} - {1}', chapter.chapter.position, chapter.title)}</dt>
                         <dd>
                             <div class="chapter__levels">
                                 <c:set var="solvedPuzzles"
@@ -232,7 +232,7 @@
                                                 >${puzzle.rounds}</span>
                                             </div>
                                             <div class="chapter__level__title">
-                                                <h3>${puzzle.puzzle.title}</h3>
+                                                <h3>${puzzle.title}</h3>
                                                 <p>${puzzle.puzzle.type == 'EQUIVALENCE' ? i18n.tr('Equivalence')
                                                         : puzzle.puzzle.type == 'ATTACKER' ? i18n.tr('Attacker') : i18n.tr('Defender')}
                                                         ${i18n.tr('puzzle')}</p>

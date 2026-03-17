@@ -51,12 +51,15 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleChapterText;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
@@ -85,6 +88,7 @@ public class PuzzleImporter {
     private final MutantRepository mutantRepo;
     private final PuzzleRepository puzzleRepo;
     private final GameClassRepository gameClassRepo;
+    private final I18nService i18nService;
 
     @Inject
     public PuzzleImporter(BackendExecutorService backend,
@@ -93,7 +97,8 @@ public class PuzzleImporter {
                           TestRepository testRepo,
                           MutantRepository mutantRepo,
                           PuzzleRepository puzzleRepo,
-                          GameClassRepository gameClassRepo) {
+                          GameClassRepository gameClassRepo,
+                          I18nService i18nService) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
@@ -101,6 +106,7 @@ public class PuzzleImporter {
         this.mutantRepo = mutantRepo;
         this.puzzleRepo = puzzleRepo;
         this.gameClassRepo = gameClassRepo;
+        this.i18nService = i18nService;
     }
 
     /**
@@ -169,7 +175,7 @@ public class PuzzleImporter {
             CompileException, BackendExecutorService.ExecutionException {
         PuzzleChapter chapter = storePuzzleChapterToDB(data.properties);
         for (PuzzleData puzzleData : data.puzzles) {
-            importPuzzle(puzzleData, chapter.getChapterId());
+            importPuzzle(puzzleData, chapter.getId());
         }
     }
 
@@ -191,19 +197,13 @@ public class PuzzleImporter {
     private PuzzleChapter storePuzzleChapterToDB(SimpleFile propertiesFile) throws IOException {
         var props = readPuzzleChapterProperties(propertiesFile);
 
-        // Find next free position.
-        int position = puzzleRepo.getPuzzleChapters().stream()
-                .map(PuzzleChapter::getPosition)
-                .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
-                .max()
-                .orElse(0) + 1;
+        PuzzleChapter chapter = puzzleRepo.createNewPuzzleChapter();
 
-        PuzzleChapter chapter = new PuzzleChapter(-1, position, props.title, props.description);
-        int chapterId = puzzleRepo.storePuzzleChapter(chapter);
-        chapter.setChapterId(chapterId);
+        // Store chapter text using the default locale
+        String language = i18nService.getDefaultLocale().getLanguage();
+        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(chapter.getId(), language, props.title, props.description));
 
-        logger.info("Stored puzzle chapter with id {}", chapterId);
+        logger.info("Stored puzzle chapter with id {}", chapter.getId());
         return chapter;
     }
 
@@ -467,9 +467,13 @@ public class PuzzleImporter {
             // Store puzzle to DB.
             Puzzle puzzle = new Puzzle(-1, cut.getId(), props.type, props.isEquivalent, props.level,
                     maxAssertionsPerTest, mutantValidatorLevel, props.editableLinesStart, props.editableLinesEnd,
-                    chapterId, position, props.title, props.description);
+                    chapterId, position);
             int puzzleId = puzzleRepo.storePuzzle(puzzle);
             puzzle.setPuzzleId(puzzleId);
+
+            // Store puzzle text using the default locale
+            String language = i18nService.getDefaultLocale().getLanguage();
+            puzzleRepo.storePuzzleText(new PuzzleText(puzzleId, language, props.title, props.description));
 
             logger.info("Created Puzzle {}", puzzleId);
 

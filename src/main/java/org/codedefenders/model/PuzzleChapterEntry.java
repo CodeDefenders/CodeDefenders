@@ -37,12 +37,17 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @see PuzzleEntry
  */
 public class PuzzleChapterEntry implements Comparable<PuzzleChapterEntry> {
-    private PuzzleChapter chapter;
-    private SortedSet<PuzzleEntry> puzzleEntries;
+    private final PuzzleChapter chapter;
+    private final SortedSet<PuzzleEntry> puzzleEntries;
+    private final String title;
+    private final String description;
 
-    public PuzzleChapterEntry(PuzzleChapter chapter, Collection<PuzzleEntry> puzzleEntries) {
+    public PuzzleChapterEntry(PuzzleChapter chapter, Collection<PuzzleEntry> puzzleEntries,
+                              String title, String description) {
         this.chapter = chapter;
         this.puzzleEntries = new TreeSet<>(puzzleEntries);
+        this.title = title;
+        this.description = description;
     }
 
     public PuzzleChapter getChapter() {
@@ -54,6 +59,14 @@ public class PuzzleChapterEntry implements Comparable<PuzzleChapterEntry> {
      */
     public SortedSet<PuzzleEntry> getPuzzleEntries() {
         return puzzleEntries;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override

@@ -34,10 +34,11 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleChapterText;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.game.puzzle.PuzzleType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -312,11 +313,9 @@ public class PuzzleRepository {
                 Editable_Lines_End,
                 Chapter_ID,
                 Position,
-                Title,
-                Description,
                 IsEquivalent)
 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
         """;
 
         return queryRunner.insert(query,
@@ -330,8 +329,6 @@ public class PuzzleRepository {
                 puzzle.getEditableLinesEnd(),
                 puzzle.getChapterId(),
                 puzzle.getPosition(),
-                puzzle.getTitle(),
-                puzzle.getDescription(),
                 puzzle.isEquivalent()
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle."));
     }
@@ -340,10 +337,9 @@ public class PuzzleRepository {
     /**
      * Stores the given {@link PuzzleChapter} in the database.
      *
-     * @param chapter The {@link PuzzleChapter}.
-     * @return The ID of the stored puzzle chapter, or -1 if the insert failed.
+     * @return The PuzzleChapter with the generated chapter ID and last position, or {@code null} if the insert failed.
      */
-    public int storePuzzleChapter(PuzzleChapter chapter) {
+    public PuzzleChapter createNewPuzzleChapter() {
         @Language("SQL") String positionQuery = """
             SELECT MAX(position) AS max_position FROM puzzle_chapters;
         """;
@@ -352,21 +348,15 @@ public class PuzzleRepository {
                 .orElse(0);
 
         @Language("SQL") String query = """
-                INSERT INTO puzzle_chapters
-
-                (Position,
-                Title,
-                Description)
-
-                VALUES (?, ?, ?);
+                INSERT INTO puzzle_chapters (Position) VALUES (?);
         """;
 
-        return queryRunner.insert(query,
-                generatedKeyFromRS(),
-                maxPosition + 1,
-                chapter.getTitle(),
-                chapter.getDescription()
+        int position = maxPosition + 1;
+        int id = queryRunner.insert(
+                query, generatedKeyFromRS(), position
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
+
+        return new PuzzleChapter(id, position);
     }
 
     /**
@@ -420,8 +410,6 @@ public class PuzzleRepository {
                 UPDATE puzzles
                 SET Chapter_ID           = ?,
                     Position             = ?,
-                    Title                = ?,
-                    Description          = ?,
                     Max_Assertions       = ?,
                     Editable_Lines_Start = ?,
                     Editable_Lines_End   = ?,
@@ -433,8 +421,6 @@ public class PuzzleRepository {
         int updatedRows = queryRunner.update(query,
                 puzzle.getChapterId(),
                 puzzle.getPosition(),
-                puzzle.getTitle(),
-                puzzle.getDescription(),
                 puzzle.getMaxAssertionsPerTest(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
@@ -454,18 +440,13 @@ public class PuzzleRepository {
     public boolean updatePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
                 UPDATE puzzle_chapters
-                SET Position    = ?,
-                    Title       = ?,
-                    Description = ?
+                SET Position = ?
                 WHERE Chapter_ID = ?;
         """;
 
         int updatedRows = queryRunner.update(query,
                 chapter.getPosition(),
-                chapter.getTitle(),
-                chapter.getDescription(),
-
-                chapter.getChapterId()
+                chapter.getId()
         );
         return updatedRows > 0;
     }
@@ -562,7 +543,7 @@ public class PuzzleRepository {
     public boolean removePuzzleChapter(@Nonnull PuzzleChapter chapter) {
         @Language("SQL") String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
         int updatedRows = queryRunner.update(query,
-                chapter.getChapterId()
+                chapter.getId()
         );
         return updatedRows > 0;
     }
@@ -704,6 +685,179 @@ public class PuzzleRepository {
                 chapter -> chapter.id()));
     }
 
+    // ---- Puzzle Text CRUD ----
+
+    /**
+     * Stores a {@link PuzzleText} in the database. If a text for the same puzzle and language already exists,
+     * it will be updated.
+     *
+     * @param text The {@link PuzzleText} to store.
+     */
+    public void storePuzzleText(PuzzleText text) {
+        @Language("SQL") String query = """
+                INSERT INTO puzzle_text (Puzzle_ID, Language, Title, Description)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description);
+        """;
+
+        queryRunner.update(query,
+                text.puzzleId(),
+                text.language(),
+                text.title(),
+                text.description()
+        );
+    }
+
+    /**
+     * Returns the {@link PuzzleText} for a given puzzle and language.
+     *
+     * @param puzzleId The puzzle ID.
+     * @param language The language code.
+     * @return The {@link PuzzleText}, or {@code null} if not found.
+     */
+    public PuzzleText getPuzzleText(int puzzleId, String language) {
+        @Language("SQL") String query = """
+                SELECT * FROM puzzle_text
+                WHERE Puzzle_ID = ? AND Language = ?;
+        """;
+
+        return queryRunner.query(query,
+                oneFromRS(PuzzleRepository::puzzleTextFromRS),
+                puzzleId, language
+        ).orElse(null);
+    }
+
+    /**
+     * Returns the {@link PuzzleText} for the given language, falling back to the fallback language if no
+     * text exists for the primary language.
+     *
+     * @param puzzleId         The puzzle ID.
+     * @param language         The preferred language code.
+     * @param fallbackLanguage The fallback language code.
+     * @return The {@link PuzzleText}, or {@code null} if not found for either language.
+     */
+    public PuzzleText getPuzzleTextWithFallback(int puzzleId, String language, String fallbackLanguage) {
+        PuzzleText text = getPuzzleText(puzzleId, language);
+        if (text == null && !language.equals(fallbackLanguage)) {
+            text = getPuzzleText(puzzleId, fallbackLanguage);
+        }
+        return text;
+    }
+
+    /**
+     * Returns all {@link PuzzleText} entries for a given puzzle.
+     *
+     * @param puzzleId The puzzle ID.
+     * @return A list of all language variants for the puzzle.
+     */
+    public List<PuzzleText> getAllPuzzleTexts(int puzzleId) {
+        @Language("SQL") String query = """
+                SELECT * FROM puzzle_text
+                WHERE Puzzle_ID = ?;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleTextFromRS),
+                puzzleId
+        );
+    }
+
+    private static PuzzleText puzzleTextFromRS(ResultSet rs) throws SQLException {
+        return new PuzzleText(
+                rs.getInt("Puzzle_ID"),
+                rs.getString("Language"),
+                rs.getString("Title"),
+                rs.getString("Description")
+        );
+    }
+
+    // ---- Puzzle Chapter Text CRUD ----
+
+    /**
+     * Stores a {@link PuzzleChapterText} in the database. If a text for the same chapter and language already exists,
+     * it will be updated.
+     *
+     * @param text The {@link PuzzleChapterText} to store.
+     */
+    public void storePuzzleChapterText(PuzzleChapterText text) {
+        @Language("SQL") String query = """
+                INSERT INTO puzzle_chapter_text (Chapter_ID, Language, Title, Description)
+                VALUES (?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE Title = VALUES(Title), Description = VALUES(Description);
+        """;
+
+        queryRunner.update(query,
+                text.chapterId(),
+                text.language(),
+                text.title(),
+                text.description()
+        );
+    }
+
+    /**
+     * Returns the {@link PuzzleChapterText} for a given chapter and language.
+     *
+     * @param chapterId The chapter ID.
+     * @param language  The language code.
+     * @return The {@link PuzzleChapterText}, or {@code null} if not found.
+     */
+    public PuzzleChapterText getPuzzleChapterText(int chapterId, String language) {
+        @Language("SQL") String query = """
+                SELECT * FROM puzzle_chapter_text
+                WHERE Chapter_ID = ? AND Language = ?;
+        """;
+
+        return queryRunner.query(query,
+                oneFromRS(PuzzleRepository::puzzleChapterTextFromRS),
+                chapterId, language
+        ).orElse(null);
+    }
+
+    /**
+     * Returns the {@link PuzzleChapterText} for the given language, falling back to the fallback language if no
+     * text exists for the primary language.
+     *
+     * @param chapterId        The chapter ID.
+     * @param language         The preferred language code.
+     * @param fallbackLanguage The fallback language code.
+     * @return The {@link PuzzleChapterText}, or {@code null} if not found for either language.
+     */
+    public PuzzleChapterText getPuzzleChapterTextWithFallback(int chapterId, String language,
+                                                              String fallbackLanguage) {
+        PuzzleChapterText text = getPuzzleChapterText(chapterId, language);
+        if (text == null && !language.equals(fallbackLanguage)) {
+            text = getPuzzleChapterText(chapterId, fallbackLanguage);
+        }
+        return text;
+    }
+
+    /**
+     * Returns all {@link PuzzleChapterText} entries for a given chapter.
+     *
+     * @param chapterId The chapter ID.
+     * @return A list of all language variants for the chapter.
+     */
+    public List<PuzzleChapterText> getAllPuzzleChapterTexts(int chapterId) {
+        @Language("SQL") String query = """
+                SELECT * FROM puzzle_chapter_text
+                WHERE Chapter_ID = ?;
+        """;
+
+        return queryRunner.query(query,
+                listFromRS(PuzzleRepository::puzzleChapterTextFromRS),
+                chapterId
+        );
+    }
+
+    private static PuzzleChapterText puzzleChapterTextFromRS(ResultSet rs) throws SQLException {
+        return new PuzzleChapterText(
+                rs.getInt("Chapter_ID"),
+                rs.getString("Language"),
+                rs.getString("Title"),
+                rs.getString("Description")
+        );
+    }
+
     /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.
      *
@@ -718,10 +872,7 @@ public class PuzzleRepository {
             position = null;
         }
 
-        String title = rs.getString("puzzle_chapters.Title");
-        String description = rs.getString("puzzle_chapters.Description");
-
-        return new PuzzleChapter(chapterId, position, title, description);
+        return new PuzzleChapter(chapterId, position);
     }
 
     /**
@@ -745,9 +896,6 @@ public class PuzzleRepository {
             position = null;
         }
 
-        String title = rs.getString("puzzles.Title");
-        String description = rs.getString("puzzles.Description");
-
         GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
 
         int maxAssertions = rs.getInt("puzzles.Max_Assertions");
@@ -768,7 +916,7 @@ public class PuzzleRepository {
 
         boolean isEquivalent = rs.getBoolean("puzzles.IsEquivalent");
         return new Puzzle(puzzleId, classId, type, isEquivalent, level, maxAssertions,
-                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position);
     }
 
     /**

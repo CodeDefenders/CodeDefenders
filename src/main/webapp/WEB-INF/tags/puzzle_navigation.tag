@@ -49,7 +49,7 @@
                 <c:set var="nextPuzzleObj" value="${puzzleNavigation.nextPuzzle.get()}"/>
                 <li><a class="dropdown-item" id="header-puzzle-next"
                        href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}"
-                       title="${i18n.tr('Next puzzle: {0}, {1}', nextPuzzleObj.puzzle.chapter.title, nextPuzzleObj.puzzle.title)}"
+                       title="${i18n.tr('Next puzzle: {0}, {1}', nextPuzzleObj.chapterTitle, nextPuzzleObj.title)}"
                        data-bs-toggle="tooltip"
                 >${i18n.tr('Play next puzzle')}</a></li>
             </c:if>
@@ -58,17 +58,17 @@
                 <%-- shouldn't happen --%>
                 <li class="dropdown-item">${i18n.tr('There are currently no puzzles available.')}</li>
             </c:if>
-            <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
-                <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
-                <c:set var="chapter" value="${ChapterEntry.chapter}"/>
+            <c:forEach items="${puzzleNavigation.puzzleChapters}" var="chapterEntry">
+                <%--@elvariable id="chapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
+                <c:set var="chapter" value="${chapterEntry.chapter}"/>
                 <li class="dropdown dropend">
                     <a class="dropdown-item dropdown-toggle" href="#"
                        id="header-puzzle-chapter-${chapter.position}"
                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                    >${chapter.title}</a>
+                    >${chapterEntry.title}</a>
 
                     <ul class="dropdown-menu">
-                        <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
+                        <c:forEach var="puzzleEntry" items="${chapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
                             <c:set var="status"
                                    value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
@@ -86,7 +86,7 @@
                                             title="${i18n.tr('This puzzle is locked.')}"
                                         </c:otherwise>
                                     </c:choose>
-                            ><i class="fa ${icon}"></i> ${puzzle.title}</a></li>
+                            ><i class="fa ${icon}"></i> ${puzzleEntry.title}</a></li>
                         </c:forEach>
                     </ul>
                 </li>

@@ -21,7 +21,9 @@ package org.codedefenders.servlets.admin.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,8 +39,11 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleChapterText;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.GetPuzzlesData.PuzzleData;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -98,6 +103,9 @@ public class AdminPuzzleAPI extends HttpServlet {
 
     @Inject
     private GameClassRepository gameClassRepo;
+
+    @Inject
+    private I18nService i18nService;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -254,7 +262,11 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .serializeNulls()
                 .create();
+        String[] supportedLanguages = Arrays.stream(i18nService.getSupportedLocales())
+                .map(Locale::getLanguage)
+                .toArray(String[]::new);
         JsonElement json = gson.toJsonTree(new GetPuzzlesData(puzzles, puzzleChapters));
+        json.getAsJsonObject().add("supportedLanguages", gson.toJsonTree(supportedLanguages));
         writeJSONResponse(response, 200, json);
     }
 
@@ -284,6 +296,11 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .create();
         JsonElement json = gson.toJsonTree(puzzleChapter);
         writeJSONResponse(response, 200, json);
+    }
+
+    private String getLanguage(HttpServletRequest request) {
+        return getStringParameter(request, "language")
+                .orElse(i18nService.getDefaultLocale().getLanguage());
     }
 
     private void handleUpdatePuzzle(HttpServletRequest request,
@@ -335,8 +352,6 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        puzzle.setTitle(title);
-        puzzle.setDescription(description);
         puzzle.setMaxAssertionsPerTest(maxAssertionsPerTest);
         puzzle.setEditableLinesStart(editableLinesStart);
         puzzle.setEditableLinesEnd(editableLinesEnd);
@@ -347,6 +362,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             writeJSONMessage(response, 500, "Failed to update puzzle.");
             return;
         }
+
+        puzzleRepo.storePuzzleText(new PuzzleText(puzzleId, getLanguage(request), title, description));
 
         JsonObject answer = new JsonObject();
         gson = new GsonBuilder()
@@ -369,10 +386,6 @@ public class AdminPuzzleAPI extends HttpServlet {
         var data = gson.fromJson(body.get(), CreateChapterData.class);
 
         // TODO: This should be done in a service.
-        int maxPosition = puzzleRepo.getPuzzleChapters().stream()
-                    .mapToInt(PuzzleChapter::getPosition)
-                    .max().orElse(0);
-        int position = maxPosition + 1;
         String title = data.title.strip();
         if (title.isEmpty() || title.length() > 100) {
             writeJSONMessage(response, 400, "Invalid title.");
@@ -384,10 +397,9 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        PuzzleChapter chapter = new PuzzleChapter(-1, position, title, description);
-        int id = puzzleRepo.storePuzzleChapter(chapter);
-        chapter.setChapterId(id);
+        PuzzleChapter chapter = puzzleRepo.createNewPuzzleChapter();
 
+        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(chapter.getId(), getLanguage(request), title, description));
 
         gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
@@ -434,8 +446,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             return;
         }
 
-        chapter.setTitle(title);
-        chapter.setDescription(description);
+        puzzleRepo.storePuzzleChapterText(new PuzzleChapterText(puzzleChapterId, getLanguage(request), title, description));
+
         gson = new GsonBuilder()
                 .registerTypeAdapter(PuzzleChapter.class, new PuzzleChapterTypeAdapter())
                 .create();
@@ -512,22 +524,30 @@ public class AdminPuzzleAPI extends HttpServlet {
      * Custom {@link TypeAdapter} to convert {@link org.codedefenders.game.puzzle.Puzzle puzzle information} to JSON.
      * Currently, does not support to convert JSON to puzzles.
      */
-    private static class PuzzleTypeAdapter extends TypeAdapter<Puzzle> {
+    private class PuzzleTypeAdapter extends TypeAdapter<Puzzle> {
         @Override
         public void write(JsonWriter out, Puzzle puzzle) throws IOException {
             out.beginObject()
                     .name("id").value(puzzle.getPuzzleId())
                     .name("position").value(puzzle.getPosition())
-                    .name("title").value(puzzle.getTitle())
-                    .name("description").value(puzzle.getDescription())
                     .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
                     .name("editableLinesStart").value(puzzle.getEditableLinesStart())
                     .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
                     .name("chapterId").value(puzzle.getChapterId())
                     .name("classId").value(puzzle.getClassId())
                     .name("level").value(puzzle.getLevel().toString())
-                    .name("isEquivalent").value(puzzle.isEquivalent())
-                    .endObject();
+                    .name("isEquivalent").value(puzzle.isEquivalent());
+
+            out.name("texts").beginObject();
+            for (PuzzleText text : puzzleRepo.getAllPuzzleTexts(puzzle.getPuzzleId())) {
+                out.name(text.language()).beginObject()
+                        .name("title").value(text.title())
+                        .name("description").value(text.description())
+                        .endObject();
+            }
+            out.endObject();
+
+            out.endObject();
         }
 
         @Override
@@ -538,15 +558,13 @@ public class AdminPuzzleAPI extends HttpServlet {
             int puzzleId = json.get("id").getAsInt();
             Integer chapterId = json.get("chapterId").isJsonNull() ? null : json.get("chapterId").getAsInt();
             Integer position = json.get("position").isJsonNull() ? null : json.get("position").getAsInt();
-            String title = json.get("title").getAsString();
-            String description = json.get("description").getAsString();
             int maxAssertionsPerTest = json.get("maxAssertionsPerTest").getAsInt();
             Integer editableLinesStart =
                     json.get("editableLinesStart").isJsonNull() ? null : json.get("editableLinesStart").getAsInt();
             Integer editableLinesEnd =
                     json.get("editableLinesEnd").isJsonNull() ? null : json.get("editableLinesEnd").getAsInt();
 
-            return Puzzle.forPuzzleInfo(puzzleId, chapterId, position, title, description, maxAssertionsPerTest,
+            return Puzzle.forPuzzleInfo(puzzleId, chapterId, position, maxAssertionsPerTest,
                     editableLinesStart, editableLinesEnd);
         }
     }
@@ -555,7 +573,7 @@ public class AdminPuzzleAPI extends HttpServlet {
      * Custom {@link TypeAdapter} to convert {@link PuzzleChapter PuzzleChapters} to JSON.
      * Currently does not support to convert JSON to puzzle chapters.
      */
-    private static class PuzzleChapterTypeAdapter extends TypeAdapter<PuzzleChapter> {
+    private class PuzzleChapterTypeAdapter extends TypeAdapter<PuzzleChapter> {
         @Override
         public void write(JsonWriter out, PuzzleChapter chapter) throws IOException {
             if (chapter == null) {
@@ -563,11 +581,19 @@ public class AdminPuzzleAPI extends HttpServlet {
                 return;
             }
             out.beginObject()
-                    .name("id").value(chapter.getChapterId())
-                    .name("position").value(chapter.getPosition())
-                    .name("title").value(chapter.getTitle())
-                    .name("description").value(chapter.getDescription())
-                    .endObject();
+                    .name("id").value(chapter.getId())
+                    .name("position").value(chapter.getPosition());
+
+            out.name("texts").beginObject();
+            for (PuzzleChapterText text : puzzleRepo.getAllPuzzleChapterTexts(chapter.getId())) {
+                out.name(text.language()).beginObject()
+                        .name("title").value(text.title())
+                        .name("description").value(text.description())
+                        .endObject();
+            }
+            out.endObject();
+
+            out.endObject();
         }
 
         @Override
@@ -577,21 +603,17 @@ public class AdminPuzzleAPI extends HttpServlet {
 
             int chapterId = json.get("id").getAsInt();
             Integer position = json.get("position").isJsonNull() ? null : json.get("position").getAsInt();
-            String title = json.get("title").getAsString();
-            String description = json.get("description").getAsString();
 
-            return new PuzzleChapter(chapterId, position, title, description);
+            return new PuzzleChapter(chapterId, position);
         }
     }
 
-    private static class PuzzleDataTypeAdapter extends TypeAdapter<GetPuzzlesData.PuzzleData> {
+    private class PuzzleDataTypeAdapter extends TypeAdapter<GetPuzzlesData.PuzzleData> {
         @Override
         public void write(JsonWriter out, PuzzleData info) throws IOException {
             out.beginObject()
                     .name("id").value(info.puzzle.getPuzzleId())
                     .name("position").value(info.puzzle.getPosition())
-                    .name("title").value(info.puzzle.getTitle())
-                    .name("description").value(info.puzzle.getDescription())
                     .name("maxAssertionsPerTest").value(info.puzzle.getMaxAssertionsPerTest())
                     .name("editableLinesStart").value(info.puzzle.getEditableLinesStart())
                     .name("editableLinesEnd").value(info.puzzle.getEditableLinesEnd())
@@ -601,8 +623,18 @@ public class AdminPuzzleAPI extends HttpServlet {
                     .name("isEquivalent").value(info.puzzle().isEquivalent())
                     .name("level").value(info.puzzle.getLevel().toString())
                     .name("gameCount").value(info.gameCount)
-                    .name("active").value(info.active)
-                    .endObject();
+                    .name("active").value(info.active);
+
+            out.name("texts").beginObject();
+            for (PuzzleText text : puzzleRepo.getAllPuzzleTexts(info.puzzle.getPuzzleId())) {
+                out.name(text.language()).beginObject()
+                        .name("title").value(text.title())
+                        .name("description").value(text.description())
+                        .endObject();
+            }
+            out.endObject();
+
+            out.endObject();
         }
 
         @Override

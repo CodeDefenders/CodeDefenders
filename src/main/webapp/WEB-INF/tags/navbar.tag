@@ -75,7 +75,7 @@
                             </ul>
                         </li>
 
-                        <t:puzzle-navigation/>
+                        <t:puzzle_navigation/>
 
                         <c:if test="${auth.admin}">
                             <li class="nav-item nav-item-highlight me-3">

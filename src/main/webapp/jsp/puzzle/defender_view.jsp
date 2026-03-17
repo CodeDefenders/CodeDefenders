@@ -48,7 +48,7 @@
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    String title = i18n.tr("Puzzle: {0} - {1}", puzzle.getChapter().getTitle(), puzzle.getTitle());
+    String title = i18n.tr("Puzzle: {0} - {1}", request.getAttribute("chapterTitle"), request.getAttribute("puzzleTitle"));
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
@@ -90,6 +90,8 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -103,7 +105,7 @@
 
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h4 class="m-0">${puzzle.description}</h4>
+                <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>

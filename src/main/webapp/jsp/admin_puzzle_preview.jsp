@@ -49,6 +49,9 @@
     gameHighlighting.setEnableFlagging(false);
 %>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
+
 <p:base_page title="${i18n.tr('Puzzle Preview')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
@@ -71,11 +74,11 @@
                 </div>
                 <div>
                     <c:choose>
-                        <c:when test="${puzzle.description == null || puzzle.description.blank}">
+                        <c:when test="${puzzleDescription == null || puzzleDescription.blank}">
                             (${i18n.tr('no description')})
                         </c:when>
                         <c:otherwise>
-                            ${puzzle.description}
+                            ${puzzleDescription}
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -102,11 +105,11 @@
                     <tbody>
                         <tr>
                             <td>${i18n.tr('Title')}</td>
-                            <td>${puzzle.title}</td>
+                            <td>${puzzleTitle}</td>
                         </tr>
                         <tr>
                             <td>${i18n.tr('Description')}</td>
-                            <td>${puzzle.description}</td>
+                            <td>${puzzleDescription}</td>
                         </tr>
                         <tr>
                             <td>${i18n.tr('Type')}</td>

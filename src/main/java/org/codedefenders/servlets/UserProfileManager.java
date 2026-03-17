@@ -38,7 +38,9 @@ import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleChapterText;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.model.Achievement;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
@@ -46,6 +48,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.AchievementService;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
@@ -88,6 +91,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private I18nService i18nService;
 
     /**
      * Checks whether users can view the profile of others.
@@ -153,11 +159,17 @@ public class UserProfileManager extends HttpServlet {
         // load stats
         final UserEntity user = urlParamUser.orElseGet(() -> userRepo.getUserById(login.getUserId()).get());
         final int userId = user.getId();
+        final String userLang = login.isLoggedIn() ? login.getUser().getLocale().getLanguage() : i18nService.getDefaultLocale().getLanguage();
+        final String defaultLang = i18nService.getDefaultLocale().getLanguage();
         final SortedSet<PuzzleChapterEntry> puzzles = puzzleRepository.getPuzzleChapters()
                 .stream()
                 .map(puzzleChapter -> {
+                    PuzzleChapterText ct = puzzleRepository.getPuzzleChapterTextWithFallback(
+                            puzzleChapter.getId(), userLang, defaultLang);
+                    String cTitle = ct != null ? ct.title() : "";
+                    String cDesc = ct != null ? ct.description() : "";
                     final Set<PuzzleEntry> puzzleEntries =
-                            puzzleRepository.getPuzzlesForChapterId(puzzleChapter.getChapterId())
+                            puzzleRepository.getPuzzlesForChapterId(puzzleChapter.getId())
                                     .stream()
                                     .map((Puzzle entry) -> {
                                         PuzzleGame puzzleGame = puzzleRepository.getLatestPuzzleGameForPuzzleAndUser(
@@ -165,11 +177,15 @@ public class UserProfileManager extends HttpServlet {
                                         boolean solved =
                                                 puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
                                         int tries = puzzleGame != null ? puzzleGame.getCurrentRound() : 0;
-                                        return new PuzzleEntry(entry, false, solved, tries);
+                                        PuzzleText pt = puzzleRepository.getPuzzleTextWithFallback(
+                                                entry.getPuzzleId(), userLang, defaultLang);
+                                        String pTitle = pt != null ? pt.title() : "";
+                                        String pDesc = pt != null ? pt.description() : "";
+                                        return new PuzzleEntry(entry, false, solved, tries, pTitle, pDesc, cTitle);
                                     })
                                     //.filter(PuzzleEntry::isSolved)
                                     .collect(Collectors.toSet());
-                    return new PuzzleChapterEntry(puzzleChapter, puzzleEntries);
+                    return new PuzzleChapterEntry(puzzleChapter, puzzleEntries, cTitle, cDesc);
                 })
                 .collect(Collectors.toCollection(TreeSet::new));
 

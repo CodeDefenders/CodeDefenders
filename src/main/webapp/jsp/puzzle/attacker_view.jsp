@@ -50,7 +50,7 @@
     final I18n i18n = (I18n) request.getAttribute("i18n");
 
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
-    String title = i18n.tr("Puzzle: ") + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle();
+    String title = i18n.tr("Puzzle: ") + request.getAttribute("chapterTitle") + " - " + request.getAttribute("puzzleTitle");
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("cut", cut);
@@ -93,8 +93,10 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
 
-<p:main_page title="${i18n.tr('Puzzle: {0}', title)}">
+<p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
     </jsp:attribute>
@@ -103,7 +105,7 @@
         <div id="game-container" class="container-fluid">
             <h4><b>${i18n.tr('Puzzle: {0}', title)}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h4 class="m-0">${puzzle.description}</h4>
+                <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>

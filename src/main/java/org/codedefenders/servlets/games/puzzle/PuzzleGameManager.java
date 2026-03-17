@@ -221,8 +221,18 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
+        // Resolve localized texts for the puzzle and its chapter
+        var i18n = i18nService.getI18n(request);
+        var userLang = i18n.getLocale().getLanguage();
+        var defaultLang = i18nService.getDefaultLocale().getLanguage();
+        var puzzleText = puzzleRepo.getPuzzleTextWithFallback(game.getPuzzleId(), userLang, defaultLang);
+        request.setAttribute("puzzleTitle", puzzleText != null ? puzzleText.title() : "");
+        request.setAttribute("puzzleDescription", puzzleText != null ? puzzleText.description() : "");
+        var chapterText = puzzleRepo.getPuzzleChapterTextWithFallback(
+                game.getPuzzle().getChapterId(), userLang, defaultLang);
+        request.setAttribute("chapterTitle", chapterText != null ? chapterText.title() : "");
+
         if (game.getState() == GameState.SOLVED) {
-            final I18n i18n = i18nService.getI18n(request);
             request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
         }
 
@@ -933,7 +943,7 @@ public class PuzzleGameManager extends HttpServlet {
      */
     private Optional<Puzzle> getNextPuzzleForUser(int userId) {
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
                         puzzle.getPuzzleId(),
@@ -963,13 +973,13 @@ public class PuzzleGameManager extends HttpServlet {
          */
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
             // Check in current and next chapters
-            if (puzzleChapter.getChapterId() >= currentChapter) {
+            if (puzzleChapter.getId() >= currentChapter) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * and empty, not-null list if there's not puzzles
                  */
-                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
-                    if (puzzleChapter.getChapterId() == currentChapter
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    if (puzzleChapter.getId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
                         continue;
@@ -982,7 +992,8 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
-                        if (puzzleChapter.getChapterId() > currentChapter) {
+                        if (puzzleChapter.getId() > currentChapter) {
+                            var chapterText = puzzleRepo.getPuzzleChapterText(puzzleChapter.getId(), i18n.getLocale().getLanguage());
                             message.append(i18n.tr("""
                                             <br>
                                             You solved all the puzzles of the current chapter!
@@ -993,7 +1004,7 @@ public class PuzzleGameManager extends HttpServlet {
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId(),
-                                    puzzleChapter.getTitle()
+                                    chapterText.title()
                             ));
                         } else {
                             message.append(i18n.tr("""

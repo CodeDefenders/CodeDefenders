@@ -40,17 +40,22 @@
                 <div id="puzzle-management-controls">
                     <div class="d-flex gap-2">
                         <button type="button" id="button-upload-chapters" class="btn btn-sm btn-outline-secondary">
-        ${i18n.tr('Upload chapters')}
+                            ${i18n.tr('Upload chapters')}
                             <i class="fa fa-upload ms-1"></i>
                         </button>
                         <button type="button" id="button-upload-puzzles" class="btn btn-sm btn-outline-secondary">
-        ${i18n.tr('Upload puzzles')}
+                            ${i18n.tr('Upload puzzles')}
                             <i class="fa fa-upload ms-1"></i>
                         </button>
                         <button type="button" id="button-add-chapter" class="btn btn-sm btn-outline-secondary">
-        ${i18n.tr('Add empty chapter')}
+                            ${i18n.tr('Add empty chapter')}
                             <i class="fa fa-plus ms-1"></i>
                         </button>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center"
+                         title="${i18n.tr('Select language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language.')}">
+                        <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
+                        <select class="form-select form-select-sm" id="locale-switch" style="width: auto;"></select>
                     </div>
                     <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
                         <span>${i18n.tr('Save')}</span>
@@ -60,7 +65,7 @@
 
                 <div class="chapter" id="chapter-unassigned">
                     <div class="chapter__header">
-        <span class="chapter__title">${i18n.tr('Unassigned Puzzles')}</span>
+                        <span class="chapter__title">${i18n.tr('Unassigned Puzzles')}</span>
                     </div>
                     <div class="puzzles"></div>
                 </div>
@@ -69,7 +74,7 @@
 
                 <div class="chapter" id="chapter-archived">
                     <div class="chapter__header">
-        <span class="chapter__title">${i18n.tr('Archived Puzzles')}</span>
+                        <span class="chapter__title">${i18n.tr('Archived Puzzles')}</span>
                     </div>
                     <div class="puzzles"></div>
                 </div>
@@ -285,9 +290,43 @@
 
             // ==== Init Data ==========================================================================================
 
-            const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            window.puzzleData = await PuzzleAPI.fetchPuzzleData();
             const puzzles = puzzleData.puzzles;
             const chapters = puzzleData.chapters;
+            const supportedLanguages = puzzleData.supportedLanguages || ['en'];
+
+            let currentLanguage = document.documentElement.getAttribute('lang');
+            if (!supportedLanguages.includes(currentLanguage)) {
+                currentLanguage = supportedLanguages[0];
+            }
+
+            /**
+             * Returns the text object for the given language, falling back to the first available language.
+             */
+            function getTextForLang(texts, lang) {
+                if (texts) {
+                    if (texts[lang]) {
+                        return {...texts[lang], isFallback: false};
+                    }
+                    // Fallback to the first available language
+                    const keys = Object.keys(texts);
+                    if (keys.length > 0) {
+                        const fallback = texts[keys[0]];
+                        return {...fallback, isFallback: true};
+                    }
+                }
+                return {title: '', description: '', isFallback: true};
+            }
+
+            // Initialize locale switch dropdown
+            const localeSwitch = document.getElementById('locale-switch');
+            for (const lang of supportedLanguages) {
+                const option = document.createElement('option');
+                option.value = lang;
+                option.innerText = lang.toUpperCase();
+                if (lang === currentLanguage) option.selected = true;
+                localeSwitch.appendChild(option);
+            }
 
             const puzzlesPerChapter = new Map();
             puzzlesPerChapter.set('unassigned', []);
@@ -317,6 +356,7 @@
             let unassignedChapter;
             const chaptersContainer = document.getElementById('chapters');
             let isUnsavedChanges = false;
+            let i = (text, italic) => italic ? `<i>\${text}</i>` : text;
 
             // ==== Components =========================================================================================
 
@@ -361,13 +401,13 @@
                             </div>
                             <div class="chapter__controls">
                                 <div class="chapter__handle me-3" title="Drag to move chapter"></div>
-        <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="${i18n.tr('Edit')}">
+                                    <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="${i18n.tr('Edit')}">
                                     <i class="fa fa-edit"></i>
                                 </button>
-        <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="${i18n.tr('Upload Puzzles')}">
+                                    <button class="btn btn-xs btn-primary btn-fixed chapter__button__upload" title="${i18n.tr('Upload Puzzles')}">
                                     <i class="fa fa-upload"></i>
                                 </button>
-        <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="${i18n.tr('Delete')}">
+                                    <button class="btn btn-xs btn-danger btn-fixed chapter__button__delete" title="${i18n.tr('Delete')}">
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </div>
@@ -388,11 +428,20 @@
                     chapterComp.chapter = chapter;
                     chapterComp.container.dataset.id = chapter.id;
 
-                    chapterComp.title.innerText = chapter.title;
-                    chapterComp.title.title = chapter.title;
-                    chapterComp.description.innerText = chapter.description;
-                    chapterComp.description.description = chapter.description;
+                    const text = getTextForLang(chapter.texts, currentLanguage);
+                    chapterComp.title.innerHTML = i(text.title, text.isFallback);
+                    chapterComp.title.title = text.title;
+                    chapterComp.description.innerHTML = i(text.description, text.isFallback);
+                    chapterComp.description.description = text.description;
                     return chapterComp;
+                }
+
+                updateDisplay() {
+                    const text = getTextForLang(this.chapter.texts, currentLanguage);
+                    this.title.innerHTML = i(text.title, text.isFallback);
+                    this.title.title = text.title;
+                    this.description.innerHTML = i(text.description, text.isFallback);
+                    this.description.description = text.description;
                 }
 
                 static fromChild(childElement) {
@@ -447,27 +496,27 @@
                             </div>
                             <div class="puzzle__tags">
                                 <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
-        <span class="badge puzzle__tag puzzle__tag__games" title="${i18n.tr('Number of games with the puzzle')}"></span>
-        <span class="badge puzzle__tag puzzle__tag__level" title="${i18n.tr('Puzzle level')}"></span>
-        <span class="badge puzzle__tag puzzle__tag__equivalent title="${i18n.tr('Mutant is equivalent')}" hidden">
+                                    <span class="badge puzzle__tag puzzle__tag__games" title="${i18n.tr('Number of games with the puzzle')}"></span>
+                                    <span class="badge puzzle__tag puzzle__tag__level" title="${i18n.tr('Puzzle level')}"></span>
+                                    <span class="badge puzzle__tag puzzle__tag__equivalent title="${i18n.tr('Mutant is equivalent')}" hidden">
                                     <i class="fa fa-flag"></i>
                                 </span>
                             </div>
                         </div>
                         <div class="puzzle__controls">
-        <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="${i18n.tr('Edit')}">
+                                <button class="btn btn-xs btn-primary btn-fixed puzzle__button__edit" title="${i18n.tr('Edit')}">
                                 <i class="fa fa-edit"></i>
                             </button>
 
-        <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="${i18n.tr('Unassign')}">
+                                <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__unassign" title="${i18n.tr('Unassign')}">
                                 <i class="fa fa-times"></i>
                             </button>
 
-        <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="${i18n.tr('Archive')}">
+                                <button class="btn btn-xs btn-secondary btn-fixed puzzle__button__archive" title="${i18n.tr('Archive')}">
                                 <i class="fa fa-archive"></i>
                             </button>
 
-        <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="${i18n.tr('Delete')}">
+                                <button class="btn btn-xs btn-danger btn-fixed puzzle__button__delete" title="${i18n.tr('Delete')}">
                                 <i class="fa fa-trash"></i>
                             </button>
                         </div>`;
@@ -485,10 +534,11 @@
                     this.puzzle = puzzle;
                     this.container.dataset.id = puzzle.id;
 
-                    this.title.innerText = puzzle.title;
-                    this.title.title = puzzle.title;
-                    this.description.innerText = puzzle.description;
-                    this.description.title = puzzle.title;
+                    const text = getTextForLang(puzzle.texts, currentLanguage);
+                    this.title.innerHTML = i(text.title, text.isFallback);
+                    this.title.title = text.title;
+                    this.description.innerHTML = i(text.description, text.isFallback);
+                    this.description.title = text.title;
                     this.tags.id.innerText = '#' + puzzle.id;
                     this.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
                     this.tags.level.innerText = puzzle.level.toLowerCase();
@@ -505,7 +555,7 @@
                     if (puzzle.gameCount > 0) {
                         const deleteButton = this.container.querySelector('.puzzle__button__delete');
                         deleteButton.disabled = true;
-                        deleteButton.title = '${i18n.tr("Puzzles with existing games can't be deleted")}';
+                        deleteButton.title = "${i18n.tr("Puzzles with existing games can\'t be deleted")}";
                     }
                 }
 
@@ -753,8 +803,9 @@
                     modal.title.innerText = '${i18n.tr("Edit Chapter")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = chapter.id;
-                    modal.body.querySelector('input[name="title"]').value = chapter.title;
-                    modal.body.querySelector('input[name="description"]').value = chapter.description;
+                    const chapterText = getTextForLang(chapter.texts, currentLanguage);
+                    modal.body.querySelector('input[name="title"]').value = chapterText.isFallback ? '' : chapterText.title;
+                    modal.body.querySelector('input[name="description"]').value = chapterText.isFallback ? '' : chapterText.description;
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-primary');
@@ -775,11 +826,9 @@
                         PuzzleAPI.updatePuzzleChapter(chapter.id, {
                             title: title,
                             description: description
-                        }).then(response => {
-                            chapter.title = response.chapter.title;
-                            chapter.description = response.chapter.description;
-                            chapterComp.title.innerText = response.chapter.title;
-                            chapterComp.description.innerText = response.chapter.description;
+                        }, currentLanguage).then(response => {
+                            chapter.texts = response.chapter.texts;
+                            chapterComp.updateDisplay();
                             ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
                         }).catch(async response => {
                             ShowToasts.showToast({title: '${i18n.tr("Error")}', body: (await response).message, colorClass: 'bg-danger'});
@@ -811,16 +860,15 @@
                                     <input type="text" class="form-control" value="" name="title"
                                         placeholder="${i18n.tr('Title')}"
                                         required minlength="1" maxlength="100">
-                                                <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
+                                    <div class="invalid-feedback">${i18n.tr('Please enter a title.')}</div>
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                        <label class="form-label">${i18n.tr('Description')}</label>
+                                    <label class="form-label">${i18n.tr('Description')}</label>
                                     <input type="text" class="form-control" value="" name="description"
-                                                placeholder="${i18n.tr('Description')}"
-                                        maxlength="1000">
+                                           placeholder="${i18n.tr('Description')}" maxlength="1000">
                                 </div>
                             </div>
 
@@ -880,8 +928,9 @@
                     modal.modal.dataset.id = puzzle.id;
 
                     const form = modal.body.querySelector("form");
-                    form["title"].value = puzzle.title;
-                    form["description"].value = puzzle.description;
+                    const puzzleText = getTextForLang(puzzle.texts, currentLanguage);
+                    form["title"].value = puzzleText.isFallback ? '' : puzzleText.title;
+                    form["description"].value = puzzleText.isFallback ? '' : puzzleText.description;
                     form["maxAssertionsPerTest"].value = puzzle.maxAssertionsPerTest;
                     form["level"].value = puzzle.level;
                     if (puzzle.type === 'DEFENDER') {
@@ -928,9 +977,8 @@
                             editableLinesStart,
                             editableLinesEnd,
                             isEquivalent
-                        }).then(response => {
-                            puzzle.title = response.puzzle.title;
-                            puzzle.description = response.puzzle.description;
+                        }, currentLanguage).then(response => {
+                            puzzle.texts = response.puzzle.texts;
                             puzzle.level = response.puzzle.level;
                             puzzle.maxAssertionsPerTest = response.puzzle.maxAssertionsPerTest;
                             puzzle.editableLinesStart = response.puzzle.editableLinesStart;
@@ -969,7 +1017,8 @@
                     modal.title.innerText = '${i18n.tr("Delete Chapter")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = chapter.id;
-                    modal.body.querySelector('.edit-chapter-title').innerText = chapter.title;
+                    const chapterText = getTextForLang(chapter.texts, currentLanguage);
+                    modal.body.querySelector('.edit-chapter-title').innerHTML = i(chapterText.title, chapterText.isFallback);
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-danger');
@@ -1017,7 +1066,8 @@
                     modal.title.innerText = '${i18n.tr("Delete Puzzle")}';
                     modal.footerCloseButton.innerText = '${i18n.tr("Cancel")}';
                     modal.modal.dataset.id = puzzle.id;
-                    modal.body.querySelector('.edit-puzzle-title').innerText = puzzle.title;
+                    const puzzleText = getTextForLang(puzzle.texts, currentLanguage);
+                    modal.body.querySelector('.edit-puzzle-title').innerHTML = i(puzzleText.title, puzzleText.isFallback);
 
                     const saveButton = document.createElement('button');
                     saveButton.classList.add('btn', 'btn-danger');
@@ -1087,11 +1137,10 @@
                         PuzzleAPI.createPuzzleChapter({
                             title: title,
                             description: description,
-                        }).then(response => {
+                        }, currentLanguage).then(response => {
                             const chapterComp = ChapterComponent.forChapter({
                                 id: response.chapter.id,
-                                title: response.chapter.title,
-                                description: response.chapter.description
+                                texts: response.chapter.texts
                             });
                             chaptersContainer.appendChild(chapterComp.container);
                             ShowToasts.showToast({title: '${i18n.tr("Success")}', body: response.message});
@@ -1117,7 +1166,8 @@
                     const puzzle = puzzleComp.puzzle;
 
                     const modal = new Modal();
-                    modal.title.innerText = puzzle.title;
+                    const previewText = getTextForLang(puzzle.texts, currentLanguage);
+                    modal.title.innerHTML = i(previewText.title, previewText.isFallback);
                     modal.title.classList.add('d-flex', 'align-items-center', 'gap-2');
                     modal.footerCloseButton.innerText = '${i18n.tr("Close")}';
                     modal.modal.dataset.id = puzzle.id;
@@ -1147,6 +1197,28 @@
                 initChaptersAndPuzzles();
                 initChapterSelects();
                 initModals();
+
+                // Locale switch handler
+                localeSwitch.addEventListener('change', function() {
+                    currentLanguage = localeSwitch.value;
+
+                    // Refresh all chapter displays
+                    for (const chapterElem of chaptersContainer.children) {
+                        chapterElem.chapterComp.updateDisplay();
+                    }
+
+                    // Refresh all puzzle displays
+                    for (const puzzlesContainer of [
+                        unassignedChapter.puzzlesContainer,
+                        archivedChapter.puzzlesContainer,
+                        ...Array.from(chaptersContainer.children).map(c => c.chapterComp.puzzlesContainer)
+                    ]) {
+                        for (const puzzleElem of puzzlesContainer.children) {
+                            const comp = puzzleElem.puzzleComp;
+                            if (comp) comp.setPuzzle(comp.puzzle);
+                        }
+                    }
+                });
 
                 window.addEventListener('beforeunload', function(event) {
                     if (isUnsavedChanges) {
@@ -1254,7 +1326,8 @@
                     }
 
                     const chapter = ChapterComponent.fromChild(uploadButton).chapter;
-                    uploadPuzzleTitle.innerText = `Upload Puzzles to \${chapter.title}`;
+                    const uploadText = getTextForLang(chapter.texts, currentLanguage);
+                    uploadPuzzleTitle.innerHTML = `Upload Puzzles to \${i(uploadText.title, uploadText.isFallback)}`;
                     uploadPuzzleChapterId.value = String(chapter.id);
                     uploadPuzzleModal.show();
                 });
