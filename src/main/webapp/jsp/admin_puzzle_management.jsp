@@ -51,11 +51,11 @@
                             ${i18n.tr('Add empty chapter')}
                             <i class="fa fa-plus ms-1"></i>
                         </button>
-                    </div>
-                    <div class="d-flex gap-2 align-items-center"
-                         title="${i18n.tr('Select language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language.')}">
-                        <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
-                        <select class="form-select form-select-sm" id="locale-switch" style="width: auto;"></select>
+                        <div class="d-flex gap-2 align-items-center puzzle-language-switch"
+                             title="${i18n.tr('Select the language for preview and editing.\nItalic titles/descriptions indicate missing translations that fall back to the default language.')}">
+                            <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
+                            <select class="form-select form-select-sm" id="locale-switch"></select>
+                        </div>
                     </div>
                     <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
                         <span>${i18n.tr('Save')}</span>
@@ -99,7 +99,7 @@
             <input type="hidden" name="formType" value="uploadPuzzles">
             <input type="hidden" name="chapterId" value="">
 
-        <t:modal title="${i18n.tr('Upload Puzzles')}" id="upload-puzzle-modal"
+            <t:modal title="${i18n.tr('Upload Puzzles')}" id="upload-puzzle-modal"
                  modalDialogClasses="modal-dialog-responsive">
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
@@ -174,7 +174,7 @@
             class="form-width" method="post" enctype="multipart/form-data" autocomplete="off">
             <input type="hidden" name="formType" value="uploadPuzzleChapters">
 
-        <t:modal title="${i18n.tr('Upload Chapters')}" id="upload-chapter-modal"
+            <t:modal title="${i18n.tr('Upload Chapters')}" id="upload-chapter-modal"
                  modalDialogClasses="modal-dialog-responsive">
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
@@ -212,19 +212,19 @@
                             <div class="mt-3 p-1">
                                 <ul>
                                     <li>
-                                            ${i18n.tr('Example chapter:')}
+                                        ${i18n.tr('Example chapter:')}
                                         <a href="${url.forPath("puzzle-importer/chapter_example.zip")}" download>
                                             chapter_example.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example properties file:')}
+                                        ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/chapter.properties")}" download>
                                             chapter.properties
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Empty chapter template:')}
+                                        ${i18n.tr('Empty chapter template:')}
                                         <a href="${url.forPath("puzzle-importer/chapter_template.zip")}" download>
                                             chapter_template.zip
                                         </a>
@@ -233,31 +233,31 @@
                                 <p>${i18n.tr('Puzzle Downloads:')}</p>
                                 <ul>
                                     <li>
-                                            ${i18n.tr('Empty puzzle template:')}
+                                        ${i18n.tr('Empty puzzle template:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
                                             puzzle_template.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example properties file:')}
+                                        ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle.properties")}" download>
                                             puzzle.properties
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example attacker puzzle:')}
+                                        ${i18n.tr('Example attacker puzzle:')}
                                         <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
                                             puzzle_attacker.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example defender puzzle:')}
+                                        ${i18n.tr('Example defender puzzle:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_defender.zip")}" download>
                                             puzzle_defender.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example puzzle with dependencies:')}
+                                        ${i18n.tr('Example puzzle with dependencies:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
                                             puzzle_deps.zip
                                         </a>

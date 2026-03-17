@@ -31,6 +31,24 @@
     justify-content: space-between;
 }
 
+.puzzle-language-switch {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    border-radius: .2rem;
+    color: #6c757d;
+    border: 1px solid #6c757d;
+
+    .form-select-sm {
+        padding-block: 0;
+        padding-right: 2.5rem;
+        color: #6c757d;
+        width: auto;
+    }
+}
+
 /* ==================== Chapters / Puzzle Containers ==================== */
 
 #chapters {
