@@ -108,7 +108,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         if (userOpt.isPresent()) {
             var user = userOpt.get();
             if (user.getLocale() == null) {
-                var locale = I18nService.getSessionLocale(request);
+                var locale = I18nService.getSessionLocale((HttpServletRequest) request);
                 user.setLocale(locale);
                 userRepository.update(user);
                 logger.info("Changed language of user '{}' to {}", user.getUsername(), locale.getLanguage());

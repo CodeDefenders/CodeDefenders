@@ -33,7 +33,6 @@ import java.util.Set;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.text.StringEscapeUtils;
@@ -171,7 +170,7 @@ public class I18nService {
      * @param request The request is used to determine the browser locale transmitted via the Accept-Language header.
      * @return The i18n instance.
      */
-    public I18n getI18n(ServletRequest request) {
+    public I18n getI18n(HttpServletRequest request) {
         var user = login.isLoggedIn() ? login.getUser() : null;
         var lang = Optional.ofNullable(user)
                 .map(User::getLocale)
@@ -183,14 +182,13 @@ public class I18nService {
 
     /**
      * Tries to get the session locale if set, or uses the request locale as fallback else.
-     * Does not consider the user's language settings, use {@link #getI18n(ServletRequest)} for that.
+     * Does not consider the user's language settings, use {@link #getI18n(HttpServletRequest)} for that.
      *
      * @param request The current HttpServletRequest
      * @return The locale
      */
-    public static Locale getSessionLocale(ServletRequest request) {
-        var httpReq = (HttpServletRequest) request;
-        var session = httpReq.getSession();
+    public static Locale getSessionLocale(HttpServletRequest request) {
+        var session = request.getSession();
         var locale = session.getAttribute("locale");
         return locale != null ? (Locale) locale : request.getLocale();
     }

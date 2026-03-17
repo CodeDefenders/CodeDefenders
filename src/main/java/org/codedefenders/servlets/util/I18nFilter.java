@@ -27,6 +27,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.codedefenders.service.I18nService;
 
@@ -43,7 +44,7 @@ public class I18nFilter implements Filter {
             throws IOException, ServletException {
 
         if (request.getAttribute(i18nAttrName) == null) {
-            request.setAttribute(i18nAttrName, i18nService.getI18n(request));
+            request.setAttribute(i18nAttrName, i18nService.getI18n((HttpServletRequest) request));
         }
 
         chain.doFilter(request, response);

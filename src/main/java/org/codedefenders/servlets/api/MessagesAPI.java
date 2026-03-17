@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import jakarta.inject.Inject;
-import jakarta.servlet.ServletRequest;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +68,7 @@ public class MessagesAPI extends HttpServlet {
      * @param request the servlet request, used to retrieve the locale for translation
      * @return a JSON string representing the list of notification messages
      */
-    private String getNotificationMessages(ServletRequest request) {
+    private String getNotificationMessages(HttpServletRequest request) {
         I18n i18n = i18nService.getI18n(request);
         List<Message> messagesList = messagesBean.getMessages();
         Gson gson = new Gson();
