@@ -69,11 +69,11 @@
 
                 <%-- Do not show Killmap Setting here. --%>
                 <c:if test="${setting.name != AUTOMATIC_KILLMAP_COMPUTATION}">
-                    <div class="row mb-3">
-                        <label class="col-4 col-form-label" id="class-label"
-                               for="${settingId}"
-                               title="${explanation}">
-                            ${readableName}
+                    <div class="row mb-4 align-items-center">
+                        <label class="col-4 col-form-label" id="class-label" for="${settingId}">
+                            <strong>${readableName}</strong>
+                            <br>
+                            <small>${explanation}</small>
                         </label>
                         <c:choose>
                             <c:when test="${setting.type == STRING_VALUE}">
