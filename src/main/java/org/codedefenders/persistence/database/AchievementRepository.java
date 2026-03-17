@@ -18,15 +18,18 @@
  */
 package org.codedefenders.persistence.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.AchievementLevel;
+import org.codedefenders.model.AchievementType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
@@ -45,20 +48,7 @@ public class AchievementRepository {
         this.queryRunner = queryRunner;
     }
 
-    public Achievement achievementFromRS(ResultSet rs) throws SQLException {
-        int nextLevelMetric = rs.getInt("NextLevelMetric");
-        Optional<Integer> nextLevelMetricOptional = rs.wasNull() ? Optional.empty() : Optional.of(nextLevelMetric);
-        return new Achievement(
-                Achievement.Id.fromInt(rs.getInt("achievements.ID")),
-                rs.getInt("achievements.Level"),
-                rs.getInt("achievements.Index"),
-                rs.getString("achievements.Name"),
-                rs.getString("achievements.Description"),
-                rs.getString("achievements.ProgressText"),
-                rs.getInt("achievements.Metric"),
-                nextLevelMetricOptional,
-                rs.getInt("CurrentUserMetric")
-        );
+    private record UserProgress(AchievementType type, int level, int metric) {
     }
 
     /**
@@ -73,42 +63,50 @@ public class AchievementRepository {
     }
 
     /**
-     * Returns the achievement for a user with the given id and the given achievement id. It always returns an Achievement
-     * object with the current level and the current metric, even when the user has not yet unlocked the achievement.
+     * Returns the achievement for a user with the given id and the given achievement type. It always returns an
+     * Achievement object with the current level and the current metric, even when the user has not yet unlocked it.
      *
-     * @param userId        The id of the user to get the achievement for.
-     * @param achievementId The id of the achievement to get.
+     * @param userId         The id of the user to get the achievement for.
+     * @param achievementType The type of the achievement to get.
      * @return The achievement for the user.
      */
-    public Optional<Achievement> getAchievementForUser(int userId, Achievement.Id achievementId) {
-        return getAchievementsForUser(userId, achievementId).stream().findFirst();
+    public Optional<Achievement> getAchievementForUser(int userId, AchievementType achievementType) {
+        return getAchievementsForUser(userId, achievementType).stream().findFirst();
     }
 
-    private Collection<Achievement> getAchievementsForUser(int userId, Achievement.Id achievementId) {
+    private Collection<Achievement> getAchievementsForUser(int userId, AchievementType singleType) {
         @Language("SQL")
         String query = """
-                SELECT achievements.*, COALESCE(has_achievement.Metric, 0) AS CurrentUserMetric, (
-                    SELECT a.Metric FROM achievements a
-                    WHERE a.ID = achievements.ID
-                    AND a.Level = achievements.Level + 1
-                ) AS NextLevelMetric
-                FROM achievements LEFT OUTER JOIN has_achievement
-                ON has_achievement.User_ID = ?
-                AND has_achievement.Achievement_ID = achievements.ID
-                WHERE (
-                    has_achievement.Achievement_Level = achievements.Level
-                    -- get achievements with no progress tracked as well -> left outer join
-                    OR has_achievement.Achievement_Level IS NULL AND achievements.Level = 0
-                )
+                SELECT Achievement_ID, Achievement_Level, Metric
+                FROM has_achievement
+                WHERE User_ID = ?
                 %s;
+        """.formatted(singleType != null ? "AND Achievement_ID = ?" : "");
 
-        """.formatted(achievementId != null ? "AND achievements.ID = ?" : "");
-
-        return queryRunner.query(
+        Collection<UserProgress> progressList = queryRunner.query(
                 query,
-                listFromRS(this::achievementFromRS),
-                achievementId == null ? new Object[] {userId} : new Object[] {userId, achievementId.getAsInt()}
+                listFromRS(rs -> new UserProgress(
+                        AchievementType.fromInt(rs.getInt("Achievement_ID")),
+                        rs.getInt("Achievement_Level"),
+                        rs.getInt("Metric")
+                )),
+                singleType == null ? new Object[]{userId} : new Object[]{userId, singleType.getId()}
         );
+
+        Map<AchievementType, UserProgress> progressMap = progressList.stream()
+                .filter(p -> p.type() != null)
+                .collect(Collectors.toMap(UserProgress::type, p -> p));
+
+        AchievementType[] types = singleType != null
+                ? new AchievementType[]{singleType}
+                : AchievementType.values();
+
+        return Arrays.stream(types)
+                .map(type -> {
+                    UserProgress progress = progressMap.getOrDefault(type, new UserProgress(type, 0, 0));
+                    return new Achievement(type, progress.level(), progress.metric());
+                })
+                .toList();
     }
 
     /**
@@ -116,17 +114,17 @@ public class AchievementRepository {
      * if necessary.
      * The return value indicates whether the level was updated or not.
      *
-     * @param userId The user to update the achievement for.
-     * @param achievementId The achievement type to update.
-     * @param metricChange The amount to change the metric by.
+     * @param userId         The user to update the achievement for.
+     * @param achievementType The achievement type to update.
+     * @param metricChange   The amount to change the metric by.
      * @return The number of rows for which the achievement level was updated (should be either 0 or 1).
      */
-    public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
-        int updated = updateAchievementMetricForUser(userId, achievementId, metricChange);
-        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
+    public int updateAchievementForUser(int userId, AchievementType achievementType, int metricChange) {
+        int updated = updateAchievementMetricForUser(userId, achievementType, metricChange);
+        return updated > 0 ? updateAchievementLevelForUser(userId, achievementType) : 0;
     }
 
-    private int updateAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricChange) {
+    private int updateAchievementMetricForUser(int userId, AchievementType achievementType, int metricChange) {
         @Language("SQL")
         String query = """
                 INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)
@@ -135,7 +133,7 @@ public class AchievementRepository {
                 Metric = Metric + ?;
         """;
 
-        return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
+        return queryRunner.update(query, achievementType.getId(), userId, metricChange, metricChange);
     }
 
 
@@ -144,17 +142,17 @@ public class AchievementRepository {
      * It sets the metric first and then updates the level if necessary.
      * The return value indicates whether the level was updated or not.
      *
-     * @param userId         The user to update the achievement for.
-     * @param achievementId  The achievement type to update.
-     * @param metricAbsolute The amount to set the metric to if it's greater than the current value.
+     * @param userId          The user to update the achievement for.
+     * @param achievementType The achievement type to update.
+     * @param metricAbsolute  The amount to set the metric to if it's greater than the current value.
      * @return The number of rows for which the achievement level was updated (should be either 0 or 1).
      */
-    public int setAchievementForUser(int userId, Achievement.Id achievementId, int metricAbsolute) {
-        int updated = setAchievementMetricForUser(userId, achievementId, metricAbsolute);
-        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : 0;
+    public int setAchievementForUser(int userId, AchievementType achievementType, int metricAbsolute) {
+        int updated = setAchievementMetricForUser(userId, achievementType, metricAbsolute);
+        return updated > 0 ? updateAchievementLevelForUser(userId, achievementType) : 0;
     }
 
-    private int setAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricAbsolute) {
+    private int setAchievementMetricForUser(int userId, AchievementType achievementType, int metricAbsolute) {
         @Language("SQL")
         String query = """
                         INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)
@@ -163,24 +161,51 @@ public class AchievementRepository {
                         Metric = GREATEST(Metric, ?);
                 """;
 
-        return queryRunner.update(query, achievementId.getAsInt(), userId, metricAbsolute, metricAbsolute);
+        return queryRunner.update(query, achievementType.getId(), userId, metricAbsolute, metricAbsolute);
     }
 
-    private int updateAchievementLevelForUser(int userId, Achievement.Id achievementId) {
+    /**
+     * Updates the achievement level for a user if the metric threshold for the next level is met.
+     * Reads the current level and metric from the DB, checks the threshold from {@link AchievementType},
+     * and atomically updates the level with optimistic locking.
+     */
+    private int updateAchievementLevelForUser(int userId, AchievementType type) {
         @Language("SQL")
-        String query = """
-                UPDATE has_achievement
-                SET Achievement_Level = Achievement_Level + 1
-                WHERE User_ID = ?
-                AND Achievement_ID = ?
-                AND Metric >= (
-                    SELECT Metric
-                    FROM achievements
-                    WHERE ID = ?
-                    AND Level = Achievement_Level + 1
-                );
+        String selectQuery = """
+                SELECT Achievement_Level, Metric
+                FROM has_achievement
+                WHERE User_ID = ? AND Achievement_ID = ?;
         """;
 
-        return queryRunner.update(query, userId, achievementId.getAsInt(), achievementId.getAsInt());
+        Collection<UserProgress> results = queryRunner.query(
+                selectQuery,
+                listFromRS(rs -> new UserProgress(
+                        type,
+                        rs.getInt("Achievement_Level"),
+                        rs.getInt("Metric")
+                )),
+                userId, type.getId()
+        );
+
+        Optional<UserProgress> progressOpt = results.stream().findFirst();
+        if (progressOpt.isEmpty()) {
+            return 0;
+        }
+
+        UserProgress progress = progressOpt.get();
+        AchievementLevel nextLevel = type.getLevel(progress.level() + 1);
+        if (nextLevel == null || progress.metric() < nextLevel.metric()) {
+            return 0;
+        }
+
+        @Language("SQL")
+        String updateQuery = """
+                UPDATE has_achievement
+                SET Achievement_Level = ?
+                WHERE User_ID = ? AND Achievement_ID = ?
+                AND Achievement_Level = ?;
+        """;
+
+        return queryRunner.update(updateQuery, progress.level() + 1, userId, type.getId(), progress.level());
     }
 }

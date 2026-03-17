@@ -49,15 +49,17 @@ class AchievementNotifications {
      * @param {String} profilePath
      */
     static showAchievementNotification(achievement, achievementPath, profilePath) {
-        const progressText = achievement.progressText
-                .replace('{0}', achievement.metricCurrent.toString())
-                .replace('{1}', achievement.metricForNextLevel.toString());
+        const progressText = i18n.tr(
+            achievement.progressText,
+            achievement.metricCurrent,
+            achievement.metricForNextLevel
+        );
 
         show_toasts.showToast({
             colorClass: "",
             title: i18n.tr("New Achievement Unlocked:"),
             //secondary: "Level " + achievement.level,
-            bodyTitle: achievement.name + " (Level " + achievement.level + ")",
+            bodyTitle: i18n.tr(achievement.name, achievement.metricCurrent) + " (Level " + achievement.level + ")",
             body: progressText,
             icon:  achievementPath + "codedefenders_achievements_" + achievement.achievementId
                     + "_lvl_" + achievement.level + ".png",

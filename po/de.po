@@ -294,6 +294,926 @@ msgstr "Beobachter"
 msgid "Player"
 msgstr "Spieler"
 
+#: src/main/java/org/codedefenders/model/AchievementType.java:122
+msgid "No games played yet"
+msgstr "Du hast noch keine Spiele gespielt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:123
+msgid "Play your first game to unlock this achievement"
+msgstr "Spiele dein erstes Spiel, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:124
+#: src/main/java/org/codedefenders/model/AchievementType.java:146
+#: src/main/java/org/codedefenders/model/AchievementType.java:168
+#: src/main/java/org/codedefenders/model/AchievementType.java:190
+msgid "{0} of {1} games played"
+msgstr "{0} von {1} gespielten Spielen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:126
+msgid "Newbie"
+msgstr "Neuling"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:127
+msgid "Play your first game!"
+msgstr "Spiel dein erstes Spiel!"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:128
+#: src/main/java/org/codedefenders/model/AchievementType.java:132
+#: src/main/java/org/codedefenders/model/AchievementType.java:136
+#: src/main/java/org/codedefenders/model/AchievementType.java:150
+#: src/main/java/org/codedefenders/model/AchievementType.java:154
+#: src/main/java/org/codedefenders/model/AchievementType.java:158
+#: src/main/java/org/codedefenders/model/AchievementType.java:172
+#: src/main/java/org/codedefenders/model/AchievementType.java:176
+#: src/main/java/org/codedefenders/model/AchievementType.java:180
+#: src/main/java/org/codedefenders/model/AchievementType.java:194
+#: src/main/java/org/codedefenders/model/AchievementType.java:198
+#: src/main/java/org/codedefenders/model/AchievementType.java:202
+msgid "{0} of {1} games played to reach the next level"
+msgstr "{0} von {1} Spielen gespielt, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:130
+msgid "Bronze Player"
+msgstr "Bronze-Spieler"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:131
+#: src/main/java/org/codedefenders/model/AchievementType.java:135
+#: src/main/java/org/codedefenders/model/AchievementType.java:139
+msgid "Play {0} games"
+msgstr "{0} Spiele spielen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:134
+msgid "Silver Player"
+msgstr "Silber-Spieler"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:138
+msgid "Gold Player"
+msgstr "Gold-Spieler"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:140
+#: src/main/java/org/codedefenders/model/AchievementType.java:162
+#: src/main/java/org/codedefenders/model/AchievementType.java:184
+#: src/main/java/org/codedefenders/model/AchievementType.java:206
+msgid "{0} games played, max level reached"
+msgstr "{0} gespielte Spiele, Höchstlevel erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:144
+msgid "No game played as attacker yet"
+msgstr "Bisher noch kein Spiel als Angreifer bestritten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:145
+msgid "Play as attacker to unlock this achievement"
+msgstr "Spiele als Angreifer, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:148
+msgid "Prepare to Attack"
+msgstr "Mach dich bereit zum Angriff"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:149
+msgid "Play your first multiplayer game as attacker"
+msgstr "Spiele dein erstes Multiplayer-Spiel als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:152
+msgid "Bronze Attacker"
+msgstr "Bronze-Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:153
+#: src/main/java/org/codedefenders/model/AchievementType.java:157
+#: src/main/java/org/codedefenders/model/AchievementType.java:161
+msgid "Play {0} games as attacker"
+msgstr "Spiele {0} Spiele als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:156
+msgid "Silver Attacker"
+msgstr "Silber-Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:160
+msgid "Gold Attacker"
+msgstr "Gold-Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:166
+msgid "No game played as defender yet"
+msgstr "Noch keine Spiele als Verteidiger gespielt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:167
+msgid "Play as defender to unlock this achievement"
+msgstr "Spiele als Verteidiger, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:170
+msgid "Prepare Your Defenses"
+msgstr "Bereite deine Verteidigung vor"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:171
+msgid "Play your first multiplayer game as defender"
+msgstr "Spiele dein erstes Multiplayer-Spiel als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:174
+msgid "Bronze Defender"
+msgstr "Bronze-Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:175
+#: src/main/java/org/codedefenders/model/AchievementType.java:179
+#: src/main/java/org/codedefenders/model/AchievementType.java:183
+msgid "Play {0} games as defender"
+msgstr "Spiele {0} Spiele als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:178
+msgid "Silver Defender"
+msgstr "Silber-Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:182
+msgid "Gold Defender"
+msgstr "Gold-Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:188
+msgid "No melee game played yet"
+msgstr "Noch kein Melee-Spiel gespielt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:189
+msgid "Try the melee mode to unlock this achievement"
+msgstr "Probier den Melee-Modus aus, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:192
+msgid "Melee Starter"
+msgstr "Melee-Starter"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:193
+msgid "Play your first melee game"
+msgstr "Spiel dein erstes Melee-Spiel"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:196
+msgid "Melee Bronze"
+msgstr "Melee-Bronze"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:197
+#: src/main/java/org/codedefenders/model/AchievementType.java:201
+#: src/main/java/org/codedefenders/model/AchievementType.java:205
+msgid "Play {0} melee games"
+msgstr "{0} Melee-Spiele spielen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:200
+msgid "Melee Silver"
+msgstr "Melee-Silber"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:204
+msgid "Melee Gold"
+msgstr "Melee-Gold"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:210
+msgid "No tests written yet"
+msgstr "Noch keine Tests geschrieben"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:211
+msgid "Write tests to unlock this achievement"
+msgstr "Schreibe Tests, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:212
+msgid "{0} of {1} test written"
+msgstr "{0} von {1} Test geschrieben"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:214
+msgid "The First Test"
+msgstr "Der erste Test"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:215
+msgid "Write your first test"
+msgstr "Schreib deinen ersten Test"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:216
+#: src/main/java/org/codedefenders/model/AchievementType.java:220
+#: src/main/java/org/codedefenders/model/AchievementType.java:224
+msgid "{0} of {1} tests written to reach the next level"
+msgstr "{0} von {1} Tests geschrieben, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:218
+msgid "Bronze Test Writer"
+msgstr "Bronze-Testschreiber"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:219
+#: src/main/java/org/codedefenders/model/AchievementType.java:223
+#: src/main/java/org/codedefenders/model/AchievementType.java:227
+msgid "Write {0} tests"
+msgstr "Schreibe {0} Tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:222
+msgid "Silver Test Writer"
+msgstr "Silber-Testschreiber"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:226
+msgid "Gold Test Writer"
+msgstr "Gold-Testschreiber"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:228
+msgid "{0} tests written, max level reached"
+msgstr "{0} Tests geschrieben, maximales Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:232
+msgid "No mutants created yet"
+msgstr "Noch keine Mutanten erstellt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:233
+msgid "Create mutants to unlock this achievement"
+msgstr "Erstelle Mutanten, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:234
+msgid "{0} of {1} mutant created"
+msgstr "{0} von {1} Mutanten erstellt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:236
+msgid "The First Mutant"
+msgstr "Der erste Mutant"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:237
+msgid "Create your first mutant"
+msgstr "Erstelle deinen ersten Mutanten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:238
+#: src/main/java/org/codedefenders/model/AchievementType.java:242
+#: src/main/java/org/codedefenders/model/AchievementType.java:246
+msgid "{0} of {1} mutants created to reach the next level"
+msgstr "{0} von {1} Mutanten, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:240
+msgid "Bronze Mutant Creator"
+msgstr "Bronze-Mutanten-Ersteller"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:241
+#: src/main/java/org/codedefenders/model/AchievementType.java:245
+#: src/main/java/org/codedefenders/model/AchievementType.java:249
+msgid "Create {0} mutants"
+msgstr "erstelle {0} Mutanten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:244
+msgid "Silver Mutant Creator"
+msgstr "Silber-Mutanten-Ersteller"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:248
+msgid "Gold Mutant Creator"
+msgstr "Gold-Mutanten-Ersteller"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:250
+msgid "{0} mutants created, max level reached"
+msgstr "{0} Mutanten erstellt, maximales Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:254
+msgid "No games won"
+msgstr "Keine gewonnenen Spiele"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:255
+msgid "Win games to unlock this achievement"
+msgstr "Gewinne Spiele, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:256
+#: src/main/java/org/codedefenders/model/AchievementType.java:278
+#: src/main/java/org/codedefenders/model/AchievementType.java:300
+msgid "{0} of {1} games won"
+msgstr "{0} von {1} gewonnenen Spielen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:258
+msgid "First Victory"
+msgstr "Erster Sieg"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:259
+msgid "Win your first game"
+msgstr "Gewinne dein erstes Spiel"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:260
+#: src/main/java/org/codedefenders/model/AchievementType.java:264
+#: src/main/java/org/codedefenders/model/AchievementType.java:268
+#: src/main/java/org/codedefenders/model/AchievementType.java:282
+#: src/main/java/org/codedefenders/model/AchievementType.java:286
+#: src/main/java/org/codedefenders/model/AchievementType.java:290
+#: src/main/java/org/codedefenders/model/AchievementType.java:304
+#: src/main/java/org/codedefenders/model/AchievementType.java:308
+#: src/main/java/org/codedefenders/model/AchievementType.java:312
+msgid "{0} of {1} games won to reach the next level"
+msgstr "{0} von {1} Spielen gewonnenen, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:262
+msgid "Bronze Winner"
+msgstr "Bronze-Gewinner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:263
+#: src/main/java/org/codedefenders/model/AchievementType.java:267
+#: src/main/java/org/codedefenders/model/AchievementType.java:271
+msgid "Win {0} games"
+msgstr "{0} Spiele gewinnen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:266
+msgid "Silver Winner"
+msgstr "Silber-Gewinner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:270
+msgid "Gold Winner"
+msgstr "Gold-Gewinner"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:272
+#: src/main/java/org/codedefenders/model/AchievementType.java:294
+#: src/main/java/org/codedefenders/model/AchievementType.java:316
+msgid "{0} games won, max level reached"
+msgstr "{0} Spiele gewonnen, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:276
+msgid "No games won as attacker"
+msgstr "Noch keine Spiele als Angreifer gewonnen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:277
+msgid "Win games as attacker to unlock this achievement"
+msgstr "Gewinne Spiele als Angreifer, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:280
+msgid "First Attacker Victory"
+msgstr "Erster Sieg als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:281
+msgid "Win your first game as attacker"
+msgstr "Gewinne dein erstes Spiel als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:284
+msgid "Good Attacker"
+msgstr "Guter Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:285
+#: src/main/java/org/codedefenders/model/AchievementType.java:289
+#: src/main/java/org/codedefenders/model/AchievementType.java:293
+msgid "Win {0} games as attacker"
+msgstr "Gewinne {0} Spiele als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:288
+msgid "Advanced Attacker"
+msgstr "Fortgeschrittener Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:292
+msgid "Master Attacker"
+msgstr "Meister-Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:298
+msgid "No games won as defender"
+msgstr "Noch keine Spiele als Verteidiger gewonnen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:299
+msgid "Win games as defender to unlock this achievement"
+msgstr "Gewinne Spiele als Verteidiger, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:302
+msgid "First Defender Victory"
+msgstr "Erster Sieg als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:303
+msgid "Win your first game as defender"
+msgstr "Gewinne dein erstes Spiel als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:306
+msgid "Good Defender"
+msgstr "Guter Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:307
+#: src/main/java/org/codedefenders/model/AchievementType.java:311
+#: src/main/java/org/codedefenders/model/AchievementType.java:315
+msgid "Win {0} games as defender"
+msgstr "Gewinne {0} Spiele als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:310
+msgid "Advanced Defender"
+msgstr "Fortgeschrittener Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:314
+msgid "Master Defender"
+msgstr "Meisterverteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:320
+msgid "No puzzles solved yet"
+msgstr "Noch keine Rätsel gelöst"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:321
+msgid "Solve puzzles to unlock this achievement"
+msgstr "Löse Rätsel, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:322
+msgid "{0} of {1} puzzles solved"
+msgstr "{0} von {1} Rätseln gelöst"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:324
+msgid "The First Puzzle"
+msgstr "Das erste Rätsel"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:325
+msgid "Solve your first puzzle"
+msgstr "Löse dein erstes Rätsel"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:326
+#: src/main/java/org/codedefenders/model/AchievementType.java:330
+#: src/main/java/org/codedefenders/model/AchievementType.java:334
+msgid "{0} of {1} puzzles solved to reach the next level"
+msgstr "{0} von {1} Rätseln gelöst, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:328
+msgid "Bronze Puzzle Solver"
+msgstr "Bronze-Rätsellöser"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:329
+#: src/main/java/org/codedefenders/model/AchievementType.java:333
+#: src/main/java/org/codedefenders/model/AchievementType.java:337
+msgid "Solve {0} puzzles"
+msgstr "Löse {0} Rätsel"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:332
+msgid "Silver Puzzle Solver"
+msgstr "Silber-Rätsellöser"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:336
+msgid "Puzzle Expert"
+msgstr "Rätsel-Experte"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:338
+msgid "{0} puzzles solved, max level reached"
+msgstr "{0} Rätsel gelöst, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:342
+msgid "No smell free tests written"
+msgstr "Noch keine Tests ohne Smells geschrieben"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:343
+msgid "Write a test without test smells to unlock this achievement"
+msgstr ""
+"Schreibe einen Test ohne Test-Smells, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:344
+msgid "{0} of {1} smell free tests written"
+msgstr "{0} von {1} Tests ohne Test-Smells verfasst"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:346
+msgid "This smells good"
+msgstr "Das riecht gut"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:347
+msgid "Write the first test without smells"
+msgstr "Schreibe deinen ersten Test ohne Test-Smells"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:348
+#: src/main/java/org/codedefenders/model/AchievementType.java:352
+#: src/main/java/org/codedefenders/model/AchievementType.java:356
+msgid "{0} of {1} smell free tests written to reach the next level"
+msgstr "{0} von {1} Tests ohne Test-Smells, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:350
+msgid "Bronze Perfumer"
+msgstr "Bronze-Parfümeur"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:351
+#: src/main/java/org/codedefenders/model/AchievementType.java:355
+#: src/main/java/org/codedefenders/model/AchievementType.java:359
+msgid "Write {0} smell free tests"
+msgstr "Schreibe {0} Tests ohne Test-Smells"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:354
+msgid "Silver Perfumer"
+msgstr "Silber-Parfümeur"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:358
+msgid "Perfume Expert"
+msgstr "Parfümexperte"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:360
+msgid "{0} smell free tests written, max level reached"
+msgstr "{0} Tests ohne Test-Smells geschrieben, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:364
+msgid "No mutants killed"
+msgstr "Noch keine Mutanten getötet"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:365
+msgid "Kill a mutant to unlock this achievement"
+msgstr "Töte einen Mutanten, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:366
+msgid "{0} of {1} mutant killed"
+msgstr "{0} von {1} Mutanten getötet"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:368
+msgid "Get the mutants!"
+msgstr "Schnapp die Mutanten!"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:369
+msgid "Kill the first mutant with a test"
+msgstr "Töte den ersten Mutanten mit deinem Test"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:370
+#: src/main/java/org/codedefenders/model/AchievementType.java:374
+#: src/main/java/org/codedefenders/model/AchievementType.java:378
+msgid "{0} of {1} mutants killed to reach the next level"
+msgstr "{0} von {1} Mutanten getötet, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:372
+msgid "Bronze Mutant Killer"
+msgstr "Bronze-Mutantenjäger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:373
+#: src/main/java/org/codedefenders/model/AchievementType.java:377
+#: src/main/java/org/codedefenders/model/AchievementType.java:381
+msgid "Kill {0} mutants with tests"
+msgstr "Töte {0} Mutanten mit Tests"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:376
+msgid "Silver Mutant Killer"
+msgstr "Silber-Mutantenjäger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:380
+msgid "Mutant Executioner"
+msgstr "Mutanten-Henker"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:382
+msgid "{0} mutants killed, max level reached"
+msgstr "{0} Mutanten getötet, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:386
+msgid "No lines covered"
+msgstr "Keine Zeilen abgedeckt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:387
+msgid "Cover at least one line of code using tests to unlock this achievement"
+msgstr ""
+"Schreibe Tests für mindestens eine Codezeile, um diese Errungenschaft "
+"freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:388
+#: src/main/java/org/codedefenders/model/AchievementType.java:410
+msgid "{0} of {1} lines covered"
+msgstr "{0} von {1} Zeilen abgedeckt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:390
+msgid "Cover the first line"
+msgstr "Die erste Zeile abdecken"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:391
+msgid "Cover the first line of code with a test"
+msgstr "Decke deine erste Codezeile mit einem Test ab"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:392
+#: src/main/java/org/codedefenders/model/AchievementType.java:396
+#: src/main/java/org/codedefenders/model/AchievementType.java:400
+#: src/main/java/org/codedefenders/model/AchievementType.java:414
+#: src/main/java/org/codedefenders/model/AchievementType.java:418
+#: src/main/java/org/codedefenders/model/AchievementType.java:422
+msgid "{0} of {1} lines covered to reach the next level"
+msgstr "{0} von {1} Zeilen abgedeckt, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:394
+msgid "Bronze Coverer"
+msgstr "Coverage-Anfänger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:395
+#: src/main/java/org/codedefenders/model/AchievementType.java:399
+#: src/main/java/org/codedefenders/model/AchievementType.java:403
+msgid "Cover {0} lines of code with tests"
+msgstr "Decke {0} Zeilen Code ab"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:398
+msgid "Silver Coverer"
+msgstr "Coverage-Meister"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:402
+msgid "Line Coverage Expert"
+msgstr "Experte für Coverage"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:404
+msgid "{0} lines covered, max level reached"
+msgstr "{0} Zeilen abgedeckt, maximales Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:408
+msgid "No tests with coverage"
+msgstr "Keine Tests mit Coverage"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:409
+msgid ""
+"Write a test that covers at least one line of code to unlock this achievement"
+msgstr ""
+"Schreibe einen Test, der mindestens eine Codezeile abdeckt, um diese "
+"Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:412
+msgid "Specific Tester"
+msgstr "Spezifischer Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:413
+msgid "Write a test that covers at least one line of code"
+msgstr "Schreibe einen Test, der mindestens eine Codezeile abdeckt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:416
+msgid "Small Tester"
+msgstr "Kleiner Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:417
+#: src/main/java/org/codedefenders/model/AchievementType.java:421
+#: src/main/java/org/codedefenders/model/AchievementType.java:425
+msgid "Cover {0} lines of code using a single test"
+msgstr "Decke mit einem einzigen Test {0} Zeilen Code ab"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:420
+msgid "Large-Scale Tester"
+msgstr "Großtester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:424
+msgid "All-Encompassing Tester"
+msgstr "Alles-Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:426
+msgid "You wrote a test that covered {0} lines, this is crazy, please stop :o"
+msgstr ""
+"Du hast einen Test geschrieben, der {0} Zeilen abdeckt – das ist verrückt, "
+"hör bitte auf :o"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:430
+msgid "No Duels won"
+msgstr "Noch keine Duelle gewonnen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:431
+msgid "Win your first equivalence duel to unlock this achievement"
+msgstr ""
+"Gewinne dein erstes Äquivalenzduell, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:432
+msgid "{0} of {1} equivalence duels won"
+msgstr "{0} von {1} gewonnenen Äquivalenzduellen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:434
+msgid "Beginner Duelist"
+msgstr "Anfänger-Duellant"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:435
+msgid "Win your first equivalence duel"
+msgstr "Gewinne dein erstes Äquivalenzduell"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:436
+#: src/main/java/org/codedefenders/model/AchievementType.java:440
+#: src/main/java/org/codedefenders/model/AchievementType.java:444
+msgid "{0} of {1} equivalence duels won to reach the next level"
+msgstr "{0} von {1} gewonnenen Duellen, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:438
+msgid "Bronze Duelist"
+msgstr "Bronze-Duellant"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:439
+#: src/main/java/org/codedefenders/model/AchievementType.java:443
+#: src/main/java/org/codedefenders/model/AchievementType.java:447
+msgid "Win {0} equivalence duels"
+msgstr "Gewinne {0} Äquivalenzduelle"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:442
+msgid "Silver Duelist"
+msgstr "Silber-Duellant"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:446
+msgid "The Best Duelist"
+msgstr "Der unangefochtene Duellant"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:448
+msgid "{0} equivalence duels won, max level reached"
+msgstr "{0} gewonnene Äquivalenzduelle, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:452
+msgid "No Duels won as attacker"
+msgstr "Noch keine Äquivalenzduelle als Angreifer gewonnen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:453
+msgid "Win your first equivalence duel as attacker to unlock this achievement"
+msgstr ""
+"Gewinne dein erstes Äquivalenzduell als Angreifer, um diese Errungenschaft "
+"freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:454
+msgid "{0} of {1} equivalence duels won as attacker"
+msgstr "{0} von {1} gewonnenen Äquivalenzduellen als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:456
+msgid "Prove them wrong!"
+msgstr "Beweis ihnen das Gegenteil!"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:457
+msgid "Win your first equivalence duel as attacker"
+msgstr "Gewinne dein erstes Äquivalenzduell als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:458
+#: src/main/java/org/codedefenders/model/AchievementType.java:462
+#: src/main/java/org/codedefenders/model/AchievementType.java:466
+msgid "{0} of {1} equivalence duels won as attacker to reach the next level"
+msgstr ""
+"{0} von {1} Duellen als Angreifer gewonnen, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:460
+msgid "Bronze Mutant Defender"
+msgstr "Bronze-Mutantenverteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:461
+#: src/main/java/org/codedefenders/model/AchievementType.java:465
+#: src/main/java/org/codedefenders/model/AchievementType.java:469
+msgid "Win {0} equivalence duels as attacker"
+msgstr "Gewinne {0} Äquivalenzduelle als Angreifer"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:464
+msgid "Silver Mutant Defender"
+msgstr "Silber-Mutantenverteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:468
+msgid "The Best Mutant Defender"
+msgstr "Der beste Mutanten-Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:470
+msgid "{0} equivalence duels won as attacker, max level reached"
+msgstr "{0} als Angreifer gewonnene Äquivalenzduelle, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:474
+msgid "No Duels won as defender"
+msgstr "Keine gewonnenen Äquivalenzduelle als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:475
+msgid "Win your first equivalence duel as defender to unlock this achievement"
+msgstr ""
+"Gewinne dein erstes Äquivalenzduell als Verteidiger, um diese Errungenschaft "
+"freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:476
+msgid "{0} of {1} equivalence duels won as defender"
+msgstr "{0} von {1} gewonnenen Äquivalenzduellen als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:478
+msgid "Beginner Equivalence Detective"
+msgstr "Äquivalenz-Detektiv-Lehrling"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:479
+msgid "Win your first equivalence duel as defender"
+msgstr "Gewinne dein erstes Äquivalenzduell als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:480
+#: src/main/java/org/codedefenders/model/AchievementType.java:484
+#: src/main/java/org/codedefenders/model/AchievementType.java:488
+msgid "{0} of {1} equivalence duels won as defender to reach the next level"
+msgstr ""
+"{0} von {1} Äquivalenzduellen als Verteidiger gewonnen, um das nächste Level "
+"zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:482
+msgid "Bronze Equivalence Detective"
+msgstr "Bronze-Äquivalenz-Detektiv"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:483
+#: src/main/java/org/codedefenders/model/AchievementType.java:487
+#: src/main/java/org/codedefenders/model/AchievementType.java:491
+msgid "Win {0} equivalence duels as defender"
+msgstr "Gewinne {0} Äquivalenzduelle als Verteidiger"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:486
+msgid "Silver Equivalence Detective"
+msgstr "Silber-Äquivalenz-Detektiv"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:490
+msgid "The Best Equivalence Detective"
+msgstr "Der beste Äquivalenz-Detektiv"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:492
+msgid "{0} equivalence duels won as defender, max level reached"
+msgstr "{0} Äquivalenzduelle als Verteidiger gewonnen, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:496
+msgid "Not enough tests written in 5 minutes"
+msgstr "Nicht ausreichend viele Tests innerhalb von 5 Minuten geschrieben"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:497
+msgid "Write two tests in 5 minutes to unlock this achievement"
+msgstr ""
+"Schreibe innerhalb von 5 Minuten zwei Tests, um diese Errungenschaft "
+"freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:498
+msgid "{0} of {1} tests written in 5 minutes"
+msgstr "{0} von {1} Tests in 5 Minuten geschrieben"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:500
+msgid "Speedy Tester"
+msgstr "Schnelltester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:501
+#: src/main/java/org/codedefenders/model/AchievementType.java:505
+#: src/main/java/org/codedefenders/model/AchievementType.java:509
+#: src/main/java/org/codedefenders/model/AchievementType.java:513
+msgid "Write {0} tests in 5 minutes"
+msgstr "Schreibe {0} Tests in 5 Minuten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:502
+#: src/main/java/org/codedefenders/model/AchievementType.java:506
+#: src/main/java/org/codedefenders/model/AchievementType.java:510
+msgid "{0} of {1} tests written in 5 minutes to reach the next level"
+msgstr ""
+"{0} von {1} Tests in 5 Minuten geschrieben, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:504
+msgid "Bronze Speedy Tester"
+msgstr "Bronze-Schnelltester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:508
+msgid "Silver Speedy Tester"
+msgstr "Silber-Schnelltester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:512
+msgid "The Fastest Tester"
+msgstr "Der schnellste Tester"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:514
+msgid "{0} tests written in 5 minutes, max level reached"
+msgstr "{0} Tests in 5 Minuten geschrieben, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:518
+msgid "Not enough mutants created in 5 minutes"
+msgstr "Nicht ausreichend viele Mutanten innerhalb von 5 Minuten erzeugt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:519
+msgid "Create five mutants in 5 minutes to unlock this achievement"
+msgstr ""
+"Erstelle in 5 Minuten fünf Mutanten, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:520
+msgid "{0} of {1} mutants created in 5 minutes"
+msgstr "{0} von {1} Mutanten in 5 Minuten erzeugt"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:522
+msgid "Speedy Mutant Creator"
+msgstr "Schneller Mutanten-Ersteller"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:523
+#: src/main/java/org/codedefenders/model/AchievementType.java:527
+#: src/main/java/org/codedefenders/model/AchievementType.java:531
+#: src/main/java/org/codedefenders/model/AchievementType.java:535
+msgid "Create {0} mutants in 5 minutes"
+msgstr "Erstelle {0} Mutanten in 5 Minuten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:524
+#: src/main/java/org/codedefenders/model/AchievementType.java:528
+#: src/main/java/org/codedefenders/model/AchievementType.java:532
+msgid "{0} of {1} mutants created in 5 minutes to reach the next level"
+msgstr ""
+"erstelle {0} von {1} Mutanten in 5 Minuten, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:526
+msgid "Bronze Speedy Mutator"
+msgstr "Bronze-Schnellmutator"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:530
+msgid "Silver Speedy Mutator"
+msgstr "Silber-Schnellmutator"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:534
+msgid "The Fastest Mutator"
+msgstr "Der schnellste Mutator"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:536
+msgid "{0} mutants created in 5 minutes, max level reached"
+msgstr "{0} Mutanten in 5 Minuten erstellt, höchstes Level erreicht"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:540
+msgid "No puzzles solved on the first try"
+msgstr "Keine Rätsel auf Anhieb gelöst"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:541
+msgid "Solve a puzzle on the first try to unlock this achievement"
+msgstr ""
+"Löse ein Rätsel beim ersten Versuch, um diese Errungenschaft freizuschalten"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:542
+msgid "{0} of {1} puzzles solved on the first try"
+msgstr "{0} von {1} Rätseln auf Anhieb gelöst"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:544
+msgid "One and Done"
+msgstr "Einmal hin, alles drin"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:545
+msgid "Solve your first puzzle on the first try"
+msgstr "Löse dein erstes Rätsel auf Anhieb"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:546
+#: src/main/java/org/codedefenders/model/AchievementType.java:550
+#: src/main/java/org/codedefenders/model/AchievementType.java:554
+msgid "{0} of {1} puzzles solved on the first try to reach the next level"
+msgstr ""
+"{0} von {1} Rätseln auf Anhieb gelöst, um das nächste Level zu erreichen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:548
+#: src/main/java/org/codedefenders/model/AchievementType.java:552
+#: src/main/java/org/codedefenders/model/AchievementType.java:556
+msgid "{0} Birds with {0} Stones"
+msgstr "{0} Fliegen mit {0} Klappen"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:549
+#: src/main/java/org/codedefenders/model/AchievementType.java:553
+#: src/main/java/org/codedefenders/model/AchievementType.java:557
+msgid "Solve {0} puzzles on the first try"
+msgstr "Löse {0} Rätsel auf Anhieb"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java:558
+msgid "{0} puzzles solved on the first try, max level reached"
+msgstr "{0} Rätsel auf Anhieb gelöst, höchstes Level erreicht"
+
 #: src/main/java/org/codedefenders/model/KeyMap.java:29
 msgid "default"
 msgstr "Standard"
@@ -1239,7 +2159,7 @@ msgstr "Test gegen Mutanten ausführen"
 msgid "Test Failed Against Original"
 msgstr "Testausführung gegenüber Original fehlgeschlagen"
 
-#: src/main/javascript/main/achievement_notifications.js:58
+#: src/main/javascript/main/achievement_notifications.js:60
 msgid "New Achievement Unlocked:"
 msgstr "Neue Errungenschaft freigeschaltet:"
 
