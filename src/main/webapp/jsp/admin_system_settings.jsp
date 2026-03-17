@@ -51,6 +51,7 @@
 %>
 
 <p:main_page title="${i18n.tr('System Settings')}">
+
     <div class="container">
         <t:admin_navigation activePage="adminSystemSettings"/>
 
@@ -60,10 +61,10 @@
               autocomplete="off">
             <input type="hidden" name="formType" value="saveSettings">
 
-            <c:forEach var="setting" items="${AdminDAO.getSystemSettings()}">
+            <c:forEach var="setting" items="${AdminDAO.getSystemSettings()}"><%-- AdminDAO.systemSettings does not work! --%>
                 <%--@elvariable id="setting" type="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"--%>
-                <c:set var="readableName" value="${setting.name.readableName}"/>
-                <c:set var="explanation" value="${setting.name.toString()}"/>
+                <c:set var="readableName" value="${i18n.tr(setting.name.readableName)}"/>
+                <c:set var="explanation" value="${i18n.tr(setting.name.description)}"/>
                 <c:set var="settingId" value="${setting.name.name()}"/>
 
                 <%-- Do not show Killmap Setting here. --%>
@@ -77,7 +78,9 @@
                         <c:choose>
                             <c:when test="${setting.type == STRING_VALUE}">
                                 <c:choose>
-                                    <c:when test="${setting.name == SITE_NOTICE || setting.name == PRIVACY_NOTICE || setting.name == CONTACT_NOTICE}">
+                                    <c:when test="${setting.name == SITE_NOTICE
+                                                 || setting.name == PRIVACY_NOTICE
+                                                 || setting.name == CONTACT_NOTICE}">
                                         <div class="col-8">
                                             <textarea class="form-control" rows="3"
                                                       name="${settingId}"

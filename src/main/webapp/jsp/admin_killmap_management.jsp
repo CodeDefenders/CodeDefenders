@@ -44,7 +44,7 @@
      */
     KillmapPage currentPage = (KillmapPage) request.getAttribute("page");
 
-    String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
+    String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.getDescription();
 
     KillMapJob currentJob = CDIUtil.getBeanFromCDI(KillMapCronJob.class).getCurrentJob();
 
