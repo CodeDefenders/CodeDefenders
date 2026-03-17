@@ -53,7 +53,7 @@
                         </button>
                     </div>
                     <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
-        ${i18n.tr('Save')}
+                        <span>${i18n.tr('Save')}</span>
                         <i class="fa fa-save ms-1"></i>
                     </button>
                 </div>
@@ -83,7 +83,7 @@
             </jsp:attribute>
             <jsp:attribute name="footer">
                 <button type="button" class="btn btn-primary button-save">
-                        ${i18n.tr('Save')}
+                    <span>${i18n.tr('Save')}</span>
                     <i class="fa fa-save ms-1"></i>
                 </button>
             </jsp:attribute>
@@ -1200,7 +1200,8 @@
                     saveButton.addEventListener('click', function (event) {
                         for (const btn of saveButtons) {
                             btn.disabled = true;
-                            btn.innerText = '${i18n.tr("Saving...")}';
+                            let span = btn.querySelector('span');
+                            (span || btn).innerText = '${i18n.tr("Saving...")}';
                         }
                         PuzzleAPI.batchUpdatePuzzlePositions(getPuzzlePositions())
                                 .then(response => {
@@ -1213,7 +1214,8 @@
                                     unsavedChangesModal.hide();
                                     for (const btn of saveButtons) {
                                         btn.disabled = false;
-                                        btn.innerText = '${i18n.tr("Save")}';
+                                        let span = btn.querySelector('span');
+                                        (span || btn).innerText = '${i18n.tr("Save")}';
                                     }
                                 });
                     });
