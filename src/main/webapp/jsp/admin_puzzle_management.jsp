@@ -25,6 +25,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18nService" type="org.codedefenders.service.I18nService"--%>
 
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
@@ -54,7 +56,13 @@
                         <div class="d-flex gap-2 align-items-center puzzle-language-switch"
                              title="${i18n.tr('Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language.')}">
                             <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
-                            <select class="form-select form-select-sm" id="locale-switch"></select>
+                            <select class="form-select form-select-sm" id="locale-switch">
+                                <c:forEach items="${i18nService.supportedLocales}" var="l">
+                                    <option value="${l.language}">
+                                        ${l.getDisplayLanguage(login.user.locale)}
+                                    </option>
+                                </c:forEach>
+                            </select>
                         </div>
                     </div>
                     <button type="button" id="button-save" class="btn btn-primary btn-lg btn-highlight button-save">
@@ -293,12 +301,8 @@
             window.puzzleData = await PuzzleAPI.fetchPuzzleData();
             const puzzles = puzzleData.puzzles;
             const chapters = puzzleData.chapters;
-            const supportedLanguages = puzzleData.supportedLanguages || ['en'];
-
-            let currentLanguage = document.documentElement.getAttribute('lang');
-            if (!supportedLanguages.includes(currentLanguage)) {
-                currentLanguage = supportedLanguages[0];
-            }
+            let currentLanguage = '${i18nService.supportedLocales[0].language}';
+            const localeSwitch = document.getElementById('locale-switch');
 
             /**
              * Returns the text object for the given language, falling back to the first available language.
@@ -316,16 +320,6 @@
                     }
                 }
                 return {title: '', description: '', isFallback: true};
-            }
-
-            // Initialize locale switch dropdown
-            const localeSwitch = document.getElementById('locale-switch');
-            for (const lang of supportedLanguages) {
-                const option = document.createElement('option');
-                option.value = lang;
-                option.innerText = lang.toUpperCase();
-                if (lang === currentLanguage) option.selected = true;
-                localeSwitch.appendChild(option);
             }
 
             const puzzlesPerChapter = new Map();
