@@ -125,7 +125,14 @@
                                                 <form method="post" action="${url.forPath("/change-language")}">
                                                     <input type="hidden" name="lang" value="${l.language}"/>
                                                     <button type="submit" class="btn btn-link dropdown-item px-3 py-1">
-                                                            ${i18n.tr(l.displayName)}
+                                                        <c:choose>
+                                                            <c:when test="${i18n.locale.language == l.language}">
+                                                                ${l.getDisplayLanguage(i18n.locale)}
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                ${l.getDisplayLanguage(i18n.locale)} (${l.getDisplayLanguage(l)})
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </button>
                                                 </form>
                                             </li>
