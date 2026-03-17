@@ -615,7 +615,7 @@
                 let options = document.createDocumentFragment();
                 let index = 1;
                 for (const chapterElem of chaptersContainer.children) {
-                    const title = chapterElem.chapterComp.chapter.title;
+                    const title = chapterElem.chapterComp.title.innerText;
                     const option = document.createElement('option');
                     option.value = String(index);
                     option.innerText = `\${index} | \${title}`;
@@ -684,7 +684,7 @@
                             label: '${i18n.tr("Scroll to chapter:")}',
                             moveButtonContent: '${i18n.tr("Go")}',
                     showButtonClasses: 'btn btn-sm btn-outline-secondary',
-                    showButtonContent: 'Scroll to chapter <i class="fa fa-arrow-down ms-1"></i>',
+                    showButtonContent: '${i18n.tr("Scroll to chapter")} <i class="fa fa-arrow-down ms-1"></i>',
                 });
                 document.getElementById('button-add-chapter').insertAdjacentElement('afterend', scrollDropdown);
 
