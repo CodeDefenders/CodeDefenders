@@ -48,7 +48,9 @@
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    String title = i18n.tr("Puzzle: {0} - {1}", request.getAttribute("chapterTitle"), request.getAttribute("puzzleTitle"));
+    String title = i18n.tr("Puzzle") + ": "
+            + request.getAttribute("chapterTitle") + " - "
+            + request.getAttribute("puzzleTitle");
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);

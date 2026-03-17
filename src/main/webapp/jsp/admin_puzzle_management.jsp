@@ -52,7 +52,7 @@
                             <i class="fa fa-plus ms-1"></i>
                         </button>
                         <div class="d-flex gap-2 align-items-center puzzle-language-switch"
-                             title="${i18n.tr('Select the language for preview and editing.\nItalic titles/descriptions indicate missing translations that fall back to the default language.')}">
+                             title="${i18n.tr('Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language.')}">
                             <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
                             <select class="form-select form-select-sm" id="locale-switch"></select>
                         </div>
