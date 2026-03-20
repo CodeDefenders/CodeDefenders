@@ -1423,6 +1423,62 @@ msgstr "Solve {0} puzzles on the first try"
 msgid "{0} puzzles solved on the first try, max level reached"
 msgstr "{0} puzzles solved on the first try, max level reached"
 
+#: src/main/java/org/codedefenders/model/Feedback.java:38
+msgid "Mutation Difficulty"
+msgstr "Mutation Difficulty"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:39
+msgid "The class under test is difficult to mutate"
+msgstr "The class under test is difficult to mutate"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:42
+msgid "Test Difficulty"
+msgstr "Test Difficulty"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:43
+msgid "The class under test is difficult to test"
+msgstr "The class under test is difficult to test"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:46
+msgid "Attacker Competence"
+msgstr "Attacker Competence"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:47
+msgid "The attacking team is competent"
+msgstr "The attacking team is competent"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:50
+msgid "Defender Competence"
+msgstr "Defender Competence"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:51
+msgid "The defending team is competent"
+msgstr "The defending team is competent"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:54
+msgid "Attacker Fairness"
+msgstr "Attacker Fairness"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:55
+msgid "The attacking team is playing fair"
+msgstr "The attacking team is playing fair"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:58
+msgid "Defender Fairness"
+msgstr "Defender Fairness"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:59
+msgid "The defending team is playing fair"
+msgstr "The defending team is playing fair"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:62
+msgid "Game Engaging"
+msgstr "Game Engaging"
+
+#: src/main/java/org/codedefenders/model/Feedback.java:63
+msgid "The game is engaging"
+msgstr "The game is engaging"
+
 #: src/main/java/org/codedefenders/model/KeyMap.java:29
 msgid "default"
 msgstr "default"
@@ -3843,459 +3899,463 @@ msgstr "Are you sure you want to stop the selected Games?"
 msgid "Stop Games"
 msgstr "Stop Games"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:32
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:34
 msgid "Puzzle Management"
 msgstr "Puzzle Management"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:43
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:45
 msgid "Upload chapters"
 msgstr "Upload chapters"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:47
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:49
 msgid "Upload puzzles"
 msgstr "Upload puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:51
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:53
 msgid "Add empty chapter"
 msgstr "Add empty chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:55
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:57
 msgid "Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language."
 msgstr "Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:56
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:58
 msgid "Language"
 msgstr "Language"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:61
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:69
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:68
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:76
 msgid "Unassigned Puzzles"
 msgstr "Unassigned Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:77
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:85
 msgid "Archived Puzzles"
 msgstr "Archived Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:84
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:92
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:85
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:93
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:87
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:95
 msgid "You have unsaved changes. Please save first."
 msgstr "You have unsaved changes. Please save first."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:91
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:99
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:102
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:110
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:107
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:115
 msgid "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
 msgstr "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:114
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:122
 msgid "Puzzle Format Explanation"
 msgstr "Puzzle Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:120
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:128
 msgid "Puzzle Properties Explanation"
 msgstr "Puzzle Properties Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:126
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:134
 msgid "Downloads"
 msgstr "Downloads"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:130
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:138
 msgid "Empty puzzle template:"
 msgstr "Empty puzzle template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:136
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:144
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:142
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:150
 msgid "Example attacker puzzle:"
 msgstr "Example attacker puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:148
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:156
 msgid "Example defender puzzle:"
 msgstr "Example defender puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:154
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:162
 msgid "Example puzzle with dependencies:"
 msgstr "Example puzzle with dependencies:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:166
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:174
 msgid "Uploading..."
 msgstr "Uploading..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:167
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:175
 msgid "Upload"
 msgstr "Upload"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:177
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:185
 msgid "Upload Chapters"
 msgstr "Upload Chapters"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:182
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:190
 msgid "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
 msgstr "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:186
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:194
 msgid "Uploading large chapters may take several minutes."
 msgstr "Uploading large chapters may take several minutes."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:193
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:201
 msgid "Chapter Format Explanation"
 msgstr "Chapter Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:199
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:207
 msgid "Puzzle Format Explanation"
 msgstr "Puzzle Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:205
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:213
 msgid "Puzzle Properties Explanation"
 msgstr "Puzzle Properties Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:211
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:219
 msgid "Downloads"
 msgstr "Downloads"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:215
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:223
 msgid "Example chapter:"
 msgstr "Example chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:221
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:229
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:227
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:235
 msgid "Empty chapter template:"
 msgstr "Empty chapter template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:233
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:241
 msgid "Puzzle Downloads:"
 msgstr "Puzzle Downloads:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:236
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:244
 msgid "Empty puzzle template:"
 msgstr "Empty puzzle template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:242
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:250
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:248
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:256
 msgid "Example attacker puzzle:"
 msgstr "Example attacker puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:254
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:262
 msgid "Example defender puzzle:"
 msgstr "Example defender puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:260
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:268
 msgid "Example puzzle with dependencies:"
 msgstr "Example puzzle with dependencies:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:272
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:280
 msgid "Uploading..."
 msgstr "Uploading..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:273
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:281
 msgid "Upload"
 msgstr "Upload"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:404
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:398
 msgid "Edit"
 msgstr "Edit"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:407
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:401
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:410
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:404
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:419
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:413
 msgid "Move to position:"
 msgstr "Move to position:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:420
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:414
 msgid "Move to position"
 msgstr "Move to position"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:499
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:493
 msgid "Number of games with the puzzle"
 msgstr "Number of games with the puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:500
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:494
 msgid "Puzzle level"
 msgstr "Puzzle level"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:501
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:495
 msgid "Mutant is equivalent"
 msgstr "Mutant is equivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:507
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:501
 msgid "Edit"
 msgstr "Edit"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:511
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:505
 msgid "Unassign"
 msgstr "Unassign"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:515
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:509
 msgid "Archive"
 msgstr "Archive"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:519
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:513
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:527
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:521
 msgid "Move to chapter:"
 msgstr "Move to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:528
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:522
 msgid "Move to chapter"
 msgstr "Move to chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:558
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:552
 msgid "Puzzles with existing games can\'t be deleted"
 msgstr "Puzzles with existing games can\'t be deleted"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:589
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:583
 msgid "Move to chapter:"
 msgstr "Move to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:689
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:683
 msgid "Scroll to chapter"
 msgstr "Scroll to chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:690
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:684
 msgid "Scroll to chapter:"
 msgstr "Scroll to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:691
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:685
 msgid "Go"
 msgstr "Go"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:790
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:687
+msgid "Scroll to chapter"
+msgstr "Scroll to chapter"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:784
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:798
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:792
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:803
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:797
 msgid "Edit Chapter"
 msgstr "Edit Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:804
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:798
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:832
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:826
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:834
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:828
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:859
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:853
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:861
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:855
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:863
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:857
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:869
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:863
+msgid "Description"
+msgstr "Description"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:865
 msgid "Description"
 msgstr "Description"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:871
-msgid "Description"
-msgstr "Description"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:877
 msgid "Max. Assertions"
 msgstr "Max. Assertions"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:885
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
 msgid "First Editable Line"
 msgstr "First Editable Line"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:890
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:884
 msgid "Last Editable Line"
 msgstr "Last Editable Line"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:898
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:892
 msgid "Game Level"
 msgstr "Game Level"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:902
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:896
 msgid "Easy"
 msgstr "Easy"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:903
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:897
 msgid "Please select a level."
 msgstr "Please select a level."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:909
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:903
 msgid "Hard"
 msgstr "Hard"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:916
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:910
 msgid "Equivalence"
 msgstr "Equivalence"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:920
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:914
 msgid "Mutant equivalent"
 msgstr "Mutant equivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:926
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:920
 msgid "Edit Puzzle"
 msgstr "Edit Puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:927
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:921
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:988
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:982
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:990
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:984
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1013
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1007
 msgid "Are you sure you want to delete chapter {0}?"
 msgstr "Are you sure you want to delete chapter {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1014
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1008
 msgid "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
 msgstr "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1017
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1011
 msgid "Delete Chapter"
 msgstr "Delete Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1018
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1037
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1031
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1039
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1033
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1062
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1056
 msgid "Are you sure you want to permanently delete puzzle {0}?"
 msgstr "Are you sure you want to permanently delete puzzle {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1066
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1060
 msgid "Delete Puzzle"
 msgstr "Delete Puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1067
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1061
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1075
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1069
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1082
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1084
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1078
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1103
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1097
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1105
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1111
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1105
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1113
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1107
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1112
 msgid "Create New Chapter"
 msgstr "Create New Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1119
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1113
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1124
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1146
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1140
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1148
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1142
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1172
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1166
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1276
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1270
 msgid "Saving..."
 msgstr "Saving..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1281
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1275
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1283
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1277
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1284
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1278
 msgid "Could not save changes."
 msgstr "Could not save changes."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1290
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1284
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1317
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1311
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
@@ -4407,31 +4467,31 @@ msgstr "Editable lines start below"
 msgid "Editable lines end above"
 msgstr "Editable lines end above"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:38
+#: src/main/webapp/jsp/admin_system_settings.jsp:53
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:84
+#: src/main/webapp/jsp/admin_system_settings.jsp:99
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:85
+#: src/main/webapp/jsp/admin_system_settings.jsp:100
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:115
+#: src/main/webapp/jsp/admin_system_settings.jsp:130
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:116
+#: src/main/webapp/jsp/admin_system_settings.jsp:131
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:129
+#: src/main/webapp/jsp/admin_system_settings.jsp:144
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:133
+#: src/main/webapp/jsp/admin_system_settings.jsp:148
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -6763,83 +6823,83 @@ msgstr "Defend"
 msgid "JUnit Tests"
 msgstr "JUnit Tests"
 
-#: src/main/webapp/jsp/player_feedback.jsp:37
+#: src/main/webapp/jsp/player_feedback.jsp:42
 msgid "Feedback for Game {0}"
 msgstr "Feedback for Game {0}"
 
-#: src/main/webapp/jsp/player_feedback.jsp:39
+#: src/main/webapp/jsp/player_feedback.jsp:44
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/player_feedback.jsp:50
+#: src/main/webapp/jsp/player_feedback.jsp:55
 msgid "Give Feedback"
 msgstr "Give Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:57
+#: src/main/webapp/jsp/player_feedback.jsp:62
 msgid "View Feedback"
 msgstr "View Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:64
+#: src/main/webapp/jsp/player_feedback.jsp:69
 msgid "How much do you agree with the following statements?"
 msgstr "How much do you agree with the following statements?"
 
-#: src/main/webapp/jsp/player_feedback.jsp:80
+#: src/main/webapp/jsp/player_feedback.jsp:86
 msgid "very much"
 msgstr "very much"
 
-#: src/main/webapp/jsp/player_feedback.jsp:84
+#: src/main/webapp/jsp/player_feedback.jsp:90
 msgid "a lot"
 msgstr "a lot"
 
-#: src/main/webapp/jsp/player_feedback.jsp:88
+#: src/main/webapp/jsp/player_feedback.jsp:94
 msgid "somewhat"
 msgstr "somewhat"
 
-#: src/main/webapp/jsp/player_feedback.jsp:92
+#: src/main/webapp/jsp/player_feedback.jsp:98
 msgid "a bit"
 msgstr "a bit"
 
-#: src/main/webapp/jsp/player_feedback.jsp:96
+#: src/main/webapp/jsp/player_feedback.jsp:102
 msgid "not at all"
 msgstr "not at all"
 
-#: src/main/webapp/jsp/player_feedback.jsp:104
+#: src/main/webapp/jsp/player_feedback.jsp:110
 msgid "In providing feedback you help us improve gameplay mechanics,"
 msgstr "In providing feedback you help us improve gameplay mechanics,"
 
-#: src/main/webapp/jsp/player_feedback.jsp:105
+#: src/main/webapp/jsp/player_feedback.jsp:111
 msgid "hone match making and select classes that are engaging and fun."
 msgstr "hone match making and select classes that are engaging and fun."
 
-#: src/main/webapp/jsp/player_feedback.jsp:106
+#: src/main/webapp/jsp/player_feedback.jsp:112
 msgid "You can change your feedback even after the game finishes."
 msgstr "You can change your feedback even after the game finishes."
 
-#: src/main/webapp/jsp/player_feedback.jsp:107
+#: src/main/webapp/jsp/player_feedback.jsp:113
 msgid "Thank you for your time."
 msgstr "Thank you for your time."
 
-#: src/main/webapp/jsp/player_feedback.jsp:112
+#: src/main/webapp/jsp/player_feedback.jsp:118
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/player_feedback.jsp:115
+#: src/main/webapp/jsp/player_feedback.jsp:121
 msgid "Save Feedback"
 msgstr "Save Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:130
+#: src/main/webapp/jsp/player_feedback.jsp:136
 msgid "Player"
 msgstr "Player"
 
-#: src/main/webapp/jsp/player_feedback.jsp:172
+#: src/main/webapp/jsp/player_feedback.jsp:178
 msgid "Average"
 msgstr "Average"
 
-#: src/main/webapp/jsp/player_feedback.jsp:204
+#: src/main/webapp/jsp/player_feedback.jsp:210
 msgid "No player has provided feedback for this game yet."
 msgstr "No player has provided feedback for this game yet."
 
-#: src/main/webapp/jsp/player_feedback.jsp:211
+#: src/main/webapp/jsp/player_feedback.jsp:217
 msgid "Close"
 msgstr "Close"
 
@@ -9423,7 +9483,7 @@ msgstr "Logout"
 msgid "Language"
 msgstr "Language"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:137
+#: src/main/webapp/WEB-INF/tags/navbar.tag:144
 msgid "Login"
 msgstr "Login"
 

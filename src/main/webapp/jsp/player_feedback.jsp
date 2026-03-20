@@ -24,7 +24,11 @@
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.model.Feedback.Type" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<% I18n i18n = (I18n) request.getAttribute("i18n"); %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 
@@ -72,7 +76,7 @@
                                         for (Type type : playerFeedback.getAvailableFeedbackTypes()) {
                                             int oldValue = ratings.getOrDefault(type, 0);
                                     %>
-                                        <div><%=type.description()%></div>
+                                        <div><%= i18n.tr(type.description()) %></div>
                                         <fieldset class="rating rating-interactive">
                                             <input type="radio" id="star5_<%=type.name()%>" name="rating<%=type.name()%>" value=5
                                                 <%=oldValue == 5 ? "checked" : ""%>>
@@ -129,7 +133,9 @@
                                         <tr>
                                             <th>${playerFeedback.canSeeFeedback() ? i18n.tr('Player') : ''}</th>
                                             <% for (Type f : Type.TYPES) { %>
-                                                <th class="text-center" title="<%=f.description()%>"><%=f.displayName()%></th>
+                                                <th class="text-center" title="<%=i18n.tr(f.description())%>">
+                                                    <%=i18n.tr(f.displayName())%>
+                                                </th>
                                             <% } %>
                                         </tr>
                                     </thead>
