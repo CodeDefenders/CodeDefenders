@@ -1519,7 +1519,7 @@ msgstr "Gültigkeitsdauer des Passwort-Zurücksetzungscodes"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:159
 msgid "How long (in hours) a password reset secret is valid"
-msgstr "Wie lange (in Stunden) ist ein Passwort-Zurücksetzungscode gültig?"
+msgstr "Wie lange (in Stunden) ein Passwort-Zurücksetzungscode gültig ist"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
 msgid "Debug Mode"
@@ -2052,7 +2052,7 @@ msgstr "Hey! Das darfst du nicht machen!"
 #: src/main/webapp/WEB-INF/tags/create_games.tag:641
 #: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:25
 msgid "Relaxed"
-msgstr "Relaxed"
+msgstr "Locker"
 
 #: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:25
 #: src/main/webapp/WEB-INF/tags/create_games.tag:642
@@ -4388,18 +4388,18 @@ msgid ""
 "Forces players to specify the intentions of their mutants/tests before they "
 "can submit them."
 msgstr ""
-"Zwingt die Spieler dazu, die Intentions ihrer Mutanten/Tests anzugeben, "
-"bevor sie diese einreichen können."
+"Zwingt die Spieler dazu, die Intention ihrer Mutanten/Tests anzugeben, bevor "
+"sie diese einreichen können."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:217
 #: src/main/webapp/jsp/melee/create_game_view.jsp:211
 msgid "Capture Intentions"
-msgstr "Intentions erfassen"
+msgstr "Intentionen erfassen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:223
 #: src/main/webapp/jsp/melee/create_game_view.jsp:217
 msgid "Enable Capturing Players\\' Intentions"
-msgstr "Spieler-Intentions erfassen"
+msgstr "Spieler-Intentionen erfassen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:229
 #: src/main/webapp/WEB-INF/tags/create_games.tag:275
@@ -6711,7 +6711,7 @@ msgstr "Deine Rolle"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:270
 msgid "Enable Capture Players' Intentions"
-msgstr "Die Intentions der Spieler erfassen"
+msgstr "Die Intentionen der Spieler erfassen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:283
 msgid "Automatically start games once they are created."
@@ -6984,7 +6984,7 @@ msgstr "Chat aktiviert"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1201
 msgid "Capture Player Intentions"
-msgstr "Intentions der Spieler erfassen"
+msgstr "Intentionen der Spieler erfassen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1205
 msgid "Equivalence Threshold"
