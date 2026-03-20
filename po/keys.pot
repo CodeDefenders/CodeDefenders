@@ -1515,11 +1515,11 @@ msgstr "Creating games is currently not enabled."
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:170
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:168
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:223
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:221
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
@@ -5176,108 +5176,104 @@ msgid "Make Public"
 msgstr "Make Public"
 
 #: src/main/webapp/jsp/classroom_page.jsp:193
-msgid "Password is"
-msgstr "Password is"
+msgid "Password is <span class=\"text-success\">set</span>."
+msgstr "Password is <span class=\"text-success\">set</span>."
 
-#: src/main/webapp/jsp/classroom_page.jsp:194
-msgid "set"
-msgstr "set"
+#: src/main/webapp/jsp/classroom_page.jsp:196
+msgid "Password is <span class=\"text-danger\">not set</span>."
+msgstr "Password is <span class=\"text-danger\">not set</span>."
 
-#: src/main/webapp/jsp/classroom_page.jsp:197
-msgid "Password is"
-msgstr "Password is"
-
-#: src/main/webapp/jsp/classroom_page.jsp:197
-msgid "not set"
-msgstr "not set"
-
-#: src/main/webapp/jsp/classroom_page.jsp:205
+#: src/main/webapp/jsp/classroom_page.jsp:204
 msgid "Set Password"
 msgstr "Set Password"
 
-#: src/main/webapp/jsp/classroom_page.jsp:211
+#: src/main/webapp/jsp/classroom_page.jsp:210
 msgid "Remove Password"
 msgstr "Remove Password"
 
-#: src/main/webapp/jsp/classroom_page.jsp:219
+#: src/main/webapp/jsp/classroom_page.jsp:218
 msgid "Classroom UID is"
 msgstr "Classroom UID is"
 
-#: src/main/webapp/jsp/classroom_page.jsp:227
+#: src/main/webapp/jsp/classroom_page.jsp:226
 msgid "Invite link is"
 msgstr "Invite link is"
 
-#: src/main/webapp/jsp/classroom_page.jsp:240
+#: src/main/webapp/jsp/classroom_page.jsp:239
 msgid "Classroom Settings"
 msgstr "Classroom Settings"
 
-#: src/main/webapp/jsp/classroom_page.jsp:246
+#: src/main/webapp/jsp/classroom_page.jsp:245
 msgid "Change Name"
 msgstr "Change Name"
 
-#: src/main/webapp/jsp/classroom_page.jsp:255
+#: src/main/webapp/jsp/classroom_page.jsp:254
 msgid "Restore Classroom"
 msgstr "Restore Classroom"
 
-#: src/main/webapp/jsp/classroom_page.jsp:261
+#: src/main/webapp/jsp/classroom_page.jsp:260
 msgid "Archive Classroom"
 msgstr "Archive Classroom"
 
-#: src/main/webapp/jsp/classroom_page.jsp:274
+#: src/main/webapp/jsp/classroom_page.jsp:273
 msgid "Member Actions"
 msgstr "Member Actions"
 
-#: src/main/webapp/jsp/classroom_page.jsp:279
+#: src/main/webapp/jsp/classroom_page.jsp:278
 msgid "Leave Classroom"
 msgstr "Leave Classroom"
 
-#: src/main/webapp/jsp/classroom_page.jsp:295
+#: src/main/webapp/jsp/classroom_page.jsp:294
 msgid "Change classroom name"
 msgstr "Change classroom name"
 
-#: src/main/webapp/jsp/classroom_page.jsp:296
+#: src/main/webapp/jsp/classroom_page.jsp:295
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/classroom_page.jsp:298
+#: src/main/webapp/jsp/classroom_page.jsp:297
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/classroom_page.jsp:302
+#: src/main/webapp/jsp/classroom_page.jsp:301
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/classroom_page.jsp:304
+#: src/main/webapp/jsp/classroom_page.jsp:303
 msgid "Please enter a valid name."
 msgstr "Please enter a valid name."
 
-#: src/main/webapp/jsp/classroom_page.jsp:307
+#: src/main/webapp/jsp/classroom_page.jsp:306
 msgid "Maximum length: 100 characters."
 msgstr "Maximum length: 100 characters."
 
-#: src/main/webapp/jsp/classroom_page.jsp:311
+#: src/main/webapp/jsp/classroom_page.jsp:310
 msgid "Save changes"
 msgstr "Save changes"
 
-#: src/main/webapp/jsp/classroom_page.jsp:324
+#: src/main/webapp/jsp/classroom_page.jsp:323
 msgid "Set password"
 msgstr "Set password"
 
-#: src/main/webapp/jsp/classroom_page.jsp:325
+#: src/main/webapp/jsp/classroom_page.jsp:324
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/classroom_page.jsp:328
+#: src/main/webapp/jsp/classroom_page.jsp:327
 msgid "Password"
 msgstr "Password"
 
-#: src/main/webapp/jsp/classroom_page.jsp:330
+#: src/main/webapp/jsp/classroom_page.jsp:329
 msgid "Password"
 msgstr "Password"
 
-#: src/main/webapp/jsp/classroom_page.jsp:333
+#: src/main/webapp/jsp/classroom_page.jsp:332
 msgid "Please enter a valid password."
 msgstr "Please enter a valid password."
+
+#: src/main/webapp/jsp/classroom_page.jsp:337
+msgid "Confirm Password"
+msgstr "Confirm Password"
 
 #: src/main/webapp/jsp/classroom_page.jsp:338
 msgid "Confirm Password"

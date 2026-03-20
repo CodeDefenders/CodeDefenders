@@ -1306,8 +1306,8 @@ msgstr "FEHLER: Systemspieler konnten nicht zum Spiel hinzugefügt werden {0}."
 
 #: src/main/java/org/codedefenders/service/game/MeleeGameService.java:166
 #: src/main/java/org/codedefenders/service/game/MeleeGameService.java:221
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:170
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:223
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:168
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:221
 msgid "Creating games is currently not enabled."
 msgstr "Das Erstellen von Spielen ist im Moment nicht möglich."
 
@@ -3093,8 +3093,8 @@ msgstr "Klassenverwaltung"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:653
 #: src/main/webapp/jsp/admin_monitor_games.jsp:185
 #: src/main/webapp/jsp/admin_monitor_games.jsp:420
-#: src/main/webapp/jsp/classroom_page.jsp:298
-#: src/main/webapp/jsp/classroom_page.jsp:302
+#: src/main/webapp/jsp/classroom_page.jsp:297
+#: src/main/webapp/jsp/classroom_page.jsp:301
 #: src/main/webapp/jsp/classrooms_overview.jsp:82
 #: src/main/webapp/jsp/classrooms_overview.jsp:84
 #: src/main/webapp/jsp/classrooms_overview.jsp:181
@@ -3228,8 +3228,8 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:337
 #: src/main/webapp/jsp/battleground/details_view.jsp:111
-#: src/main/webapp/jsp/classroom_page.jsp:296
-#: src/main/webapp/jsp/classroom_page.jsp:325
+#: src/main/webapp/jsp/classroom_page.jsp:295
+#: src/main/webapp/jsp/classroom_page.jsp:324
 #: src/main/webapp/jsp/classroom_page.jsp:387
 #: src/main/webapp/jsp/classroom_page.jsp:406
 #: src/main/webapp/jsp/classroom_page.jsp:425
@@ -3255,13 +3255,13 @@ msgid "Cancel"
 msgstr "Abbrechen"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:64
-#: src/main/webapp/jsp/classroom_page.jsp:304
+#: src/main/webapp/jsp/classroom_page.jsp:303
 #: src/main/webapp/jsp/classrooms_overview.jsp:86
 msgid "Please enter a valid name."
 msgstr "Bitte gebe einen gültigen Namen ein."
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:67
-#: src/main/webapp/jsp/classroom_page.jsp:307
+#: src/main/webapp/jsp/classroom_page.jsp:306
 #: src/main/webapp/jsp/classroom_page.jsp:343
 #: src/main/webapp/jsp/classrooms_overview.jsp:89
 msgid "Maximum length: 100 characters."
@@ -4237,8 +4237,8 @@ msgstr "Admin"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:127
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:129
-#: src/main/webapp/jsp/classroom_page.jsp:328
-#: src/main/webapp/jsp/classroom_page.jsp:330
+#: src/main/webapp/jsp/classroom_page.jsp:327
+#: src/main/webapp/jsp/classroom_page.jsp:329
 #: src/main/webapp/jsp/classroom_page.jsp:604
 #: src/main/webapp/jsp/login_view.jsp:60 src/main/webapp/jsp/login_view.jsp:62
 #: src/main/webapp/jsp/login_view.jsp:139
@@ -4250,7 +4250,7 @@ msgid "Password"
 msgstr "Passwort"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:133
-#: src/main/webapp/jsp/classroom_page.jsp:333
+#: src/main/webapp/jsp/classroom_page.jsp:332
 #: src/main/webapp/jsp/login_view.jsp:144
 #: src/main/webapp/jsp/login_view.jsp:283
 #: src/main/webapp/jsp/user_settings.jsp:129
@@ -4259,6 +4259,7 @@ msgstr "Bitte gib ein gültiges Passwort ein."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:139
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:140
+#: src/main/webapp/jsp/classroom_page.jsp:337
 #: src/main/webapp/jsp/classroom_page.jsp:338
 #: src/main/webapp/jsp/login_view.jsp:150
 #: src/main/webapp/jsp/login_view.jsp:290
@@ -4869,68 +4870,63 @@ msgid "Make Public"
 msgstr "Veröffentlichen"
 
 #: src/main/webapp/jsp/classroom_page.jsp:193
-#: src/main/webapp/jsp/classroom_page.jsp:197
-msgid "Password is"
-msgstr "Passwort lautet"
+msgid "Password is <span class=\"text-success\">set</span>."
+msgstr "Passwort <span class=\"text-success\">festgelegt</span>."
 
-#: src/main/webapp/jsp/classroom_page.jsp:194
-msgid "set"
-msgstr "Satz"
+#: src/main/webapp/jsp/classroom_page.jsp:196
+msgid "Password is <span class=\"text-danger\">not set</span>."
+msgstr "Es wurde <span class=\"text-danger\">kein</span> Passwort festgelegt."
 
-#: src/main/webapp/jsp/classroom_page.jsp:197
-msgid "not set"
-msgstr "nicht gesetzt"
-
-#: src/main/webapp/jsp/classroom_page.jsp:205
+#: src/main/webapp/jsp/classroom_page.jsp:204
 msgid "Set Password"
 msgstr "Passwort festlegen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:211
+#: src/main/webapp/jsp/classroom_page.jsp:210
 msgid "Remove Password"
 msgstr "Passwort entfernen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:219
+#: src/main/webapp/jsp/classroom_page.jsp:218
 msgid "Classroom UID is"
 msgstr "Die Raum-ID ist"
 
-#: src/main/webapp/jsp/classroom_page.jsp:227
+#: src/main/webapp/jsp/classroom_page.jsp:226
 msgid "Invite link is"
 msgstr "Einladungslink ist"
 
-#: src/main/webapp/jsp/classroom_page.jsp:240
+#: src/main/webapp/jsp/classroom_page.jsp:239
 msgid "Classroom Settings"
 msgstr "Raumeinstellungen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:246
+#: src/main/webapp/jsp/classroom_page.jsp:245
 msgid "Change Name"
 msgstr "Namen ändern"
 
-#: src/main/webapp/jsp/classroom_page.jsp:255
+#: src/main/webapp/jsp/classroom_page.jsp:254
 msgid "Restore Classroom"
 msgstr "Raum wiederherstellen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:261
+#: src/main/webapp/jsp/classroom_page.jsp:260
 msgid "Archive Classroom"
 msgstr "Raum archivieren"
 
-#: src/main/webapp/jsp/classroom_page.jsp:274
+#: src/main/webapp/jsp/classroom_page.jsp:273
 msgid "Member Actions"
 msgstr "Mitgliederaktionen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:279
+#: src/main/webapp/jsp/classroom_page.jsp:278
 msgid "Leave Classroom"
 msgstr "Raum verlassen"
 
-#: src/main/webapp/jsp/classroom_page.jsp:295
+#: src/main/webapp/jsp/classroom_page.jsp:294
 msgid "Change classroom name"
 msgstr "Raumnamen ändern"
 
-#: src/main/webapp/jsp/classroom_page.jsp:311
+#: src/main/webapp/jsp/classroom_page.jsp:310
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:79
 msgid "Save changes"
 msgstr "Änderungen speichern"
 
-#: src/main/webapp/jsp/classroom_page.jsp:324
+#: src/main/webapp/jsp/classroom_page.jsp:323
 #: src/main/webapp/jsp/classroom_page.jsp:373
 msgid "Set password"
 msgstr "Passwort setzen"
@@ -7667,6 +7663,15 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Password is"
+#~ msgstr "Passwort lautet"
+
+#~ msgid "not set"
+#~ msgstr "nicht gesetzt"
+
+#~ msgid "set"
+#~ msgstr "Satz"
 
 #, fuzzy
 #~ msgid "Puzzle: {0} - {1}\", request.getAttribute(\"chapterTitle"

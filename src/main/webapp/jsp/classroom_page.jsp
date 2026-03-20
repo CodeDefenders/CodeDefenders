@@ -190,11 +190,10 @@
                     <div class="d-flex gap-2 mb-3">
                         <c:choose>
                             <c:when test="${classroom.password.isPresent()}">
-                                <span>${i18n.tr('Password is')} <span
-                                        class="text-success">${i18n.tr('set')}</span>.</span>
+                                <span>${i18n.tr('Password is <span class="text-success">set</span>.')}</span>
                             </c:when>
                             <c:otherwise>
-                                <span>${i18n.tr('Password is')} <span class="text-danger">${i18n.tr('not set')}</span>.</span>
+                                <span>${i18n.tr('Password is <span class="text-danger">not set</span>.')}</span>
                             </c:otherwise>
                         </c:choose>
                         <c:if test="${canEditClassroom}">
@@ -335,7 +334,8 @@
                         </div>
                         <div class="mb-3">
                             <input type="password" class="form-control" id="confirm-password-input"
-                                   name="confirm" placeholder="${i18n.tr('Confirm Password')}" required>
+                                   name="confirm" placeholder="${i18n.tr('Confirm Password')}" required
+                                   aria-label="${i18n.tr('Confirm Password')}">
                             <div class="invalid-feedback" id="confirm-password-feedback">
                                     ${i18n.tr('Please confirm your password.')}
                             </div>
