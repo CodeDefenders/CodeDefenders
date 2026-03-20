@@ -1279,6 +1279,14 @@ msgstr "Das Spiel macht Spaß"
 msgid "default"
 msgstr "Standard"
 
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:131
+msgid "/{0} is not a valid chat command."
+msgstr "/{0} ist kein gültiger Chat-Befehl."
+
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:137
+msgid "Your message cannot be empty."
+msgstr "Deine Nachricht darf nicht leer sein."
+
 #: src/main/java/org/codedefenders/service/CreateGamesService.java:164
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr ""

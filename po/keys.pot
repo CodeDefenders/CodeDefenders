@@ -1483,6 +1483,14 @@ msgstr "The game is engaging"
 msgid "default"
 msgstr "default"
 
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:131
+msgid "/{0} is not a valid chat command."
+msgstr "/{0} is not a valid chat command."
+
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:137
+msgid "Your message cannot be empty."
+msgstr "Your message cannot be empty."
+
 #: src/main/java/org/codedefenders/service/CreateGamesService.java:164
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
