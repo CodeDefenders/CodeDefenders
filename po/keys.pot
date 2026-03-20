@@ -2171,17 +2171,45 @@ msgstr "Defend"
 msgid "Could not fetch class.\nPlease try again later."
 msgstr "Could not fetch class.\nPlease try again later."
 
-#: src/main/javascript/game/game_chat.js:270
+#: src/main/javascript/game/game_chat.js:188
+msgid "All"
+msgstr "All"
+
+#: src/main/javascript/game/game_chat.js:192
+msgid "Attacker"
+msgstr "Attacker"
+
+#: src/main/javascript/game/game_chat.js:195
+msgid "Defender"
+msgstr "Defender"
+
+#: src/main/javascript/game/game_chat.js:198
+msgid "Player"
+msgstr "Player"
+
+#: src/main/javascript/game/game_chat.js:201
+msgid "Observer"
+msgstr "Observer"
+
+#: src/main/javascript/game/game_chat.js:286
 msgid "Connected to chat."
 msgstr "Connected to chat."
 
-#: src/main/javascript/game/game_chat.js:278
+#: src/main/javascript/game/game_chat.js:294
 msgid "Disconnected from chat."
 msgstr "Disconnected from chat."
 
-#: src/main/javascript/game/game_chat.js:286
+#: src/main/javascript/game/game_chat.js:302
 msgid "Could not load chat messages."
 msgstr "Could not load chat messages."
+
+#: src/main/javascript/game/game_chat.js:417
+msgid "All"
+msgstr "All"
+
+#: src/main/javascript/game/game_chat.js:421
+msgid "Team"
+msgstr "Team"
 
 #: src/main/javascript/game/game_highlighting.js:127
 msgid "Alive Mutants"
@@ -6823,71 +6851,71 @@ msgstr "Defend"
 msgid "JUnit Tests"
 msgstr "JUnit Tests"
 
-#: src/main/webapp/jsp/player_feedback.jsp:42
+#: src/main/webapp/jsp/player_feedback.jsp:41
 msgid "Feedback for Game {0}"
 msgstr "Feedback for Game {0}"
 
-#: src/main/webapp/jsp/player_feedback.jsp:44
+#: src/main/webapp/jsp/player_feedback.jsp:43
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/player_feedback.jsp:55
+#: src/main/webapp/jsp/player_feedback.jsp:54
 msgid "Give Feedback"
 msgstr "Give Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:62
+#: src/main/webapp/jsp/player_feedback.jsp:61
 msgid "View Feedback"
 msgstr "View Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:69
+#: src/main/webapp/jsp/player_feedback.jsp:68
 msgid "How much do you agree with the following statements?"
 msgstr "How much do you agree with the following statements?"
 
-#: src/main/webapp/jsp/player_feedback.jsp:86
+#: src/main/webapp/jsp/player_feedback.jsp:84
 msgid "very much"
 msgstr "very much"
 
-#: src/main/webapp/jsp/player_feedback.jsp:90
+#: src/main/webapp/jsp/player_feedback.jsp:88
 msgid "a lot"
 msgstr "a lot"
 
-#: src/main/webapp/jsp/player_feedback.jsp:94
+#: src/main/webapp/jsp/player_feedback.jsp:92
 msgid "somewhat"
 msgstr "somewhat"
 
-#: src/main/webapp/jsp/player_feedback.jsp:98
+#: src/main/webapp/jsp/player_feedback.jsp:96
 msgid "a bit"
 msgstr "a bit"
 
-#: src/main/webapp/jsp/player_feedback.jsp:102
+#: src/main/webapp/jsp/player_feedback.jsp:100
 msgid "not at all"
 msgstr "not at all"
 
-#: src/main/webapp/jsp/player_feedback.jsp:110
+#: src/main/webapp/jsp/player_feedback.jsp:108
 msgid "In providing feedback you help us improve gameplay mechanics,"
 msgstr "In providing feedback you help us improve gameplay mechanics,"
 
-#: src/main/webapp/jsp/player_feedback.jsp:111
+#: src/main/webapp/jsp/player_feedback.jsp:109
 msgid "hone match making and select classes that are engaging and fun."
 msgstr "hone match making and select classes that are engaging and fun."
 
-#: src/main/webapp/jsp/player_feedback.jsp:112
+#: src/main/webapp/jsp/player_feedback.jsp:110
 msgid "You can change your feedback even after the game finishes."
 msgstr "You can change your feedback even after the game finishes."
 
-#: src/main/webapp/jsp/player_feedback.jsp:113
+#: src/main/webapp/jsp/player_feedback.jsp:111
 msgid "Thank you for your time."
 msgstr "Thank you for your time."
 
-#: src/main/webapp/jsp/player_feedback.jsp:118
+#: src/main/webapp/jsp/player_feedback.jsp:116
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/player_feedback.jsp:121
+#: src/main/webapp/jsp/player_feedback.jsp:119
 msgid "Save Feedback"
 msgstr "Save Feedback"
 
-#: src/main/webapp/jsp/player_feedback.jsp:136
+#: src/main/webapp/jsp/player_feedback.jsp:134
 msgid "Player"
 msgstr "Player"
 

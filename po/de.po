@@ -256,6 +256,7 @@ msgid "Hard"
 msgstr "Schwer"
 
 #: src/main/java/org/codedefenders/game/Role.java:30
+#: src/main/javascript/game/game_chat.js:192
 #: src/main/webapp/jsp/classroom_page.jsp:928
 #: src/main/webapp/jsp/games_history.jsp:131
 #: src/main/webapp/jsp/user_games_view.jsp:235
@@ -267,6 +268,7 @@ msgid "Attacker"
 msgstr "Angreifer"
 
 #: src/main/java/org/codedefenders/game/Role.java:31
+#: src/main/javascript/game/game_chat.js:195
 #: src/main/webapp/jsp/classroom_page.jsp:930
 #: src/main/webapp/jsp/games_history.jsp:164
 #: src/main/webapp/jsp/user_games_view.jsp:271
@@ -278,6 +280,7 @@ msgid "Defender"
 msgstr "Verteidiger"
 
 #: src/main/java/org/codedefenders/game/Role.java:32
+#: src/main/javascript/game/game_chat.js:201
 #: src/main/webapp/jsp/classroom_page.jsp:934
 #: src/main/webapp/WEB-INF/tags/create_games.tag:257
 #: src/main/webapp/WEB-INF/tags/create_games.tag:653
@@ -285,9 +288,10 @@ msgid "Observer"
 msgstr "Beobachter"
 
 #: src/main/java/org/codedefenders/game/Role.java:33
+#: src/main/javascript/game/game_chat.js:198
 #: src/main/webapp/jsp/classroom_page.jsp:932
 #: src/main/webapp/jsp/games_history.jsp:272
-#: src/main/webapp/jsp/player_feedback.jsp:136
+#: src/main/webapp/jsp/player_feedback.jsp:134
 #: src/main/webapp/jsp/user_games_view.jsp:397
 #: src/main/webapp/jsp/user_games_view.jsp:732
 #: src/main/webapp/WEB-INF/tags/create_games.tag:654
@@ -2139,17 +2143,32 @@ msgstr ""
 "Klasse konnte nicht abgerufen werden.\n"
 "Bitte versuch es später nochmal."
 
-#: src/main/javascript/game/game_chat.js:270
+#: src/main/javascript/game/game_chat.js:188
+#: src/main/javascript/game/game_chat.js:417
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:38
+#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:36
+#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:36
+#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:36
+msgid "All"
+msgstr "Alle"
+
+#: src/main/javascript/game/game_chat.js:286
 msgid "Connected to chat."
 msgstr "Mit dem Chat verbunden."
 
-#: src/main/javascript/game/game_chat.js:278
+#: src/main/javascript/game/game_chat.js:294
 msgid "Disconnected from chat."
 msgstr "Vom Chat getrennt."
 
-#: src/main/javascript/game/game_chat.js:286
+#: src/main/javascript/game/game_chat.js:302
 msgid "Could not load chat messages."
 msgstr "Chat-Nachrichten konnten nicht geladen werden."
+
+#: src/main/javascript/game/game_chat.js:421
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:64
+#: src/main/webapp/WEB-INF/tags/game_chat.tag:76
+msgid "Team"
+msgstr "Team"
 
 #: src/main/javascript/game/game_highlighting.js:127
 #: src/main/webapp/jsp/games_history.jsp:133
@@ -3218,7 +3237,7 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/classrooms_overview.jsp:80
 #: src/main/webapp/jsp/melee/create_game_view.jsp:313
 #: src/main/webapp/jsp/melee/details_view.jsp:147
-#: src/main/webapp/jsp/player_feedback.jsp:118
+#: src/main/webapp/jsp/player_feedback.jsp:116
 #: src/main/webapp/jsp/upload_class_view.jsp:206
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:53
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:63
@@ -4027,7 +4046,7 @@ msgstr "Neues Kapitel erstellen"
 #: src/main/webapp/jsp/login_view.jsp:165
 #: src/main/webapp/jsp/login_view.jsp:239
 #: src/main/webapp/jsp/login_view.jsp:305
-#: src/main/webapp/jsp/player_feedback.jsp:44
+#: src/main/webapp/jsp/player_feedback.jsp:43
 #: src/main/webapp/jsp/player_feedback.jsp:217
 #: src/main/webapp/jsp/user_settings.jsp:197
 #: src/main/webapp/WEB-INF/tags/modal.tag:38
@@ -5810,60 +5829,60 @@ msgstr ""
 "dass die Hervorhebung der Abdeckung nicht richtig angezeigt wird, bis du den "
 "Mutanten einreichst.</i></p>"
 
-#: src/main/webapp/jsp/player_feedback.jsp:42
+#: src/main/webapp/jsp/player_feedback.jsp:41
 msgid "Feedback for Game {0}"
 msgstr "Feedback zum Spiel {0}"
 
-#: src/main/webapp/jsp/player_feedback.jsp:55
+#: src/main/webapp/jsp/player_feedback.jsp:54
 msgid "Give Feedback"
 msgstr "Feedback geben"
 
-#: src/main/webapp/jsp/player_feedback.jsp:62
+#: src/main/webapp/jsp/player_feedback.jsp:61
 msgid "View Feedback"
 msgstr "Feedback ansehen"
 
-#: src/main/webapp/jsp/player_feedback.jsp:69
+#: src/main/webapp/jsp/player_feedback.jsp:68
 msgid "How much do you agree with the following statements?"
 msgstr "Inwieweit stimmst du den folgenden Aussagen zu?"
 
-#: src/main/webapp/jsp/player_feedback.jsp:86
+#: src/main/webapp/jsp/player_feedback.jsp:84
 msgid "very much"
 msgstr "voll und ganz"
 
-#: src/main/webapp/jsp/player_feedback.jsp:90
+#: src/main/webapp/jsp/player_feedback.jsp:88
 msgid "a lot"
 msgstr "sehr"
 
-#: src/main/webapp/jsp/player_feedback.jsp:94
+#: src/main/webapp/jsp/player_feedback.jsp:92
 msgid "somewhat"
 msgstr "teilweise"
 
-#: src/main/webapp/jsp/player_feedback.jsp:98
+#: src/main/webapp/jsp/player_feedback.jsp:96
 msgid "a bit"
 msgstr "ein wenig"
 
-#: src/main/webapp/jsp/player_feedback.jsp:102
+#: src/main/webapp/jsp/player_feedback.jsp:100
 msgid "not at all"
 msgstr "überhaupt nicht"
 
-#: src/main/webapp/jsp/player_feedback.jsp:110
+#: src/main/webapp/jsp/player_feedback.jsp:108
 msgid "In providing feedback you help us improve gameplay mechanics,"
 msgstr "Durch dein Feedback hilfst du uns, die Spielmechanik,"
 
-#: src/main/webapp/jsp/player_feedback.jsp:111
+#: src/main/webapp/jsp/player_feedback.jsp:109
 msgid "hone match making and select classes that are engaging and fun."
 msgstr ""
 "das Matchmaking und die Auswahl von interessanten Klassen zu verbessern."
 
-#: src/main/webapp/jsp/player_feedback.jsp:112
+#: src/main/webapp/jsp/player_feedback.jsp:110
 msgid "You can change your feedback even after the game finishes."
 msgstr "Du kannst dein Feedback auch nach Spielende noch ändern."
 
-#: src/main/webapp/jsp/player_feedback.jsp:113
+#: src/main/webapp/jsp/player_feedback.jsp:111
 msgid "Thank you for your time."
 msgstr "Vielen Dank für deine Zeit."
 
-#: src/main/webapp/jsp/player_feedback.jsp:121
+#: src/main/webapp/jsp/player_feedback.jsp:119
 msgid "Save Feedback"
 msgstr "Feedback speichern"
 
@@ -7138,13 +7157,6 @@ msgstr "Impressum und Datenschutz"
 msgid "Show all messages."
 msgstr "Alle Nachrichten anzeigen."
 
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:38
-#: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:36
-#: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:36
-#: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:36
-msgid "All"
-msgstr "Alle"
-
 #: src/main/webapp/WEB-INF/tags/game_chat.tag:40
 msgid "Show messages from the perspective of the attacker team."
 msgstr "Zeige Nachrichten aus der Perspektive des Angreiferteams an."
@@ -7158,11 +7170,6 @@ msgid "Switch between sending messages to your own team or all players."
 msgstr ""
 "Wechseln Sie zwischen dem Senden von Nachrichten an Ihr eigenes Team oder an "
 "alle Spieler."
-
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:64
-#: src/main/webapp/WEB-INF/tags/game_chat.tag:76
-msgid "Team"
-msgstr "Team"
 
 #: src/main/webapp/WEB-INF/tags/game_chat.tag:90
 #: src/main/webapp/WEB-INF/tags/game_chat.tag:92

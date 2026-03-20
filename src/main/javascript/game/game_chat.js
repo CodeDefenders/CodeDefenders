@@ -185,10 +185,26 @@ class GameChat {
             let messageRole;
             if (!message.system) {
                 if (message.isAllChat) {
-                    messageRole = 'All';
+                    messageRole = i18n.tr('All');
                 } else {
-                    // Capitalize role name.
-                    messageRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+                    switch (message.role) {
+                        case 'ATTACKER':
+                            messageRole = i18n.tr('Attacker');
+                            break;
+                        case 'DEFENDER':
+                            messageRole = i18n.tr('Defender');
+                            break;
+                        case 'PLAYER':
+                            messageRole = i18n.tr('Player');
+                            break;
+                        case 'OBSERVER':
+                            messageRole = i18n.tr('Observer');
+                            break;
+                        default:
+                            // Capitalize role name.
+                            messageRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1).toLowerCase();
+                            break;
+                    }
                 }
             }
 
@@ -398,11 +414,11 @@ class GameChat {
         }
 
         static get CHANNEL_ALL () {
-            return 'All';
+            return i18n.tr('All');
         }
 
         static get CHANNEL_TEAM () {
-            return 'Team';
+            return i18n.tr('Team');
         }
     }
 

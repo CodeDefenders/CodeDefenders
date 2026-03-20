@@ -102,20 +102,14 @@ public class Feedback {
         }
 
         public static List<Type> getFeedbackTypesForRole(Role role) {
-            switch (role) {
-                case ATTACKER:
-                    return ATTACKER_TYPES;
-                case DEFENDER:
-                    return DEFENDER_TYPES;
-                case PLAYER:
-                    return PLAYER_TYPES;
-                case OBSERVER:
-                    return TYPES;
-                case NONE:
-                    return Collections.emptyList();
-                default:
-                    throw new IllegalArgumentException("Unknown role: " + role);
-            }
+            return switch (role) {
+                case ATTACKER -> ATTACKER_TYPES;
+                case DEFENDER -> DEFENDER_TYPES;
+                case PLAYER -> PLAYER_TYPES;
+                case OBSERVER -> TYPES;
+                case NONE -> Collections.emptyList();
+                default -> throw new IllegalArgumentException("Unknown role: " + role);
+            };
         }
     }
 
