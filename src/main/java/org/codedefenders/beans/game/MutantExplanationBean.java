@@ -20,7 +20,7 @@ package org.codedefenders.beans.game;
 
 import jakarta.enterprise.context.RequestScoped;
 
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 /**
  * <p>Provides data for the mutant explanation game component.</p>
@@ -31,19 +31,19 @@ public class MutantExplanationBean {
     /**
      * The validation level to display.
      */
-    private CodeValidatorLevel codeValidatorLevel;
+    private MutantValidationRuleSet ruleSet;
 
     public MutantExplanationBean() {
-        codeValidatorLevel = null;
+        ruleSet = null;
     }
 
-    public void setCodeValidatorLevel(CodeValidatorLevel codeValidatorLevel) {
-        this.codeValidatorLevel = codeValidatorLevel;
+    public void setMutantRuleSet(MutantValidationRuleSet ruleSet) {
+        this.ruleSet = ruleSet;
     }
 
     // --------------------------------------------------------------------------------
 
-    public CodeValidatorLevel getCodeValidatorLevel() {
-        return codeValidatorLevel;
+    public MutantValidationRuleSet getValidationRuleSet() {
+        return ruleSet;
     }
 }

@@ -127,6 +127,8 @@ public class Constants {
     public static final String MUTANT_ALIVE_1_MESSAGE = I18n.marktr("Cool, your mutant survived its first test.");
     public static final String MUTANT_ALIVE_N_MESSAGE = I18n.marktr("Awesome, your mutant survived %d tests!"); // number of tests that covered mutant
 
+    public static final String MUTANT_MISSING_INTENTION = I18n.marktr("You must declare your intention.");
+
     // Message titles
     public static final String TITLE_SUCCESS = I18n.marktr("Success!");
 
@@ -138,4 +140,7 @@ public class Constants {
     public static final String DEFAULT_KILL_MESSAGE = I18n.marktr("Sorry, no kill message available for this mutant");
 
     public static final String ILLEGAL_ACTION_MESSAGE = I18n.marktr("Hey! You're not allowed to do that!");
+    //Default configurations: number of max. allowed assertions for battleground games
+    public static final int DEFAULT_NB_ASSERTIONS = 2;
+
 }

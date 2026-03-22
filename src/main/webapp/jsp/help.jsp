@@ -78,7 +78,27 @@
                 class="img-responsive"/></p>
         <p>Similarly to tests, mutants are limited by rules, which come in three strictness levels:</p>
         <div class="card p-4">
-            <t:validator_explanation_mutant/>
+
+            <b>Relaxed</b> <br>
+            <ul>
+                <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
+                <li>No mutants with only changes to comments or formatting</li>
+                <li>No renaming of methods or fields, no additional methods or fields</li>
+            </ul>
+            <b>Moderate</b> <br>
+            <ul>
+                <li>No changes to comments</li>
+                <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
+                <li>No ternary operators</li>
+                <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
+            </ul>
+            <b>Strict</b> <br>
+            <ul class="mb-0">
+                <li>No reflection</li>
+                <li>No bitwise operators (bitshifts and logical)</li>
+                <li>No signature changes</li>
+            </ul>
+
         </div>
         <p>Here I have created a mutant by changing the &gt; comparator to &lt;. Return values, variables, etc. can also be changed.</p>
         <p>

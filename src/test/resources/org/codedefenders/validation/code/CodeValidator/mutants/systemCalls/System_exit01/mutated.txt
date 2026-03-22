@@ -1,0 +1,7 @@
+public class Test {
+    public int test() {
+        if (true) {
+            System.exit(0);
+        }
+    }
+}

@@ -50,7 +50,8 @@ import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -146,8 +147,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         int maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
 
-        CodeValidatorLevel mutantValidatorLevel = getEnumParameter(
-                request, CodeValidatorLevel.class, "mutantValidatorLevel").get();
+        MutantValidationRuleSet mutantValidatorLevel =
+                DefaultRuleSets.getRulesetFromName(request.getParameter("mutantValidatorLevel"));
+        /*= getEnumParameter(
+                request, CodeValidatorLevel.class, "mutantValidatorLevel").get();*/
 
         boolean chatEnabled = request.getParameter("chatEnabled") != null;
 

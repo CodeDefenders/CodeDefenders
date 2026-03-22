@@ -66,7 +66,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
-import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -404,9 +403,7 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     result.validationErrorMessages().ifPresent(errors -> {
-                        for (var error : errors) {
-                            messages.add(error).alert();
-                        }
+                        messages.add(errors).alert();
                     });
                 }
                 case COMPILATION_FAILED -> {
@@ -460,7 +457,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         var intention = ServletUtils.getStringParameter(request, "attacker_intention").map(AttackerIntention::fromString);
         if (game.isCapturePlayersIntention() && intention.isEmpty()) {
-            messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.get());
+            messages.add(Constants.MUTANT_MISSING_INTENTION);
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -532,7 +529,7 @@ public class MultiplayerGameManager extends HttpServlet {
             switch (result.failureReason().orElseThrow()) {
                 case VALIDATION_FAILED -> {
                     // Mutant is either the same as the CUT or it contains invalid code
-                    result.validationErrorMessage().ifPresent(error -> messages.add(error.get()).alert());
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error).alert());
                 }
                 case DUPLICATE_MUTANT_FOUND -> {
                     messages.add(MUTANT_DUPLICATED_MESSAGE);
@@ -599,7 +596,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
 
@@ -653,9 +651,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 switch (result.failureReason().orElseThrow()) {
                     case VALIDATION_FAILED -> {
                         result.validationErrorMessages().ifPresent(errors -> {
-                            for (var error : errors) {
-                                messages.add(error).alert();
-                            }
+                            messages.add(errors).alert();
                         });
                     }
                     case COMPILATION_FAILED -> {
@@ -696,7 +692,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 return;
             }
-            case YES -> {}
+            case YES -> {
+            }
         }
 
         Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");

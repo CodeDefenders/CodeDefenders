@@ -18,26 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
-<h3>${i18n.tr('Mutation rules')}</h3>
-<b>${i18n.tr('Relaxed')}</b> <br>
-<ul>
-    <li>${i18n.tr('No calls to {0},{1}', '<i>System.*</i>', '<i>Random.*</i>')}</li>
-    <li>${i18n.tr('No mutants with only changes to comments or formatting')}</li>
-    <li>${i18n.tr('No renaming of methods or fields, no additional methods or fields')}</li>
-</ul>
-<b>${i18n.tr('Moderate')}</b> <br>
-<ul>
-    <li>${i18n.tr('No changes to comments')}</li>
-    <li>${i18n.tr('No additional logical operators ({0}, {1})', '<i>&&</i>', '<i>||</i>')}</li>
-    <li>${i18n.tr('No ternary operators')}</li>
-    <li>${i18n.tr('No new control structures ({0}, {1}, {2}, ...)', '<i>switch</i>', '<i>if</i>', '<i>for</i>')}</li>
-</ul>
-<b>${i18n.tr('Strict')}</b> <br>
-<ul class="mb-0">
-    <li>${i18n.tr('No reflection')}</li>
-    <li>${i18n.tr('No bitwise operators (bitshifts and logical)')}</li>
-    <li>${i18n.tr('No signature changes')}</li>
-</ul>
+<%@ tag pageEncoding="UTF-8" %>
+<%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ attribute name="ruleset" required="false" type="java.lang.String" %>
+
+
+<%--@elvariable id="defaultRuleSets" type="org.codedefenders.validation.code.DefaultRuleSets"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
+
+<c:forEach items="${defaultRuleSets.getValues()}" var="set">
+    <div id="rule-div-${set.getName()}" ${ruleset != null && !set.getName().equals(ruleset) ? "hidden" : ""}>
+        <t:mutant_ruleset_explanation ruleset="${set}"/>
+    </div>
+</c:forEach>
+

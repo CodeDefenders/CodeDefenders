@@ -34,7 +34,8 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +82,7 @@ public class MultiplayerGameRepository {
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
-        CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
+        MutantValidationRuleSet mutantValidator = DefaultRuleSets.getRulesetFromName(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
         boolean requiresValidation = rs.getBoolean("RequiresValidation");
         float lineCoverage = rs.getFloat("Coverage_Goal");
@@ -185,7 +186,7 @@ public class MultiplayerGameRepository {
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
         boolean chatEnabled = game.isChatEnabled();
-        CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
+        MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
@@ -233,7 +234,7 @@ public class MultiplayerGameRepository {
                 mode.name(),
                 maxAssertionsPerTest,
                 chatEnabled,
-                mutantValidatorLevel.name(),
+                mutantValidatorLevel.getName(),
                 capturePlayersIntention,
                 automaticMutantEquivalenceThreshold,
                 gameDurationMinutes,

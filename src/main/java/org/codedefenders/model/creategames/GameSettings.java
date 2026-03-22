@@ -24,7 +24,7 @@ import java.util.Optional;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.annotations.Expose;
 
@@ -36,7 +36,7 @@ public class GameSettings implements Serializable {
     @Expose private final boolean withTests;
 
     @Expose private final int maxAssertionsPerTest;
-    @Expose private final CodeValidatorLevel mutantValidatorLevel;
+    @Expose private final MutantValidationRuleSet mutantValidatorLevel;
     @Expose private final boolean chatEnabled;
     @Expose private final boolean captureIntentions;
     @Expose private final int equivalenceThreshold;
@@ -54,7 +54,7 @@ public class GameSettings implements Serializable {
             boolean withMutants,
             boolean withTests,
             int maxAssertionsPerTest,
-            CodeValidatorLevel mutantValidatorLevel,
+            MutantValidationRuleSet mutantValidatorLevel,
             boolean chatEnabled,
             boolean captureIntentions,
             int equivalenceThreshold,
@@ -122,7 +122,7 @@ public class GameSettings implements Serializable {
         return maxAssertionsPerTest;
     }
 
-    public CodeValidatorLevel getMutantValidatorLevel() {
+    public MutantValidationRuleSet getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
 
@@ -164,7 +164,7 @@ public class GameSettings implements Serializable {
         private boolean withMutants;
         private boolean withTests;
         private int maxAssertionsPerTest;
-        private CodeValidatorLevel mutantValidatorLevel;
+        private MutantValidationRuleSet mutantValidatorLevel;
         private boolean chatEnabled;
         private boolean captureIntentions;
         private int equivalenceThreshold;
@@ -180,7 +180,7 @@ public class GameSettings implements Serializable {
                 boolean withMutants,
                 boolean withTests,
                 int maxAssertionsPerTest,
-                CodeValidatorLevel mutantValidatorLevel,
+                MutantValidationRuleSet mutantValidatorLevel,
                 boolean chatEnabled,
                 boolean captureIntentions,
                 int equivalenceThreshold,
@@ -230,7 +230,7 @@ public class GameSettings implements Serializable {
             return this;
         }
 
-        public Builder setMutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+        public Builder setMutantValidatorLevel(MutantValidationRuleSet mutantValidatorLevel) {
             this.mutantValidatorLevel = mutantValidatorLevel;
             return this;
         }

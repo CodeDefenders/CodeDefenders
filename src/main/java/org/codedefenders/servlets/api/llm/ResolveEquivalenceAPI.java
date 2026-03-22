@@ -156,7 +156,7 @@ public class ResolveEquivalenceAPI extends APIServlet {
         if (!result.testValid()) {
             var failureReason = result.failureReason().orElseThrow();
             switch (failureReason) {
-                case VALIDATION_FAILED -> result.validationErrorMessages().ifPresent(messages::addAll);
+                case VALIDATION_FAILED -> result.validationErrorMessages().ifPresent(messages::add);
                 case COMPILATION_FAILED -> {
                     messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
                     result.compilationError().ifPresent(messages::add);

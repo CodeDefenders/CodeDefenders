@@ -25,11 +25,12 @@
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.codedefenders.util.Paths" %>
 <%@ tag import="org.codedefenders.game.GameLevel" %>
-<%@ tag import="org.codedefenders.validation.code.CodeValidator" %>
-<%@ tag import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ tag import="org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy" %>
 <%@ tag import="org.codedefenders.util.CDIUtil" %>
+<%@ tag import="org.codedefenders.validation.code.MutantValidationRuleSet" %>
+<%@ tag import="org.codedefenders.validation.code.DefaultRuleSets" %>
+<%@ tag import="org.codedefenders.util.Constants" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -215,17 +216,17 @@
                                 </a>
                             </label>
                             <div id="mutant-validator-group">
-                                <c:forEach var="level" items="${CodeValidatorLevel.values()}">
-                                    <%--@elvariable id="level" type="org.codedefenders.validation.code.CodeValidatorLevel"--%>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio"
-                                               id="mutant-validator-radio-${level.name().toLowerCase()}" name="mutantValidatorLevel"
-                                               value="${level.name()}" ${level == CodeValidatorLevel.RELAXED ? "checked" : ""}>
-                                        <label class="form-check-label" for="mutant-validator-radio-${level.name().toLowerCase()}">
-                                            ${i18n.tr(level.displayName)}
-                                        </label>
-                                    </div>
-                                </c:forEach>
+                                <% for (MutantValidationRuleSet level : DefaultRuleSets.getValues()) { %>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio"
+                                           id="mutant-validator-radio-<%=level.getName().toLowerCase()%>" name="mutantValidatorLevel"
+                                           value="<%=level.getName()%>"
+                                        <%=level == DefaultRuleSets.MODERATE ? "checked" : ""%>>
+                                    <label class="form-check-label" for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
+                                        <%=level.getName()%>
+                                    </label>
+                                </div>
+                                <% } %>
                             </div>
                         </div>
 
@@ -235,7 +236,7 @@
                                 ${i18n.tr('Max. Assertions Per Test')}
                             </label>
                             <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
-                                   value="<%=CodeValidator.DEFAULT_NB_ASSERTIONS%>" min="1" required>
+                                   value="<%=Constants.DEFAULT_NB_ASSERTIONS%>" min="1" required>
                         </div>
 
                         <div class="col-12">
@@ -1187,7 +1188,7 @@
 
         tr = table.insertRow();
         tr.insertCell().textContent = '${i18n.tr("Mutant Validator Level")}';
-        tr.insertCell().textContent = CodeValidatorLevel[gameSettings.mutantValidatorLevel].display;
+        tr.insertCell().textContent = gameSettings.mutantValidatorLevel.getName();
 
         tr = table.insertRow();
         tr.insertCell().textContent = '${i18n.tr("Creator Role")}';

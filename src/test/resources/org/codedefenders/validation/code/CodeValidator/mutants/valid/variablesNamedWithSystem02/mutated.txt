@@ -1,0 +1,5 @@
+public class Foo {
+    String soundSystem = "s";
+    int unrelated = 9;
+    int y = soundSystem.size();
+}

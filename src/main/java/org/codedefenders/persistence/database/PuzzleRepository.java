@@ -44,7 +44,8 @@ import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.UpdatePuzzlePositionsData;
-import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.DefaultRuleSets;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -324,7 +325,7 @@ public class PuzzleRepository {
                 puzzle.getType().toString(),
                 puzzle.getLevel().toString(),
                 puzzle.getMaxAssertionsPerTest(),
-                puzzle.getMutantValidatorLevel().toString(),
+                puzzle.getMutantValidatorLevel().getName(),
                 puzzle.getEditableLinesStart(),
                 puzzle.getEditableLinesEnd(),
                 puzzle.getChapterId(),
@@ -389,7 +390,7 @@ public class PuzzleRepository {
                 game.getLevel().toString(),
                 game.getCreatorId(),
                 game.getMaxAssertionsPerTest(),
-                game.getMutantValidatorLevel().toString(),
+                game.getMutantValidatorLevel().getName(),
                 game.getState().toString(),
                 game.getCurrentRound(),
                 game.getActiveRole().toString(),
@@ -479,7 +480,7 @@ public class PuzzleRepository {
                 game.getLevel().toString(),
                 game.getCreatorId(),
                 game.getMaxAssertionsPerTest(),
-                game.getMutantValidatorLevel().toString(),
+                game.getMutantValidatorLevel().getName(),
                 game.getState().toString(),
                 game.getCurrentRound(),
                 game.getActiveRole().toString(),
@@ -901,8 +902,8 @@ public class PuzzleRepository {
         int maxAssertions = rs.getInt("puzzles.Max_Assertions");
         // TODO Pay attention that the name of the column here follows a different format
 
-        CodeValidatorLevel mutantValidatorLevel =
-                CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
+        MutantValidationRuleSet mutantValidatorLevel =
+                DefaultRuleSets.getRulesetFromName(rs.getString("puzzles.Mutant_Validator_Level"));
 
         Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
         if (rs.wasNull()) {
@@ -932,7 +933,7 @@ public class PuzzleRepository {
         GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));
         int creatorId = rs.getInt("games.Creator_ID");
         int maxAssertionsPerTest = rs.getInt("games.MaxAssertionsPerTest");
-        CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
+        MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.getRulesetFromName(rs.getString("games.MutantValidator"));
         GameState state = GameState.valueOf(rs.getString("games.State"));
         int currentRound = rs.getInt("games.CurrentRound");
 

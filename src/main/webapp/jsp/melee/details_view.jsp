@@ -112,7 +112,7 @@
 %>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+<% mutantExplanation.setMutantRuleSet(game.getMutantValidatorLevel()); %>
 
 <c:set var="title" value="${i18n.tr('Details of Game {0} ({1})', game.id, i18n.tr(role.formattedString))}"/>
 
