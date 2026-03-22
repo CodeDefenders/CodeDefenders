@@ -33,6 +33,7 @@ import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.xnap.commons.i18n.I18n;
 
 
 @WebServlet(Paths.USER)
@@ -58,12 +59,12 @@ public class UserServlet extends HttpServlet {
 
             if (!password.equals(confirm)) {
                 // This check should be performed in the user interface too.
-                messages.add("Could not create user. Password entries did not match.");
+                messages.add(I18n.marktr("Could not create user. Password entries did not match."));
             } else {
                 var locale = I18nService.getSessionLocale(request); // init with session/request locale
                 Optional<String> result = userService.registerUser(username, password, email, locale);
                 if (result.isEmpty()) {
-                    messages.add("Your user has been created. You can login now.");
+                    messages.add(I18n.marktr("Your user has been created. You can login now."));
                 } else {
                     messages.add(result.get());
                 }

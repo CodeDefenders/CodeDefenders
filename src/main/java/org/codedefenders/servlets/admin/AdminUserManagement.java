@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
@@ -170,20 +171,22 @@ public class AdminUserManagement extends HttpServlet {
                     boolean isAdmin = request.getParameter("role-admin") != null;
 
                     String msg;
+                    Object arg;
 
                     if (!password.equals(confirmPassword)) {
-                        msg = "Passwords don't match";
+                        msg = I18n.marktr("Passwords don't match");
+                        arg = null;
                     } else {
                         String newPassword = null;
-                        if (!password.equals("")) {
+                        if (!password.isEmpty()) {
                             newPassword = password;
                         }
 
-                        Optional<String> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
+                        Optional<String[]> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
                         if (result.isPresent()) { // There was an error
-                            responsePath = url.forPath(Paths.ADMIN_USERS)
-                                    + "?editUser=" + userId.get();
-                            msg = result.get();
+                            responsePath = url.forPath(Paths.ADMIN_USERS) + "?editUser=" + userId.get();
+                            msg = result.get()[0];
+                            arg = result.get().length > 1 ? result.get()[1] : null;
                         } else {
                             if (isTeacher) {
                                 roleService.addRoleForUser(userId.get(), new TeacherRole());
@@ -196,11 +199,16 @@ public class AdminUserManagement extends HttpServlet {
                                 roleService.removeRoleForUser(userId.get(), new AdminRole());
                             }
 
-                            msg = "Successfully updated info for User " + userId.get();
+                            msg = I18n.marktr("Successfully updated info for User {0}");
+                            arg = userId.get();
                         }
                     }
 
-                    messages.add(msg);
+                    if (Objects.nonNull(arg)) {
+                        messages.addFormatted(msg, arg);
+                    } else {
+                        messages.add(msg);
+                    }
                 }
                 break;
             }

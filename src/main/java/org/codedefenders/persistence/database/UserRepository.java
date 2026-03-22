@@ -136,7 +136,7 @@ public class UserRepository {
                         userEntity.getAllowContact(),
                         userEntity.getKeyMap().name(),
                         userEntity.getKeepPreviousTest(),
-                        Optional.ofNullable(userEntity.getLocale()).map(Locale::getLanguage).orElse(null));
+                        userEntity.getLanguage());
     }
 
     /**
@@ -169,7 +169,7 @@ public class UserRepository {
                 userEntity.getAllowContact(),
                 userEntity.getKeyMap().name(),
                 userEntity.getKeepPreviousTest(),
-                userEntity.getLocale().getLanguage(),
+                userEntity.getLanguage(),
                 userEntity.getId()) == 1;
     }
 

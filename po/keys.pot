@@ -1515,11 +1515,11 @@ msgstr "Creating games is currently not enabled."
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:168
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:170
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:221
+#: src/main/java/org/codedefenders/service/game/MultiplayerGameService.java:223
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
@@ -1538,6 +1538,54 @@ msgstr "Your configuration still contains the deprecated auth.admin.role setting
 #: src/main/java/org/codedefenders/service/RoleService.java:197
 msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
+
+#: src/main/java/org/codedefenders/service/UserService.java:184
+msgid "Could not create user. Invalid username."
+msgstr "Could not create user. Invalid username."
+
+#: src/main/java/org/codedefenders/service/UserService.java:187
+msgid "Could not create user. Invalid password."
+msgstr "Could not create user. Invalid password."
+
+#: src/main/java/org/codedefenders/service/UserService.java:190
+msgid "Could not create user. Invalid Email address."
+msgstr "Could not create user. Invalid Email address."
+
+#: src/main/java/org/codedefenders/service/UserService.java:192
+msgid "Could not create user. Username is already taken."
+msgstr "Could not create user. Username is already taken."
+
+#: src/main/java/org/codedefenders/service/UserService.java:194
+msgid "Could not create user. Email has already been used. You can reset your password."
+msgstr "Could not create user. Email has already been used. You can reset your password."
+
+#: src/main/java/org/codedefenders/service/UserService.java:199
+msgid "Could not create user."
+msgstr "Could not create user."
+
+#: src/main/java/org/codedefenders/service/UserService.java:237
+msgid "Error. User {0} cannot be retrieved from database."
+msgstr "Error. User {0} cannot be retrieved from database."
+
+#: src/main/java/org/codedefenders/service/UserService.java:245
+msgid "Username {0} is already taken"
+msgstr "Username {0} is already taken"
+
+#: src/main/java/org/codedefenders/service/UserService.java:252
+msgid "Email {0} is already in use"
+msgstr "Email {0} is already in use"
+
+#: src/main/java/org/codedefenders/service/UserService.java:258
+msgid "Email Address is not valid"
+msgstr "Email Address is not valid"
+
+#: src/main/java/org/codedefenders/service/UserService.java:263
+msgid "Password is not valid"
+msgstr "Password is not valid"
+
+#: src/main/java/org/codedefenders/service/UserService.java:272
+msgid "Error trying to update info for user {0}!"
+msgstr "Error trying to update info for user {0}!"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:83
 msgid "Successfully set class as active!"
@@ -1855,43 +1903,51 @@ msgstr "Successfully set user with id {0} as inactive."
 msgid "Failed to set user as inactive."
 msgstr "Failed to set user as inactive."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:251
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:176
+msgid "Passwords don't match"
+msgstr "Passwords don't match"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:200
+msgid "Successfully updated info for User {0}"
+msgstr "Successfully updated info for User {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:257
 msgid "Please provide at least username and password"
 msgstr "Please provide at least username and password"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:255
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:261
 msgid "Please provide at maximum username,password and email"
 msgstr "Please provide at maximum username,password and email"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:262
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:268
 msgid "Username '{0}' already in use."
 msgstr "Username '{0}' already in use."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:267
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:273
 msgid "Username '{0}' invalid, user not created"
 msgstr "Username '{0}' invalid, user not created"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:276
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:282
 msgid "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
 msgstr "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:294
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:300
 msgid "Email '{0}' already in use."
 msgstr "Email '{0}' already in use."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:299
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:305
 msgid "Email for user {0} invalid, user not created."
 msgstr "Email for user {0} invalid, user not created."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:310
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:316
 msgid "Failed to create account for user '{0}'"
 msgstr "Failed to create account for user '{0}'"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:315
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:321
 msgid "Created user {0}"
 msgstr "Created user {0}"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:322
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:328
 msgid "Could not send email to user {0} with email {1}"
 msgstr "Could not send email to user {0} with email {1}"
 
@@ -2038,6 +2094,14 @@ msgstr "You could not join the game."
 #: src/main/java/org/codedefenders/servlets/InvitePage.java:197
 msgid "You had already joined this game."
 msgstr "You had already joined this game."
+
+#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:62
+msgid "Could not create user. Password entries did not match."
+msgstr "Could not create user. Password entries did not match."
+
+#: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:67
+msgid "Your user has been created. You can login now."
+msgstr "Your user has been created. You can login now."
 
 #: src/main/java/org/codedefenders/servlets/SendEmail.java:69
 msgid "Thanks for your message, we'll get back to you soon! --The Code Defenders Team"

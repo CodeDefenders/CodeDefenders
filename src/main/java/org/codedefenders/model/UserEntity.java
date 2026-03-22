@@ -148,6 +148,10 @@ public class UserEntity implements Serializable {
         return locale;
     }
 
+    public String getLanguage() {
+        return locale != null ? locale.getLanguage() : null;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
