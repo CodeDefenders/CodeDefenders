@@ -301,7 +301,7 @@ msgstr "Spieler"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:122
 msgid "No games played yet"
-msgstr "Du hast noch keine Spiele gespielt"
+msgstr "Noch keine Spiele gespielt"
 
 #: src/main/java/org/codedefenders/model/AchievementType.java:123
 msgid "Play your first game to unlock this achievement"

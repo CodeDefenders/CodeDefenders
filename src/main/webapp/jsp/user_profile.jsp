@@ -59,9 +59,9 @@
                         const button = document.currentScript.previousElementSibling;
                         button.addEventListener("click", function (event) {
                             document.querySelector('.locked-achievements').classList.toggle('hidden');
-                            button.innerText = button.innerText === i18n.tr('Show all achievements')
-                                ? i18n.tr('Hide locked achievements')
-                                : i18n.tr('Show all achievements');
+                            button.innerText = button.innerText === '${i18n.tr('Show all achievements')}'
+                                ? '${i18n.tr('Hide locked achievements')}'
+                                : '${i18n.tr('Show all achievements')}';
                         });
                     </script>
                     <div class="achievements locked-achievements hidden">
