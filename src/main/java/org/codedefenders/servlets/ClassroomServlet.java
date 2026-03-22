@@ -38,7 +38,6 @@ import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.service.ClassroomService;
-import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -164,11 +163,11 @@ public class ClassroomServlet extends HttpServlet {
                     setArchived(request, response, classroom.get(), member.orElse(null), false);
                     break;
                 default:
-                    messages.add(I18nService.marktrf("Invalid action: {0}", action));
+                    messages.addFormatted(I18n.marktr("Invalid action: {0}"), action);
                     Redirect.redirectBack(request, response);
             }
         } catch (ValidationException e) {
-            messages.add(I18nService.marktrf("Validation failed: {0}", e.getMessage()));
+            messages.addFormatted(I18n.marktr("Validation failed: {0}"), e.getMessage());
             Redirect.redirectBack(request, response);
         } catch (PermissionDeniedException e) {
             messages.add(I18n.marktr("You're not allowed to do that."));
@@ -250,7 +249,7 @@ public class ClassroomServlet extends HttpServlet {
         checkPermission(classroomService.canEditClassroom(member));
         classroomService.changeName(classroom.getId(), name);
 
-        messages.add(I18nService.marktrf("Successfully changed the name to: {0}", name));
+        messages.addFormatted(I18n.marktr("Successfully changed the name to: {0}"), name);
         redirectToClassroomPage(response, classroom.getUUID());
     }
 

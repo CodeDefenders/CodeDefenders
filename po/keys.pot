@@ -35,59 +35,59 @@ msgstr "Removed user {0} from staged game {1}."
 msgid "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game."
 msgstr "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:301
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:302
 msgid "Removed you from staged game {0}. Your role is now {1} again."
 msgstr "Removed you from staged game {0}. Your role is now {1} again."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:314
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:316
 msgid "Switched role of user {0} in staged game {1}."
 msgstr "Switched role of user {0} in staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:318
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:322
 msgid "ERROR: Cannot switch role of user {0} in staged game {1}."
 msgstr "ERROR: Cannot switch role of user {0} in staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:331
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:337
 msgid "Switched your role in staged game {0}."
 msgstr "Switched your role in staged game {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:335
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:343
 msgid "ERROR: Cannot switch your role in staged game {0}."
 msgstr "ERROR: Cannot switch your role in staged game {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:352
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:361
 msgid "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game."
 msgstr "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:367
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:376
 msgid "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 msgstr "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:371
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:381
 msgid "Moved user {0} from staged game {1} to staged game {2} as {3}."
 msgstr "Moved user {0} from staged game {1} to staged game {2} as {3}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:386
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:400
 msgid "Added user {0} to staged game {1} as {2}."
 msgstr "Added user {0} to staged game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:389
-msgid "ERROR: Cannot add user {0} to staged game {1}. "
-msgstr "ERROR: Cannot add user {0} to staged game {1}. "
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:404
+msgid "ERROR: Cannot add user {0} to staged game {1}."
+msgstr "ERROR: Cannot add user {0} to staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:403
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:419
 msgid "ERROR: Cannot add user {0} to existing game {1} as {2}."
 msgstr "ERROR: Cannot add user {0} to existing game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:407
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:424
 msgid "Added user {0} to existing game {1} as {2}."
 msgstr "Added user {0} to existing game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:428
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:446
 msgid "ERROR: No valid user with the ID {0} exists."
 msgstr "ERROR: No valid user with the ID {0} exists."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:465
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:483
 msgid "ERROR: No valid user with name/email {0} exists."
 msgstr "ERROR: No valid user with name/email {0} exists."
 
@@ -1491,19 +1491,19 @@ msgstr "/{0} is not a valid chat command."
 msgid "Your message cannot be empty."
 msgstr "Your message cannot be empty."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:164
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:166
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:171
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:176
 msgid "ERROR: Could not create game for staged game {0}."
 msgstr "ERROR: Could not create game for staged game {0}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:180
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:187
 msgid "ERROR: Could not add system players to game {0}."
 msgstr "ERROR: Could not add system players to game {0}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:187
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:196
 msgid "ERROR: Could not add system players to game {0}."
 msgstr "ERROR: Could not add system players to game {0}."
 
@@ -1539,9 +1539,37 @@ msgstr "Your configuration still contains the deprecated auth.admin.role setting
 msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:80
-msgid "Failed to set class as {0}."
-msgstr "Failed to set class as {0}."
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:83
+msgid "Successfully set class as active!"
+msgstr "Successfully set class as active!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:84
+msgid "Successfully set class as inactive!"
+msgstr "Successfully set class as inactive!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:94
+msgid "Failed to set class as active."
+msgstr "Failed to set class as active."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:95
+msgid "Failed to set class as inactive."
+msgstr "Failed to set class as inactive."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:102
+msgid "Failed to remove class."
+msgstr "Failed to remove class."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:108
+msgid "Failed to remove class! There are existing games with this class."
+msgstr "Failed to remove class! There are existing games with this class."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:113
+msgid "Successfully removed class!"
+msgstr "Successfully removed class!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:116
+msgid "Failed to remove class!"
+msgstr "Failed to remove class!"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:132
 msgid "Invalid request. Invalid URL."
@@ -1819,87 +1847,127 @@ msgstr "Updated Settings."
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:135
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
 msgid "Successfully set user with id {0} as inactive."
 msgstr "Successfully set user with id {0} as inactive."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:138
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:137
 msgid "Failed to set user as inactive."
 msgstr "Failed to set user as inactive."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:251
+msgid "Please provide at least username and password"
+msgstr "Please provide at least username and password"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:255
+msgid "Please provide at maximum username,password and email"
+msgstr "Please provide at maximum username,password and email"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:262
+msgid "Username '{0}' already in use."
+msgstr "Username '{0}' already in use."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:267
+msgid "Username '{0}' invalid, user not created"
+msgstr "Username '{0}' invalid, user not created"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:276
+msgid "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
+msgstr "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:294
+msgid "Email '{0}' already in use."
+msgstr "Email '{0}' already in use."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:299
+msgid "Email for user {0} invalid, user not created."
+msgstr "Email for user {0} invalid, user not created."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:310
+msgid "Failed to create account for user '{0}'"
+msgstr "Failed to create account for user '{0}'"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:315
+msgid "Created user {0}"
+msgstr "Created user {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:322
+msgid "Could not send email to user {0} with email {1}"
+msgstr "Could not send email to user {0} with email {1}"
 
 #: src/main/java/org/codedefenders/servlets/auth/CodeDefendersFormAuthenticationFilter.java:133
 msgid "Username not found or password incorrect."
 msgstr "Username not found or password incorrect."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:75
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:74
 msgid "Classroom not found."
 msgstr "Classroom not found."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:104
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:103
 msgid "Missing required parameter: action."
 msgstr "Missing required parameter: action."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:111
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:110
 msgid "Classroom not found."
 msgstr "Classroom not found."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:167
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:166
 msgid "Invalid action: {0}"
 msgstr "Invalid action: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:171
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:170
 msgid "Validation failed: {0}"
 msgstr "Validation failed: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:174
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:173
 msgid "You're not allowed to do that."
 msgstr "You're not allowed to do that."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:177
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:176
 msgid "Missing or invalid parameter."
 msgstr "Missing or invalid parameter."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:215
 msgid "Successfully set classroom to open."
 msgstr "Successfully set classroom to open."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:217
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
 msgid "Successfully set classroom to closed."
 msgstr "Successfully set classroom to closed."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:227
 msgid "Successfully set classroom to public."
 msgstr "Successfully set classroom to public."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:229
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
 msgid "Successfully set classroom to private."
 msgstr "Successfully set classroom to private."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:239
 msgid "Successfully archived classroom."
 msgstr "Successfully archived classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:241
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
 msgid "Successfully restored classroom."
 msgstr "Successfully restored classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:253
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:252
 msgid "Successfully changed the name to: {0}"
 msgstr "Successfully changed the name to: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:264
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:263
 msgid "Successfully set the password."
 msgstr "Successfully set the password."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:273
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:272
 msgid "Successfully removed the password."
 msgstr "Successfully removed the password."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:140
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:139
 msgid "Class upload is disabled."
 msgstr "Class upload is disabled."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:211
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:210
 msgid "Class upload failed. Alias must not contain whitespaces or special characters."
 msgstr "Class upload failed. Alias must not contain whitespaces or special characters."
 
@@ -1927,15 +1995,15 @@ msgstr "You solved all the puzzles of the current chapter, go back to the <a hre
 msgid "Help"
 msgstr "Help"
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:86
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:85
 msgid "Your link is malformed, you could not join the game."
 msgstr "Your link is malformed, you could not join the game."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:96
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:95
 msgid "The game you are trying to join doesn't exist. Your invite link might have been malformed."
 msgstr "The game you are trying to join doesn't exist. Your invite link might have been malformed."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:103
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:102
 msgid "Your link is malformed, you could not join the game."
 msgstr "Your link is malformed, you could not join the game."
 

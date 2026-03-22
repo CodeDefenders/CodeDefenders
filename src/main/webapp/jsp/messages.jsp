@@ -30,6 +30,7 @@
 <c:if test="${messages.count > 0}">
     <div class="mx-3" id="messages">
         <c:forEach items="${messages.getAlertMessages(true)}" var="message">
+            <%--@elvariable id="message" type="org.codedefenders.beans.message.Message--%>
             <div id="message-${message.id}" class="alert alert-primary alert-dismissible fade show" role="alert">
                     <%-- Don't escape text here; message.getText() already escapes the text. --%>
                 <c:if test="${message.title != '' && message.secondary != ''}">
@@ -38,7 +39,7 @@
                         <i><c:out value="${i18n.tr(message.secondary)}"/></i>
                     </div>
                 </c:if>
-                <pre class="m-0"><c:out value="${i18n.tr(message.text)}" escapeXml="false"/></pre>
+                <pre class="m-0"><c:out value="${i18n.tr(message.text, message.args)}" escapeXml="false"/></pre>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:forEach>

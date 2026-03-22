@@ -84,7 +84,7 @@ public class MessagesAPI extends HttpServlet {
         return message
                 .setTitle(I18nService.safeTr(i18n, message.getTitle()))
                 .setSecondary(I18nService.safeTr(i18n, message.getSecondary()))
-                .setText(I18nService.safeTr(i18n, message.getText()));
+                .setText(I18nService.safeTr(i18n, message.getText(), message.getArgs()));
     }
 
 }

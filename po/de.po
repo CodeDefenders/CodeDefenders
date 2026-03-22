@@ -56,30 +56,30 @@ msgstr ""
 "Fehler: Kann den Benutzer {0} nicht aus dem Spielentwurf {1} löschen. Der "
 "Benutzer ist dem Spielentwurf nicht zugewiesen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:301
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:302
 msgid "Removed you from staged game {0}. Your role is now {1} again."
 msgstr ""
 "Du wurdest aus dem Spielentwurf {0} rausgenommen. Deine Rolle ist jetzt "
 "wieder {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:314
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:316
 msgid "Switched role of user {0} in staged game {1}."
 msgstr "Die Rolle von Nutzer {0} im Spielentwurf {1} wurde getauscht."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:318
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:322
 msgid "ERROR: Cannot switch role of user {0} in staged game {1}."
 msgstr ""
 "FEHLER: Kann die Rolle von Benutzer {0} im Spielentwurf {1} nicht wechseln."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:331
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:337
 msgid "Switched your role in staged game {0}."
 msgstr "Deine Rolle im Spielentwurf {0} wurde geändert."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:335
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:343
 msgid "ERROR: Cannot switch your role in staged game {0}."
 msgstr "Fehler: Du kannst deine Rolle im Spielentwurf nicht wechseln {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:352
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:361
 msgid ""
 "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to "
 "the staged game."
@@ -87,41 +87,42 @@ msgstr ""
 "Fehler: Der Benutzer {0} kann nicht aus dem Spielentwurf {1} entfernt "
 "werden. Der Benutzer ist dem Spielentwurf nicht zugewiesen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:367
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:376
 msgid "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 msgstr ""
 "FEHLER: Kann den Spieler nicht mit der Rolle {0} nicht in den Spielentwurf "
 "verschieben: Ungültige Rolle."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:371
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:381
 msgid "Moved user {0} from staged game {1} to staged game {2} as {3}."
 msgstr ""
 "Benutzer {0} wurde vom Spielentwurf {1} zum Spielentwurf {2} als {3} "
 "verschoben."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:386
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:400
 msgid "Added user {0} to staged game {1} as {2}."
 msgstr "Benutzer {0} wurde als {2} zum Spiel {1} hinzugefügt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:389
-msgid "ERROR: Cannot add user {0} to staged game {1}. "
-msgstr "FEHLER: Kann den Benutzer {0} nicht zum Spielentwurf {1} hinzufügen. "
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:404
+msgid "ERROR: Cannot add user {0} to staged game {1}."
+msgstr ""
+"FEHLER: Der Benutzer {0} kann nicht zum Spielentwurf {1} hinzugefügt werden."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:403
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:419
 msgid "ERROR: Cannot add user {0} to existing game {1} as {2}."
 msgstr ""
 "Fehler: Kann den Benutzer {0} nicht als {2} zum bestehenden Spiel {1} "
 "hinzufügen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:407
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:424
 msgid "Added user {0} to existing game {1} as {2}."
 msgstr "Benutzer {0} wurde als {2} zum bestehenden Spiel {1} hinzugefügt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:428
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:446
 msgid "ERROR: No valid user with the ID {0} exists."
 msgstr "FEHLER: Es gibt keinen gültigen Benutzer mit der ID {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:465
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:483
 msgid "ERROR: No valid user with name/email {0} exists."
 msgstr ""
 "FEHLER: Es gibt keinen gültigen Benutzer mit dem Namen/der E-Mail-Adresse "
@@ -1287,20 +1288,20 @@ msgstr "/{0} ist kein gültiger Chat-Befehl."
 msgid "Your message cannot be empty."
 msgstr "Deine Nachricht darf nicht leer sein."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:164
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:166
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr ""
 "FEHLER: Das vorbereitete Spiel kann nicht erstellt werden {0}. Ungültiger "
 "Spieltyp: {1}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:171
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:176
 msgid "ERROR: Could not create game for staged game {0}."
 msgstr ""
 "FEHLER: Das Spiel für das vorbereitete Spiel {0} konnte nicht erstellt "
 "werden."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:180
 #: src/main/java/org/codedefenders/service/CreateGamesService.java:187
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:196
 msgid "ERROR: Could not add system players to game {0}."
 msgstr "FEHLER: Systemspieler konnten nicht zum Spiel hinzugefügt werden {0}."
 
@@ -1343,9 +1344,39 @@ msgstr ""
 "Benutzerdatenbank in unser neues System migrieren. Danach kannst du "
 "„auth.admin.role“ einfach löschen."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:80
-msgid "Failed to set class as {0}."
-msgstr "Die Klasse konnte nicht als {0} festgelegt werden."
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:83
+msgid "Successfully set class as active!"
+msgstr "Die Klasse wurde erfolgreich auf aktiv gesetzt!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:84
+msgid "Successfully set class as inactive!"
+msgstr "Die Klasse wurde erfolgreich auf inaktiv gesetzt!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:94
+msgid "Failed to set class as active."
+msgstr "Die Klasse konnte nicht auf aktiv gesetzt werden."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:95
+msgid "Failed to set class as inactive."
+msgstr "Die Klasse konnte nicht auf inaktiv gesetzt werden."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:102
+msgid "Failed to remove class."
+msgstr "Das Entfernen der Klasse ist fehlgeschlagen."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:108
+msgid "Failed to remove class! There are existing games with this class."
+msgstr ""
+"Das Entfernen der Klasse ist fehlgeschlagen! Es gibt bereits Spiele mit "
+"dieser Klasse."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:113
+msgid "Successfully removed class!"
+msgstr "Klasse erfolgreich entfernt!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminClassesManagement.java:116
+msgid "Failed to remove class!"
+msgstr "Das Entfernen der Klasse ist fehlgeschlagen!"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:132
 msgid "Invalid request. Invalid URL."
@@ -1691,84 +1722,137 @@ msgstr "Einstellungen aktualisiert."
 msgid "There was a problem. Please consult the logs"
 msgstr "Es ist ein Problem aufgetreten. Schau mal in den Protokollen nach."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:135
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
 msgid "Successfully set user with id {0} as inactive."
 msgstr "Benutzer mit der ID {0} erfolgreich als inaktiv gesetzt."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:138
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:137
 msgid "Failed to set user as inactive."
 msgstr "Es hat nicht geklappt, den Benutzer als inaktiv zu markieren."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:251
+msgid "Please provide at least username and password"
+msgstr "Bitte gib mindestens Benutzername und dein Passwort an"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:255
+msgid "Please provide at maximum username,password and email"
+msgstr ""
+"Bitte gib höchstens deinen Benutzernamen, dein Passwort und deine E-Mail-"
+"Adresse an"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:262
+msgid "Username '{0}' already in use."
+msgstr "Der Benutzername „{0}“ wird bereits verwendet."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:267
+msgid "Username '{0}' invalid, user not created"
+msgstr "Der Benutzername „{0}“ ist ungültig, der Benutzer wurde nicht angelegt"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:276
+msgid ""
+"Password for user {0} invalid, user not created.\n"
+"Please notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) "
+"without whitespaces are allowed.\n"
+msgstr ""
+"Das Passwort für Benutzer {0} ist ungültig, der Benutzer wurde nicht "
+"angelegt.\n"
+"Bitte beachte, dass nur mindestens {0} alphanumerische Zeichen (a-z, A-Z, "
+"0-9) ohne Leerzeichen zulässig sind.\n"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:294
+msgid "Email '{0}' already in use."
+msgstr "Die E-Mail-Adresse „{0}“ wird bereits verwendet."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:299
+msgid "Email for user {0} invalid, user not created."
+msgstr ""
+"Die E-Mail-Adresse für Benutzer {0} ist ungültig, der Benutzer wurde nicht "
+"angelegt."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:310
+msgid "Failed to create account for user '{0}'"
+msgstr "Das Erstellen des Kontos für den Benutzer „{0}“ ist fehlgeschlagen"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:315
+msgid "Created user {0}"
+msgstr "Benutzer {0} erstellt"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:322
+msgid "Could not send email to user {0} with email {1}"
+msgstr ""
+"Die E-Mail an Benutzer {0} mit der E-Mail-Adresse {1} konnte nicht gesendet "
+"werden"
 
 #: src/main/java/org/codedefenders/servlets/auth/CodeDefendersFormAuthenticationFilter.java:133
 msgid "Username not found or password incorrect."
 msgstr "Benutzername nicht gefunden oder Passwort falsch."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:75
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:111
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:74
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:110
 msgid "Classroom not found."
 msgstr "Klassenraum nicht gefunden."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:104
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:103
 msgid "Missing required parameter: action."
 msgstr "Fehlender erforderlicher Parameter: Aktion."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:167
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:166
 msgid "Invalid action: {0}"
 msgstr "Ungültige Aktion: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:171
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:170
 msgid "Validation failed: {0}"
 msgstr "Die Validierung ist schiefgegangen: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:174
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:173
 msgid "You're not allowed to do that."
 msgstr "Du hast nicht die Berechtigung das zu tun."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:177
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:176
 msgid "Missing or invalid parameter."
 msgstr "Fehlender oder ungültiger Parameter."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:215
 msgid "Successfully set classroom to open."
 msgstr "Der Klassenraum wurde erfolgreich geöffnet."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:217
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
 msgid "Successfully set classroom to closed."
 msgstr "Der Klassenraum wurde erfolgreich geschlossen."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:227
 msgid "Successfully set classroom to public."
 msgstr "Klassenraum erfolgreich auf öffentlich gestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:229
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
 msgid "Successfully set classroom to private."
 msgstr "Der Klassenraum wurde erfolgreich auf privat gestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:239
 msgid "Successfully archived classroom."
 msgstr "Der Klassenraum wurde erfolgreich gespeichert."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:241
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
 msgid "Successfully restored classroom."
 msgstr "Der Klassenraum wurde wiederhergestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:253
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:252
 msgid "Successfully changed the name to: {0}"
 msgstr "Der Name wurde erfolgreich geändert in: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:264
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:263
 msgid "Successfully set the password."
 msgstr "Passwort erfolgreich gesetzt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:273
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:272
 msgid "Successfully removed the password."
 msgstr "Passwort erfolgreich gelöscht."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:140
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:139
 msgid "Class upload is disabled."
 msgstr "Der Klassen-Upload ist deaktiviert."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:211
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:210
 msgid ""
 "Class upload failed. Alias must not contain whitespaces or special "
 "characters."
@@ -1832,12 +1916,12 @@ msgstr ""
 msgid "Help"
 msgstr "Hilfe"
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:86
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:103
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:85
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:102
 msgid "Your link is malformed, you could not join the game."
 msgstr "Dein Link ist fehlerhaft, du konntest nicht am Spiel teilnehmen."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:96
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:95
 msgid ""
 "The game you are trying to join doesn't exist. Your invite link might have "
 "been malformed."
@@ -4853,7 +4937,7 @@ msgstr "Sichtbarkeit ist"
 
 #: src/main/webapp/jsp/classroom_page.jsp:168
 msgid "public"
-msgstr "Öffentlich"
+msgstr "öffentlich"
 
 #: src/main/webapp/jsp/classroom_page.jsp:173
 #: src/main/webapp/jsp/classroom_page.jsp:468
@@ -7663,6 +7747,21 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Failed to set class as {0}."
+#~ msgstr "Die Klasse konnte nicht als {0} festgelegt werden."
+
+#, fuzzy
+#~ msgid "Successfully set class as {0}!"
+#~ msgstr "Klasse wurde erfolgreich auf {0} gesetzt!"
+
+#, fuzzy
+#~ msgid "Failed to set class as {0}!"
+#~ msgstr "Die Klasse konnte nicht als {0} festgelegt werden."
+
+#~ msgid "ERROR: Cannot add user {0} to staged game {1}. "
+#~ msgstr ""
+#~ "FEHLER: Kann den Benutzer {0} nicht zum Spielentwurf {1} hinzufügen. "
 
 #~ msgid "Password is"
 #~ msgstr "Passwort lautet"

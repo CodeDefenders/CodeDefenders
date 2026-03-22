@@ -40,7 +40,6 @@ import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
-import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -116,8 +115,9 @@ public class InvitePage extends HttpServlet {
                 case "flex" -> flexIsDesired = true;
                 default -> {
                     logger.warn("Invalid role parameter in invite link: {}", roleParameter);
-                    messages.add(I18nService.marktrf("Your invite link was malformed: Your role may not be {0}", roleParameter))
-                            .alert();
+                    messages.addFormatted(I18n.marktr(
+                            "Your invite link was malformed: Your role may not be {0}"), roleParameter
+                    ).alert();
                     resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                     return;
                 }

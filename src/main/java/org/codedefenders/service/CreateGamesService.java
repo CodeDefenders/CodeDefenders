@@ -43,6 +43,7 @@ import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.game.GameType.MELEE;
 import static org.codedefenders.game.GameType.MULTIPLAYER;
@@ -161,15 +162,20 @@ public class CreateGamesService {
                     .classroomId(gameSettings.getClassroomId().orElse(null))
                     .build();
         } else {
-            messages.add(I18nService.marktrf("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
-                    stagedGame.getFormattedId(), gameSettings.getGameType().getName()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot create staged game {0}. Invalid game type: {1}."),
+                    stagedGame.getFormattedId(),
+                    gameSettings.getGameType().getName()
+            );
             return false;
         }
 
         /* Insert the game. */
         if (!game.insert()) {
-            messages.add(I18nService.marktrf("ERROR: Could not create game for staged game {0}.",
-                    stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Could not create game for staged game {0}."),
+                    stagedGame.getFormattedId()
+            );
             return false;
         }
 
@@ -177,15 +183,19 @@ public class CreateGamesService {
         if (gameSettings.getGameType() != MELEE) {
             if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
                     || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-                messages.add(I18nService.marktrf("ERROR: Could not add system players to game {0}.",
-                        stagedGame.getFormattedId()));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Could not add system players to game {0}."),
+                        stagedGame.getFormattedId()
+                );
                 return false;
             }
         } else {
             if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER)
                     || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER)) {
-                messages.add(I18nService.marktrf("ERROR: Could not add system players to game {0}.",
-                        stagedGame.getFormattedId()));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Could not add system players to game {0}."),
+                        stagedGame.getFormattedId()
+                );
                 return false;
             }
         }

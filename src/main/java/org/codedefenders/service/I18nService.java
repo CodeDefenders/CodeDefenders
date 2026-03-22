@@ -221,13 +221,14 @@ public class I18nService {
      *
      * @param i18n The i18n instance to use for translation.
      * @param text The text to translate.
+     * @param args Optional arguments for the text, if the text contains placeholders.
      * @return The translated text, or an empty string if the text is empty.
      */
-    public static String safeTr(I18n i18n, String text) {
+    public static String safeTr(I18n i18n, String text, Object... args) {
         if (Objects.equals(text, "")) {
             return "";
         }
-        return i18n.tr(text);
+        return i18n.tr(text, args);
     }
 
     public static String marktrf(String text, Object... args) {

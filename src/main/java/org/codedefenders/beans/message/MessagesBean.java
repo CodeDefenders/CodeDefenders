@@ -84,6 +84,10 @@ public class MessagesBean implements Serializable {
         return add(text).setTitle(title);
     }
 
+    public synchronized Message addFormatted(String text, Object... args) {
+        return add(text).setArgs(args);
+    }
+
     public void addAll(Collection<? extends String> texts) {
         for (String text : texts) {
             add(text);

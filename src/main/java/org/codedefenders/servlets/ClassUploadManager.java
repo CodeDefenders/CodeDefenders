@@ -68,7 +68,6 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
-import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -255,8 +254,10 @@ public class ClassUploadManager extends HttpServlet {
             byte[] fileContentBytes = fileParameter.get();
             if (fileContentBytes.length == 0) {
                 logger.error("Class upload failed. Given file {} was empty", fileName);
-                messages.add(I18nService.marktrf("Class upload failed. File content for {0} could not be read. Please try again.", fileName))
-                        .alert();
+                messages.addFormatted(
+                        I18n.marktr("Class upload failed. File content for {0} could not be read. Please try again."),
+                        fileName
+                ).alert();
                 abortRequestAndCleanUp(request, response);
                 return;
             }
