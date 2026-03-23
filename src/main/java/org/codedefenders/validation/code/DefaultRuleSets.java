@@ -26,15 +26,35 @@ import jakarta.inject.Named;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
-import static org.codedefenders.validation.code.MutantValidationRules.*;
+import static org.codedefenders.validation.code.MutantValidationRules.addOrRenameFields;
+import static org.codedefenders.validation.code.MutantValidationRules.addOrRenameMethods;
+import static org.codedefenders.validation.code.MutantValidationRules.astEqual;
+import static org.codedefenders.validation.code.MutantValidationRules.changesImportStatements;
+import static org.codedefenders.validation.code.MutantValidationRules.changesMethodSignatures;
+import static org.codedefenders.validation.code.MutantValidationRules.classDeclarations;
+import static org.codedefenders.validation.code.MutantValidationRules.instanceofChanges;
+import static org.codedefenders.validation.code.MutantValidationRules.logicalOperator;
+import static org.codedefenders.validation.code.MutantValidationRules.noChangesToComments;
+import static org.codedefenders.validation.code.MutantValidationRules.noCommentsEqual;
+import static org.codedefenders.validation.code.MutantValidationRules.noDate;
+import static org.codedefenders.validation.code.MutantValidationRules.noIO;
+import static org.codedefenders.validation.code.MutantValidationRules.noRandom;
+import static org.codedefenders.validation.code.MutantValidationRules.noSystemCalls;
+import static org.codedefenders.validation.code.MutantValidationRules.noThreading;
+import static org.codedefenders.validation.code.MutantValidationRules.packageDeclarations;
+import static org.codedefenders.validation.code.MutantValidationRules.prohibitedBitwiseOperators;
+import static org.codedefenders.validation.code.MutantValidationRules.prohibitedConditionals;
+import static org.codedefenders.validation.code.MutantValidationRules.prohibitedLoops;
+import static org.codedefenders.validation.code.MutantValidationRules.prohibitedModifier;
 
 @Named("defaultRuleSets")
 @ApplicationScoped
 public class DefaultRuleSets {
     private static final Logger logger = LoggerFactory.getLogger(DefaultRuleSets.class);
 
-    public static final MutantValidationRuleSet RELAXED = new MutantValidationRuleSet("Relaxed")
+    public static final MutantValidationRuleSet RELAXED = new MutantValidationRuleSet(I18n.marktr("Relaxed"))
             .addRule(noCommentsEqual)
             .addRule(packageDeclarations)
             .addRule(classDeclarations)
@@ -47,13 +67,13 @@ public class DefaultRuleSets {
             .addRule(noDate)
             .addRule(noRandom);
 
-    public static final MutantValidationRuleSet MODERATE = new MutantValidationRuleSet("Moderate", RELAXED)
+    public static final MutantValidationRuleSet MODERATE = new MutantValidationRuleSet(I18n.marktr("Moderate"), RELAXED)
             .addRule(noChangesToComments)
             .addRule(logicalOperator)
             .addRule(prohibitedConditionals)
             .addRule(prohibitedLoops);
 
-    public static final MutantValidationRuleSet STRICT = new MutantValidationRuleSet("Strict", MODERATE)
+    public static final MutantValidationRuleSet STRICT = new MutantValidationRuleSet(I18n.marktr("Strict"), MODERATE)
             .addRule(changesMethodSignatures)
             .addRule(changesImportStatements)
             .addRule(instanceofChanges)

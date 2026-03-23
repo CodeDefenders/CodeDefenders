@@ -127,13 +127,13 @@ public class ClientEventHandler {
             } else if (command.equals(TEAM.getCommandString())) {
                 isAllChat = false;
             } else {
-                I18n i18n = i18nService.getI18n(user);
+                I18n i18n = i18nService.getI18n(user.getId());
                 sendSystemMessage(i18n.tr("/{0} is not a valid chat command.", command));
                 return;
             }
             message = message.substring(command.length() + 1).trim();
             if (message.isEmpty()) {
-                I18n i18n = i18nService.getI18n(user);
+                I18n i18n = i18nService.getI18n(user.getId());
                 sendSystemMessage(i18n.tr("Your message cannot be empty."));
                 return;
             }

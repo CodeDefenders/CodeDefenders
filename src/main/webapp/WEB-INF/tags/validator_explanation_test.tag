@@ -21,6 +21,8 @@
 
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="org.codedefenders.game.AbstractGame" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
 <%@ tag import="org.codedefenders.util.MessageUtils" %>
@@ -45,7 +47,7 @@
 
 <%--@elvariable id="ruleset" type="org.codedefenders.validation.code.TestValidationRules" --%>
 
-<h3>Test rules</h3>
+<h3>${i18n.tr("Test rules")}</h3>
 <div class="accordion" id="rule-accordion-test">
     <c:forEach items="${ruleset.tieredRules}" var="group" varStatus="groupStatus">
         <div class="accordion-item">
@@ -53,7 +55,7 @@
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                         data-bs-target="#rule-collapse-${groupStatus.index}"
                         aria-expanded="false" aria-controls="rule-collapse-${groupStatus.index}">
-                        ${group.get(0).generalDescription}
+                        ${i18n.tr(group.get(0).generalDescription)}
                 </button>
             </h2>
             <div id="rule-collapse-${groupStatus.index}" class="accordion-collapse collapse"
@@ -62,7 +64,7 @@
                 <div class="accordion-body">
                     <ul>
                         <c:forEach items="${group}" var="rule">
-                            <li>${rule.detailedDescription}</li>
+                            <li>${i18n.tr(rule.detailedDescription)}</li>
                         </c:forEach>
                     </ul>
                 </div>
@@ -72,12 +74,9 @@
     <div class="accordion-item pt-2">
         <ul>
             <c:forEach items="${ruleset.singleRules}" var="rule">
-                <li>
-                        ${rule.detailedDescription}
-                </li>
+                <li>${i18n.tr(rule.detailedDescription)}</li>
             </c:forEach>
-            <li><%=maxAssertionsText%>
-            </li>
+            <li><%=maxAssertionsText%></li>
         </ul>
     </div>
 </div>

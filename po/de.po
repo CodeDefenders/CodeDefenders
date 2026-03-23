@@ -233,15 +233,15 @@ msgstr "Alle Tests"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:896
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:149
 #: src/main/webapp/jsp/melee/create_game_view.jsp:146
-#: src/main/webapp/WEB-INF/tags/create_games.tag:204
-#: src/main/webapp/WEB-INF/tags/create_games.tag:648
+#: src/main/webapp/WEB-INF/tags/create_games.tag:205
+#: src/main/webapp/WEB-INF/tags/create_games.tag:649
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:24
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
 msgid "Easy"
 msgstr "Einfach"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:28
-#: src/main/webapp/WEB-INF/tags/create_games.tag:647
+#: src/main/webapp/WEB-INF/tags/create_games.tag:648
 msgid "Medium"
 msgstr "Mittel"
 
@@ -249,8 +249,8 @@ msgstr "Mittel"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:903
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:144
 #: src/main/webapp/jsp/melee/create_game_view.jsp:141
-#: src/main/webapp/WEB-INF/tags/create_games.tag:199
-#: src/main/webapp/WEB-INF/tags/create_games.tag:646
+#: src/main/webapp/WEB-INF/tags/create_games.tag:200
+#: src/main/webapp/WEB-INF/tags/create_games.tag:647
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:36
 msgid "Hard"
@@ -263,8 +263,8 @@ msgstr "Schwer"
 #: src/main/webapp/jsp/user_games_view.jsp:235
 #: src/main/webapp/jsp/user_games_view.jsp:563
 #: src/main/webapp/jsp/user_profile.jsp:237
-#: src/main/webapp/WEB-INF/tags/create_games.tag:258
-#: src/main/webapp/WEB-INF/tags/create_games.tag:651
+#: src/main/webapp/WEB-INF/tags/create_games.tag:259
+#: src/main/webapp/WEB-INF/tags/create_games.tag:652
 msgid "Attacker"
 msgstr "Angreifer"
 
@@ -275,16 +275,16 @@ msgstr "Angreifer"
 #: src/main/webapp/jsp/user_games_view.jsp:271
 #: src/main/webapp/jsp/user_games_view.jsp:599
 #: src/main/webapp/jsp/user_profile.jsp:237
-#: src/main/webapp/WEB-INF/tags/create_games.tag:259
-#: src/main/webapp/WEB-INF/tags/create_games.tag:652
+#: src/main/webapp/WEB-INF/tags/create_games.tag:260
+#: src/main/webapp/WEB-INF/tags/create_games.tag:653
 msgid "Defender"
 msgstr "Verteidiger"
 
 #: src/main/java/org/codedefenders/game/Role.java:32
 #: src/main/javascript/game/game_chat.js:201
 #: src/main/webapp/jsp/classroom_page.jsp:934
-#: src/main/webapp/WEB-INF/tags/create_games.tag:257
-#: src/main/webapp/WEB-INF/tags/create_games.tag:653
+#: src/main/webapp/WEB-INF/tags/create_games.tag:258
+#: src/main/webapp/WEB-INF/tags/create_games.tag:654
 msgid "Observer"
 msgstr "Beobachter"
 
@@ -295,7 +295,7 @@ msgstr "Beobachter"
 #: src/main/webapp/jsp/player_feedback.jsp:134
 #: src/main/webapp/jsp/user_games_view.jsp:397
 #: src/main/webapp/jsp/user_games_view.jsp:732
-#: src/main/webapp/WEB-INF/tags/create_games.tag:654
+#: src/main/webapp/WEB-INF/tags/create_games.tag:655
 msgid "Player"
 msgstr "Spieler"
 
@@ -1777,41 +1777,41 @@ msgstr "Einstellungen aktualisiert."
 msgid "There was a problem. Please consult the logs"
 msgstr "Es ist ein Problem aufgetreten. Schau mal in den Protokollen nach."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:135
 msgid "Successfully set user with id {0} as inactive."
 msgstr "Benutzer mit der ID {0} erfolgreich als inaktiv gesetzt."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:137
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:138
 msgid "Failed to set user as inactive."
 msgstr "Es hat nicht geklappt, den Benutzer als inaktiv zu markieren."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:176
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:177
 msgid "Passwords don't match"
 msgstr "Die Passwörter stimmen nicht überein"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:200
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:202
 msgid "Successfully updated info for User {0}"
 msgstr "Die Daten für Benutzer {0} wurden erfolgreich aktualisiert"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:257
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:259
 msgid "Please provide at least username and password"
 msgstr "Bitte gib mindestens Benutzername und dein Passwort an"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:261
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:263
 msgid "Please provide at maximum username,password and email"
 msgstr ""
 "Bitte gib höchstens deinen Benutzernamen, dein Passwort und deine E-Mail-"
 "Adresse an"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:268
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:270
 msgid "Username '{0}' already in use."
 msgstr "Der Benutzername „{0}“ wird bereits verwendet."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:273
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:275
 msgid "Username '{0}' invalid, user not created"
 msgstr "Der Benutzername „{0}“ ist ungültig, der Benutzer wurde nicht angelegt"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:282
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:284
 msgid ""
 "Password for user {0} invalid, user not created.\n"
 "Please notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) "
@@ -1822,25 +1822,25 @@ msgstr ""
 "Bitte beachte, dass nur mindestens {0} alphanumerische Zeichen (a-z, A-Z, "
 "0-9) ohne Leerzeichen zulässig sind.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:300
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:302
 msgid "Email '{0}' already in use."
 msgstr "Die E-Mail-Adresse „{0}“ wird bereits verwendet."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:305
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:307
 msgid "Email for user {0} invalid, user not created."
 msgstr ""
 "Die E-Mail-Adresse für Benutzer {0} ist ungültig, der Benutzer wurde nicht "
 "angelegt."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:316
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:318
 msgid "Failed to create account for user '{0}'"
 msgstr "Das Erstellen des Kontos für den Benutzer „{0}“ ist fehlgeschlagen"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:321
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:323
 msgid "Created user {0}"
 msgstr "Benutzer {0} erstellt"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:328
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:330
 msgid "Could not send email to user {0} with email {1}"
 msgstr ""
 "Die E-Mail an Benutzer {0} mit der E-Mail-Adresse {1} konnte nicht gesendet "
@@ -1911,11 +1911,11 @@ msgstr "Passwort erfolgreich gesetzt."
 msgid "Successfully removed the password."
 msgstr "Passwort erfolgreich gelöscht."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:139
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:138
 msgid "Class upload is disabled."
 msgstr "Der Klassen-Upload ist deaktiviert."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:210
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:209
 msgid ""
 "Class upload failed. Alias must not contain whitespaces or special "
 "characters."
@@ -1923,7 +1923,7 @@ msgstr ""
 "Das Hochladen der Klasse hat nicht geklappt. Der Alias darf keine "
 "Leerzeichen oder Sonderzeichen haben."
 
-#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:258
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:257
 msgid ""
 "Class upload failed. File content for {0} could not be read. Please try "
 "again."
@@ -1937,7 +1937,74 @@ msgstr ""
 "Dein Feedback konnte nicht gespeichert werden. Versuch's bitte später "
 "nochmal!"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:997
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:771
+msgid "User is not a player in the game."
+msgstr "Der Benutzer ist kein Spieler in diesem Spiel."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:776
+msgid "Can only resolve equivalence duels if you are a Player!"
+msgstr "Du kannst Äquivalenz-Duelle nur lösen, wenn du ein Spieler bist!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:781
+msgid "Game {0} has finished."
+msgstr "Spiel {0} ist beendet."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:786
+msgid "Mutant does not exist."
+msgstr "Mutant existiert nicht."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:802
+msgid ""
+"Too late. The mutant was already killed and therefore proven to be not "
+"equivalent."
+msgstr ""
+"Zu spät. Der Mutant ist bereits getötet worden und hat sich somit als nicht "
+"äquivalent erwiesen."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1029
+msgid "...and it also killed another claimed mutant!"
+msgstr ""
+"...und er hat auch noch einen weiteren äquivalent markierten Mutanten "
+"getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1031
+msgid "...and it also killed other {0} claimed mutants!"
+msgstr ""
+"...und er hat auch noch {0} weitere äquivalent markierte Mutanten getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1036
+msgid "...however, your test did kill another claimed mutant!"
+msgstr ""
+"...aber dein Test hat immerhin einen weiteren äquivalent markierten Mutanten "
+"getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1038
+msgid "...however, your test killed other {0} claimed mutants!"
+msgstr ""
+"...dein Test hat jedoch {0} andere äquivalent markierte Mutanten getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
+msgid "You cannot claim mutants as equivalent in this game anymore."
+msgstr ""
+"In diesem Spiel kannst du Mutanten nicht mehr als äquivalent einstufen."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1137
+msgid "Mutant has already been claimed as equivalent or killed!"
+msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1139
+msgid "Flagged 1 mutant as equivalent"
+msgstr "1 Mutant als äquivalent markiert"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
+msgid "Flagged {0} mutants as equivalent"
+msgstr "{0} Mutanten wurden als äquivalent markiert"
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:436
+msgid "No, this mutant is not equivalent to the class under test."
+msgstr "Nein, dieser Mutant ist nicht äquivalent mit der zu testenden Klasse."
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1005
 msgid ""
 "<br>\n"
 "You solved all the puzzles of the current chapter!\n"
@@ -1953,7 +2020,7 @@ msgstr ""
 "des nächsten Kapitels „{2}“ oder kehre zur\n"
 "<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1010
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1018
 msgid ""
 "Try to solve the\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">next Puzzle</a>,\n"
@@ -1965,7 +2032,7 @@ msgstr ""
 "oder kehre zur\n"
 "<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1031
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1039
 msgid ""
 "You solved all the puzzles of the current chapter, go back to the <a "
 "href=\"{0}\">Puzzle Overview</a>."
@@ -2251,11 +2318,15 @@ msgstr "Cool, dein Mutant hat seinen ersten Test überstanden."
 msgid "Awesome, your mutant survived %d tests!"
 msgstr "Super, dein Mutant hat %d Tests überstanden!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:131
+#: src/main/java/org/codedefenders/util/Constants.java:130
+msgid "You must declare your intention."
+msgstr "Du musst deine Absicht angeben."
+
+#: src/main/java/org/codedefenders/util/Constants.java:133
 msgid "Success!"
 msgstr "Erfolgreich!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:136
+#: src/main/java/org/codedefenders/util/Constants.java:138
 msgid ""
 "Sorry, your mutant cannot be accepted because you have pending equivalence "
 "duels!\n"
@@ -2266,31 +2337,388 @@ msgstr ""
 "Äquivalenzduelle hast! Keine Sorge, dein Mutant steht bereit, um eingereicht "
 "zu werden, sobald du alle deine Äquivalenzduelle gelöst hast."
 
-#: src/main/java/org/codedefenders/util/Constants.java:138
+#: src/main/java/org/codedefenders/util/Constants.java:140
 msgid "Sorry, no kill message available for this mutant"
 msgstr "Sorry, für diesen Mutanten gibt's keine Kill-Nachricht."
 
-#: src/main/java/org/codedefenders/util/Constants.java:140
+#: src/main/java/org/codedefenders/util/Constants.java:142
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! Das darfst du nicht machen!"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:24
-#: src/main/webapp/WEB-INF/tags/create_games.tag:641
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:25
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:109
+msgid "Your test is not valid, sorry! It failed for the following reasons:"
+msgstr ""
+"Dein Test ist leider ungültig! Er ist aus folgenden Gründen fehlgeschlagen:"
+
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:110
+msgid "Your mutant is not valid, sorry! It failed for the following reasons:"
+msgstr ""
+"Dein Mutant ist leider ungültig! Er ist aus folgenden Gründen fehlgeschlagen:"
+
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:120
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:131
+msgid "Offending statement:"
+msgstr "Verstoßende Statements:"
+
+#: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:57
+#: src/main/webapp/WEB-INF/tags/create_games.tag:642
 msgid "Relaxed"
 msgstr "Locker"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:25
-#: src/main/webapp/WEB-INF/tags/create_games.tag:642
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:31
+#: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:70
+#: src/main/webapp/WEB-INF/tags/create_games.tag:643
 msgid "Moderate"
 msgstr "Mittel"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidatorLevel.java:26
-#: src/main/webapp/WEB-INF/tags/create_games.tag:643
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:38
+#: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:76
+#: src/main/webapp/WEB-INF/tags/create_games.tag:644
 msgid "Strict"
 msgstr "Strikt"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:66
+msgid "Mutants must change the code"
+msgstr "Mutanten müssen den Code ändern"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:67
+msgid "Changes to names are restricted"
+msgstr "Namensänderungen sind eingeschränkt"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:68
+msgid "Changes to control structures are restricted"
+msgstr "Änderungen an Kontrollstrukturen sind eingeschränkt"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:69
+msgid "Some classes and methods may not be called"
+msgstr ""
+"Einige Klassen und Methoden können möglicherweise nicht aufgerufen werden"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:71
+msgid "Some statements and expressions may not be changed by a mutant"
+msgstr ""
+"Manche Aussagen und Ausdrücke lassen sich durch einen Mutanten nicht ändern"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:75
+msgid "No mutants that only change comments"
+msgstr "Keine Mutanten, die nur Kommentare ändern"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:82
+msgid "No changes to package signatures"
+msgstr "Keine Änderungen an den Paketsignaturen"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:89
+msgid "No changes to class signatures"
+msgstr "Keine Änderungen an den Klassensignaturen"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:97
+msgid "No new or renamed methods"
+msgstr "Keine neuen oder umbenannten Methoden"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:108
+msgid "No new or renamed fields"
+msgstr "Keine neuen oder umbenannten Felder"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:115
+msgid "No changes to method signatures"
+msgstr "Keine Änderungen an den Methodensignaturen"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:122
+msgid "No changes to import statements"
+msgstr "Keine Änderungen an den Import-Statements"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:129
+msgid "No changes to instanceof statements"
+msgstr "Keine Änderungen an instanceof-Statements"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:136
+msgid "No mutants that are identical to the Class under Test"
+msgstr "Es gibt keine Mutanten, die mit der zu testenden Klasse identisch sind"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:143
+msgid "No changes to comments"
+msgstr "Keine Änderungen an Kommentaren"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:151
+msgid "No changes to modifiers like 'static' or 'public'"
+msgstr "Keine Änderungen an Modifizierern wie „static“ oder „public“"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:158
+msgid "No new logical operators like '&&' or '||'"
+msgstr "Keine neuen logischen Operatoren wie „&&“ oder „||“"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:165
+msgid "No new conditional statements like if, switch etc."
+msgstr "Keine neuen bedingten Anweisungen wie „if“, „switch“ usw."
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:178
+msgid "No new loops."
+msgstr "Keine neuen Schleifen."
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:190
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:125
+msgid "No calls to System.*"
+msgstr "Keine Aufrufe von System.*"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:208
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:158
+msgid "No use of random number generators"
+msgstr "Keine Verwendung von Zufallszahlengeneratoren"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:217
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:220
+msgid "No calls to Date classes"
+msgstr "Keine Aufrufe von Date-Klassen"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:226
+msgid "No calls to multithreading classes"
+msgstr "Keine Aufrufe von Multithreading-Klassen"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:235
+msgid "No new IO calls"
+msgstr "Keine neuen I/O-Aufrufe"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:243
+msgid "No new bitwise operators"
+msgstr "Keine neuen bitweisen Operatoren"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:266
+msgid "You deleted a class declaration."
+msgstr "Du hast eine Klassendeklaration gelöscht."
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:268
+msgid "You added a class declaration"
+msgstr "Du hast eine Klassendeklaration hinzugefügt"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:273
+msgid "You changed the class declaration for {0} from {1} to {2}"
+msgstr "Du hast die Klassendeklaration für {0} von {1} auf {2} geändert"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:278
+msgid "You changed a class name."
+msgstr "Du hast einen Klassennamen geändert."
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:338
+msgid "Changed comment {0} to {1}"
+msgstr "Kommentar von {0} auf {1} geändert"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:344
+msgid "Removed comments:"
+msgstr "Entfernte Kommentare:"
+
+#: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:350
+msgid "Added comments:"
+msgstr "Kommentare hinzugefügt:"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:55
+msgid "Do not use too many assertions."
+msgstr "Verwende nicht zu viele Assertions."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:56
+msgid "New classes or methods are not allowed"
+msgstr "Neue Klassen oder Methoden sind nicht zulässig"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:57
+msgid "Control structures are not allowed"
+msgstr "Kontrollstrukturen sind nicht erlaubt"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:58
+msgid "Calls to certain packages are not allowed"
+msgstr "Aufrufe bestimmter Pakete sind nicht zulässig"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:59
+msgid "Test may not be empty"
+msgstr "Test darf nicht leer sein"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:64
+msgid "No new classes"
+msgstr "Keine neuen Klassen"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:65
+msgid "You cannot create a second class."
+msgstr "Du kannst keine zweite Klasse erstellen."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:69
+msgid "No new methods"
+msgstr "Keine neuen Methoden"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:70
+msgid "You cannot create a new method."
+msgstr "Du kannst keine neue Methode erstellen."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:75
+msgid "The test is empty."
+msgstr "Der Test ist leer."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:79
+msgid "No loops"
+msgstr "Keine Schleifen"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:80
+msgid "Loops in the test are not allowed."
+msgstr "Schleifen sind im Test nicht erlaubt."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:88
+msgid "No conditional statements (like if, switch etc)"
+msgstr "Keine bedingten Anweisungen (wie if, switch usw.)"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:89
+msgid "Conditional statements are not allowed."
+msgstr "Bedingte Anweisungen sind nicht zulässig."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:97
+msgid "No logical operators like '&&' or '||'"
+msgstr "Keine logischen Operatoren wie „&&“ oder „||“"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:98
+msgid "You used an illegal binary operator."
+msgstr "Du hast einen unzulässigen binären Operator verwendet."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:107
+msgid "No bitwise operators like &= or |="
+msgstr "Keine bitweisen Operatoren wie &= oder |="
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:108
+msgid "An operator you used is not allowed."
+msgstr "Ein von dir verwendeter Operator ist nicht zulässig."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:118
+msgid "No \"assert()\"-Statements"
+msgstr "Keine „assert()“-Anweisungen"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:119
+msgid ""
+"\"assert()\"-statements are not allowed. Use the Assertions from your test "
+"library!"
+msgstr ""
+"„assert()“-Anweisungen sind nicht erlaubt. Nutze die Assertions aus deiner "
+"Testbibliothek!"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:126
+msgid "You have called System.*"
+msgstr "Du hast System.* aufgerufen"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:159
+msgid "You have used a random number generator."
+msgstr "Du hast einen Zufallszahlengenerator verwendet."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:196
+msgid "No multithreading"
+msgstr "Kein Multithreading"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:197
+msgid "You called a multithreading class."
+msgstr "Du hast eine Multithreading-Klasse aufgerufen."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:221
+msgid "You have called a Date class."
+msgstr "Du hast eine Date-Klasse aufgerufen."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:228
+msgid "No IO calls"
+msgstr "Keine I/O-Aufrufe"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:229
+msgid "You have called an IO package."
+msgstr "Du hast ein IO-Paket aufgerufen."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:239
+msgid "Keep the assertion limit of your game!"
+msgstr "Halte die Obergrenze für Assertions in deinem Spiel ein!"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:240
+msgid "You used more than [MAX_ASSERTIONS] assertions."
+msgstr "Du hast mehr als [MAX_ASSERTIONS] Assertions verwendet."
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:247
+msgid "Only use the assertions of the correct test library"
+msgstr "Verwende nur die Assertions der richtigen Testbibliothek"
+
+#: src/main/java/org/codedefenders/validation/code/TestValidationRules.java:248
+msgid "Your assertion does not belong to the correct test library."
+msgstr "Deine Assertion gehört nicht zur richtigen Testbibliothek."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:31
+msgid "Your mutant only changes comments."
+msgstr "Dein Mutant ändert nur Kommentare."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:32
+msgid "Your mutant changes the package signature."
+msgstr "Dein Mutant verändert die Paketsignatur."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:33
+msgid "Your mutant adds a new class or changes a class signature."
+msgstr ""
+"Dein Mutant fügt eine neue Klasse hinzu oder ändert die Signatur einer "
+"Klasse."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:34
+msgid "Your mutant adds or renames a field."
+msgstr "Dein Mutant fügt ein Feld hinzu oder benennt es um."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:35
+msgid "Your mutant adds or renames a method."
+msgstr "Dein Mutant fügt eine Methode hinzu oder benennt sie um."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:36
+msgid "Your mutant changes one or more method signatures."
+msgstr "Dein Mutant ändert eine oder mehrere Methodensignaturen."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:37
+msgid "Your mutant changes one or more import statements."
+msgstr "Dein Mutant ändert ein oder mehrere Import-Statements."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:38
+msgid "Your mutant modifies an instanceof condition."
+msgstr "Dein Mutant verändert eine „instanceof“-Bedingung."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:39
+msgid "Your mutant is identical to the CUT."
+msgstr "Dein Mutant ist identisch mit der zu testenden Klasse."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:40
+msgid "Your mutant adds or modifies a comment."
+msgstr "Dein Mutant fügt einen Kommentar hinzu oder ändert ihn."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:41
+msgid "Your mutant changes a modifier like 'static' or 'private'."
+msgstr "Dein Mutant ändert einen Modifizierer wie „static“ oder „private“."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:42
+msgid "Your mutant adds a new logical operator like '&&' or '||'."
+msgstr ""
+"Dein Mutant fügt einen neuen logischen Operator wie „&&“ oder „||“ hinzu."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:43
+msgid "Your mutant adds new bitwise operators like '&' or '>>'"
+msgstr "Dein Mutant fügt neue bitweise Operatoren wie „&“ oder „>>“ hinzu"
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:44
+msgid "Your mutant adds a new conditional statement like 'if', 'switch' etc."
+msgstr ""
+"Dein Mutant fügt eine neue bedingte Anweisung wie „if“, „switch“ usw. hinzu."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:45
+msgid "Your mutant adds a new loop."
+msgstr "Dein Mutant fügt eine neue Schleife hinzu."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:46
+msgid "Your mutant adds a call to System.*."
+msgstr "Dein Mutant fügt einen Aufruf von System.*. hinzu."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:47
+msgid "Your mutant calls a random number generator."
+msgstr "Dein Mutant ruft einen Zufallszahlengenerator auf."
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:48
+msgid "Your mutant calls a Date class"
+msgstr "Dein Mutant ruft eine Date-Klasse auf"
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:49
+msgid "Your mutant calls a multithreading class"
+msgstr "Dein Mutant ruft eine Multithreading-Klasse auf"
+
+#: src/main/java/org/codedefenders/validation/code/ValidationMessage.java:50
+msgid "Your mutant calls an IO class"
+msgstr "Dein Mutant ruft eine IO-Klasse auf"
 
 #: src/main/javascript/game/defender_intention_collection.js:111
 #: src/main/webapp/jsp/battleground/defender_view.jsp:97
@@ -2494,7 +2922,7 @@ msgstr "Covered"
 
 #: src/main/javascript/game/killmap_mutant_accordion.js:195
 #: src/main/javascript/game/test_accordion.js:235
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:59
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:57
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:46
 msgid "Killed"
 msgstr "Getötet"
@@ -3048,9 +3476,9 @@ msgid "Class Name"
 msgstr "Klassenname"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:46
-#: src/main/webapp/WEB-INF/tags/create_games.tag:807
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1067
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1105
+#: src/main/webapp/WEB-INF/tags/create_games.tag:808
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1068
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1106
 msgid "Role"
 msgstr "Benutzerrolle"
 
@@ -3142,8 +3570,8 @@ msgstr "Benutzeranalyse"
 #: src/main/webapp/jsp/games_history.jsp:212
 #: src/main/webapp/jsp/upload_class_view.jsp:217
 #: src/main/webapp/jsp/user_games_view.jsp:84
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1248
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1484
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1249
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1485
 msgid "ID"
 msgstr "ID"
 
@@ -3178,7 +3606,7 @@ msgstr "Verteidiger-Punktzahl"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:424
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:196
 #: src/main/webapp/jsp/leaderboards.jsp:45
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1507
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1508
 msgid "Total Score"
 msgstr "Gesamtpunktzahl"
 
@@ -3257,7 +3685,7 @@ msgstr "Klassenverwaltung"
 #: src/main/webapp/jsp/classrooms_overview.jsp:181
 #: src/main/webapp/jsp/classrooms_overview.jsp:245
 #: src/main/webapp/jsp/contact.jsp:68 src/main/webapp/jsp/contact.jsp:70
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1489
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1490
 msgid "Name"
 msgstr "Name"
 
@@ -3363,8 +3791,8 @@ msgstr "Neuer Raum"
 #: src/main/webapp/jsp/classrooms_overview.jsp:59
 #: src/main/webapp/jsp/classrooms_overview.jsp:69
 #: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:49
-#: src/main/webapp/WEB-INF/tags/create_games.tag:64
-#: src/main/webapp/WEB-INF/tags/create_games.tag:111
+#: src/main/webapp/WEB-INF/tags/create_games.tag:65
+#: src/main/webapp/WEB-INF/tags/create_games.tag:112
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:44
 msgid "Search"
 msgstr "Suche"
@@ -3383,7 +3811,7 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1113
 #: src/main/webapp/jsp/admin_system_settings.jsp:148
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:337
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:345
 #: src/main/webapp/jsp/battleground/details_view.jsp:111
 #: src/main/webapp/jsp/classroom_page.jsp:295
 #: src/main/webapp/jsp/classroom_page.jsp:324
@@ -3400,7 +3828,7 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/classroom_page.jsp:580
 #: src/main/webapp/jsp/classroom_page.jsp:598
 #: src/main/webapp/jsp/classrooms_overview.jsp:80
-#: src/main/webapp/jsp/melee/create_game_view.jsp:313
+#: src/main/webapp/jsp/melee/create_game_view.jsp:321
 #: src/main/webapp/jsp/melee/details_view.jsp:147
 #: src/main/webapp/jsp/player_feedback.jsp:116
 #: src/main/webapp/jsp/upload_class_view.jsp:206
@@ -3463,8 +3891,8 @@ msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 #: src/main/webapp/jsp/admin_killmap_management.jsp:95
 #: src/main/webapp/jsp/admin_killmap_management.jsp:600
-#: src/main/webapp/WEB-INF/tags/create_games.tag:778
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1044
+#: src/main/webapp/WEB-INF/tags/create_games.tag:779
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1045
 #: src/main/webapp/WEB-INF/tags/game_header.tag:119
 msgid "Game"
 msgstr "Spiel"
@@ -3494,8 +3922,8 @@ msgstr "Killmap-Status"
 #: src/main/webapp/jsp/index.jsp:160 src/main/webapp/jsp/user_games_view.jsp:86
 #: src/main/webapp/jsp/user_games_view.jsp:450
 #: src/main/webapp/jsp/user_games_view.jsp:650
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1169
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1254
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1170
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1255
 msgid "Class"
 msgstr "Klasse"
 
@@ -3683,8 +4111,8 @@ msgstr "Keine Räume stehen für die Killmap-Berechnung in der Warteschlange."
 #: src/main/webapp/jsp/admin_killmap_management.jsp:539
 #: src/main/webapp/jsp/admin_killmap_management.jsp:592
 #: src/main/webapp/jsp/admin_killmap_management.jsp:644
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1238
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1475
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1239
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1476
 msgid "Select"
 msgstr "Auswählen"
 
@@ -3736,7 +4164,7 @@ msgstr "Verteidiger"
 #: src/main/webapp/jsp/index.jsp:162 src/main/webapp/jsp/user_games_view.jsp:88
 #: src/main/webapp/jsp/user_games_view.jsp:456
 #: src/main/webapp/jsp/user_games_view.jsp:655
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1173
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1174
 msgid "Level"
 msgstr "Level"
 
@@ -3816,7 +4244,7 @@ msgstr "Spieler entfernen"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:227
 #: src/main/webapp/jsp/admin_monitor_games.jsp:457
-#: src/main/webapp/WEB-INF/tags/create_games.tag:758
+#: src/main/webapp/WEB-INF/tags/create_games.tag:759
 msgid "never"
 msgstr "nie"
 
@@ -3853,7 +4281,7 @@ msgid "Remove"
 msgstr "Entfernen"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:300
-#: src/main/webapp/WEB-INF/tags/create_games.tag:481
+#: src/main/webapp/WEB-INF/tags/create_games.tag:482
 msgid "Melee Games"
 msgstr "Melee-Spiele"
 
@@ -3870,7 +4298,7 @@ msgid "You don\\'t control any unfinished melee games at the moment."
 msgstr "Du hast im Moment keine laufenden Melee-Spiele unter Kontrolle."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:517
-#: src/main/webapp/WEB-INF/tags/create_games.tag:286
+#: src/main/webapp/WEB-INF/tags/create_games.tag:287
 msgid "Start Games"
 msgstr "Spiele starten"
 
@@ -4151,7 +4579,7 @@ msgstr "Letzte bearbeitbare Zeile"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:892
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:135
 #: src/main/webapp/jsp/melee/create_game_view.jsp:132
-#: src/main/webapp/WEB-INF/tags/create_games.tag:190
+#: src/main/webapp/WEB-INF/tags/create_games.tag:191
 msgid "Game Level"
 msgstr "Spiellevel"
 
@@ -4256,7 +4684,7 @@ msgstr "JUnit-Tests"
 #: src/main/webapp/jsp/melee/player_view.jsp:223
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:130
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:229
-#: src/main/webapp/WEB-INF/tags/create_games.tag:156
+#: src/main/webapp/WEB-INF/tags/create_games.tag:157
 msgid "Class Under Test"
 msgstr "Zu testende Klasse"
 
@@ -4453,7 +4881,7 @@ msgid "User"
 msgstr "Benutzer"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:197
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1513
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1514
 msgid "Last Login"
 msgstr "Letzte Anmeldung"
 
@@ -4559,7 +4987,7 @@ msgstr ""
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:103
 #: src/main/webapp/jsp/melee/create_game_view.jsp:100
-#: src/main/webapp/WEB-INF/tags/create_games.tag:165
+#: src/main/webapp/WEB-INF/tags/create_games.tag:166
 msgid "Upload a class."
 msgstr "Eine Klasse hochladen."
 
@@ -4570,20 +4998,20 @@ msgstr "Bitte wähle eine Klasse aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:118
 #: src/main/webapp/jsp/melee/create_game_view.jsp:115
-#: src/main/webapp/WEB-INF/tags/create_games.tag:177
+#: src/main/webapp/WEB-INF/tags/create_games.tag:178
 msgid "Include predefined mutants (if available)"
 msgstr "Vordefinierte Mutanten einbeziehen (falls verfügbar)"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:126
 #: src/main/webapp/jsp/melee/create_game_view.jsp:123
-#: src/main/webapp/WEB-INF/tags/create_games.tag:182
+#: src/main/webapp/WEB-INF/tags/create_games.tag:183
 msgid "Include predefined tests (if available)"
 msgstr "Vordefinierte Tests einbeziehen (falls verfügbar)"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:159
 #: src/main/webapp/jsp/melee/create_game_view.jsp:156
-#: src/main/webapp/WEB-INF/tags/create_games.tag:213
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1189
+#: src/main/webapp/WEB-INF/tags/create_games.tag:214
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1190
 msgid "Mutant Validator Level"
 msgstr "Mutanten-Validator-Level"
 
@@ -4592,9 +5020,9 @@ msgstr "Mutanten-Validator-Level"
 msgid "Please select a mutant validator level."
 msgstr "Bitte wähle eine Mutanten-Validierungsstufe aus."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:184
-#: src/main/webapp/jsp/melee/create_game_view.jsp:181
-#: src/main/webapp/WEB-INF/tags/create_games.tag:233
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:192
+#: src/main/webapp/jsp/melee/create_game_view.jsp:189
+#: src/main/webapp/WEB-INF/tags/create_games.tag:234
 msgid ""
 "Maximum number of assertions per test. Increase this for difficult to test "
 "classes."
@@ -4602,31 +5030,31 @@ msgstr ""
 "Maximale Anzahl von Assertions pro Test. Erhöhe diesen Wert für schwer zu "
 "testende Klassen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:186
-#: src/main/webapp/jsp/melee/create_game_view.jsp:183
-#: src/main/webapp/WEB-INF/tags/create_games.tag:235
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:194
+#: src/main/webapp/jsp/melee/create_game_view.jsp:191
+#: src/main/webapp/WEB-INF/tags/create_games.tag:236
 msgid "Max. Assertions Per Test"
 msgstr "Max. Assertions pro Test"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:192
-#: src/main/webapp/jsp/melee/create_game_view.jsp:188
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:200
+#: src/main/webapp/jsp/melee/create_game_view.jsp:196
 msgid "Please provide a valid number. Must be greater than zero."
 msgstr "Bitte gib eine gültige Zahl ein. Muss größer als Null sein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:201
-#: src/main/webapp/jsp/melee/create_game_view.jsp:196
-#: src/main/webapp/WEB-INF/tags/create_games.tag:245
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:209
+#: src/main/webapp/jsp/melee/create_game_view.jsp:204
+#: src/main/webapp/WEB-INF/tags/create_games.tag:246
 msgid "Auto Equiv. Threshold"
 msgstr "Auto-Äquivalent-Schwellenwert"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:209
-#: src/main/webapp/jsp/melee/create_game_view.jsp:204
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:217
+#: src/main/webapp/jsp/melee/create_game_view.jsp:212
 msgid "Please provide a valid number. Must be positive or zero."
 msgstr "Bitte gib eine gültige Zahl ein. Muss positiv oder Null sein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:215
-#: src/main/webapp/jsp/melee/create_game_view.jsp:209
-#: src/main/webapp/WEB-INF/tags/create_games.tag:267
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:223
+#: src/main/webapp/jsp/melee/create_game_view.jsp:217
+#: src/main/webapp/WEB-INF/tags/create_games.tag:268
 msgid ""
 "Forces players to specify the intentions of their mutants/tests before they "
 "can submit them."
@@ -4634,146 +5062,146 @@ msgstr ""
 "Zwingt die Spieler dazu, die Intention ihrer Mutanten/Tests anzugeben, bevor "
 "sie diese einreichen können."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:217
-#: src/main/webapp/jsp/melee/create_game_view.jsp:211
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:225
+#: src/main/webapp/jsp/melee/create_game_view.jsp:219
 msgid "Capture Intentions"
 msgstr "Intentionen erfassen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:223
-#: src/main/webapp/jsp/melee/create_game_view.jsp:217
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:231
+#: src/main/webapp/jsp/melee/create_game_view.jsp:225
 msgid "Enable Capturing Players\\' Intentions"
 msgstr "Spieler-Intentionen erfassen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:229
-#: src/main/webapp/WEB-INF/tags/create_games.tag:275
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:237
+#: src/main/webapp/WEB-INF/tags/create_games.tag:276
 msgid "Allows players to chat within their team and with the enemy team."
 msgstr ""
 "Ermöglicht es den Spielern, innerhalb ihres Teams und mit dem gegnerischen "
 "Team zu chatten."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:231
-#: src/main/webapp/jsp/melee/create_game_view.jsp:225
-#: src/main/webapp/WEB-INF/tags/create_games.tag:278
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:239
+#: src/main/webapp/jsp/melee/create_game_view.jsp:233
+#: src/main/webapp/WEB-INF/tags/create_games.tag:279
 msgid "Game Chat"
 msgstr "Spiel-Chat"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:236
-#: src/main/webapp/jsp/melee/create_game_view.jsp:229
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:244
+#: src/main/webapp/jsp/melee/create_game_view.jsp:237
 msgid "Enable Chat"
 msgstr "Chat aktivieren"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:242
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:250
 msgid "Allows player to choose their role (attacker or defender) when joining."
 msgstr ""
 "Ermöglicht es dem Spieler, bei der Teilnahme seine Rolle (Angreifer oder "
 "Verteidiger) zu wählen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:244
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:252
 msgid "Players may choose their role"
 msgstr "Die Spieler können ihre Rolle wählen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:250
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:258
 msgid "Allow players to choose their own roles"
 msgstr "Spielern die Wahl ihrer eigenen Rollen ermöglichen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:256
-#: src/main/webapp/jsp/melee/create_game_view.jsp:235
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:264
+#: src/main/webapp/jsp/melee/create_game_view.jsp:243
 msgid "Allows only whitelisted players to join the game."
 msgstr ""
 "Erlaubt nur Spielern, die auf der Whitelist stehen, am Spiel teilzunehmen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:258
-#: src/main/webapp/jsp/melee/create_game_view.jsp:237
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:266
+#: src/main/webapp/jsp/melee/create_game_view.jsp:245
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:38
 msgid "Invite players"
 msgstr "Spieler einladen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:265
-#: src/main/webapp/jsp/melee/create_game_view.jsp:244
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:273
+#: src/main/webapp/jsp/melee/create_game_view.jsp:252
 msgid "Allow only whitelisted players to join"
 msgstr "Nur Spielern auf der Whitelist den Beitritt erlauben"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:275
-#: src/main/webapp/jsp/melee/create_game_view.jsp:254
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:283
+#: src/main/webapp/jsp/melee/create_game_view.jsp:262
 msgid "Select the role the creator (you) will have in the game."
 msgstr "Wähle die Rolle aus, die der Ersteller (du) im Spiel einnehmen wird."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:277
-#: src/main/webapp/jsp/melee/create_game_view.jsp:256
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1193
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:285
+#: src/main/webapp/jsp/melee/create_game_view.jsp:264
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1194
 msgid "Creator Role"
 msgstr "Rolle des Erstellers"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:286
-#: src/main/webapp/jsp/melee/create_game_view.jsp:265
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:294
+#: src/main/webapp/jsp/melee/create_game_view.jsp:273
 msgid "Please select a role."
 msgstr "Bitte wähle eine Rolle aus."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:290
-#: src/main/webapp/jsp/melee/create_game_view.jsp:269
-#: src/main/webapp/WEB-INF/tags/create_games.tag:290
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:298
+#: src/main/webapp/jsp/melee/create_game_view.jsp:277
+#: src/main/webapp/WEB-INF/tags/create_games.tag:291
 msgid "The duration for how long the games will be open."
 msgstr "Die Dauer, für die die Spiele geöffnet sein werden."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:293
-#: src/main/webapp/jsp/melee/create_game_view.jsp:272
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:301
+#: src/main/webapp/jsp/melee/create_game_view.jsp:280
 msgid "Set the game\\'s duration:"
 msgstr "Leg die Spieldauer fest:"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:297
-#: src/main/webapp/jsp/melee/create_game_view.jsp:276
-#: src/main/webapp/WEB-INF/tags/create_games.tag:300
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:305
+#: src/main/webapp/jsp/melee/create_game_view.jsp:284
+#: src/main/webapp/WEB-INF/tags/create_games.tag:301
 #: src/main/webapp/WEB-INF/tags/game_time.tag:109
 msgid "days"
 msgstr "Tage"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:299
-#: src/main/webapp/jsp/melee/create_game_view.jsp:278
-#: src/main/webapp/WEB-INF/tags/create_games.tag:302
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:307
+#: src/main/webapp/jsp/melee/create_game_view.jsp:286
+#: src/main/webapp/WEB-INF/tags/create_games.tag:303
 #: src/main/webapp/WEB-INF/tags/game_time.tag:111
 msgid "hours"
 msgstr "Stunden"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:301
-#: src/main/webapp/jsp/melee/create_game_view.jsp:280
-#: src/main/webapp/WEB-INF/tags/create_games.tag:304
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:309
+#: src/main/webapp/jsp/melee/create_game_view.jsp:288
+#: src/main/webapp/WEB-INF/tags/create_games.tag:305
 #: src/main/webapp/WEB-INF/tags/game_time.tag:113
 msgid "minutes"
 msgstr "Minuten"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:303
-#: src/main/webapp/jsp/melee/create_game_view.jsp:282
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:311
+#: src/main/webapp/jsp/melee/create_game_view.jsp:290
 #: src/main/webapp/WEB-INF/tags/game_time.tag:115
 msgid "Please input a valid duration."
 msgstr "Bitte gib eine gültige Dauer ein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:304
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:312
 msgid "Maximum duration: {0}"
 msgstr "Maximale Dauer: {0}"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:331
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:335
-#: src/main/webapp/jsp/melee/create_game_view.jsp:307
-#: src/main/webapp/jsp/melee/create_game_view.jsp:311
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:339
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:343
+#: src/main/webapp/jsp/melee/create_game_view.jsp:315
+#: src/main/webapp/jsp/melee/create_game_view.jsp:319
 msgid "Create Game"
 msgstr "Spiel erstellen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:343
-#: src/main/webapp/jsp/melee/create_game_view.jsp:319
-#: src/main/webapp/WEB-INF/tags/create_games.tag:477
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:351
+#: src/main/webapp/jsp/melee/create_game_view.jsp:327
+#: src/main/webapp/WEB-INF/tags/create_games.tag:478
 msgid "Level Explanation"
 msgstr "Erklärung der Level"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:349
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:84
-#: src/main/webapp/jsp/melee/create_game_view.jsp:325
-#: src/main/webapp/WEB-INF/tags/create_games.tag:486
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:357
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:82
+#: src/main/webapp/jsp/melee/create_game_view.jsp:333
+#: src/main/webapp/WEB-INF/tags/create_games.tag:487
 msgid "Validator Explanation"
 msgstr "Erläuterung zum Validator"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:358
-#: src/main/webapp/jsp/melee/create_game_view.jsp:334
-#: src/main/webapp/WEB-INF/tags/create_games.tag:494
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:366
+#: src/main/webapp/jsp/melee/create_game_view.jsp:342
+#: src/main/webapp/WEB-INF/tags/create_games.tag:495
 msgid "Auto Equivalence Duel Threshold Explanation"
 msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalenz"
 
@@ -4977,7 +5405,7 @@ msgstr "Beitreten"
 
 #: src/main/webapp/jsp/classroom_page.jsp:98
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
-#: src/main/webapp/WEB-INF/tags/create_games.tag:75
+#: src/main/webapp/WEB-INF/tags/create_games.tag:76
 msgid "Create Games"
 msgstr "Spiele erstellen"
 
@@ -5279,21 +5707,21 @@ msgid "No members found."
 msgstr "Keine Mitglieder gefunden."
 
 #: src/main/webapp/jsp/classroom_page.jsp:905
-#: src/main/webapp/WEB-INF/tags/create_games.tag:144
-#: src/main/webapp/WEB-INF/tags/create_games.tag:637
+#: src/main/webapp/WEB-INF/tags/create_games.tag:145
+#: src/main/webapp/WEB-INF/tags/create_games.tag:638
 #: src/main/webapp/WEB-INF/tags/game_header.tag:89
 msgid "Battleground"
 msgstr "Battleground"
 
 #: src/main/webapp/jsp/classroom_page.jsp:907
-#: src/main/webapp/WEB-INF/tags/create_games.tag:150
-#: src/main/webapp/WEB-INF/tags/create_games.tag:638
+#: src/main/webapp/WEB-INF/tags/create_games.tag:151
+#: src/main/webapp/WEB-INF/tags/create_games.tag:639
 #: src/main/webapp/WEB-INF/tags/game_header.tag:93
 msgid "Melee"
 msgstr "Melee"
 
 #: src/main/webapp/jsp/classroom_page.jsp:909
-#: src/main/webapp/WEB-INF/tags/create_games.tag:834
+#: src/main/webapp/WEB-INF/tags/create_games.tag:835
 msgid "unknown"
 msgstr "unbekannt"
 
@@ -5506,19 +5934,19 @@ msgstr ""
 msgid "Make sure the address is correct and that the page hasn\\'t moved."
 msgstr "Schau mal, ob die Adresse stimmt und die Seite nicht verschoben wurde."
 
-#: src/main/webapp/jsp/error_page_500.jsp:26
+#: src/main/webapp/jsp/error_page_500.jsp:27
 msgid "Internal Server Error (500)"
 msgstr "Internal Server Error (500)"
 
-#: src/main/webapp/jsp/error_page_500.jsp:28
+#: src/main/webapp/jsp/error_page_500.jsp:29
 msgid "Internal Server Error"
 msgstr "Interner Server-Fehler"
 
-#: src/main/webapp/jsp/error_page_500.jsp:30
+#: src/main/webapp/jsp/error_page_500.jsp:31
 msgid "There has been a problem on our side. Sorry about that."
 msgstr "Es gab ein Problem auf unserer Seite. Das tut uns leid."
 
-#: src/main/webapp/jsp/error_page_500.jsp:31
+#: src/main/webapp/jsp/error_page_500.jsp:32
 msgid ""
 "Please try again and contact your administrator if this keeps happening."
 msgstr ""
@@ -5653,25 +6081,25 @@ msgstr "Editor-Modus:"
 msgid "mutant"
 msgstr "Mutant"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:55
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:53
 msgid "Live"
 msgstr "Live"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:63
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:61
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:51
 msgid "Claimed Equivalent"
 msgstr "Als äquivalent markiert"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:67
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:65
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:56
 msgid "Equivalent"
 msgstr "Äquivalent"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:72
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:70
 msgid "Mutant/Test restrictions:"
 msgstr "Mutanten-/Testbeschränkungen:"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:74
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:72
 msgid "Click for more information"
 msgstr "Für weitere Informationen hier klicken"
 
@@ -5934,12 +6362,12 @@ msgstr "Passwort ändern"
 msgid "Create Melee Game"
 msgstr "Erstelle Melee-Spiel"
 
-#: src/main/webapp/jsp/melee/create_game_view.jsp:223
+#: src/main/webapp/jsp/melee/create_game_view.jsp:231
 msgid "Allows players to chat with each other."
 msgstr "Ermöglicht es den Spielern, miteinander zu chatten."
 
-#: src/main/webapp/jsp/melee/create_game_view.jsp:283
-#: src/main/webapp/WEB-INF/tags/create_games.tag:307
+#: src/main/webapp/jsp/melee/create_game_view.jsp:291
+#: src/main/webapp/WEB-INF/tags/create_games.tag:308
 #: src/main/webapp/WEB-INF/tags/game_time.tag:116
 msgid "Maximum duration:"
 msgstr "Maximale Dauer:"
@@ -6870,121 +7298,121 @@ msgstr ""
 msgid "Confirm"
 msgstr "Bestätigen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:47
+#: src/main/webapp/WEB-INF/tags/create_games.tag:48
 msgid "Staged Games"
 msgstr "Spielentwürfe"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:50
+#: src/main/webapp/WEB-INF/tags/create_games.tag:51
 msgid "Select all games (that your search applies to)"
 msgstr "Alle Spiele auswählen (auf die deine Suche zutrifft)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:51
-#: src/main/webapp/WEB-INF/tags/create_games.tag:95
+#: src/main/webapp/WEB-INF/tags/create_games.tag:52
+#: src/main/webapp/WEB-INF/tags/create_games.tag:96
 msgid "Select All"
 msgstr "Alle auswählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:54
+#: src/main/webapp/WEB-INF/tags/create_games.tag:55
 msgid "Deselect all games (that your search applies to)"
 msgstr "Alle Spiele (auf die sich deine Suche bezieht) abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:55
-#: src/main/webapp/WEB-INF/tags/create_games.tag:99
+#: src/main/webapp/WEB-INF/tags/create_games.tag:56
+#: src/main/webapp/WEB-INF/tags/create_games.tag:100
 msgid "Deselect All"
 msgstr "Alle abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:60
+#: src/main/webapp/WEB-INF/tags/create_games.tag:61
 msgid "Hide Players"
 msgstr "Spieler ausblenden"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:81
+#: src/main/webapp/WEB-INF/tags/create_games.tag:82
 msgid "Delete Games"
 msgstr "Spiele löschen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:91
+#: src/main/webapp/WEB-INF/tags/create_games.tag:92
 msgid "Unassigned Users"
 msgstr "Nicht zugewiesene Benutzer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:94
+#: src/main/webapp/WEB-INF/tags/create_games.tag:95
 msgid "Select all users (that your search applies to)"
 msgstr "Alle Benutzer auswählen (auf die deine Suche zutrifft)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:98
+#: src/main/webapp/WEB-INF/tags/create_games.tag:99
 msgid "Deselect all users (that your search applies to)"
 msgstr "Alle Benutzer (auf die deine Suche zutrifft) abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:106
+#: src/main/webapp/WEB-INF/tags/create_games.tag:107
 msgid "Show users that are part of an existing active game."
 msgstr "Zeige Benutzer, die Teil eines bestehenden aktiven Spiels sind."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:107
+#: src/main/webapp/WEB-INF/tags/create_games.tag:108
 msgid "Show Assigned Users (in active games)"
 msgstr "Zugewiesene Benutzer anzeigen (in aktiven Spielen)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:130
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1298
+#: src/main/webapp/WEB-INF/tags/create_games.tag:131
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1299
 msgid "Game Settings"
 msgstr "Spieleinstellungen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:136
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1165
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1260
+#: src/main/webapp/WEB-INF/tags/create_games.tag:137
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1166
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1261
 msgid "Game Type"
 msgstr "Spieltyp"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:175
+#: src/main/webapp/WEB-INF/tags/create_games.tag:176
 msgid "Include mutants uploaded together with the class."
 msgstr "Mutanten, die zusammen mit der Klasse hochgeladen wurden, einbeziehen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:254
+#: src/main/webapp/WEB-INF/tags/create_games.tag:255
 msgid "Select the role you will have in the game."
 msgstr "Wähle die Rolle aus, die du im Spiel übernehmen möchtest."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:255
+#: src/main/webapp/WEB-INF/tags/create_games.tag:256
 msgid "Your Role"
 msgstr "Deine Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:270
+#: src/main/webapp/WEB-INF/tags/create_games.tag:271
 msgid "Enable Capture Players' Intentions"
 msgstr "Die Intentionen der Spieler erfassen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:283
+#: src/main/webapp/WEB-INF/tags/create_games.tag:284
 msgid "Automatically start games once they are created."
 msgstr "Spiele automatisch starten, sobald sie erstellt wurden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:297
+#: src/main/webapp/WEB-INF/tags/create_games.tag:298
 msgid "Set the game's duration:"
 msgstr "Leg die Spieldauer fest:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:308
+#: src/main/webapp/WEB-INF/tags/create_games.tag:309
 msgid "If the value is greater, it will be limited to this maximum."
 msgstr "Wenn der Wert größer ist, wird er auf diesen Höchstwert begrenzt."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:346
+#: src/main/webapp/WEB-INF/tags/create_games.tag:347
 msgid "Create Staged Games With Users"
 msgstr "Inszenierte Spiele mit Benutzern erstellen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:357
+#: src/main/webapp/WEB-INF/tags/create_games.tag:358
 msgid "User Names"
 msgstr "Benutzername"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:365
+#: src/main/webapp/WEB-INF/tags/create_games.tag:366
 msgid "Method of assigning roles to players."
 msgstr "Verfahren zur Zuweisung von Rollen an Spieler."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:369
+#: src/main/webapp/WEB-INF/tags/create_games.tag:370
 msgid "Role Assignment"
 msgstr "Rollenzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:379
-#: src/main/webapp/WEB-INF/tags/create_games.tag:405
+#: src/main/webapp/WEB-INF/tags/create_games.tag:380
+#: src/main/webapp/WEB-INF/tags/create_games.tag:406
 msgid "Random"
 msgstr "Zufällig"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:385
+#: src/main/webapp/WEB-INF/tags/create_games.tag:386
 msgid "Opposite Role"
 msgstr "Gegenteilige Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:391
+#: src/main/webapp/WEB-INF/tags/create_games.tag:392
 msgid ""
 "Method of assigning players to teams. Click the question mark for more "
 "information."
@@ -6992,126 +7420,126 @@ msgstr ""
 "Verfahren zur Zuweisung von Spielern zu Teams. Klicke auf das Fragezeichen, "
 "um weitere Informationen zu erhalten."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:395
+#: src/main/webapp/WEB-INF/tags/create_games.tag:396
 msgid "Game Assignment"
 msgstr "Spielzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:411
+#: src/main/webapp/WEB-INF/tags/create_games.tag:412
 msgid "Score Descending"
 msgstr "Punktzahl absteigend"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:417
+#: src/main/webapp/WEB-INF/tags/create_games.tag:418
 msgid "Number of attackers per game."
 msgstr "Anzahl der Angreifer pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:418
+#: src/main/webapp/WEB-INF/tags/create_games.tag:419
 msgid "Attackers per Game"
 msgstr "Angreifer pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:423
+#: src/main/webapp/WEB-INF/tags/create_games.tag:424
 msgid "Number of defenders per game."
 msgstr "Anzahl der Verteidiger pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:424
+#: src/main/webapp/WEB-INF/tags/create_games.tag:425
 msgid "Defenders per Game"
 msgstr "Verteidiger pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:429
+#: src/main/webapp/WEB-INF/tags/create_games.tag:430
 msgid "Players per game."
 msgstr "Spieler pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:430
+#: src/main/webapp/WEB-INF/tags/create_games.tag:431
 msgid "Players per Game"
 msgstr "Spieler pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:437
-#: src/main/webapp/WEB-INF/tags/create_games.tag:465
+#: src/main/webapp/WEB-INF/tags/create_games.tag:438
+#: src/main/webapp/WEB-INF/tags/create_games.tag:466
 msgid "Stage Games"
 msgstr "Spielentwürfe anlegen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:449
+#: src/main/webapp/WEB-INF/tags/create_games.tag:450
 msgid "Create Empty Staged Games"
 msgstr "Leeren Spielentwurf erstellen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:457
+#: src/main/webapp/WEB-INF/tags/create_games.tag:458
 msgid "Number of staged games to create."
 msgstr "Anzahl der zu erstellenden Spielentwürfe."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:458
+#: src/main/webapp/WEB-INF/tags/create_games.tag:459
 msgid "Number of Games"
 msgstr "Anzahl der Spiele"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:479
+#: src/main/webapp/WEB-INF/tags/create_games.tag:480
 msgid "Battleground Games"
 msgstr "Battleground-Spiele"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:500
+#: src/main/webapp/WEB-INF/tags/create_games.tag:501
 msgid "Role Assignment Explanation"
 msgstr "Erläuterung der Rollenzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:502
+#: src/main/webapp/WEB-INF/tags/create_games.tag:503
 msgid "Specifies how roles are assigned to players:"
 msgstr "Legt fest, wie Rollen den Spielern zugewiesen werden:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:505
-#: src/main/webapp/WEB-INF/tags/create_games.tag:521
+#: src/main/webapp/WEB-INF/tags/create_games.tag:506
+#: src/main/webapp/WEB-INF/tags/create_games.tag:522
 msgid "Random:"
 msgstr "Zufällig:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:506
+#: src/main/webapp/WEB-INF/tags/create_games.tag:507
 msgid "Players are assigned roles randomly."
 msgstr "Die Spieler erhalten ihre Rollen nach dem Zufallsprinzip."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:509
+#: src/main/webapp/WEB-INF/tags/create_games.tag:510
 msgid "Opposite:"
 msgstr "Gegenüber:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:510
+#: src/main/webapp/WEB-INF/tags/create_games.tag:511
 msgid ""
 "Players are assigned the opposite of their last played role, if possible."
 msgstr ""
 "Den Spielern wird, wenn möglich, die entgegengesetzte Rolle ihrer zuletzt "
 "gespielten Rolle zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:516
+#: src/main/webapp/WEB-INF/tags/create_games.tag:517
 msgid "Game Assignment Explanation"
 msgstr "Erklärung zur Spielaufgabe"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:518
+#: src/main/webapp/WEB-INF/tags/create_games.tag:519
 msgid "Specifies how players are assigned to games:"
 msgstr "Legt fest, wie Spieler den Spielen zugewiesen werden:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:522
+#: src/main/webapp/WEB-INF/tags/create_games.tag:523
 msgid "Players are assigned to games randomly."
 msgstr "Die Spieler werden nach dem Zufallsprinzip den Spielen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:525
+#: src/main/webapp/WEB-INF/tags/create_games.tag:526
 msgid "Scores Descending:"
 msgstr "Ergebnisse absteigend:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:526
+#: src/main/webapp/WEB-INF/tags/create_games.tag:527
 msgid "Players are assigned to games based on their total score in past games."
 msgstr ""
 "Die Spieler werden anhand ihrer Gesamtpunktzahl aus früheren Spielen den "
 "Spielen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:527
+#: src/main/webapp/WEB-INF/tags/create_games.tag:528
 msgid "The players with the highest scores are assigned to the first games,"
 msgstr ""
 "Die Spieler mit den höchsten Punktzahlen werden den ersten Spielen "
 "zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:528
+#: src/main/webapp/WEB-INF/tags/create_games.tag:529
 msgid "the players with the lowest scores are assigned to the last games."
 msgstr ""
 "Die Spieler mit den niedrigsten Punktzahlen werden den letzten Spielen "
 "zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:534
+#: src/main/webapp/WEB-INF/tags/create_games.tag:535
 msgid "User Names Explanation"
 msgstr "Erläuterung der Benutzernamen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:536
+#: src/main/webapp/WEB-INF/tags/create_games.tag:537
 msgid ""
 "Newline-separated list of usernames or emails. The users with these names/"
 "emails, as well as the users selected in the table, will be assigned to "
@@ -7121,11 +7549,11 @@ msgstr ""
 "Die Benutzer mit diesen Namen/E-Mail-Adressen sowie die in der Tabelle "
 "ausgewählten Benutzer werden den erstellten Spielentwürfen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:540
+#: src/main/webapp/WEB-INF/tags/create_games.tag:541
 msgid "Stage Games With Users Explanation"
 msgstr "Spielentwürfe mit Benutzern Erklärung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:543
+#: src/main/webapp/WEB-INF/tags/create_games.tag:544
 msgid ""
 "Selected users from the table, as well as users entered in the text area, "
 "will be assigned to new staged games."
@@ -7133,7 +7561,7 @@ msgstr ""
 "Ausgewählte Benutzer aus der Tabelle sowie Benutzer, die in den Textbereich "
 "eingegeben wurden, werden neuen Spielentwürfen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:544
+#: src/main/webapp/WEB-INF/tags/create_games.tag:545
 msgid ""
 "The number of games is decided by the number of users and the selected "
 "method of distributing the users to teams."
@@ -7141,153 +7569,153 @@ msgstr ""
 "Die Anzahl der Spiele wird durch die Anzahl der Benutzer und die gewählte "
 "Methode zur Aufteilung der Benutzer auf die Teams bestimmt."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:547
-#: src/main/webapp/WEB-INF/tags/create_games.tag:555
+#: src/main/webapp/WEB-INF/tags/create_games.tag:548
+#: src/main/webapp/WEB-INF/tags/create_games.tag:556
 msgid "The settings for the staged games are specified in the left card."
 msgstr ""
 "Die Einstellungen für die inszenierten Spiele sind auf der linken Karte "
 "angegeben."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:552
+#: src/main/webapp/WEB-INF/tags/create_games.tag:553
 msgid "Stage Empty Games Explanation"
 msgstr "Erklärung: Spielentwürfe ohne Spieler"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:554
+#: src/main/webapp/WEB-INF/tags/create_games.tag:555
 msgid "Create a number staged games without users assigned to them."
 msgstr "Erstelle eine Reihe von Spielen, denen keine Benutzer zugewiesen sind."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:655
+#: src/main/webapp/WEB-INF/tags/create_games.tag:656
 msgid "None"
 msgstr "Keine"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:736
+#: src/main/webapp/WEB-INF/tags/create_games.tag:737
 msgid "none"
 msgstr "keine"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:760
+#: src/main/webapp/WEB-INF/tags/create_games.tag:761
 msgid "Dates are converted to you local timezone: {0}"
 msgstr "Die Daten werden in deine lokale Zeitzone umgerechnet: {0}"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:813
+#: src/main/webapp/WEB-INF/tags/create_games.tag:814
 msgid "Add player to selected game"
 msgstr "Spieler zum ausgewählten Spiel hinzufügen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:840
+#: src/main/webapp/WEB-INF/tags/create_games.tag:841
 msgid "alias"
 msgstr "alias"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:862
+#: src/main/webapp/WEB-INF/tags/create_games.tag:863
 msgid "hidden"
 msgstr "versteckt"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:958
+#: src/main/webapp/WEB-INF/tags/create_games.tag:959
 msgid "Switch your role"
 msgstr "Wechsle deine Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:970
+#: src/main/webapp/WEB-INF/tags/create_games.tag:971
 msgid "Change to Observer"
 msgstr "Wechsle zu Beobachter"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1020
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1021
 msgid "Switch role of player"
 msgstr "Rolle des Spielers wechseln"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1032
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1033
 msgid "Remove player from game"
 msgstr "Spieler aus dem Spiel entfernen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1073
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1074
 msgid "Move player to selected game"
 msgstr "Spieler zum ausgewählten Spiel verschieben"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1177
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1178
 msgid "Include Predefined Mutants"
 msgstr "Vordefinierte Mutanten einbeziehen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1181
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1182
 msgid "Include Predefined Tests"
 msgstr "Vordefinierte Tests einbeziehen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1185
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1186
 msgid "Max Assertions Per Test"
 msgstr "Maximale Anzahl von Assertions pro Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1197
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1198
 msgid "Chat Enabled"
 msgstr "Chat aktiviert"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1201
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1202
 msgid "Capture Player Intentions"
 msgstr "Intentionen der Spieler erfassen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1205
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1206
 msgid "Equivalence Threshold"
 msgstr "Äquivalenz-Threshold"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1209
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1210
 #: src/main/webapp/WEB-INF/tags/game_header.tag:165
 msgid "Start Game"
 msgstr "Spiel starten"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1213
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1214
 #: src/main/webapp/WEB-INF/tags/game_time.tag:53
 #: src/main/webapp/WEB-INF/tags/game_time.tag:58
 msgid "Game Duration"
 msgstr "Spieldauer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1265
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1266
 msgid "Show"
 msgstr "Anzeigen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1267
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1268
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1275
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1276
 msgid "Players (Username, Classroom Role, Last Game Role, Total Score)"
 msgstr ""
 "Spieler (Benutzername, Rolle im Klassenzimmer, Rolle im letzten Spiel, "
 "Gesamtpunktzahl)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1276
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1277
 msgid "Players (Username, Last Game Role, Total Score)"
 msgstr "Spieler (Benutzername, letzte Spielrolle, Gesamtpunktzahl)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1314
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
 msgid "There are currently no staged games."
 msgstr "Derzeit gibt es keine Spielentwürfe."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1316
 msgid "No matching staged games found."
 msgstr "Es wurden keine passenden Spielentwürfe gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1495
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1496
 msgid "Classroom Role"
 msgstr "Rolle im Klassenraum"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1502
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1503
 msgid "Last Game Role"
 msgstr "Letzte Spielrolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1520
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1521
 msgid "Add to existing game"
 msgstr "Zum bestehenden Spiel hinzufügen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1544
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1545
 msgid "No users found."
 msgstr "Keine Benutzer gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1545
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1546
 msgid "No matching users found."
 msgstr "Keine passenden Benutzer gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1692
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1693
 msgid "You have users selected. Are you sure you want to stage empty games?"
 msgstr ""
 "Sie haben Benutzer ausgewählt. Möchten Sie wirklich leere Spielentwürfe "
 "erstellen?"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1696
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1697
 msgid ""
 "You entered user names/emails. Are you sure you want to stage empty games?"
 msgstr ""
@@ -7642,6 +8070,10 @@ msgstr "Bestehende Mutanten"
 msgid "Alive"
 msgstr "Lebendig"
 
+#: src/main/webapp/WEB-INF/tags/mutant_ruleset_explanation.tag:27
+msgid "Mutation rules:"
+msgstr "Mutationsregeln:"
+
 #: src/main/webapp/WEB-INF/tags/navbar.tag:63
 msgid "Multiplayer"
 msgstr "Mehrspieler"
@@ -7702,79 +8134,9 @@ msgstr "Mein Mutant ist äquivalent"
 msgid "I don\\'t know if my mutant is killable"
 msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:24
-msgid "Mutation rules"
-msgstr "Mutationsregeln"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:27
-msgid "No calls to {0},{1}"
-msgstr "Keine Aufrufe von {0}, {1}"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:28
-msgid "No mutants with only changes to comments or formatting"
-msgstr "Keine Mutanten mit nur Änderungen an Kommentaren oder Formatierungen"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:29
-msgid "No renaming of methods or fields, no additional methods or fields"
-msgstr ""
-"Keine Umbenennung von Methoden oder Feldern, keine zusätzlichen Methoden "
-"oder Felder"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:33
-msgid "No changes to comments"
-msgstr "Keine Änderungen an Kommentaren"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:34
-msgid "No additional logical operators ({0}, {1})"
-msgstr "Keine zusätzlichen logischen Operatoren ({0}, {1})"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
-msgid "No ternary operators"
-msgstr "Keine ternären Operatoren"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:36
-msgid "No new control structures ({0}, {1}, {2}, ...)"
-msgstr "Keine neuen Kontrollstrukturen ({0}, {1}, {2}, ...)"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:40
-msgid "No reflection"
-msgstr "Keine Reflection"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:41
-msgid "No bitwise operators (bitshifts and logical)"
-msgstr "Keine Bitoperatoren (Bitverschiebungen und logische Operatoren)"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:42
-msgid "No signature changes"
-msgstr "Keine Änderungen der Signatur"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:38
-msgid "Only {0} assertion per test"
-msgstr "Nur {0} Assertion pro Test"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:39
-msgid "Only {0} assertions per test"
-msgstr "Nur {0} Assertions pro Test"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:44
-msgid "Only the configured number of assertions per test (default: {0})"
-msgstr "Nur die konfigurierte Anzahl von Assertions pro Test (Standard: {0})"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:47
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
 msgid "Test rules"
 msgstr "Testregeln"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:49
-msgid "No loops"
-msgstr "Keine Schleifen"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
-msgid "No calls to System.*"
-msgstr "Keine Aufrufe von System.*"
-
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:51
-msgid "No new methods or conditionals"
-msgstr "Keine neuen Methoden oder Bedingungen"
 
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:47
 msgid "Invite users"
@@ -7820,6 +8182,52 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Mutation rules"
+#~ msgstr "Mutationsregeln"
+
+#~ msgid "No calls to {0},{1}"
+#~ msgstr "Keine Aufrufe von {0}, {1}"
+
+#~ msgid "No mutants with only changes to comments or formatting"
+#~ msgstr ""
+#~ "Keine Mutanten mit nur Änderungen an Kommentaren oder Formatierungen"
+
+#~ msgid "No renaming of methods or fields, no additional methods or fields"
+#~ msgstr ""
+#~ "Keine Umbenennung von Methoden oder Feldern, keine zusätzlichen Methoden "
+#~ "oder Felder"
+
+#~ msgid "No additional logical operators ({0}, {1})"
+#~ msgstr "Keine zusätzlichen logischen Operatoren ({0}, {1})"
+
+#~ msgid "No ternary operators"
+#~ msgstr "Keine ternären Operatoren"
+
+#~ msgid "No new control structures ({0}, {1}, {2}, ...)"
+#~ msgstr "Keine neuen Kontrollstrukturen ({0}, {1}, {2}, ...)"
+
+#~ msgid "No reflection"
+#~ msgstr "Keine Reflection"
+
+#~ msgid "No bitwise operators (bitshifts and logical)"
+#~ msgstr "Keine Bitoperatoren (Bitverschiebungen und logische Operatoren)"
+
+#~ msgid "No signature changes"
+#~ msgstr "Keine Änderungen der Signatur"
+
+#~ msgid "Only {0} assertion per test"
+#~ msgstr "Nur {0} Assertion pro Test"
+
+#~ msgid "Only {0} assertions per test"
+#~ msgstr "Nur {0} Assertions pro Test"
+
+#~ msgid "Only the configured number of assertions per test (default: {0})"
+#~ msgstr ""
+#~ "Nur die konfigurierte Anzahl von Assertions pro Test (Standard: {0})"
+
+#~ msgid "No new methods or conditionals"
+#~ msgstr "Keine neuen Methoden oder Bedingungen"
 
 #~ msgid "Failed to set class as {0}."
 #~ msgstr "Die Klasse konnte nicht als {0} festgelegt werden."

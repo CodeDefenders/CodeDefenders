@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
@@ -79,6 +80,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.CDIUtil;
@@ -92,6 +94,7 @@ import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
@@ -186,6 +189,10 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private MutantValidator mutantValidator;
+
+    @Named
+    @Inject
+    private I18nService i18nService;
 
     /**
      * {@inheritDoc}
@@ -321,8 +328,9 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+        I18n i18n = i18nService.getI18n(userId);
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, i18n);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -333,7 +341,10 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         if (!validationSuccess) {
             return CreateBattlegroundMutantResult.failure(
-                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
+                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED,
+                    validationResult.getMessage(i18n),
+                    null
+            );
         }
 
         Mutant existingMutant = existingMutant(game.getId(), code);
@@ -534,6 +545,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
+        I18n i18n = i18nService.getI18n(userId);
+
         // Do the validation even before creating the mutant
         CodeValidationResult validationMessage = testValidator.validateTestCode(
                 code,
@@ -545,13 +558,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return CreateBattlegroundTestResult.failure(
                     null, CreateBattlegroundTestResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.toString(), null, null);
+                    validationMessage.getMessage(i18n), null, null);
         }
 
         // From this point on we assume that test is valid according to the rules (but it might still not compile)
@@ -751,6 +764,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             MultiplayerGame game, int userId, Mutant equivMutant, String code) throws IOException {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
+        I18n i18n = i18nService.getI18n(userId);
 
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(game.getId());
@@ -767,13 +781,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return RejectBattlegroundEquivalenceResult.testInvalid(
                     null, RejectBattlegroundEquivalenceResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.toString(), null, null);
+                    validationMessage.getMessage(i18n), null, null);
         }
 
         Test newTest = createTest(game.getId(), game.getClassId(), code, userId, MODE_BATTLEGROUND_DIR);

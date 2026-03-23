@@ -20,7 +20,8 @@
 --%>
 <%@ page isErrorPage="true" pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-f<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <t:error_page
         title="${i18n.tr('Internal Server Error (500)')}"

@@ -37,7 +37,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,13 +185,11 @@ public class I18nService {
     /**
      * Get the i18n instance for the user's preferred locale.
      *
-     * @param simpleUser The user for which to get the i18n instance. If null, the default locale is used.
+     * @param userId The user for which to get the i18n instance. If it doesn't exist, the default locale is used.
      * @return The i18n instance for the user's preferred locale.
      */
-    public I18n getI18n(SimpleUser simpleUser) {
-        var lang = Optional.ofNullable(simpleUser)
-                .map(SimpleUser::getId)
-                .flatMap(userService::getUserById)
+    public I18n getI18n(int userId) {
+        var lang = userService.getUserById(userId)
                 .map(User::getLocale)
                 .orElseGet(this::getDefaultLocale)
                 .getLanguage();

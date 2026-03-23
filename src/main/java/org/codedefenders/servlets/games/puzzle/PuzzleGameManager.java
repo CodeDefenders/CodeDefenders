@@ -433,7 +433,7 @@ public class PuzzleGameManager extends HttpServlet {
                     gse.setGameId(gameId);
                     notificationService.post(gse);
                 } else {
-                    messages.add("No, this mutant is not equivalent to the class under test.");
+                    messages.add(I18n.marktr("No, this mutant is not equivalent to the class under test."));
                     game.incrementCurrentRound();
 
                     ServletUtils.getStringParameter(request, "test")
@@ -461,15 +461,17 @@ public class PuzzleGameManager extends HttpServlet {
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
                 boolean validationSuccess = validationMessage.isValid();
 
+                I18n i18n = i18nService.getI18n(request);
+
                 TestValidatedEvent tve = new TestValidatedEvent();
                 tve.setGameId(gameId);
                 tve.setUserId(login.getUserId());
                 tve.setSuccess(validationSuccess);
-                tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+                tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    messages.add(validationMessage.toString()).alert();
+                    messages.add(validationMessage.getMessage(i18n)).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -647,15 +649,17 @@ public class PuzzleGameManager extends HttpServlet {
                 game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isValid();
 
+        I18n i18n = i18nService.getI18n(request);
+
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.add(validationMessage.toString()).alert();
+            messages.add(validationMessage.getMessage(i18n)).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -807,21 +811,22 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(mse);
 
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
+        final I18n i18n = i18nService.getI18n(request);
 
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel, i18n);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
         mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationResult.toString());
+        mve.setValidationMessage(validationSuccess ? null : validationResult.getMessage(i18n));
         notificationService.post(mve);
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationResult.toString()).alert();
+            messages.add(validationResult.getMessage(i18n)).alert();
             Redirect.redirectBack(request, response);
             return;
         }
@@ -979,7 +984,7 @@ public class PuzzleGameManager extends HttpServlet {
             if (puzzleChapter.getId() >= currentChapter) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
-                 * and empty, not-null list if there's not puzzles
+                 * an empty, not-null list if there are no puzzles
                  */
                 for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
                     if (puzzleChapter.getId() == currentChapter
@@ -996,7 +1001,10 @@ public class PuzzleGameManager extends HttpServlet {
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
                         if (puzzleChapter.getId() > currentChapter) {
-                            var chapterText = puzzleRepo.getPuzzleChapterText(puzzleChapter.getId(), i18n.getLocale().getLanguage());
+                            var chapterText = puzzleRepo.getPuzzleChapterText(
+                                    puzzleChapter.getId(),
+                                    i18n.getLocale().getLanguage()
+                            );
                             message.append(i18n.tr("""
                                             <br>
                                             You solved all the puzzles of the current chapter!

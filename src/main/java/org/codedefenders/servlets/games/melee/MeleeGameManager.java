@@ -77,6 +77,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -92,6 +93,7 @@ import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
@@ -201,6 +203,9 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private MutantValidator mutantValidator;
+
+    @Inject
+    private I18nService i18nService;
 
 
     @Override
@@ -435,6 +440,7 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
+        I18n i18n = i18nService.getI18n(user.getId());
         CodeValidationResult validationMessages = testValidator.validateTestCode(testText,
                 game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessages.isValid();
@@ -443,11 +449,11 @@ public class MeleeGameManager extends HttpServlet {
         tve.setGameId(game.getId());
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessages.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.add(validationMessages.toString()).alert();
+            messages.add(validationMessages.getMessage(i18n)).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
@@ -607,9 +613,10 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
+        I18n i18n = i18nService.getI18n(user.getId());
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
-                mutantText, codeValidatorLevel);
+                mutantText, codeValidatorLevel, i18n);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -620,7 +627,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationResult.toString()).alert();
+            messages.add(validationResult.getMessage(i18n)).alert();
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -761,22 +768,22 @@ public class MeleeGameManager extends HttpServlet {
 
         switch (gameManagingUtils.canUserResolveEquivalence(game, login.getUserId(), equivMutantId.get())) {
             case USER_NOT_PART_OF_THE_GAME -> {
-                messages.add("User is not a player in the game.");
+                messages.add(I18n.marktr("User is not a player in the game."));
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
             case USER_NOT_AN_ATTACKER -> {
-                messages.add("Can only resolve equivalence duels if you are a Player!");
+                messages.add(I18n.marktr("Can only resolve equivalence duels if you are a Player!"));
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
                 return;
             }
             case GAME_NOT_ACTIVE -> {
-                messages.add(String.format("Game %d has finished.", gameId));
+                messages.addFormatted(I18n.marktr("Game {0} has finished."), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
             case MUTANT_DOES_NOT_EXIST -> {
-                messages.add("Mutant does not exist.");
+                messages.add(I18n.marktr("Mutant does not exist."));
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
                 return;
             }
@@ -792,7 +799,7 @@ public class MeleeGameManager extends HttpServlet {
                         "User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                         login.getUserId(), equivMutantId.get());
                 if (equivMutant.getState() == KILLED) {
-                    messages.add("Too late. The mutant was already killed and therefore proven to be not equivalent.");
+                    messages.add(I18n.marktr("Too late. The mutant was already killed and therefore proven to be not equivalent."));
                     // TODO: Continue with the resolution to give them the option to win other duels? (only if action=="reject")
                 }
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
@@ -874,15 +881,17 @@ public class MeleeGameManager extends HttpServlet {
                     game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessages.isValid();
 
+            I18n i18n = i18nService.getI18n(request);
+
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
             tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
-            tve.setValidationMessage(validationSuccess ? null : validationMessages.toString());
+            tve.setValidationMessage(validationSuccess ? null : validationMessages.getMessage(i18n));
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.add(validationMessages.toString()).alert();
+                messages.add(validationMessages.getMessage(i18n)).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
@@ -1017,16 +1026,16 @@ public class MeleeGameManager extends HttpServlet {
             if (killedClaimed) {
                 messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
                 if (killedOthers == 1) {
-                    messages.add("...and it also killed another claimed mutant!");
+                    messages.add(I18n.marktr("...and it also killed another claimed mutant!"));
                 } else if (killedOthers > 1) {
-                    messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
+                    messages.addFormatted(I18n.marktr("...and it also killed other {0} claimed mutants!"), killedOthers);
                 }
             } else {
                 messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
                 if (killedOthers == 1) {
-                    messages.add("...however, your test did kill another claimed mutant!");
+                    messages.add(I18n.marktr("...however, your test did kill another claimed mutant!"));
                 } else if (killedOthers > 1) {
-                    messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
+                    messages.addFormatted(I18n.marktr("...however, your test killed other {0} claimed mutants!"), killedOthers);
                 }
             }
 
@@ -1052,7 +1061,7 @@ public class MeleeGameManager extends HttpServlet {
                                  int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
-            messages.add("You cannot claim mutants as equivalent in this game anymore.");
+            messages.add(I18n.marktr("You cannot claim mutants as equivalent in this game anymore."));
             logger.info("Mutant claimed for non-active game.");
             Redirect.redirectBack(request, response);
             return;
@@ -1124,9 +1133,14 @@ public class MeleeGameManager extends HttpServlet {
             eventDAO.insert(event);
         }
 
-        String flaggingMessage = nClaimed == 0 ? "Mutant has already been claimed as equivalent or killed!"
-                : String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's'));
-        messages.add(flaggingMessage);
+        if (nClaimed == 0) {
+            messages.add(I18n.marktr("Mutant has already been claimed as equivalent or killed!"));
+        } else if (nClaimed == 1) {
+            messages.add(I18n.marktr("Flagged 1 mutant as equivalent"));
+        } else {
+            messages.addFormatted(I18n.marktr("Flagged {0} mutants as equivalent"), nClaimed);
+        }
+
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
 
