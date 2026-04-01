@@ -21,7 +21,7 @@ create table if not exists `llm_models`
 create table if not exists llm_custom_strategies
 (
     Strategy_ID   int(11) primary key auto_increment,
-    Strategy_Name varchar(100),
+    Strategy_Name varchar(100) unique not null,
     Base_name     varchar(100),
     Time_modifier double default 1
 );

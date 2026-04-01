@@ -21,6 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -267,7 +268,25 @@ public class LlmRepository {
 
 
     public void saveCustomStrategy(LlmStrategy customStrategy, String oldName) {
-        boolean alreadyExisting = getCustomStrategy(customStrategy.getName()).isPresent();
+        Optional<LlmStrategy> oldStrategy = getCustomStrategy(customStrategy.getName());
+        boolean alreadyExisting;
+        if (oldStrategy.isEmpty()) {
+            alreadyExisting = false;
+        } else if (oldStrategy.get().getBase().equals(customStrategy.getBase())) {
+            alreadyExisting = true;
+        } else {
+            // This should normally be caught at the UI level
+            throw new IllegalArgumentException("A custom strategy with this name already exists.");
+        }
+
+
+        if (Arrays.stream(LlmDefaultStrategy.values())
+                .anyMatch(strat -> strat.name().equals(customStrategy.getName()))) {
+            // This should normally be caught at the UI level
+            throw new IllegalArgumentException("You tried to name a custom strategy "
+                    + customStrategy + "after a default strategy");
+        }
+
         @Language("SQL") String strategySql;
 
         if (alreadyExisting) {
