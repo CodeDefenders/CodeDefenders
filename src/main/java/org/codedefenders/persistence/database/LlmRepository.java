@@ -268,7 +268,7 @@ public class LlmRepository {
 
 
     public void saveCustomStrategy(LlmStrategy customStrategy, String oldName) {
-        Optional<LlmStrategy> oldStrategy = getCustomStrategy(customStrategy.getName());
+        Optional<LlmStrategy> oldStrategy = getCustomStrategy(oldName);
         boolean alreadyExisting;
         if (oldStrategy.isEmpty()) {
             alreadyExisting = false;

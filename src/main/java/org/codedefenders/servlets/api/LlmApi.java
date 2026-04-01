@@ -265,7 +265,11 @@ public class LlmApi extends HttpServlet {
 
                 LlmStrategy customStrategy = new LlmStrategy(newCustomName.get(), baseStrategy.get());
                 customStrategy.setCustomPrompts(customPrompts);
-                llmRepo.saveCustomStrategy(customStrategy);
+                if (oldCustomName.isPresent()) {
+                    llmRepo.saveCustomStrategy(customStrategy, oldCustomName.get());
+                } else {
+                    llmRepo.saveCustomStrategy(customStrategy);
+                }
                 resp.setStatus(HttpServletResponse.SC_OK);
 
                 logger.info("Map: {}", customPrompts);
