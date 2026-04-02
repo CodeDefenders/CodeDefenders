@@ -25,9 +25,6 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("KillMap Analytics"); %>
-
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <p:main_page title="${i18n.tr('KillMap Analytics')}">

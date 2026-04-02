@@ -29,7 +29,6 @@
 <%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%@ attribute name="additionalImports" required="false" fragment="true"

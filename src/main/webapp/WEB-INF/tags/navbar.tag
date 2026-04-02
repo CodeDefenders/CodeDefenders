@@ -26,7 +26,6 @@
 <%@ tag import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="puzzleRepo" type="org.codedefenders.persistence.database.PuzzleRepository"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>

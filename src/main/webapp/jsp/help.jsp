@@ -28,7 +28,6 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
 <fmt:setBundle basename="org.codedefenders.i18n.Messages" var="bundle"/>
 

@@ -33,7 +33,6 @@ import jakarta.validation.ValidationException;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
@@ -61,9 +60,6 @@ public class ClassroomServlet extends HttpServlet {
     private URLUtils url;
 
     @Inject
-    private PageInfoBean pageInfo;
-
-    @Inject
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -80,7 +76,6 @@ public class ClassroomServlet extends HttpServlet {
                 classroom.get().getId(), login.getUserId());
 
         // Go to classroom page
-        pageInfo.setPageTitle(classroom.get().getName());
         request.setAttribute("classroom", classroom.get());
         request.setAttribute("member", member.orElse(null));
         request.setAttribute("link", classroomService.getInviteLinkForClassroom(classroom.get().getUUID()));
