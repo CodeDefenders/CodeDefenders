@@ -51,7 +51,7 @@
                     </c:when>
                     <c:otherwise>
                     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
-                                Edit TODO
+                                Edit
                             </button>
                         </c:otherwise>
                         </c:choose>

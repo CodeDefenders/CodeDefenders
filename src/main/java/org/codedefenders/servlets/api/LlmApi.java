@@ -228,6 +228,12 @@ public class LlmApi extends HttpServlet {
             case "updatePrompts" -> {
                 Optional<String> oldCustomName = ServletUtils.getStringParameter(req, "oldCustomName");
                 Optional<String> newCustomName = ServletUtils.getStringParameter(req, "newCustomName");
+                if (newCustomName.isPresent() && !newCustomName.get().matches("[a-zA-Z0-9_\\-]+")) {
+                    logger.error("{} contains illegal characters.", newCustomName.get());
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                    return;
+                }
                 Optional<LlmDefaultStrategy> baseStrategy = ServletUtils.getEnumParameter(
                         req,
                         LlmDefaultStrategy.class,

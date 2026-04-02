@@ -75,7 +75,7 @@
         <div class="d-flex flex-row border-bottom border-2 border-secondary p-2 mb-2">
             <label class="form-label flex-fill" for="${htmlId}-new-custom-name">Strategy name:</label>
             <input class="form-control" id="${htmlId}-new-custom-name" type="text" name="newCustomName"
-                   value="${strategy.name}">
+                   value="${strategy.name}${strategy.readOnly ? "_clone" : ""}"  required pattern="[a-zA-Z0-9_\-]+">
         </div>
         <button class="btn btn-primary" id="${htmlId}-add-prompt" type="button">
             Add custom prompt
