@@ -59,19 +59,16 @@ public class TeacherApplicationTemplate {
     }
 
     public String getBody(I18n i18n) {
-        return i18n.tr(
-                """
+        return i18n.tr("""
                 Greetings,
 
-                I would like to request a teacher account for %s on %s.
+                I would like to request a teacher account for {0} on {1}.
 
                 Regards,
-                %s
-                """
-        ).stripIndent().formatted(
-                login.getSimpleUser().getName(),
-                getShortAbsoluteUri(),
-                login.getSimpleUser().getName()
+                {0}
+                """,
+            login.getSimpleUser().getName(),
+            getShortAbsoluteUri()
         );
     }
 

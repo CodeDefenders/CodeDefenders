@@ -6682,8 +6682,8 @@ msgstr ""
 "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um Spiele "
 "einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto umwandeln "
 "möchtest, schick uns bitte eine E-Mail mit der unten stehenden Vorlage. Du "
-"kannst auch diesen <a href=\\'{0}\\'>Mailto-Link</a> verwenden, um "
-"automatisch eine E-Mail mit der Vorlage zu erstellen."
+"kannst auch diesen <a href=\"{0}\">Mailto-Link</a> verwenden, um automatisch "
+"eine E-Mail mit der Vorlage zu erstellen."
 
 #: src/main/webapp/jsp/contact.jsp:116
 msgid "Show template"
