@@ -87,6 +87,7 @@ import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
+import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
@@ -500,7 +501,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             boolean isSuccess,
             // on success
             Optional<Test> test,
-            Optional<String> mutationTesterMessage,
+            Optional<PreparedMessage> mutationTesterMessage,
             // on failure
             Optional<FailureReason> failureReason,
             Optional<String> validationErrorMessages,
@@ -513,7 +514,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             TEST_DID_NOT_PASS_ON_CUT,
         }
 
-        public static CreateBattlegroundTestResult success(Test test, String mutationTesterMessage) {
+        public static CreateBattlegroundTestResult success(Test test, PreparedMessage mutationTesterMessage) {
             return new CreateBattlegroundTestResult(
                     true,
                     Optional.of(test),
@@ -596,7 +597,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
 
-        String mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
+        PreparedMessage mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -1156,16 +1157,22 @@ public class GameManagingUtils implements IGameManagingUtils {
         return decorated.toString();
     }
 
-    public Optional<String> getTestSmellsMessage(Test test) {
+    public Optional<PreparedMessage> getTestSmellsMessage(Test test) {
         List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(test.getId());
-        if (!detectedTestSmells.isEmpty()) {
-            if (detectedTestSmells.size() == 1) {
-                return Optional.of("Your test has the following smell: " + detectedTestSmells.get(0));
-            } else {
-                String join = String.join(", ", detectedTestSmells);
-                return Optional.of("Your test has the following smells: " + join);
-            }
+        if (detectedTestSmells.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        if (detectedTestSmells.size() == 1) {
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Your test has the following smell: {0}"),
+                    detectedTestSmells.get(0)
+            ));
+        } else {
+            String smells = String.join(", ", detectedTestSmells);
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Your test has the following smells: {0}"),
+                    smells
+            ));
+        }
     }
 }

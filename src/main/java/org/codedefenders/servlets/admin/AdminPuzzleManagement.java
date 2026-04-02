@@ -50,6 +50,7 @@ import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.ADMIN_PUZZLE_MANAGEMENT_JSP;
@@ -119,8 +120,9 @@ public class AdminPuzzleManagement extends HttpServlet {
 
         Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
+            I18n i18n = i18nService.getI18n(request);
             response.setStatus(HttpStatus.SC_NOT_FOUND);
-            response.getWriter().println("Puzzle not found.");
+            response.getWriter().println(i18n.tr("Puzzle not found."));
             return;
         }
 

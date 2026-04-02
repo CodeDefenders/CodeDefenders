@@ -128,7 +128,7 @@
                     case 'filter':
                         return memberCount;
                     case 'display':
-                        const members = memberCount > 1 ? '${i18n.tr('Members')}' : '${i18n.tr('Member')}';
+                        const members = memberCount === 1 ? '${i18n.tr('Member')}' : '${i18n.tr('Members')}';
                         return `
                             <span class="text-muted">\${memberCount} \${members}</span>
                         `;

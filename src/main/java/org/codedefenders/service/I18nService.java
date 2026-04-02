@@ -127,7 +127,7 @@ public class I18nService {
     /**
      * @return Array of locales set in the admin settings. Always contains at least one fallback locale.
      */
-    public Locale [] getSupportedLocales() {
+    public Locale[] getSupportedLocales() {
         var supportedLanguageSetting = getSystemSetting(SUPPORTED_LANGUAGES).getStringValue();
         var locales = Arrays.stream(supportedLanguageSetting.split("[,;]"))
                 .filter(not(String::isBlank)).map(Locale::new).toArray(Locale[]::new);

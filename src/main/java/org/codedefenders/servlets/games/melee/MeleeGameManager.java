@@ -678,9 +678,9 @@ public class MeleeGameManager extends HttpServlet {
                     MODE_BATTLEGROUND_DIR);
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
-                messages.add("Error submitting the mutant: data too long. Maybe you made too many changes?").alert();
+                messages.add(I18n.marktr("Error submitting the mutant: data too long. Maybe you made too many changes?")).alert();
             } else {
-                messages.add("Database error while saving the mutant.");
+                messages.add(I18n.marktr("Database error while saving the mutant."));
                 logger.error("Database error while saving the mutant: {}", e.getMessage());
             }
             response.sendRedirect(

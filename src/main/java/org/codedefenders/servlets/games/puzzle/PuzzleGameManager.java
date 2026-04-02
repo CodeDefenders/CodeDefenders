@@ -549,7 +549,7 @@ public class PuzzleGameManager extends HttpServlet {
                     gse.setGameId(gameId);
                     notificationService.post(gse);
                 } else { // ASSUMED_YES
-                    messages.add("Your test did not kill the mutant. Try again.");
+                    messages.add(I18n.marktr("Your test did not kill the mutant. Try again."));
                     previousSubmission.setTestCode(testText); // keep the non-killing test?
                     game.incrementCurrentRound();
                 }
@@ -726,7 +726,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         if (!solver.solve(game, newTest)) {
-            messages.add("Your test did not solve the puzzle. Try another one...");
+            messages.add(I18n.marktr("Your test did not solve the puzzle. Try another one..."));
             game.incrementCurrentRound();
         } else {
             messages.clear();
@@ -926,7 +926,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         if (!solver.solve(game, newMutant)) {
-            messages.add("Your mutant did not solve the puzzle. Try another one...");
+            messages.add(I18n.marktr("Your mutant did not solve the puzzle. Try another one..."));
             game.incrementCurrentRound();
         } else {
             messages.clear();

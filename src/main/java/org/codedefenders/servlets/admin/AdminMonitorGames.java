@@ -67,6 +67,7 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {
@@ -200,16 +201,19 @@ public class AdminMonitorGames extends HttpServlet {
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
             Optional<Integer> userId = userRepo.getUserIdForPlayerId(playerToRemoveId);
             if (userId.isPresent() && !deletePlayer(playerToRemoveId, gameToRemoveFromId, userId.get())) {
-                messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
+                messages.addFormatted(
+                        I18n.marktr("Deleting player {0} failed! \n Please check the logs!"),
+                        playerToRemoveId
+                );
             } else if (switchUser && userId.isPresent()) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 game = gameRepo.getGame(gameToRemoveFromId);
                 if (game != null) {
                     if (!game.addPlayer(userId.get(), newRole)) {
-                        messages.add("Changing role of user " + userId.get() + " failed! \n Please check the logs!");
+                        messages.addFormatted(I18n.marktr("Changing role of user {0} failed! \n Please check the logs!"), userId.get());
                     } else {
-                        messages.add("Successfully changed role of user " + userId.get() + ".");
+                        messages.addFormatted(I18n.marktr("Successfully changed role of user {0}."), userId.get());
                     }
                 }
             }
@@ -228,7 +232,7 @@ public class AdminMonitorGames extends HttpServlet {
                 try {
                     gameId = Integer.parseInt(gameSelectedViaPlayButton);
                 } catch (Exception e) {
-                    messages.add("There was a problem with the form.");
+                    messages.add(I18n.marktr("There was a problem with the form."));
                     response.sendRedirect(url.forPath("/admin"));
                     return;
                 }
@@ -241,7 +245,7 @@ public class AdminMonitorGames extends HttpServlet {
                 try {
                     gameId = Integer.parseInt(gameSelectedViaRematchButton);
                 } catch (Exception e) {
-                    messages.add("There was a problem with the form.");
+                    messages.add(I18n.marktr("There was a problem with the form."));
                     response.sendRedirect(url.forPath("/admin"));
                     return;
                 }
@@ -280,10 +284,10 @@ public class AdminMonitorGames extends HttpServlet {
         }
 
         if (!updated) {
-            messages.add(String.format(
-                    "ERROR trying to start or stop game %d.\nIf this problem persists, contact your administrator.",
+            messages.addFormatted(
+                    I18n.marktr("ERROR trying to start or stop game {0}.\nIf this problem persists, contact your administrator."),
                     gameId
-            ));
+            );
         }
     }
 
@@ -294,7 +298,7 @@ public class AdminMonitorGames extends HttpServlet {
         } else if (game instanceof MeleeGame) {
             meleeGameService.rematch((MeleeGame) game);
         } else {
-            messages.add("Couldn't create a rematch game.");
+            messages.add(I18n.marktr("Couldn't create a rematch game."));
         }
     }
 
@@ -342,7 +346,7 @@ public class AdminMonitorGames extends HttpServlet {
     private void joinGameAsObserver(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var gameId = ServletUtils.getIntParameter(request, "gameId");
         if (gameId.isEmpty()) {
-            messages.add("Missing game id from request");
+            messages.add(I18n.marktr("Missing game id from request"));
             logger.info("Missing game id from request");
             Redirect.redirectBack(request, response);
             return;
@@ -350,14 +354,14 @@ public class AdminMonitorGames extends HttpServlet {
 
         AbstractGame game = gameRepo.getGame(gameId.get());
         if (game == null) {
-            messages.add("Game doesn't exist: " + gameId);
+            messages.addFormatted(I18n.marktr("Game doesn't exist: {0}"), gameId);
             logger.info("Game doesn't exist: " + gameId);
             Redirect.redirectBack(request, response);
             return;
         }
 
         if (game.getCreatorId() == login.getUserId()) {
-            messages.add("You're already the creator of this game.");
+            messages.add(I18n.marktr("You're already the creator of this game."));
             logger.info("User is already the creator of game: " + gameId);
             Redirect.redirectBack(request, response);
             return;

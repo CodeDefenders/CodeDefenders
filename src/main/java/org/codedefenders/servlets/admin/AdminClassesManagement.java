@@ -79,7 +79,7 @@ public class AdminClassesManagement extends HttpServlet {
                     logger.info("Setting class as " + newState + "...");
                     if (setClassActive(classId.get(), active)) {
                         logger.info("Successfully set class as " + newState + "!");
-                        messages.addFormatted(active
+                        messages.add(active
                                 ? I18n.marktr("Successfully set class as active!")
                                 : I18n.marktr("Successfully set class as inactive!"));
                         break;

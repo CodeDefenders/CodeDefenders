@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,11 +35,13 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.javaparser.quality.Nullable;
 
@@ -68,12 +71,16 @@ public class ResolveEquivalenceAPI extends APIServlet {
     @Inject
     protected CodeDefendersAuth login;
 
+    @Named
+    @Inject
+    private I18nService i18nService;
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final var gameId = ServletUtils.getIntParameter(request, "gameId");
         final Optional<GameManagingUtils.ResolveBattlegroundEquivalenceAction> action =
             ServletUtils.getStringParameter(request, "action")
-                    .map(s -> s.toUpperCase())
+                    .map(String::toUpperCase)
                     .map(GameManagingUtils.ResolveBattlegroundEquivalenceAction::valueOf);
         final var equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
         final var code = ServletUtils.getStringParameter(request, "code");
@@ -129,13 +136,14 @@ public class ResolveEquivalenceAPI extends APIServlet {
             MultiplayerGame game, Mutant equivMutant) throws IOException {
         var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
         var messages = new ArrayList<String>();
+        var i18n = i18nService.getI18n(request);
 
         if (result.mutantKillable()) {
-            messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " However, the mutatnt was killable!");
+            messages.add(i18n.tr(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE_KILLABLE));
             writeResponse(response, HttpServletResponse.SC_OK,
                     new AcceptEquivalenceResponseDTO(true, messages));
         } else {
-            messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
+            messages.add(i18n.tr(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE));
             writeResponse(response, HttpServletResponse.SC_OK,
                     new AcceptEquivalenceResponseDTO(false, null));
         }
@@ -143,6 +151,7 @@ public class ResolveEquivalenceAPI extends APIServlet {
 
     private void rejectEquivalence(HttpServletRequest request, HttpServletResponse response,
             MultiplayerGame game, Mutant equivMutant, String code) throws IOException {
+        I18n i18n = i18nService.getI18n(request);
         GameManagingUtils.RejectBattlegroundEquivalenceResult result;
         try {
             result = gameManagingUtils.rejectBattlegroundEquivalence(game, login.getUserId(), equivMutant, code);
@@ -158,11 +167,11 @@ public class ResolveEquivalenceAPI extends APIServlet {
             switch (failureReason) {
                 case VALIDATION_FAILED -> result.validationErrorMessages().ifPresent(messages::add);
                 case COMPILATION_FAILED -> {
-                    messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+                    messages.add(i18n.tr(TEST_DID_NOT_COMPILE_MESSAGE));
                     result.compilationError().ifPresent(messages::add);
                 }
                 case TEST_DID_NOT_PASS_ON_CUT -> {
-                    messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                    messages.add(i18n.tr(TEST_DID_NOT_PASS_ON_CUT_MESSAGE));
                     result.testCutError().ifPresent(messages::add);
                 }
             }
@@ -172,10 +181,8 @@ public class ResolveEquivalenceAPI extends APIServlet {
                             false,
                             false,
                             messages,
-                            result.test().map(test -> {
-                                return Common.TestDTO.fromTestDTO(
-                                    gameService.getTest(login.getUserId(), test.getId()));
-                            }).orElse(null),
+                            result.test().map(test -> Common.TestDTO.fromTestDTO(
+                                gameService.getTest(login.getUserId(), test.getId()))).orElse(null),
                             switch (failureReason) {
                                 case VALIDATION_FAILED -> TestRejectReason.VALIDATION_FAILED;
                                 case COMPILATION_FAILED -> TestRejectReason.COMPILATION_FAILED;
@@ -185,20 +192,20 @@ public class ResolveEquivalenceAPI extends APIServlet {
                             null));
         } else {
             if (result.killedPendingMutant().orElseThrow()) {
-                messages.add(Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+                messages.add(i18n.tr(Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE));
             } else {
                 if (result.isMutantKillable().orElseThrow()) {
-                    messages.add(Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE + " However, the mutatnt was killable!");
+                    messages.add(i18n.tr(Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE_KILLABLE));
                 } else {
-                    messages.add(Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
+                    messages.add(i18n.tr(Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE));
                 }
             }
 
             int killedOthers = result.numOtherPendingMutantsKilled().orElseThrow();
             if (killedOthers == 1) {
-                messages.add("Additionally, your test did kill another claimed mutant!");
+                messages.add(i18n.tr("Additionally, your test did kill another claimed mutant!"));
             } else if (killedOthers > 1) {
-                messages.add(String.format("Additionally, your test killed other %d claimed mutants!", killedOthers));
+                messages.add(i18n.tr("Additionally, your test killed other {0} claimed mutants!", killedOthers));
             }
 
             writeResponse(response, HttpServletResponse.SC_OK,
@@ -206,10 +213,8 @@ public class ResolveEquivalenceAPI extends APIServlet {
                             true,
                             result.killedPendingMutant().orElseThrow(),
                             messages,
-                            result.test().map(test -> {
-                                return Common.TestDTO.fromTestDTO(
-                                    gameService.getTest(login.getUserId(), test.getId()));
-                            }).orElse(null),
+                            result.test().map(test -> Common.TestDTO.fromTestDTO(
+                                gameService.getTest(login.getUserId(), test.getId()))).orElse(null),
                             null,
                             result.isMutantKillable().orElseThrow(),
                             result.numOtherPendingMutantsKilled().orElseThrow()));

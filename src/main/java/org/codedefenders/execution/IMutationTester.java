@@ -23,19 +23,20 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.util.PreparedMessage;
 
 public interface IMutationTester {
 
-    String runTestOnAllMutants(AbstractGame game, Test test);
+    PreparedMessage runTestOnAllMutants(AbstractGame game, Test test);
 
-    String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test);
+    PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test);
 
     // TODO Note that we need duplicate methods because the basic runAll methods use
     // AbstractGame !
     /**
      * Execute the test against all the other players' mutants
      */
-    String runTestOnAllMeleeMutants(MeleeGame game, Test test);
+    PreparedMessage runTestOnAllMeleeMutants(MeleeGame game, Test test);
 
     /**
      * Execute all the tests registered from all the other players against the

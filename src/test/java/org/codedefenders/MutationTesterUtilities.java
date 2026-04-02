@@ -92,7 +92,7 @@ public class MutationTesterUtilities {
 
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "
                             + newTest.getId());
-                    String message = mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest);
+                    String message = mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest).resolve();
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
                             + message);

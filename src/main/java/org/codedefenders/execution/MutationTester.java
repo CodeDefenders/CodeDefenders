@@ -43,6 +43,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.PreparedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +90,7 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public String runTestOnAllMutants(AbstractGame game, Test test) {
+    public PreparedMessage runTestOnAllMutants(AbstractGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         for (Mutant mutant : mutants) {
@@ -100,7 +101,7 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
+    public PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
@@ -162,7 +163,7 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public String runTestOnAllMeleeMutants(MeleeGame game, Test test) {
+    public PreparedMessage runTestOnAllMeleeMutants(MeleeGame game, Test test) {
 
         int testOwnerPlayerId = test.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(testOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
@@ -237,22 +238,22 @@ public class MutationTester implements IMutationTester {
     }
 
     @Nonnull
-    protected static String getTestOnMutantResultString(@Nonnull List<Mutant> mutants, int killed) {
+    protected static PreparedMessage getTestOnMutantResultString(@Nonnull List<Mutant> mutants, int killed) {
         if (killed == 0) {
-            if (mutants.size() == 0) {
-                return TEST_SUBMITTED_MESSAGE;
+            if (mutants.isEmpty()) {
+                return new PreparedMessage(TEST_SUBMITTED_MESSAGE);
             } else {
-                return TEST_KILLED_ZERO_MESSAGE;
+                return new PreparedMessage(TEST_KILLED_ZERO_MESSAGE);
             }
         } else {
             if (killed == 1) {
                 if (mutants.size() == 1) {
-                    return TEST_KILLED_LAST_MESSAGE;
+                    return new PreparedMessage(TEST_KILLED_LAST_MESSAGE);
                 } else {
-                    return TEST_KILLED_ONE_MESSAGE;
+                    return new PreparedMessage(TEST_KILLED_ONE_MESSAGE);
                 }
             } else {
-                return String.format(TEST_KILLED_N_MESSAGE, killed);
+                return new PreparedMessage(TEST_KILLED_N_MESSAGE, killed);
             }
         }
     }

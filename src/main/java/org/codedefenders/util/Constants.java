@@ -20,7 +20,6 @@ package org.codedefenders.util;
 
 import java.nio.file.Paths;
 
-import org.codedefenders.configuration.Configuration;
 import org.xnap.commons.i18n.I18n;
 
 /**
@@ -107,6 +106,8 @@ public class Constants {
     public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = I18n.marktr("Your test did not pass on the original class under test. Try again.");
     public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = I18n.marktr("Yay, your test killed the allegedly equivalent mutant. You won the duel!");
     public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = I18n.marktr("Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.");
+    public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE_KILLABLE = I18n.marktr("Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!");
+    public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE_KILLABLE_2 = I18n.marktr("Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!");
     public static final String TEST_SUBMITTED_MESSAGE = I18n.marktr("Test submitted and ready to kill mutants!");
     public static final String TEST_KILLED_ZERO_MESSAGE = I18n.marktr("Your test has not killed any mutants, just yet.");
     public static final String TEST_KILLED_LAST_MESSAGE = I18n.marktr("Great, your test killed the last mutant!");
@@ -115,6 +116,8 @@ public class Constants {
 
     public static final String MUTANT_COMPILED_MESSAGE = I18n.marktr("Your mutant was compiled successfully.");
     public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = I18n.marktr("The mutant was accepted as equivalent.");
+    public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE_KILLABLE = I18n.marktr("The mutant was accepted as equivalent. However, the mutant was killable!");
+    public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE_KILLABLE_VIEWABLE = I18n.marktr("The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion.");
     public static final String MUTANT_UNCOMPILABLE_MESSAGE = I18n.marktr("Your mutant failed to compile. Try again.");
     public static final String MUTANT_INVALID_MESSAGE = I18n.marktr("Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)");
     public static final String MUTANT_CREATION_ERROR_MESSAGE = I18n.marktr("Oops! Something went wrong and the mutant was not created.");

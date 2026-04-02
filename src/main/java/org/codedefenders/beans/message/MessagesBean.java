@@ -26,6 +26,8 @@ import java.util.List;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
+import org.codedefenders.util.PreparedMessage;
+
 /**
  * <p>Implements a container for messages that are displayed to the user on page load.</p>
  * <p>
@@ -82,6 +84,12 @@ public class MessagesBean implements Serializable {
 
     public synchronized Message add(String text, String title) {
         return add(text).setTitle(title);
+    }
+
+    public synchronized Message add(PreparedMessage pMessage) {
+        var msg = add(pMessage.pattern());
+        if (pMessage.hasArguments()) msg.setArgs(pMessage.arguments());
+        return msg;
     }
 
     public synchronized Message addFormatted(String text, Object... args) {

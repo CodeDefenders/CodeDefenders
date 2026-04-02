@@ -40,11 +40,7 @@
                         <i><c:out value="${i18n.tr(message.secondary)}"/></i>
                     </div>
                 </c:if>
-                <pre class="m-0"><c:out value="${
-                    fn:length(message.args) > 0
-                        ? i18n.tr(message.text, message.args)
-                        : i18n.tr(message.text)
-                }" escapeXml="false"/></pre>
+                <pre class="m-0"><c:out value="${message.preparedText.resolve(i18n)}" escapeXml="false"/></pre>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         </c:forEach>

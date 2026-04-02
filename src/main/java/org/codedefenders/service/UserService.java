@@ -37,6 +37,7 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.transaction.Transactional;
+import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,40 +228,40 @@ public class UserService {
      * Admin only method!
      */
     @Nonnull
-    public Optional<String[]> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
-            @Nullable String newPassword) {
+    public Optional<PreparedMessage> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
+                                                @Nullable String newPassword) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         Optional<UserEntity> u = userRepo.getUserById(userId);
         if (u.isEmpty()) {
-            return Optional.of(new String[] {
+            return Optional.of(new PreparedMessage(
                     I18n.marktr("Error. User {0} cannot be retrieved from database."),
                     Integer.toString(userId)
-            });
+            ));
         }
         UserEntity user = u.get();
 
         if (!newUsername.equals(user.getUsername()) && userRepo.getUserByName(newUsername).isPresent()) {
-            return Optional.of(new String[] {
+            return Optional.of(new PreparedMessage(
                     I18n.marktr("Username {0} is already taken"),
                     newUsername
-            });
+            ));
         }
 
         if (!newEmail.equals(user.getEmail()) && userRepo.getUserByEmail(newEmail).isPresent()) {
-            return Optional.of(new String[] {
+            return Optional.of(new PreparedMessage(
                     I18n.marktr("Email {0} is already in use"),
                     newEmail
-            });
+            ));
         }
 
         if (!validator.validEmailAddress(newEmail)) {
-            return Optional.of(new String[] {I18n.marktr("Email Address is not valid")});
+            return Optional.of(new PreparedMessage(I18n.marktr("Email Address is not valid")));
         }
 
         if (newPassword != null) {
             if (!validator.validPassword(newPassword)) {
-                return Optional.of(new String[] {I18n.marktr("Password is not valid")});
+                return Optional.of(new PreparedMessage(I18n.marktr("Password is not valid")));
             }
             user.setEncodedPassword(passwordEncoder.encode(newPassword));
         }
@@ -268,10 +269,10 @@ public class UserService {
         user.setEmail(newEmail);
 
         if (!userRepo.update(user)) {
-            return Optional.of(new String[] {
+            return Optional.of(new PreparedMessage(
                     I18n.marktr("Error trying to update info for user {0}!"),
                     Integer.toString(userId)
-            });
+            ));
         }
 
         simpleUserForUserIdCache.invalidate(userId);

@@ -44,6 +44,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.PreparedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +73,7 @@ public class ParallelMutationTester extends MutationTester {
     }
 
     @Override
-    public String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
+    public PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());

@@ -36,6 +36,7 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.PreparedMessage;
 
 import com.github.javaparser.quality.Nullable;
 
@@ -112,8 +113,8 @@ public class TestAPI extends APIServlet {
             Test test = result.test().orElseThrow();
 
             messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-            gameManagingUtils.getTestSmellsMessage(test).ifPresent(messages::add);
-            result.mutationTesterMessage().ifPresent(messages::add);
+            gameManagingUtils.getTestSmellsMessage(test).map(PreparedMessage::resolve).ifPresent(messages::add);
+            result.mutationTesterMessage().map(PreparedMessage::resolve).ifPresent(messages::add);
 
             writeResponse(response, HttpServletResponse.SC_OK,
                     new SubmitTestResponseDTO(

@@ -21,6 +21,7 @@ package org.codedefenders.beans.message;
 import java.io.Serializable;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.util.PreparedMessage;
 
 /**
  * Represents a message shown on to a user on page load. By default, the message is HTML-escaped and fades out after a
@@ -92,14 +93,6 @@ public class Message implements Serializable {
     }
 
     /**
-     * Returns the arguments for the message's text, which can be inserted into the text if it contains placeholders.
-     * @return The arguments for the message's text.
-     */
-    public Object[] getArgs() {
-        return args;
-    }
-
-    /**
      * Returns if the message should be HTML-escaped.
      * @return If the message should be HTML-escaped.
      */
@@ -150,5 +143,11 @@ public class Message implements Serializable {
     public Message setArgs(Object... args) {
         this.args = args;
         return this;
+    }
+
+    /* Utility methods. */
+
+    public PreparedMessage getPreparedText() {
+        return new PreparedMessage(text, args);
     }
 }

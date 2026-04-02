@@ -333,7 +333,10 @@ public class AdminSystemSettings extends HttpServlet {
                 success = success && AdminDAO.updateSystemSetting(setting);
             }
         }
-        messages.add(success ? I18n.marktr("Updated Settings.") : I18n.marktr("There was a problem. Please consult the logs"));
+        messages.add(success
+                ? I18n.marktr("Updated Settings.")
+                : I18n.marktr("There was a problem. Please consult the logs")
+        );
     }
 
 }
