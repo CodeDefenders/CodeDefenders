@@ -7,9 +7,9 @@ msgstr ""
 msgid "Teacher Account Application for {0}"
 msgstr "Teacher Account Application for {0}"
 
-#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:63
-msgid "Greetings,\nI would like to request a teacher account for %s on %s.\nRegards,\n%s\n"
-msgstr "Greetings,\nI would like to request a teacher account for %s on %s.\nRegards,\n%s\n"
+#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:62
+msgid "Greetings,\n\nI would like to request a teacher account for {0} on {1}.\n\nRegards,\n{0}\n"
+msgstr "Greetings,\n\nI would like to request a teacher account for {0} on {1}.\n\nRegards,\n{0}\n"
 
 #: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:225
 msgid "Created {0} staged games."
@@ -2080,8 +2080,8 @@ msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:90
-msgid "Welcome to Code Defenders!\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\nHappy coding!"
-msgstr "Welcome to Code Defenders!\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\nHappy coding!"
+msgid "Welcome to Code Defenders!\n\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\n\nHappy coding!"
+msgstr "Welcome to Code Defenders!\n\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\n\nHappy coding!"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
 msgid "Successfully set user with id {0} as inactive."
@@ -2155,111 +2155,111 @@ msgstr "Additionally, your test killed other {0} claimed mutants!"
 msgid "Username not found or password incorrect."
 msgstr "Username not found or password incorrect."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:74
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:70
 msgid "Classroom not found."
 msgstr "Classroom not found."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:103
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:98
 msgid "Missing required parameter: action."
 msgstr "Missing required parameter: action."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:110
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:105
 msgid "Classroom not found."
 msgstr "Classroom not found."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:166
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:161
 msgid "Invalid action: {0}"
 msgstr "Invalid action: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:170
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:165
 msgid "Validation failed: {0}"
 msgstr "Validation failed: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:173
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:168
 msgid "You're not allowed to do that."
 msgstr "You're not allowed to do that."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:176
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:171
 msgid "Missing or invalid parameter."
 msgstr "Missing or invalid parameter."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:215
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:210
 msgid "Successfully set classroom to open."
 msgstr "Successfully set classroom to open."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:211
 msgid "Successfully set classroom to closed."
 msgstr "Successfully set classroom to closed."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:227
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:222
 msgid "Successfully set classroom to public."
 msgstr "Successfully set classroom to public."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:223
 msgid "Successfully set classroom to private."
 msgstr "Successfully set classroom to private."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:239
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:234
 msgid "Successfully archived classroom."
 msgstr "Successfully archived classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:235
 msgid "Successfully restored classroom."
 msgstr "Successfully restored classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:252
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:247
 msgid "Successfully changed the name to: {0}"
 msgstr "Successfully changed the name to: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:263
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:258
 msgid "Successfully set the password."
 msgstr "Successfully set the password."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:272
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:267
 msgid "Successfully removed the password."
 msgstr "Successfully removed the password."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:285
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:280
 msgid "Invalid enum value for parameter: role."
 msgstr "Invalid enum value for parameter: role."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:293
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:288
 msgid "Successfully changed role."
 msgstr "Successfully changed role."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:304
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:299
 msgid "Successfully changed the owner."
 msgstr "Successfully changed the owner."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:315
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:310
 msgid "Member not found."
 msgstr "Member not found."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:325
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:320
 msgid "Successfully kicked member."
 msgstr "Successfully kicked member."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:332
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:327
 msgid "You're already a member of this classroom."
 msgstr "You're already a member of this classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:338
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:333
 msgid "Can't join this classroom."
 msgstr "Can't join this classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:347
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:342
 msgid "Wrong password"
 msgstr "Wrong password"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:356
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:351
 msgid "Successfully joined classroom."
 msgstr "Successfully joined classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:363
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:358
 msgid "You're not a member of this classroom."
 msgstr "You're not a member of this classroom."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:370
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:365
 msgid "Successfully left classroom."
 msgstr "Successfully left classroom."
 
@@ -2823,10 +2823,6 @@ msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\n
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
-#: src/main/java/org/codedefenders/servlets/HelpPage.java:43
-msgid "Help"
-msgstr "Help"
-
 #: src/main/java/org/codedefenders/servlets/InvitePage.java:85
 msgid "Your link is malformed, you could not join the game."
 msgstr "Your link is malformed, you could not join the game."
@@ -2868,8 +2864,8 @@ msgid "You had already joined this game."
 msgstr "You had already joined this game."
 
 #: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:73
-msgid "Hello {0}!\nChange your password here: {1}\nThis link is only valid for {2} hours.\nGreetings, your Code Defenders team"
-msgstr "Hello {0}!\nChange your password here: {1}\nThis link is only valid for {2} hours.\nGreetings, your Code Defenders team"
+msgid "Hello {0}!\n\nChange your password here: {1}\nThis link is only valid for {2} hours.\n\nGreetings, your Code Defenders team"
+msgstr "Hello {0}!\n\nChange your password here: {1}\nThis link is only valid for {2} hours.\n\nGreetings, your Code Defenders team"
 
 #: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:98
 msgid "No user was found for this username and email. Please check if the username and email match."
@@ -4291,95 +4287,95 @@ msgstr "Per Game:"
 msgid "Showing _TOTAL_ entries"
 msgstr "Showing _TOTAL_ entries"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:33
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:30
 msgid "KillMap Analytics"
 msgstr "KillMap Analytics"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:37
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:34
 msgid "Useful Actions"
 msgstr "Useful Actions"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:42
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:39
 msgid "User ID"
 msgstr "User ID"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:40
 msgid "User Name"
 msgstr "User Name"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:44
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:41
 msgid "Class ID"
 msgstr "Class ID"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:45
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:42
 msgid "Class Name"
 msgstr "Class Name"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:46
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:47
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:44
 msgid "Useful Mutants"
 msgstr "Useful Mutants"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:48
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:45
 msgid "Useful Tests"
 msgstr "Useful Tests"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:49
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:46
 msgid "Useful Actions"
 msgstr "Useful Actions"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:57
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:54
 msgid "What are useful actions?"
 msgstr "What are useful actions?"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:65
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:62
 msgid "Download table"
 msgstr "Download table"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:69
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:66
 msgid "as CSV"
 msgstr "as CSV"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:73
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:70
 msgid "as JSON"
 msgstr "as JSON"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:79
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:76
 msgid "Useful Actions Explanation"
 msgstr "Useful Actions Explanation"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:82
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:79
 msgid "This table uses data from the class killmaps to determine the number of useful tests and mutants per player, class and role."
 msgstr "This table uses data from the class killmaps to determine the number of useful tests and mutants per player, class and role."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:87
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:84
 msgid "Useful Tests:"
 msgstr "Useful Tests:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:88
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:85
 msgid "Number of tests, which killed at least one mutant."
 msgstr "Number of tests, which killed at least one mutant."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:91
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:88
 msgid "Useful Mutants:"
 msgstr "Useful Mutants:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:92
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:89
 msgid "Number of mutants, which were killed by at least one test, but were covered and not killed by at least one other test."
 msgstr "Number of mutants, which were killed by at least one test, but were covered and not killed by at least one other test."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:95
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:92
 msgid "Useful Actions:"
 msgstr "Useful Actions:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:96
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:93
 msgid "Sum of useful tests and useful mutants."
 msgstr "Sum of useful tests and useful mutants."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:138
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:135
 msgid "Showing _TOTAL_ entries"
 msgstr "Showing _TOTAL_ entries"
 
@@ -7084,8 +7080,8 @@ msgid "A teacher account lets you create classrooms for your students, so you ca
 msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page."
 
 #: src/main/webapp/jsp/contact.jsp:112
-msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\\'{0}\\'>mailto link</a> to automatically create an email with the template."
-msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\\'{0}\\'>mailto link</a> to automatically create an email with the template."
+msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
+msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
 
 #: src/main/webapp/jsp/contact.jsp:116
 msgid "Show template"
@@ -8299,31 +8295,31 @@ msgstr "Reset"
 msgid "Puzzle"
 msgstr "Puzzle"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:122
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:119
 msgid "Congratulations!"
 msgstr "Congratulations!"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:123
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:120
 msgid "Your test solved the puzzle. {0}"
 msgstr "Your test solved the puzzle. {0}"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:130
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:127
 msgid "Class Under Test"
 msgstr "Class Under Test"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:143
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:140
 msgid "Solving JUnit Test"
 msgstr "Solving JUnit Test"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:146
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:143
 msgid "Write a new JUnit test here"
 msgstr "Write a new JUnit test here"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:152
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:149
 msgid "Defend"
 msgstr "Defend"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:191
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:188
 msgid "JUnit Tests"
 msgstr "JUnit Tests"
 
@@ -10299,99 +10295,99 @@ msgstr "Chat"
 msgid "Chat"
 msgstr "Chat"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:89
+#: src/main/webapp/WEB-INF/tags/game_header.tag:88
 msgid "Battleground"
 msgstr "Battleground"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:93
+#: src/main/webapp/WEB-INF/tags/game_header.tag:92
 msgid "Melee"
 msgstr "Melee"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:119
+#: src/main/webapp/WEB-INF/tags/game_header.tag:118
 msgid "Game"
 msgstr "Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:122
+#: src/main/webapp/WEB-INF/tags/game_header.tag:121
 msgid "Game Mode: {0}"
 msgstr "Game Mode: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:126
+#: src/main/webapp/WEB-INF/tags/game_header.tag:125
 msgid "Your Role: {0}"
 msgstr "Your Role: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:141
+#: src/main/webapp/WEB-INF/tags/game_header.tag:140
 msgid "End Game"
 msgstr "End Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:146
+#: src/main/webapp/WEB-INF/tags/game_header.tag:145
 msgid "Confirm End Game"
 msgstr "Confirm End Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:146
+#: src/main/webapp/WEB-INF/tags/game_header.tag:145
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:148
+#: src/main/webapp/WEB-INF/tags/game_header.tag:147
 msgid "Are you sure you want to end the game?"
 msgstr "Are you sure you want to end the game?"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:151
+#: src/main/webapp/WEB-INF/tags/game_header.tag:150
 msgid "Confirm"
 msgstr "Confirm"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:165
+#: src/main/webapp/WEB-INF/tags/game_header.tag:164
 msgid "Start Game"
 msgstr "Start Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:175
+#: src/main/webapp/WEB-INF/tags/game_header.tag:174
 msgid "Start a new game with the same settings and opposite roles."
 msgstr "Start a new game with the same settings and opposite roles."
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:178
+#: src/main/webapp/WEB-INF/tags/game_header.tag:177
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:184
+#: src/main/webapp/WEB-INF/tags/game_header.tag:183
 msgid "Confirm Rematch"
 msgstr "Confirm Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:184
+#: src/main/webapp/WEB-INF/tags/game_header.tag:183
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:186
+#: src/main/webapp/WEB-INF/tags/game_header.tag:185
 msgid "Are you sure you want to create a new game with opposite roles?"
 msgstr "Are you sure you want to create a new game with opposite roles?"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:189
+#: src/main/webapp/WEB-INF/tags/game_header.tag:188
 msgid "Confirm Rematch"
 msgstr "Confirm Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:225
+#: src/main/webapp/WEB-INF/tags/game_header.tag:224
 msgid "Scoreboard"
 msgstr "Scoreboard"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:232
+#: src/main/webapp/WEB-INF/tags/game_header.tag:231
 msgid "Scoring System"
 msgstr "Scoring System"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:241
+#: src/main/webapp/WEB-INF/tags/game_header.tag:240
 msgid "Timeline"
 msgstr "Timeline"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:246
+#: src/main/webapp/WEB-INF/tags/game_header.tag:245
 msgid "Export as a Gradle project to import into an IDE."
 msgstr "Export as a Gradle project to import into an IDE."
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:248
+#: src/main/webapp/WEB-INF/tags/game_header.tag:247
 msgid "Gradle Export"
 msgstr "Gradle Export"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:254
+#: src/main/webapp/WEB-INF/tags/game_header.tag:253
 msgid "Feedback"
 msgstr "Feedback"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:268
+#: src/main/webapp/WEB-INF/tags/game_header.tag:267
 msgid "Invitations"
 msgstr "Invitations"
 
@@ -10791,63 +10787,63 @@ msgstr "Equivalent"
 msgid "Mutation rules:"
 msgstr "Mutation rules:"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:48
+#: src/main/webapp/WEB-INF/tags/navbar.tag:47
 msgid "Code Defenders"
 msgstr "Code Defenders"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:63
+#: src/main/webapp/WEB-INF/tags/navbar.tag:62
 msgid "Multiplayer"
 msgstr "Multiplayer"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:67
+#: src/main/webapp/WEB-INF/tags/navbar.tag:66
 msgid "Games"
 msgstr "Games"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:69
+#: src/main/webapp/WEB-INF/tags/navbar.tag:68
 msgid "Classrooms"
 msgstr "Classrooms"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:72
+#: src/main/webapp/WEB-INF/tags/navbar.tag:71
 msgid "History"
 msgstr "History"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:74
+#: src/main/webapp/WEB-INF/tags/navbar.tag:73
 msgid "Leaderboard"
 msgstr "Leaderboard"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:83
+#: src/main/webapp/WEB-INF/tags/navbar.tag:82
 msgid "Admin"
 msgstr "Admin"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:97
+#: src/main/webapp/WEB-INF/tags/navbar.tag:96
 msgid "Profile"
 msgstr "Profile"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:99
+#: src/main/webapp/WEB-INF/tags/navbar.tag:98
 msgid "Account"
 msgstr "Account"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:101
+#: src/main/webapp/WEB-INF/tags/navbar.tag:100
 msgid "Help"
 msgstr "Help"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:103
+#: src/main/webapp/WEB-INF/tags/navbar.tag:102
 msgid "Logout"
 msgstr "Logout"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:120
+#: src/main/webapp/WEB-INF/tags/navbar.tag:119
 msgid "Language"
 msgstr "Language"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:144
+#: src/main/webapp/WEB-INF/tags/navbar.tag:143
 msgid "Login"
 msgstr "Login"
 
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:57
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:56
 msgid "no role"
 msgstr "no role"
 
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:60
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:59
 msgid "Game {0} ({1})"
 msgstr "Game {0} ({1})"
 

@@ -16,17 +16,21 @@ msgstr ""
 msgid "Teacher Account Application for {0}"
 msgstr "Lehrer-Konto-Antrag für {0}"
 
-#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:63
+#: src/main/java/org/codedefenders/beans/contact/TeacherApplicationTemplate.java:62
 msgid ""
 "Greetings,\n"
-"I would like to request a teacher account for %s on %s.\n"
+"\n"
+"I would like to request a teacher account for {0} on {1}.\n"
+"\n"
 "Regards,\n"
-"%s\n"
+"{0}\n"
 msgstr ""
 "Sehr geehrte Damen und Herren,\n"
-"ich möchte ein Lehrerkonto für %s auf %s beantragen.\n"
-"Mit freundlichen Grüßen,\n"
-"%s \n"
+"\n"
+"ich möchte ein Lehrerkonto für {0} auf {1} beantragen.\n"
+"\n"
+"Mit freundlichen Grüßen\n"
+"{0} \n"
 
 #: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:225
 msgid "Created {0} staged games."
@@ -1978,14 +1982,18 @@ msgstr "Es ist ein Problem aufgetreten. Schau mal in den Protokollen nach."
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:90
 msgid ""
 "Welcome to Code Defenders!\n"
+"\n"
 "An account has been created for you with Username {0} and Password {1}.\n"
 "You can log in at {2}.\n"
+"\n"
 "Happy coding!"
 msgstr ""
 "Willkommen bei Code Defenders!\n"
+"\n"
 "Es wurde ein Konto für dich mit dem Benutzernamen {0} und dem Passwort {1} "
 "erstellt.\n"
 "Du kannst dich unter {2} anmelden.\n"
+"\n"
 "Viel Spaß beim Programmieren!"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
@@ -2076,110 +2084,110 @@ msgstr "Außerdem hast du bei deinem Test weitere {0} Mutanten getötet!"
 msgid "Username not found or password incorrect."
 msgstr "Benutzername nicht gefunden oder Passwort falsch."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:74
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:110
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:70
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:105
 #: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:67
 #: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:98
 msgid "Classroom not found."
 msgstr "Klassenraum nicht gefunden."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:103
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:98
 msgid "Missing required parameter: action."
 msgstr "Fehlender erforderlicher Parameter: Aktion."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:166
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:161
 msgid "Invalid action: {0}"
 msgstr "Ungültige Aktion: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:170
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:165
 msgid "Validation failed: {0}"
 msgstr "Die Validierung ist schiefgegangen: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:173
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:168
 msgid "You're not allowed to do that."
 msgstr "Du hast nicht die Berechtigung das zu tun."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:176
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:171
 msgid "Missing or invalid parameter."
 msgstr "Fehlender oder ungültiger Parameter."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:215
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:210
 msgid "Successfully set classroom to open."
 msgstr "Der Klassenraum wurde erfolgreich geöffnet."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:216
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:211
 msgid "Successfully set classroom to closed."
 msgstr "Der Klassenraum wurde erfolgreich geschlossen."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:227
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:222
 msgid "Successfully set classroom to public."
 msgstr "Klassenraum erfolgreich auf öffentlich gestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:228
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:223
 msgid "Successfully set classroom to private."
 msgstr "Der Klassenraum wurde erfolgreich auf privat gestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:239
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:234
 msgid "Successfully archived classroom."
 msgstr "Der Klassenraum wurde erfolgreich gespeichert."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:240
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:235
 msgid "Successfully restored classroom."
 msgstr "Der Klassenraum wurde wiederhergestellt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:252
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:247
 msgid "Successfully changed the name to: {0}"
 msgstr "Der Name wurde erfolgreich geändert in: {0}"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:263
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:258
 msgid "Successfully set the password."
 msgstr "Passwort erfolgreich gesetzt."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:272
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:267
 msgid "Successfully removed the password."
 msgstr "Passwort erfolgreich gelöscht."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:285
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:280
 msgid "Invalid enum value for parameter: role."
 msgstr "Ungültiger Enum-Wert für den Parameter: role."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:293
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:288
 msgid "Successfully changed role."
 msgstr "Die Rolle wurde erfolgreich geändert."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:304
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:299
 msgid "Successfully changed the owner."
 msgstr "Der Eigentümer wurde erfolgreich geändert."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:315
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:310
 msgid "Member not found."
 msgstr "Mitglied nicht gefunden."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:325
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:320
 msgid "Successfully kicked member."
 msgstr "Mitglied erfolgreich ausgeschlossen."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:332
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:327
 msgid "You're already a member of this classroom."
 msgstr "Du bist bereits Mitglied in diesem Raum."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:338
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:333
 msgid "Can't join this classroom."
 msgstr "Du kannst diesem Raum nicht beitreten."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:347
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:342
 msgid "Wrong password"
 msgstr "Falsches Passwort"
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:356
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:351
 msgid "Successfully joined classroom."
 msgstr "Du bist erfolgreich dem Raum beigetreten."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:363
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:358
 msgid "You're not a member of this classroom."
 msgstr "Du bist kein Mitglied dieses Raumes."
 
-#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:370
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:365
 msgid "Successfully left classroom."
 msgstr "Ich habe den Raum erfolgreich verlassen."
 
@@ -2785,12 +2793,6 @@ msgstr ""
 "Du hast alle Rätsel des aktuellen Kapitels gelöst, kehre zur <a "
 "href=\"{0}\">Rätselübersicht</a> zurück."
 
-#: src/main/java/org/codedefenders/servlets/HelpPage.java:43
-#: src/main/webapp/WEB-INF/tags/footer.tag:45
-#: src/main/webapp/WEB-INF/tags/navbar.tag:101
-msgid "Help"
-msgstr "Hilfe"
-
 #: src/main/java/org/codedefenders/servlets/InvitePage.java:85
 #: src/main/java/org/codedefenders/servlets/InvitePage.java:102
 msgid "Your link is malformed, you could not join the game."
@@ -2837,8 +2839,10 @@ msgstr "Du hast dich schon für dieses Spiel angemeldet."
 #: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:73
 msgid ""
 "Hello {0}!\n"
+"\n"
 "Change your password here: {1}\n"
 "This link is only valid for {2} hours.\n"
+"\n"
 "Greetings, your Code Defenders team"
 msgstr ""
 "Guten Tag {0}!\n"
@@ -2846,7 +2850,8 @@ msgstr ""
 "Hier kannst Du Dein Passwort ändern: {1}\n"
 "Dieser Link ist nur {2} Stunden lang gültig.\n"
 "\n"
-"Viele Grüße\vCode Defenders-Team"
+"Viele Grüße\n"
+"Code Defenders-Team"
 
 #: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:98
 msgid ""
@@ -3543,7 +3548,7 @@ msgstr "Dein Mutant ruft eine IO-Klasse auf"
 #: src/main/javascript/game/defender_intention_collection.js:111
 #: src/main/webapp/jsp/battleground/defender_view.jsp:97
 #: src/main/webapp/jsp/melee/player_view.jsp:318
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:152
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:149
 msgid "Defend"
 msgstr "Verteidige"
 
@@ -4213,7 +4218,7 @@ msgid "Defender Wins:"
 msgstr "Defender gewinnt:"
 
 #: src/main/webapp/jsp/admin_analytics_classes.jsp:105
-#: src/main/webapp/WEB-INF/tags/game_header.tag:254
+#: src/main/webapp/WEB-INF/tags/game_header.tag:253
 msgid "Feedback"
 msgstr "Feedback"
 
@@ -4263,63 +4268,63 @@ msgid "Mutants Equivalent:"
 msgstr "Äquivalente Mutanten:"
 
 #: src/main/webapp/jsp/admin_analytics_classes.jsp:189
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:138
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:135
 #: src/main/webapp/jsp/admin_analytics_users.jsp:175
 #: src/main/webapp/jsp/upload_class_view.jsp:272
 msgid "Showing _TOTAL_ entries"
 msgstr "Zeige _TOTAL_ Einträge"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:33
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:30
 msgid "KillMap Analytics"
 msgstr "KillMap-Analysen"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:37
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:49
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:34
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:46
 msgid "Useful Actions"
 msgstr "Nützliche Aktionen"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:42
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:39
 msgid "User ID"
 msgstr "Benutzer-ID"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:40
 msgid "User Name"
 msgstr "Benutzername"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:44
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:41
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:154
 msgid "Class ID"
 msgstr "Klassen-ID"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:45
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:42
 msgid "Class Name"
 msgstr "Klassenname"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:46
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
 #: src/main/webapp/WEB-INF/tags/create_games.tag:808
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1068
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1106
 msgid "Role"
 msgstr "Benutzerrolle"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:47
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:44
 msgid "Useful Mutants"
 msgstr "Nützliche Mutanten"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:48
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:45
 msgid "Useful Tests"
 msgstr "Nützliche Tests"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:57
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:54
 msgid "What are useful actions?"
 msgstr "Was sind nützliche Maßnahmen?"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:65
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:62
 #: src/main/webapp/jsp/admin_analytics_users.jsp:54
 msgid "Download table"
 msgstr "Tabelle herunterladen"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:69
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:66
 #: src/main/webapp/jsp/admin_analytics_users.jsp:58
 #: src/main/webapp/jsp/admin_killmap_management.jsp:343
 #: src/main/webapp/jsp/admin_killmap_management.jsp:363
@@ -4327,7 +4332,7 @@ msgstr "Tabelle herunterladen"
 msgid "as CSV"
 msgstr "als CSV"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:73
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:70
 #: src/main/webapp/jsp/admin_analytics_users.jsp:62
 #: src/main/webapp/jsp/admin_killmap_management.jsp:348
 #: src/main/webapp/jsp/admin_killmap_management.jsp:368
@@ -4335,11 +4340,11 @@ msgstr "als CSV"
 msgid "as JSON"
 msgstr "als JSON"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:79
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:76
 msgid "Useful Actions Explanation"
 msgstr "Nützliche Aktionen Erklärung"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:82
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:79
 msgid ""
 "This table uses data from the class killmaps to determine the number of "
 "useful tests and mutants per player, class and role."
@@ -4347,19 +4352,19 @@ msgstr ""
 "Diese Tabelle verwendet Daten aus den Killmaps der Klassen, um die Anzahl "
 "der nützlichen Tests und Mutanten pro Spieler, Klasse und Rolle zu ermitteln."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:87
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:84
 msgid "Useful Tests:"
 msgstr "Nützliche Tests:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:88
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:85
 msgid "Number of tests, which killed at least one mutant."
 msgstr "Anzahl der Tests, bei denen mindestens ein Mutant getötet wurde."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:91
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:88
 msgid "Useful Mutants:"
 msgstr "Nützliche Mutanten:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:92
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:89
 msgid ""
 "Number of mutants, which were killed by at least one test, but were covered "
 "and not killed by at least one other test."
@@ -4367,11 +4372,11 @@ msgstr ""
 "Anzahl der Mutanten, die durch mindestens einen Test getötet wurden, aber "
 "durch mindestens einen anderen Test abgedeckt und nicht getötet wurden."
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:95
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:92
 msgid "Useful Actions:"
 msgstr "Nützliche Aktionen:"
 
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:96
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:93
 msgid "Sum of useful tests and useful mutants."
 msgstr "Summe der nützlichen Tests und nützlichen Mutanten."
 
@@ -4593,7 +4598,7 @@ msgstr ""
 #: src/main/webapp/jsp/admin_classrooms.jsp:39
 #: src/main/webapp/jsp/admin_killmap_management.jsp:297
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:38
-#: src/main/webapp/WEB-INF/tags/navbar.tag:69
+#: src/main/webapp/WEB-INF/tags/navbar.tag:68
 msgid "Classrooms"
 msgstr "Räume"
 
@@ -4654,8 +4659,8 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/upload_class_view.jsp:206
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:53
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:63
-#: src/main/webapp/WEB-INF/tags/game_header.tag:146
-#: src/main/webapp/WEB-INF/tags/game_header.tag:184
+#: src/main/webapp/WEB-INF/tags/game_header.tag:145
+#: src/main/webapp/WEB-INF/tags/game_header.tag:183
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -4713,7 +4718,7 @@ msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
 #: src/main/webapp/jsp/admin_killmap_management.jsp:600
 #: src/main/webapp/WEB-INF/tags/create_games.tag:779
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1045
-#: src/main/webapp/WEB-INF/tags/game_header.tag:119
+#: src/main/webapp/WEB-INF/tags/game_header.tag:118
 msgid "Game"
 msgstr "Spiel"
 
@@ -4763,7 +4768,7 @@ msgstr "und"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:184
 #: src/main/webapp/jsp/admin_killmap_management.jsp:261
 #: src/main/webapp/jsp/classroom_page.jsp:93
-#: src/main/webapp/WEB-INF/tags/navbar.tag:67
+#: src/main/webapp/WEB-INF/tags/navbar.tag:66
 msgid "Games"
 msgstr "Spiele"
 
@@ -5030,7 +5035,7 @@ msgstr "Möchtest du wirklich eine Revanche für dieses Spiel erstellen?"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:396
 #: src/main/webapp/jsp/battleground/details_view.jsp:104
 #: src/main/webapp/jsp/melee/details_view.jsp:140
-#: src/main/webapp/WEB-INF/tags/game_header.tag:178
+#: src/main/webapp/WEB-INF/tags/game_header.tag:177
 msgid "Rematch"
 msgstr "Revanche"
 
@@ -5156,7 +5161,7 @@ msgstr ""
 "die Standardsprache zurückgegriffen wird."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:58
-#: src/main/webapp/WEB-INF/tags/navbar.tag:120
+#: src/main/webapp/WEB-INF/tags/navbar.tag:119
 msgid "Language"
 msgstr "Sprache"
 
@@ -5489,7 +5494,7 @@ msgstr "keine Beschreibung"
 #: src/main/webapp/jsp/melee/creator_view.jsp:58
 #: src/main/webapp/jsp/melee/player_view.jsp:358
 #: src/main/webapp/jsp/puzzle/attacker_view.jsp:156
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:191
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:188
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:247
 msgid "JUnit Tests"
 msgstr "JUnit-Tests"
@@ -5502,7 +5507,7 @@ msgstr "JUnit-Tests"
 #: src/main/webapp/jsp/melee/create_game_view.jsp:90
 #: src/main/webapp/jsp/melee/creator_view.jsp:64
 #: src/main/webapp/jsp/melee/player_view.jsp:223
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:130
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:127
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:229
 #: src/main/webapp/WEB-INF/tags/create_games.tag:157
 msgid "Class Under Test"
@@ -5636,7 +5641,7 @@ msgid "Teacher"
 msgstr "Lehrer"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:121
-#: src/main/webapp/WEB-INF/tags/navbar.tag:83
+#: src/main/webapp/WEB-INF/tags/navbar.tag:82
 msgid "Admin"
 msgstr "Admin"
 
@@ -6027,7 +6032,7 @@ msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalen
 
 #: src/main/webapp/jsp/battleground/defender_view.jsp:91
 #: src/main/webapp/jsp/melee/player_view.jsp:311
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:146
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:143
 msgid "Write a new JUnit test here"
 msgstr "Schreibe hier einen neuen JUnit-Test"
 
@@ -6038,7 +6043,7 @@ msgstr "Details zum Spiel {0} ({1})"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:101
 #: src/main/webapp/jsp/melee/details_view.jsp:137
-#: src/main/webapp/WEB-INF/tags/game_header.tag:175
+#: src/main/webapp/WEB-INF/tags/game_header.tag:174
 msgid "Start a new game with the same settings and opposite roles."
 msgstr ""
 "Beginne ein neues Spiel mit denselben Einstellungen und umgekehrten Rollen."
@@ -6047,14 +6052,14 @@ msgstr ""
 #: src/main/webapp/jsp/battleground/details_view.jsp:116
 #: src/main/webapp/jsp/melee/details_view.jsp:146
 #: src/main/webapp/jsp/melee/details_view.jsp:152
-#: src/main/webapp/WEB-INF/tags/game_header.tag:184
-#: src/main/webapp/WEB-INF/tags/game_header.tag:189
+#: src/main/webapp/WEB-INF/tags/game_header.tag:183
+#: src/main/webapp/WEB-INF/tags/game_header.tag:188
 msgid "Confirm Rematch"
 msgstr "Revanche bestätigen"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:113
 #: src/main/webapp/jsp/melee/details_view.jsp:149
-#: src/main/webapp/WEB-INF/tags/game_header.tag:186
+#: src/main/webapp/WEB-INF/tags/game_header.tag:185
 msgid "Are you sure you want to create a new game with opposite roles?"
 msgstr ""
 "Bist du sicher, dass du ein neues Spiel mit vertauschten Rollen erstellen "
@@ -6062,20 +6067,20 @@ msgstr ""
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:125
 #: src/main/webapp/jsp/melee/details_view.jsp:161
-#: src/main/webapp/WEB-INF/tags/game_header.tag:246
+#: src/main/webapp/WEB-INF/tags/game_header.tag:245
 msgid "Export as a Gradle project to import into an IDE."
 msgstr "Als Gradle-Projekt exportieren, um es in eine IDE zu importieren."
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:127
 #: src/main/webapp/jsp/melee/details_view.jsp:163
-#: src/main/webapp/WEB-INF/tags/game_header.tag:248
+#: src/main/webapp/WEB-INF/tags/game_header.tag:247
 msgid "Gradle Export"
 msgstr "Gradle-Export"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:136
 #: src/main/webapp/jsp/battleground/game_scoreboard.jsp:30
 #: src/main/webapp/jsp/melee/details_view.jsp:172
-#: src/main/webapp/WEB-INF/tags/game_header.tag:225
+#: src/main/webapp/WEB-INF/tags/game_header.tag:224
 msgid "Scoreboard"
 msgstr "Scoreboard"
 
@@ -6086,7 +6091,7 @@ msgstr "Info"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:143
 #: src/main/webapp/jsp/melee/details_view.jsp:179
-#: src/main/webapp/WEB-INF/tags/game_header.tag:232
+#: src/main/webapp/WEB-INF/tags/game_header.tag:231
 msgid "Scoring System"
 msgstr "Punktesystem"
 
@@ -6113,7 +6118,7 @@ msgstr "Zu testende Klasse"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:207
 #: src/main/webapp/jsp/melee/details_view.jsp:281
-#: src/main/webapp/WEB-INF/tags/game_header.tag:241
+#: src/main/webapp/WEB-INF/tags/game_header.tag:240
 msgid "Timeline"
 msgstr "Zeitachse"
 
@@ -6158,7 +6163,7 @@ msgstr ""
 "wurde, verlierst du Punkte!"
 
 #: src/main/webapp/jsp/battleground/game_history.jsp:31
-#: src/main/webapp/WEB-INF/tags/navbar.tag:72
+#: src/main/webapp/WEB-INF/tags/navbar.tag:71
 msgid "History"
 msgstr "Historie"
 
@@ -6529,14 +6534,14 @@ msgstr "Keine Mitglieder gefunden."
 #: src/main/webapp/jsp/classroom_page.jsp:905
 #: src/main/webapp/WEB-INF/tags/create_games.tag:145
 #: src/main/webapp/WEB-INF/tags/create_games.tag:638
-#: src/main/webapp/WEB-INF/tags/game_header.tag:89
+#: src/main/webapp/WEB-INF/tags/game_header.tag:88
 msgid "Battleground"
 msgstr "Battleground"
 
 #: src/main/webapp/jsp/classroom_page.jsp:907
 #: src/main/webapp/WEB-INF/tags/create_games.tag:151
 #: src/main/webapp/WEB-INF/tags/create_games.tag:639
-#: src/main/webapp/WEB-INF/tags/game_header.tag:93
+#: src/main/webapp/WEB-INF/tags/game_header.tag:92
 msgid "Melee"
 msgstr "Melee"
 
@@ -6671,8 +6676,8 @@ msgid ""
 "A teacher account lets you create classrooms for your students, so you can "
 "manage games more easily. If you\\'re interested in turning your account "
 "into a teacher account, please use the template below to email us. You can "
-"also use this <a href=\\'{0}\\'>mailto link</a> to automatically create an "
-"email with the template."
+"also use this <a href='{0}'>mailto link</a> to automatically create an email "
+"with the template."
 msgstr ""
 "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um Spiele "
 "einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto umwandeln "
@@ -6686,7 +6691,7 @@ msgstr "Vorlage anzeigen"
 
 #: src/main/webapp/jsp/contact.jsp:132
 msgid "To:"
-msgstr "Bis:"
+msgstr "An:"
 
 #: src/main/webapp/jsp/contact.jsp:136
 msgid "Subject:"
@@ -6694,7 +6699,7 @@ msgstr "Betreff:"
 
 #: src/main/webapp/jsp/contact.jsp:140
 msgid "Body:"
-msgstr "Body:"
+msgstr "Inhalt:"
 
 #: src/main/webapp/jsp/contact.jsp:167
 msgid "Contact the Developers"
@@ -7000,7 +7005,7 @@ msgstr ""
 msgid "Welcome to Code Defenders"
 msgstr "Willkommen bei CodeDefenders"
 
-#: src/main/webapp/jsp/index.jsp:54 src/main/webapp/WEB-INF/tags/navbar.tag:48
+#: src/main/webapp/jsp/index.jsp:54 src/main/webapp/WEB-INF/tags/navbar.tag:47
 msgid "Code Defenders"
 msgstr "CodeDefenders"
 
@@ -7105,7 +7110,7 @@ msgid "Battlegrounds Leaderboard"
 msgstr "Battleground Rangliste"
 
 #: src/main/webapp/jsp/login_view.jsp:43
-#: src/main/webapp/WEB-INF/tags/navbar.tag:144
+#: src/main/webapp/WEB-INF/tags/navbar.tag:143
 msgid "Login"
 msgstr "Anmelden"
 
@@ -7312,7 +7317,7 @@ msgid "Puzzle: {0}"
 msgstr "Rätsel: {0}"
 
 #: src/main/webapp/jsp/puzzle/attacker_view.jsp:120
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:122
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:119
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:124
 msgid "Congratulations!"
 msgstr "Glückwunsch!"
@@ -7333,11 +7338,11 @@ msgstr "Lösender Mutant"
 msgid "Puzzle"
 msgstr "Rätsel"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:123
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:120
 msgid "Your test solved the puzzle. {0}"
 msgstr "Dein Test hat das Rätsel gelöst. {0}"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:143
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:140
 msgid "Solving JUnit Test"
 msgstr "Lösender JUnit-Test"
 
@@ -8114,7 +8119,7 @@ msgstr ""
 "aktueller Code überschrieben."
 
 #: src/main/webapp/WEB-INF/tags/clone_previous_test_button.tag:68
-#: src/main/webapp/WEB-INF/tags/game_header.tag:151
+#: src/main/webapp/WEB-INF/tags/game_header.tag:150
 msgid "Confirm"
 msgstr "Bestätigen"
 
@@ -8473,7 +8478,7 @@ msgid "Equivalence Threshold"
 msgstr "Äquivalenz-Threshold"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1210
-#: src/main/webapp/WEB-INF/tags/game_header.tag:165
+#: src/main/webapp/WEB-INF/tags/game_header.tag:164
 msgid "Start Game"
 msgstr "Spiel starten"
 
@@ -8558,6 +8563,11 @@ msgstr "Zurück"
 msgid "About CodeDefenders"
 msgstr "Über CodeDefenders"
 
+#: src/main/webapp/WEB-INF/tags/footer.tag:45
+#: src/main/webapp/WEB-INF/tags/navbar.tag:100
+msgid "Help"
+msgstr "Hilfe"
+
 #: src/main/webapp/WEB-INF/tags/footer.tag:49
 msgid "Imprint and Privacy Policy"
 msgstr "Impressum und Datenschutz"
@@ -8585,27 +8595,27 @@ msgstr ""
 msgid "Chat"
 msgstr "Chat"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:122
+#: src/main/webapp/WEB-INF/tags/game_header.tag:121
 msgid "Game Mode: {0}"
 msgstr "Spielmodus: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:126
+#: src/main/webapp/WEB-INF/tags/game_header.tag:125
 msgid "Your Role: {0}"
 msgstr "Ihre Rolle: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:141
+#: src/main/webapp/WEB-INF/tags/game_header.tag:140
 msgid "End Game"
 msgstr "Spiel beenden"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:146
+#: src/main/webapp/WEB-INF/tags/game_header.tag:145
 msgid "Confirm End Game"
 msgstr "Spielende bestätigen"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:148
+#: src/main/webapp/WEB-INF/tags/game_header.tag:147
 msgid "Are you sure you want to end the game?"
 msgstr "Möchten Sie das Spiel wirklich beenden?"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:268
+#: src/main/webapp/WEB-INF/tags/game_header.tag:267
 msgid "Invitations"
 msgstr "Einladungen"
 
@@ -8894,31 +8904,31 @@ msgstr "Lebendig"
 msgid "Mutation rules:"
 msgstr "Mutationsregeln:"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:63
+#: src/main/webapp/WEB-INF/tags/navbar.tag:62
 msgid "Multiplayer"
 msgstr "Mehrspieler"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:74
+#: src/main/webapp/WEB-INF/tags/navbar.tag:73
 msgid "Leaderboard"
 msgstr "Bestenliste"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:97
+#: src/main/webapp/WEB-INF/tags/navbar.tag:96
 msgid "Profile"
 msgstr "Profil"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:99
+#: src/main/webapp/WEB-INF/tags/navbar.tag:98
 msgid "Account"
 msgstr "Konto"
 
-#: src/main/webapp/WEB-INF/tags/navbar.tag:103
+#: src/main/webapp/WEB-INF/tags/navbar.tag:102
 msgid "Logout"
 msgstr "Abmelden"
 
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:57
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:56
 msgid "no role"
 msgstr "keine Rolle"
 
-#: src/main/webapp/WEB-INF/tags/page/game_page.tag:60
+#: src/main/webapp/WEB-INF/tags/page/game_page.tag:59
 msgid "Game {0} ({1})"
 msgstr "Spiel {0} ({1})"
 
@@ -9002,6 +9012,66 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid ""
+#~ "Greetings,\n"
+#~ "I would like to request a teacher account for {0} on {1}.\n"
+#~ "Regards,\n"
+#~ "{0}\n"
+#~ msgstr ""
+#~ "Sehr geehrte Damen und Herren,\n"
+#~ "ich möchte ein Lehrerkonto für {0} auf {1} beantragen.\n"
+#~ "Mit freundlichen Grüßen,\n"
+#~ "{0}\n"
+
+#~ msgid ""
+#~ "Welcome to Code Defenders!\n"
+#~ "An account has been created for you with Username {0} and Password {1}.\n"
+#~ "You can log in at {2}.\n"
+#~ "Happy coding!"
+#~ msgstr ""
+#~ "Willkommen bei Code Defenders!\n"
+#~ "Es wurde ein Konto für dich mit dem Benutzernamen {0} und dem Passwort "
+#~ "{1} erstellt.\n"
+#~ "Du kannst dich unter {2} anmelden.\n"
+#~ "Viel Spaß beim Programmieren!"
+
+#~ msgid ""
+#~ "Hello {0}!\n"
+#~ "Change your password here: {1}\n"
+#~ "This link is only valid for {2} hours.\n"
+#~ "Greetings, your Code Defenders team"
+#~ msgstr ""
+#~ "Guten Tag {0}!\n"
+#~ "\n"
+#~ "Hier kannst Du Dein Passwort ändern: {1}\n"
+#~ "Dieser Link ist nur {2} Stunden lang gültig.\n"
+#~ "\n"
+#~ "Viele Grüße\vCode Defenders-Team"
+
+#~ msgid ""
+#~ "A teacher account lets you create classrooms for your students, so you "
+#~ "can manage games more easily. If you\\'re interested in turning your "
+#~ "account into a teacher account, please use the template below to email "
+#~ "us. You can also use this <a href=\\'{0}\\'>mailto link</a> to "
+#~ "automatically create an email with the template."
+#~ msgstr ""
+#~ "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um "
+#~ "Spiele einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto "
+#~ "umwandeln möchtest, schick uns bitte eine E-Mail mit der unten stehenden "
+#~ "Vorlage. Du kannst auch diesen <a href=\\'{0}\\'>Mailto-Link</a> "
+#~ "verwenden, um automatisch eine E-Mail mit der Vorlage zu erstellen."
+
+#~ msgid ""
+#~ "Greetings,\n"
+#~ "I would like to request a teacher account for %s on %s.\n"
+#~ "Regards,\n"
+#~ "%s\n"
+#~ msgstr ""
+#~ "Sehr geehrte Damen und Herren,\n"
+#~ "ich möchte ein Lehrerkonto für %s auf %s beantragen.\n"
+#~ "Mit freundlichen Grüßen,\n"
+#~ "%s \n"
 
 #~ msgid ""
 #~ "The game you were invited to no longer exists, or it has not been created "
