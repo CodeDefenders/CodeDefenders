@@ -3186,16 +3186,19 @@ msgid "Offending statement:"
 msgstr "Verstoßende Statements:"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:57
+#: src/main/webapp/jsp/help.jsp:113
 #: src/main/webapp/WEB-INF/tags/create_games.tag:642
 msgid "Relaxed"
 msgstr "Locker"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:70
+#: src/main/webapp/jsp/help.jsp:120
 #: src/main/webapp/WEB-INF/tags/create_games.tag:643
 msgid "Moderate"
 msgstr "Mittel"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:76
+#: src/main/webapp/jsp/help.jsp:128
 #: src/main/webapp/WEB-INF/tags/create_games.tag:644
 msgid "Strict"
 msgstr "Strikt"
@@ -3259,6 +3262,7 @@ msgid "No mutants that are identical to the Class under Test"
 msgstr "Es gibt keine Mutanten, die mit der zu testenden Klasse identisch sind"
 
 #: src/main/java/org/codedefenders/validation/code/MutantValidationRules.java:143
+#: src/main/webapp/jsp/help.jsp:122
 msgid "No changes to comments"
 msgstr "Keine Änderungen an Kommentaren"
 
@@ -4108,27 +4112,27 @@ msgstr ""
 "Der Angreifer erhält einen Punkt für die Erzeugung eines Mutanten, der einen "
 "Test überlebt."
 
-#: src/main/webapp/jsp/about_page.jsp:26
+#: src/main/webapp/jsp/about_page.jsp:27
 msgid "About Code Defenders"
 msgstr "Über CodeDefenders"
 
-#: src/main/webapp/jsp/about_page.jsp:34
+#: src/main/webapp/jsp/about_page.jsp:35
 msgid "Version"
 msgstr "Version"
 
-#: src/main/webapp/jsp/about_page.jsp:38
+#: src/main/webapp/jsp/about_page.jsp:39
 msgid "This is Code Defenders version {0}."
 msgstr "Dies ist die Version {0} von Code Defenders."
 
-#: src/main/webapp/jsp/about_page.jsp:45
+#: src/main/webapp/jsp/about_page.jsp:46
 msgid "This is Code Defenders running on git commit {0}."
 msgstr "Dies ist Code Defenders, das auf Git-Commit {0} läuft."
 
-#: src/main/webapp/jsp/about_page.jsp:48
+#: src/main/webapp/jsp/about_page.jsp:49
 msgid "The git commit hash is {0}."
 msgstr "Der Git-Commit-Hash lautet {0}."
 
-#: src/main/webapp/jsp/about_page.jsp:54
+#: src/main/webapp/jsp/about_page.jsp:55
 msgid ""
 "The version is dirty, i.e., the working directory contains uncommitted "
 "changes."
@@ -4136,60 +4140,60 @@ msgstr ""
 "Die Version ist schmutzig, d.h. das Arbeitsverzeichnis enthält unübertragene "
 "Änderungen."
 
-#: src/main/webapp/jsp/about_page.jsp:61
+#: src/main/webapp/jsp/about_page.jsp:62
 msgid "Source Code"
 msgstr "Quellcode"
 
-#: src/main/webapp/jsp/about_page.jsp:64
+#: src/main/webapp/jsp/about_page.jsp:65
 msgid "CodeDefenders is developed and maintained at the"
 msgstr "CodeDefenders wird betrieben und entwickelt vom"
 
-#: src/main/webapp/jsp/about_page.jsp:65
+#: src/main/webapp/jsp/about_page.jsp:66
 msgid "Chair of Software Engineering&nbsp;II"
 msgstr "Lehrstuhl für Software Engineering&nbsp;II"
 
-#: src/main/webapp/jsp/about_page.jsp:66
+#: src/main/webapp/jsp/about_page.jsp:67
 msgid "at the University of Passau."
 msgstr "an der Universität Passau."
 
-#: src/main/webapp/jsp/about_page.jsp:69 src/main/webapp/jsp/contact.jsp:169
+#: src/main/webapp/jsp/about_page.jsp:70 src/main/webapp/jsp/contact.jsp:169
 msgid "Code Defenders is an open source project."
 msgstr "CodeDefenders ist ein Open Source Projekt."
 
-#: src/main/webapp/jsp/about_page.jsp:70
+#: src/main/webapp/jsp/about_page.jsp:71
 msgid "See the"
 msgstr "Gehe zur"
 
-#: src/main/webapp/jsp/about_page.jsp:72
+#: src/main/webapp/jsp/about_page.jsp:73
 msgid "project page."
 msgstr "Projektseite."
 
-#: src/main/webapp/jsp/about_page.jsp:76
+#: src/main/webapp/jsp/about_page.jsp:77
 msgid "Contributors"
 msgstr "Mitwirkende"
 
-#: src/main/webapp/jsp/about_page.jsp:79 src/main/webapp/jsp/about_page.jsp:88
-#: src/main/webapp/jsp/about_page.jsp:89 src/main/webapp/jsp/about_page.jsp:93
+#: src/main/webapp/jsp/about_page.jsp:80 src/main/webapp/jsp/about_page.jsp:89
+#: src/main/webapp/jsp/about_page.jsp:90 src/main/webapp/jsp/about_page.jsp:94
 msgid "The University of Sheffield"
 msgstr "Universität Sheffield"
 
-#: src/main/webapp/jsp/about_page.jsp:80 src/main/webapp/jsp/about_page.jsp:81
-#: src/main/webapp/jsp/about_page.jsp:82 src/main/webapp/jsp/about_page.jsp:84
-#: src/main/webapp/jsp/about_page.jsp:85 src/main/webapp/jsp/about_page.jsp:86
-#: src/main/webapp/jsp/about_page.jsp:87 src/main/webapp/jsp/about_page.jsp:90
-#: src/main/webapp/jsp/about_page.jsp:91 src/main/webapp/jsp/about_page.jsp:92
+#: src/main/webapp/jsp/about_page.jsp:81 src/main/webapp/jsp/about_page.jsp:82
+#: src/main/webapp/jsp/about_page.jsp:83 src/main/webapp/jsp/about_page.jsp:85
+#: src/main/webapp/jsp/about_page.jsp:86 src/main/webapp/jsp/about_page.jsp:87
+#: src/main/webapp/jsp/about_page.jsp:88 src/main/webapp/jsp/about_page.jsp:91
+#: src/main/webapp/jsp/about_page.jsp:92 src/main/webapp/jsp/about_page.jsp:93
 msgid "University of Passau"
 msgstr "Universität Passau"
 
-#: src/main/webapp/jsp/about_page.jsp:97
+#: src/main/webapp/jsp/about_page.jsp:98
 msgid "Supporters"
 msgstr "Unterstützer"
 
-#: src/main/webapp/jsp/about_page.jsp:100
+#: src/main/webapp/jsp/about_page.jsp:101
 msgid "Gamifying the Quest for Software Tests"
 msgstr "Gamifying the Quest for Software Tests"
 
-#: src/main/webapp/jsp/about_page.jsp:101
+#: src/main/webapp/jsp/about_page.jsp:102
 msgid ""
 "Improving Engagement of Students in Software Engineering Courses through "
 "Gamification"
@@ -4197,15 +4201,15 @@ msgstr ""
 "Verbesserung des Engagements von Studierenden in Software-Engineering-Kursen "
 "durch Gamification"
 
-#: src/main/webapp/jsp/about_page.jsp:104
+#: src/main/webapp/jsp/about_page.jsp:105
 msgid "Sheffield Undergraduate Research Experience"
 msgstr "Sheffield Undergraduate Research Experience"
 
-#: src/main/webapp/jsp/about_page.jsp:106
+#: src/main/webapp/jsp/about_page.jsp:107
 msgid "Grant RG160969"
 msgstr "Grant RG160969"
 
-#: src/main/webapp/jsp/about_page.jsp:110 src/main/webapp/jsp/index.jsp:194
+#: src/main/webapp/jsp/about_page.jsp:111 src/main/webapp/jsp/index.jsp:194
 msgid "Research"
 msgstr "Forschung"
 
@@ -4320,7 +4324,7 @@ msgstr "Das Spiel ist fesselnd:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:558
 #: src/main/webapp/jsp/admin_killmap_management.jsp:610
 #: src/main/webapp/jsp/admin_killmap_management.jsp:659
-#: src/main/webapp/jsp/games_history.jsp:132
+#: src/main/webapp/jsp/games_history.jsp:132 src/main/webapp/jsp/help.jsp:191
 #: src/main/webapp/jsp/leaderboards.jsp:40
 #: src/main/webapp/jsp/user_games_view.jsp:236
 #: src/main/webapp/jsp/user_games_view.jsp:565
@@ -4501,7 +4505,7 @@ msgstr "Äquivalente Mutanten:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:563
 #: src/main/webapp/jsp/admin_killmap_management.jsp:615
 #: src/main/webapp/jsp/admin_killmap_management.jsp:664
-#: src/main/webapp/jsp/games_history.jsp:165
+#: src/main/webapp/jsp/games_history.jsp:165 src/main/webapp/jsp/help.jsp:195
 #: src/main/webapp/jsp/leaderboards.jsp:42
 #: src/main/webapp/jsp/user_games_view.jsp:272
 #: src/main/webapp/jsp/user_games_view.jsp:601
@@ -5007,8 +5011,8 @@ msgid "Multiplayer Games"
 msgstr "Mehrspieler-Spiele"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:81
-#: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/index.jsp:123
-#: src/main/webapp/jsp/scoring_system.jsp:25
+#: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/help.jsp:102
+#: src/main/webapp/jsp/index.jsp:123 src/main/webapp/jsp/scoring_system.jsp:25
 #: src/main/webapp/jsp/user_games_view.jsp:127
 #: src/main/webapp/jsp/user_games_view.jsp:451
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:84
@@ -5017,8 +5021,8 @@ msgid "Attackers"
 msgstr "Angreifer"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:82
-#: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/index.jsp:124
-#: src/main/webapp/jsp/scoring_system.jsp:26
+#: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/help.jsp:48
+#: src/main/webapp/jsp/index.jsp:124 src/main/webapp/jsp/scoring_system.jsp:26
 #: src/main/webapp/jsp/user_games_view.jsp:128
 #: src/main/webapp/jsp/user_games_view.jsp:452
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:139
@@ -6142,6 +6146,7 @@ msgid "Info"
 msgstr "Info"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:143
+#: src/main/webapp/jsp/help.jsp:189
 #: src/main/webapp/jsp/melee/details_view.jsp:179
 #: src/main/webapp/WEB-INF/tags/game_header.tag:231
 msgid "Scoring System"
@@ -7034,6 +7039,378 @@ msgstr "Deine Melee-Spielhistorie ist leer."
 #: src/main/webapp/jsp/games_history.jsp:282
 msgid "There are no Players."
 msgstr "Es gibt keine Spieler."
+
+#: src/main/webapp/jsp/help.jsp:31 src/main/webapp/WEB-INF/tags/footer.tag:45
+#: src/main/webapp/WEB-INF/tags/navbar.tag:100
+msgid "Help"
+msgstr "Hilfe"
+
+#: src/main/webapp/jsp/help.jsp:37
+msgid ""
+"Code Defenders pits two teams against each other on a Java class. Attackers "
+"must create mutants in the code, whilst Defenders write unit tests to catch "
+"(kill) these changes to the code."
+msgstr ""
+"Bei Code Defenders treten zwei Teams mit einer Java-Klasse gegeneinander an. "
+"Die Angreifer müssen Mutanten im Code erzeugen, während die Verteidiger Unit-"
+"Tests schreiben, um diese Änderungen am Code abzufangen (zu töten)."
+
+#: src/main/webapp/jsp/help.jsp:39
+msgid "Main page"
+msgstr "Hauptseite"
+
+#: src/main/webapp/jsp/help.jsp:40
+msgid "Here you can join open games. You can also create your own games!"
+msgstr ""
+"Hier kannst du an offenen Spielen teilnehmen. Du kannst auch deine eigenen "
+"Spiele erstellen!"
+
+#: src/main/webapp/jsp/help.jsp:44
+msgid "Games overview page showing open and available games."
+msgstr "Übersichtsseite mit offenen und verfügbaren Spielen."
+
+#: src/main/webapp/jsp/help.jsp:49
+msgid ""
+"At the top of the page, there are two panels. On the left is the original "
+"Class Under Test (CUT), and on the right there is a panel to write a new "
+"test, along with a \"Defend\" button which submits the test."
+msgstr ""
+"Oben auf der Seite befinden sich zwei Felder. Links ist die ursprüngliche zu "
+"testende Klasse (CUT) zu sehen, und rechts gibt es ein Feld zum Erstellen "
+"eines neuen Tests sowie eine Schaltfläche „Verteidigen“, mit der der Test "
+"übermittelt wird."
+
+#: src/main/webapp/jsp/help.jsp:49
+msgid ""
+"On the CUT panel, we can see the coverage of existing tests (in green) and "
+"the location of existing mutants (the symbols at the side)."
+msgstr ""
+"Im CUT-Fenster sehen wir die Coverage der vorhandenen Tests (in Grün) und "
+"die Position der vorhandenen Mutanten (die Symbole an der Seite)."
+
+#: src/main/webapp/jsp/help.jsp:53
+msgid ""
+"Defender view with the Class Under Test on the left and the test editor on "
+"the right."
+msgstr ""
+"Verteidiger-Ansicht mit der zu testenden Klasse auf der linken Seite und dem "
+"Test-Editor auf der rechten Seite."
+
+#: src/main/webapp/jsp/help.jsp:57
+msgid ""
+"We're going to submit a test to kill a living mutant. Tests don't "
+"necessarily have to target alive mutants, and can simply be made to kill "
+"possible future mutants."
+msgstr ""
+"Wir werden einen Test einreichen, der darauf abzielt, einen lebenden "
+"Mutanten zu töten. Tests müssen nicht unbedingt auf lebende Mutanten "
+"abzielen, sondern können auch einfach darauf ausgelegt sein, mögliche "
+"zukünftige Mutanten zu töten."
+
+#: src/main/webapp/jsp/help.jsp:58
+msgid ""
+"As we can see above, there is a living mutant in the "
+"<code>getCurrentFloor()</code> method, and there is no test yet to cover it."
+msgstr ""
+"Wie wir oben sehen können, gibt es in der Methode <code>getCurrentFloor()</"
+"code> einen lebenden Mutanten, und es gibt noch keinen Test, der diesen "
+"covered."
+
+#: src/main/webapp/jsp/help.jsp:65
+msgid "Defender test submission showing a failing or broken test example."
+msgstr ""
+"Eine Test-Einreichung, die ein fehlgeschlagenes oder fehlerhaftes "
+"Testbeispiel zeigt."
+
+#: src/main/webapp/jsp/help.jsp:69
+msgid ""
+"If an error is made in your test and it does not compile, a full compiler "
+"error is shown at the top of the screen. In this case, I did not add the "
+"brackets at the end of a method call."
+msgstr ""
+"Wenn in deinem Test ein Fehler vorliegt und er nicht kompiliert werden kann, "
+"wird oben auf dem Bildschirm ein vollständiger Compiler-Fehler angezeigt. In "
+"diesem Fall habe ich die Klammern am Ende eines Methodenaufrufs nicht "
+"gesetzt."
+
+#: src/main/webapp/jsp/help.jsp:73
+msgid "Compiler error displayed after submitting a test that does not compile."
+msgstr ""
+"Nach dem Absenden eines Tests, der nicht kompiliert werden kann, wird ein "
+"Compilerfehler angezeigt."
+
+#: src/main/webapp/jsp/help.jsp:77
+msgid ""
+"After re-submitting the test, we see that it compiled successfully and "
+"killed the mutant."
+msgstr ""
+"Nach erneuter Einreichung des Tests sehen wir, dass er erfolgreich "
+"kompiliert wurde und den Mutanten eliminiert hat."
+
+#: src/main/webapp/jsp/help.jsp:81
+msgid "Successful test submission showing the mutant was killed."
+msgstr ""
+"Erfolgreiche Testdurchführung, die zeigt, dass der Mutant abgetötet wurde."
+
+#: src/main/webapp/jsp/help.jsp:85
+msgid ""
+"Below these panels are two more panels, which show existing mutants and "
+"tests."
+msgstr ""
+"Unter diesen Feldern befinden sich zwei weitere Felder, die vorhandene "
+"Mutationen und Tests anzeigen."
+
+#: src/main/webapp/jsp/help.jsp:89
+msgid ""
+"Lower section of the defender page showing the mutants and tests panels."
+msgstr ""
+"Der untere Bereich der Verteidiger-Seite mit den Mutanten- und Testfeldern."
+
+#: src/main/webapp/jsp/help.jsp:93
+msgid ""
+"The actual changes made in killed mutants can be viewed by clicking the "
+"\"View Diff\" button on the killed tab of the mutants panel."
+msgstr ""
+"Die tatsächlich vorgenommenen Änderungen an getöteten Mutanten können durch "
+"Klicken auf die Schaltfläche „Diff anzeigen“ auf der Registerkarte „Getötet“ "
+"im Mutantenfenster angezeigt werden."
+
+#: src/main/webapp/jsp/help.jsp:97
+msgid "Mutant diff view displayed after clicking the \"View Diff\" button."
+msgstr ""
+"Die Mutanten-Differenz-Ansicht wird nach dem Klicken auf die Schaltfläche "
+"„Diff anzeigen“ angezeigt."
+
+#: src/main/webapp/jsp/help.jsp:103
+msgid ""
+"The attack page only has two panels, existing mutants, and a panel "
+"containing the CUT, which can be modified to create mutants. Green lines are "
+"covered by existing tests, with darker green showing more coverage."
+msgstr ""
+"Die Angriffsseite hat nur zwei Felder: vorhandene Mutanten und ein Feld mit "
+"dem CUT, das geändert werden kann, um Mutanten zu erstellen. Grüne Linien "
+"werden von vorhandenen Tests abgedeckt, wobei dunkleres Grün eine größere "
+"Abdeckung anzeigt."
+
+#: src/main/webapp/jsp/help.jsp:107
+msgid ""
+"Attacker view showing existing mutants and the editable Class Under Test."
+msgstr ""
+"Ansicht des Angreifers mit den vorhandenen Mutanten und der bearbeitbaren zu "
+"testenden Klasse."
+
+#: src/main/webapp/jsp/help.jsp:111
+msgid ""
+"Similarly to tests, mutants are limited by rules, which come in three "
+"strictness levels:"
+msgstr ""
+"Ähnlich wie Tests unterliegen Mutanten bestimmten Regeln, die in drei Stufen "
+"unterteilt sind:"
+
+#: src/main/webapp/jsp/help.jsp:115
+msgid "No calls to System.* or Random.*"
+msgstr "Keine Aufrufe von System.* oder Random.*"
+
+#: src/main/webapp/jsp/help.jsp:116
+msgid "No mutants with only changes to comments or formatting"
+msgstr "Keine Mutanten mit nur Änderungen an Kommentaren oder Formatierungen"
+
+#: src/main/webapp/jsp/help.jsp:117
+msgid "No renaming of methods or fields, and no additional methods or fields"
+msgstr ""
+"Keine Umbenennung von Methoden oder Feldern und keine zusätzlichen Methoden "
+"oder Felder"
+
+#: src/main/webapp/jsp/help.jsp:123
+msgid "No additional logical operators (&&, ||)"
+msgstr "Keine zusätzlichen logischen Operatoren (&&, ||)"
+
+#: src/main/webapp/jsp/help.jsp:124
+msgid "No ternary operators"
+msgstr "Keine ternären Operatoren"
+
+#: src/main/webapp/jsp/help.jsp:125
+msgid "No new control structures (switch, if, for, ...)"
+msgstr "Keine neuen Kontrollstrukturen (switch, if, for, ...)"
+
+#: src/main/webapp/jsp/help.jsp:130
+msgid "No reflection"
+msgstr "Keine Reflection"
+
+#: src/main/webapp/jsp/help.jsp:131
+msgid "No bitwise operators (bitshifts and logical)"
+msgstr "Keine Bitoperatoren (Bitverschiebungen und logische Operatoren)"
+
+#: src/main/webapp/jsp/help.jsp:132
+msgid "No signature changes"
+msgstr "Keine Änderungen der Signatur"
+
+#: src/main/webapp/jsp/help.jsp:137
+msgid ""
+"Here I have created a mutant by changing the > comparator to <. Return "
+"values, variables, etc. can also be changed."
+msgstr ""
+"Hier habe ich einen Mutanten erstellt, indem ich den Komparator > in < "
+"geändert habe. Rückgabewerte, Variablen usw. können ebenfalls geändert "
+"werden."
+
+#: src/main/webapp/jsp/help.jsp:142
+msgid "Original code snippet before creating a mutant."
+msgstr "Der ursprüngliche Codeausschnitt vor der Erstellung eines Mutanten."
+
+#: src/main/webapp/jsp/help.jsp:146
+msgid "Mutated code snippet after changing the comparator."
+msgstr "Geändertes Code-Schnipsel nach dem Austausch des Komparators."
+
+#: src/main/webapp/jsp/help.jsp:150
+msgid ""
+"After submitting our mutant by pressing the \"Attack!\" button, we see that "
+"it survived two existing tests. Similarly to submitting a test, an error "
+"will be displayed if the mutated class did not compile."
+msgstr ""
+"Nachdem wir unseren Mutanten durch Drücken der Schaltfläche „Attack!“ "
+"eingereicht haben, sehen wir, dass er zwei bestehende Tests überstanden hat. "
+"Ähnlich wie beim Einreichen eines Tests wird ein Fehler angezeigt, wenn die "
+"mutierte Klasse nicht kompiliert werden konnte."
+
+#: src/main/webapp/jsp/help.jsp:154
+msgid "Attack result showing that the mutant survived existing tests."
+msgstr ""
+"Das Ergebnis des Angriffs zeigt, dass der Mutant die bisherigen Tests "
+"überstanden hat."
+
+#: src/main/webapp/jsp/help.jsp:158
+msgid "Equivalents"
+msgstr "Äquivalente"
+
+#: src/main/webapp/jsp/help.jsp:159
+msgid ""
+"It is possible to create a mutant which is identical in functionality to the "
+"CUT, so no test can pass on the CUT and fail on the mutated class."
+msgstr ""
+"Es ist möglich, einen Mutanten zu erstellen, der in seiner Funktionalität "
+"mit dem CUT identisch ist, sodass kein Test den CUT bestehen und bei der "
+"mutierten Klasse fehlschlagen kann."
+
+#: src/main/webapp/jsp/help.jsp:160
+msgid ""
+"For example, the following functions are identical in behaviour, they are "
+"equivalent:"
+msgstr ""
+"Beispielsweise sind die folgenden Funktionen in ihrem Verhalten identisch, "
+"sie sind äquivalent:"
+
+#: src/main/webapp/jsp/help.jsp:164
+msgid "Original function used in an equivalence example."
+msgstr ""
+"Die ursprüngliche Funktion, die in einem Äquivalenzbeispiel verwendet wurde."
+
+#: src/main/webapp/jsp/help.jsp:168
+msgid "Mutated function that is equivalent to the original example."
+msgstr "Eine angepasste Funktion, die dem ursprünglichen Beispiel entspricht."
+
+#: src/main/webapp/jsp/help.jsp:172
+msgid ""
+"If a Defender believes that an Attacker's mutant is equivalent, they can "
+"click the \"Claim Equivalent\" button on the mutant."
+msgstr ""
+"Wenn ein Verteidiger der Meinung ist, dass der Mutant eines Angreifers "
+"äquivalent ist, kann er auf die Schaltfläche „Als gleichwertig beanspruchen“ "
+"auf dem Mutanten klicken."
+
+#: src/main/webapp/jsp/help.jsp:176
+msgid "Mutant panel showing the \"Claim Equivalent\" action."
+msgstr "Mutanten-Panel mit der Aktion „Als äquivalent markieren“."
+
+#: src/main/webapp/jsp/help.jsp:180
+msgid ""
+"After this, the Attacker will see that their mutant was marked as "
+"equivalent. If the mutant is equivalent, they should accept it as equivalent."
+msgstr ""
+"Danach sieht der Angreifer, dass sein Mutant als äquivalent markiert wurde. "
+"Wenn der Mutant äquivalent ist, sollte er ihn als äquivalent akzeptieren."
+
+#: src/main/webapp/jsp/help.jsp:181
+msgid ""
+"However, if the mutant isn't equivalent, the Attacker can prove that it "
+"isn't by writing a test which kills it."
+msgstr ""
+"Wenn der Mutant jedoch nicht äquivalent ist, kann der Angreifer dies "
+"beweisen, indem er einen Test schreibt, der ihn tötet."
+
+#: src/main/webapp/jsp/help.jsp:185
+msgid "Attacker view showing an equivalent marking and the option to respond."
+msgstr ""
+"Ansicht aus Sicht des Angreifers mit einer Äquivalenz-Markierung und der "
+"Möglichkeit zu reagieren."
+
+#: src/main/webapp/jsp/help.jsp:192
+msgid ""
+"For every test a mutant passes where the test executes the mutated line, the "
+"mutant gains a point."
+msgstr ""
+"Für jeden Test, den ein Mutant überlebt, bei dem die mutierte Zeile "
+"ausgeführt wird, erhält der Mutant einen Punkt."
+
+#: src/main/webapp/jsp/help.jsp:193
+msgid "Mutants also gain one point for being created and surviving."
+msgstr ""
+"Mutanten erhalten außerdem einen Punkt dafür, dass sie erschaffen wurden und "
+"überlebt haben."
+
+#: src/main/webapp/jsp/help.jsp:196
+msgid ""
+"For every mutant a test kills, the test gains points equal to the score of "
+"the mutant."
+msgstr ""
+"Für jeden Mutanten, den ein Test tötet, erhält der Test Punkte in Höhe der "
+"Punktzahl des Mutanten."
+
+#: src/main/webapp/jsp/help.jsp:197
+msgid "A test gains a point for killing a previously untouched mutant."
+msgstr ""
+"Ein Test erhält einen Punkt für das Töten eines zuvor unberührten Mutanten."
+
+#: src/main/webapp/jsp/help.jsp:198
+msgid ""
+"A test is also given an additional point for killing a newly created mutant."
+msgstr ""
+"Ein Test erhält außerdem einen zusätzlichen Punkt für das Töten eines neu "
+"erstellten Mutanten."
+
+#: src/main/webapp/jsp/help.jsp:200
+msgid "Equivalences"
+msgstr "Äquivalenzen"
+
+#: src/main/webapp/jsp/help.jsp:201
+msgid ""
+"If an Attacker proves a mutant is not equivalent, they keep the mutant's "
+"points and gain an additional point."
+msgstr ""
+"Wenn ein Angreifer nachweist, dass ein Mutant nicht äquivalent ist, behält "
+"er die Punkte des Mutanten und erhält einen zusätzlichen Punkt."
+
+#: src/main/webapp/jsp/help.jsp:202
+msgid ""
+"If the Attacker accepts the mutant is equivalent, or the game expires, they "
+"lose the points of that mutant, and the Defender who claimed that it is "
+"equivalent gains a point."
+msgstr ""
+"Wenn der Angreifer akzeptiert, dass der Mutant äquivalent ist, oder das "
+"Spiel abläuft, verliert er die Punkte dieses Mutanten, und der Verteidiger, "
+"der behauptet hat, dass er äquivalent ist, erhält einen Punkt."
+
+#: src/main/webapp/jsp/help.jsp:204
+msgid "Code Editor Keyboard Shortcuts"
+msgstr "Tastaturkürzel für den Code-Editor"
+
+#: src/main/webapp/jsp/help.jsp:205
+msgid ""
+"Keyboard shortcuts can be configured by clicking on the \"editor mode\" "
+"button at the top of the page."
+msgstr ""
+"Tastaturkürzel kannst du konfigurieren, indem du oben auf der Seite auf die "
+"Schaltfläche „Editor-Modus“ klickst."
 
 #: src/main/webapp/jsp/imprint.jsp:36
 msgid "Imprint & Privacy Policy"
@@ -8614,11 +8991,6 @@ msgstr "Zurück"
 msgid "About CodeDefenders"
 msgstr "Über CodeDefenders"
 
-#: src/main/webapp/WEB-INF/tags/footer.tag:45
-#: src/main/webapp/WEB-INF/tags/navbar.tag:100
-msgid "Help"
-msgstr "Hilfe"
-
 #: src/main/webapp/WEB-INF/tags/footer.tag:49
 msgid "Imprint and Privacy Policy"
 msgstr "Impressum und Datenschutz"
@@ -8951,10 +9323,6 @@ msgstr "Bestehende Mutanten"
 msgid "Alive"
 msgstr "Lebendig"
 
-#: src/main/webapp/WEB-INF/tags/mutant_ruleset_explanation.tag:27
-msgid "Mutation rules:"
-msgstr "Mutationsregeln:"
-
 #: src/main/webapp/WEB-INF/tags/navbar.tag:62
 msgid "Multiplayer"
 msgstr "Mehrspieler"
@@ -9015,6 +9383,10 @@ msgstr "Mein Mutant ist äquivalent"
 msgid "I don\\'t know if my mutant is killable"
 msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
+msgid "Mutation rules:"
+msgstr "Mutationsregeln:"
+
 #: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
 msgid "Test rules"
 msgstr "Testregeln"
@@ -9063,6 +9435,13 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid ""
+#~ "As we can see above, there is a living mutant in the getCurrentFloor() "
+#~ "method, and there is no test yet to cover it."
+#~ msgstr ""
+#~ "Wie wir oben sehen können, gibt es in der Methode getCurrentFloor() einen "
+#~ "lebenden Mutanten, und es gibt noch keinen Test, der diesen covered."
 
 #~ msgid ""
 #~ "Greetings,\n"
@@ -9137,10 +9516,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ msgid "No calls to {0},{1}"
 #~ msgstr "Keine Aufrufe von {0}, {1}"
 
-#~ msgid "No mutants with only changes to comments or formatting"
-#~ msgstr ""
-#~ "Keine Mutanten mit nur Änderungen an Kommentaren oder Formatierungen"
-
 #~ msgid "No renaming of methods or fields, no additional methods or fields"
 #~ msgstr ""
 #~ "Keine Umbenennung von Methoden oder Feldern, keine zusätzlichen Methoden "
@@ -9149,20 +9524,8 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ msgid "No additional logical operators ({0}, {1})"
 #~ msgstr "Keine zusätzlichen logischen Operatoren ({0}, {1})"
 
-#~ msgid "No ternary operators"
-#~ msgstr "Keine ternären Operatoren"
-
 #~ msgid "No new control structures ({0}, {1}, {2}, ...)"
 #~ msgstr "Keine neuen Kontrollstrukturen ({0}, {1}, {2}, ...)"
-
-#~ msgid "No reflection"
-#~ msgstr "Keine Reflection"
-
-#~ msgid "No bitwise operators (bitshifts and logical)"
-#~ msgstr "Keine Bitoperatoren (Bitverschiebungen und logische Operatoren)"
-
-#~ msgid "No signature changes"
-#~ msgstr "Keine Änderungen der Signatur"
 
 #~ msgid "Only {0} assertion per test"
 #~ msgstr "Nur {0} Assertion pro Test"
@@ -9481,16 +9844,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ "fill='role' class='border rounded px-1'></span>"
 
 #~ msgid ""
-#~ "Code Defenders pits two teams against each other on a Java class. "
-#~ "Attackers must create mutants in the code, whilst Defenders write unit "
-#~ "tests to catch (kill) these changes to the code."
-#~ msgstr ""
-#~ "Bei Code Defenders treten zwei Teams mit einer Java-Klasse gegeneinander "
-#~ "an. Die Angreifer müssen Mutanten im Code erzeugen, während die "
-#~ "Verteidiger Unit-Tests schreiben, um diese Änderungen am Code abzufangen "
-#~ "(zu töten)."
-
-#~ msgid ""
 #~ "At the top of the page, there are two panels. On the left is the original "
 #~ "Class Under Test (CUT), and on the right there is a panel to write a new "
 #~ "test, along with a \"Defend!\" button which submits the test."
@@ -9530,140 +9883,3 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ "kann, wird oben auf dem Bildschirm ein vollständiger Compiler-Fehler "
 #~ "angezeigt. In diesem Fall habe ich die Klammern am Ende eines "
 #~ "Funktionsaufrufs nicht hinzugefügt."
-
-#~ msgid ""
-#~ "After re-submitting the test, we see that it compiled successfully and "
-#~ "killed the mutant."
-#~ msgstr ""
-#~ "Nach erneuter Einreichung des Tests sehen wir, dass er erfolgreich "
-#~ "kompiliert wurde und den Mutanten eliminiert hat."
-
-#~ msgid ""
-#~ "The actual changes made in killed mutants can be viewed by clicking the "
-#~ "\"View Diff\" button on the killed tab of the mutants panel."
-#~ msgstr ""
-#~ "Die tatsächlich vorgenommenen Änderungen an getöteten Mutanten können "
-#~ "durch Klicken auf die Schaltfläche „Diff anzeigen“ auf der Registerkarte "
-#~ "„Getötet“ im Mutantenfenster angezeigt werden."
-
-#~ msgid ""
-#~ "The attack page only has two panels, existing mutants, and a panel "
-#~ "containing the CUT, which can be modified to create mutants. Green lines "
-#~ "are covered by existing tests, with darker green showing more coverage."
-#~ msgstr ""
-#~ "Die Angriffsseite hat nur zwei Felder: vorhandene Mutanten und ein Feld "
-#~ "mit dem CUT, das geändert werden kann, um Mutanten zu erstellen. Grüne "
-#~ "Linien werden von vorhandenen Tests abgedeckt, wobei dunkleres Grün eine "
-#~ "größere Abdeckung anzeigt."
-
-#~ msgid ""
-#~ "Similarly to tests, mutants are limited by rules, which come in three "
-#~ "strictness levels:"
-#~ msgstr ""
-#~ "Ähnlich wie Tests unterliegen Mutanten bestimmten Regeln, die in drei "
-#~ "Stufen unterteilt sind:"
-
-#~ msgid ""
-#~ "Here I have created a mutant by changing the > comparator to <. Return "
-#~ "values, variables, etc. can also be changed."
-#~ msgstr ""
-#~ "Hier habe ich einen Mutanten erstellt, indem ich den Komparator > in < "
-#~ "geändert habe. Rückgabewerte, Variablen usw. können ebenfalls geändert "
-#~ "werden."
-
-#~ msgid ""
-#~ "After submitting our mutant by pressing the \"Attack!\" button, we see "
-#~ "that it survived two existing tests. Similarly to submitting a test, an "
-#~ "error will be displayed if the mutated class did not compile."
-#~ msgstr ""
-#~ "Nachdem wir unseren Mutanten durch Drücken der Schaltfläche „Attack!“ "
-#~ "eingereicht haben, sehen wir, dass er zwei bestehende Tests überstanden "
-#~ "hat. Ähnlich wie beim Einreichen eines Tests wird ein Fehler angezeigt, "
-#~ "wenn die mutierte Klasse nicht kompiliert werden konnte."
-
-#~ msgid ""
-#~ "It is possible to create a mutant which is identical in functionality to "
-#~ "the CUT, so no test can pass on the CUT and fail on the mutated class."
-#~ msgstr ""
-#~ "Es ist möglich, einen Mutanten zu erstellen, der in seiner Funktionalität "
-#~ "mit dem CUT identisch ist, sodass kein Test den CUT bestehen und bei der "
-#~ "mutierten Klasse fehlschlagen kann."
-
-#~ msgid ""
-#~ "For example, the following functions are identical in behaviour, they are "
-#~ "equivalent:"
-#~ msgstr ""
-#~ "Beispielsweise sind die folgenden Funktionen in ihrem Verhalten "
-#~ "identisch, sie sind äquivalent:"
-
-#~ msgid ""
-#~ "If a Defender believes that an Attacker's mutant is equivalent, they can "
-#~ "click the \"Claim Equivalent\" button on the mutant."
-#~ msgstr ""
-#~ "Wenn ein Verteidiger der Meinung ist, dass der Mutant eines Angreifers "
-#~ "äquivalent ist, kann er auf die Schaltfläche „Als gleichwertig "
-#~ "beanspruchen“ auf dem Mutanten klicken."
-
-#~ msgid ""
-#~ "After this, the Attacker will see that their mutant was marked as "
-#~ "equivalent. If the mutant is equivalent, they should accept it as "
-#~ "equivalent."
-#~ msgstr ""
-#~ "Danach sieht der Angreifer, dass sein Mutant als äquivalent markiert "
-#~ "wurde. Wenn der Mutant äquivalent ist, sollte er ihn als äquivalent "
-#~ "akzeptieren."
-
-#~ msgid ""
-#~ "However, if the mutant isn't equivalent, the Attacker can prove that it "
-#~ "isn't by writing a test which kills it."
-#~ msgstr ""
-#~ "Wenn der Mutant jedoch nicht äquivalent ist, kann der Angreifer dies "
-#~ "beweisen, indem er einen Test schreibt, der ihn tötet."
-
-#~ msgid ""
-#~ "For every test a mutant passes where the test executes the mutated line, "
-#~ "the mutant gains a point."
-#~ msgstr ""
-#~ "Für jeden Test, den ein Mutant überlebt, bei dem die mutierte Zeile "
-#~ "ausgeführt wird, erhält der Mutant einen Punkt."
-
-#~ msgid "Mutants also gain one point for being created and surviving."
-#~ msgstr ""
-#~ "Mutanten erhalten außerdem einen Punkt dafür, dass sie erschaffen wurden "
-#~ "und überlebt haben."
-
-#~ msgid ""
-#~ "For every mutant a test kills, the test gains points equal to the score "
-#~ "of the mutant."
-#~ msgstr ""
-#~ "Für jeden Mutanten, den ein Test tötet, erhält der Test Punkte in Höhe "
-#~ "der Punktzahl des Mutanten."
-
-#~ msgid "A test gains a point for killing a previously untouched mutant."
-#~ msgstr ""
-#~ "Ein Test erhält einen Punkt für das Töten eines zuvor unberührten "
-#~ "Mutanten."
-
-#~ msgid ""
-#~ "A test is also given an additional point for killing a newly created "
-#~ "mutant."
-#~ msgstr ""
-#~ "Ein Test erhält außerdem einen zusätzlichen Punkt für das Töten eines neu "
-#~ "erstellten Mutanten."
-
-#~ msgid ""
-#~ "If an Attacker proves a mutant is not equivalent, they keep the mutant's "
-#~ "points and gain an additional point."
-#~ msgstr ""
-#~ "Wenn ein Angreifer nachweist, dass ein Mutant nicht äquivalent ist, "
-#~ "behält er die Punkte des Mutanten und erhält einen zusätzlichen Punkt."
-
-#~ msgid ""
-#~ "If the Attacker accepts the mutant is equivalent, or the game expires, "
-#~ "they lose the points of that mutant, and the Defender who claimed that it "
-#~ "is equivalent gains a point."
-#~ msgstr ""
-#~ "Wenn der Angreifer akzeptiert, dass der Mutant äquivalent ist, oder das "
-#~ "Spiel abläuft, verliert er die Punkte dieses Mutanten, und der "
-#~ "Verteidiger, der behauptet hat, dass er äquivalent ist, erhält einen "
-#~ "Punkt."

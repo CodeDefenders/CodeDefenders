@@ -4091,69 +4091,65 @@ msgstr "All current tests pass. The mutant survives!"
 msgid "The attacker gains one point for creating a mutant that survives one test."
 msgstr "The attacker gains one point for creating a mutant that survives one test."
 
-#: src/main/webapp/jsp/about_page.jsp:26
+#: src/main/webapp/jsp/about_page.jsp:27
 msgid "About Code Defenders"
 msgstr "About Code Defenders"
 
-#: src/main/webapp/jsp/about_page.jsp:34
+#: src/main/webapp/jsp/about_page.jsp:35
 msgid "Version"
 msgstr "Version"
 
-#: src/main/webapp/jsp/about_page.jsp:38
+#: src/main/webapp/jsp/about_page.jsp:39
 msgid "This is Code Defenders version {0}."
 msgstr "This is Code Defenders version {0}."
 
-#: src/main/webapp/jsp/about_page.jsp:45
+#: src/main/webapp/jsp/about_page.jsp:46
 msgid "This is Code Defenders running on git commit {0}."
 msgstr "This is Code Defenders running on git commit {0}."
 
-#: src/main/webapp/jsp/about_page.jsp:48
+#: src/main/webapp/jsp/about_page.jsp:49
 msgid "The git commit hash is {0}."
 msgstr "The git commit hash is {0}."
 
-#: src/main/webapp/jsp/about_page.jsp:54
+#: src/main/webapp/jsp/about_page.jsp:55
 msgid "The version is dirty, i.e., the working directory contains uncommitted changes."
 msgstr "The version is dirty, i.e., the working directory contains uncommitted changes."
 
-#: src/main/webapp/jsp/about_page.jsp:61
+#: src/main/webapp/jsp/about_page.jsp:62
 msgid "Source Code"
 msgstr "Source Code"
 
-#: src/main/webapp/jsp/about_page.jsp:64
+#: src/main/webapp/jsp/about_page.jsp:65
 msgid "CodeDefenders is developed and maintained at the"
 msgstr "CodeDefenders is developed and maintained at the"
 
-#: src/main/webapp/jsp/about_page.jsp:65
+#: src/main/webapp/jsp/about_page.jsp:66
 msgid "Chair of Software Engineering&nbsp;II"
 msgstr "Chair of Software Engineering&nbsp;II"
 
-#: src/main/webapp/jsp/about_page.jsp:66
+#: src/main/webapp/jsp/about_page.jsp:67
 msgid "at the University of Passau."
 msgstr "at the University of Passau."
 
-#: src/main/webapp/jsp/about_page.jsp:69
+#: src/main/webapp/jsp/about_page.jsp:70
 msgid "Code Defenders is an open source project."
 msgstr "Code Defenders is an open source project."
 
-#: src/main/webapp/jsp/about_page.jsp:70
+#: src/main/webapp/jsp/about_page.jsp:71
 msgid "See the"
 msgstr "See the"
 
-#: src/main/webapp/jsp/about_page.jsp:72
+#: src/main/webapp/jsp/about_page.jsp:73
 msgid "project page."
 msgstr "project page."
 
-#: src/main/webapp/jsp/about_page.jsp:76
+#: src/main/webapp/jsp/about_page.jsp:77
 msgid "Contributors"
 msgstr "Contributors"
 
-#: src/main/webapp/jsp/about_page.jsp:79
+#: src/main/webapp/jsp/about_page.jsp:80
 msgid "The University of Sheffield"
 msgstr "The University of Sheffield"
-
-#: src/main/webapp/jsp/about_page.jsp:80
-msgid "University of Passau"
-msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:81
 msgid "University of Passau"
@@ -4163,7 +4159,7 @@ msgstr "University of Passau"
 msgid "University of Passau"
 msgstr "University of Passau"
 
-#: src/main/webapp/jsp/about_page.jsp:84
+#: src/main/webapp/jsp/about_page.jsp:83
 msgid "University of Passau"
 msgstr "University of Passau"
 
@@ -4180,16 +4176,16 @@ msgid "University of Passau"
 msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:88
-msgid "The University of Sheffield"
-msgstr "The University of Sheffield"
+msgid "University of Passau"
+msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:89
 msgid "The University of Sheffield"
 msgstr "The University of Sheffield"
 
 #: src/main/webapp/jsp/about_page.jsp:90
-msgid "University of Passau"
-msgstr "University of Passau"
+msgid "The University of Sheffield"
+msgstr "The University of Sheffield"
 
 #: src/main/webapp/jsp/about_page.jsp:91
 msgid "University of Passau"
@@ -4200,30 +4196,34 @@ msgid "University of Passau"
 msgstr "University of Passau"
 
 #: src/main/webapp/jsp/about_page.jsp:93
+msgid "University of Passau"
+msgstr "University of Passau"
+
+#: src/main/webapp/jsp/about_page.jsp:94
 msgid "The University of Sheffield"
 msgstr "The University of Sheffield"
 
-#: src/main/webapp/jsp/about_page.jsp:97
+#: src/main/webapp/jsp/about_page.jsp:98
 msgid "Supporters"
 msgstr "Supporters"
 
-#: src/main/webapp/jsp/about_page.jsp:100
+#: src/main/webapp/jsp/about_page.jsp:101
 msgid "Gamifying the Quest for Software Tests"
 msgstr "Gamifying the Quest for Software Tests"
 
-#: src/main/webapp/jsp/about_page.jsp:101
+#: src/main/webapp/jsp/about_page.jsp:102
 msgid "Improving Engagement of Students in Software Engineering Courses through Gamification"
 msgstr "Improving Engagement of Students in Software Engineering Courses through Gamification"
 
-#: src/main/webapp/jsp/about_page.jsp:104
+#: src/main/webapp/jsp/about_page.jsp:105
 msgid "Sheffield Undergraduate Research Experience"
 msgstr "Sheffield Undergraduate Research Experience"
 
-#: src/main/webapp/jsp/about_page.jsp:106
+#: src/main/webapp/jsp/about_page.jsp:107
 msgid "Grant RG160969"
 msgstr "Grant RG160969"
 
-#: src/main/webapp/jsp/about_page.jsp:110
+#: src/main/webapp/jsp/about_page.jsp:111
 msgid "Research"
 msgstr "Research"
 
@@ -7575,6 +7575,266 @@ msgstr "Points"
 msgid "There are no Players."
 msgstr "There are no Players."
 
+#: src/main/webapp/jsp/help.jsp:31
+msgid "Help"
+msgstr "Help"
+
+#: src/main/webapp/jsp/help.jsp:37
+msgid "Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code."
+msgstr "Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code."
+
+#: src/main/webapp/jsp/help.jsp:39
+msgid "Main page"
+msgstr "Main page"
+
+#: src/main/webapp/jsp/help.jsp:40
+msgid "Here you can join open games. You can also create your own games!"
+msgstr "Here you can join open games. You can also create your own games!"
+
+#: src/main/webapp/jsp/help.jsp:44
+msgid "Games overview page showing open and available games."
+msgstr "Games overview page showing open and available games."
+
+#: src/main/webapp/jsp/help.jsp:48
+msgid "Defenders"
+msgstr "Defenders"
+
+#: src/main/webapp/jsp/help.jsp:49
+msgid "At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a \"Defend\" button which submits the test."
+msgstr "At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a \"Defend\" button which submits the test."
+
+#: src/main/webapp/jsp/help.jsp:49
+msgid "On the CUT panel, we can see the coverage of existing tests (in green) and the location of existing mutants (the symbols at the side)."
+msgstr "On the CUT panel, we can see the coverage of existing tests (in green) and the location of existing mutants (the symbols at the side)."
+
+#: src/main/webapp/jsp/help.jsp:53
+msgid "Defender view with the Class Under Test on the left and the test editor on the right."
+msgstr "Defender view with the Class Under Test on the left and the test editor on the right."
+
+#: src/main/webapp/jsp/help.jsp:57
+msgid "We're going to submit a test to kill a living mutant. Tests don't necessarily have to target alive mutants, and can simply be made to kill possible future mutants."
+msgstr "We're going to submit a test to kill a living mutant. Tests don't necessarily have to target alive mutants, and can simply be made to kill possible future mutants."
+
+#: src/main/webapp/jsp/help.jsp:58
+msgid "As we can see above, there is a living mutant in the <code>getCurrentFloor()</code> method, and there is no test yet to cover it."
+msgstr "As we can see above, there is a living mutant in the <code>getCurrentFloor()</code> method, and there is no test yet to cover it."
+
+#: src/main/webapp/jsp/help.jsp:65
+msgid "Defender test submission showing a failing or broken test example."
+msgstr "Defender test submission showing a failing or broken test example."
+
+#: src/main/webapp/jsp/help.jsp:69
+msgid "If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a method call."
+msgstr "If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a method call."
+
+#: src/main/webapp/jsp/help.jsp:73
+msgid "Compiler error displayed after submitting a test that does not compile."
+msgstr "Compiler error displayed after submitting a test that does not compile."
+
+#: src/main/webapp/jsp/help.jsp:77
+msgid "After re-submitting the test, we see that it compiled successfully and killed the mutant."
+msgstr "After re-submitting the test, we see that it compiled successfully and killed the mutant."
+
+#: src/main/webapp/jsp/help.jsp:81
+msgid "Successful test submission showing the mutant was killed."
+msgstr "Successful test submission showing the mutant was killed."
+
+#: src/main/webapp/jsp/help.jsp:85
+msgid "Below these panels are two more panels, which show existing mutants and tests."
+msgstr "Below these panels are two more panels, which show existing mutants and tests."
+
+#: src/main/webapp/jsp/help.jsp:89
+msgid "Lower section of the defender page showing the mutants and tests panels."
+msgstr "Lower section of the defender page showing the mutants and tests panels."
+
+#: src/main/webapp/jsp/help.jsp:93
+msgid "The actual changes made in killed mutants can be viewed by clicking the \"View Diff\" button on the killed tab of the mutants panel."
+msgstr "The actual changes made in killed mutants can be viewed by clicking the \"View Diff\" button on the killed tab of the mutants panel."
+
+#: src/main/webapp/jsp/help.jsp:97
+msgid "Mutant diff view displayed after clicking the \"View Diff\" button."
+msgstr "Mutant diff view displayed after clicking the \"View Diff\" button."
+
+#: src/main/webapp/jsp/help.jsp:102
+msgid "Attackers"
+msgstr "Attackers"
+
+#: src/main/webapp/jsp/help.jsp:103
+msgid "The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage."
+msgstr "The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage."
+
+#: src/main/webapp/jsp/help.jsp:107
+msgid "Attacker view showing existing mutants and the editable Class Under Test."
+msgstr "Attacker view showing existing mutants and the editable Class Under Test."
+
+#: src/main/webapp/jsp/help.jsp:111
+msgid "Similarly to tests, mutants are limited by rules, which come in three strictness levels:"
+msgstr "Similarly to tests, mutants are limited by rules, which come in three strictness levels:"
+
+#: src/main/webapp/jsp/help.jsp:113
+msgid "Relaxed"
+msgstr "Relaxed"
+
+#: src/main/webapp/jsp/help.jsp:115
+msgid "No calls to System.* or Random.*"
+msgstr "No calls to System.* or Random.*"
+
+#: src/main/webapp/jsp/help.jsp:116
+msgid "No mutants with only changes to comments or formatting"
+msgstr "No mutants with only changes to comments or formatting"
+
+#: src/main/webapp/jsp/help.jsp:117
+msgid "No renaming of methods or fields, and no additional methods or fields"
+msgstr "No renaming of methods or fields, and no additional methods or fields"
+
+#: src/main/webapp/jsp/help.jsp:120
+msgid "Moderate"
+msgstr "Moderate"
+
+#: src/main/webapp/jsp/help.jsp:122
+msgid "No changes to comments"
+msgstr "No changes to comments"
+
+#: src/main/webapp/jsp/help.jsp:123
+msgid "No additional logical operators (&&, ||)"
+msgstr "No additional logical operators (&&, ||)"
+
+#: src/main/webapp/jsp/help.jsp:124
+msgid "No ternary operators"
+msgstr "No ternary operators"
+
+#: src/main/webapp/jsp/help.jsp:125
+msgid "No new control structures (switch, if, for, ...)"
+msgstr "No new control structures (switch, if, for, ...)"
+
+#: src/main/webapp/jsp/help.jsp:128
+msgid "Strict"
+msgstr "Strict"
+
+#: src/main/webapp/jsp/help.jsp:130
+msgid "No reflection"
+msgstr "No reflection"
+
+#: src/main/webapp/jsp/help.jsp:131
+msgid "No bitwise operators (bitshifts and logical)"
+msgstr "No bitwise operators (bitshifts and logical)"
+
+#: src/main/webapp/jsp/help.jsp:132
+msgid "No signature changes"
+msgstr "No signature changes"
+
+#: src/main/webapp/jsp/help.jsp:137
+msgid "Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed."
+msgstr "Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed."
+
+#: src/main/webapp/jsp/help.jsp:142
+msgid "Original code snippet before creating a mutant."
+msgstr "Original code snippet before creating a mutant."
+
+#: src/main/webapp/jsp/help.jsp:146
+msgid "Mutated code snippet after changing the comparator."
+msgstr "Mutated code snippet after changing the comparator."
+
+#: src/main/webapp/jsp/help.jsp:150
+msgid "After submitting our mutant by pressing the \"Attack!\" button, we see that it survived two existing tests. Similarly to submitting a test, an error will be displayed if the mutated class did not compile."
+msgstr "After submitting our mutant by pressing the \"Attack!\" button, we see that it survived two existing tests. Similarly to submitting a test, an error will be displayed if the mutated class did not compile."
+
+#: src/main/webapp/jsp/help.jsp:154
+msgid "Attack result showing that the mutant survived existing tests."
+msgstr "Attack result showing that the mutant survived existing tests."
+
+#: src/main/webapp/jsp/help.jsp:158
+msgid "Equivalents"
+msgstr "Equivalents"
+
+#: src/main/webapp/jsp/help.jsp:159
+msgid "It is possible to create a mutant which is identical in functionality to the CUT, so no test can pass on the CUT and fail on the mutated class."
+msgstr "It is possible to create a mutant which is identical in functionality to the CUT, so no test can pass on the CUT and fail on the mutated class."
+
+#: src/main/webapp/jsp/help.jsp:160
+msgid "For example, the following functions are identical in behaviour, they are equivalent:"
+msgstr "For example, the following functions are identical in behaviour, they are equivalent:"
+
+#: src/main/webapp/jsp/help.jsp:164
+msgid "Original function used in an equivalence example."
+msgstr "Original function used in an equivalence example."
+
+#: src/main/webapp/jsp/help.jsp:168
+msgid "Mutated function that is equivalent to the original example."
+msgstr "Mutated function that is equivalent to the original example."
+
+#: src/main/webapp/jsp/help.jsp:172
+msgid "If a Defender believes that an Attacker's mutant is equivalent, they can click the \"Claim Equivalent\" button on the mutant."
+msgstr "If a Defender believes that an Attacker's mutant is equivalent, they can click the \"Claim Equivalent\" button on the mutant."
+
+#: src/main/webapp/jsp/help.jsp:176
+msgid "Mutant panel showing the \"Claim Equivalent\" action."
+msgstr "Mutant panel showing the \"Claim Equivalent\" action."
+
+#: src/main/webapp/jsp/help.jsp:180
+msgid "After this, the Attacker will see that their mutant was marked as equivalent. If the mutant is equivalent, they should accept it as equivalent."
+msgstr "After this, the Attacker will see that their mutant was marked as equivalent. If the mutant is equivalent, they should accept it as equivalent."
+
+#: src/main/webapp/jsp/help.jsp:181
+msgid "However, if the mutant isn't equivalent, the Attacker can prove that it isn't by writing a test which kills it."
+msgstr "However, if the mutant isn't equivalent, the Attacker can prove that it isn't by writing a test which kills it."
+
+#: src/main/webapp/jsp/help.jsp:185
+msgid "Attacker view showing an equivalent marking and the option to respond."
+msgstr "Attacker view showing an equivalent marking and the option to respond."
+
+#: src/main/webapp/jsp/help.jsp:189
+msgid "Scoring System"
+msgstr "Scoring System"
+
+#: src/main/webapp/jsp/help.jsp:191
+msgid "Mutants"
+msgstr "Mutants"
+
+#: src/main/webapp/jsp/help.jsp:192
+msgid "For every test a mutant passes where the test executes the mutated line, the mutant gains a point."
+msgstr "For every test a mutant passes where the test executes the mutated line, the mutant gains a point."
+
+#: src/main/webapp/jsp/help.jsp:193
+msgid "Mutants also gain one point for being created and surviving."
+msgstr "Mutants also gain one point for being created and surviving."
+
+#: src/main/webapp/jsp/help.jsp:195
+msgid "Tests"
+msgstr "Tests"
+
+#: src/main/webapp/jsp/help.jsp:196
+msgid "For every mutant a test kills, the test gains points equal to the score of the mutant."
+msgstr "For every mutant a test kills, the test gains points equal to the score of the mutant."
+
+#: src/main/webapp/jsp/help.jsp:197
+msgid "A test gains a point for killing a previously untouched mutant."
+msgstr "A test gains a point for killing a previously untouched mutant."
+
+#: src/main/webapp/jsp/help.jsp:198
+msgid "A test is also given an additional point for killing a newly created mutant."
+msgstr "A test is also given an additional point for killing a newly created mutant."
+
+#: src/main/webapp/jsp/help.jsp:200
+msgid "Equivalences"
+msgstr "Equivalences"
+
+#: src/main/webapp/jsp/help.jsp:201
+msgid "If an Attacker proves a mutant is not equivalent, they keep the mutant\'s points and gain an additional point."
+msgstr "If an Attacker proves a mutant is not equivalent, they keep the mutant\'s points and gain an additional point."
+
+#: src/main/webapp/jsp/help.jsp:202
+msgid "If the Attacker accepts the mutant is equivalent, or the game expires, they lose the points of that mutant, and the Defender who claimed that it is equivalent gains a point."
+msgstr "If the Attacker accepts the mutant is equivalent, or the game expires, they lose the points of that mutant, and the Defender who claimed that it is equivalent gains a point."
+
+#: src/main/webapp/jsp/help.jsp:204
+msgid "Code Editor Keyboard Shortcuts"
+msgstr "Code Editor Keyboard Shortcuts"
+
+#: src/main/webapp/jsp/help.jsp:205
+msgid "Keyboard shortcuts can be configured by clicking on the \"editor mode\" button at the top of the page."
+msgstr "Keyboard shortcuts can be configured by clicking on the \"editor mode\" button at the top of the page."
+
 #: src/main/webapp/jsp/imprint.jsp:36
 msgid "Imprint & Privacy Policy"
 msgstr "Imprint & Privacy Policy"
@@ -10883,10 +11143,6 @@ msgstr "Claimed Equivalent"
 msgid "Equivalent"
 msgstr "Equivalent"
 
-#: src/main/webapp/WEB-INF/tags/mutant_ruleset_explanation.tag:27
-msgid "Mutation rules:"
-msgstr "Mutation rules:"
-
 #: src/main/webapp/WEB-INF/tags/navbar.tag:47
 msgid "Code Defenders"
 msgstr "Code Defenders"
@@ -11006,6 +11262,10 @@ msgstr "My mutant is equivalent"
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
 msgid "I don\\\'t know if my mutant is killable"
 msgstr "I don\\\'t know if my mutant is killable"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
+msgid "Mutation rules:"
+msgstr "Mutation rules:"
 
 #: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
 msgid "Test rules"
