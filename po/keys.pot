@@ -1539,51 +1539,51 @@ msgstr "Your configuration still contains the deprecated auth.admin.role setting
 msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
 
-#: src/main/java/org/codedefenders/service/UserService.java:184
+#: src/main/java/org/codedefenders/service/UserService.java:185
 msgid "Could not create user. Invalid username."
 msgstr "Could not create user. Invalid username."
 
-#: src/main/java/org/codedefenders/service/UserService.java:187
+#: src/main/java/org/codedefenders/service/UserService.java:188
 msgid "Could not create user. Invalid password."
 msgstr "Could not create user. Invalid password."
 
-#: src/main/java/org/codedefenders/service/UserService.java:190
+#: src/main/java/org/codedefenders/service/UserService.java:191
 msgid "Could not create user. Invalid Email address."
 msgstr "Could not create user. Invalid Email address."
 
-#: src/main/java/org/codedefenders/service/UserService.java:192
+#: src/main/java/org/codedefenders/service/UserService.java:193
 msgid "Could not create user. Username is already taken."
 msgstr "Could not create user. Username is already taken."
 
-#: src/main/java/org/codedefenders/service/UserService.java:194
+#: src/main/java/org/codedefenders/service/UserService.java:195
 msgid "Could not create user. Email has already been used. You can reset your password."
 msgstr "Could not create user. Email has already been used. You can reset your password."
 
-#: src/main/java/org/codedefenders/service/UserService.java:199
+#: src/main/java/org/codedefenders/service/UserService.java:200
 msgid "Could not create user."
 msgstr "Could not create user."
 
-#: src/main/java/org/codedefenders/service/UserService.java:237
+#: src/main/java/org/codedefenders/service/UserService.java:238
 msgid "Error. User {0} cannot be retrieved from database."
 msgstr "Error. User {0} cannot be retrieved from database."
 
-#: src/main/java/org/codedefenders/service/UserService.java:245
+#: src/main/java/org/codedefenders/service/UserService.java:246
 msgid "Username {0} is already taken"
 msgstr "Username {0} is already taken"
 
-#: src/main/java/org/codedefenders/service/UserService.java:252
+#: src/main/java/org/codedefenders/service/UserService.java:253
 msgid "Email {0} is already in use"
 msgstr "Email {0} is already in use"
 
-#: src/main/java/org/codedefenders/service/UserService.java:258
+#: src/main/java/org/codedefenders/service/UserService.java:259
 msgid "Email Address is not valid"
 msgstr "Email Address is not valid"
 
-#: src/main/java/org/codedefenders/service/UserService.java:263
+#: src/main/java/org/codedefenders/service/UserService.java:264
 msgid "Password is not valid"
 msgstr "Password is not valid"
 
-#: src/main/java/org/codedefenders/service/UserService.java:272
+#: src/main/java/org/codedefenders/service/UserService.java:273
 msgid "Error trying to update info for user {0}!"
 msgstr "Error trying to update info for user {0}!"
 
@@ -1619,41 +1619,225 @@ msgstr "Successfully removed class!"
 msgid "Failed to remove class!"
 msgstr "Failed to remove class!"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:132
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:134
 msgid "Invalid request. Invalid URL."
 msgstr "Invalid request. Invalid URL."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:140
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:142
 msgid "Invalid request. Missing form type."
 msgstr "Invalid request. Missing form type."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:151
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:153
 msgid "Invalid request. Missing parameter \"enable\"."
 msgstr "Invalid request. Missing parameter \"enable\"."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:159
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:161
 msgid "Invalid request. Invalid parameter \"enable\"."
 msgstr "Invalid request. Invalid parameter \"enable\"."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:170
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:172
 msgid "Invalid request. Missing job type."
 msgstr "Invalid request. Missing job type."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:176
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:178
 msgid "Invalid request. Invalid job type."
 msgstr "Invalid request. Invalid job type."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:184
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:186
 msgid "Invalid request. Missing IDs."
 msgstr "Invalid request. Missing IDs."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:197
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:199
 msgid "Invalid request. Invalid IDs."
 msgstr "Invalid request. Invalid IDs."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:220
+msgid "Invalid request. Invalid form type."
+msgstr "Invalid request. Invalid form type."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:258
+msgid "Failed to queue selected killmap."
+msgstr "Failed to queue selected killmap."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:259
+msgid "Failed to queue selected killmaps."
+msgstr "Failed to queue selected killmaps."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:272
+msgid "Successfully queued {0} killmap."
+msgstr "Successfully queued {0} killmap."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:273
+msgid "Successfully queued {0} killmaps."
+msgstr "Successfully queued {0} killmaps."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:290
+msgid "class"
+msgstr "class"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:290
+msgid "classes"
+msgstr "classes"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
+msgid "game"
+msgstr "game"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
+msgid "games"
+msgstr "games"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:296
+msgid "classroom"
+msgstr "classroom"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:296
+msgid "classrooms"
+msgstr "classrooms"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:304
+msgid "Invalid request. No {0} for ID {1} exist. No killmaps were queued."
+msgstr "Invalid request. No {0} for ID {1} exist. No killmaps were queued."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:305
+msgid "Invalid request. No {0} for IDs {1} exist. No killmaps were queued."
+msgstr "Invalid request. No {0} for IDs {1} exist. No killmaps were queued."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:318
+msgid "Successfully canceled {0} job."
+msgstr "Successfully canceled {0} job."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:319
+msgid "Successfully canceled {0} jobs."
+msgstr "Successfully canceled {0} jobs."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:324
+msgid "Failed to cancel selected jobs."
+msgstr "Failed to cancel selected jobs."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:335
+msgid "Successfully deleted {0} killmap."
+msgstr "Successfully deleted {0} killmap."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:336
+msgid "Successfully deleted {0} killmaps."
+msgstr "Successfully deleted {0} killmaps."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:349
+msgid "Successfully enabled killmap processing."
+msgstr "Successfully enabled killmap processing."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:352
+msgid "Failed to enable killmap processing"
+msgstr "Failed to enable killmap processing"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:358
+msgid "Successfully disabled killmap processing."
+msgstr "Successfully disabled killmap processing."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:361
+msgid "Failed to disable killmap processing"
+msgstr "Failed to disable killmap processing"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:205
+msgid "Deleting player {0} failed! \n Please check the logs!"
+msgstr "Deleting player {0} failed! \n Please check the logs!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:214
+msgid "Changing role of user {0} failed! \n Please check the logs!"
+msgstr "Changing role of user {0} failed! \n Please check the logs!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:216
+msgid "Successfully changed role of user {0}."
+msgstr "Successfully changed role of user {0}."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:235
+msgid "There was a problem with the form."
+msgstr "There was a problem with the form."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:248
+msgid "There was a problem with the form."
+msgstr "There was a problem with the form."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:288
+msgid "ERROR trying to start or stop game {0}.\nIf this problem persists, contact your administrator."
+msgstr "ERROR trying to start or stop game {0}.\nIf this problem persists, contact your administrator."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:301
+msgid "Couldn't create a rematch game."
+msgstr "Couldn't create a rematch game."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:349
+msgid "Missing game id from request"
+msgstr "Missing game id from request"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:357
+msgid "Game doesn't exist: {0}"
+msgstr "Game doesn't exist: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminMonitorGames.java:364
+msgid "You're already the creator of this game."
+msgstr "You're already the creator of this game."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:125
+msgid "Puzzle not found."
+msgstr "Puzzle not found."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:75
 msgid "Failed to get file upload parameters."
 msgstr "Failed to get file upload parameters."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:88
+msgid "No formType provided."
+msgstr "No formType provided."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:104
+msgid "Invalid chapterId."
+msgstr "Invalid chapterId."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:124
+msgid "No file parameters found."
+msgstr "No file parameters found."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:152
+msgid "Error while computing coverage."
+msgstr "Error while computing coverage."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:155
+msgid "Error while compiling."
+msgstr "Error while compiling."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:158
+msgid "IO Error."
+msgstr "IO Error."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:161
+msgid "Execution Error"
+msgstr "Execution Error"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:164
+msgid "Successfully uploaded puzzle(s). As of now, please check the logs for errors."
+msgstr "Successfully uploaded puzzle(s). As of now, please check the logs for errors."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:175
+msgid "Error while computing coverage."
+msgstr "Error while computing coverage."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:178
+msgid "Error while compiling."
+msgstr "Error while compiling."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:181
+msgid "IO Error."
+msgstr "IO Error."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:184
+msgid "Execution Error: {0}"
+msgstr "Execution Error: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleUpload.java:188
+msgid "Successfully uploaded chapter(s). As of now, please check the logs for errors."
+msgstr "Successfully uploaded chapter(s). As of now, please check the logs for errors."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:54
 msgid "Show Player Feedback"
@@ -1887,69 +2071,85 @@ msgstr "Teacher Applications Email"
 msgid "The email address to use for teacher account applications."
 msgstr "The email address to use for teacher account applications."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:336
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:337
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:336
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:338
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:135
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:90
+msgid "Welcome to Code Defenders!\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\nHappy coding!"
+msgstr "Welcome to Code Defenders!\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\nHappy coding!"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:134
 msgid "Successfully set user with id {0} as inactive."
 msgstr "Successfully set user with id {0} as inactive."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:138
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:137
 msgid "Failed to set user as inactive."
 msgstr "Failed to set user as inactive."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:177
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:174
 msgid "Passwords don't match"
 msgstr "Passwords don't match"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:202
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:198
 msgid "Successfully updated info for User {0}"
 msgstr "Successfully updated info for User {0}"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:259
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:252
 msgid "Please provide at least username and password"
 msgstr "Please provide at least username and password"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:263
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:256
 msgid "Please provide at maximum username,password and email"
 msgstr "Please provide at maximum username,password and email"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:270
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:263
 msgid "Username '{0}' already in use."
 msgstr "Username '{0}' already in use."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:275
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:268
 msgid "Username '{0}' invalid, user not created"
 msgstr "Username '{0}' invalid, user not created"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:284
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:277
 msgid "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
 msgstr "Password for user {0} invalid, user not created.\nPlease notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:302
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:295
 msgid "Email '{0}' already in use."
 msgstr "Email '{0}' already in use."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:307
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:300
 msgid "Email for user {0} invalid, user not created."
 msgstr "Email for user {0} invalid, user not created."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:318
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:311
 msgid "Failed to create account for user '{0}'"
 msgstr "Failed to create account for user '{0}'"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:323
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:316
 msgid "Created user {0}"
 msgstr "Created user {0}"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:330
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:323
 msgid "Could not send email to user {0} with email {1}"
 msgstr "Could not send email to user {0} with email {1}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:337
+msgid "Your Code Defenders Account"
+msgstr "Your Code Defenders Account"
+
+#: src/main/java/org/codedefenders/servlets/api/llm/ResolveEquivalenceAPI.java:206
+msgid "Additionally, your test did kill another claimed mutant!"
+msgstr "Additionally, your test did kill another claimed mutant!"
+
+#: src/main/java/org/codedefenders/servlets/api/llm/ResolveEquivalenceAPI.java:208
+msgid "Additionally, your test killed other {0} claimed mutants!"
+msgstr "Additionally, your test killed other {0} claimed mutants!"
 
 #: src/main/java/org/codedefenders/servlets/auth/CodeDefendersFormAuthenticationFilter.java:133
 msgid "Username not found or password incorrect."
@@ -2019,6 +2219,50 @@ msgstr "Successfully set the password."
 msgid "Successfully removed the password."
 msgstr "Successfully removed the password."
 
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:285
+msgid "Invalid enum value for parameter: role."
+msgstr "Invalid enum value for parameter: role."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:293
+msgid "Successfully changed role."
+msgstr "Successfully changed role."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:304
+msgid "Successfully changed the owner."
+msgstr "Successfully changed the owner."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:315
+msgid "Member not found."
+msgstr "Member not found."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:325
+msgid "Successfully kicked member."
+msgstr "Successfully kicked member."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:332
+msgid "You're already a member of this classroom."
+msgstr "You're already a member of this classroom."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:338
+msgid "Can't join this classroom."
+msgstr "Can't join this classroom."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:347
+msgid "Wrong password"
+msgstr "Wrong password"
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:356
+msgid "Successfully joined classroom."
+msgstr "Successfully joined classroom."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:363
+msgid "You're not a member of this classroom."
+msgstr "You're not a member of this classroom."
+
+#: src/main/java/org/codedefenders/servlets/ClassroomServlet.java:370
+msgid "Successfully left classroom."
+msgstr "Successfully left classroom."
+
 #: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:138
 msgid "Class upload is disabled."
 msgstr "Class upload is disabled."
@@ -2031,9 +2275,433 @@ msgstr "Class upload failed. Alias must not contain whitespaces or special chara
 msgid "Class upload failed. File content for {0} could not be read. Please try again."
 msgstr "Class upload failed. File content for {0} could not be read. Please try again."
 
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:269
+msgid "Class upload failed. Multiple classes under test uploaded."
+msgstr "Class upload failed. Multiple classes under test uploaded."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:280
+msgid "Class upload failed. Multiple dependency ZIP files uploaded."
+msgstr "Class upload failed. Multiple dependency ZIP files uploaded."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:292
+msgid "Class upload failed. Multiple mutant ZIP files uploaded."
+msgstr "Class upload failed. Multiple mutant ZIP files uploaded."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:303
+msgid "Class upload failed. Multiple test ZIP files uploaded."
+msgstr "Class upload failed. Multiple test ZIP files uploaded."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:318
+msgid "Class upload failed. No class under test uploaded."
+msgstr "Class upload failed. No class under test uploaded."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:328
+msgid "Class upload failed. The class under test must be a .java file."
+msgstr "Class upload failed. The class under test must be a .java file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:335
+msgid "Class upload failed. {0} is a reserved class name, please rename your Java class."
+msgstr "Class upload failed. {0} is a reserved class name, please rename your Java class."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:347
+msgid "Class upload failed. Given alias is already used."
+msgstr "Class upload failed. Given alias is already used."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:359
+msgid "Class upload failed due to a file error. Please contact an admin and show them this message. Or try a different class alias."
+msgstr "Class upload failed due to a file error. Please contact an admin and show them this message. Or try a different class alias."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:375
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:388
+msgid "Class upload failed. Could not compile {0}!\n{1}"
+msgstr "Class upload failed. Could not compile {0}!\n{1}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:398
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:410
+msgid "Class upload failed. Dependencies must be provided in a .zip file."
+msgstr "Class upload failed. Dependencies must be provided in a .zip file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:423
+msgid "Class upload failed. Failed to extract dependencies ZIP file."
+msgstr "Class upload failed. Failed to extract dependencies ZIP file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:437
+msgid "Class upload failed. Dependency must be a .java file."
+msgstr "Class upload failed. Dependency must be a .java file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:443
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:457
+msgid "Class upload failed. No valid package declaration found in dependency file {0}"
+msgstr "Class upload failed. No valid package declaration found in dependency file {0}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:465
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:480
+msgid "Class upload failed. Could not compile {0}!\n{1}"
+msgstr "Class upload failed. Could not compile {0}!\n{1}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:489
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:501
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:521
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:535
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:562
+msgid "Class upload successful."
+msgstr "Class upload successful."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:631
+msgid "Class upload failed. Mutants must be provided in a .zip file."
+msgstr "Class upload failed. Mutants must be provided in a .zip file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:642
+msgid "Class upload failed. Failed to extract mutants ZIP file."
+msgstr "Class upload failed. Failed to extract mutants ZIP file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:655
+msgid "Class upload failed. Mutant must be a .java file."
+msgstr "Class upload failed. Mutant must be a .java file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:662
+msgid "Class upload failed. Mutants must have same class name as class under test!"
+msgstr "Class upload failed. Mutants must have same class name as class under test!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:668
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:682
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:694
+msgid "Class upload failed. Could not compile mutant {0}!\n{1}"
+msgstr "Class upload failed. Could not compile mutant {0}!\n{1}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:704
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:718
+msgid "Class upload failed. Could not compile mutant {0}!\n{1}"
+msgstr "Class upload failed. Could not compile mutant {0}!\n{1}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:728
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:743
+msgid "Class upload failed. Seems like you uploaded two identical mutants."
+msgstr "Class upload failed. Seems like you uploaded two identical mutants."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:782
+msgid "Class upload failed. The tests must be provided in a .zip file."
+msgstr "Class upload failed. The tests must be provided in a .zip file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:793
+msgid "Class upload failed. Failed to extract tests ZIP file."
+msgstr "Class upload failed. Failed to extract tests ZIP file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:806
+msgid "Class upload failed. The tests files must be .java file."
+msgstr "Class upload failed. The tests files must be .java file."
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:812
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:823
+msgid "Class upload failed. Could not store java file of test class {0}"
+msgstr "Class upload failed. Could not store java file of test class {0}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:833
+msgid "Class upload failed. Could not compile test {0}!\n{1}"
+msgstr "Class upload failed. Could not compile test {0}!\n{1}"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:840
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:854
+msgid "Class upload failed. Test {0} failed"
+msgstr "Class upload failed. Test {0} failed"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:865
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/ClassUploadManager.java:879
+msgid "Class upload failed. Internal error. Sorry about that!"
+msgstr "Class upload failed. Internal error. Sorry about that!"
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:67
+msgid "Classroom not found."
+msgstr "Classroom not found."
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:75
+msgid "You don't have access to this page."
+msgstr "You don't have access to this page."
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:81
+msgid "This classroom is archived. You cannot create games for it."
+msgstr "This classroom is archived. You cannot create games for it."
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:98
+msgid "Classroom not found."
+msgstr "Classroom not found."
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:106
+msgid "You don't have access to this page."
+msgstr "You don't have access to this page."
+
+#: src/main/java/org/codedefenders/servlets/creategames/ClassroomCreateGames.java:112
+msgid "This classroom is archived. You cannot create games for it."
+msgstr "This classroom is archived. You cannot create games for it."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:126
+msgid "ERROR: Missing parameter"
+msgstr "ERROR: Missing parameter"
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:128
+msgid "ERROR: Invalid parameter"
+msgstr "ERROR: Invalid parameter"
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:202
+msgid "INFO: The max. allowed duration is {0} minutes."
+msgstr "INFO: The max. allowed duration is {0} minutes."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:205
+msgid "INFO: The min. allowed duration is {0} minutes."
+msgstr "INFO: The min. allowed duration is {0} minutes."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:277
+msgid "ERROR: Cannot create staged games with user {0}. User is already assigned to a staged game."
+msgstr "ERROR: Cannot create staged games with user {0}. User is already assigned to a staged game."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:287
+msgid "Invalid team sizes. Players per game: {0}."
+msgstr "Invalid team sizes. Players per game: {0}."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:293
+msgid "Invalid team sizes. Attackers per game: {0}, defenders per game: {1}."
+msgstr "Invalid team sizes. Attackers per game: {0}, defenders per game: {1}."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:317
+msgid "ERROR: Won't create more than 100 staged games."
+msgstr "ERROR: Won't create more than 100 staged games."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:344
+msgid "ERROR: Cannot delete staged games. Not all selected staged games exist."
+msgstr "ERROR: Cannot delete staged games. Not all selected staged games exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:375
+msgid "ERROR: Cannot create staged games. Not all selected staged games exist."
+msgstr "ERROR: Cannot create staged games. Not all selected staged games exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:399
+msgid "ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist."
+msgstr "ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:421
+msgid "ERROR: Cannot remove you from staged game {0}. Staged game does not exist."
+msgstr "ERROR: Cannot remove you from staged game {0}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:441
+msgid "ERROR: Cannot switch role of user {0}. Invalid user."
+msgstr "ERROR: Cannot switch role of user {0}. Invalid user."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:448
+msgid "ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist."
+msgstr "ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:469
+msgid "ERROR: Cannot switch creator role in staged game {0}. Staged game does not exist."
+msgstr "ERROR: Cannot switch creator role in staged game {0}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:494
+msgid "ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist."
+msgstr "ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:503
+msgid "ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist."
+msgstr "ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:512
+msgid "ERROR: Cannot move user {0}. User does not exist."
+msgstr "ERROR: Cannot move user {0}. User does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:547
+msgid "ERROR: Cannot add user {0} to staged game {1}. User does not exist."
+msgstr "ERROR: Cannot add user {0} to staged game {1}. User does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:552
+msgid "ERROR: Cannot add user {0} to existing game {1}. User does not exist."
+msgstr "ERROR: Cannot add user {0} to existing game {1}. User does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:563
+msgid "ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist."
+msgstr "ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:573
+msgid "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action."
+msgstr "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action."
+
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:582
+msgid "ERROR: Cannot add user {0} to existing game {1}. Game does not exist."
+msgstr "ERROR: Cannot add user {0} to existing game {1}. Game does not exist."
+
 #: src/main/java/org/codedefenders/servlets/FeedbackManager.java:74
 msgid "Could not save your feedback. Please try again later!"
 msgstr "Could not save your feedback. Please try again later!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:348
+msgid "Parameter 'test' is missing."
+msgstr "Parameter 'test' is missing."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:358
+msgid "You cannot submit a test without specifying a line to cover."
+msgstr "You cannot submit a test without specifying a line to cover."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:365
+msgid "User is not a player in the game."
+msgstr "User is not a player in the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:371
+msgid "Can only submit tests if you are an Defender!"
+msgstr "Can only submit tests if you are an Defender!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:453
+msgid "Parameter 'mutant' is missing."
+msgstr "Parameter 'mutant' is missing."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:469
+msgid "User is not a player in the game."
+msgstr "User is not a player in the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:475
+msgid "Can only submit mutants if you are an Attacker."
+msgstr "Can only submit mutants if you are an Attacker."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:507
+msgid "Error submitting the mutant: data too long. Maybe you made too many changes?"
+msgstr "Error submitting the mutant: data too long. Maybe you made too many changes?"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:509
+msgid "Database error while saving the mutant."
+msgstr "Database error while saving the mutant."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:566
+msgid "User is not a player in the game."
+msgstr "User is not a player in the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:571
+msgid "Can only resolve equivalence duels if you are an Attacker!"
+msgstr "Can only resolve equivalence duels if you are an Attacker!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:576
+msgid "Game {0} has finished."
+msgstr "Game {0} has finished."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:581
+msgid "Mutant does not exist."
+msgstr "Mutant does not exist."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:595
+msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
+msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:643
+msgid "Additionally, your test did kill another claimed mutant!"
+msgstr "Additionally, your test did kill another claimed mutant!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:646
+msgid "Additionally, your test killed other {0} claimed mutants!"
+msgstr "Additionally, your test killed other {0} claimed mutants!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:679
+msgid "User is not a player in the game."
+msgstr "User is not a player in the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:686
+msgid "Can only claim mutant as equivalent if you are a Defender!"
+msgstr "Can only claim mutant as equivalent if you are a Defender!"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:692
+msgid "You cannot claim mutants as equivalent in this game anymore."
+msgstr "You cannot claim mutants as equivalent in this game anymore."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:333
+msgid "An error occurred while leaving game {0}"
+msgstr "An error occurred while leaving game {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:338
+msgid "You left game {0}"
+msgstr "You left game {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:366
+msgid "Only the game's creator or an observer can start the game."
+msgstr "Only the game's creator or an observer can start the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:385
+msgid "Only the game's creator or an observer can end the game."
+msgstr "Only the game's creator or an observer can end the game."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:406
+msgid "Only the creator or an observer of this game can call a rematch."
+msgstr "Only the creator or an observer of this game can call a rematch."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:424
+msgid "The game is already over. You cannot change its duration."
+msgstr "The game is already over. You cannot change its duration."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:430
+msgid "Only the creator or an observer of this game can change its duration."
+msgstr "Only the creator or an observer of this game can change its duration."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:448
+msgid "The remaining time cannot be below {0} minutes."
+msgstr "The remaining time cannot be below {0} minutes."
+
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameSelectionManager.java:454
+msgid "The new remaining duration must be at most {0} minutes."
+msgstr "The new remaining duration must be at most {0} minutes."
+
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1167
+msgid "Your test has the following smell: {0}"
+msgstr "Your test has the following smell: {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1173
+msgid "Your test has the following smells: {0}"
+msgstr "Your test has the following smells: {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
+msgid "Error submitting the mutant: data too long. Maybe you made too many changes?"
+msgstr "Error submitting the mutant: data too long. Maybe you made too many changes?"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:683
+msgid "Database error while saving the mutant."
+msgstr "Database error while saving the mutant."
 
 #: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:771
 msgid "User is not a player in the game."
@@ -2087,19 +2755,71 @@ msgstr "Flagged 1 mutant as equivalent"
 msgid "Flagged {0} mutants as equivalent"
 msgstr "Flagged {0} mutants as equivalent"
 
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:306
+msgid "You cannot leave a game you are not part of."
+msgstr "You cannot leave a game you are not part of."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:315
+msgid "An error occurred while leaving game {0}"
+msgstr "An error occurred while leaving game {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:320
+msgid "You left game {0}"
+msgstr "You left game {0}"
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:349
+msgid "Only the game's creator or an observer can start the game."
+msgstr "Only the game's creator or an observer can start the game."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:375
+msgid "Only the game's creator or an observer can end the game."
+msgstr "Only the game's creator or an observer can end the game."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:396
+msgid "Only the creator of this game can call a rematch."
+msgstr "Only the creator of this game can call a rematch."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:414
+msgid "The game is already over. You cannot change its duration."
+msgstr "The game is already over. You cannot change its duration."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:420
+msgid "Only the creator or an observer of this game can change its duration."
+msgstr "Only the creator or an observer of this game can change its duration."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:438
+msgid "The remaining time cannot be below {0} minutes."
+msgstr "The remaining time cannot be below {0} minutes."
+
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameSelectionManager.java:444
+msgid "The new remaining duration must be at most {0} minutes."
+msgstr "The new remaining duration must be at most {0} minutes."
+
 #: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:436
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "No, this mutant is not equivalent to the class under test."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1005
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:552
+msgid "Your test did not kill the mutant. Try again."
+msgstr "Your test did not kill the mutant. Try again."
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:729
+msgid "Your test did not solve the puzzle. Try another one..."
+msgstr "Your test did not solve the puzzle. Try another one..."
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:929
+msgid "Your mutant did not solve the puzzle. Try another one..."
+msgstr "Your mutant did not solve the puzzle. Try another one..."
+
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1008
 msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1018
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1021
 msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1039
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1042
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
@@ -2123,33 +2843,65 @@ msgstr "Your link is malformed, you could not join the game."
 msgid "Your invite link was malformed: Your role may not be {0}"
 msgstr "Your invite link was malformed: Your role may not be {0}"
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:130
-msgid "The game you were invited to no longer exists, or it has not been created yet."
-msgstr "The game you were invited to no longer exists, or it has not been created yet."
-
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:136
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:129
 msgid "The game you were invited to has already finished!"
 msgstr "The game you were invited to has already finished!"
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:148
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:141
 msgid "Joining games is disabled."
 msgstr "Joining games is disabled."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:174
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:167
 msgid "You cannot join puzzle games with an invite link."
 msgstr "You cannot join puzzle games with an invite link."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:185
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:178
 msgid "You could not join the game because you have not been added to the whitelist."
 msgstr "You could not join the game because you have not been added to the whitelist."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:190
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:183
 msgid "You could not join the game."
 msgstr "You could not join the game."
 
-#: src/main/java/org/codedefenders/servlets/InvitePage.java:197
+#: src/main/java/org/codedefenders/servlets/InvitePage.java:190
 msgid "You had already joined this game."
 msgstr "You had already joined this game."
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:73
+msgid "Hello {0}!\nChange your password here: {1}\nThis link is only valid for {2} hours.\nGreetings, your Code Defenders team"
+msgstr "Hello {0}!\nChange your password here: {1}\nThis link is only valid for {2} hours.\nGreetings, your Code Defenders team"
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:98
+msgid "No user was found for this username and email. Please check if the username and email match."
+msgstr "No user was found for this username and email. Please check if the username and email match."
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:110
+msgid "Code Defenders Password reset"
+msgstr "Code Defenders Password reset"
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:113
+msgid "A password reset link has been sent to {0}"
+msgstr "A password reset link has been sent to {0}"
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:115
+msgid "Something went wrong. No email could be sent."
+msgstr "Something went wrong. No email could be sent."
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:130
+msgid "Password not changed. Make sure it is valid."
+msgstr "Password not changed. Make sure it is valid."
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:138
+msgid "Successfully changed your password."
+msgstr "Successfully changed your password."
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:142
+msgid "Your two password entries did not match"
+msgstr "Your two password entries did not match"
+
+#: src/main/java/org/codedefenders/servlets/registration/PasswordServlet.java:145
+msgid "Your password reset link is not valid or has expired."
+msgstr "Your password reset link is not valid or has expired."
 
 #: src/main/java/org/codedefenders/servlets/registration/UserServlet.java:62
 msgid "Could not create user. Password entries did not match."
@@ -2215,139 +2967,155 @@ msgstr "No or invalid password provided."
 msgid "Failed to set your account as inactive. Please contact the page administrator."
 msgstr "Failed to set your account as inactive. Please contact the page administrator."
 
-#: src/main/java/org/codedefenders/util/Constants.java:56
+#: src/main/java/org/codedefenders/util/Constants.java:55
 msgid "Game is now in grace period."
 msgstr "Game is now in grace period."
 
-#: src/main/java/org/codedefenders/util/Constants.java:99
+#: src/main/java/org/codedefenders/util/Constants.java:98
 msgid "You won!"
 msgstr "You won!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:100
+#: src/main/java/org/codedefenders/util/Constants.java:99
 msgid "You lost!"
 msgstr "You lost!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:101
+#: src/main/java/org/codedefenders/util/Constants.java:100
 msgid "It was a draw!"
 msgstr "It was a draw!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:103
+#: src/main/java/org/codedefenders/util/Constants.java:102
 msgid "Sorry! An error on the server prevented the compilation of your test."
 msgstr "Sorry! An error on the server prevented the compilation of your test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:104
+#: src/main/java/org/codedefenders/util/Constants.java:103
 msgid "Your test did not compile. Try again, but with compilable code."
 msgstr "Your test did not compile. Try again, but with compilable code."
 
-#: src/main/java/org/codedefenders/util/Constants.java:105
+#: src/main/java/org/codedefenders/util/Constants.java:104
 msgid "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!"
 msgstr "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:106
+#: src/main/java/org/codedefenders/util/Constants.java:105
 msgid "Great! Your test compiled and passed on the original class under test."
 msgstr "Great! Your test compiled and passed on the original class under test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:107
+#: src/main/java/org/codedefenders/util/Constants.java:106
 msgid "Your test did not pass on the original class under test. Try again."
 msgstr "Your test did not pass on the original class under test. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:108
+#: src/main/java/org/codedefenders/util/Constants.java:107
 msgid "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 msgstr "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:109
+#: src/main/java/org/codedefenders/util/Constants.java:108
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 
+#: src/main/java/org/codedefenders/util/Constants.java:109
+msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
+msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
+
 #: src/main/java/org/codedefenders/util/Constants.java:110
+msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
+msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
+
+#: src/main/java/org/codedefenders/util/Constants.java:111
 msgid "Test submitted and ready to kill mutants!"
 msgstr "Test submitted and ready to kill mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:111
+#: src/main/java/org/codedefenders/util/Constants.java:112
 msgid "Your test has not killed any mutants, just yet."
 msgstr "Your test has not killed any mutants, just yet."
 
-#: src/main/java/org/codedefenders/util/Constants.java:112
+#: src/main/java/org/codedefenders/util/Constants.java:113
 msgid "Great, your test killed the last mutant!"
 msgstr "Great, your test killed the last mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:113
+#: src/main/java/org/codedefenders/util/Constants.java:114
 msgid "Great, your test killed a mutant!"
 msgstr "Great, your test killed a mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:114
+#: src/main/java/org/codedefenders/util/Constants.java:115
 msgid "Awesome! Your test killed %d mutants!"
 msgstr "Awesome! Your test killed %d mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:116
+#: src/main/java/org/codedefenders/util/Constants.java:117
 msgid "Your mutant was compiled successfully."
 msgstr "Your mutant was compiled successfully."
 
-#: src/main/java/org/codedefenders/util/Constants.java:117
+#: src/main/java/org/codedefenders/util/Constants.java:118
 msgid "The mutant was accepted as equivalent."
 msgstr "The mutant was accepted as equivalent."
 
-#: src/main/java/org/codedefenders/util/Constants.java:118
+#: src/main/java/org/codedefenders/util/Constants.java:119
+msgid "The mutant was accepted as equivalent. However, the mutant was killable!"
+msgstr "The mutant was accepted as equivalent. However, the mutant was killable!"
+
+#: src/main/java/org/codedefenders/util/Constants.java:120
+msgid "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
+msgstr "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
+
+#: src/main/java/org/codedefenders/util/Constants.java:121
 msgid "Your mutant failed to compile. Try again."
 msgstr "Your mutant failed to compile. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:119
+#: src/main/java/org/codedefenders/util/Constants.java:122
 msgid "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 msgstr "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 
-#: src/main/java/org/codedefenders/util/Constants.java:120
+#: src/main/java/org/codedefenders/util/Constants.java:123
 msgid "Oops! Something went wrong and the mutant was not created."
 msgstr "Oops! Something went wrong and the mutant was not created."
 
-#: src/main/java/org/codedefenders/util/Constants.java:121
+#: src/main/java/org/codedefenders/util/Constants.java:124
 msgid "Sorry, your mutant already exists in this game!"
 msgstr "Sorry, your mutant already exists in this game!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:122
+#: src/main/java/org/codedefenders/util/Constants.java:125
 msgid "Mutant claimed as equivalent, waiting for attacker to respond."
 msgstr "Mutant claimed as equivalent, waiting for attacker to respond."
 
-#: src/main/java/org/codedefenders/util/Constants.java:123
+#: src/main/java/org/codedefenders/util/Constants.java:126
 msgid "Something went wrong claiming an equivalent mutant"
 msgstr "Something went wrong claiming an equivalent mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:124
+#: src/main/java/org/codedefenders/util/Constants.java:127
 msgid "Cheeky! You cannot claim equivalence on untested lines!"
 msgstr "Cheeky! You cannot claim equivalence on untested lines!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:125
+#: src/main/java/org/codedefenders/util/Constants.java:128
 msgid "Test %d killed your mutant. Better luck with the next one!"
 msgstr "Test %d killed your mutant. Better luck with the next one!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:126
+#: src/main/java/org/codedefenders/util/Constants.java:129
 msgid "Mutant submitted, may the force be with it."
 msgstr "Mutant submitted, may the force be with it."
 
-#: src/main/java/org/codedefenders/util/Constants.java:127
+#: src/main/java/org/codedefenders/util/Constants.java:130
 msgid "Cool, your mutant survived its first test."
 msgstr "Cool, your mutant survived its first test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:128
+#: src/main/java/org/codedefenders/util/Constants.java:131
 msgid "Awesome, your mutant survived %d tests!"
 msgstr "Awesome, your mutant survived %d tests!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:130
+#: src/main/java/org/codedefenders/util/Constants.java:133
 msgid "You must declare your intention."
 msgstr "You must declare your intention."
 
-#: src/main/java/org/codedefenders/util/Constants.java:133
+#: src/main/java/org/codedefenders/util/Constants.java:136
 msgid "Success!"
 msgstr "Success!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:138
+#: src/main/java/org/codedefenders/util/Constants.java:141
 msgid "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 msgstr "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 
-#: src/main/java/org/codedefenders/util/Constants.java:140
+#: src/main/java/org/codedefenders/util/Constants.java:143
 msgid "Sorry, no kill message available for this mutant"
 msgstr "Sorry, no kill message available for this mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:142
+#: src/main/java/org/codedefenders/util/Constants.java:145
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
@@ -6196,12 +6964,12 @@ msgid "Create Classroom"
 msgstr "Create Classroom"
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:131
-msgid "Members"
-msgstr "Members"
-
-#: src/main/webapp/jsp/classrooms_overview.jsp:131
 msgid "Member"
 msgstr "Member"
+
+#: src/main/webapp/jsp/classrooms_overview.jsp:131
+msgid "Members"
+msgstr "Members"
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:165
 msgid "Not open for joining"
