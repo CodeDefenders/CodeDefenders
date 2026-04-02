@@ -25,23 +25,23 @@
 
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<p:main_page title="Class Analytics">
+<p:main_page title="${i18n.tr('Class Analytics')}">
     <div class="container">
         <t:admin_navigation activePage="adminAnalytics"/>
 
-        <h3>Class Analytics</h3>
+        <h3>${i18n.tr('Class Analytics')}</h3>
 
         <table id="tableClasses" class="table table-striped">
             <thead>
                 <tr>
                     <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
-                    <th>ID</th>
-                    <th>Name (Alias)</th>
-                    <th>Games Played</th>
-                    <th>Test Submitted</th>
-                    <th>Tests per Game</th>
-                    <th>Mutants Submitted</th>
-                    <th>Mutants per Game</th>
+                    <th>${i18n.tr('ID')}</th>
+                    <th>${i18n.tr('Name (Alias)')}</th>
+                    <th>${i18n.tr('Games Played')}</th>
+                    <th>${i18n.tr('Test Submitted')}</th>
+                    <th>${i18n.tr('Tests per Game')}</th>
+                    <th>${i18n.tr('Mutants Submitted')}</th>
+                    <th>${i18n.tr('Mutants per Game')}</th>
                 </tr>
             </thead>
         </table>
@@ -52,15 +52,15 @@
                     <a download="classes-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download">
                         <i class="fa fa-download me-1"></i>
-                        Download table
+                        ${i18n.tr('Download table')}
                     </a>
                     <a download="classes-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                        as CSV
+                        ${i18n.tr('as CSV')}
                     </a>
                     <a download="classes-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=json"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
-                        as JSON
+                        ${i18n.tr('as JSON')}
                     </a>
                 </div>
             </div>

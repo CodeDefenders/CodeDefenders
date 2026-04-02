@@ -29,7 +29,7 @@
 
 <c:set var="classroom" value="${requestScope.classroom}"/>
 
-<p:main_page title="Create Games">
+<p:main_page title="${i18n.tr('Create Games')}">
     <div class="container">
         <div class="d-flex align-items-center mb-4 gap-3">
             <h2 class="m-0"><c:out value="${classroom.name}"/></h2>

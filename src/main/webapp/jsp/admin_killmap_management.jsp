@@ -110,7 +110,7 @@
                     <p>${i18n.tr('Currently processing: {0} with ID {1}', jobType, currentJob.id)}</p>
                 </c:if>
 
-                <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="${processorExplanation}"
+                <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="${i18n.tr(processorExplanation)}"
                       method="post">
                     <input type="hidden" name="formType" value="toggleKillMapProcessing">
                     <c:choose>

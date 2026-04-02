@@ -4185,6 +4185,10 @@ msgstr "Universität Passau"
 msgid "Supporters"
 msgstr "Unterstützer"
 
+#: src/main/webapp/jsp/about_page.jsp:100
+msgid "Gamifying the Quest for Software Tests"
+msgstr "Gamifying the Quest for Software Tests"
+
 #: src/main/webapp/jsp/about_page.jsp:101
 msgid ""
 "Improving Engagement of Students in Software Engineering Courses through "
@@ -4204,6 +4208,77 @@ msgstr "Grant RG160969"
 #: src/main/webapp/jsp/about_page.jsp:110 src/main/webapp/jsp/index.jsp:194
 msgid "Research"
 msgstr "Forschung"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:28
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:32
+msgid "Class Analytics"
+msgstr "Klassen-Analyse"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:38
+#: src/main/webapp/jsp/admin_analytics_users.jsp:38
+#: src/main/webapp/jsp/admin_class_management.jsp:45
+#: src/main/webapp/jsp/admin_classrooms.jsp:141
+#: src/main/webapp/jsp/admin_monitor_games.jsp:77
+#: src/main/webapp/jsp/admin_monitor_games.jsp:315
+#: src/main/webapp/jsp/admin_user_mgmt.jsp:192
+#: src/main/webapp/jsp/games_history.jsp:65
+#: src/main/webapp/jsp/games_history.jsp:212
+#: src/main/webapp/jsp/upload_class_view.jsp:217
+#: src/main/webapp/jsp/user_games_view.jsp:84
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1249
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1485
+msgid "ID"
+msgstr "ID"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:39
+msgid "Name (Alias)"
+msgstr "Name (Spitzname)"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:40
+#: src/main/webapp/jsp/admin_analytics_users.jsp:40
+#: src/main/webapp/jsp/admin_analytics_users.jsp:85
+msgid "Games Played"
+msgstr "Anzahl gespielter Spiele"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:41
+msgid "Test Submitted"
+msgstr "Test eingereicht"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:42
+msgid "Tests per Game"
+msgstr "Tests pro Spiel"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:43
+msgid "Mutants Submitted"
+msgstr "Eingereichte Mutanten"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:44
+msgid "Mutants per Game"
+msgstr "Mutanten pro Spiel"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:55
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:62
+#: src/main/webapp/jsp/admin_analytics_users.jsp:54
+msgid "Download table"
+msgstr "Tabelle herunterladen"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:59
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:66
+#: src/main/webapp/jsp/admin_analytics_users.jsp:58
+#: src/main/webapp/jsp/admin_killmap_management.jsp:343
+#: src/main/webapp/jsp/admin_killmap_management.jsp:363
+#: src/main/webapp/jsp/admin_killmap_management.jsp:383
+msgid "as CSV"
+msgstr "als CSV"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:63
+#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:70
+#: src/main/webapp/jsp/admin_analytics_users.jsp:62
+#: src/main/webapp/jsp/admin_killmap_management.jsp:348
+#: src/main/webapp/jsp/admin_killmap_management.jsp:368
+#: src/main/webapp/jsp/admin_killmap_management.jsp:388
+msgid "as JSON"
+msgstr "als JSON"
 
 #: src/main/webapp/jsp/admin_analytics_classes.jsp:90
 msgid "Win Rates"
@@ -4284,6 +4359,7 @@ msgid "Useful Actions"
 msgstr "Nützliche Aktionen"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:39
+#: src/main/webapp/jsp/classroom_page.jsp:847
 msgid "User ID"
 msgstr "Benutzer-ID"
 
@@ -4301,6 +4377,7 @@ msgid "Class Name"
 msgstr "Klassenname"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
+#: src/main/webapp/jsp/classroom_page.jsp:859
 #: src/main/webapp/WEB-INF/tags/create_games.tag:808
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1068
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1106
@@ -4318,27 +4395,6 @@ msgstr "Nützliche Tests"
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:54
 msgid "What are useful actions?"
 msgstr "Was sind nützliche Maßnahmen?"
-
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:62
-#: src/main/webapp/jsp/admin_analytics_users.jsp:54
-msgid "Download table"
-msgstr "Tabelle herunterladen"
-
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:66
-#: src/main/webapp/jsp/admin_analytics_users.jsp:58
-#: src/main/webapp/jsp/admin_killmap_management.jsp:343
-#: src/main/webapp/jsp/admin_killmap_management.jsp:363
-#: src/main/webapp/jsp/admin_killmap_management.jsp:383
-msgid "as CSV"
-msgstr "als CSV"
-
-#: src/main/webapp/jsp/admin_analytics_killmaps.jsp:70
-#: src/main/webapp/jsp/admin_analytics_users.jsp:62
-#: src/main/webapp/jsp/admin_killmap_management.jsp:348
-#: src/main/webapp/jsp/admin_killmap_management.jsp:368
-#: src/main/webapp/jsp/admin_killmap_management.jsp:388
-msgid "as JSON"
-msgstr "als JSON"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:76
 msgid "Useful Actions Explanation"
@@ -4385,21 +4441,6 @@ msgstr "Summe der nützlichen Tests und nützlichen Mutanten."
 msgid "User Analytics"
 msgstr "Benutzeranalyse"
 
-#: src/main/webapp/jsp/admin_analytics_users.jsp:38
-#: src/main/webapp/jsp/admin_class_management.jsp:45
-#: src/main/webapp/jsp/admin_classrooms.jsp:141
-#: src/main/webapp/jsp/admin_monitor_games.jsp:77
-#: src/main/webapp/jsp/admin_monitor_games.jsp:315
-#: src/main/webapp/jsp/admin_user_mgmt.jsp:192
-#: src/main/webapp/jsp/games_history.jsp:65
-#: src/main/webapp/jsp/games_history.jsp:212
-#: src/main/webapp/jsp/upload_class_view.jsp:217
-#: src/main/webapp/jsp/user_games_view.jsp:84
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1249
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1485
-msgid "ID"
-msgstr "ID"
-
 #: src/main/webapp/jsp/admin_analytics_users.jsp:39
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:89
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:91
@@ -4410,11 +4451,6 @@ msgstr "ID"
 #: src/main/webapp/jsp/login_view.jsp:212
 msgid "Username"
 msgstr "Benutzername"
-
-#: src/main/webapp/jsp/admin_analytics_users.jsp:40
-#: src/main/webapp/jsp/admin_analytics_users.jsp:85
-msgid "Games Played"
-msgstr "Anzahl gespielter Spiele"
 
 #: src/main/webapp/jsp/admin_analytics_users.jsp:41
 #: src/main/webapp/jsp/leaderboards.jsp:41
@@ -4505,6 +4541,7 @@ msgstr "Klassenverwaltung"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:420
 #: src/main/webapp/jsp/classroom_page.jsp:297
 #: src/main/webapp/jsp/classroom_page.jsp:301
+#: src/main/webapp/jsp/classroom_page.jsp:854
 #: src/main/webapp/jsp/classrooms_overview.jsp:82
 #: src/main/webapp/jsp/classrooms_overview.jsp:84
 #: src/main/webapp/jsp/classrooms_overview.jsp:181
@@ -4712,6 +4749,14 @@ msgstr "Link"
 #: src/main/webapp/jsp/admin_classrooms.jsp:183
 msgid "There aren\\'t any classrooms... yet."
 msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
+
+#: src/main/webapp/jsp/admin_create_games.jsp:27
+#: src/main/webapp/jsp/classroom_create_games.jsp:32
+#: src/main/webapp/jsp/classroom_page.jsp:98
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
+#: src/main/webapp/WEB-INF/tags/create_games.tag:76
+msgid "Create Games"
+msgstr "Spiele erstellen"
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 #: src/main/webapp/jsp/admin_killmap_management.jsp:95
@@ -5011,6 +5056,7 @@ msgstr "Möchtest du dieses Spiel wirklich beenden?"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:125
 #: src/main/webapp/jsp/admin_monitor_games.jsp:362
+#: src/main/webapp/jsp/classroom_page.jsp:1027
 #: src/main/webapp/jsp/user_games_view.jsp:549
 #: src/main/webapp/jsp/user_games_view.jsp:718
 msgid "Observe"
@@ -5018,6 +5064,7 @@ msgstr "Beobachten"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:132
 #: src/main/webapp/jsp/admin_monitor_games.jsp:369
+#: src/main/webapp/jsp/classroom_page.jsp:1026
 msgid "Join as Observer"
 msgstr "Als Beobachter teilnehmen"
 
@@ -5293,6 +5340,10 @@ msgstr "Leere Kapitelvorlage:"
 msgid "Puzzle Downloads:"
 msgstr "Rätsel-Downloads:"
 
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:397
+msgid "Drag to move chapter"
+msgstr "Zum Verschieben des Kapitels ziehen"
+
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:398
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:501
 msgid "Edit"
@@ -5305,6 +5356,11 @@ msgstr "Bewege zur Position:"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:414
 msgid "Move to position"
 msgstr "Bewege zur Position"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:492
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:150
+msgid "Puzzle ID"
+msgstr "Rätsel-ID"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:493
 msgid "Number of games with the puzzle"
@@ -5554,10 +5610,6 @@ msgstr "Max. Assertions pro Test"
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:146
 msgid "Mutant validator level"
 msgstr "Mutanten-Validator-Level"
-
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:150
-msgid "Puzzle ID"
-msgstr "Rätsel-ID"
 
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:158
 msgid "Chapter ID"
@@ -6228,12 +6280,6 @@ msgstr "Wenn du dem Raum beitreten möchtest, kannst du das hier tun:"
 msgid "Join"
 msgstr "Beitreten"
 
-#: src/main/webapp/jsp/classroom_page.jsp:98
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
-#: src/main/webapp/WEB-INF/tags/create_games.tag:76
-msgid "Create Games"
-msgstr "Spiele erstellen"
-
 #: src/main/webapp/jsp/classroom_page.jsp:105
 #: src/main/webapp/jsp/classrooms_overview.jsp:53
 msgid "Active"
@@ -6523,6 +6569,12 @@ msgstr "Moderator"
 msgid "Owner"
 msgstr "Eigentümer"
 
+#: src/main/webapp/jsp/classroom_page.jsp:865
+#: src/main/webapp/jsp/games_history.jsp:71
+#: src/main/webapp/jsp/games_history.jsp:217
+msgid "Actions"
+msgstr "Aktionen"
+
 #: src/main/webapp/jsp/classroom_page.jsp:880
 msgid "This classroom has no members... yet."
 msgstr "Dieser Raum hat noch keine Mitglieder..."
@@ -6557,6 +6609,10 @@ msgstr "Laufend: {0} übrig"
 #: src/main/webapp/jsp/classroom_page.jsp:975
 msgid "Ended at {0}"
 msgstr "Beendet bei {0}"
+
+#: src/main/webapp/jsp/classroom_page.jsp:982
+msgid "Not Started"
+msgstr "Noch nicht gestartet"
 
 #: src/main/webapp/jsp/classroom_page.jsp:1105
 msgid "This classroom has no games... yet."
@@ -6939,11 +6995,6 @@ msgstr "Spielhistorie"
 #: src/main/webapp/jsp/games_history.jsp:60
 msgid "Battlegrounds"
 msgstr "Battlegrounds"
-
-#: src/main/webapp/jsp/games_history.jsp:71
-#: src/main/webapp/jsp/games_history.jsp:217
-msgid "Actions"
-msgstr "Aktionen"
 
 #: src/main/webapp/jsp/games_history.jsp:82
 msgid "Your battleground game history is empty."
@@ -7408,21 +7459,21 @@ msgstr "Rätsel in {0} Versuch gelöst."
 msgid "Puzzle solved in {0} attempts."
 msgstr "Rätsel in {0} Versuchen gelöst."
 
-#: src/main/webapp/jsp/research.jsp:26 src/main/webapp/jsp/research.jsp:68
-#: src/main/webapp/jsp/research.jsp:91 src/main/webapp/jsp/research.jsp:115
-#: src/main/webapp/jsp/research.jsp:137 src/main/webapp/jsp/research.jsp:157
-#: src/main/webapp/jsp/research.jsp:179
+#: src/main/webapp/jsp/research.jsp:30 src/main/webapp/jsp/research.jsp:51
+#: src/main/webapp/jsp/research.jsp:72 src/main/webapp/jsp/research.jsp:95
+#: src/main/webapp/jsp/research.jsp:119 src/main/webapp/jsp/research.jsp:141
+#: src/main/webapp/jsp/research.jsp:161 src/main/webapp/jsp/research.jsp:183
 msgid "Download PDF"
 msgstr "PDF herunterladen"
 
-#: src/main/webapp/jsp/research.jsp:64 src/main/webapp/jsp/research.jsp:87
-#: src/main/webapp/jsp/research.jsp:110 src/main/webapp/jsp/research.jsp:132
-#: src/main/webapp/jsp/research.jsp:152 src/main/webapp/jsp/research.jsp:174
-#: src/main/webapp/jsp/research.jsp:196 src/main/webapp/jsp/research.jsp:211
+#: src/main/webapp/jsp/research.jsp:68 src/main/webapp/jsp/research.jsp:91
+#: src/main/webapp/jsp/research.jsp:114 src/main/webapp/jsp/research.jsp:136
+#: src/main/webapp/jsp/research.jsp:156 src/main/webapp/jsp/research.jsp:178
+#: src/main/webapp/jsp/research.jsp:200 src/main/webapp/jsp/research.jsp:215
 msgid "Copy"
 msgstr "Kopieren"
 
-#: src/main/webapp/jsp/research.jsp:209
+#: src/main/webapp/jsp/research.jsp:213
 msgid "Copied."
 msgstr "Kopiert."
 

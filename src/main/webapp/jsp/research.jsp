@@ -18,6 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <link href="${url.forPath("/css/specific/research.css")}" rel="stylesheet">
 
 <div id="research" class="paper-list">
@@ -44,7 +48,7 @@
 
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.

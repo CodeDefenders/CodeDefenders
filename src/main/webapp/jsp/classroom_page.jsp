@@ -844,25 +844,25 @@
                     columns: [
                         {
                             data: 'user.id',
-                            title: 'User ID',
+                            title: "${i18n.tr('User ID')}",
                             type: 'number',
                             width: '5em',
                             visible: canChangeRoles || canChangeOwner || canKickStudents || canKickModerators
                         },
                         {
                             data: 'user.name',
-                            title: 'Name',
+                            title: "${i18n.tr('Name')}",
                             type: 'string'
                         },
                         {
                             data: 'role',
-                            title: 'Role',
+                            title: "${i18n.tr('Role')}",
                             type: 'string',
                             render: renderClassroomRole,
                         },
                         {
                             data: null,
-                            title: 'Actions',
+                            title: "${i18n.tr('Actions')}",
                             orderable: false,
                             searchable: false,
                             render: renderMemberActions,
@@ -979,7 +979,7 @@
             const renderGameState = function(data, type, row, meta) {
                 switch (data.state) {
                     case GameState.CREATED:
-                        return 'Not Started';
+                        return "${i18n.tr('Not Started')}";
                     case GameState.ACTIVE:
                         return renderGameStateActive(data, type, row, meta);
                     case GameState.FINISHED:
@@ -1023,8 +1023,8 @@
                             <span class="text-nowrap">
                                 <button type="submit" id="join-observer-\${data.gameId}"
                                         class="btn btn-sm btn-info ms-1"
-                                        title="Join as Observer">
-                                    <i class="fa fa-external-link text-primary"></i> Observe
+                                        title="${i18n.tr('Join as Observer')}">
+                                    <i class="fa fa-external-link text-primary"></i> ${i18n.tr('Observe')}
                                 </button>
                             </span>
                         </form>

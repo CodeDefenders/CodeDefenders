@@ -112,7 +112,7 @@
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
                         <p>
-                                ${i18n.tr('Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations.')}
+                            ${i18n.tr('Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations.')}
                         </p>
 
                         <input class="form-control mb-4" type="file" id="fileUploadPuzzle" name="fileUploadPuzzle"
@@ -135,31 +135,31 @@
                             <div class="mt-3 p-1">
                                 <ul>
                                     <li>
-                                            ${i18n.tr('Empty puzzle template:')}
+                                        ${i18n.tr('Empty puzzle template:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_template.zip")}" download>
                                             puzzle_template.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example properties file:')}
+                                        ${i18n.tr('Example properties file:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_properties.zip")}" download>
                                             puzzle.properties
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example attacker puzzle:')}
+                                        ${i18n.tr('Example attacker puzzle:')}
                                         <a href="${url.forPath("/puzzle-importer/puzzle_attacker.zip")}" download>
                                             puzzle_attacker.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example defender puzzle:')}
+                                        ${i18n.tr('Example defender puzzle:')}
                                         <a href="${url.forPath("puzzle_importer/puzzle_defender.zip")}" download>
                                             puzzle_defender.zip
                                         </a>
                                     </li>
                                     <li>
-                                            ${i18n.tr('Example puzzle with dependencies:')}
+                                        ${i18n.tr('Example puzzle with dependencies:')}
                                         <a href="${url.forPath("puzzle-importer/puzzle_deps.zip")}" download>
                                             puzzle_deps.zip
                                         </a>
@@ -172,7 +172,7 @@
                 <jsp:attribute name="footer">
                     <button class="btn btn-primary" type="submit" id="uploadPuzzlesButton"
                             onclick="this.form.submit(); this.disabled = true; this.innerText='${i18n.tr('Uploading...')}';">
-                            ${i18n.tr('Upload')}
+                        ${i18n.tr('Upload')}
                     </button>
                 </jsp:attribute>
             </t:modal>
@@ -187,11 +187,11 @@
                 <jsp:attribute name="content">
                     <div style="width: 700px;">
                         <p>
-                                ${i18n.tr('Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation.')}
+                            ${i18n.tr('Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation.')}
                         </p>
 
                         <p>
-                                ${i18n.tr('Uploading large chapters may take several minutes.')}
+                            ${i18n.tr('Uploading large chapters may take several minutes.')}
                         </p>
 
                         <input class="form-control mb-4" type="file" id="fileUploadChapter" name="fileUploadChapter"
@@ -394,7 +394,7 @@
                                 <div class="chapter__description"></div>
                             </div>
                             <div class="chapter__controls">
-                                <div class="chapter__handle me-3" title="Drag to move chapter"></div>
+                                <div class="chapter__handle me-3" title="${i18n.tr('Drag to move chapter')}"></div>
                                     <button class="btn btn-xs btn-primary btn-fixed chapter__button__edit" title="${i18n.tr('Edit')}">
                                     <i class="fa fa-edit"></i>
                                 </button>
@@ -489,7 +489,7 @@
                                 <div class="puzzle__description"></div>
                             </div>
                             <div class="puzzle__tags">
-                                <span class="badge puzzle__tag puzzle__tag__id" title="Puzzle ID"></span>
+                                <span class="badge puzzle__tag puzzle__tag__id" title="${i18n.tr('Puzzle ID')}"></span>
                                     <span class="badge puzzle__tag puzzle__tag__games" title="${i18n.tr('Number of games with the puzzle')}"></span>
                                     <span class="badge puzzle__tag puzzle__tag__level" title="${i18n.tr('Puzzle level')}"></span>
                                     <span class="badge puzzle__tag puzzle__tag__equivalent title="${i18n.tr('Mutant is equivalent')}" hidden">

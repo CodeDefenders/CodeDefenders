@@ -122,3 +122,11 @@ body {
 .header-puzzle-menu .header-puzzle-solved i {
     color: var(--bs-success);
 }
+
+.links-no-color a {
+    color: inherit;
+    text-decoration: none;
+}
+.links-no-color a:hover {
+    text-decoration: underline;
+}

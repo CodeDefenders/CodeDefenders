@@ -4207,6 +4207,10 @@ msgstr "The University of Sheffield"
 msgid "Supporters"
 msgstr "Supporters"
 
+#: src/main/webapp/jsp/about_page.jsp:100
+msgid "Gamifying the Quest for Software Tests"
+msgstr "Gamifying the Quest for Software Tests"
+
 #: src/main/webapp/jsp/about_page.jsp:101
 msgid "Improving Engagement of Students in Software Engineering Courses through Gamification"
 msgstr "Improving Engagement of Students in Software Engineering Courses through Gamification"
@@ -4222,6 +4226,54 @@ msgstr "Grant RG160969"
 #: src/main/webapp/jsp/about_page.jsp:110
 msgid "Research"
 msgstr "Research"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:28
+msgid "Class Analytics"
+msgstr "Class Analytics"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:32
+msgid "Class Analytics"
+msgstr "Class Analytics"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:38
+msgid "ID"
+msgstr "ID"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:39
+msgid "Name (Alias)"
+msgstr "Name (Alias)"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:40
+msgid "Games Played"
+msgstr "Games Played"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:41
+msgid "Test Submitted"
+msgstr "Test Submitted"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:42
+msgid "Tests per Game"
+msgstr "Tests per Game"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:43
+msgid "Mutants Submitted"
+msgstr "Mutants Submitted"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:44
+msgid "Mutants per Game"
+msgstr "Mutants per Game"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:55
+msgid "Download table"
+msgstr "Download table"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:59
+msgid "as CSV"
+msgstr "as CSV"
+
+#: src/main/webapp/jsp/admin_analytics_classes.jsp:63
+msgid "as JSON"
+msgstr "as JSON"
 
 #: src/main/webapp/jsp/admin_analytics_classes.jsp:90
 msgid "Win Rates"
@@ -4646,6 +4698,10 @@ msgstr "Link"
 #: src/main/webapp/jsp/admin_classrooms.jsp:183
 msgid "There aren\\'t any classrooms... yet."
 msgstr "There aren\\'t any classrooms... yet."
+
+#: src/main/webapp/jsp/admin_create_games.jsp:27
+msgid "Create Games"
+msgstr "Create Games"
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 msgid "Game"
@@ -5423,6 +5479,10 @@ msgstr "Uploading..."
 msgid "Upload"
 msgstr "Upload"
 
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:397
+msgid "Drag to move chapter"
+msgstr "Drag to move chapter"
+
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:398
 msgid "Edit"
 msgstr "Edit"
@@ -5442,6 +5502,10 @@ msgstr "Move to position:"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:414
 msgid "Move to position"
 msgstr "Move to position"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:492
+msgid "Puzzle ID"
+msgstr "Puzzle ID"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:493
 msgid "Number of games with the puzzle"
@@ -6383,6 +6447,10 @@ msgstr "Balance teams"
 msgid "Join as defender"
 msgstr "Join as defender"
 
+#: src/main/webapp/jsp/classroom_create_games.jsp:32
+msgid "Create Games"
+msgstr "Create Games"
+
 #: src/main/webapp/jsp/classroom_create_games.jsp:38
 msgid "Back to Classroom"
 msgstr "Back to Classroom"
@@ -6843,6 +6911,22 @@ msgstr "Owner"
 msgid "Kick"
 msgstr "Kick"
 
+#: src/main/webapp/jsp/classroom_page.jsp:847
+msgid "User ID"
+msgstr "User ID"
+
+#: src/main/webapp/jsp/classroom_page.jsp:854
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/classroom_page.jsp:859
+msgid "Role"
+msgstr "Role"
+
+#: src/main/webapp/jsp/classroom_page.jsp:865
+msgid "Actions"
+msgstr "Actions"
+
 #: src/main/webapp/jsp/classroom_page.jsp:880
 msgid "This classroom has no members... yet."
 msgstr "This classroom has no members... yet."
@@ -6886,6 +6970,18 @@ msgstr "Running: {0} left"
 #: src/main/webapp/jsp/classroom_page.jsp:975
 msgid "Ended at {0}"
 msgstr "Ended at {0}"
+
+#: src/main/webapp/jsp/classroom_page.jsp:982
+msgid "Not Started"
+msgstr "Not Started"
+
+#: src/main/webapp/jsp/classroom_page.jsp:1026
+msgid "Join as Observer"
+msgstr "Join as Observer"
+
+#: src/main/webapp/jsp/classroom_page.jsp:1027
+msgid "Observe"
+msgstr "Observe"
 
 #: src/main/webapp/jsp/classroom_page.jsp:1105
 msgid "This classroom has no games... yet."
@@ -8407,67 +8503,71 @@ msgstr "Puzzle solved in {0} attempt."
 msgid "Puzzle solved in {0} attempts."
 msgstr "Puzzle solved in {0} attempts."
 
-#: src/main/webapp/jsp/research.jsp:26
+#: src/main/webapp/jsp/research.jsp:30
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:64
-msgid "Copy"
-msgstr "Copy"
+#: src/main/webapp/jsp/research.jsp:51
+msgid "Download PDF"
+msgstr "Download PDF"
 
 #: src/main/webapp/jsp/research.jsp:68
-msgid "Download PDF"
-msgstr "Download PDF"
-
-#: src/main/webapp/jsp/research.jsp:87
 msgid "Copy"
 msgstr "Copy"
+
+#: src/main/webapp/jsp/research.jsp:72
+msgid "Download PDF"
+msgstr "Download PDF"
 
 #: src/main/webapp/jsp/research.jsp:91
-msgid "Download PDF"
-msgstr "Download PDF"
-
-#: src/main/webapp/jsp/research.jsp:110
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:115
+#: src/main/webapp/jsp/research.jsp:95
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:132
+#: src/main/webapp/jsp/research.jsp:114
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:137
+#: src/main/webapp/jsp/research.jsp:119
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:152
+#: src/main/webapp/jsp/research.jsp:136
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:157
+#: src/main/webapp/jsp/research.jsp:141
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:174
+#: src/main/webapp/jsp/research.jsp:156
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:179
+#: src/main/webapp/jsp/research.jsp:161
 msgid "Download PDF"
 msgstr "Download PDF"
 
-#: src/main/webapp/jsp/research.jsp:196
+#: src/main/webapp/jsp/research.jsp:178
 msgid "Copy"
 msgstr "Copy"
 
-#: src/main/webapp/jsp/research.jsp:209
+#: src/main/webapp/jsp/research.jsp:183
+msgid "Download PDF"
+msgstr "Download PDF"
+
+#: src/main/webapp/jsp/research.jsp:200
+msgid "Copy"
+msgstr "Copy"
+
+#: src/main/webapp/jsp/research.jsp:213
 msgid "Copied."
 msgstr "Copied."
 
-#: src/main/webapp/jsp/research.jsp:211
+#: src/main/webapp/jsp/research.jsp:215
 msgid "Copy"
 msgstr "Copy"
 
