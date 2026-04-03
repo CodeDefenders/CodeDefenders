@@ -42,19 +42,19 @@ public interface IMutationTester {
      * Execute all the tests registered from all the other players against the
      * provided mutant, using a random scheduling of test execution.
      */
-    String runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant);
+    PreparedMessage runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a random scheduling of test execution.
      */
-    String runAllTestsOnMutant(AbstractGame game, Mutant mutant);
+    PreparedMessage runAllTestsOnMutant(AbstractGame game, Mutant mutant);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a the given TestScheduler for ordering the execution of tests.
      */
-    String runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler);
+    PreparedMessage runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler);
 
     /**
      * Runs an equivalence test using an attacker supplied test and a mutant thought

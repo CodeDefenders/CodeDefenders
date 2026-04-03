@@ -288,7 +288,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             boolean isSuccess,
             // on success
             Optional<Mutant> mutant,
-            Optional<String> mutationTesterMessage,
+            Optional<PreparedMessage> mutationTesterMessage,
             // on failure
             Optional<FailureReason> failureReason,
             Optional<String> validationErrorMessage,
@@ -300,7 +300,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             COMPILATION_FAILED,
         }
 
-        public static CreateBattlegroundMutantResult success(Mutant mutant, String mutationTesterMessage) {
+        public static CreateBattlegroundMutantResult success(Mutant mutant, PreparedMessage mutationTesterMessage) {
             return new CreateBattlegroundMutantResult(
                     true,
                     Optional.of(mutant),
@@ -407,7 +407,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        String mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
+        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -674,7 +674,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                     " However, the mutant was killable! You can view an example for a killing test in the mutant accordion.";
         }
 
-        // At this point we where not able to kill the mutant will all the covering
+        // At this point, we were not able to kill the mutant will all the covering
         // tests on the same class from different games
         mutantRepo.killMutant(equivMutant, Mutant.Equivalence.DECLARED_YES);
 
@@ -916,21 +916,21 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public record ClaimEquivalentResult(
             List<Mutant> claimedMutants,
-            List<String> messages
+            List<PreparedMessage> messages
     ){}
-    public ClaimEquivalentResult claimBattlegroundEquivalence(MultiplayerGame game, int userId, List<Integer> mutantLines) throws IOException {
+    public ClaimEquivalentResult claimBattlegroundEquivalence(MultiplayerGame game, int userId, List<Integer> mutantLines) {
         var user = userService.getSimpleUserById(userId).orElseThrow();
         int playerId = playerRepo.getPlayerIdForUserAndGame(userId, game.getId());
 
         List<Mutant> mutantsAlive = game.getAliveMutants();
-        List<String> messages = new ArrayList<>();
+        List<PreparedMessage> messages = new ArrayList<>();
 
         mutantLines = mutantLines.stream()
                 .filter(game::isLineCovered)
                 .toList();
 
         if (mutantLines.isEmpty()) {
-            messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
+            messages.add(new PreparedMessage(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE));
             return new ClaimEquivalentResult(List.of(), messages);
         }
 
@@ -956,7 +956,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                     .forEach(claimedMutants::add);
         }
 
-        if (claimedMutants.size() > 0) {
+        if (!claimedMutants.isEmpty()) {
             String flaggingChatMessage = user.getName() + " flagged "
                     + claimedMutants.size() + " mutant" + (claimedMutants.size() == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, game.getId(), userId, flaggingChatMessage,
@@ -965,11 +965,12 @@ public class GameManagingUtils implements IGameManagingUtils {
             eventDAO.insert(event);
         }
 
-        String flaggingMessage = claimedMutants.size() == 0
-                ? "Mutant has already been claimed as equivalent or killed!"
-                : String.format("Flagged %d mutant%s as equivalent", claimedMutants.size(),
-                (claimedMutants.size() == 1 ? "" : 's'));
-        messages.add(flaggingMessage);
+        messages.add(switch (claimedMutants.size()) {
+            case 0  -> new PreparedMessage(I18n.marktr("Mutant has already been claimed as equivalent or killed!"));
+            case 1  -> new PreparedMessage(I18n.marktr("Flagged 1 mutant as equivalent!"));
+            default -> new PreparedMessage(I18n.marktr("Flagged {0} mutants as equivalent!"), claimedMutants.size());
+        });
+
         return new ClaimEquivalentResult(claimedMutants, messages);
     }
 

@@ -101,7 +101,7 @@ public class Constants {
 
     public static final String TEST_GENERIC_ERROR_MESSAGE = I18n.marktr("Sorry! An error on the server prevented the compilation of your test.");
     public static final String TEST_DID_NOT_COMPILE_MESSAGE = I18n.marktr("Your test did not compile. Try again, but with compilable code.");
-    public static final String TEST_INVALID_MESSAGE = I18n.marktr("Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!");
+    public static final String TEST_INVALID_MESSAGE = I18n.marktr("Your test is not valid. Remember the rules: Only one non-empty test, at most {0} assertions per test, no conditionals and no loops!");
     public static final String TEST_PASSED_ON_CUT_MESSAGE = I18n.marktr("Great! Your test compiled and passed on the original class under test.");
     public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = I18n.marktr("Your test did not pass on the original class under test. Try again.");
     public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = I18n.marktr("Yay, your test killed the allegedly equivalent mutant. You won the duel!");
@@ -112,7 +112,7 @@ public class Constants {
     public static final String TEST_KILLED_ZERO_MESSAGE = I18n.marktr("Your test has not killed any mutants, just yet.");
     public static final String TEST_KILLED_LAST_MESSAGE = I18n.marktr("Great, your test killed the last mutant!");
     public static final String TEST_KILLED_ONE_MESSAGE = I18n.marktr("Great, your test killed a mutant!");
-    public static final String TEST_KILLED_N_MESSAGE = I18n.marktr("Awesome! Your test killed %d mutants!"); // number of mutants
+    public static final String TEST_KILLED_N_MESSAGE = I18n.marktr("Awesome! Your test killed {0} mutants!"); // number of mutants
 
     public static final String MUTANT_COMPILED_MESSAGE = I18n.marktr("Your mutant was compiled successfully.");
     public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = I18n.marktr("The mutant was accepted as equivalent.");
@@ -125,10 +125,10 @@ public class Constants {
     public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = I18n.marktr("Mutant claimed as equivalent, waiting for attacker to respond.");
     public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = I18n.marktr("Something went wrong claiming an equivalent mutant"); // TODO: How?
     public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE = I18n.marktr("Cheeky! You cannot claim equivalence on untested lines!");
-    public static final String MUTANT_KILLED_BY_TEST_MESSAGE = I18n.marktr("Test %d killed your mutant. Better luck with the next one!"); // test
+    public static final String MUTANT_KILLED_BY_TEST_MESSAGE = I18n.marktr("Test {0} killed your mutant. Better luck with the next one!"); // test
     public static final String MUTANT_SUBMITTED_MESSAGE = I18n.marktr("Mutant submitted, may the force be with it.");
     public static final String MUTANT_ALIVE_1_MESSAGE = I18n.marktr("Cool, your mutant survived its first test.");
-    public static final String MUTANT_ALIVE_N_MESSAGE = I18n.marktr("Awesome, your mutant survived %d tests!"); // number of tests that covered mutant
+    public static final String MUTANT_ALIVE_N_MESSAGE = I18n.marktr("Awesome, your mutant survived {0} tests!"); // number of tests that covered mutant
 
     public static final String MUTANT_MISSING_INTENTION = I18n.marktr("You must declare your intention.");
 

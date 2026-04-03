@@ -676,7 +676,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
         if (newTest == null) {
-            messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+            messages.addFormatted(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest());
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;

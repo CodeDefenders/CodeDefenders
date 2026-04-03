@@ -59,7 +59,7 @@ public class MutationTesterUtilities {
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
                             + mutant.getId());
-                    String message = mutationTester.runAllTestsOnMutant(activeGame, mutant);
+                    String message = mutationTester.runAllTestsOnMutant(activeGame, mutant).resolve();
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
                             + message);

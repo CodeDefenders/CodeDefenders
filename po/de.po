@@ -235,7 +235,7 @@ msgstr "Alle Tests"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:27
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:896
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:149
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:150
 #: src/main/webapp/jsp/melee/create_game_view.jsp:146
 #: src/main/webapp/WEB-INF/tags/create_games.tag:205
 #: src/main/webapp/WEB-INF/tags/create_games.tag:649
@@ -251,7 +251,7 @@ msgstr "Mittel"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:29
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:903
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:144
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:145
 #: src/main/webapp/jsp/melee/create_game_view.jsp:141
 #: src/main/webapp/WEB-INF/tags/create_games.tag:200
 #: src/main/webapp/WEB-INF/tags/create_games.tag:647
@@ -2686,11 +2686,24 @@ msgstr "Die verbleibende Zeit darf nicht unter {0} Minuten liegen."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "Die neue verbleibende Dauer darf höchstens {0} Minuten betragen."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1167
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:969
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1137
+msgid "Mutant has already been claimed as equivalent or killed!"
+msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
+
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:970
+msgid "Flagged 1 mutant as equivalent!"
+msgstr "1 Mutant als äquivalent markiert!"
+
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+msgid "Flagged {0} mutants as equivalent!"
+msgstr "{0} Mutanten als äquivalent markiert!"
+
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1168
 msgid "Your test has the following smell: {0}"
 msgstr "Dein Test weist folgenden Test-Smell auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1173
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1174
 msgid "Your test has the following smells: {0}"
 msgstr "Dein Test weist folgende Test-Smells auf: {0}"
 
@@ -2719,10 +2732,6 @@ msgstr ""
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr ""
 "...dein Test hat jedoch {0} andere äquivalent markierte Mutanten getötet!"
-
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1137
-msgid "Mutant has already been claimed as equivalent or killed!"
-msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
 
 #: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1139
 msgid "Flagged 1 mutant as equivalent"
@@ -3003,10 +3012,10 @@ msgstr ""
 #: src/main/java/org/codedefenders/util/Constants.java:104
 msgid ""
 "Your test is not valid. Remember the rules: Only one non-empty test, at most "
-"%d assertions per test, no conditionals and no loops!"
+"{0} assertions per test, no conditionals and no loops!"
 msgstr ""
 "Dein Test ist nicht gültig. Denk an die Regeln: Nur ein nicht leerer Test, "
-"höchstens %d Assertions pro Test, keine Bedingungen und keine Schleifen!"
+"höchstens {0} Assertions pro Test, keine Bedingungen und keine Schleifen!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:105
 msgid "Great! Your test compiled and passed on the original class under test."
@@ -3068,8 +3077,8 @@ msgid "Great, your test killed a mutant!"
 msgstr "Super, dein Test hat einen Mutanten erledigt!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:115
-msgid "Awesome! Your test killed %d mutants!"
-msgstr "Super! Dein Test hat %d Mutanten erledigt!"
+msgid "Awesome! Your test killed {0} mutants!"
+msgstr "Großartig! Dein Test hat {0} Mutanten getötet!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:117
 msgid "Your mutant was compiled successfully."
@@ -3128,8 +3137,8 @@ msgid "Cheeky! You cannot claim equivalence on untested lines!"
 msgstr "Frech! Du kannst keine Äquivalenz in ungetesteten Zeilen markieren!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:128
-msgid "Test %d killed your mutant. Better luck with the next one!"
-msgstr "Test %d hat deinen Mutanten erledigt. Viel Glück beim nächsten Mal!"
+msgid "Test {0} killed your mutant. Better luck with the next one!"
+msgstr "Test {0} hat deinen Mutanten getötet. Viel Glück beim nächsten Mal!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:129
 msgid "Mutant submitted, may the force be with it."
@@ -3140,8 +3149,8 @@ msgid "Cool, your mutant survived its first test."
 msgstr "Cool, dein Mutant hat seinen ersten Test überstanden."
 
 #: src/main/java/org/codedefenders/util/Constants.java:131
-msgid "Awesome, your mutant survived %d tests!"
-msgstr "Super, dein Mutant hat %d Tests überstanden!"
+msgid "Awesome, your mutant survived {0} tests!"
+msgstr "Großartig, dein Mutant hat {0} Tests überlebt!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:133
 msgid "You must declare your intention."
@@ -4677,7 +4686,7 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1113
 #: src/main/webapp/jsp/admin_system_settings.jsp:148
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:345
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:346
 #: src/main/webapp/jsp/battleground/details_view.jsp:111
 #: src/main/webapp/jsp/classroom_page.jsp:295
 #: src/main/webapp/jsp/classroom_page.jsp:324
@@ -5462,14 +5471,14 @@ msgid "Last Editable Line"
 msgstr "Letzte bearbeitbare Zeile"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:892
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:135
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:136
 #: src/main/webapp/jsp/melee/create_game_view.jsp:132
 #: src/main/webapp/WEB-INF/tags/create_games.tag:191
 msgid "Game Level"
 msgstr "Spiellevel"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:897
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:150
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:151
 #: src/main/webapp/jsp/melee/create_game_view.jsp:147
 msgid "Please select a level."
 msgstr "Bitte wähle ein Level aus."
@@ -5560,7 +5569,7 @@ msgid "JUnit Tests"
 msgstr "JUnit-Tests"
 
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:95
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:93
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:94
 #: src/main/webapp/jsp/battleground/creator_view.jsp:65
 #: src/main/webapp/jsp/battleground/defender_view.jsp:80
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:176
@@ -5842,22 +5851,22 @@ msgstr "Erstelle hier einen Mutanten"
 msgid "Reset"
 msgstr "Zurücksetzen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:59
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:62
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:60
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:63
 msgid "Create Battleground Game"
 msgstr "Erstelle Battleground-Spiel"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:68
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:69
 #: src/main/webapp/jsp/melee/create_game_view.jsp:66
 msgid "Before you can start games, please"
 msgstr "Bevor du mit den Spielen beginnen kannst, bitte"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:70
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:71
 #: src/main/webapp/jsp/melee/create_game_view.jsp:68
 msgid "upload a class under test"
 msgstr "eine zu testende Klasse hochladen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:75
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:76
 #: src/main/webapp/jsp/melee/create_game_view.jsp:73
 msgid ""
 "Games can only be started once at least one class under test has been "
@@ -5866,42 +5875,42 @@ msgstr ""
 "Spiele können erst gestartet werden, wenn mindestens eine zu testende Klasse "
 "hochgeladen wurde."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:103
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:104
 #: src/main/webapp/jsp/melee/create_game_view.jsp:100
 #: src/main/webapp/WEB-INF/tags/create_games.tag:166
 msgid "Upload a class."
 msgstr "Eine Klasse hochladen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:110
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:111
 #: src/main/webapp/jsp/melee/create_game_view.jsp:107
 msgid "Please select a class."
 msgstr "Bitte wähle eine Klasse aus."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:118
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:119
 #: src/main/webapp/jsp/melee/create_game_view.jsp:115
 #: src/main/webapp/WEB-INF/tags/create_games.tag:178
 msgid "Include predefined mutants (if available)"
 msgstr "Vordefinierte Mutanten einbeziehen (falls verfügbar)"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:126
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:127
 #: src/main/webapp/jsp/melee/create_game_view.jsp:123
 #: src/main/webapp/WEB-INF/tags/create_games.tag:183
 msgid "Include predefined tests (if available)"
 msgstr "Vordefinierte Tests einbeziehen (falls verfügbar)"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:159
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:160
 #: src/main/webapp/jsp/melee/create_game_view.jsp:156
 #: src/main/webapp/WEB-INF/tags/create_games.tag:214
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1190
 msgid "Mutant Validator Level"
 msgstr "Mutanten-Validator-Level"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:176
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:177
 #: src/main/webapp/jsp/melee/create_game_view.jsp:173
 msgid "Please select a mutant validator level."
 msgstr "Bitte wähle eine Mutanten-Validierungsstufe aus."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:192
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:193
 #: src/main/webapp/jsp/melee/create_game_view.jsp:189
 #: src/main/webapp/WEB-INF/tags/create_games.tag:234
 msgid ""
@@ -5911,29 +5920,29 @@ msgstr ""
 "Maximale Anzahl von Assertions pro Test. Erhöhe diesen Wert für schwer zu "
 "testende Klassen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:194
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:195
 #: src/main/webapp/jsp/melee/create_game_view.jsp:191
 #: src/main/webapp/WEB-INF/tags/create_games.tag:236
 msgid "Max. Assertions Per Test"
 msgstr "Max. Assertions pro Test"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:200
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:201
 #: src/main/webapp/jsp/melee/create_game_view.jsp:196
 msgid "Please provide a valid number. Must be greater than zero."
 msgstr "Bitte gib eine gültige Zahl ein. Muss größer als Null sein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:209
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:210
 #: src/main/webapp/jsp/melee/create_game_view.jsp:204
 #: src/main/webapp/WEB-INF/tags/create_games.tag:246
 msgid "Auto Equiv. Threshold"
 msgstr "Auto-Äquivalent-Schwellenwert"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:217
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:218
 #: src/main/webapp/jsp/melee/create_game_view.jsp:212
 msgid "Please provide a valid number. Must be positive or zero."
 msgstr "Bitte gib eine gültige Zahl ein. Muss positiv oder Null sein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:223
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:224
 #: src/main/webapp/jsp/melee/create_game_view.jsp:217
 #: src/main/webapp/WEB-INF/tags/create_games.tag:268
 msgid ""
@@ -5943,144 +5952,144 @@ msgstr ""
 "Zwingt die Spieler dazu, die Intention ihrer Mutanten/Tests anzugeben, bevor "
 "sie diese einreichen können."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:225
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:226
 #: src/main/webapp/jsp/melee/create_game_view.jsp:219
 msgid "Capture Intentions"
 msgstr "Intentionen erfassen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:231
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:232
 #: src/main/webapp/jsp/melee/create_game_view.jsp:225
 msgid "Enable Capturing Players\\' Intentions"
 msgstr "Spieler-Intentionen erfassen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:237
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:238
 #: src/main/webapp/WEB-INF/tags/create_games.tag:276
 msgid "Allows players to chat within their team and with the enemy team."
 msgstr ""
 "Ermöglicht es den Spielern, innerhalb ihres Teams und mit dem gegnerischen "
 "Team zu chatten."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:239
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:240
 #: src/main/webapp/jsp/melee/create_game_view.jsp:233
 #: src/main/webapp/WEB-INF/tags/create_games.tag:279
 msgid "Game Chat"
 msgstr "Spiel-Chat"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:244
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:245
 #: src/main/webapp/jsp/melee/create_game_view.jsp:237
 msgid "Enable Chat"
 msgstr "Chat aktivieren"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:250
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:251
 msgid "Allows player to choose their role (attacker or defender) when joining."
 msgstr ""
 "Ermöglicht es dem Spieler, bei der Teilnahme seine Rolle (Angreifer oder "
 "Verteidiger) zu wählen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:252
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:253
 msgid "Players may choose their role"
 msgstr "Die Spieler können ihre Rolle wählen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:258
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:259
 msgid "Allow players to choose their own roles"
 msgstr "Spielern die Wahl ihrer eigenen Rollen ermöglichen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:264
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:265
 #: src/main/webapp/jsp/melee/create_game_view.jsp:243
 msgid "Allows only whitelisted players to join the game."
 msgstr ""
 "Erlaubt nur Spielern, die auf der Whitelist stehen, am Spiel teilzunehmen."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:266
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:267
 #: src/main/webapp/jsp/melee/create_game_view.jsp:245
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:38
 msgid "Invite players"
 msgstr "Spieler einladen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:273
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:274
 #: src/main/webapp/jsp/melee/create_game_view.jsp:252
 msgid "Allow only whitelisted players to join"
 msgstr "Nur Spielern auf der Whitelist den Beitritt erlauben"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:283
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:284
 #: src/main/webapp/jsp/melee/create_game_view.jsp:262
 msgid "Select the role the creator (you) will have in the game."
 msgstr "Wähle die Rolle aus, die der Ersteller (du) im Spiel einnehmen wird."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:285
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:286
 #: src/main/webapp/jsp/melee/create_game_view.jsp:264
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1194
 msgid "Creator Role"
 msgstr "Rolle des Erstellers"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:294
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:295
 #: src/main/webapp/jsp/melee/create_game_view.jsp:273
 msgid "Please select a role."
 msgstr "Bitte wähle eine Rolle aus."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:298
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:299
 #: src/main/webapp/jsp/melee/create_game_view.jsp:277
 #: src/main/webapp/WEB-INF/tags/create_games.tag:291
 msgid "The duration for how long the games will be open."
 msgstr "Die Dauer, für die die Spiele geöffnet sein werden."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:301
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:302
 #: src/main/webapp/jsp/melee/create_game_view.jsp:280
 msgid "Set the game\\'s duration:"
 msgstr "Leg die Spieldauer fest:"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:305
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:306
 #: src/main/webapp/jsp/melee/create_game_view.jsp:284
 #: src/main/webapp/WEB-INF/tags/create_games.tag:301
 #: src/main/webapp/WEB-INF/tags/game_time.tag:109
 msgid "days"
 msgstr "Tage"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:307
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:308
 #: src/main/webapp/jsp/melee/create_game_view.jsp:286
 #: src/main/webapp/WEB-INF/tags/create_games.tag:303
 #: src/main/webapp/WEB-INF/tags/game_time.tag:111
 msgid "hours"
 msgstr "Stunden"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:309
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:310
 #: src/main/webapp/jsp/melee/create_game_view.jsp:288
 #: src/main/webapp/WEB-INF/tags/create_games.tag:305
 #: src/main/webapp/WEB-INF/tags/game_time.tag:113
 msgid "minutes"
 msgstr "Minuten"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:311
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:312
 #: src/main/webapp/jsp/melee/create_game_view.jsp:290
 #: src/main/webapp/WEB-INF/tags/game_time.tag:115
 msgid "Please input a valid duration."
 msgstr "Bitte gib eine gültige Dauer ein."
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:312
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:313
 msgid "Maximum duration: {0}"
 msgstr "Maximale Dauer: {0}"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:339
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:343
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:340
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:344
 #: src/main/webapp/jsp/melee/create_game_view.jsp:315
 #: src/main/webapp/jsp/melee/create_game_view.jsp:319
 msgid "Create Game"
 msgstr "Spiel erstellen"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:351
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:352
 #: src/main/webapp/jsp/melee/create_game_view.jsp:327
 #: src/main/webapp/WEB-INF/tags/create_games.tag:478
 msgid "Level Explanation"
 msgstr "Erklärung der Level"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:357
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:358
 #: src/main/webapp/jsp/game_components/mutant_explanation.jsp:82
 #: src/main/webapp/jsp/melee/create_game_view.jsp:333
 #: src/main/webapp/WEB-INF/tags/create_games.tag:487
 msgid "Validator Explanation"
 msgstr "Erläuterung zum Validator"
 
-#: src/main/webapp/jsp/battleground/create_game_view.jsp:366
+#: src/main/webapp/jsp/battleground/create_game_view.jsp:367
 #: src/main/webapp/jsp/melee/create_game_view.jsp:342
 #: src/main/webapp/WEB-INF/tags/create_games.tag:495
 msgid "Auto Equivalence Duel Threshold Explanation"
@@ -7172,14 +7181,14 @@ msgid ""
 "\"View Diff\" button on the killed tab of the mutants panel."
 msgstr ""
 "Die tatsächlich vorgenommenen Änderungen an getöteten Mutanten können durch "
-"Klicken auf die Schaltfläche „Diff anzeigen“ auf der Registerkarte „Getötet“ "
-"im Mutantenfenster angezeigt werden."
+"Klicken auf die Schaltfläche „Betrachten“ auf der Registerkarte „Getötet“ im "
+"Mutantenfenster angezeigt werden."
 
 #: src/main/webapp/jsp/help.jsp:97
 msgid "Mutant diff view displayed after clicking the \"View Diff\" button."
 msgstr ""
 "Die Mutanten-Differenz-Ansicht wird nach dem Klicken auf die Schaltfläche "
-"„Diff anzeigen“ angezeigt."
+"„Betrachten“ angezeigt."
 
 #: src/main/webapp/jsp/help.jsp:103
 msgid ""
@@ -9323,6 +9332,10 @@ msgstr "Bestehende Mutanten"
 msgid "Alive"
 msgstr "Lebendig"
 
+#: src/main/webapp/WEB-INF/tags/mutant_ruleset_explanation.tag:27
+msgid "Mutation rules:"
+msgstr "Mutationsregeln:"
+
 #: src/main/webapp/WEB-INF/tags/navbar.tag:62
 msgid "Multiplayer"
 msgstr "Mehrspieler"
@@ -9383,11 +9396,19 @@ msgstr "Mein Mutant ist äquivalent"
 msgid "I don\\'t know if my mutant is killable"
 msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_mutant.tag:35
-msgid "Mutation rules:"
-msgstr "Mutationsregeln:"
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:41
+msgid "Only {0} assertion per test"
+msgstr "Nur {0} Assertion pro Test"
 
-#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:50
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:42
+msgid "Only {0} assertions per test"
+msgstr "Nur {0} Assertions pro Test"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:48
+msgid "Only the configured number of assertions per test (default: {0})"
+msgstr "Nur die konfigurierte Anzahl von Assertions pro Test (Standard: {0})"
+
+#: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:57
 msgid "Test rules"
 msgstr "Testregeln"
 
@@ -9435,6 +9456,23 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid ""
+#~ "Your test is not valid. Remember the rules: Only one non-empty test, at "
+#~ "most %d assertions per test, no conditionals and no loops!"
+#~ msgstr ""
+#~ "Dein Test ist nicht gültig. Denk an die Regeln: Nur ein nicht leerer "
+#~ "Test, höchstens %d Assertions pro Test, keine Bedingungen und keine "
+#~ "Schleifen!"
+
+#~ msgid "Awesome! Your test killed %d mutants!"
+#~ msgstr "Super! Dein Test hat %d Mutanten erledigt!"
+
+#~ msgid "Test %d killed your mutant. Better luck with the next one!"
+#~ msgstr "Test %d hat deinen Mutanten erledigt. Viel Glück beim nächsten Mal!"
+
+#~ msgid "Awesome, your mutant survived %d tests!"
+#~ msgstr "Super, dein Mutant hat %d Tests überstanden!"
 
 #~ msgid ""
 #~ "As we can see above, there is a living mutant in the getCurrentFloor() "
@@ -9526,16 +9564,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 
 #~ msgid "No new control structures ({0}, {1}, {2}, ...)"
 #~ msgstr "Keine neuen Kontrollstrukturen ({0}, {1}, {2}, ...)"
-
-#~ msgid "Only {0} assertion per test"
-#~ msgstr "Nur {0} Assertion pro Test"
-
-#~ msgid "Only {0} assertions per test"
-#~ msgstr "Nur {0} Assertions pro Test"
-
-#~ msgid "Only the configured number of assertions per test (default: {0})"
-#~ msgstr ""
-#~ "Nur die konfigurierte Anzahl von Assertions pro Test (Standard: {0})"
 
 #~ msgid "No new methods or conditionals"
 #~ msgstr "Keine neuen Methoden oder Bedingungen"
