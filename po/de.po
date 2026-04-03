@@ -5143,7 +5143,7 @@ msgid ""
 "equivalences and might create inconsistencies in the game."
 msgstr ""
 "Dadurch bleibt die Punktzahl erhalten, aber ALLE seine Tests, Mutanten und "
-"beanspruchten Äquivalenzen werden gelöscht, was zu Inkonsistenzen im Spiel "
+"markierten Äquivalenzen werden gelöscht, was zu Inkonsistenzen im Spiel "
 "führen kann."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:275
@@ -5157,8 +5157,8 @@ msgid ""
 "This will also delete ALL of his tests, mutants and claimed equivalences and "
 "might create inconsistencies in the Game."
 msgstr ""
-"Dadurch werden auch ALLE seine Tests, Mutanten und beanspruchten "
-"Äquivalenzen gelöscht, was zu Inkonsistenzen im Spiel führen kann."
+"Dadurch werden auch ALLE seine Tests, Mutanten und markierten Äquivalenzen "
+"gelöscht, was zu Inkonsistenzen im Spiel führen kann."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:279
 #: src/main/webapp/jsp/admin_monitor_games.jsp:493
@@ -7661,11 +7661,11 @@ msgstr "Gegnerische Coverage"
 #: src/main/webapp/jsp/melee/player_view.jsp:62
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:141
 msgid "Mutant {0} automatically claimed equivalent"
-msgstr "Mutant {0} automatisch als äquivalent beansprucht"
+msgstr "Mutant {0} automatisch als äquivalent markiert"
 
 #: src/main/webapp/jsp/melee/player_view.jsp:63
 msgid "Mutant {0} claimed equivalent by {1}"
-msgstr "Mutant {0} wurde von {1} als äquivalent beansprucht."
+msgstr "Mutant {0} wurde von {1} als äquivalent markiert."
 
 #: src/main/webapp/jsp/melee/player_view.jsp:250
 msgid ""
@@ -8306,7 +8306,7 @@ msgstr "Erfolgreich als equivalent anerkannt:"
 
 #: src/main/webapp/jsp/user_profile.jsp:195
 msgid "Incorrectly claimed mutants:"
-msgstr "Falsch beanspruchte Mutanten:"
+msgstr "Falsch markierte Mutanten:"
 
 #: src/main/webapp/jsp/user_profile.jsp:201
 msgid "Statistics for Puzzle Games"

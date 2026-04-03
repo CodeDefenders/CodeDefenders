@@ -130,3 +130,7 @@ body {
 .links-no-color a:hover {
     text-decoration: underline;
 }
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+}
