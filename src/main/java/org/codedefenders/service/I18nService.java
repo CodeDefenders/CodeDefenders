@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
@@ -46,6 +45,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import com.google.gson.JsonParser;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Locale.ENGLISH;
 import static java.util.function.Predicate.not;
 import static org.codedefenders.database.AdminDAO.getSystemSetting;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.SUPPORTED_LANGUAGES;
@@ -58,7 +58,7 @@ import static org.xnap.commons.i18n.I18nFactory.READ_PROPERTIES;
 public class I18nService {
 
     private static final Logger logger = LoggerFactory.getLogger(I18nService.class);
-    private static final Locale FALLBACK_LOCALE = Locale.US;
+    private static final Locale FALLBACK_LOCALE = ENGLISH;
 
     private final Set<String> javascriptStrings = readI18nJsJson();
 
@@ -83,16 +83,17 @@ public class I18nService {
         final Set<String> set = new HashSet<>();
         String json;
 
-        var url = Thread.currentThread().getContextClassLoader().getResource("i18n.js.json");
+        final var filename = "i18n.js.json";
+        final var url = Thread.currentThread().getContextClassLoader().getResource(filename);
         if (url == null) {
-            logger.error("i18n.js.json not found");
+            logger.error("{} not found", filename);
             return set;
         }
 
         try {
             var path = Path.of(url.toURI());
             json = Files.readString(path, UTF_8);
-            logger.debug("i18n.js.json loaded: {}", json);
+            logger.debug("{} loaded: {}", filename, json);
         } catch (URISyntaxException | IOException ex) {
             logger.error(ex.getMessage());
             return set;
@@ -125,6 +126,8 @@ public class I18nService {
     // determine/setting user locale
 
     /**
+     * Gets the supported locales from the admin settings. The first locale is considered the default locale.
+     *
      * @return Array of locales set in the admin settings. Always contains at least one fallback locale.
      */
     public Locale[] getSupportedLocales() {
@@ -144,6 +147,13 @@ public class I18nService {
         return getSupportedLocales()[0];
     }
 
+    /**
+     * Checks if the given language is among the supported locales.
+     * If so, returns the corresponding locale, else returns the default locale.
+     *
+     * @param language The language to check, e.g. "en" or "de". Should not be null, but may be empty or invalid.
+     * @return The locale corresponding to the given language if it is supported, else the default locale.
+     */
     public Locale toSupportedLocale(String language) {
         var supportedLocales = getSupportedLocales();
         var locale = new Locale(language);
@@ -157,10 +167,16 @@ public class I18nService {
 
     // supply i18n instance
 
-    public static I18n getI18n(Locale pLocale) {
+    /**
+     * Gets the i18n instance for the given locale.
+     *
+     * @param locale The locale for which to get the i18n instance.
+     * @return The i18n instance for the given locale.
+     */
+    public static I18n getI18n(Locale locale) {
         return I18nFactory.getI18n(
                 I18nService.class,
-                pLocale == null ? Locale.getDefault() : pLocale,
+                locale == null ? FALLBACK_LOCALE : locale,
                 FALLBACK | READ_PROPERTIES
         );
     }
@@ -228,7 +244,4 @@ public class I18nService {
         return i18n.tr(text, args);
     }
 
-    public static String marktrf(String text, Object... args) {
-        return MessageFormat.format(text, args);
-    }
 }
