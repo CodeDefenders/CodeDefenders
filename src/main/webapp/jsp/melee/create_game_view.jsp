@@ -158,28 +158,28 @@
                                 </a>
                             </label>
                             <div class="col-8" id="mutant-validator-group">
-                                <c:forEach items="${DefaultRuleSets.getValues()}" var="level" varStatus="s">
+                                <c:forEach items="<%=DefaultRuleSets.getValues()%>" var="level" varStatus="s">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               id="mutant-validator-radio-${level.getName()}"
+                                               id="mutant-validator-radio-${level.name}"
                                                name="mutantValidatorLevel"
-                                               value="${level.getName()}" required
+                                               value="${level.name}" required
                                                ${level == DefaultRuleSets.MODERATE ? "checked" : ""}>
                                         <label class="form-check-label"
-                                               for="mutant-validator-radio-${level.getName()}">
-                                            ${level.getName()}
+                                               for="mutant-validator-radio-${level.name}">
+                                            ${level.name}
                                         </label>
                                         <c:if test="${s.last}">
                                             <div class="invalid-feedback">${i18n.tr('Please select a mutant validator level.')}</div>
                                         </c:if>
                                     </div>
                                     <script>
-                                        document.getElementById("mutant-validator-radio-${level.getName()}")
+                                        document.getElementById("mutant-validator-radio-${level.name}")
                                                 .addEventListener('click', e => {
                                                     document.querySelectorAll("[id^='rule-div-']").forEach(d => {
-                                                        d.hidden = d.id !== 'rule-div-${level.getName()}';
-                                                    })
-                                                })
+                                                        d.hidden = d.id !== 'rule-div-${level.name}';
+                                                    });
+                                                });
                                     </script>
                                 </c:forEach>
                             </div>
