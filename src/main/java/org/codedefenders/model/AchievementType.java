@@ -100,6 +100,14 @@ public enum AchievementType {
         return levels.keySet().stream().mapToInt(i -> i).max().orElse(0);
     }
 
+    public int getLevelForMetric(int metric) {
+        return levels.entrySet().stream()
+                .filter(entry -> entry.getValue().metric() <= metric)
+                .map(Map.Entry::getKey)
+                .max(Integer::compareTo)
+                .orElse(0);
+    }
+
     public static AchievementType fromInt(int id) {
         return BY_ID.get(id);
     }

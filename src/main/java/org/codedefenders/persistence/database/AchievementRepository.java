@@ -28,7 +28,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import org.codedefenders.model.Achievement;
-import org.codedefenders.model.AchievementLevel;
 import org.codedefenders.model.AchievementType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
@@ -167,7 +166,7 @@ public class AchievementRepository {
     /**
      * Updates the achievement level for a user if the metric threshold for the next level is met.
      * Reads the current level and metric from the DB, checks the threshold from {@link AchievementType},
-     * and atomically updates the level with optimistic locking.
+     * and atomically updates the level.
      */
     private int updateAchievementLevelForUser(int userId, AchievementType type) {
         @Language("SQL")
@@ -187,14 +186,13 @@ public class AchievementRepository {
                 userId, type.getId()
         );
 
-        Optional<UserProgress> progressOpt = results.stream().findFirst();
-        if (progressOpt.isEmpty()) {
+        if (results.isEmpty()) {
             return 0;
         }
 
-        UserProgress progress = progressOpt.get();
-        AchievementLevel nextLevel = type.getLevel(progress.level() + 1);
-        if (nextLevel == null || progress.metric() < nextLevel.metric()) {
+        UserProgress current = results.stream().findFirst().get();
+        int newLevel = current.type.getLevelForMetric(current.metric());
+        if (newLevel <= current.level()) {
             return 0;
         }
 
@@ -206,6 +204,6 @@ public class AchievementRepository {
                 AND Achievement_Level = ?;
         """;
 
-        return queryRunner.update(updateQuery, progress.level() + 1, userId, type.getId(), progress.level());
+        return queryRunner.update(updateQuery, newLevel, userId, type.getId(), current.level());
     }
 }
