@@ -208,14 +208,15 @@
     form.addEventListener("submit", (event) => {
         const chosenName = document.getElementById("${htmlId}-new-custom-name").value;
 
+        if (chosenName !== "${strategy.name}") {
         <c:forEach items="${allStrategies}" var="n">
-        console.log("Chosen: " + chosenName + "; ${n.name}")
-        if (chosenName === "${n.name}") {
-            alert("The strategy already exists.")
-            event.preventDefault();
-            return;
+            if (chosenName === "${n.name}") {
+                alert("The strategy already exists.")
+                event.preventDefault();
+                return;
+            }
+            </c:forEach>
         }
-        </c:forEach>
 
         const selects = contentPane.querySelectorAll("select");
         const names = [];
