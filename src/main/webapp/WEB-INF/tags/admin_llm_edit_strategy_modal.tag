@@ -160,6 +160,13 @@
             })
             textarea.textContent = prompt
             textarea.name = prompt_type
+        } else {
+            const options = clone.querySelectorAll("option");
+            if (options.length > 0 ) {
+                options[0].selected = true;
+                textarea.textContent = namePromptMap.get(options[0].text);
+                textarea.name = options[0].text;
+            }
         }
 
         const removeBtn = clone.querySelector("button");
