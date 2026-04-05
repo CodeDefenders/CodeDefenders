@@ -33,34 +33,73 @@ import org.codedefenders.service.llm.TestStrategyFullSuite;
 import org.codedefenders.service.llm.TestStrategyFullSuitePlusAnnotated;
 import org.codedefenders.service.llm.TestStrategyFullSuitePlusDefault;
 
+import static org.codedefenders.model.llm.LlmPromptType.*;
+
 public enum LlmDefaultStrategy {
-    TEST_DEFAULT(TestStrategyDefault.class),
-    TEST_ANNOTATED_SINGLE_TEST(TestStrategyAnnotatedSingleTest.class),
-    TEST_FULL_SUITE(TestStrategyFullSuite.class),
-    TEST_FULL_SUITE_PLUS_DEFAULT(TestStrategyFullSuitePlusDefault.class),
-    TEST_FULL_SUITE_PLUS_ANNOTATED(TestStrategyFullSuitePlusAnnotated.class),
-    MUTANT_ANNOTATED_FULL_CLASS(MutantStrategyAnnotatedFullClass.class),
-    MUTANT_ANNOTATED_SINGLE_METHOD(MutantStrategyAnnotatedSingleMethod.class, 0.5),
-    MUTANT_DEFAULT(MutantStrategyDefault.class),
-    MUTANT_RANDOM_SINGLE_METHOD(MutantStrategyRandomSingleMethod.class),
-    MUTANT_DEFAULT_WITHOUT_EXISTING(MutantStrategyDefaultWithoutExisting.class),
-    EQUIVALENCE_DEFAULT(LlmEquivalenceService.class);
+    TEST_DEFAULT(TestStrategyDefault.class,
+            TEST_DEFAULT_DEFAULT_SYSTEM,
+            TEST_DEFAULT_DEPENDENCY_SYSTEM,
+            TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM),
+    TEST_ANNOTATED_SINGLE_TEST(TestStrategyAnnotatedSingleTest.class,
+            TEST_ANNOTATED_DEFAULT_SYSTEM),
+    TEST_FULL_SUITE(TestStrategyFullSuite.class,
+            TEST_FULL_SUITE_SYSTEM,
+            TEST_FULL_SUITE_CORRECTION_SYSTEM,
+            TEST_TEMPLATE_FULL_SUITE_USER,
+            TEST_PARAMETER_TEMPLATE_DID_NOT_PASS,
+            TEST_PARAMETER_TEMPLATE_RULE_VIOLATION,
+            TEST_PARAMETER_TEMPLATE_COMPILATION_FAILED),
+    TEST_FULL_SUITE_PLUS_DEFAULT(TestStrategyFullSuitePlusDefault.class,
+            TEST_DEFAULT_DEFAULT_SYSTEM,
+            TEST_DEFAULT_DEPENDENCY_SYSTEM,
+            TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM,
+            TEST_FULL_SUITE_SYSTEM,
+            TEST_FULL_SUITE_CORRECTION_SYSTEM,
+            TEST_TEMPLATE_FULL_SUITE_USER,
+            TEST_PARAMETER_TEMPLATE_DID_NOT_PASS,
+            TEST_PARAMETER_TEMPLATE_RULE_VIOLATION,
+            TEST_PARAMETER_TEMPLATE_COMPILATION_FAILED),
+    TEST_FULL_SUITE_PLUS_ANNOTATED(TestStrategyFullSuitePlusAnnotated.class,
+            TEST_ANNOTATED_DEFAULT_SYSTEM,
+            TEST_FULL_SUITE_SYSTEM,
+            TEST_FULL_SUITE_CORRECTION_SYSTEM,
+            TEST_TEMPLATE_FULL_SUITE_USER,
+            TEST_PARAMETER_TEMPLATE_DID_NOT_PASS,
+            TEST_PARAMETER_TEMPLATE_RULE_VIOLATION,
+            TEST_PARAMETER_TEMPLATE_COMPILATION_FAILED),
+    MUTANT_ANNOTATED_FULL_CLASS(MutantStrategyAnnotatedFullClass.class,
+            MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM),
+    MUTANT_ANNOTATED_SINGLE_METHOD(MutantStrategyAnnotatedSingleMethod.class, 0.5,
+            MUTANT_ANNOTATED_SINGLE_METHOD_INITIAL_SYSTEM,
+            MUTANT_ANNOTATED_SINGLE_METHOD_NO_SUCH_METHOD_SYSTEM,
+            MUTANT_ANNOTATED_SINGLE_METHOD_FOLLOWUP_SYSTEM),
+    MUTANT_DEFAULT(MutantStrategyDefault.class,
+            MUTANT_DEFAULT_DEFAULT_SYSTEM,
+            MUTANT_TEMPLATE_DEFAULT_DIFFS_USER),
+    MUTANT_RANDOM_SINGLE_METHOD(MutantStrategyRandomSingleMethod.class,
+            MUTANT_RANDOM_DEFAULT_SYSTEM),
+    MUTANT_DEFAULT_WITHOUT_EXISTING(MutantStrategyDefaultWithoutExisting.class,
+            MUTANT_DEFAULT_WITHOUT_EXISTING_DEFAULT_SYSTEM),
+    EQUIVALENCE_DEFAULT(LlmEquivalenceService.class,
+            EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM);
 
 
     final Class<? extends LlmSubActionService> service;
     final double timeModifier;
+    final List<LlmPromptType> promptTypes;
 
-    LlmDefaultStrategy(Class<? extends LlmSubActionService> service, double timeModifier) {
+    LlmDefaultStrategy(Class<? extends LlmSubActionService> service, double timeModifier,
+                       LlmPromptType... promptTypes) {
         this.service = service;
         this.timeModifier = timeModifier;
+        this.promptTypes = List.of(promptTypes);
     }
 
-    LlmDefaultStrategy(Class<? extends LlmSubActionService> service) {
-        this(service, 1);
+    LlmDefaultStrategy(Class<? extends LlmSubActionService> service, LlmPromptType... promptTypes) {
+        this(service, 1, promptTypes);
     }
 
     public List<LlmPromptType> getRelevantPrompts() {
-        //TODO Adapt to only show relevant prompts - automatically would be nice, otherwise constructor-supplied
-        return List.of(LlmPromptType.values());
+        return promptTypes;
     }
 }

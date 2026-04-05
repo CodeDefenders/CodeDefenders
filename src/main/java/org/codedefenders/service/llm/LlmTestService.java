@@ -137,6 +137,7 @@ abstract class LlmTestService extends LlmSubActionService {
         }
     }
 
+    //TODO customize this
     protected void standardSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
         StringBuilder correction = new StringBuilder("This test could not be submitted: \n" + testSrc);
         switch (result.failureReason().orElseThrow()) {

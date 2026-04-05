@@ -84,10 +84,15 @@ public class LlmStrategy {
     }
 
     public String getPrompt(LlmPromptType promptType) {
-        if (customPrompts.containsKey(promptType)) {
-            return customPrompts.get(promptType);
+        if (base.promptTypes.contains(promptType)) {
+            if (customPrompts.containsKey(promptType)) {
+                return customPrompts.get(promptType);
+            } else {
+                return promptType.getDefaultPrompt();
+            }
         } else {
-            return promptType.getDefaultPrompt();
+            throw new IllegalArgumentException("The prompt type " + promptType + " is not specified for a strategy "
+                    + "based on " + base.name());
         }
     }
 

@@ -18,7 +18,6 @@
  */
 package org.codedefenders.service.llm;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -34,10 +33,8 @@ import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
-import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
