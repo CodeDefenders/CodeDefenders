@@ -1351,19 +1351,28 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
         var defenderModelParam = ServletUtils.getStringParameter(request, "defenderModel");
+        var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
         Optional<LlmStrategy> defenderStrategy = ServletUtils.getStringParameter(
                 request, "defenderStrategy").flatMap(llmRepo::getStrategyByName);
-        if (defenderModelParam.isPresent() && defenderStrategy.isPresent()) {
-            llmService.setPlayerModel(game, Role.DEFENDER,
-                    getLLModelFromSingleValue(defenderModelParam.get()), defenderStrategy.get());
-
-        }
-        var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
         Optional<LlmStrategy> attackerStrategy = ServletUtils.getStringParameter(
                 request, "attackerStrategy").flatMap(llmRepo::getStrategyByName);
-        if (attackerModelParam.isPresent() && attackerStrategy.isPresent()) {
-            llmService.setPlayerModel(game, Role.ATTACKER,
-                    getLLModelFromSingleValue(attackerModelParam.get()), attackerStrategy.get());
+
+        LlModel defenderModel = defenderModelParam.isPresent()
+                ? getLLModelFromSingleValue(defenderModelParam.get())
+                : null;
+        LlModel attackerModel = attackerModelParam.isPresent()
+                ? getLLModelFromSingleValue(attackerModelParam.get())
+                : null;
+
+        if (game instanceof MultiplayerGame) {
+            llmService.setPlayerModel(game, Role.DEFENDER, defenderModel, null,
+                    defenderStrategy.orElse(null), null);
+            llmService.setPlayerModel(game, Role.ATTACKER, null, attackerModel,
+                    null, attackerStrategy.orElse(null));
+        } else {
+            llmService.setPlayerModel(game, Role.PLAYER, defenderModel, attackerModel,
+                    defenderStrategy.orElse(null), attackerStrategy.orElse(null));
         }
+
     }
 }

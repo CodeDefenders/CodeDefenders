@@ -36,6 +36,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
@@ -206,47 +207,45 @@ public class LlmManagerService {
         }
     }
 
-    public void setPlayerModel(AbstractGame game, Role role, LlModel model, LlmStrategy strategy) {
-        GameLlmState m = getCorrectMap(role);
+    public void setPlayerModel(AbstractGame game, Role role,
+                               LlModel defendModel,
+                               LlModel attackModel,
+                               LlmStrategy defendStrategy,
+                               LlmStrategy attackStrategy) {
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
-        LlmStrategy testStrategy = role == Role.DEFENDER ? strategy : null;
-        LlmStrategy mutantStrategy = role == Role.ATTACKER ? strategy : null;
         LlmStrategy equivalenceStrategy = LlmStrategy.of(EQUIVALENCE_DEFAULT); //TODO Adjustable
-        LlmStrategy conStrategy;
-        if (strategy != null) {
-            conStrategy = strategy;
-        } else { //TODO Define default strategies elsewhere
-            if (role == Role.DEFENDER) {
-                conStrategy = LlmStrategy.of(TEST_FULL_SUITE_PLUS_DEFAULT);
-            } else {
-                conStrategy = LlmStrategy.of(MUTANT_ANNOTATED_SINGLE_METHOD);
-            }
+
+        //TODO No default strategies, fail with an error if strategies are null when they shouldn't be
+
+        if ((role == Role.DEFENDER || role == Role.PLAYER)
+                && (defendModel != null || activeLlmDefenders.getState(game.getId()) != ThreadState.INACTIVE)) { //Never put a new 'null' value, it wouldn't be deleted
+            activeLlmDefenders.put(game.getId(), defendModel, defendStrategy);
+        }
+        if ((role == Role.ATTACKER || role == Role.PLAYER)
+                && (attackModel != null || activeLlmAttackers.getState(game.getId()) != ThreadState.INACTIVE)) { //Never put a new 'null' value, it wouldn't be deleted
+            activeLlmAttackers.put(game.getId(), attackModel, attackStrategy);
         }
 
-        if (model != null || alreadyPresent) { //Never put a new 'null' value, it wouldn't be deleted
-            m.put(game.getId(), model, strategy);
-        }
+        if ((attackModel != null || defendModel != null) && !alreadyPresent) {
 
-        if (model != null && !alreadyPresent) {
-            if (game instanceof MeleeGame) {
-                role = Role.PLAYER;
-            }
+
+            //Role userRole = game instanceof MeleeGame ? Role.PLAYER : role;
 
             int userId = getCorrectUserId(role);
             SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
             game.addPlayer(userId, role);
-            final Role finalRole = role;
 
-            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, finalRole,
-                    new LlmConversationBatch(game, user, conStrategy),
-                    //testStrategy, mutantStrategy, equivalenceStrategy,
+            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, role,
+                    new LlmConversationBatch(game, user, defendStrategy),
+                    new LlmConversationBatch(game, user, attackStrategy),
                     new Random())));
         }
     }
 
     public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
-        setPlayerModel(game, role, model, null);
+        throw new NotImplementedException("No support for staged games"); //TODO Implement
+        //setPlayerModel(game, role, model, null);
     }
 
     public void finishPlayer(int gameId, Role role) {
@@ -285,10 +284,12 @@ public class LlmManagerService {
      * It only runs for a single action, i.e. one mutant or one test, and then schedules another execution of itself
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
+     *
+     * @param role May be {@link Role#ATTACKER}, {@link Role#DEFENDER} or {@link Role#PLAYER}
      */
-    private void runLlmAction(AbstractGame game, final Role role, final LlmConversationBatch conversation,
-                              //final LlmStrategy testStrategy, final LlmStrategy mutantStrategy,
-                              //final LlmStrategy equivalenceStrategy,
+    private void runLlmAction(AbstractGame game, final Role role,
+                              final LlmConversationBatch defendConversation,
+                              final LlmConversationBatch attackConversation,
                               final Random random) {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         final int gameId = game.getId();
@@ -323,7 +324,7 @@ public class LlmManagerService {
 
         if (isLlmPlayerActive(game, role)) {
             try {
-                singleLlmAction(game, user, role, conversation,
+                singleLlmAction(game, user, role, defendConversation, attackConversation,
                         testStrategy, mutantStrategy, equivalenceStrategy, random);
                 long timeToWait;
                 if (equivalentOnlyGames.contains(game.getId())) {
@@ -334,8 +335,8 @@ public class LlmManagerService {
 
                 organizerExecutor.schedule(() -> llmExecutor.execute(
                                 () -> runLlmAction(
-                                        gameRepository.getGame(game.getId()), role, conversation, random)),
-                        //testStrategy, mutantStrategy, equivalenceStrategy, random)),
+                                        gameRepository.getGame(game.getId()), role, defendConversation,
+                                        attackConversation, random)),
                         timeToWait, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
@@ -358,7 +359,8 @@ public class LlmManagerService {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
                             () -> runLlmAction(
-                                    gameRepository.getGame(game.getId()), role, conversation, random)),
+                                    gameRepository.getGame(game.getId()), role, defendConversation,
+                                    attackConversation, random)),
                     //testStrategy, mutantStrategy, equivalenceStrategy, random)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
@@ -367,7 +369,8 @@ public class LlmManagerService {
     }
 
     private void singleLlmAction(AbstractGame game, final SimpleUser user, final Role role,
-                                 final LlmConversationBatch conversation,
+                                 final LlmConversationBatch defendConversation,
+                                 final LlmConversationBatch attackConversation,
                                  LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
                                  final Random random) throws NoSuchModelException {
         if (testStrategy == null) {
@@ -398,9 +401,9 @@ public class LlmManagerService {
             Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
             Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
 
-            equivalenceService.init(game, user, attackModel, conversation, random);
-            mutantService.init(game, user, attackModel, conversation, random);
-            testService.init(game, user, defendModel, conversation, random);
+            equivalenceService.init(game, user, attackModel, attackConversation, random);
+            mutantService.init(game, user, attackModel, attackConversation, random);
+            testService.init(game, user, defendModel, defendConversation, random);
 
             if (role == Role.DEFENDER) {
                 testService.claimEquivalent();

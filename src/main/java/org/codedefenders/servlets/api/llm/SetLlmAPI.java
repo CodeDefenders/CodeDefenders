@@ -91,8 +91,15 @@ public class SetLlmAPI extends APIServlet {
             return;
         }
         LlModel model = new LlModel(modelName.get(), modelType.get());
+        //TODO test if this really works
         if (action.get() == Action.START) {
-            llmService.setPlayerModel(game, role.get(), model, strategy);
+            if (role.get() == Role.DEFENDER) {
+                llmService.setPlayerModel(game, role.get(), model, null, strategy, null);
+            } else if (role.get() == Role.ATTACKER) {
+                llmService.setPlayerModel(game, role.get(), null, model, null, strategy);
+            } else {
+                writeResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Melee games are not supported.");
+            }
         } else {
             llmService.finishPlayer(gameId.get(), role.get());
         }
