@@ -29,6 +29,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
@@ -63,12 +64,13 @@ public class LlmConversationRepository {
             @Language("SQL")
             String sql = """
                     INSERT INTO llm_conversations(
-                        Strategy_Name, Type, Game_ID, User_ID, Is_Active, Is_Success, Test_ID, Mutant_ID)
-                        value (?, ?, ?, ?, ?, ?, ?, ?);
+                        Strategy_Name, Type, Role, Game_ID, User_ID, Is_Active, Is_Success, Test_ID, Mutant_ID)
+                        value (?, ?, ?, ?, ?, ?, ?, ?, ?);
                     """;
             conversation.setId(queryRunner.insert(sql, ResultSetUtils.generatedKeyFromRS(),
                     conversation.getStrategyName(),
                     conversation.getType(),
+                    conversation.getRole().name(),
                     conversation.getGame().getId(),
                     conversation.getUser().getId(),
                     conversation.isActive(),
@@ -133,6 +135,7 @@ public class LlmConversationRepository {
                 if (currentConversation == null || currentConversation.getId() != id) {
                     String strategy = rs.getString("Strategy_Name");
                     String type = rs.getString("Type");
+                    Role role = Role.valueOf(rs.getString("Role"));
                     int userId = rs.getInt("User_ID");
                     SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
                     boolean active = rs.getBoolean("Is_active");
@@ -140,7 +143,7 @@ public class LlmConversationRepository {
                     int testId = rs.getInt("TEST_ID");
                     int mutantId = rs.getInt("MUTANT_ID");
                     currentConversation = new LlmConversation(
-                            type, game, user, strategy, active, success, testId, mutantId);
+                            type, role, game, user, strategy, active, success, testId, mutantId);
                     currentConversation.setId(id);
                     result.add(currentConversation);
                 }

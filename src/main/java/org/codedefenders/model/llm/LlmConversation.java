@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.util.CDIUtil;
 
@@ -45,14 +46,16 @@ public class LlmConversation {
     private boolean active;
     private boolean success;
     private final String type;
+    private final Role role;
     private int id = -1;
     private int testId;
     private int mutantId;
 
 
-    public LlmConversation(String type, AbstractGame game, SimpleUser user, String strategyName,
+    public LlmConversation(String type, Role role, AbstractGame game, SimpleUser user, String strategyName,
                            boolean active, boolean success, int testId, int mutantId) {
         this.type = type;
+        this.role = role;
         this.game = game;
         this.user = user;
         this.strategyName = strategyName;
@@ -181,5 +184,9 @@ public class LlmConversation {
 
     public void setMutantId(int mutantId) {
         this.mutantId = mutantId;
+    }
+
+    public Role getRole() {
+        return role;
     }
 }

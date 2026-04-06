@@ -73,7 +73,8 @@ public class LlmConversationBatch {
      */
     public LlmConversation getConversation(String type) {
         if (!messageLists.containsKey(type)) {
-            LlmConversation con = new LlmConversation(type, game, user, strategy.getName(), true, false, 0, 0);
+            LlmConversation con = new LlmConversation(type, strategy.getBase().role,
+                    game, user, strategy.getName(), true, false, 0, 0);
             messageLists.put(type, con);
         }
         return messageLists.get(type);

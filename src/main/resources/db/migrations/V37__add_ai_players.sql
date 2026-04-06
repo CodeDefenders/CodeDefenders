@@ -28,7 +28,7 @@ create table if not exists llm_custom_strategies
 
 create table if not exists `llm_custom_prompts`
 (
-    Strategy_ID int(11) not null,
+    Strategy_ID int(11)      not null,
     Prompt_type varchar(100) not null,
     Prompt      text,
 
@@ -41,7 +41,8 @@ create table if not exists `llm_conversations`
 (
     Conversation_ID int(11)      not null primary key auto_increment,
     Strategy_Name   varchar(100) not null,
-    Type     varchar(100) not null,
+    Type            varchar(100) not null,
+    Role            enum ('ATTACKER', 'DEFENDER') not null,
     Game_ID         int(11)      not null,
     User_ID         int(11)      not null,
     Mutant_ID       int(11),

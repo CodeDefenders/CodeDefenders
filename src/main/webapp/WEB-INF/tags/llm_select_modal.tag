@@ -178,10 +178,12 @@
                 conCard.classList.add("card")
                 const header = document.createElement("div");
                 header.classList.add("card-header");
-                if (c.type.includes("DEFEND")) {
+                if (c.role === "DEFENDER") {
                     header.classList.add("bg-defender")
-                } else {
+                } else if (c.role === "ATTACKER") {
                     header.classList.add("bg-attacker");
+                } else {
+                    console.log("Unknown conversation role: " + c.role)
                 }
                 conCard.appendChild(header);
                 const toggleButton = document.createElement("button");
