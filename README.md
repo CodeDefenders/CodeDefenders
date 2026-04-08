@@ -131,6 +131,20 @@ Code Defenders is built and deployed with Maven using the following commands.
 mvn clean deploy -DskipTests
 ```
 
+#### Logs
+
+By default, logs messages are:
+- saved to the configured data directory under `data.dir/logs`,
+- printed to the console (and will show up in Tomcat/container logs).
+
+The log level can be configured at runtime in the admin system settings.
+
+##### Custom Logging config
+
+A custom log4j2 config file can be set via the Java option `-Dlog4j2.configurationFile=/path/to/log4j2.xml`.
+In the config file, Code Defenders config values can be looked up via `${cfg:camelCaseName}`, e.g., `${cfg:dataDir}`.
+This has to be enabled via `<Configuration packages="org.codedefenders.logging.ConfigLookup">`.
+
 ### Supporters
 
 This project is supported [IMPRESS](https://impress-project.eu/).
