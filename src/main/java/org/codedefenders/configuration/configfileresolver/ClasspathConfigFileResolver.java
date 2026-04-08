@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author degenhart
  */
 @Singleton
-class ClasspathConfigFileResolver extends ConfigFileResolver {
+public class ClasspathConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ClasspathConfigFileResolver.class);
 
     @Override
