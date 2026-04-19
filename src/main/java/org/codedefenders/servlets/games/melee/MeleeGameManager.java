@@ -780,6 +780,9 @@ public class MeleeGameManager extends HttpServlet {
         }
         // Clean the mutated code only if mutant is accepted
         previousSubmission.clear();
+
+        gameManagingUtils.notifyPlayersOnMutantAdded(newMutant, game);
+
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }

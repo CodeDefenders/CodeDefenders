@@ -17,8 +17,20 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Popover} from '../thirdparty/bootstrap';
-import {objects} from '../main';
+import {objects, PushSocket} from '../main';
 
+
+/**
+ * @typedef {Object} GHMutantDTO
+ * @description Data transfer object for mutants used in Game Highlighting.
+ * @property {number} id The mutant's id.
+ * @property {score} score The mutant's score.
+ * @property {string} lines The lines changed by the mutant.
+ * @property {List<number>} mutatedLines The line numbers changed by the mutant.
+ * @property {string} creatorName The name of the mutant's creator.
+ * @property {string} status The mutant's status (ALIVE, KILLED, FLAGGED, EQUIVALENT).
+ * @property {boolean} canClaim Whether the mutant can be claimed as equivalent by the current player.
+ */
 
 class GameHighlighting {
 
@@ -112,6 +124,8 @@ class GameHighlighting {
             objects.await('classViewer'),
             objects.await('mutantEditor')
         ])).editor;
+
+        await this._initSocket();
 
         return this;
     }
@@ -416,6 +430,47 @@ class GameHighlighting {
     clearMutants () {
         this._editor.clearGutter('CodeMirror-mutantIcons');
     }
+
+
+    /**
+     * Register for WebSocket events.
+     * @private
+     */
+    async _initSocket () {
+        this._pushSocket = await objects.await('pushSocket');
+        this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
+        this._pushSocket.register('highlighting.MutantAddedEvent', this._onMutantAdded.bind(this));
+    }
+
+    /**
+     * @typedef {Object} EnemyMutantAddedEvent
+     * @property {GHMutantDTO} mutant The added mutant.
+     * @property {number} gameId The id of the game the mutant was added in.
+     */
+
+    /**
+     * Event handler for when a new mutant is added by the enemy team. This adds the mutant to the highlighting and updates the popover if it is active.
+     * @param {EnemyMutantAddedEvent} event The WebSocket event.
+     * @private
+     */
+    _onMutantAdded (event) {
+        const mutantId = event.mutant.id;
+        console.log("added mutant: ", event.mutant);
+        this.clearMutants();
+
+        this._mutants.set(mutantId, event.mutant);
+        for (const line of event.mutant.mutatedLines) {
+            if (!this._mutantIdsPerLine.has(line)) {
+                this._mutantIdsPerLine.set(line, []);
+            }
+            this._mutantIdsPerLine.get(line).push(mutantId);
+        }
+
+        this.highlightMutants();
+
+        // TODO: instead of clear & rerender: only change the affected line(s) and play an animation on the new or updated mutant icon(s)
+    }
+
 }
 
 

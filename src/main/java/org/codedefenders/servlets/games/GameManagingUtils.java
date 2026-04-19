@@ -25,7 +25,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,6 +58,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.highlighting.GHMutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -69,6 +72,7 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
+import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -572,7 +576,38 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
+        notifyPlayersOnMutantAdded(newMutant, game);
+
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
+    }
+
+    public void notifyPlayersOnMutantAdded(Mutant mutant, MultiplayerGame game) {
+        var allPlayers = new LinkedList<Player>();
+        allPlayers.addAll(game.getAttackerPlayers());
+        allPlayers.addAll(game.getDefenderPlayers());
+        allPlayers.addAll(game.getObserverPlayers());
+
+        notifyPlayersOnMutantAdded(mutant, allPlayers, game.getId());
+    }
+    public void notifyPlayersOnMutantAdded(Mutant mutant, MeleeGame game) {
+        var allPlayers = new LinkedList<Player>();
+        allPlayers.addAll(game.getPlayers());
+        allPlayers.addAll(game.getObserverPlayers());
+
+        notifyPlayersOnMutantAdded(mutant, allPlayers, game.getId());
+    }
+    public void notifyPlayersOnMutantAdded(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
+        var creatorId = mutant.getCreatorId();
+        gamePlayers.removeIf(p -> p.getUser().getId() == creatorId);
+        gamePlayers.stream().map(player -> {
+            logger.info("ghe/mae sent to user {}", player.getUser().getUsername());
+            var uid = player.getUser().getId();
+            var mte = new MutantAddedEvent();
+            mte.setUserId(uid);
+            mte.setGameId(gameId);
+            mte.setMutant(new GHMutantDTO(mutant, uid));
+            return mte;
+        }).forEach(notificationService::post);
     }
 
     /**
