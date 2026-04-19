@@ -32,6 +32,12 @@ import {objects, PushSocket} from '../main';
  * @property {boolean} canClaim Whether the mutant can be claimed as equivalent by the current player.
  */
 
+/**
+ * @typedef {Object} GHTestDTO
+ * @description Data transfer object for tests used in Game Highlighting.
+ * @property {number} id The test's id.
+ */
+
 class GameHighlighting {
 
     /**
@@ -440,17 +446,26 @@ class GameHighlighting {
         this._pushSocket = await objects.await('pushSocket');
         this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
         this._pushSocket.register('highlighting.MutantAddedEvent', this._onMutantAdded.bind(this));
+        this._pushSocket.register('highlighting.TestAddedEvent', this._onTestAdded.bind(this));
     }
 
     /**
-     * @typedef {Object} EnemyMutantAddedEvent
+     * @typedef {Object} MutantAddedEvent
      * @property {GHMutantDTO} mutant The added mutant.
      * @property {number} gameId The id of the game the mutant was added in.
      */
 
+    /**]
+     * @typedef {Object} TestAddedEvent
+     * @property {GHTestDTO} test The added test.
+     * @property {number[]} coveredLines The lines covered by the added test.
+     */
+
     /**
-     * Event handler for when a new mutant is added by the enemy team. This adds the mutant to the highlighting and updates the popover if it is active.
-     * @param {EnemyMutantAddedEvent} event The WebSocket event.
+     * Event handler for when a new mutant is added.
+     * This adds the mutant to the highlighting and updates the popover if it is active.
+     *
+     * @param {MutantAddedEvent} event The WebSocket event.
      * @private
      */
     _onMutantAdded (event) {
@@ -469,6 +484,22 @@ class GameHighlighting {
         this.highlightMutants();
 
         // TODO: instead of clear & rerender: only change the affected line(s) and play an animation on the new or updated mutant icon(s)
+    }
+
+    _onTestAdded (event) {
+        const testId = event.test.id;
+        console.log("added test: ", event.test);
+        this.clearCoverage();
+
+        this._tests.set(testId, event.test);
+        for (const line of event.coveredLines) {
+            if (!this._testIdsPerLine.has(line)) {
+                this._testIdsPerLine.set(line, []);
+            }
+            this._testIdsPerLine.get(line).push(testId);
+        }
+
+        this.highlightCoverage();
     }
 
 }

@@ -59,6 +59,7 @@ import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.highlighting.GHMutantDTO;
+import org.codedefenders.game.highlighting.GHTestDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -73,6 +74,7 @@ import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
+import org.codedefenders.notification.events.server.highlighting.TestAddedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -600,7 +602,6 @@ public class GameManagingUtils implements IGameManagingUtils {
         var creatorId = mutant.getCreatorId();
         gamePlayers.removeIf(p -> p.getUser().getId() == creatorId);
         gamePlayers.stream().map(player -> {
-            logger.info("ghe/mae sent to user {}", player.getUser().getUsername());
             var uid = player.getUser().getId();
             var mte = new MutantAddedEvent();
             mte.setUserId(uid);
@@ -810,8 +811,19 @@ public class GameManagingUtils implements IGameManagingUtils {
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
+        notifyPlayersOnTestAdded(newTest, game.getId());
+
         return CreateBattlegroundTestResult.success(newTest, mutationTesterMessage);
     }
+
+    public void notifyPlayersOnTestAdded(Test test, int gameId) {
+        var tae = new TestAddedEvent();
+        tae.setTest(new GHTestDTO(test));
+        tae.setGameId(gameId);
+        tae.setCoveredLines(test.getLineCoverage().getLinesCovered().toArray(new Integer[]{}));
+        notificationService.post(tae);
+    }
+
 
     public enum CanUserResolveEquivalenceResult {
         USER_NOT_PART_OF_THE_GAME,
