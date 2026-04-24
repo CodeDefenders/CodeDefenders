@@ -52,7 +52,7 @@ TODO Further generalize for use in llm_select_modal.tag
         <label class="form-label" for="${htmlId}-defenderStrategySelect">Choose defend
             strategy</label>
         <select class="form-select" id="${htmlId}-defenderStrategySelect"
-                name="defenderStrat">
+                name="defenderStrategy">
             <c:forEach items="${defendStrategies}" var="strat">
                 <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
                         ${strat.toString()}
@@ -75,7 +75,7 @@ TODO Further generalize for use in llm_select_modal.tag
         <label class="form-label" for="${htmlId}-attackerStrategySelect">Choose attack
             strategy</label>
         <select class="form-select" id="${htmlId}-attackerStrategySelect"
-                name="defenderStrat">
+                name="attackerStrategy">
             <c:forEach items="${attackStrategies}" var="strat">
                 <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
                         ${strat.toString()}
