@@ -222,10 +222,12 @@
                                 <% for (MutantValidationRuleSet level : DefaultRuleSets.getValues()) { %>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"
-                                           id="mutant-validator-radio-<%=level.getName().toLowerCase()%>" name="mutantValidatorLevel"
+                                           id="mutant-validator-radio-<%=level.getName().toLowerCase()%>"
+                                           name="mutantValidatorLevel"
                                            value="<%=level.getName()%>"
                                         <%=level == DefaultRuleSets.MODERATE ? "checked" : ""%>>
-                                    <label class="form-check-label" for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
+                                    <label class="form-check-label"
+                                           for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
                                         <%=level.getName()%>
                                     </label>
                                 </div>
@@ -238,7 +240,8 @@
                             <label class="form-label" id="max-assertions-label" for="max-assertions-input">
                                 Max. Assertions Per Test
                             </label>
-                            <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
+                            <input type="number" class="form-control" id="max-assertions-input"
+                                   name="maxAssertionsPerTest"
                                    value="<%=Constants.DEFAULT_NB_ASSERTIONS%>" min="1" required>
                         </div>
 
@@ -712,23 +715,31 @@
 
     /* Search function added to DataTables to filter the users table. */
     const searchFunction = function (settings, renderedData, index, data, counter) {
-        /* Let this search function only affect the users table. */
-        if (settings.nTable.id !== 'table-users') {
-            return true;
-        }
+                /* Let this search function only affect the users table. */
+                if (settings.nTable.id !== 'table-users') {
+                    return true;
+                }
 
-        /* Filter out logged-in user. */
-        if (data.id === loggedInUserId) {
-            return false;
-        }
+                /* Filter out logged-in user. */
+                if (data.id === loggedInUserId) {
+                    return false;
+                }
 
-        if (showAssignedUsers) {
-            return true;
-        }
+                // Filter out LLM users
+                if (data.id === ${Constants.AI_ATTACKER_USER_ID}
+                        || data.id === ${Constants.AI_DEFENDER_USER_ID}
+                        || data.id === ${Constants.AI_PLAYER_USER_ID}) {
+                    return false;
+                }
 
-        /* Filter out assigned users. */
-        return !assignedUserIds.has(data.id);
-    };
+                if (showAssignedUsers) {
+                    return true;
+                }
+
+                /* Filter out assigned users. */
+                return !assignedUserIds.has(data.id);
+            }
+    ;
     DataTable.ext.search.push(searchFunction);
 
     const renderClassroomRole = function (role, type, row, meta) {
