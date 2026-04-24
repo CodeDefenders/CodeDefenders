@@ -20,6 +20,8 @@ package org.codedefenders.service.llm;
 
 import java.util.Optional;
 
+import jakarta.enterprise.inject.Vetoed;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
@@ -120,6 +122,7 @@ public class MutantStrategyAnnotatedSingleMethod extends LlmMutantService {
     }
 
     //TODO Generalize with other Single-Method-Mutants
+    @Vetoed
     private static class MethodNameVisitor extends GenericVisitorAdapter<CallableDeclaration<?>, String> {
         @Override
         public MethodDeclaration visit(MethodDeclaration methodDeclaration, String searchedFor) {

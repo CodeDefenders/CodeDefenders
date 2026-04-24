@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.enterprise.inject.Vetoed;
+
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmPromptType;
@@ -111,6 +113,7 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
         }
     }
 
+    @Vetoed
     private static class MethodNameVisitor
             extends GenericVisitorAdapter<CallableDeclaration<? extends CallableDeclaration<?>>, String> {
         @Override
