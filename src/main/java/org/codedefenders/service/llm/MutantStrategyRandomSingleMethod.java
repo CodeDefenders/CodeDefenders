@@ -80,7 +80,8 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
     }
 
     private SingleMethodBaggage baggage() {
-        if (conversationBatch.getBaggage() == null) {
+        if (conversationBatch.getBaggage() == null
+                || !(conversationBatch.getBaggage() instanceof SingleMethodBaggage)) {
             conversationBatch.setBaggage(new SingleMethodBaggage(game));
         }
         return (SingleMethodBaggage) conversationBatch.getBaggage();

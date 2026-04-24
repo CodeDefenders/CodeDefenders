@@ -36,7 +36,8 @@ public class TestStrategyFullSuite extends LlmTestService {
     private static final String ONE_FROM_MANY = "ONE_FROM_MANY";
 
     private FullSuiteBaggage baggage() {
-        if (conversationBatch.getBaggage() == null) {
+        if (conversationBatch.getBaggage() == null
+                || !(conversationBatch.getBaggage() instanceof FullSuiteBaggage)) {
             conversationBatch.setBaggage(new FullSuiteBaggage());
         }
         return (FullSuiteBaggage) conversationBatch.getBaggage();
