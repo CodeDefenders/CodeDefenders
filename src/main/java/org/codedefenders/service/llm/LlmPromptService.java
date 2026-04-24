@@ -18,10 +18,6 @@
  */
 package org.codedefenders.service.llm;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -30,10 +26,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
-import org.codedefenders.model.llm.LlmConversationBatch;
-import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.LlmConversationRepository;
-import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,32 +46,11 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 public class LlmPromptService {
     private static final Logger logger = LoggerFactory.getLogger(LlmPromptService.class);
 
-    //Maps model name to ChatModel
-    private final Map<LlModel, ChatModel> openaiModels = new HashMap<>();
-    private final Map<LlModel, ChatModel> ollamaModels = new HashMap<>();
-
+    @Inject
     LlmConversationRepository conversationRepository;
 
     @Inject
-    LlmPromptService(LlmRepository llmRepo, Configuration config, LlmConversationRepository conversationRepository) {
-        List<LlModel> models = llmRepo.getAllModels();
-        this.conversationRepository = conversationRepository;
-        for (LlModel m : models) {
-            if (m.getType() == LlmType.OPENAI) {
-                openaiModels.put(m, OpenAiChatModel.builder()
-                        //.apiKey(config.getOpenaiApiKey())
-                        .apiKey(AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.OPENAI_KEY).getStringValue())
-                        .modelName(m.getName())
-                        .build());
-            }
-            if (m.getType() == LlmType.OLLAMA) {
-                ollamaModels.put(m, OllamaChatModel.builder()
-                        .baseUrl(config.getLlmLocalServer())
-                        .modelName(m.getName())
-                        .build());
-            }
-        }
-    }
+    Configuration config;
 
     /**
      * Queries the LLM specified by {@code model} with the prompts specified by {@code conversation}.
@@ -94,12 +66,18 @@ public class LlmPromptService {
         }
         logger.info("Sending conversation with {} characters to model {}", inputLength, model);
 
-        Map<LlModel, ChatModel> chatMap = switch (model.getType()) {
-            case OPENAI -> openaiModels;
-            case OLLAMA -> ollamaModels;
+        ChatModel chatModel = switch (model.getType()) {
+            case OLLAMA -> OllamaChatModel.builder()
+                    .baseUrl(config.getLlmLocalServer())
+                    .modelName(model.getName())
+                    .build();
+            case OPENAI -> OpenAiChatModel.builder()
+                    .apiKey(AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.OPENAI_KEY).getStringValue())
+                    .modelName(model.getName())
+                    .build();
             default -> throw new IllegalArgumentException("Unsupported model type: " + model.getType());
         };
-        ChatModel chatModel = chatMap.get(model);
+
         if (chatModel != null) {
             conversationRepository.saveConversation(conversation);
             ChatResponse response = chatModel.chat(chatMessages);
