@@ -55,6 +55,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.creategames.CreateGamesServlet;
 import org.codedefenders.util.JSONUtils;
+import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -487,6 +488,7 @@ public abstract class CreateGamesBean implements Serializable {
                 .serializeNulls()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .registerTypeAdapterFactory(new JSONUtils.SetTypeAdapterFactory())
+                .registerTypeAdapter(MutantValidationRuleSet.class, new JSONUtils.MutantRuleSetNameSerializer())
                 .create();
         return gson.toJson(getStagedGames().getMap());
     }
