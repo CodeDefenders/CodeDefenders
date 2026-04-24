@@ -1,6 +1,9 @@
 <%@ page import="org.codedefenders.model.llm.LlModel" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.model.llm.LlmStrategy" %><%--
+<%@ page import="org.codedefenders.model.llm.LlmStrategy" %>
+<%@ page import="org.codedefenders.model.llm.LlmType" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -36,6 +39,7 @@
     List<LlmStrategy> defendStrategies = (List<LlmStrategy>) request.getAttribute("defendStrategies");
     @SuppressWarnings("unchecked")
     List<LlmStrategy> equivalenceStrategies = (List<LlmStrategy>) request.getAttribute("equivalenceStrategies");
+    pageContext.setAttribute("providers", LlmType.values());
     pageContext.setAttribute("models", models);
     pageContext.setAttribute("attackStrategies", attackStrategies);
     pageContext.setAttribute("defendStrategies", defendStrategies);
@@ -55,6 +59,7 @@
                         <th>Provider</th>
                         <th>Name</th>
                         <th>Active</th>
+                        <th>Remove</th>
                     </tr>
                     </thead>
                     <tbody id="modelBody">
@@ -74,16 +79,44 @@
                                            id="active-button-${identifier}"/>
                                 </label>
                             </td>
+                            <td>
+                                <form method="post" action="${url.forPath(Paths.API_LLM)}">
+                                    <input type="hidden" name="formType" value="deleteModel">
+                                    <input type="hidden" name="llmType" value="${model.type}">
+                                    <input type="hidden" name="llmName" value="${model.name}">
+                                    <button class="btn-sm btn-danger" type="submit">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
+                <form method="post" action="${url.forPath(Paths.API_LLM)}">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="hidden" name="formType" value="createModel">
+                        <label for="create-model-provider-select">Provider:</label>
+                        <select id="create-model-provider-select" name="llmType" class="form-select" style="width:auto">
+                            <c:forEach items="${providers}" var="provider">
+                                <option value="${provider}">
+                                        ${provider}
+                                </option>
+                            </c:forEach>
+                        </select>
+
+                        <label for="create-model-name-input" >Model name:</label>
+                        <input id="create-model-name-input" type="text" name="llmName" class="form-control" style="width: auto;">
+                        <button class="btn-primary btn" type="submit">Create new model</button>
+                    </div>
+                </form>
             </div>
         </div>
 
         <t:admin_llm_strat_table strategies="${attackStrategies}" title="Attack strategies" htmlId="attackTable"/>
         <t:admin_llm_strat_table strategies="${defendStrategies}" title="Defend strategies" htmlId="defendTable"/>
-        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies" htmlId="equivTable"/>
+        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies"
+                                 htmlId="equivTable"/>
 
         <script type="module">
             console.log("MODELS: ${models}");

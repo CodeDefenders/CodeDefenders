@@ -169,16 +169,6 @@ public abstract class BaseConfiguration {
         return mutantCoverage;
     }
 
-    //TODO Make this dynamic via LLM settings!
-    public List<String> getLlmOpenaiModels() {
-        return List.of("gpt-4.1-nano", "gpt-5-nano", "gpt-5.2");
-    }
-
-    //TODO s.o.
-    public List<String> getLlmOllamaModels() {
-        return List.of();
-    }
-
     public String getLlmLocalServer() {
         return llmOllamaServer;
     }

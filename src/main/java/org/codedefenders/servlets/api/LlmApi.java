@@ -213,6 +213,24 @@ public class LlmApi extends HttpServlet {
         Gson gson = new Gson();
         String action = ServletUtils.formType(req);
         switch (action) {
+            case "createModel" -> {
+                Optional<LlModel> model = getModelFromRequest(req, resp);
+                if (model.isPresent()) {
+                    llmRepo.addNewModel(model.get());
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                }
+            }
+
+            case "deleteModel" -> {
+                Optional<LlModel> model = getModelFromRequest(req, resp);
+                if (model.isPresent()) {
+                    llmRepo.deleteModel(model.get());
+                    resp.setStatus(HttpServletResponse.SC_OK);
+                    resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+                }
+            }
+
             case "setActive" -> {
                 LlModel model = gson.fromJson(req.getReader(), LlModel.class);
                 if (model.getType() != null && model.getName() != null) {
@@ -295,5 +313,25 @@ public class LlmApi extends HttpServlet {
 
     }
 
-    private record LlmApiDTO(LlModel model, String strategy){}
+    private Optional<LlModel> getModelFromRequest(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, IllegalArgumentException {
+        Optional<LlmType> type = ServletUtils.getEnumParameter(req, LlmType.class, "llmType");
+        if (type.isEmpty()) {
+            logger.error("Could not create model from request: No support for LLM types {}", ServletUtils.getStringParameter(req, "llmType"));
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+            return Optional.empty();
+        }
+        Optional<String> name = ServletUtils.getStringParameter(req, "llmName");
+        if (name.isEmpty()) {
+            logger.error("Could not create model from request: No name was provided.");
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
+            return Optional.empty();
+        }
+        return Optional.of(new LlModel(name.get(), type.get()));
+    }
+
+    private record LlmApiDTO(LlModel model, String strategy) {
+    }
 }

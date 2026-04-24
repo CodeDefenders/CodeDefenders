@@ -56,18 +56,20 @@ public class LlmRepository {
     QueryRunner queryRunner;
 
     /**
-     * Add models from the config file to DB. Duplicates are ignored.
+     * Adds a new model to the DB. If it already exists, nothing happens.
+     * A new model is automatically active.
+     * @param model representation of the model to be added.
      */
-    public void addNewModels() {
+    public void addNewModel(LlModel model) {
         @Language("SQL")
-        String sql = "INSERT IGNORE INTO llm_models(model_name, type) VALUES (?,?)";
-        Object[][] params = QueryUtils.extractBatchParams(config.getLlmOllamaModels(),
-                model -> model, model -> "OLLAMA");
-        queryRunner.batch(sql, params);
+        String sql = "INSERT IGNORE INTO llm_models(type, model_name, active) VALUES (?,?, TRUE)";
+        queryRunner.execute(sql, model.getType().name(), model.getName());
+    }
 
-        params = QueryUtils.extractBatchParams(config.getLlmOpenaiModels(),
-                model -> model, model -> "OPENAI");
-        queryRunner.batch(sql, params);
+    public void deleteModel(LlModel model) {
+        @Language("SQL")
+        String sql = "DELETE FROM llm_models where type = ? and model_name = ?";
+        queryRunner.execute(sql, model.getType().name(), model.getName());
     }
 
     /**
@@ -111,13 +113,11 @@ public class LlmRepository {
         @Language("SQL")
         String sql = """
                 SELECT * FROM llm_models
-                WHERE type != ?""" + (mustBeActive ? " AND active = true" : "")
+                """ + (mustBeActive ? " WHERE active = true" : "")
                 + " ORDER BY llm_models.type, llm_models.model_name";
 
-        List<LlModel> modelsInDB = queryRunner.query(
-                sql, LlmRepository::modelsFromRs, LlmType.DEFAULT.name());
-
-        return modelsInDB.stream().filter(this::modelIsInConfig).toList();
+        return queryRunner.query(
+                sql, LlmRepository::modelsFromRs);
     }
 
     public Optional<LlmStrategy> getStrategyByName(String name) {
@@ -199,11 +199,6 @@ public class LlmRepository {
                 .stream()
                 .filter(s -> s.getBase().name().startsWith(prefix))
                 .toList();
-    }
-
-    private boolean modelIsInConfig(LlModel m) {
-        return m.getType() == LlmType.OLLAMA && config.getLlmOllamaModels().contains(m.getName())
-                || m.getType() == LlmType.OPENAI && config.getLlmOpenaiModels().contains(m.getName());
     }
 
     private static Optional<LlModel> oneModelFromRs(ResultSet rs) throws SQLException {

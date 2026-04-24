@@ -20,6 +20,6 @@ package org.codedefenders.model.llm;
 
 public enum LlmType {
     OPENAI,
-    OLLAMA,
-    DEFAULT //Only used as a reference to default values, never as an actual model
+    OLLAMA
 }
+

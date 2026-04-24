@@ -125,7 +125,6 @@ public class SystemStartStop implements ServletContextListener {
             logger.error("Could not install dependencies.", e);
             throw new RuntimeException(e);
         }
-        llmRepository.addNewModels();
     }
 
     /**
