@@ -1716,7 +1716,7 @@
     /* Create new empty staged games. */
     document.getElementById('stage-games-empty-button').addEventListener('click', function (event) {
         const userNames = document.getElementById('userNames').value;
-
+        console.log("Empty button clicked")
         if (getSelected(usersTable).length > 0) {
             if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
                 return;

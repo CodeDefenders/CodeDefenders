@@ -99,7 +99,7 @@ public enum LlmDefaultStrategy {
             EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM);
 
 
-    final Class<? extends LlmSubActionService> service;
+    final transient Class<? extends LlmSubActionService> service;
     final Role role;
     final double timeModifier;
     final List<LlmPromptType> promptTypes;

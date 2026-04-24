@@ -18,13 +18,16 @@
  */
 package org.codedefenders.model.llm;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.service.llm.LlmSubActionService;
 
-public class LlmStrategy {
+import com.google.gson.annotations.Expose;
+
+public class LlmStrategy implements Serializable {
 
     /**
      * The time between LLM actions is reduced by this multiplier.
@@ -35,7 +38,7 @@ public class LlmStrategy {
 
     Map<LlmPromptType, String> customPrompts;
 
-    final Class<? extends LlmSubActionService> service;
+    final transient Class<? extends LlmSubActionService> service;
 
     private final LlmDefaultStrategy base;
 

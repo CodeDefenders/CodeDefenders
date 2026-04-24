@@ -25,6 +25,7 @@ import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.annotations.Expose;
@@ -64,9 +65,13 @@ public class GameSettings implements Serializable {
     private final Integer classroomId;
 
     @Expose
-    private final LlModel llmDefender;
+    private final LlModel llmDefenderModel;
     @Expose
-    private final LlModel llmAttacker;
+    private final LlModel llmAttackerModel;
+    @Expose
+    private final LlmStrategy llmDefenderStrategy;
+    @Expose
+    private final LlmStrategy llmAttackerStrategy;
 
     public GameSettings(
             GameType gameType,
@@ -83,8 +88,10 @@ public class GameSettings implements Serializable {
             int gameDurationMinutes,
             boolean startGame,
             Integer classroomId,
-            LlModel llmDefender,
-            LlModel llmAttacker) {
+            LlModel llmDefenderModel,
+            LlModel llmAttackerModel,
+            LlmStrategy llmDefenderStrategy,
+            LlmStrategy llmAttackerStrategy) {
         this.gameType = gameType;
         this.classId = classId;
         this.withMutants = withMutants;
@@ -99,8 +106,10 @@ public class GameSettings implements Serializable {
         this.gameDurationMinutes = gameDurationMinutes;
         this.startGame = startGame;
         this.classroomId = classroomId;
-        this.llmDefender = llmDefender;
-        this.llmAttacker = llmAttacker;
+        this.llmDefenderModel = llmDefenderModel;
+        this.llmAttackerModel = llmAttackerModel;
+        this.llmDefenderStrategy = llmDefenderStrategy;
+        this.llmAttackerStrategy = llmAttackerStrategy;
     }
 
     /**
@@ -123,8 +132,10 @@ public class GameSettings implements Serializable {
                 other.gameDurationMinutes,
                 other.startGame,
                 other.classroomId,
-                other.llmDefender,
-                other.llmAttacker
+                other.llmDefenderModel,
+                other.llmAttackerModel,
+                other.llmDefenderStrategy,
+                other.llmAttackerStrategy
         );
     }
 
@@ -184,12 +195,20 @@ public class GameSettings implements Serializable {
         return Optional.ofNullable(classroomId);
     }
 
-    public LlModel getLlmDefender() {
-        return llmDefender;
+    public LlModel getLlmDefenderModel() {
+        return llmDefenderModel;
     }
 
-    public LlModel getLlmAttacker() {
-        return llmAttacker;
+    public LlModel getLlmAttackerModel() {
+        return llmAttackerModel;
+    }
+
+    public LlmStrategy getLlmDefenderStrategy() {
+        return llmDefenderStrategy;
+    }
+
+    public LlmStrategy getLlmAttackerStrategy() {
+        return llmAttackerStrategy;
     }
 
     public static class Builder {
@@ -209,6 +228,8 @@ public class GameSettings implements Serializable {
         private Integer classroomId;
         private LlModel llmDefender;
         private LlModel llmAttacker;
+        private LlmStrategy llmDefenderStrategy;
+        private LlmStrategy llmAttackerStrategy;
 
         private Builder(
                 GameType gameType,
@@ -226,7 +247,9 @@ public class GameSettings implements Serializable {
                 boolean startGame,
                 Integer classroomId,
                 LlModel llmDefender,
-                LlModel llmAttacker) {
+                LlModel llmAttacker,
+                LlmStrategy llmDefenderStrategy,
+                LlmStrategy llmAttackerStrategy) {
             this.gameType = gameType;
             this.classId = classId;
             this.withMutants = withMutants;
@@ -243,6 +266,8 @@ public class GameSettings implements Serializable {
             this.classroomId = classroomId;
             this.llmDefender = llmDefender;
             this.llmAttacker = llmAttacker;
+            this.llmDefenderStrategy = llmDefenderStrategy;
+            this.llmAttackerStrategy = llmAttackerStrategy;
         }
 
         public Builder setGameType(GameType gameType) {
@@ -325,6 +350,16 @@ public class GameSettings implements Serializable {
             return this;
         }
 
+        public Builder setLlmDefenderStrategy(LlmStrategy llmDefenderStrategy) {
+            this.llmDefenderStrategy = llmDefenderStrategy;
+            return this;
+        }
+
+        public Builder setLlmAttackerStrategy(LlmStrategy llmAttackerStrategy) {
+            this.llmAttackerStrategy = llmAttackerStrategy;
+            return this;
+        }
+
         public GameSettings build() {
             return new GameSettings(
                     gameType,
@@ -342,7 +377,9 @@ public class GameSettings implements Serializable {
                     startGame,
                     classroomId,
                     llmDefender,
-                    llmAttacker
+                    llmAttacker,
+                    llmDefenderStrategy,
+                    llmAttackerStrategy
             );
         }
     }

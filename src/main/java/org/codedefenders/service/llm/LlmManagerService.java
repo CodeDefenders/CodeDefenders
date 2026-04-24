@@ -243,11 +243,6 @@ public class LlmManagerService {
         }
     }
 
-    public void setPlayerModel(AbstractGame game, Role role, LlModel model) {
-        throw new NotImplementedException("No support for staged games"); //TODO Implement
-        //setPlayerModel(game, role, model, null);
-    }
-
     public void finishPlayer(int gameId, Role role) {
         if (role == Role.PLAYER) {
             activeLlmAttackers.completeFinish(gameId);

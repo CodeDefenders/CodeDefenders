@@ -220,11 +220,30 @@ public class CreateGamesService {
         }
 
         //Add LLM players if configured to
-        if (gameSettings.getLlmDefender() != null) {
-            llmManagerService.setPlayerModel(game, Role.DEFENDER, gameSettings.getLlmDefender());
-        }
-        if (gameSettings.getLlmAttacker() != null) {
-            llmManagerService.setPlayerModel(game, Role.ATTACKER, gameSettings.getLlmAttacker());
+        if (gameSettings.getGameType() == MELEE) {
+            if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null
+                    || gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
+                llmManagerService.setPlayerModel(game, Role.PLAYER,
+                        gameSettings.getLlmDefenderModel(),
+                        gameSettings.getLlmAttackerModel(),
+                        gameSettings.getLlmDefenderStrategy(),
+                        gameSettings.getLlmAttackerStrategy());
+            }
+        } else if (gameSettings.getGameType() == MULTIPLAYER) {
+            if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null) {
+                llmManagerService.setPlayerModel(game, Role.DEFENDER,
+                        gameSettings.getLlmDefenderModel(),
+                        null,
+                        gameSettings.getLlmDefenderStrategy(),
+                        null);
+            }
+            if (gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
+                llmManagerService.setPlayerModel(game, Role.ATTACKER,
+                        null,
+                        gameSettings.getLlmAttackerModel(),
+                        null,
+                        gameSettings.getLlmAttackerStrategy());
+            }
         }
 
         /* Start game if configured to. */

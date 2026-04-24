@@ -66,7 +66,7 @@ import static org.mockito.ArgumentMatchers.eq;
 public class CreateGamesBeanTest {
     private final GameSettings defaultSettings = new GameSettings(GameType.MULTIPLAYER, -1, false, false, 3,
             DefaultRuleSets.MODERATE, true, false, 0, GameLevel.HARD, Role.OBSERVER, 60, false, null,
-            null, null);
+            null, null, null, null);
 
     private AdminCreateGamesBean createGamesBean;
     private StagedGameList stagedGameList;

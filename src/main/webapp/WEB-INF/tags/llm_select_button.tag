@@ -1,4 +1,5 @@
-<%--
+<%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
+<%@ tag import="org.codedefenders.util.CDIUtil" %><%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
 
@@ -26,6 +27,13 @@
 <%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
 
 <%@ attribute name="htmlId" required="true" %>
+
+<%
+    LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
+    request.setAttribute("attackStrategies", llmRepo.getAttackStrategies());
+    request.setAttribute("defendStrategies", llmRepo.getDefendStrategies());
+%>
+
 <%--
 TODO Further generalize for use in llm_select_modal.tag
 --%>
@@ -41,6 +49,19 @@ TODO Further generalize for use in llm_select_modal.tag
     </div>
 
     <div class="mb-3">
+        <label class="form-label" for="${htmlId}-defenderStrategySelect">Choose defend
+            strategy</label>
+        <select class="form-select" id="${htmlId}-defenderStrategySelect"
+                name="defenderStrat">
+            <c:forEach items="${defendStrategies}" var="strat">
+                <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
+                        ${strat.toString()}
+                </option>
+            </c:forEach>
+        </select>
+    </div>
+
+    <div class="mb-3">
         <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker model</label>
         <div class="d-flex gap-2 align-items-center">
             <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
@@ -48,6 +69,19 @@ TODO Further generalize for use in llm_select_modal.tag
                 </option>
             </select>
         </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label" for="${htmlId}-attackerStrategySelect">Choose attack
+            strategy</label>
+        <select class="form-select" id="${htmlId}-attackerStrategySelect"
+                name="defenderStrat">
+            <c:forEach items="${attackStrategies}" var="strat">
+                <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
+                        ${strat.toString()}
+                </option>
+            </c:forEach>
+        </select>
     </div>
 
     <script>
