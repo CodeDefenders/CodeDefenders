@@ -34,6 +34,7 @@ public class LlmStrategy implements Serializable {
      */
     double timeModifier;
 
+    @Expose
     private final String name;
 
     Map<LlmPromptType, String> customPrompts;

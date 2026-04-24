@@ -1253,6 +1253,26 @@
         tr.insertCell().textContent = 'Game Duration';
         tr.insertCell().textContent = GameTime.formatTime(gameSettings.gameDurationMinutes);
 
+        if (gameSettings.llmDefenderModel !== null && gameSettings.llmDefenderStrategy !== null) {
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Defender Model';
+            tr.insertCell().textContent = gameSettings.llmDefenderModel.type + ':' + gameSettings.llmDefenderModel.name;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Defender Strategy';
+            tr.insertCell().textContent = gameSettings.llmDefenderStrategy.name;
+        }
+
+        if (gameSettings.llmAttackerModel !== null && gameSettings.llmAttackerStrategy !== null) {
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Attacker Model';
+            tr.insertCell().textContent = gameSettings.llmAttackerModel.type + ':' + gameSettings.llmAttackerModel.name;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Attacker Strategy';
+            tr.insertCell().textContent = gameSettings.llmAttackerStrategy.name;
+        }
+
         return table;
     };
 
