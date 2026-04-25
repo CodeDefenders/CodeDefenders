@@ -105,10 +105,17 @@ public class LlmRepository {
         return queryRunner.query(sql, LlmRepository::oneModelFromRs, name, type.name());
     }
 
+    /**
+     * Returns a list of all models in the DB.
+     */
     public List<LlModel> getAllModels() {
         return getAllModels(false);
     }
 
+    /**
+     * Returns a list of models in the database.
+     * @param mustBeActive If false, all models are returned, of true, only active ones are returned.
+     */
     public List<LlModel> getAllModels(boolean mustBeActive) {
         @Language("SQL")
         String sql = """
@@ -120,6 +127,10 @@ public class LlmRepository {
                 sql, LlmRepository::modelsFromRs);
     }
 
+    /**
+     * Returns an Optional containing the strategy with the supplied name, or an empty optional if
+     * no such strategy exists. Can return both Default strategies and custom strategies.
+     */
     public Optional<LlmStrategy> getStrategyByName(String name) {
         for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
             if (s.name().equals(name)) {
@@ -127,17 +138,11 @@ public class LlmRepository {
             }
         }
         return getCustomStrategy(name);
-            /*@Language("SQL")
-            String sql = """
-                    SELECT Strategy_Name, Base_name, Time_modifier, Prompt_type, Prompt
-                    FROM llm_custom_strategies
-                    JOIN llm_custom_prompts
-                    ON llm_custom_strategies.Strategy_ID = llm_custom_prompts.Strategy_ID
-                    WHERE Strategy_Name = ?;
-                    """;
-            return queryRunner.query(sql, LlmRepository::strategyFromRs, name);*/
     }
 
+    /**
+     * Returns a list of all strategies.
+     */
     public List<LlmStrategy> getAllStrategies() {
         List<LlmStrategy> result = new ArrayList<>();
         for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
@@ -262,6 +267,11 @@ public class LlmRepository {
     }
 
 
+    /**
+     * Save a custom strategy to the DB.
+     * @param customStrategy The strategy to save. It's content will be written to the DB.
+     * @param oldName The old name of the strategy. This allows for the renaming of strategies.
+     */
     public void saveCustomStrategy(LlmStrategy customStrategy, String oldName) {
         Optional<LlmStrategy> oldStrategy = getCustomStrategy(oldName);
         boolean alreadyExisting;
