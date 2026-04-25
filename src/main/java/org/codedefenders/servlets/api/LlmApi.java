@@ -242,6 +242,7 @@ public class LlmApi extends HttpServlet {
             case "deleteModel" -> {
                 Optional<LlModel> model = getModelFromRequest(req, resp);
                 if (model.isPresent()) {
+                    llmService.closeModel(model.get());
                     llmRepo.deleteModel(model.get());
                     resp.setStatus(HttpServletResponse.SC_OK);
                     resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));

@@ -71,8 +71,7 @@ create table if not exists `llm_messages`
 
 
     primary key (Conversation_ID, Index_in_conversation),
-    foreign key (Conversation_ID) references llm_conversations (Conversation_ID),
-    foreign key (Model_name, Model_type) references llm_models (Model_name, Type)
+    foreign key (Conversation_ID) references llm_conversations (Conversation_ID)
 );
 
 create table if not exists experiment
