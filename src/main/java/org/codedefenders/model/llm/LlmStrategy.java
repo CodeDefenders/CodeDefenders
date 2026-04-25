@@ -27,6 +27,9 @@ import org.codedefenders.service.llm.LlmSubActionService;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * A concrete strategy that can be either a default or a customized strategy.
+ */
 public class LlmStrategy implements Serializable {
 
     /**
@@ -53,10 +56,6 @@ public class LlmStrategy implements Serializable {
         this.base = base;
     }
 
-    //    private LlmStrategy(String name, Map<ImmutablePair<String, String>, String> prompts, Class<LlmSubActionService> service) {
-//        this(name, prompts, service, 1);
-//    }
-//
     public LlmStrategy(String name, LlmDefaultStrategy base) {
         this(name, new HashMap<>(), base.service, base.timeModifier, base);
     }
@@ -87,6 +86,11 @@ public class LlmStrategy implements Serializable {
         customPrompts.remove(promptType);
     }
 
+    /**
+     * Returns the correct prompt for a specified prompt type. Returns the customized prompt type, if specified,
+     * or falls back to the default prompt of this type for this strategy.
+     * @throws IllegalArgumentException If the prompt type is not specified for this strategy.
+     */
     public String getPrompt(LlmPromptType promptType) {
         if (base.promptTypes.contains(promptType)) {
             if (customPrompts.containsKey(promptType)) {
@@ -100,6 +104,9 @@ public class LlmStrategy implements Serializable {
         }
     }
 
+    /**
+     * Same as {@link LlmStrategy#getPrompt(LlmPromptType)}, but the result is escaped for HTML use.
+     */
     public String getHtmlPrompt(LlmPromptType promptType) {
         return getPrompt(promptType).replace("\r\n", "\n").replace("\n", "\\n");
     }
@@ -125,6 +132,9 @@ public class LlmStrategy implements Serializable {
                 .toLowerCase();
     }
 
+    /**
+     * Returns true if this strategy is a base strategy, returns false if it is a custom strategy.
+     */
     public boolean isReadOnly() {
         return base.name().equals(name);
     }

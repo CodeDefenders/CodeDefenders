@@ -82,16 +82,24 @@ public class LlmApi extends HttpServlet {
 
     /**
      * Send back information about LLMs or LLM players. Supported actions:
+     *
      * <p>
      * - getall -> Send back a list of all Large Language Models. If the "mustBeActive" parameter is present,
      * only active models are sent back.
      * </p>
+     *
      * <p>
      * - get -> Send back a single LLM identified by type and name
      * </p>
+     *
      * <p>
      * - getLlmForGame -> Send back a single LLM that is active for the supplied game and role
      * </p>
+     *
+     * <p>
+     * - getConversations -> Send back a list of conversations for the specified game and role.
+     * </p>
+     *
      * <p>
      * - error -> Send back the last error message produced by the llm player specified by gameId and role, or an
      * empty string if there is no error message.
@@ -202,8 +210,17 @@ public class LlmApi extends HttpServlet {
      * Supported actions (formTypes):
      *
      * <p>
+     *     - createModel -> Make a new model available.
+     * </p>
+     *
+     * <p>
+     *     - deleteModel -> Remove a model.
+     * </p>
+     *
+     * <p>
      * - setActive -> The model identified by type and name is set as active or inactive, depending on the attribute
      * in the JSON object.
+     *
      *
      * <p>
      * - updatePrompts -> The prompts of the model are adjusted according to the attributes in the JSON object.

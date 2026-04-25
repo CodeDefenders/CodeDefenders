@@ -37,6 +37,7 @@ import dev.langchain4j.data.message.UserMessage;
 
 /**
  * This represents the prompts and responses of an LLM.
+ * It includes data about the associated strategy, LLM user, game, test/mutant id and success state.
  */
 public class LlmConversation {
     private final String strategyName; //This is only used for analysis/recordkeeping, the name is enough

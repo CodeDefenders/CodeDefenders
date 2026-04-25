@@ -130,7 +130,7 @@
     const contentPane = document.getElementById("${htmlId}-content-pane");
     let counter = 0;
 
-    const namePromptMap = new Map([//TODO This is horrible
+    const namePromptMap = new Map([
         <% for (Map.Entry<String, String> entry : namesToContent.entrySet()) { %>
         ["<%= entry.getKey() %>", "<%= entry.getValue()
         .replace("\r\n", "\\n")

@@ -22,6 +22,10 @@ package org.codedefenders.model.llm;
  * This enum lists the types of llm prompts and their default value.
  *
  * <p>
+ * The default strategies use the default values, custom strategies can use customized values for this prompt
+ * type, or fall back to the default if not specified.
+ *
+ * <p>
  * Naming scheme:
  * <ol>
  * <li> TEST|MUTANT|EQUIVALENCE - In which kind of strategy this is used </li>
@@ -291,6 +295,6 @@ public enum LlmPromptType {
     }
 
     public String displayName() {
-        return name(); //TODO
+        return name();
     }
 }

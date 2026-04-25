@@ -37,7 +37,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializer;
 
-
+/**
+ * This service provides methods for inspecting LLM conversations in the UI.
+ */
 @ApplicationScoped
 public class LlmInspectionService {
 

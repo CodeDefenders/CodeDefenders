@@ -44,7 +44,8 @@ import org.slf4j.LoggerFactory;
 public abstract class LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmSubActionService.class);
 
-    private static final int EQUIVALENT_POINT_RESTRICTION = 10; //TODO Als system setting??
+    //TODO Make this customizable
+    private static final int EQUIVALENT_POINT_RESTRICTION = 10;
 
     @Inject
     protected LlmPromptService promptService;
@@ -68,7 +69,6 @@ public abstract class LlmSubActionService {
     protected SimpleUser user;
     protected Random random;
     protected int numberOfRepairAttempts = 3;
-    //protected LlmStrategy strategy;
 
     protected boolean disabled = false;
 
@@ -89,8 +89,19 @@ public abstract class LlmSubActionService {
         }
     }
 
+    /**
+     * Generate a test/mutant to submit. This is responsible for creating the prompt, getting the response
+     * from the LLM and formatting the response.
+     * @param strategy The strategy to use
+     * @return The code of the generated test/mutant
+     */
     protected abstract Optional<String> generate(LlmStrategy strategy);
 
+    /**
+     * Submit the generated test/mutant.
+     * @param reply The code of the generated test/mutant.
+     * @param strategy The strategy to use.
+     */
     protected abstract void submit(String reply, LlmStrategy strategy);
 
     protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
@@ -104,15 +115,18 @@ public abstract class LlmSubActionService {
         this.user = user;
         this.game = game;
         this.conversationBatch = conversation;
-        //this.strategy = strategy;
         this.random = random;
-        //this.numberOfRepairAttempts = numberOfRepairAttempts;
     }
 
     protected void updateGame() {
         game = gameRepository.getGame(game.getId());
     }
 
+    /**
+     * Utility method to reset conversations. If the maximum number of failed generation attempts has been reached,
+     * reset the conversation - which means a fresh start for generating mutants/tests.
+     * Otherwise, nothing happens.
+     */
     protected void resetConversationAfterTooManyTries() {
         String tmp = conversation.getType();
         if (conversation.numberOfTries() > numberOfRepairAttempts) {

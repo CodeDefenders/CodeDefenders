@@ -70,6 +70,7 @@ import static org.codedefenders.model.llm.LlmDefaultStrategy.TEST_FULL_SUITE_PLU
  * This class manages actions of llm players. All information about which llm players are activated in which games
  * are stored in fields of this class. It is a conscious decision not to store this information persistently, so that
  * potentially costly llm players are not unknowingly reawakened after restarting the server.
+ *
  * <p>
  * The detailed proceedings of an LLM action are managed by {@link LlmSubActionService} and its subclasses. This
  * class only establishes the general structure of an LLM action and handles their scheduling, activation, error
@@ -140,6 +141,12 @@ public class LlmManagerService {
         return Optional.ofNullable(getCorrectMap(role).getStrategy(gameId));
     }
 
+    /**
+     * Used for llm-vs-llm experiments. When this happens, the LLM defender is deactivated, and all living
+     * mutants are marked
+     * as equivalent, giving the attacker the chance to defend itself.
+     * @param gameId The ID of the game to be set to equivalent-only.
+     */
     public void setEquivalentOnly(int gameId) {
         if (activeLlmAttackers.getState(gameId) != ThreadState.INACTIVE) {
             equivalentOnlyGames.add(gameId);
@@ -183,6 +190,9 @@ public class LlmManagerService {
                 .getIntValue());
     }
 
+    /**
+     * Checks if an LLM player with this role is active in this game.
+     */
     private boolean isLlmPlayerActive(AbstractGame game, Role role) {
         if (!gameRepository.isGameActive(game.getId())) {
             return false;
@@ -214,10 +224,6 @@ public class LlmManagerService {
                                LlmStrategy attackStrategy) {
         boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
-        LlmStrategy equivalenceStrategy = LlmStrategy.of(EQUIVALENCE_DEFAULT); //TODO Adjustable
-
-        //TODO No default strategies, fail with an error if strategies are null when they shouldn't be
-
         if ((role == Role.DEFENDER || role == Role.PLAYER)
                 && (defendModel != null || activeLlmDefenders.getState(game.getId()) != ThreadState.INACTIVE)) { //Never put a new 'null' value, it wouldn't be deleted
             activeLlmDefenders.put(game.getId(), defendModel, defendStrategy);
@@ -228,10 +234,6 @@ public class LlmManagerService {
         }
 
         if ((attackModel != null || defendModel != null) && !alreadyPresent) {
-
-
-            //Role userRole = game instanceof MeleeGame ? Role.PLAYER : role;
-
             int userId = getCorrectUserId(role);
             SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
             game.addPlayer(userId, role);
@@ -243,6 +245,10 @@ public class LlmManagerService {
         }
     }
 
+    /**
+     * Gracefully stops the LLM player in this game with this role. The current action may finish,
+     * but no new actions will be started.
+     */
     public void finishPlayer(int gameId, Role role) {
         if (role == Role.PLAYER) {
             activeLlmAttackers.completeFinish(gameId);
@@ -260,6 +266,13 @@ public class LlmManagerService {
         activeLlmDefenders.closeModel(model);
     }
 
+    /**
+     * Add an error message. This message will be portrayed in the UI and should only be used for unexpected
+     * errors, like bugs, connection or authentication issues.
+     * @param game The game in which the error occurred.
+     * @param role The role in which's thread the error occurred.
+     * @param e The exception.
+     */
     private void addErrorMessage(AbstractGame game, Role role, Exception e) {
         logger.error("LLM thread had an error: ", e);
         String timestamp = LocalDateTime.now().toString();
@@ -441,24 +454,6 @@ public class LlmManagerService {
 
         private void put(int gameId, LlModel model, LlmStrategy strategy) {
             map.put(gameId, ImmutablePair.of(model, strategy));
-        }
-
-        private void setModel(int gameId, LlModel model) {
-            if (map.containsKey(gameId)) {
-                LlmStrategy strategy = map.get(gameId).right;
-                put(gameId, model, strategy);
-            } else {
-                throw new IllegalStateException("No game with id " + gameId + " in this map.");
-            }
-        }
-
-        private void setStrategy(int gameId, LlmStrategy strategy) {
-            if (map.containsKey(gameId)) {
-                LlModel model = map.get(gameId).left;
-                put(gameId, model, strategy);
-            } else {
-                throw new IllegalStateException("No game with id " + gameId + " in this map.");
-            }
         }
 
         private LlModel getModel(int gameId) {

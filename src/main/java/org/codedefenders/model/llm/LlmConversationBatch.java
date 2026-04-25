@@ -25,14 +25,10 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 
 /**
- * Contains mutable lists of {@link LlmConversation}s, representing the back and forth
- * conversation between the client and the LLM. Every prompt type has its own associated conversation, in order to allow
- * for several conversations. This way history about mutant generation attempts is not lost when trying to solve an
+ * Contains mutable {@link LlmConversation}s, representing the back and forth
+ * conversation between the client and the LLM. There is at most one conversation for each type of conversation.
+ * This way history about mutant generation attempts is not lost when trying to solve an
  * equivalence duel, for example.
- * <p>
- * Within one LLM action, the prompt type of this conversation should be established in the beginning,
- * before querying the LLM, and remain unchanged thereafter. This prompt type is represented by TODO outdated
- * {@link LlmConversationBatch#currentType}.
  */
 public class LlmConversationBatch {
     private final Map<String, LlmConversation> messageLists = new HashMap<>();

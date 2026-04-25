@@ -40,6 +40,10 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Superclass of all TestStrategies. It is not to be instantiated itself. Provides some commonly used structures
+ * and utility methods.
+ */
 abstract class LlmTestService extends LlmSubActionService {
     private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
 
@@ -83,8 +87,14 @@ abstract class LlmTestService extends LlmSubActionService {
         }
     }
 
+    /**
+     * Defines what to do when submission was successful.
+     */
     protected abstract void onSubmitSuccess(LlmStrategy strategy);
 
+    /**
+     * Defines what to do when submission fails.
+     */
     protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
                                             String testSrc,
                                             LlmStrategy strategy);
@@ -137,7 +147,11 @@ abstract class LlmTestService extends LlmSubActionService {
         }
     }
 
-    //TODO customize this
+    /**
+     * The default error handling for test strategies. This can be called after validation or compilation failed.
+     * @param result This contains the reason why the test could not be submitted.
+     * @param testSrc The source of the test that was submitted and rejected.
+     */
     protected void standardSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
         StringBuilder correction = new StringBuilder("This test could not be submitted: \n" + testSrc);
         switch (result.failureReason().orElseThrow()) {

@@ -38,6 +38,14 @@ import static org.codedefenders.game.Role.ATTACKER;
 import static org.codedefenders.game.Role.DEFENDER;
 import static org.codedefenders.model.llm.LlmPromptType.*;
 
+/**
+ * This enum lists the hard-coded default strategies. They cannot be customized by the user, but
+ * customized variations of them can be created by users.
+ *
+ * <p>
+ * Every enum value contains the {@link Class} of the strategy and a list of all prompt types that can
+ * be customized for this strategy.
+ */
 public enum LlmDefaultStrategy {
     TEST_DEFAULT(TestStrategyDefault.class,
             DEFENDER,
