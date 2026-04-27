@@ -167,7 +167,7 @@
                                                ${level == DefaultRuleSets.MODERATE ? "checked" : ""}>
                                         <label class="form-check-label"
                                                for="mutant-validator-radio-${level.name}">
-                                            ${level.name}
+                                            ${i18n.tr(level.name)}
                                         </label>
                                         <c:if test="${s.last}">
                                             <div class="invalid-feedback">${i18n.tr('Please select a mutant validator level.')}</div>

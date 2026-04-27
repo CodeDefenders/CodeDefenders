@@ -31,6 +31,7 @@
 <%@ tag import="org.codedefenders.validation.code.MutantValidationRuleSet" %>
 <%@ tag import="org.codedefenders.validation.code.DefaultRuleSets" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -216,6 +217,7 @@
                                 </a>
                             </label>
                             <div id="mutant-validator-group">
+                                <% I18n i18n = (I18n) request.getAttribute("i18n"); %>
                                 <% for (MutantValidationRuleSet level : DefaultRuleSets.getValues()) { %>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"
@@ -223,7 +225,7 @@
                                            value="<%=level.getName()%>"
                                         <%=level == DefaultRuleSets.MODERATE ? "checked" : ""%>>
                                     <label class="form-check-label" for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
-                                        <%=level.getName()%>
+                                        <%=i18n.tr(level.getName())%>
                                     </label>
                                 </div>
                                 <% } %>
