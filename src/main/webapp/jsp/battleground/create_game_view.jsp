@@ -287,7 +287,7 @@
                                 <select class="form-select" id="role-select" name="roleSelection" required>
                                     <c:forEach items="${Role.multiplayerRoles()}" var="role">
                                         <option value="${role.name()}" ${role == Role.OBSERVER ? "selected" : ""}>
-                                                ${role.formattedString}
+                                                ${i18n.tr(role.formattedString)}
                                         </option>
                                     </c:forEach>
                                 </select>
