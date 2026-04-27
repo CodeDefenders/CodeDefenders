@@ -95,10 +95,10 @@ public class GameRepository {
      */
     public boolean addPlayerToGame(int gameId, int userId, Role role) {
         @Language("SQL") String query = """
-                INSERT INTO players (Game_ID, User_ID, Points, Role)
-                VALUES (?, ?, 0, ?)
-                ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
-        """;
+                        INSERT INTO players (Game_ID, User_ID, Points, Role)
+                        VALUES (?, ?, 0, ?)
+                        ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;
+                """;
 
         int numRows = queryRunner.update(query,
                 gameId,
@@ -113,21 +113,31 @@ public class GameRepository {
      * Retrieves all players identifiers for a given game ID and {@link Role}.
      *
      * @param gameId The game ID.
-     * @param role The role to get players for.
+     * @param role   The role to get players for.
      * @return The list of players.
      */
     public List<Player> getPlayersForGame(int gameId, Role role) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE Game_ID = ?
-                  AND Role = ?
-                  AND Active = TRUE;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE Game_ID = ?
+                          AND Role = ?
+                          AND Active = TRUE;
+                """;
 
         return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS),
                 gameId,
                 role.toString());
+    }
+
+    /**
+     * Set the finish time of a game to the current time.
+     * @param gameId The id of the game to be updated.
+     */
+    public void setFinishTime(int gameId) {
+        @Language("SQL")
+        String sql = "UPDATE games SET Finish_Time = CURRENT_TIMESTAMP WHERE ID = ?";
+        queryRunner.execute(sql, gameId);
     }
 
     /**
@@ -138,11 +148,11 @@ public class GameRepository {
      */
     public List<Player> getValidPlayersForGame(int gameId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE Game_ID = ?
-                  AND Active = TRUE;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE Game_ID = ?
+                          AND Active = TRUE;
+                """;
 
         return queryRunner.query(query, listFromRS(PlayerRepository::playerWithUserFromRS), gameId);
     }
@@ -156,11 +166,11 @@ public class GameRepository {
      */
     public boolean removeUserFromGame(int gameId, int userId) {
         @Language("SQL") String query = """
-                UPDATE players
-                SET Active = FALSE
-                WHERE Game_ID = ?
-                  AND User_ID = ?;
-        """;
+                        UPDATE players
+                        SET Active = FALSE
+                        WHERE Game_ID = ?
+                          AND User_ID = ?;
+                """;
 
         int updatedRows = queryRunner.update(query, gameId, userId);
         return updatedRows > 0;
@@ -168,10 +178,10 @@ public class GameRepository {
 
     public int getCurrentRound(int gameId) {
         @Language("SQL") String query = """
-                SELECT CurrentRound
-                FROM games
-                WHERE games.ID = ?;
-        """;
+                        SELECT CurrentRound
+                        FROM games
+                        WHERE games.ID = ?;
+                """;
 
         var currentRound = queryRunner.query(query,
                 oneFromRS(rs -> rs.getInt("CurrentRound")),
@@ -234,10 +244,10 @@ public class GameRepository {
     public boolean isGameExpired(int gameId) {
         // do not use TIMESTAMPADD here to avoid errors with daylight saving
         @Language("SQL") final String query = """
-                SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired
-                FROM games
-                WHERE ID = ?;
-        """;
+                        SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired
+                        FROM games
+                        WHERE ID = ?;
+                """;
 
         var isExpired = queryRunner.query(query,
                 oneFromRS(l -> l.getBoolean("isExpired")),
@@ -248,10 +258,10 @@ public class GameRepository {
 
     public boolean storeStartTime(int gameId) {
         @Language("SQL") String query = """
-                UPDATE games
-                SET Start_Time = NOW()
-                WHERE ID = ?
-        """;
+                        UPDATE games
+                        SET Start_Time = NOW()
+                        WHERE ID = ?
+                """;
 
         int updatedRows = queryRunner.update(query, gameId);
         return updatedRows > 0;
@@ -260,16 +270,17 @@ public class GameRepository {
     /**
      * Stores a new invitation link id. If the game is null, the link id is stored without a game,
      * the game will have to be added later.
-     * @param gameId The id of the game to store the link for, or null if that game is not yet created.
+     *
+     * @param gameId    The id of the game to store the link for, or null if that game is not yet created.
      * @param creatorId The id of the game creator. This is used to prevent the hijacking of an uncreated game's
      *                  invitation link by another user.
      * @return The generated ID of the invitation link.
      */
     public int storeInvitationLink(Integer gameId, int creatorId) {
         @Language("SQL") String query = """
-                INSERT INTO invitation_links (game_id, creator_id)
-                VALUES (?, ?)
-        """;
+                        INSERT INTO invitation_links (game_id, creator_id)
+                        VALUES (?, ?)
+                """;
 
         return queryRunner.insert(query, generatedKeyFromRS(), gameId, creatorId).orElseThrow();
     }
@@ -282,10 +293,10 @@ public class GameRepository {
      */
     public Optional<AbstractGame> getGameForInviteId(int inviteId) {
         @Language("SQL") String query = """
-                SELECT game_id
-                FROM invitation_links
-                WHERE invitation_id = ?
-        """;
+                        SELECT game_id
+                        FROM invitation_links
+                        WHERE invitation_id = ?
+                """;
         Optional<Integer> gameId = queryRunner.query(query, oneFromRS(
                 rs -> rs.getInt("game_id")), inviteId);
         return gameId.map(this::getGame);
@@ -296,11 +307,11 @@ public class GameRepository {
      */
     public List<String> getUsernamesForGame(int gameId) {
         @Language("SQL") String query = """
-                SELECT distinct Username FROM games, players, users
-                WHERE games.ID = ?
-                  AND players.Game_ID = games.ID
-                  AND players.User_ID = users.User_ID;
-        """;
+                        SELECT distinct Username FROM games, players, users
+                        WHERE games.ID = ?
+                          AND players.Game_ID = games.ID
+                          AND players.User_ID = users.User_ID;
+                """;
 
         return queryRunner.query(query, listFromRS(rs -> rs.getString("UserName")), gameId);
     }
