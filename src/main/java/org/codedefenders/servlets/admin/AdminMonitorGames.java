@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -55,6 +56,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.service.game.MeleeGameService;
@@ -121,6 +123,10 @@ public class AdminMonitorGames extends HttpServlet {
     @Inject
     private NotificationService notificationService;
 
+    @Named
+    @Inject
+    private I18nService i18nService;
+
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -171,7 +177,8 @@ public class AdminMonitorGames extends HttpServlet {
         request.setAttribute("meleePlayersInfoForGame", meleePlayersInfoForGame);
         request.setAttribute("meleeUserIdForPlayerIds", meleeUserIdForPlayerIds);
 
-        JspWorkaround.forwardInWrapper(request, response, "Monitor Games", Constants.ADMIN_MONITOR_JSP);
+        var i18n = i18nService.getI18n(request);
+        JspWorkaround.forwardInWrapper(request, response, i18n.tr("Monitor Games"), Constants.ADMIN_MONITOR_JSP);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
