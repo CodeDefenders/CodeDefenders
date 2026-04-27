@@ -91,6 +91,7 @@ public class MultiplayerGameRepository {
         int attackerValue = rs.getInt("Attacker_Value");
         int gameDuration = rs.getInt("Game_Duration_Minutes");
         long startTime = rs.getLong("Timestamp_Start");
+        long finishTime = rs.getLong("Timestamp_Finish");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
         boolean inviteOnly = rs.getBoolean("invite_only");
         boolean mayChooseRole = rs.getBoolean("may_choose_role");
@@ -115,6 +116,7 @@ public class MultiplayerGameRepository {
                 .mutantCoverage(mutantCoverage)
                 .gameDurationMinutes(gameDuration)
                 .startTimeUnixSeconds(startTime)
+                .finishTimeUnixSeconds(finishTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .classroomId(classroomId)
                 .mayChooseRoles(mayChooseRole)
