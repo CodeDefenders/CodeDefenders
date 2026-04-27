@@ -258,7 +258,7 @@
                         scrollY: '800px',
                         scrollCollapse: true,
                         paging: false,
-                        language: DataTablesUtils.language({info: 'Showing _TOTAL_ entries'})
+                        language: DataTablesUtils.language({info: "${i18n.tr('Showing _TOTAL_ entries')}"})
                     });
                 });
             </script>
