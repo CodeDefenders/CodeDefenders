@@ -4222,8 +4222,8 @@ msgid ""
 "Improving Engagement of Students in Software Engineering Courses through "
 "Gamification"
 msgstr ""
-"Verbesserung des Engagements von Studierenden in Software-Engineering-Kursen "
-"durch Gamification"
+"Improving Engagement of Students in Software Engineering Courses through "
+"Gamification"
 
 #: src/main/webapp/jsp/about_page.jsp:105
 msgid "Sheffield Undergraduate Research Experience"
