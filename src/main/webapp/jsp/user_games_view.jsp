@@ -38,6 +38,7 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.model.WhitelistType" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <%
     // Games active for this user (Created or joined)
@@ -60,6 +61,8 @@
     PlayerScore zeroDummyScore = new PlayerScore(-1);
     zeroDummyScore.setMutantKillInformation("0 / 0 / 0");
     zeroDummyScore.setDuelInformation("0 / 0 / 0");
+
+    I18n i18n = (I18n) request.getAttribute("i18n");
 %>
 
 <%!
@@ -127,7 +130,7 @@
                                 <span><%=attackers.size()%>&nbsp;${i18n.tr('Attackers')}</span>,
                                 <span><%=defenders.size()%>&nbsp;${i18n.tr('Defenders')}</span>
                             </td>
-                            <td><%=info.gameLevel().getFormattedString()%></td>
+                            <td><%=i18n.tr(info.gameLevel().getFormattedString())%></td>
                             <td>
                                 <%
                                     if (info.gameState() == GameState.CREATED
@@ -324,7 +327,7 @@
                                     <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                                 </td>
                                 <td><span><%=players.size()%> ${i18n.tr('Players')}</span></td>
-                                <td><%=info.gameLevel().getFormattedString()%></td>
+                                <td><%=i18n.tr(info.gameLevel().getFormattedString())%></td>
                                 <td>
                                     <%
                                         if (info.gameState() == GameState.CREATED
@@ -552,7 +555,7 @@
                                         </form>
                                     </td>
                                 </c:if>
-                                <td><%=info.gameLevel().getFormattedString() %></td>
+                                <td><%=i18n.tr(info.gameLevel().getFormattedString())%></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                                 <td colspan="100">
@@ -721,7 +724,7 @@
                                         </form>
                                     </td>
                                 </c:if>
-                                <td><%=info.gameLevel().getFormattedString() %></td>
+                                <td><%=i18n.tr(info.gameLevel().getFormattedString())%></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                                 <td colspan="100">
