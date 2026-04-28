@@ -79,6 +79,10 @@ bootstrap classes
     width: max-content;
 }
 
+.modal-body {
+    overflow: auto;
+}
+
 /* Navbar
 ----------------------------------------------------------------------------- */
 
