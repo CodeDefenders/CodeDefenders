@@ -234,27 +234,27 @@ msgid "All Tests"
 msgstr "Alle Tests"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:27
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:896
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:900
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:149
 #: src/main/webapp/jsp/melee/create_game_view.jsp:146
-#: src/main/webapp/WEB-INF/tags/create_games.tag:205
-#: src/main/webapp/WEB-INF/tags/create_games.tag:649
+#: src/main/webapp/WEB-INF/tags/create_games.tag:206
+#: src/main/webapp/WEB-INF/tags/create_games.tag:651
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:24
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
 msgid "Easy"
 msgstr "Einfach"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:28
-#: src/main/webapp/WEB-INF/tags/create_games.tag:648
+#: src/main/webapp/WEB-INF/tags/create_games.tag:650
 msgid "Medium"
 msgstr "Mittel"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:29
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:903
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:907
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:144
 #: src/main/webapp/jsp/melee/create_game_view.jsp:141
-#: src/main/webapp/WEB-INF/tags/create_games.tag:200
-#: src/main/webapp/WEB-INF/tags/create_games.tag:647
+#: src/main/webapp/WEB-INF/tags/create_games.tag:201
+#: src/main/webapp/WEB-INF/tags/create_games.tag:649
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:36
 msgid "Hard"
@@ -264,11 +264,11 @@ msgstr "Schwer"
 #: src/main/javascript/game/game_chat.js:192
 #: src/main/webapp/jsp/classroom_page.jsp:928
 #: src/main/webapp/jsp/games_history.jsp:131
-#: src/main/webapp/jsp/user_games_view.jsp:235
-#: src/main/webapp/jsp/user_games_view.jsp:563
+#: src/main/webapp/jsp/user_games_view.jsp:238
+#: src/main/webapp/jsp/user_games_view.jsp:566
 #: src/main/webapp/jsp/user_profile.jsp:237
-#: src/main/webapp/WEB-INF/tags/create_games.tag:259
-#: src/main/webapp/WEB-INF/tags/create_games.tag:652
+#: src/main/webapp/WEB-INF/tags/create_games.tag:261
+#: src/main/webapp/WEB-INF/tags/create_games.tag:654
 msgid "Attacker"
 msgstr "Angreifer"
 
@@ -276,19 +276,19 @@ msgstr "Angreifer"
 #: src/main/javascript/game/game_chat.js:195
 #: src/main/webapp/jsp/classroom_page.jsp:930
 #: src/main/webapp/jsp/games_history.jsp:164
-#: src/main/webapp/jsp/user_games_view.jsp:271
-#: src/main/webapp/jsp/user_games_view.jsp:599
+#: src/main/webapp/jsp/user_games_view.jsp:274
+#: src/main/webapp/jsp/user_games_view.jsp:602
 #: src/main/webapp/jsp/user_profile.jsp:237
-#: src/main/webapp/WEB-INF/tags/create_games.tag:260
-#: src/main/webapp/WEB-INF/tags/create_games.tag:653
+#: src/main/webapp/WEB-INF/tags/create_games.tag:262
+#: src/main/webapp/WEB-INF/tags/create_games.tag:655
 msgid "Defender"
 msgstr "Verteidiger"
 
 #: src/main/java/org/codedefenders/game/Role.java:32
 #: src/main/javascript/game/game_chat.js:201
 #: src/main/webapp/jsp/classroom_page.jsp:934
-#: src/main/webapp/WEB-INF/tags/create_games.tag:258
-#: src/main/webapp/WEB-INF/tags/create_games.tag:654
+#: src/main/webapp/WEB-INF/tags/create_games.tag:260
+#: src/main/webapp/WEB-INF/tags/create_games.tag:656
 msgid "Observer"
 msgstr "Beobachter"
 
@@ -297,9 +297,9 @@ msgstr "Beobachter"
 #: src/main/webapp/jsp/classroom_page.jsp:932
 #: src/main/webapp/jsp/games_history.jsp:272
 #: src/main/webapp/jsp/player_feedback.jsp:134
-#: src/main/webapp/jsp/user_games_view.jsp:397
-#: src/main/webapp/jsp/user_games_view.jsp:732
-#: src/main/webapp/WEB-INF/tags/create_games.tag:655
+#: src/main/webapp/jsp/user_games_view.jsp:400
+#: src/main/webapp/jsp/user_games_view.jsp:735
+#: src/main/webapp/WEB-INF/tags/create_games.tag:657
 msgid "Player"
 msgstr "Spieler"
 
@@ -1500,10 +1500,12 @@ msgid "classes"
 msgstr "Klassen"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:538
 msgid "game"
 msgstr "Spiele"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:538
 msgid "games"
 msgstr "Spiele"
 
@@ -2813,7 +2815,7 @@ msgstr ""
 "href=\"{0}\">Rätselübersicht</a> zurück."
 
 #: src/main/java/org/codedefenders/servlets/GamesOverview.java:101
-#: src/main/webapp/jsp/user_games_view.jsp:79
+#: src/main/webapp/jsp/user_games_view.jsp:82
 msgid "My Games"
 msgstr "Meine Spiele"
 
@@ -3211,19 +3213,19 @@ msgstr "Verstoßende Statements:"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:57
 #: src/main/webapp/jsp/help.jsp:113
-#: src/main/webapp/WEB-INF/tags/create_games.tag:642
+#: src/main/webapp/WEB-INF/tags/create_games.tag:644
 msgid "Relaxed"
 msgstr "Locker"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:70
 #: src/main/webapp/jsp/help.jsp:120
-#: src/main/webapp/WEB-INF/tags/create_games.tag:643
+#: src/main/webapp/WEB-INF/tags/create_games.tag:645
 msgid "Moderate"
 msgstr "Mittel"
 
 #: src/main/java/org/codedefenders/validation/code/DefaultRuleSets.java:76
 #: src/main/webapp/jsp/help.jsp:128
-#: src/main/webapp/WEB-INF/tags/create_games.tag:644
+#: src/main/webapp/WEB-INF/tags/create_games.tag:646
 msgid "Strict"
 msgstr "Strikt"
 
@@ -3618,8 +3620,8 @@ msgstr "Team"
 
 #: src/main/javascript/game/game_highlighting.js:127
 #: src/main/webapp/jsp/games_history.jsp:133
-#: src/main/webapp/jsp/user_games_view.jsp:238
-#: src/main/webapp/jsp/user_games_view.jsp:567
+#: src/main/webapp/jsp/user_games_view.jsp:241
+#: src/main/webapp/jsp/user_games_view.jsp:570
 msgid "Alive Mutants"
 msgstr "Lebende Mutanten"
 
@@ -3641,9 +3643,9 @@ msgstr "Äquivalente Mutanten"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:80
 #: src/main/webapp/jsp/admin_monitor_games.jsp:318
 #: src/main/webapp/jsp/index.jsp:121 src/main/webapp/jsp/index.jsp:159
-#: src/main/webapp/jsp/user_games_view.jsp:85
-#: src/main/webapp/jsp/user_games_view.jsp:449
-#: src/main/webapp/jsp/user_games_view.jsp:649
+#: src/main/webapp/jsp/user_games_view.jsp:88
+#: src/main/webapp/jsp/user_games_view.jsp:452
+#: src/main/webapp/jsp/user_games_view.jsp:652
 msgid "Creator"
 msgstr "Ersteller"
 
@@ -3693,12 +3695,12 @@ msgstr "Keine Coverage"
 
 #: src/main/javascript/game/killmap_accordion.js:351
 #: src/main/javascript/game/killmap_accordion.js:367
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:828
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:984
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1033
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1078
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1142
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1277
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:832
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:988
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1037
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1082
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1146
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1281
 #: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:51
 #: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:51
 msgid "Error"
@@ -3744,12 +3746,12 @@ msgstr ""
 #: src/main/webapp/jsp/games_history.jsp:134
 #: src/main/webapp/jsp/games_history.jsp:167
 #: src/main/webapp/jsp/games_history.jsp:273
-#: src/main/webapp/jsp/user_games_view.jsp:239
-#: src/main/webapp/jsp/user_games_view.jsp:275
-#: src/main/webapp/jsp/user_games_view.jsp:398
-#: src/main/webapp/jsp/user_games_view.jsp:569
-#: src/main/webapp/jsp/user_games_view.jsp:605
-#: src/main/webapp/jsp/user_games_view.jsp:733
+#: src/main/webapp/jsp/user_games_view.jsp:242
+#: src/main/webapp/jsp/user_games_view.jsp:278
+#: src/main/webapp/jsp/user_games_view.jsp:401
+#: src/main/webapp/jsp/user_games_view.jsp:572
+#: src/main/webapp/jsp/user_games_view.jsp:608
+#: src/main/webapp/jsp/user_games_view.jsp:736
 msgid "Points"
 msgstr "Punkte"
 
@@ -4252,9 +4254,9 @@ msgstr "Klassen-Analyse"
 #: src/main/webapp/jsp/games_history.jsp:65
 #: src/main/webapp/jsp/games_history.jsp:212
 #: src/main/webapp/jsp/upload_class_view.jsp:217
-#: src/main/webapp/jsp/user_games_view.jsp:84
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1249
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1485
+#: src/main/webapp/jsp/user_games_view.jsp:87
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1251
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1487
 msgid "ID"
 msgstr "ID"
 
@@ -4350,8 +4352,8 @@ msgstr "Das Spiel ist fesselnd:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:659
 #: src/main/webapp/jsp/games_history.jsp:132 src/main/webapp/jsp/help.jsp:191
 #: src/main/webapp/jsp/leaderboards.jsp:40
-#: src/main/webapp/jsp/user_games_view.jsp:236
-#: src/main/webapp/jsp/user_games_view.jsp:565
+#: src/main/webapp/jsp/user_games_view.jsp:239
+#: src/main/webapp/jsp/user_games_view.jsp:568
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:85
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:31
 msgid "Mutants"
@@ -4373,6 +4375,7 @@ msgstr "Äquivalente Mutanten:"
 #: src/main/webapp/jsp/admin_analytics_classes.jsp:189
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:135
 #: src/main/webapp/jsp/admin_analytics_users.jsp:175
+#: src/main/webapp/jsp/admin_user_mgmt.jsp:261
 #: src/main/webapp/jsp/upload_class_view.jsp:272
 msgid "Showing _TOTAL_ entries"
 msgstr "Zeige _TOTAL_ Einträge"
@@ -4406,9 +4409,9 @@ msgstr "Klassenname"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:43
 #: src/main/webapp/jsp/classroom_page.jsp:859
-#: src/main/webapp/WEB-INF/tags/create_games.tag:808
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1068
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1106
+#: src/main/webapp/WEB-INF/tags/create_games.tag:810
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1070
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1108
 msgid "Role"
 msgstr "Benutzerrolle"
 
@@ -4495,7 +4498,7 @@ msgstr "Verteidiger-Punktzahl"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:424
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:196
 #: src/main/webapp/jsp/leaderboards.jsp:45
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1508
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1510
 msgid "Total Score"
 msgstr "Gesamtpunktzahl"
 
@@ -4531,8 +4534,8 @@ msgstr "Äquivalente Mutanten:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:664
 #: src/main/webapp/jsp/games_history.jsp:165 src/main/webapp/jsp/help.jsp:195
 #: src/main/webapp/jsp/leaderboards.jsp:42
-#: src/main/webapp/jsp/user_games_view.jsp:272
-#: src/main/webapp/jsp/user_games_view.jsp:601
+#: src/main/webapp/jsp/user_games_view.jsp:275
+#: src/main/webapp/jsp/user_games_view.jsp:604
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:140
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:32
 msgid "Tests"
@@ -4575,7 +4578,7 @@ msgstr "Klassenverwaltung"
 #: src/main/webapp/jsp/classrooms_overview.jsp:181
 #: src/main/webapp/jsp/classrooms_overview.jsp:245
 #: src/main/webapp/jsp/contact.jsp:68 src/main/webapp/jsp/contact.jsp:70
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1490
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1492
 msgid "Name"
 msgstr "Name"
 
@@ -4681,8 +4684,8 @@ msgstr "Neuer Raum"
 #: src/main/webapp/jsp/classrooms_overview.jsp:59
 #: src/main/webapp/jsp/classrooms_overview.jsp:69
 #: src/main/webapp/jsp/game_components/editor_help_config_modal.jsp:49
-#: src/main/webapp/WEB-INF/tags/create_games.tag:65
-#: src/main/webapp/WEB-INF/tags/create_games.tag:112
+#: src/main/webapp/WEB-INF/tags/create_games.tag:66
+#: src/main/webapp/WEB-INF/tags/create_games.tag:113
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:44
 msgid "Search"
 msgstr "Suche"
@@ -4694,11 +4697,11 @@ msgstr "Raum erstellen"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:58
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:93
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:798
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:921
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1061
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1113
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:802
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:925
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1016
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1117
 #: src/main/webapp/jsp/admin_system_settings.jsp:148
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:345
@@ -4782,15 +4785,15 @@ msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
 #: src/main/webapp/jsp/classroom_create_games.jsp:32
 #: src/main/webapp/jsp/classroom_page.jsp:98
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
-#: src/main/webapp/WEB-INF/tags/create_games.tag:76
+#: src/main/webapp/WEB-INF/tags/create_games.tag:77
 msgid "Create Games"
 msgstr "Spiele erstellen"
 
 #: src/main/webapp/jsp/admin_killmap_management.jsp:68
 #: src/main/webapp/jsp/admin_killmap_management.jsp:95
 #: src/main/webapp/jsp/admin_killmap_management.jsp:600
-#: src/main/webapp/WEB-INF/tags/create_games.tag:779
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1045
+#: src/main/webapp/WEB-INF/tags/create_games.tag:781
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1047
 #: src/main/webapp/WEB-INF/tags/game_header.tag:118
 msgid "Game"
 msgstr "Spiel"
@@ -4817,11 +4820,11 @@ msgstr "Killmap-Status"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:317
 #: src/main/webapp/jsp/games_history.jsp:67
 #: src/main/webapp/jsp/games_history.jsp:214 src/main/webapp/jsp/index.jsp:122
-#: src/main/webapp/jsp/index.jsp:160 src/main/webapp/jsp/user_games_view.jsp:86
-#: src/main/webapp/jsp/user_games_view.jsp:450
-#: src/main/webapp/jsp/user_games_view.jsp:650
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1170
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1255
+#: src/main/webapp/jsp/index.jsp:160 src/main/webapp/jsp/user_games_view.jsp:89
+#: src/main/webapp/jsp/user_games_view.jsp:453
+#: src/main/webapp/jsp/user_games_view.jsp:653
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1172
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1257
 msgid "Class"
 msgstr "Klasse"
 
@@ -4902,7 +4905,7 @@ msgstr "Warteschlange"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:204
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:404
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:513
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1069
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1073
 msgid "Delete"
 msgstr "Löschen"
 
@@ -5009,8 +5012,8 @@ msgstr "Keine Räume stehen für die Killmap-Berechnung in der Warteschlange."
 #: src/main/webapp/jsp/admin_killmap_management.jsp:539
 #: src/main/webapp/jsp/admin_killmap_management.jsp:592
 #: src/main/webapp/jsp/admin_killmap_management.jsp:644
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1239
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1476
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1241
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1478
 msgid "Select"
 msgstr "Auswählen"
 
@@ -5037,8 +5040,8 @@ msgstr "Mehrspieler-Spiele"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:81
 #: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/help.jsp:102
 #: src/main/webapp/jsp/index.jsp:123 src/main/webapp/jsp/scoring_system.jsp:25
-#: src/main/webapp/jsp/user_games_view.jsp:127
-#: src/main/webapp/jsp/user_games_view.jsp:451
+#: src/main/webapp/jsp/user_games_view.jsp:130
+#: src/main/webapp/jsp/user_games_view.jsp:454
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:84
 #: src/main/webapp/WEB-INF/tags/game_chat.tag:40
 msgid "Attackers"
@@ -5047,8 +5050,8 @@ msgstr "Angreifer"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:82
 #: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/help.jsp:48
 #: src/main/webapp/jsp/index.jsp:124 src/main/webapp/jsp/scoring_system.jsp:26
-#: src/main/webapp/jsp/user_games_view.jsp:128
-#: src/main/webapp/jsp/user_games_view.jsp:452
+#: src/main/webapp/jsp/user_games_view.jsp:131
+#: src/main/webapp/jsp/user_games_view.jsp:455
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:139
 #: src/main/webapp/WEB-INF/tags/game_chat.tag:42
 msgid "Defenders"
@@ -5059,10 +5062,10 @@ msgstr "Verteidiger"
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:130
 #: src/main/webapp/jsp/games_history.jsp:70
 #: src/main/webapp/jsp/games_history.jsp:216 src/main/webapp/jsp/index.jsp:125
-#: src/main/webapp/jsp/index.jsp:162 src/main/webapp/jsp/user_games_view.jsp:88
-#: src/main/webapp/jsp/user_games_view.jsp:456
-#: src/main/webapp/jsp/user_games_view.jsp:655
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1174
+#: src/main/webapp/jsp/index.jsp:162 src/main/webapp/jsp/user_games_view.jsp:91
+#: src/main/webapp/jsp/user_games_view.jsp:459
+#: src/main/webapp/jsp/user_games_view.jsp:658
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1176
 msgid "Level"
 msgstr "Level"
 
@@ -5085,8 +5088,8 @@ msgstr "Möchtest du dieses Spiel wirklich beenden?"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:125
 #: src/main/webapp/jsp/admin_monitor_games.jsp:362
 #: src/main/webapp/jsp/classroom_page.jsp:1027
-#: src/main/webapp/jsp/user_games_view.jsp:549
-#: src/main/webapp/jsp/user_games_view.jsp:718
+#: src/main/webapp/jsp/user_games_view.jsp:552
+#: src/main/webapp/jsp/user_games_view.jsp:721
 msgid "Observe"
 msgstr "Beobachten"
 
@@ -5144,7 +5147,7 @@ msgstr "Spieler entfernen"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:227
 #: src/main/webapp/jsp/admin_monitor_games.jsp:457
-#: src/main/webapp/WEB-INF/tags/create_games.tag:759
+#: src/main/webapp/WEB-INF/tags/create_games.tag:761
 msgid "never"
 msgstr "nie"
 
@@ -5181,15 +5184,15 @@ msgid "Remove"
 msgstr "Entfernen"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:300
-#: src/main/webapp/WEB-INF/tags/create_games.tag:482
+#: src/main/webapp/WEB-INF/tags/create_games.tag:484
 msgid "Melee Games"
 msgstr "Melee-Spiele"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:319
 #: src/main/webapp/jsp/games_history.jsp:215 src/main/webapp/jsp/index.jsp:161
-#: src/main/webapp/jsp/user_games_view.jsp:87
-#: src/main/webapp/jsp/user_games_view.jsp:326
-#: src/main/webapp/jsp/user_games_view.jsp:651
+#: src/main/webapp/jsp/user_games_view.jsp:90
+#: src/main/webapp/jsp/user_games_view.jsp:329
+#: src/main/webapp/jsp/user_games_view.jsp:654
 msgid "Players"
 msgstr "Spieler"
 
@@ -5198,7 +5201,7 @@ msgid "You don\\'t control any unfinished melee games at the moment."
 msgstr "Du hast im Moment keine laufenden Melee-Spiele unter Kontrolle."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:517
-#: src/main/webapp/WEB-INF/tags/create_games.tag:287
+#: src/main/webapp/WEB-INF/tags/create_games.tag:289
 msgid "Start Games"
 msgstr "Spiele starten"
 
@@ -5242,8 +5245,8 @@ msgstr "Sprache"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:69
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:99
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1284
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1122
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1288
 #: src/main/webapp/jsp/admin_system_settings.jsp:144
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:156
 msgid "Save"
@@ -5267,7 +5270,7 @@ msgstr "Du hast ungespeicherte Änderungen. Bitte speichere zuerst."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:110
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:401
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1311
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1315
 msgid "Upload Puzzles"
 msgstr "Rätsel hochladen"
 
@@ -5412,7 +5415,7 @@ msgid "Archive"
 msgstr "Archiv"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:521
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:583
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:587
 msgid "Move to chapter:"
 msgstr "Weiter zu Kapitel:"
 
@@ -5420,102 +5423,110 @@ msgstr "Weiter zu Kapitel:"
 msgid "Move to chapter"
 msgstr "Bewege zu Kapitel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:552
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:540
+msgid "easy"
+msgstr "einfach"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:541
+msgid "hard"
+msgstr "schwer"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:556
 msgid "Puzzles with existing games can't be deleted"
 msgstr "Rätsel mit vorhandenen Spielen können nicht gelöscht werden"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:683
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:687
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:691
 msgid "Scroll to chapter"
 msgstr "Zum Kapitel scrollen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:684
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:688
 msgid "Scroll to chapter:"
 msgstr "Zum Kapitel scrollen:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:685
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:689
 msgid "Go"
 msgstr "Los"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:784
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:857
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1099
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:788
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:861
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1103
 msgid "Please enter a title."
 msgstr "Bitte gib einen Titel ein."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:792
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:863
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:865
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1105
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1107
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:796
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:867
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:869
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1109
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1111
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:73
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:111
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:797
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:801
 msgid "Edit Chapter"
 msgstr "Kapitel bearbeiten"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:826
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:982
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1031
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1076
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1140
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1275
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:830
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:986
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1035
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1080
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1144
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1279
 msgid "Success"
 msgstr "Erfolg"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:853
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:855
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1097
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:857
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:859
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1101
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:107
 msgid "Title"
 msgstr "Titel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:871
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:875
 msgid "Max. Assertions"
 msgstr "Max. Assertions"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:879
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:883
 msgid "First Editable Line"
 msgstr "Erste bearbeitbare Zeile"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:884
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:888
 msgid "Last Editable Line"
 msgstr "Letzte bearbeitbare Zeile"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:892
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:896
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:135
 #: src/main/webapp/jsp/melee/create_game_view.jsp:132
-#: src/main/webapp/WEB-INF/tags/create_games.tag:191
+#: src/main/webapp/WEB-INF/tags/create_games.tag:192
 msgid "Game Level"
 msgstr "Spiellevel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:897
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:901
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:150
 #: src/main/webapp/jsp/melee/create_game_view.jsp:147
 msgid "Please select a level."
 msgstr "Bitte wähle ein Level aus."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:910
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:914
 #: src/main/webapp/jsp/user_profile.jsp:236
 msgid "Equivalence"
 msgstr "Äquivalenz"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:914
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:918
 msgid "Mutant equivalent"
 msgstr "Mutant äquivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:920
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:924
 msgid "Edit Puzzle"
 msgstr "Rätsel bearbeiten"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1007
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1011
 msgid "Are you sure you want to delete chapter {0}?"
 msgstr "Möchtest du Kapitel {0} wirklich löschen?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1008
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
 msgid ""
 "Any puzzles left in the chapter will be moved to <span class=\"px-1 border "
 "rounded-1\">Unassigned</span>."
@@ -5523,23 +5534,23 @@ msgstr ""
 "Alle Rätsel, die noch in diesem Kapitel sind, werden in den Ordner <span "
 "class=\"px-1 border rounded-1\">„Nicht zugewiesen“</span> verschoben."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1011
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
 msgid "Delete Chapter"
 msgstr "Kapitel löschen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1056
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1060
 msgid "Are you sure you want to permanently delete puzzle {0}?"
 msgstr "Möchtest du das Puzzle {0} wirklich endgültig löschen?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1060
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1064
 msgid "Delete Puzzle"
 msgstr "Rätsel löschen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1112
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1116
 msgid "Create New Chapter"
 msgstr "Neues Kapitel erstellen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1166
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1170
 #: src/main/webapp/jsp/battleground/game_history.jsp:38
 #: src/main/webapp/jsp/battleground/game_scoreboard.jsp:32
 #: src/main/webapp/jsp/battleground/game_scoreboard.jsp:38
@@ -5555,11 +5566,11 @@ msgstr "Neues Kapitel erstellen"
 msgid "Close"
 msgstr "Schließen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1270
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1274
 msgid "Saving..."
 msgstr "Speichern..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1278
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1282
 msgid "Could not save changes."
 msgstr "Änderungen konnten nicht gespeichert werden."
 
@@ -5593,7 +5604,7 @@ msgstr "JUnit-Tests"
 #: src/main/webapp/jsp/melee/player_view.jsp:223
 #: src/main/webapp/jsp/puzzle/defender_view.jsp:127
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:229
-#: src/main/webapp/WEB-INF/tags/create_games.tag:157
+#: src/main/webapp/WEB-INF/tags/create_games.tag:158
 msgid "Class Under Test"
 msgstr "Zu testende Klasse"
 
@@ -5786,7 +5797,7 @@ msgid "User"
 msgstr "Benutzer"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:197
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1514
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1516
 msgid "Last Login"
 msgstr "Letzte Anmeldung"
 
@@ -5892,7 +5903,7 @@ msgstr ""
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:103
 #: src/main/webapp/jsp/melee/create_game_view.jsp:100
-#: src/main/webapp/WEB-INF/tags/create_games.tag:166
+#: src/main/webapp/WEB-INF/tags/create_games.tag:167
 msgid "Upload a class."
 msgstr "Eine Klasse hochladen."
 
@@ -5903,20 +5914,20 @@ msgstr "Bitte wähle eine Klasse aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:118
 #: src/main/webapp/jsp/melee/create_game_view.jsp:115
-#: src/main/webapp/WEB-INF/tags/create_games.tag:178
+#: src/main/webapp/WEB-INF/tags/create_games.tag:179
 msgid "Include predefined mutants (if available)"
 msgstr "Vordefinierte Mutanten einbeziehen (falls verfügbar)"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:126
 #: src/main/webapp/jsp/melee/create_game_view.jsp:123
-#: src/main/webapp/WEB-INF/tags/create_games.tag:183
+#: src/main/webapp/WEB-INF/tags/create_games.tag:184
 msgid "Include predefined tests (if available)"
 msgstr "Vordefinierte Tests einbeziehen (falls verfügbar)"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:159
 #: src/main/webapp/jsp/melee/create_game_view.jsp:156
-#: src/main/webapp/WEB-INF/tags/create_games.tag:214
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1190
+#: src/main/webapp/WEB-INF/tags/create_games.tag:215
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1192
 msgid "Mutant Validator Level"
 msgstr "Mutanten-Validator-Level"
 
@@ -5927,7 +5938,7 @@ msgstr "Bitte wähle eine Mutanten-Validierungsstufe aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:192
 #: src/main/webapp/jsp/melee/create_game_view.jsp:189
-#: src/main/webapp/WEB-INF/tags/create_games.tag:234
+#: src/main/webapp/WEB-INF/tags/create_games.tag:236
 msgid ""
 "Maximum number of assertions per test. Increase this for difficult to test "
 "classes."
@@ -5937,7 +5948,7 @@ msgstr ""
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:194
 #: src/main/webapp/jsp/melee/create_game_view.jsp:191
-#: src/main/webapp/WEB-INF/tags/create_games.tag:236
+#: src/main/webapp/WEB-INF/tags/create_games.tag:238
 msgid "Max. Assertions Per Test"
 msgstr "Max. Assertions pro Test"
 
@@ -5948,7 +5959,7 @@ msgstr "Bitte gib eine gültige Zahl ein. Muss größer als Null sein."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:209
 #: src/main/webapp/jsp/melee/create_game_view.jsp:204
-#: src/main/webapp/WEB-INF/tags/create_games.tag:246
+#: src/main/webapp/WEB-INF/tags/create_games.tag:248
 msgid "Auto Equiv. Threshold"
 msgstr "Auto-Äquivalent-Schwellenwert"
 
@@ -5959,7 +5970,7 @@ msgstr "Bitte gib eine gültige Zahl ein. Muss positiv oder Null sein."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:223
 #: src/main/webapp/jsp/melee/create_game_view.jsp:217
-#: src/main/webapp/WEB-INF/tags/create_games.tag:268
+#: src/main/webapp/WEB-INF/tags/create_games.tag:270
 msgid ""
 "Forces players to specify the intentions of their mutants/tests before they "
 "can submit them."
@@ -5978,7 +5989,7 @@ msgid "Enable Capturing Players\\' Intentions"
 msgstr "Spieler-Intentionen erfassen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:237
-#: src/main/webapp/WEB-INF/tags/create_games.tag:276
+#: src/main/webapp/WEB-INF/tags/create_games.tag:278
 msgid "Allows players to chat within their team and with the enemy team."
 msgstr ""
 "Ermöglicht es den Spielern, innerhalb ihres Teams und mit dem gegnerischen "
@@ -5986,7 +5997,7 @@ msgstr ""
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:239
 #: src/main/webapp/jsp/melee/create_game_view.jsp:233
-#: src/main/webapp/WEB-INF/tags/create_games.tag:279
+#: src/main/webapp/WEB-INF/tags/create_games.tag:281
 msgid "Game Chat"
 msgstr "Spiel-Chat"
 
@@ -6033,7 +6044,7 @@ msgstr "Wähle die Rolle aus, die der Ersteller (du) im Spiel einnehmen wird."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:285
 #: src/main/webapp/jsp/melee/create_game_view.jsp:264
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1194
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1196
 msgid "Creator Role"
 msgstr "Rolle des Erstellers"
 
@@ -6044,7 +6055,7 @@ msgstr "Bitte wähle eine Rolle aus."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:298
 #: src/main/webapp/jsp/melee/create_game_view.jsp:277
-#: src/main/webapp/WEB-INF/tags/create_games.tag:291
+#: src/main/webapp/WEB-INF/tags/create_games.tag:293
 msgid "The duration for how long the games will be open."
 msgstr "Die Dauer, für die die Spiele geöffnet sein werden."
 
@@ -6055,21 +6066,21 @@ msgstr "Leg die Spieldauer fest:"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:305
 #: src/main/webapp/jsp/melee/create_game_view.jsp:284
-#: src/main/webapp/WEB-INF/tags/create_games.tag:301
+#: src/main/webapp/WEB-INF/tags/create_games.tag:303
 #: src/main/webapp/WEB-INF/tags/game_time.tag:109
 msgid "days"
 msgstr "Tage"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:307
 #: src/main/webapp/jsp/melee/create_game_view.jsp:286
-#: src/main/webapp/WEB-INF/tags/create_games.tag:303
+#: src/main/webapp/WEB-INF/tags/create_games.tag:305
 #: src/main/webapp/WEB-INF/tags/game_time.tag:111
 msgid "hours"
 msgstr "Stunden"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:309
 #: src/main/webapp/jsp/melee/create_game_view.jsp:288
-#: src/main/webapp/WEB-INF/tags/create_games.tag:305
+#: src/main/webapp/WEB-INF/tags/create_games.tag:307
 #: src/main/webapp/WEB-INF/tags/game_time.tag:113
 msgid "minutes"
 msgstr "Minuten"
@@ -6093,20 +6104,20 @@ msgstr "Spiel erstellen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:351
 #: src/main/webapp/jsp/melee/create_game_view.jsp:327
-#: src/main/webapp/WEB-INF/tags/create_games.tag:478
+#: src/main/webapp/WEB-INF/tags/create_games.tag:480
 msgid "Level Explanation"
 msgstr "Erklärung der Level"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:357
 #: src/main/webapp/jsp/game_components/mutant_explanation.jsp:82
 #: src/main/webapp/jsp/melee/create_game_view.jsp:333
-#: src/main/webapp/WEB-INF/tags/create_games.tag:487
+#: src/main/webapp/WEB-INF/tags/create_games.tag:489
 msgid "Validator Explanation"
 msgstr "Erläuterung zum Validator"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:366
 #: src/main/webapp/jsp/melee/create_game_view.jsp:342
-#: src/main/webapp/WEB-INF/tags/create_games.tag:495
+#: src/main/webapp/WEB-INF/tags/create_games.tag:497
 msgid "Auto Equivalence Duel Threshold Explanation"
 msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalenz"
 
@@ -6305,7 +6316,7 @@ msgstr "Wenn du dem Raum beitreten möchtest, kannst du das hier tun:"
 
 #: src/main/webapp/jsp/classroom_page.jsp:85
 #: src/main/webapp/jsp/classroom_page.jsp:613
-#: src/main/webapp/jsp/user_games_view.jsp:701
+#: src/main/webapp/jsp/user_games_view.jsp:704
 msgid "Join"
 msgstr "Beitreten"
 
@@ -6613,21 +6624,21 @@ msgid "No members found."
 msgstr "Keine Mitglieder gefunden."
 
 #: src/main/webapp/jsp/classroom_page.jsp:905
-#: src/main/webapp/WEB-INF/tags/create_games.tag:145
-#: src/main/webapp/WEB-INF/tags/create_games.tag:638
+#: src/main/webapp/WEB-INF/tags/create_games.tag:146
+#: src/main/webapp/WEB-INF/tags/create_games.tag:640
 #: src/main/webapp/WEB-INF/tags/game_header.tag:88
 msgid "Battleground"
 msgstr "Battleground"
 
 #: src/main/webapp/jsp/classroom_page.jsp:907
-#: src/main/webapp/WEB-INF/tags/create_games.tag:151
-#: src/main/webapp/WEB-INF/tags/create_games.tag:639
+#: src/main/webapp/WEB-INF/tags/create_games.tag:152
+#: src/main/webapp/WEB-INF/tags/create_games.tag:641
 #: src/main/webapp/WEB-INF/tags/game_header.tag:92
 msgid "Melee"
 msgstr "Melee"
 
 #: src/main/webapp/jsp/classroom_page.jsp:909
-#: src/main/webapp/WEB-INF/tags/create_games.tag:835
+#: src/main/webapp/WEB-INF/tags/create_games.tag:837
 msgid "unknown"
 msgstr "unbekannt"
 
@@ -7031,20 +7042,20 @@ msgid "View Results"
 msgstr "Ergebnisse anzeigen"
 
 #: src/main/webapp/jsp/games_history.jsp:143
-#: src/main/webapp/jsp/user_games_view.jsp:248
+#: src/main/webapp/jsp/user_games_view.jsp:251
 msgid "There are no Attackers."
 msgstr "Es gibt keine Angreifer."
 
 #: src/main/webapp/jsp/games_history.jsp:166
 #: src/main/webapp/jsp/leaderboards.jsp:44
-#: src/main/webapp/jsp/user_games_view.jsp:274
-#: src/main/webapp/jsp/user_games_view.jsp:603
+#: src/main/webapp/jsp/user_games_view.jsp:277
+#: src/main/webapp/jsp/user_games_view.jsp:606
 #: src/main/webapp/WEB-INF/tags/battleground_game_scoreboard.tag:141
 msgid "Mutants Killed"
 msgstr "Getötete Mutanten"
 
 #: src/main/webapp/jsp/games_history.jsp:176
-#: src/main/webapp/jsp/user_games_view.jsp:284
+#: src/main/webapp/jsp/user_games_view.jsp:287
 msgid "There are no Defenders."
 msgstr "Es gibt keine Verteidiger."
 
@@ -7640,7 +7651,7 @@ msgid "Allows players to chat with each other."
 msgstr "Ermöglicht es den Spielern, miteinander zu chatten."
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:291
-#: src/main/webapp/WEB-INF/tags/create_games.tag:308
+#: src/main/webapp/WEB-INF/tags/create_games.tag:310
 #: src/main/webapp/WEB-INF/tags/game_time.tag:116
 msgid "Maximum duration:"
 msgstr "Maximale Dauer:"
@@ -8075,98 +8086,98 @@ msgstr "Schwierigkeitsgrad des Tests"
 msgid "No classes uploaded."
 msgstr "Keine Klassen hochgeladen."
 
-#: src/main/webapp/jsp/user_games_view.jsp:98
+#: src/main/webapp/jsp/user_games_view.jsp:101
 msgid "You are currently not active in any games."
 msgstr "Du bist derzeit in keinem Spiel aktiv."
 
-#: src/main/webapp/jsp/user_games_view.jsp:142
+#: src/main/webapp/jsp/user_games_view.jsp:145
 msgid "Start battleground game"
 msgstr "Starte das Battleground-Spiel"
 
-#: src/main/webapp/jsp/user_games_view.jsp:155
+#: src/main/webapp/jsp/user_games_view.jsp:158
 msgid "Attack in battleground"
 msgstr "Greife im Battleground an"
 
-#: src/main/webapp/jsp/user_games_view.jsp:161
+#: src/main/webapp/jsp/user_games_view.jsp:164
 msgid "Joined as attacker"
 msgstr "Als Angreifer beigetreten"
 
-#: src/main/webapp/jsp/user_games_view.jsp:172
-#: src/main/webapp/jsp/user_games_view.jsp:204
+#: src/main/webapp/jsp/user_games_view.jsp:175
+#: src/main/webapp/jsp/user_games_view.jsp:207
 msgid "Leave battleground"
 msgstr "Das Battleground-Spiel verlassen"
 
-#: src/main/webapp/jsp/user_games_view.jsp:187
+#: src/main/webapp/jsp/user_games_view.jsp:190
 msgid "Defend in battleground"
 msgstr "Verteidige dich im Battleground"
 
-#: src/main/webapp/jsp/user_games_view.jsp:193
+#: src/main/webapp/jsp/user_games_view.jsp:196
 msgid "Joined as defender"
 msgstr "Als Verteidiger beigetreten"
 
-#: src/main/webapp/jsp/user_games_view.jsp:218
+#: src/main/webapp/jsp/user_games_view.jsp:221
 msgid "Observe battleground"
 msgstr "Beobachte das Battleground-Spiel"
 
-#: src/main/webapp/jsp/user_games_view.jsp:339
+#: src/main/webapp/jsp/user_games_view.jsp:342
 msgid "Start melee game"
 msgstr "Das Melee-Spiel starten"
 
-#: src/main/webapp/jsp/user_games_view.jsp:351
+#: src/main/webapp/jsp/user_games_view.jsp:354
 msgid "Observe melee game"
 msgstr "Beobachte Melee-Spiel"
 
-#: src/main/webapp/jsp/user_games_view.jsp:361
+#: src/main/webapp/jsp/user_games_view.jsp:364
 msgid "Play in melee game"
 msgstr "Im Melee-Spiel teilnehmen"
 
-#: src/main/webapp/jsp/user_games_view.jsp:367
+#: src/main/webapp/jsp/user_games_view.jsp:370
 msgid "Joined as player"
 msgstr "Als Spieler beigetreten"
 
-#: src/main/webapp/jsp/user_games_view.jsp:376
+#: src/main/webapp/jsp/user_games_view.jsp:379
 msgid "Leave Melee Game"
 msgstr "Melee-Spiel verlassen"
 
-#: src/main/webapp/jsp/user_games_view.jsp:405
-#: src/main/webapp/jsp/user_games_view.jsp:740
+#: src/main/webapp/jsp/user_games_view.jsp:408
+#: src/main/webapp/jsp/user_games_view.jsp:743
 msgid "There are no Players. Go Join!"
 msgstr "Es gibt noch keine Spieler. Mach mit!"
 
-#: src/main/webapp/jsp/user_games_view.jsp:431
+#: src/main/webapp/jsp/user_games_view.jsp:434
 msgid "Create battleground game"
 msgstr "Erstelle Battleground-Spiel"
 
-#: src/main/webapp/jsp/user_games_view.jsp:434
+#: src/main/webapp/jsp/user_games_view.jsp:437
 msgid "Create melee game"
 msgstr "Erstelle Melee-Spiel"
 
-#: src/main/webapp/jsp/user_games_view.jsp:443
+#: src/main/webapp/jsp/user_games_view.jsp:446
 msgid "Open Battleground Games"
 msgstr "Offene Battleground-Spiele"
 
-#: src/main/webapp/jsp/user_games_view.jsp:454
-#: src/main/webapp/jsp/user_games_view.jsp:653
+#: src/main/webapp/jsp/user_games_view.jsp:457
+#: src/main/webapp/jsp/user_games_view.jsp:656
 msgid "Observers"
 msgstr "Beobachter"
 
-#: src/main/webapp/jsp/user_games_view.jsp:465
+#: src/main/webapp/jsp/user_games_view.jsp:468
 msgid "There are currently no open battleground games."
 msgstr "Derzeit gibt es keine offenen Battleground-Spiele."
 
-#: src/main/webapp/jsp/user_games_view.jsp:576
+#: src/main/webapp/jsp/user_games_view.jsp:579
 msgid "There are no Attackers. Go Join!"
 msgstr "Es gibt keine Angreifer. Mach mit!"
 
-#: src/main/webapp/jsp/user_games_view.jsp:612
+#: src/main/webapp/jsp/user_games_view.jsp:615
 msgid "There are no Defenders. Go Join!"
 msgstr "Es gibt keine Verteidiger. Mach mit!"
 
-#: src/main/webapp/jsp/user_games_view.jsp:643
+#: src/main/webapp/jsp/user_games_view.jsp:646
 msgid "Open Melee Games"
 msgstr "Offene Melee-Spiele"
 
-#: src/main/webapp/jsp/user_games_view.jsp:664
+#: src/main/webapp/jsp/user_games_view.jsp:667
 msgid "There are currently no open melee games."
 msgstr "Derzeit sind keine Melee-Spiele verfügbar."
 
@@ -8563,121 +8574,121 @@ msgstr ""
 msgid "Confirm"
 msgstr "Bestätigen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:48
+#: src/main/webapp/WEB-INF/tags/create_games.tag:49
 msgid "Staged Games"
 msgstr "Spielentwürfe"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:51
+#: src/main/webapp/WEB-INF/tags/create_games.tag:52
 msgid "Select all games (that your search applies to)"
 msgstr "Alle Spiele auswählen (auf die deine Suche zutrifft)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:52
-#: src/main/webapp/WEB-INF/tags/create_games.tag:96
+#: src/main/webapp/WEB-INF/tags/create_games.tag:53
+#: src/main/webapp/WEB-INF/tags/create_games.tag:97
 msgid "Select All"
 msgstr "Alle auswählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:55
+#: src/main/webapp/WEB-INF/tags/create_games.tag:56
 msgid "Deselect all games (that your search applies to)"
 msgstr "Alle Spiele (auf die sich deine Suche bezieht) abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:56
-#: src/main/webapp/WEB-INF/tags/create_games.tag:100
+#: src/main/webapp/WEB-INF/tags/create_games.tag:57
+#: src/main/webapp/WEB-INF/tags/create_games.tag:101
 msgid "Deselect All"
 msgstr "Alle abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:61
+#: src/main/webapp/WEB-INF/tags/create_games.tag:62
 msgid "Hide Players"
 msgstr "Spieler ausblenden"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:82
+#: src/main/webapp/WEB-INF/tags/create_games.tag:83
 msgid "Delete Games"
 msgstr "Spiele löschen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:92
+#: src/main/webapp/WEB-INF/tags/create_games.tag:93
 msgid "Unassigned Users"
 msgstr "Nicht zugewiesene Benutzer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:95
+#: src/main/webapp/WEB-INF/tags/create_games.tag:96
 msgid "Select all users (that your search applies to)"
 msgstr "Alle Benutzer auswählen (auf die deine Suche zutrifft)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:99
+#: src/main/webapp/WEB-INF/tags/create_games.tag:100
 msgid "Deselect all users (that your search applies to)"
 msgstr "Alle Benutzer (auf die deine Suche zutrifft) abwählen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:107
+#: src/main/webapp/WEB-INF/tags/create_games.tag:108
 msgid "Show users that are part of an existing active game."
 msgstr "Zeige Benutzer, die Teil eines bestehenden aktiven Spiels sind."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:108
+#: src/main/webapp/WEB-INF/tags/create_games.tag:109
 msgid "Show Assigned Users (in active games)"
 msgstr "Zugewiesene Benutzer anzeigen (in aktiven Spielen)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:131
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1299
+#: src/main/webapp/WEB-INF/tags/create_games.tag:132
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1301
 msgid "Game Settings"
 msgstr "Spieleinstellungen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:137
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1166
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1261
+#: src/main/webapp/WEB-INF/tags/create_games.tag:138
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1168
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1263
 msgid "Game Type"
 msgstr "Spieltyp"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:176
+#: src/main/webapp/WEB-INF/tags/create_games.tag:177
 msgid "Include mutants uploaded together with the class."
 msgstr "Mutanten, die zusammen mit der Klasse hochgeladen wurden, einbeziehen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:255
+#: src/main/webapp/WEB-INF/tags/create_games.tag:257
 msgid "Select the role you will have in the game."
 msgstr "Wähle die Rolle aus, die du im Spiel übernehmen möchtest."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:256
+#: src/main/webapp/WEB-INF/tags/create_games.tag:258
 msgid "Your Role"
 msgstr "Deine Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:271
+#: src/main/webapp/WEB-INF/tags/create_games.tag:273
 msgid "Enable Capture Players' Intentions"
 msgstr "Die Intentionen der Spieler erfassen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:284
+#: src/main/webapp/WEB-INF/tags/create_games.tag:286
 msgid "Automatically start games once they are created."
 msgstr "Spiele automatisch starten, sobald sie erstellt wurden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:298
+#: src/main/webapp/WEB-INF/tags/create_games.tag:300
 msgid "Set the game's duration:"
 msgstr "Leg die Spieldauer fest:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:309
+#: src/main/webapp/WEB-INF/tags/create_games.tag:311
 msgid "If the value is greater, it will be limited to this maximum."
 msgstr "Wenn der Wert größer ist, wird er auf diesen Höchstwert begrenzt."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:347
+#: src/main/webapp/WEB-INF/tags/create_games.tag:349
 msgid "Create Staged Games With Users"
 msgstr "Inszenierte Spiele mit Benutzern erstellen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:358
+#: src/main/webapp/WEB-INF/tags/create_games.tag:360
 msgid "User Names"
 msgstr "Benutzername"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:366
+#: src/main/webapp/WEB-INF/tags/create_games.tag:368
 msgid "Method of assigning roles to players."
 msgstr "Verfahren zur Zuweisung von Rollen an Spieler."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:370
+#: src/main/webapp/WEB-INF/tags/create_games.tag:372
 msgid "Role Assignment"
 msgstr "Rollenzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:380
-#: src/main/webapp/WEB-INF/tags/create_games.tag:406
+#: src/main/webapp/WEB-INF/tags/create_games.tag:382
+#: src/main/webapp/WEB-INF/tags/create_games.tag:408
 msgid "Random"
 msgstr "Zufällig"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:386
+#: src/main/webapp/WEB-INF/tags/create_games.tag:388
 msgid "Opposite Role"
 msgstr "Gegenteilige Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:392
+#: src/main/webapp/WEB-INF/tags/create_games.tag:394
 msgid ""
 "Method of assigning players to teams. Click the question mark for more "
 "information."
@@ -8685,126 +8696,126 @@ msgstr ""
 "Verfahren zur Zuweisung von Spielern zu Teams. Klicke auf das Fragezeichen, "
 "um weitere Informationen zu erhalten."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:396
+#: src/main/webapp/WEB-INF/tags/create_games.tag:398
 msgid "Game Assignment"
 msgstr "Spielzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:412
+#: src/main/webapp/WEB-INF/tags/create_games.tag:414
 msgid "Score Descending"
 msgstr "Punktzahl absteigend"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:418
+#: src/main/webapp/WEB-INF/tags/create_games.tag:420
 msgid "Number of attackers per game."
 msgstr "Anzahl der Angreifer pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:419
+#: src/main/webapp/WEB-INF/tags/create_games.tag:421
 msgid "Attackers per Game"
 msgstr "Angreifer pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:424
+#: src/main/webapp/WEB-INF/tags/create_games.tag:426
 msgid "Number of defenders per game."
 msgstr "Anzahl der Verteidiger pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:425
+#: src/main/webapp/WEB-INF/tags/create_games.tag:427
 msgid "Defenders per Game"
 msgstr "Verteidiger pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:430
+#: src/main/webapp/WEB-INF/tags/create_games.tag:432
 msgid "Players per game."
 msgstr "Spieler pro Spiel."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:431
+#: src/main/webapp/WEB-INF/tags/create_games.tag:433
 msgid "Players per Game"
 msgstr "Spieler pro Spiel"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:438
-#: src/main/webapp/WEB-INF/tags/create_games.tag:466
+#: src/main/webapp/WEB-INF/tags/create_games.tag:440
+#: src/main/webapp/WEB-INF/tags/create_games.tag:468
 msgid "Stage Games"
 msgstr "Spielentwürfe anlegen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:450
+#: src/main/webapp/WEB-INF/tags/create_games.tag:452
 msgid "Create Empty Staged Games"
 msgstr "Leeren Spielentwurf erstellen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:458
+#: src/main/webapp/WEB-INF/tags/create_games.tag:460
 msgid "Number of staged games to create."
 msgstr "Anzahl der zu erstellenden Spielentwürfe."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:459
+#: src/main/webapp/WEB-INF/tags/create_games.tag:461
 msgid "Number of Games"
 msgstr "Anzahl der Spiele"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:480
+#: src/main/webapp/WEB-INF/tags/create_games.tag:482
 msgid "Battleground Games"
 msgstr "Battleground-Spiele"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:501
+#: src/main/webapp/WEB-INF/tags/create_games.tag:503
 msgid "Role Assignment Explanation"
 msgstr "Erläuterung der Rollenzuweisung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:503
+#: src/main/webapp/WEB-INF/tags/create_games.tag:505
 msgid "Specifies how roles are assigned to players:"
 msgstr "Legt fest, wie Rollen den Spielern zugewiesen werden:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:506
-#: src/main/webapp/WEB-INF/tags/create_games.tag:522
+#: src/main/webapp/WEB-INF/tags/create_games.tag:508
+#: src/main/webapp/WEB-INF/tags/create_games.tag:524
 msgid "Random:"
 msgstr "Zufällig:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:507
+#: src/main/webapp/WEB-INF/tags/create_games.tag:509
 msgid "Players are assigned roles randomly."
 msgstr "Die Spieler erhalten ihre Rollen nach dem Zufallsprinzip."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:510
+#: src/main/webapp/WEB-INF/tags/create_games.tag:512
 msgid "Opposite:"
 msgstr "Gegenüber:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:511
+#: src/main/webapp/WEB-INF/tags/create_games.tag:513
 msgid ""
 "Players are assigned the opposite of their last played role, if possible."
 msgstr ""
 "Den Spielern wird, wenn möglich, die entgegengesetzte Rolle ihrer zuletzt "
 "gespielten Rolle zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:517
+#: src/main/webapp/WEB-INF/tags/create_games.tag:519
 msgid "Game Assignment Explanation"
 msgstr "Erklärung zur Spielaufgabe"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:519
+#: src/main/webapp/WEB-INF/tags/create_games.tag:521
 msgid "Specifies how players are assigned to games:"
 msgstr "Legt fest, wie Spieler den Spielen zugewiesen werden:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:523
+#: src/main/webapp/WEB-INF/tags/create_games.tag:525
 msgid "Players are assigned to games randomly."
 msgstr "Die Spieler werden nach dem Zufallsprinzip den Spielen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:526
+#: src/main/webapp/WEB-INF/tags/create_games.tag:528
 msgid "Scores Descending:"
 msgstr "Ergebnisse absteigend:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:527
+#: src/main/webapp/WEB-INF/tags/create_games.tag:529
 msgid "Players are assigned to games based on their total score in past games."
 msgstr ""
 "Die Spieler werden anhand ihrer Gesamtpunktzahl aus früheren Spielen den "
 "Spielen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:528
+#: src/main/webapp/WEB-INF/tags/create_games.tag:530
 msgid "The players with the highest scores are assigned to the first games,"
 msgstr ""
 "Die Spieler mit den höchsten Punktzahlen werden den ersten Spielen "
 "zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:529
+#: src/main/webapp/WEB-INF/tags/create_games.tag:531
 msgid "the players with the lowest scores are assigned to the last games."
 msgstr ""
 "Die Spieler mit den niedrigsten Punktzahlen werden den letzten Spielen "
 "zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:535
+#: src/main/webapp/WEB-INF/tags/create_games.tag:537
 msgid "User Names Explanation"
 msgstr "Erläuterung der Benutzernamen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:537
+#: src/main/webapp/WEB-INF/tags/create_games.tag:539
 msgid ""
 "Newline-separated list of usernames or emails. The users with these names/"
 "emails, as well as the users selected in the table, will be assigned to "
@@ -8814,11 +8825,11 @@ msgstr ""
 "Die Benutzer mit diesen Namen/E-Mail-Adressen sowie die in der Tabelle "
 "ausgewählten Benutzer werden den erstellten Spielentwürfen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:541
+#: src/main/webapp/WEB-INF/tags/create_games.tag:543
 msgid "Stage Games With Users Explanation"
 msgstr "Spielentwürfe mit Benutzern Erklärung"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:544
+#: src/main/webapp/WEB-INF/tags/create_games.tag:546
 msgid ""
 "Selected users from the table, as well as users entered in the text area, "
 "will be assigned to new staged games."
@@ -8826,7 +8837,7 @@ msgstr ""
 "Ausgewählte Benutzer aus der Tabelle sowie Benutzer, die in den Textbereich "
 "eingegeben wurden, werden neuen Spielentwürfen zugewiesen."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:545
+#: src/main/webapp/WEB-INF/tags/create_games.tag:547
 msgid ""
 "The number of games is decided by the number of users and the selected "
 "method of distributing the users to teams."
@@ -8834,153 +8845,153 @@ msgstr ""
 "Die Anzahl der Spiele wird durch die Anzahl der Benutzer und die gewählte "
 "Methode zur Aufteilung der Benutzer auf die Teams bestimmt."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:548
-#: src/main/webapp/WEB-INF/tags/create_games.tag:556
+#: src/main/webapp/WEB-INF/tags/create_games.tag:550
+#: src/main/webapp/WEB-INF/tags/create_games.tag:558
 msgid "The settings for the staged games are specified in the left card."
 msgstr ""
 "Die Einstellungen für die inszenierten Spiele sind auf der linken Karte "
 "angegeben."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:553
+#: src/main/webapp/WEB-INF/tags/create_games.tag:555
 msgid "Stage Empty Games Explanation"
 msgstr "Erklärung: Spielentwürfe ohne Spieler"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:555
+#: src/main/webapp/WEB-INF/tags/create_games.tag:557
 msgid "Create a number staged games without users assigned to them."
 msgstr "Erstelle eine Reihe von Spielen, denen keine Benutzer zugewiesen sind."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:656
+#: src/main/webapp/WEB-INF/tags/create_games.tag:658
 msgid "None"
 msgstr "Keine"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:737
+#: src/main/webapp/WEB-INF/tags/create_games.tag:739
 msgid "none"
 msgstr "keine"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:761
+#: src/main/webapp/WEB-INF/tags/create_games.tag:763
 msgid "Dates are converted to you local timezone: {0}"
 msgstr "Die Daten werden in deine lokale Zeitzone umgerechnet: {0}"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:814
+#: src/main/webapp/WEB-INF/tags/create_games.tag:816
 msgid "Add player to selected game"
 msgstr "Spieler zum ausgewählten Spiel hinzufügen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:841
+#: src/main/webapp/WEB-INF/tags/create_games.tag:843
 msgid "alias"
 msgstr "alias"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:863
+#: src/main/webapp/WEB-INF/tags/create_games.tag:865
 msgid "hidden"
 msgstr "versteckt"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:959
+#: src/main/webapp/WEB-INF/tags/create_games.tag:961
 msgid "Switch your role"
 msgstr "Wechsle deine Rolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:971
+#: src/main/webapp/WEB-INF/tags/create_games.tag:973
 msgid "Change to Observer"
 msgstr "Wechsle zu Beobachter"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1021
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1023
 msgid "Switch role of player"
 msgstr "Rolle des Spielers wechseln"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1033
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1035
 msgid "Remove player from game"
 msgstr "Spieler aus dem Spiel entfernen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1074
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1076
 msgid "Move player to selected game"
 msgstr "Spieler zum ausgewählten Spiel verschieben"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1178
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1180
 msgid "Include Predefined Mutants"
 msgstr "Vordefinierte Mutanten einbeziehen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1182
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1184
 msgid "Include Predefined Tests"
 msgstr "Vordefinierte Tests einbeziehen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1186
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1188
 msgid "Max Assertions Per Test"
 msgstr "Maximale Anzahl von Assertions pro Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1198
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1200
 msgid "Chat Enabled"
 msgstr "Chat aktiviert"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1202
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1204
 msgid "Capture Player Intentions"
 msgstr "Intentionen der Spieler erfassen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1206
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1208
 msgid "Equivalence Threshold"
 msgstr "Äquivalenz-Threshold"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1210
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1212
 #: src/main/webapp/WEB-INF/tags/game_header.tag:164
 msgid "Start Game"
 msgstr "Spiel starten"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1214
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1216
 #: src/main/webapp/WEB-INF/tags/game_time.tag:53
 #: src/main/webapp/WEB-INF/tags/game_time.tag:58
 msgid "Game Duration"
 msgstr "Spieldauer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1266
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1268
 msgid "Show"
 msgstr "Anzeigen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1268
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1270
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1276
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1278
 msgid "Players (Username, Classroom Role, Last Game Role, Total Score)"
 msgstr ""
 "Spieler (Benutzername, Rolle im Klassenzimmer, Rolle im letzten Spiel, "
 "Gesamtpunktzahl)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1277
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1279
 msgid "Players (Username, Last Game Role, Total Score)"
 msgstr "Spieler (Benutzername, letzte Spielrolle, Gesamtpunktzahl)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1317
 msgid "There are currently no staged games."
 msgstr "Derzeit gibt es keine Spielentwürfe."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1316
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1318
 msgid "No matching staged games found."
 msgstr "Es wurden keine passenden Spielentwürfe gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1496
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1498
 msgid "Classroom Role"
 msgstr "Rolle im Klassenraum"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1503
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1505
 msgid "Last Game Role"
 msgstr "Letzte Spielrolle"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1521
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1523
 msgid "Add to existing game"
 msgstr "Zum bestehenden Spiel hinzufügen"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1545
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1547
 msgid "No users found."
 msgstr "Keine Benutzer gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1546
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1548
 msgid "No matching users found."
 msgstr "Keine passenden Benutzer gefunden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1693
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1695
 msgid "You have users selected. Are you sure you want to stage empty games?"
 msgstr ""
 "Sie haben Benutzer ausgewählt. Möchten Sie wirklich leere Spielentwürfe "
 "erstellen?"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1697
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1699
 msgid ""
 "You entered user names/emails. Are you sure you want to stage empty games?"
 msgstr ""

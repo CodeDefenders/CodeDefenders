@@ -534,8 +534,12 @@
                     this.description.innerHTML = i(text.description, text.isFallback);
                     this.description.title = text.title;
                     this.tags.id.innerText = '#' + puzzle.id;
-                    this.tags.games.innerText = puzzle.gameCount + ' game' + (puzzle.gameCount === 1 ? '' : 's');
-                    this.tags.level.innerText = puzzle.level.toLowerCase();
+                    this.tags.games.innerText = puzzle.gameCount + ' '
+                        + (puzzle.gameCount === 1 ? "${i18n.tr('game')}" : "${i18n.tr('games')}");
+                    this.tags.level.innerText =
+                        ( puzzle.level === 'EASY' ? "${i18n.tr('easy')}"
+                        : puzzle.level === 'HARD' ? "${i18n.tr('hard')}"
+                        : puzzle.level);
 
                     if (puzzle.type === 'EQUIVALENCE' && puzzle.isEquivalent) {
                         this.tags.equivalent.removeAttribute('hidden');
