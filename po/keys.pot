@@ -2147,6 +2147,162 @@ msgstr "Could not send email to user {0} with email {1}"
 msgid "Your Code Defenders Account"
 msgstr "Your Code Defenders Account"
 
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:123
+msgid "Missing puzzleId parameter."
+msgstr "Missing puzzleId parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:131
+msgid "Missing puzzleChapterId parameter."
+msgstr "Missing puzzleChapterId parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:149
+msgid "Missing puzzleId parameter."
+msgstr "Missing puzzleId parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:162
+msgid "Missing puzzleChapterId or create parameter."
+msgstr "Missing puzzleChapterId or create parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:171
+msgid "Requested URL not available."
+msgstr "Requested URL not available."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:183
+msgid "Missing parameter."
+msgstr "Missing parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:191
+msgid "Missing puzzleChapterId parameter."
+msgstr "Missing puzzleChapterId parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:197
+msgid "Requested URL not available."
+msgstr "Requested URL not available."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:204
+msgid "Puzzle not found."
+msgstr "Puzzle not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:209
+msgid "Cannot delete puzzle {0} because games exist for that puzzle."
+msgstr "Cannot delete puzzle {0} because games exist for that puzzle."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:239
+msgid "Removed puzzle {0}."
+msgstr "Removed puzzle {0}."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:241
+msgid "Couldn't update puzzle {0}"
+msgstr "Couldn't update puzzle {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:250
+msgid "Puzzle chapter not found."
+msgstr "Puzzle chapter not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:254
+msgid "Failed to remove puzzle chapter."
+msgstr "Failed to remove puzzle chapter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:257
+msgid "Removed puzzle chapter."
+msgstr "Removed puzzle chapter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:280
+msgid "Puzzle not found."
+msgstr "Puzzle not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:295
+msgid "Puzzle chapter not found."
+msgstr "Puzzle chapter not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:317
+msgid "Puzzle not found."
+msgstr "Puzzle not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:323
+msgid "No valid request body provided"
+msgstr "No valid request body provided"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:333
+msgid "Invalid title."
+msgstr "Invalid title."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:338
+msgid "Invalid description."
+msgstr "Invalid description."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:343
+msgid "Invalid maxAssertionsPerTest."
+msgstr "Invalid maxAssertionsPerTest."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:348
+msgid "Invalid editableLinesStart."
+msgstr "Invalid editableLinesStart."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:353
+msgid "Invalid editableLinesEnd."
+msgstr "Invalid editableLinesEnd."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:357
+msgid "Invalid editable lines."
+msgstr "Invalid editable lines."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:368
+msgid "Failed to update puzzle."
+msgstr "Failed to update puzzle."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:378
+msgid "Updated puzzle."
+msgstr "Updated puzzle."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:388
+msgid "No valid request body provided"
+msgstr "No valid request body provided"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:398
+msgid "Invalid title."
+msgstr "Invalid title."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:403
+msgid "Invalid description."
+msgstr "Invalid description."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:415
+msgid "Created puzzle chapter."
+msgstr "Created puzzle chapter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:426
+msgid "Puzzle chapter not found."
+msgstr "Puzzle chapter not found."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:432
+msgid "No valid request body provided"
+msgstr "No valid request body provided"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:442
+msgid "Invalid title."
+msgstr "Invalid title."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:447
+msgid "Invalid description."
+msgstr "Invalid description."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:453
+msgid "Failed to update puzzle chapter."
+msgstr "Failed to update puzzle chapter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:463
+msgid "Updated puzzle chapter."
+msgstr "Updated puzzle chapter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:473
+msgid "No valid request body provided"
+msgstr "No valid request body provided"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:484
+msgid "Updated puzzle and chapter positions."
+msgstr "Updated puzzle and chapter positions."
+
 #: src/main/java/org/codedefenders/servlets/api/llm/ResolveEquivalenceAPI.java:206
 msgid "Additionally, your test did kill another claimed mutant!"
 msgstr "Additionally, your test did kill another claimed mutant!"

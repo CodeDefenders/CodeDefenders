@@ -1502,7 +1502,7 @@ msgstr "Klassen"
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:538
 msgid "game"
-msgstr "Spiele"
+msgstr "Spiel"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminKillmapManagement.java:293
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:538
@@ -1621,6 +1621,9 @@ msgid "You're already the creator of this game."
 msgstr "Du bist bereits der Ersteller dieses Spiels."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:125
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:204
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:280
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:317
 msgid "Puzzle not found."
 msgstr "Rätsel nicht gefunden."
 
@@ -2075,6 +2078,116 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:337
 msgid "Your Code Defenders Account"
 msgstr "Dein Code Defenders-Konto"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:123
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:149
+msgid "Missing puzzleId parameter."
+msgstr "Der Parameter „puzzleId“ fehlt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:131
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:191
+msgid "Missing puzzleChapterId parameter."
+msgstr "Der Parameter „puzzleChapterId“ fehlt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:162
+msgid "Missing puzzleChapterId or create parameter."
+msgstr "Der Parameter „puzzleChapterId“ oder „create“ fehlt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:171
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:197
+msgid "Requested URL not available."
+msgstr "Die angeforderte URL ist nicht verfügbar."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:183
+msgid "Missing parameter."
+msgstr "Fehlender Parameter."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:209
+msgid "Cannot delete puzzle {0} because games exist for that puzzle."
+msgstr ""
+"Das Rätsel {0} kann nicht gelöscht werden, da es bereits Spiele für dieses "
+"Puzzle gibt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:239
+msgid "Removed puzzle {0}."
+msgstr "Rätsel {0} entfernt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:241
+msgid "Couldn't update puzzle {0}"
+msgstr "Rätsel konnte nicht aktualisiert werden {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:250
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:295
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:426
+msgid "Puzzle chapter not found."
+msgstr "Das Kapitel wurde nicht gefunden."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:254
+msgid "Failed to remove puzzle chapter."
+msgstr "Das Kapitel konnte nicht entfernt werden."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:257
+msgid "Removed puzzle chapter."
+msgstr "Das Kapitel wurde entfernt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:323
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:388
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:432
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:473
+msgid "No valid request body provided"
+msgstr "Es wurde kein gültiger Request-Body angegeben"
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:333
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:398
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:442
+msgid "Invalid title."
+msgstr "Ungültiger Titel."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:338
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:403
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:447
+msgid "Invalid description."
+msgstr "Ungültige Beschreibung."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:343
+msgid "Invalid maxAssertionsPerTest."
+msgstr "Ungültiger Wert für „maxAssertionsPerTest“."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:348
+msgid "Invalid editableLinesStart."
+msgstr "Ungültiger Wert für „editableLinesStart“."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:353
+msgid "Invalid editableLinesEnd."
+msgstr "Ungültiges „editableLinesEnd“."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:357
+msgid "Invalid editable lines."
+msgstr "Ungültige bearbeitbare Zeilen."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:368
+msgid "Failed to update puzzle."
+msgstr "Das Rätsel konnte nicht aktualisiert werden."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:378
+msgid "Updated puzzle."
+msgstr "Rätsel aktualisiert."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:415
+msgid "Created puzzle chapter."
+msgstr "Kapitel erstellt."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:453
+msgid "Failed to update puzzle chapter."
+msgstr "Das Kapitel konnte nicht aktualisiert werden."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:463
+msgid "Updated puzzle chapter."
+msgstr "Das Kapitel wurde aktualisiert."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:484
+msgid "Updated puzzle and chapter positions."
+msgstr "Die Positionen der Rätsel und Kapitel wurden aktualisiert."
 
 #: src/main/java/org/codedefenders/servlets/api/llm/ResolveEquivalenceAPI.java:206
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:643
@@ -9328,11 +9441,11 @@ msgstr ""
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:37
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:58
 msgid "Attack"
-msgstr "Angreifen"
+msgstr "Angriff"
 
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:34
 msgid "Defense"
-msgstr "Verteidigen"
+msgstr "Verteidigung"
 
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:35
 msgid "Duels"
