@@ -3163,7 +3163,7 @@ msgstr ""
 msgid ""
 "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 msgstr ""
-"Juhu, dein Test hat den angeblich gleichwertigen Mutanten erledigt. Du hast "
+"Juhu, dein Test hat den angeblich äquivalenten Mutanten erledigt. Du hast "
 "das Duell gewonnen!"
 
 #: src/main/java/org/codedefenders/util/Constants.java:108
@@ -3171,7 +3171,7 @@ msgid ""
 "Oh no, your test did not kill the possibly equivalent mutant! You lost the "
 "duel."
 msgstr ""
-"Oh nein, dein Test hat den möglicherweise gleichwertigen Mutanten nicht "
+"Oh nein, dein Test hat den möglicherweise äquivalente Mutanten nicht "
 "getötet! Du hast das Duell verloren."
 
 #: src/main/java/org/codedefenders/util/Constants.java:109
@@ -3216,7 +3216,7 @@ msgstr "Dein Mutant wurde erfolgreich kompiliert."
 
 #: src/main/java/org/codedefenders/util/Constants.java:118
 msgid "The mutant was accepted as equivalent."
-msgstr "Der Mutant wurde als gleichwertig anerkannt."
+msgstr "Der Mutant wurde als äquivalent anerkannt."
 
 #: src/main/java/org/codedefenders/util/Constants.java:119
 msgid ""
@@ -7459,7 +7459,7 @@ msgid ""
 "click the \"Claim Equivalent\" button on the mutant."
 msgstr ""
 "Wenn ein Verteidiger der Meinung ist, dass der Mutant eines Angreifers "
-"äquivalent ist, kann er auf die Schaltfläche „Als gleichwertig beanspruchen“ "
+"äquivalent ist, kann er auf die Schaltfläche „Als äquivalent beanspruchen“ "
 "auf dem Mutanten klicken."
 
 #: src/main/webapp/jsp/help.jsp:176
@@ -7924,7 +7924,7 @@ msgstr "Dieser Mutant entspricht der zu testenden Klasse."
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:130
 msgid "Your test killed the mutant flagged as equivalent."
-msgstr "Dein Test hat den als gleichwertig markierten Mutanten getötet."
+msgstr "Dein Test hat den als äquivalent markierten Mutanten getötet."
 
 #: src/main/webapp/jsp/puzzle/equivalence_view.jsp:174
 msgid "The mutant is equivalent!"
