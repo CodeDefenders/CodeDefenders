@@ -8778,7 +8778,7 @@ msgstr "Wenn der Wert größer ist, wird er auf diesen Höchstwert begrenzt."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:349
 msgid "Create Staged Games With Users"
-msgstr "Inszenierte Spiele mit Benutzern erstellen"
+msgstr "Spielentwürfe mit Benutzern erstellen"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:360
 msgid "User Names"
@@ -8962,7 +8962,7 @@ msgstr ""
 #: src/main/webapp/WEB-INF/tags/create_games.tag:558
 msgid "The settings for the staged games are specified in the left card."
 msgstr ""
-"Die Einstellungen für die inszenierten Spiele sind auf der linken Karte "
+"Die Einstellungen für die Spielentwürfe sind auf der linken Karte "
 "angegeben."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:555
