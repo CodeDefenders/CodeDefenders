@@ -5288,8 +5288,8 @@ msgid "Show list of Players for each Game."
 msgstr "Show list of Players for each Game."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:99
-msgid "You don\\\'t control any unfinished multiplayer games at the moment."
-msgstr "You don\\\'t control any unfinished multiplayer games at the moment."
+msgid "You don\'t control any unfinished multiplayer games at the moment."
+msgstr "You don\'t control any unfinished multiplayer games at the moment."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:111
 msgid "Are you sure you want to stop this Game?"
@@ -5404,8 +5404,8 @@ msgid "Show list of Players for each Game."
 msgstr "Show list of Players for each Game."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:336
-msgid "You don\\\'t control any unfinished melee games at the moment."
-msgstr "You don\\\'t control any unfinished melee games at the moment."
+msgid "You don\'t control any unfinished melee games at the moment."
+msgstr "You don\'t control any unfinished melee games at the moment."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:348
 msgid "Are you sure you want to stop this Game?"
@@ -6228,8 +6228,8 @@ msgid "User is already set inactive."
 msgstr "User is already set inactive."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:231
-msgid "Are you sure you want to set {0}\\\'s account to inactive?"
-msgstr "Are you sure you want to set {0}\\\'s account to inactive?"
+msgid "Are you sure you want to set {0}\'s account to inactive?"
+msgstr "Are you sure you want to set {0}\'s account to inactive?"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:261
 msgid "Showing _TOTAL_ entries"
@@ -7436,12 +7436,12 @@ msgid "The page could not be found, or you don\\'t have permission to view it."
 msgstr "The page could not be found, or you don\\'t have permission to view it."
 
 #: src/main/webapp/jsp/error_page_404.jsp:32
-msgid "The resource that you are attempting to access does not exist, or you don\\\'t have the necessary permissions to view it."
-msgstr "The resource that you are attempting to access does not exist, or you don\\\'t have the necessary permissions to view it."
+msgid "The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it."
+msgstr "The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it."
 
 #: src/main/webapp/jsp/error_page_404.jsp:34
-msgid "Make sure the address is correct and that the page hasn\\\'t moved."
-msgstr "Make sure the address is correct and that the page hasn\\\'t moved."
+msgid "Make sure the address is correct and that the page hasn\'t moved."
+msgstr "Make sure the address is correct and that the page hasn\'t moved."
 
 #: src/main/webapp/jsp/error_page_404.jsp:35
 msgid "Please contact your administrator if you think this is a mistake."
@@ -11464,8 +11464,8 @@ msgid "My mutant is equivalent"
 msgstr "My mutant is equivalent"
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
-msgid "I don\\\'t know if my mutant is killable"
-msgstr "I don\\\'t know if my mutant is killable"
+msgid "I don\'t know if my mutant is killable"
+msgstr "I don\'t know if my mutant is killable"
 
 #: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:41
 msgid "Only {0} assertion per test"

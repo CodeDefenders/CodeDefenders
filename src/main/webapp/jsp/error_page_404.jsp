@@ -24,14 +24,14 @@
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <t:error_page
-        title="${i18n.tr('The page you\\\'re looking for could not be found (404)')}"
+        title="${i18n.tr('The page you\'re looking for could not be found (404)')}"
         statusCode="404"
-        shortDescription="${i18n.tr('The page could not be found, or you don\\\'t have permission to view it.')}">
+        shortDescription="${i18n.tr('The page could not be found, or you don\'t have permission to view it.')}">
     <jsp:attribute name="message">
         <p>
-                ${i18n.tr("The resource that you are attempting to access does not exist, or you don\\\'t have the necessary permissions to view it.")}
+                ${i18n.tr("The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it.")}
         </p>
-                        <p>${i18n.tr("Make sure the address is correct and that the page hasn\\\'t moved.")}</p>
+                        <p>${i18n.tr("Make sure the address is correct and that the page hasn\'t moved.")}</p>
         <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
     </jsp:attribute>
 </t:error_page>

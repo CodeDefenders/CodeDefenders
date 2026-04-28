@@ -185,7 +185,7 @@
                     <t:melee_game_scoreboard/>
                 </div>
                 <div class="details-content__item">
-                    <h3>${i18n.tr('The game\\\'s duration')}</h3>
+                    <h3>${i18n.tr('The game\'s duration')}</h3>
 
                     <c:set var="duration" value="${game.gameDurationMinutes}"/>
                     <c:set var="startTime" value="${game.startTimeUnixSeconds}"/>

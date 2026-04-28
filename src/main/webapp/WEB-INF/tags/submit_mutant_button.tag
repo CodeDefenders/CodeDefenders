@@ -70,7 +70,7 @@
                 </li>
                 <li>
                     <a class="dropdown-item cursor-pointer" data-intention="DONTKNOW">
-                        ${i18n.tr("I don\\\'t know if my mutant is killable")}
+                        ${i18n.tr("I don\'t know if my mutant is killable")}
                     </a>
                 </li>
             </ul>

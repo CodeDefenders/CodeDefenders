@@ -360,7 +360,7 @@
                                         confirmPasswordFeedback.innerText = '';
                                     } else {
                                         confirmPasswordInput.setCustomValidity('password-mismatch');
-                                        confirmPasswordFeedback.innerText = "${i18n.tr('Passwords don\\\'t match.')}";
+                                        confirmPasswordFeedback.innerText = "${i18n.tr('Passwords don\'t match.')}";
                                     }
                                 }
                             };
@@ -424,7 +424,7 @@
                 <t:modal title="${i18n.tr('Disable joining')}" id="disable-joining-modal"
                          closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        ${i18n.tr('Are you sure you want to disable joining? Students won\\\'t be able to join the classroom via invite link or from the public list.')}
+                        ${i18n.tr('Are you sure you want to disable joining? Students won\'t be able to join the classroom via invite link or from the public list.')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
                         <button type="submit" class="btn btn-danger">${i18n.tr('Disable joining')}</button>
@@ -462,7 +462,7 @@
                 <t:modal title="${i18n.tr('Change visibility')}" id="make-private-modal"
                          closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    ${i18n.tr('Are you sure you want to change the classroom\\\'s visibility to private? The classroom will no longer be shown in the public list and players won\\\'t be able to join from there.')}
+                    ${i18n.tr('Are you sure you want to change the classroom\'s visibility to private? The classroom will no longer be shown in the public list and players won\'t be able to join from there.')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-danger">${i18n.tr('Make Private')}</button>
@@ -539,7 +539,7 @@
                 <t:modal title='${i18n.tr("Change role")}' id="change-role-modal"
                          closeButtonText='${i18n.tr("Cancel")}'>
                     <jsp:attribute name="content">
-                        ${i18n.tr('Are you sure you want to make {0} a {1}?', '<span data-fill=\\\'username\\\' class=\\\'border rounded px-1\\\'></span>', '<span data-fill=\\\'role\\\' class=\\\'border rounded px-1\\\'></span>')}
+                        ${i18n.tr('Are you sure you want to make {0} a {1}?', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>', '<span data-fill=\'role\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
                         <button type="submit" class="btn btn-primary">${i18n.tr('Change role')}</button>
@@ -559,7 +559,7 @@
                 <t:modal title="${i18n.tr('Change role')}" id="change-role-modal"
                          closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        ${i18n.tr('Are you sure you want to make {0} the owner of this classroom? This will change the current owner\\\'s role to Moderator.', '<span data-fill=\\\'username\\\' class=\\\'border rounded px-1\\\'></span>')}
+                        ${i18n.tr('Are you sure you want to make {0} the owner of this classroom? This will change the current owner\'s role to Moderator.', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
                         <button type="submit" class="btn btn-primary">${i18n.tr('Change owner')}</button>
@@ -579,7 +579,7 @@
                 <t:modal title="${i18n.tr('Kick member')}" id="kick-member-modal"
                          closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        ${i18n.tr('Are you sure you want kick {0} from this classroom?', '<span data-fill=\\\'username\\\' class=\\\'border rounded px-1\\\'></span>')}
+                        ${i18n.tr('Are you sure you want kick {0} from this classroom?', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
                         <button type="submit" class="btn btn-danger">${i18n.tr('Kick')}</button>

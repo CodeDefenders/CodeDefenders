@@ -96,7 +96,7 @@
                 <% if (multiplayerGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            ${i18n.tr("You don\\\'t control any unfinished multiplayer games at the moment.")}
+                            ${i18n.tr("You don\'t control any unfinished multiplayer games at the moment.")}
                         </td>
                     </tr>
                 <% } %>
@@ -333,7 +333,7 @@
                 <% if (meleeGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            ${i18n.tr("You don\\\'t control any unfinished melee games at the moment.")}
+                            ${i18n.tr("You don\'t control any unfinished melee games at the moment.")}
                         </td>
                     </tr>
                 <% } %>

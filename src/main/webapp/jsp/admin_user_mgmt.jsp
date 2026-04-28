@@ -228,7 +228,7 @@
                                             <c:if test="${!user.active}">
                                                 title="${i18n.tr("User is already set inactive.")}" disabled
                                             </c:if>
-                                            onclick="return confirm('${i18n.tr("Are you sure you want to set {0}\\\'s account to inactive?", user.username)}');">
+                                            onclick="return confirm('${i18n.tr("Are you sure you want to set {0}\'s account to inactive?", user.username)}');">
                                         <i class="fa fa-power-off"></i>
                                     </button>
                                 </c:if>
@@ -299,7 +299,7 @@
                     <li>${i18n.tr('If an email is provided and sending emails is enabled, created users receive an email with their credentials.')}</li>
                     <li>${i18n.tr('The password rules are: At least {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces.', settingsRepository.minPasswordLength)}
                     </li>
-                    <li>${i18n.tr('Please consider that you can\\\'t reuse a username from an inactive user.')}</li>
+                    <li>${i18n.tr('Please consider that you can\'t reuse a username from an inactive user.')}</li>
                 </ul>
                 <p class="mb-2">${i18n.tr('Valid input format examples:')}</p>
                 <pre class="bg-light p-3 m-0"><code>username,password
