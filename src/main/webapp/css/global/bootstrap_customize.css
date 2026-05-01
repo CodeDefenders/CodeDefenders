@@ -83,6 +83,12 @@ bootstrap classes
     overflow: auto;
 }
 
+@media (min-width: 720px) {
+    .modal-dialog {
+        max-width: 680px;
+    }
+}
+
 /* Navbar
 ----------------------------------------------------------------------------- */
 
