@@ -37,11 +37,11 @@ public class Achievement implements Serializable {
     @Expose
     private final int index;
     @Expose
-    private final String name;
+    private String name;
     @Expose
-    private final String description;
+    private String description;
     @Expose
-    private final String progressText;
+    private String progressText;
     @Expose
     private final int metricForCurrentLevel;
     @Expose
@@ -132,5 +132,13 @@ public class Achievement implements Serializable {
 
     public boolean isMaxLevel() {
         return getNumMetricNeededForNextLevel().isEmpty();
+    }
+
+    public Achievement translate(I18n i18n) {
+        var n = new Achievement(achievementType, level, metricCurrent);
+        n.name = i18n.tr(n.name);
+        n.description = i18n.tr(n.description);
+        n.progressText = i18n.tr(n.progressText);
+        return n;
     }
 }

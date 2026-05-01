@@ -68,6 +68,7 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -95,6 +96,7 @@ public class AchievementService {
     private final TestRepository testRepo;
     private final PlayerRepository playerRepo;
     private final AchievementEventHandler handler;
+    private final I18nService i18nService;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
@@ -109,9 +111,9 @@ public class AchievementService {
      */
     @Inject
     public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
-                              TestSmellRepository testSmellRepo, EventDAO eventDAO,
-                              GameRepository gameRepo, PuzzleRepository puzzleRepo,
-                              TestRepository testRepo, PlayerRepository playerRepo) {
+                              TestSmellRepository testSmellRepo, EventDAO eventDAO, GameRepository gameRepo,
+                              PuzzleRepository puzzleRepo, TestRepository testRepo, PlayerRepository playerRepo,
+                              I18nService i18nService) {
         repo = achievementRepository;
         this.testSmellRepo = testSmellRepo;
         this.eventDAO = eventDAO;
@@ -120,6 +122,7 @@ public class AchievementService {
         this.puzzleRepo = puzzleRepo;
         this.testRepo = testRepo;
         this.playerRepo = playerRepo;
+        this.i18nService = i18nService;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
     }
@@ -135,16 +138,18 @@ public class AchievementService {
     }
 
     /**
-     * Sends all queued achievement notifications as events via the notification service.
+     * Translates and sends all queued achievement notifications as events via the notification service.
      */
     public void sendAchievementNotifications() {
         synchronized (notificationQueue) {
             notificationQueue.forEach((userId, achievements) -> {
+                I18n i18n = i18nService.getI18n(userId);
                 achievements.forEach(achievement -> {
                     logger.debug("Sending achievement notification for user with id {} and achievement {}",
                             userId, achievement.getType());
+
                     AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
-                    newEvent.setAchievement(achievement);
+                    newEvent.setAchievement(achievement.translate(i18n));
                     newEvent.setUserId(userId);
                     notificationService.post(newEvent);
                 });

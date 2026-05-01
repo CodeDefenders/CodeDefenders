@@ -49,6 +49,7 @@ class AchievementNotifications {
      * @param {String} profilePath
      */
     static showAchievementNotification(achievement, achievementPath, profilePath) {
+        // translation has to happen on the server side, just use i18n to replace the placeholders here.
         const progressText = i18n.tr(
             achievement.progressText,
             achievement.metricCurrent,
