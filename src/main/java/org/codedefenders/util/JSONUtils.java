@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.codedefenders.validation.code.MutantValidationRuleSet;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
@@ -180,6 +182,13 @@ public class JSONUtils {
         @Override
         public JsonElement serialize(Instant instant, Type type, JsonSerializationContext context) {
             return new JsonPrimitive(instant.getEpochSecond());
+        }
+    }
+
+    public static class MutantRuleSetNameSerializer implements JsonSerializer<MutantValidationRuleSet> {
+        @Override
+        public JsonElement serialize(MutantValidationRuleSet ruleSet, Type type, JsonSerializationContext context) {
+            return new JsonPrimitive(ruleSet.getName());
         }
     }
 }

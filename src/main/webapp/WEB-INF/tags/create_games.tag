@@ -1190,7 +1190,7 @@
 
         tr = table.insertRow();
         tr.insertCell().textContent = '${i18n.tr("Mutant Validator Level")}';
-        tr.insertCell().textContent = gameSettings.mutantValidatorLevel.getName();
+        tr.insertCell().textContent = gameSettings.mutantValidatorLevel;
 
         tr = table.insertRow();
         tr.insertCell().textContent = '${i18n.tr("Creator Role")}';
