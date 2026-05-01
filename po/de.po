@@ -3774,7 +3774,7 @@ msgstr "Punkte"
 msgid "Changed Lines"
 msgstr "Veränderte Zeilen"
 
-#: src/main/javascript/game/game_highlighting.js:335
+#: src/main/javascript/game/game_highlighting.js:333
 msgid ""
 "This will mark all player-created mutants on line {0} as equivalent. Are you "
 "sure?"
@@ -3782,8 +3782,8 @@ msgstr ""
 "Dadurch werden alle von Spielern erstellten Mutanten in Zeile {0} als "
 "äquivalent markiert. Bist du sicher?"
 
-#: src/main/javascript/game/game_highlighting.js:341
-#: src/main/javascript/game/game_highlighting.js:357
+#: src/main/javascript/game/game_highlighting.js:342
+#: src/main/javascript/game/game_highlighting.js:358
 #: src/main/javascript/game/mutant_accordion.js:344
 #: src/main/javascript/game/mutant_accordion.js:351
 msgid "Claim Equivalent"
@@ -4747,10 +4747,8 @@ msgstr ""
 "Spiele zur Verfügung."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-msgstr ""
-"Bist du sicher, dass du die Klasse '${gameClass.name}' auf inaktiv setzen "
-"möchtest?"
+msgid "Are you sure you want to set class {0} to inactive?"
+msgstr "Bist du sicher, dass du die Klasse {0} deaktivieren willst?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:97
 msgid ""
@@ -4760,10 +4758,8 @@ msgstr ""
 "Verfügung."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-msgstr ""
-"Bist du sicher, dass du die Klasse „${gameClass.name}“ als aktiv festlegen "
-"möchten?"
+msgid "Are you sure you want to set class {0} to active?"
+msgstr "Bist du sicher, dass du die Klasse {0} aktivieren willst?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:109
 msgid ""
@@ -4775,11 +4771,10 @@ msgstr ""
 
 #: src/main/webapp/jsp/admin_class_management.jsp:110
 msgid ""
-"Are you sure you want to delete class '${gameClass.name}' forever? This "
-"cannot be undone."
+"Are you sure you want to delete class {0} forever? This cannot be undone."
 msgstr ""
-"Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
-"willst? Das kann nicht rückgängig gemacht werden."
+"Bist du sicher, dass du die Klasse {0} endgültig löschen willst? Das kann "
+"nicht rückgängig gemacht werden."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:114
 msgid "Class can't be deleted, since games were already played on it."
@@ -9600,6 +9595,23 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse '${gameClass.name}' auf inaktiv setzen "
+#~ "möchtest?"
+
+#~ msgid "Are you sure you want to set class '${gameClass.name}' to active?"
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse „${gameClass.name}“ als aktiv "
+#~ "festlegen möchten?"
+
+#~ msgid ""
+#~ "Are you sure you want to delete class '${gameClass.name}' forever? This "
+#~ "cannot be undone."
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
+#~ "willst? Das kann nicht rückgängig gemacht werden."
 
 #~ msgid ""
 #~ "You have been invited to join a game. \n"

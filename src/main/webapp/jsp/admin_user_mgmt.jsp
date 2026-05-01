@@ -228,7 +228,7 @@
                                             <c:if test="${!user.active}">
                                                 title="${i18n.tr("User is already set inactive.")}" disabled
                                             </c:if>
-                                            onclick="return confirm('${i18n.tr("Are you sure you want to set {0}\'s account to inactive?", user.username)}');">
+                                            onclick="return confirm(`${i18n.tr("Are you sure you want to set {0}\'s account to inactive?", user.username)}`);">
                                         <i class="fa fa-power-off"></i>
                                     </button>
                                 </c:if>

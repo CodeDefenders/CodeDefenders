@@ -31,7 +31,7 @@
         <p>
                 ${i18n.tr("The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it.")}
         </p>
-                        <p>${i18n.tr("Make sure the address is correct and that the page hasn\'t moved.")}</p>
+        <p>${i18n.tr("Make sure the address is correct and that the page hasn\'t moved.")}</p>
         <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
     </jsp:attribute>
 </t:error_page>

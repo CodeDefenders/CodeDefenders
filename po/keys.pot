@@ -3743,15 +3743,15 @@ msgstr "Score"
 msgid "Changed Lines"
 msgstr "Changed Lines"
 
-#: src/main/javascript/game/game_highlighting.js:335
+#: src/main/javascript/game/game_highlighting.js:333
 msgid "This will mark all player-created mutants on line {0} as equivalent. Are you sure?"
 msgstr "This will mark all player-created mutants on line {0} as equivalent. Are you sure?"
 
-#: src/main/javascript/game/game_highlighting.js:341
+#: src/main/javascript/game/game_highlighting.js:342
 msgid "Claim Equivalent"
 msgstr "Claim Equivalent"
 
-#: src/main/javascript/game/game_highlighting.js:357
+#: src/main/javascript/game/game_highlighting.js:358
 msgid "Claim Equivalent"
 msgstr "Claim Equivalent"
 
@@ -4772,24 +4772,24 @@ msgid "Set class as inactive. This class won't be available for games afterwards
 msgstr "Set class as inactive. This class won't be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to inactive?"
+msgid "Are you sure you want to set class {0} to inactive?"
+msgstr "Are you sure you want to set class {0} to inactive?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:97
 msgid "Set class as active. This class will be available for games afterwards again."
 msgstr "Set class as active. This class will be available for games afterwards again."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-msgstr "Are you sure you want to set class '${gameClass.name}' to active?"
+msgid "Are you sure you want to set class {0} to active?"
+msgstr "Are you sure you want to set class {0} to active?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:109
 msgid "Delete class from the system. This class won't be available for games afterwards."
 msgstr "Delete class from the system. This class won't be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:110
-msgid "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
-msgstr "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
+msgid "Are you sure you want to delete class {0} forever? This cannot be undone."
+msgstr "Are you sure you want to delete class {0} forever? This cannot be undone."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:114
 msgid "Class can't be deleted, since games were already played on it."
