@@ -4764,32 +4764,32 @@ msgid "to upload a new class."
 msgstr "to upload a new class."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:87
-msgid "Set class as inactive. This class won\\'t be available for games afterwards."
-msgstr "Set class as inactive. This class won\\'t be available for games afterwards."
+msgid "Set class as inactive. This class won't be available for games afterwards."
+msgstr "Set class as inactive. This class won't be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
-msgstr "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
+msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
+msgstr "Are you sure you want to set class '${gameClass.name}' to inactive?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:97
 msgid "Set class as active. This class will be available for games afterwards again."
 msgstr "Set class as active. This class will be available for games afterwards again."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
-msgstr "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
+msgid "Are you sure you want to set class '${gameClass.name}' to active?"
+msgstr "Are you sure you want to set class '${gameClass.name}' to active?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:109
-msgid "Delete class from the system. This class won\\'t be available for games afterwards."
-msgstr "Delete class from the system. This class won\\'t be available for games afterwards."
+msgid "Delete class from the system. This class won't be available for games afterwards."
+msgstr "Delete class from the system. This class won't be available for games afterwards."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:110
-msgid "Are you sure you want to delete class \\'${gameClass.name}\\' forever? This cannot be undone."
-msgstr "Are you sure you want to delete class \\'${gameClass.name}\\' forever? This cannot be undone."
+msgid "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
+msgstr "Are you sure you want to delete class '${gameClass.name}' forever? This cannot be undone."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:114
-msgid "Class can\\'t be deleted, since games were already played on it."
-msgstr "Class can\\'t be deleted, since games were already played on it."
+msgid "Class can't be deleted, since games were already played on it."
+msgstr "Class can't be deleted, since games were already played on it."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:131
 msgid "Click here"
@@ -4876,8 +4876,8 @@ msgid "Link"
 msgstr "Link"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:183
-msgid "There aren\\'t any classrooms... yet."
-msgstr "There aren\\'t any classrooms... yet."
+msgid "There aren't any classrooms... yet."
+msgstr "There aren't any classrooms... yet."
 
 #: src/main/webapp/jsp/admin_create_games.jsp:27
 msgid "Create Games"
@@ -6272,8 +6272,8 @@ msgid "The password rules are: At least {0} alphanumeric characters (a-z, A-Z, 0
 msgstr "The password rules are: At least {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:302
-msgid "Please consider that you can\\'t reuse a username from an inactive user."
-msgstr "Please consider that you can\\'t reuse a username from an inactive user."
+msgid "Please consider that you can't reuse a username from an inactive user."
+msgstr "Please consider that you can't reuse a username from an inactive user."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:304
 msgid "Valid input format examples:"
@@ -6384,8 +6384,8 @@ msgid "Capture Intentions"
 msgstr "Capture Intentions"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:231
-msgid "Enable Capturing Players\\' Intentions"
-msgstr "Enable Capturing Players\\' Intentions"
+msgid "Enable Capturing Players' Intentions"
+msgstr "Enable Capturing Players' Intentions"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:237
 msgid "Allows players to chat within their team and with the enemy team."
@@ -6440,8 +6440,8 @@ msgid "The duration for how long the games will be open."
 msgstr "The duration for how long the games will be open."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:301
-msgid "Set the game\\'s duration:"
-msgstr "Set the game\\'s duration:"
+msgid "Set the game's duration:"
+msgstr "Set the game's duration:"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:305
 msgid "days"
@@ -6880,8 +6880,8 @@ msgid "Please confirm your password."
 msgstr "Please confirm your password."
 
 #: src/main/webapp/jsp/classroom_page.jsp:363
-msgid "Passwords don\\'t match."
-msgstr "Passwords don\\'t match."
+msgid "Passwords don't match."
+msgstr "Passwords don't match."
 
 #: src/main/webapp/jsp/classroom_page.jsp:373
 msgid "Set password"
@@ -6928,8 +6928,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:427
-msgid "Are you sure you want to disable joining? Students won\\'t be able to join the classroom via invite link or from the public list."
-msgstr "Are you sure you want to disable joining? Students won\\'t be able to join the classroom via invite link or from the public list."
+msgid "Are you sure you want to disable joining? Students won't be able to join the classroom via invite link or from the public list."
+msgstr "Are you sure you want to disable joining? Students won't be able to join the classroom via invite link or from the public list."
 
 #: src/main/webapp/jsp/classroom_page.jsp:430
 msgid "Disable joining"
@@ -6960,8 +6960,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:465
-msgid "Are you sure you want to change the classroom\\'s visibility to private? The classroom will no longer be shown in the public list and players won\\'t be able to join from there."
-msgstr "Are you sure you want to change the classroom\\'s visibility to private? The classroom will no longer be shown in the public list and players won\\'t be able to join from there."
+msgid "Are you sure you want to change the classroom's visibility to private? The classroom will no longer be shown in the public list and players won't be able to join from there."
+msgstr "Are you sure you want to change the classroom's visibility to private? The classroom will no longer be shown in the public list and players won't be able to join from there."
 
 #: src/main/webapp/jsp/classroom_page.jsp:468
 msgid "Make Private"
@@ -7040,8 +7040,8 @@ msgid "Cancel"
 msgstr "Cancel"
 
 #: src/main/webapp/jsp/classroom_page.jsp:562
-msgid "Are you sure you want to make {0} the owner of this classroom? This will change the current owner\\'s role to Moderator."
-msgstr "Are you sure you want to make {0} the owner of this classroom? This will change the current owner\\'s role to Moderator."
+msgid "Are you sure you want to make {0} the owner of this classroom? This will change the current owner's role to Moderator."
+msgstr "Are you sure you want to make {0} the owner of this classroom? This will change the current owner's role to Moderator."
 
 #: src/main/webapp/jsp/classroom_page.jsp:565
 msgid "Change owner"
@@ -7280,8 +7280,8 @@ msgid "Link"
 msgstr "Link"
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:204
-msgid "You\\'re not part of any classrooms."
-msgstr "You\\'re not part of any classrooms."
+msgid "You're not part of any classrooms."
+msgstr "You're not part of any classrooms."
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:205
 msgid "No classrooms found."
@@ -7376,8 +7376,8 @@ msgid "A teacher account lets you create classrooms for your students, so you ca
 msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page."
 
 #: src/main/webapp/jsp/contact.jsp:112
-msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
-msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
+msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
+msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
 
 #: src/main/webapp/jsp/contact.jsp:116
 msgid "Show template"
@@ -7412,12 +7412,12 @@ msgid "project page for more details."
 msgstr "project page for more details."
 
 #: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don\\'t have permission to perform this request (403)"
-msgstr "You don\\'t have permission to perform this request (403)"
+msgid "You don't have permission to perform this request (403)"
+msgstr "You don't have permission to perform this request (403)"
 
 #: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don\\'t have permission to perform this request."
-msgstr "You don\\'t have permission to perform this request."
+msgid "You don't have permission to perform this request."
+msgstr "You don't have permission to perform this request."
 
 #: src/main/webapp/jsp/error_page_403.jsp:31
 msgid "Your accounts permissions do not include the accessed page or performed action."
@@ -7428,12 +7428,12 @@ msgid "Please contact your administrator if you think this is a mistake."
 msgstr "Please contact your administrator if you think this is a mistake."
 
 #: src/main/webapp/jsp/error_page_404.jsp:27
-msgid "The page you\\'re looking for could not be found (404)"
-msgstr "The page you\\'re looking for could not be found (404)"
+msgid "The page you're looking for could not be found (404)"
+msgstr "The page you're looking for could not be found (404)"
 
 #: src/main/webapp/jsp/error_page_404.jsp:29
-msgid "The page could not be found, or you don\\'t have permission to view it."
-msgstr "The page could not be found, or you don\\'t have permission to view it."
+msgid "The page could not be found, or you don't have permission to view it."
+msgstr "The page could not be found, or you don't have permission to view it."
 
 #: src/main/webapp/jsp/error_page_404.jsp:32
 msgid "The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it."
@@ -8480,8 +8480,8 @@ msgid "Capture Intentions"
 msgstr "Capture Intentions"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:225
-msgid "Enable Capturing Players\\' Intentions"
-msgstr "Enable Capturing Players\\' Intentions"
+msgid "Enable Capturing Players' Intentions"
+msgstr "Enable Capturing Players' Intentions"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:231
 msgid "Allows players to chat with each other."
@@ -8524,8 +8524,8 @@ msgid "The duration for how long the games will be open."
 msgstr "The duration for how long the games will be open."
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:280
-msgid "Set the game\\'s duration:"
-msgstr "Set the game\\'s duration:"
+msgid "Set the game's duration:"
+msgstr "Set the game's duration:"
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:284
 msgid "days"
@@ -8628,8 +8628,8 @@ msgid "Scoring System"
 msgstr "Scoring System"
 
 #: src/main/webapp/jsp/melee/details_view.jsp:188
-msgid "The game\\'s duration"
-msgstr "The game\\'s duration"
+msgid "The game's duration"
+msgstr "The game's duration"
 
 #: src/main/webapp/jsp/melee/details_view.jsp:207
 msgid "Total Duration"
@@ -9072,8 +9072,8 @@ msgid "Mutant is proven to <b>not</b> be equivalent:"
 msgstr "Mutant is proven to <b>not</b> be equivalent:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:64
-msgid "Keep the mutant\\'s points and get an extra point"
-msgstr "Keep the mutant\\'s points and get an extra point"
+msgid "Keep the mutant's points and get an extra point"
+msgstr "Keep the mutant's points and get an extra point"
 
 #: src/main/webapp/jsp/scoring_system.jsp:73
 msgid "Your score does not change"
@@ -9084,8 +9084,8 @@ msgid "Equivalence is accepted or no killing test is provided in time:"
 msgstr "Equivalence is accepted or no killing test is provided in time:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:87
-msgid "Lose the mutant\\'s points"
-msgstr "Lose the mutant\\'s points"
+msgid "Lose the mutant's points"
+msgstr "Lose the mutant's points"
 
 #: src/main/webapp/jsp/scoring_system.jsp:96
 msgid "Gain one additional point"
@@ -9208,8 +9208,8 @@ msgid "The dependencies are uploaded inside of a {0} file, the folder structure 
 msgstr "The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:171
-msgid "Multiple tests can have the same name, but they don\\'t have to."
-msgstr "Multiple tests can have the same name, but they don\\'t have to."
+msgid "Multiple tests can have the same name, but they don't have to."
+msgstr "Multiple tests can have the same name, but they don't have to."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:173
 msgid "Example:"
@@ -9876,8 +9876,8 @@ msgid "Change Password"
 msgstr "Change Password"
 
 #: src/main/webapp/jsp/user_settings.jsp:161
-msgid "Passwords don\\'t match."
-msgstr "Passwords don\\'t match."
+msgid "Passwords don't match."
+msgstr "Passwords don't match."
 
 #: src/main/webapp/jsp/user_settings.jsp:172
 msgid "Account Deletion"
@@ -10988,8 +10988,8 @@ msgid "This game will end at"
 msgstr "This game will end at"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:106
-msgid "Set the game\\'s new remaining duration:"
-msgstr "Set the game\\'s new remaining duration:"
+msgid "Set the game's new remaining duration:"
+msgstr "Set the game's new remaining duration:"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:109
 msgid "days"
@@ -11127,6 +11127,42 @@ msgstr "# (Optional) The fist last of the CUT, that attackers are allowed to edi
 msgid "# This is ignored for DEFENDER puzzles."
 msgstr "# This is ignored for DEFENDER puzzles."
 
+#: src/main/webapp/WEB-INF/tags/js_init.tag:64
+msgid "Defender"
+msgstr "Defender"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:69
+msgid "Any role"
+msgstr "Any role"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:74
+msgid "Attacker"
+msgstr "Attacker"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:83
+msgid "Defender"
+msgstr "Defender"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:87
+msgid "Attacker"
+msgstr "Attacker"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:91
+msgid "Any role"
+msgstr "Any role"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:95
+msgid "Join"
+msgstr "Join"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:102
+msgid "Invite received"
+msgstr "Invite received"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:103
+msgid "You have been invited to join a game.\\n Join as: "
+msgstr "You have been invited to join a game.\\n Join as: "
+
 #: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:32
 msgid "Kill-maps by Mutants"
 msgstr "Kill-maps by Mutants"
@@ -11240,24 +11276,24 @@ msgid "Easy"
 msgstr "Easy"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:26
-msgid "Players are allowed to view other players\\' submissions."
-msgstr "Players are allowed to view other players\\' submissions."
+msgid "Players are allowed to view other players' submissions."
+msgstr "Players are allowed to view other players' submissions."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:29
 msgid "Hard"
 msgstr "Hard"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
-msgid "Players are not allowed to view other players\\' submissions."
-msgstr "Players are not allowed to view other players\\' submissions."
+msgid "Players are not allowed to view other players' submissions."
+msgstr "Players are not allowed to view other players' submissions."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
 msgid "not"
 msgstr "not"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:32
-msgid "But: Players can still view others\\' mutants after they have been killed or accepted as equivalent."
-msgstr "But: Players can still view others\\' mutants after they have been killed or accepted as equivalent."
+msgid "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
+msgstr "But: Players can still view others' mutants after they have been killed or accepted as equivalent."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:25
 msgid "Easy"

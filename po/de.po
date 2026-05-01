@@ -269,6 +269,8 @@ msgstr "Schwer"
 #: src/main/webapp/jsp/user_profile.jsp:237
 #: src/main/webapp/WEB-INF/tags/create_games.tag:261
 #: src/main/webapp/WEB-INF/tags/create_games.tag:654
+#: src/main/webapp/WEB-INF/tags/js_init.tag:74
+#: src/main/webapp/WEB-INF/tags/js_init.tag:87
 msgid "Attacker"
 msgstr "Angreifer"
 
@@ -281,6 +283,8 @@ msgstr "Angreifer"
 #: src/main/webapp/jsp/user_profile.jsp:237
 #: src/main/webapp/WEB-INF/tags/create_games.tag:262
 #: src/main/webapp/WEB-INF/tags/create_games.tag:655
+#: src/main/webapp/WEB-INF/tags/js_init.tag:64
+#: src/main/webapp/WEB-INF/tags/js_init.tag:83
 msgid "Defender"
 msgstr "Verteidiger"
 
@@ -4729,16 +4733,16 @@ msgstr "um eine neue Klasse hochzuladen."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:87
 msgid ""
-"Set class as inactive. This class won\\'t be available for games afterwards."
+"Set class as inactive. This class won't be available for games afterwards."
 msgstr ""
 "Klasse als inaktiv markieren. Diese Klasse steht danach nicht mehr für "
 "Spiele zur Verfügung."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:88
-msgid "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
+msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
 msgstr ""
-"Bist du sicher, dass du die Klasse „${gameClass.name}” auf inaktiv setzen "
-"willst?"
+"Bist du sicher, dass du die Klasse '${gameClass.name}' auf inaktiv setzen "
+"möchtest?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:97
 msgid ""
@@ -4748,31 +4752,31 @@ msgstr ""
 "Verfügung."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:98
-msgid "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
+msgid "Are you sure you want to set class '${gameClass.name}' to active?"
 msgstr ""
-"Bist du sicher, dass du die Klasse „${gameClass.name}” als aktiv setzen "
-"willst?"
+"Bist du sicher, dass du die Klasse „${gameClass.name}“ als aktiv festlegen "
+"möchten?"
 
 #: src/main/webapp/jsp/admin_class_management.jsp:109
 msgid ""
-"Delete class from the system. This class won\\'t be available for games "
+"Delete class from the system. This class won't be available for games "
 "afterwards."
 msgstr ""
-"Lösch die Klasse aus dem System. Diese Klasse steht danach nicht mehr für "
-"Spiele zur Verfügung."
+"Klasse aus dem System löschen. Diese Klasse steht danach für Spiele nicht "
+"mehr zur Verfügung."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:110
 msgid ""
-"Are you sure you want to delete class \\'${gameClass.name}\\' forever? This "
+"Are you sure you want to delete class '${gameClass.name}' forever? This "
 "cannot be undone."
 msgstr ""
 "Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
 "willst? Das kann nicht rückgängig gemacht werden."
 
 #: src/main/webapp/jsp/admin_class_management.jsp:114
-msgid "Class can\\'t be deleted, since games were already played on it."
+msgid "Class can't be deleted, since games were already played on it."
 msgstr ""
-"Die Klasse kann nicht gelöscht werden, weil damit schon Spiele gespielt "
+"Die Klasse kann nicht gelöscht werden, da bereits Spiele darauf gespielt "
 "wurden."
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:31
@@ -4891,7 +4895,7 @@ msgid "Link"
 msgstr "Link"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:183
-msgid "There aren\\'t any classrooms... yet."
+msgid "There aren't any classrooms... yet."
 msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
 
 #: src/main/webapp/jsp/admin_create_games.jsp:27
@@ -5188,7 +5192,7 @@ msgid "Show list of Players for each Game."
 msgstr "Liste der Spieler für jedes Spiel anzeigen."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:99
-msgid "You don\\'t control any unfinished multiplayer games at the moment."
+msgid "You don't control any unfinished multiplayer games at the moment."
 msgstr ""
 "Du hast im Moment keine Kontrolle über noch nicht beendete Multiplayer-"
 "Spiele."
@@ -5310,8 +5314,8 @@ msgid "Players"
 msgstr "Spieler"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:336
-msgid "You don\\'t control any unfinished melee games at the moment."
-msgstr "Du hast im Moment keine laufenden Melee-Spiele unter Kontrolle."
+msgid "You don't control any unfinished melee games at the moment."
+msgstr "Du kontrollierst derzeit keine unvollendeten Melee-Spiele."
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:517
 #: src/main/webapp/WEB-INF/tags/create_games.tag:289
@@ -5900,6 +5904,8 @@ msgid "Leave empty to keep unchanged."
 msgstr "Leer lassen, um unverändert beizubehalten."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:175
+#: src/main/webapp/jsp/classroom_page.jsp:363
+#: src/main/webapp/jsp/user_settings.jsp:161
 msgid "Passwords don't match."
 msgstr "Passwörter stimmen nicht überein."
 
@@ -5919,7 +5925,7 @@ msgid "User is already set inactive."
 msgstr "Der Benutzer ist bereits als inaktiv gekennzeichnet."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:231
-msgid "Are you sure you want to set {0}\\'s account to inactive?"
+msgid "Are you sure you want to set {0}'s account to inactive?"
 msgstr "Bist du sicher, dass du das Konto von {0} inaktiv setzen willst?"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:267
@@ -5968,8 +5974,7 @@ msgstr ""
 "0-9) ohne Leerzeichen."
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:302
-msgid ""
-"Please consider that you can\\'t reuse a username from an inactive user."
+msgid "Please consider that you can't reuse a username from an inactive user."
 msgstr ""
 "Bitte denk dran, dass du den Benutzernamen eines inaktiven Nutzers nicht "
 "wiederverwenden kannst."
@@ -6098,7 +6103,7 @@ msgstr "Intentionen erfassen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:231
 #: src/main/webapp/jsp/melee/create_game_view.jsp:225
-msgid "Enable Capturing Players\\' Intentions"
+msgid "Enable Capturing Players' Intentions"
 msgstr "Spieler-Intentionen erfassen"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:237
@@ -6174,7 +6179,8 @@ msgstr "Die Dauer, für die die Spiele geöffnet sein werden."
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:301
 #: src/main/webapp/jsp/melee/create_game_view.jsp:280
-msgid "Set the game\\'s duration:"
+#: src/main/webapp/WEB-INF/tags/create_games.tag:300
+msgid "Set the game's duration:"
 msgstr "Leg die Spieldauer fest:"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:305
@@ -6301,6 +6307,7 @@ msgid "Scoring System"
 msgstr "Punktesystem"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:155
+#: src/main/webapp/jsp/melee/details_view.jsp:188
 msgid "The game's duration"
 msgstr "Die Spieldauer"
 
@@ -6430,6 +6437,7 @@ msgstr "Wenn du dem Raum beitreten möchtest, kannst du das hier tun:"
 #: src/main/webapp/jsp/classroom_page.jsp:85
 #: src/main/webapp/jsp/classroom_page.jsp:613
 #: src/main/webapp/jsp/user_games_view.jsp:704
+#: src/main/webapp/WEB-INF/tags/js_init.tag:95
 msgid "Join"
 msgstr "Beitreten"
 
@@ -6544,11 +6552,6 @@ msgstr "Passwort setzen"
 msgid "The password will be asked whenever someone joins the classroom."
 msgstr "Das Passwort wird immer dann abgefragt, wenn jemand dem Raum beitritt."
 
-#: src/main/webapp/jsp/classroom_page.jsp:363
-#: src/main/webapp/jsp/user_settings.jsp:161
-msgid "Passwords don\\'t match."
-msgstr "Die Passwörter passen nicht zusammen."
-
 #: src/main/webapp/jsp/classroom_page.jsp:386
 msgid "Remove classroom password"
 msgstr "Passwort des Raumes entfernen"
@@ -6582,8 +6585,8 @@ msgstr "Beitritt deaktivieren"
 
 #: src/main/webapp/jsp/classroom_page.jsp:427
 msgid ""
-"Are you sure you want to disable joining? Students won\\'t be able to join "
-"the classroom via invite link or from the public list."
+"Are you sure you want to disable joining? Students won't be able to join the "
+"classroom via invite link or from the public list."
 msgstr ""
 "Bist du sicher, dass du die Teilnahme deaktivieren willst? Die Schüler "
 "können dann nicht mehr über den Einladungslink oder die öffentliche Liste "
@@ -6606,8 +6609,8 @@ msgstr ""
 
 #: src/main/webapp/jsp/classroom_page.jsp:465
 msgid ""
-"Are you sure you want to change the classroom\\'s visibility to private? The "
-"classroom will no longer be shown in the public list and players won\\'t be "
+"Are you sure you want to change the classroom's visibility to private? The "
+"classroom will no longer be shown in the public list and players won't be "
 "able to join from there."
 msgstr ""
 "Bist du sicher, dass du die Sichtbarkeit des Raumes auf „privat” ändern "
@@ -6665,7 +6668,7 @@ msgstr "Bist du sicher, dass du {0} zu {1} machen möchtest?"
 #: src/main/webapp/jsp/classroom_page.jsp:562
 msgid ""
 "Are you sure you want to make {0} the owner of this classroom? This will "
-"change the current owner\\'s role to Moderator."
+"change the current owner's role to Moderator."
 msgstr ""
 "Bist du sicher, dass du {0} zum Besitzer diesen Raumes machen willst? "
 "Dadurch wird der aktuelle Besitzer zum Moderator."
@@ -6797,7 +6800,7 @@ msgid "Not open for joining"
 msgstr "Nicht für den Beitritt geöffnet"
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:204
-msgid "You\\'re not part of any classrooms."
+msgid "You're not part of any classrooms."
 msgstr "Du bist in keinem Raum."
 
 #: src/main/webapp/jsp/classrooms_overview.jsp:205
@@ -6883,15 +6886,15 @@ msgstr ""
 #: src/main/webapp/jsp/contact.jsp:112
 msgid ""
 "A teacher account lets you create classrooms for your students, so you can "
-"manage games more easily. If you\\'re interested in turning your account "
-"into a teacher account, please use the template below to email us. You can "
-"also use this <a href='{0}'>mailto link</a> to automatically create an email "
-"with the template."
+"manage games more easily. If you're interested in turning your account into "
+"a teacher account, please use the template below to email us. You can also "
+"use this <a href='{0}'>mailto link</a> to automatically create an email with "
+"the template."
 msgstr ""
 "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um Spiele "
 "einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto umwandeln "
 "möchtest, schick uns bitte eine E-Mail mit der unten stehenden Vorlage. Du "
-"kannst auch diesen <a href=\"{0}\">Mailto-Link</a> verwenden, um automatisch "
+"kannst auch diesen <a href='{0}'>Mailto-Link</a> verwenden, um automatisch "
 "eine E-Mail mit der Vorlage zu erstellen."
 
 #: src/main/webapp/jsp/contact.jsp:116
@@ -6923,11 +6926,11 @@ msgid "project page for more details."
 msgstr "Projektseite für weitere Details an."
 
 #: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don\\'t have permission to perform this request (403)"
+msgid "You don't have permission to perform this request (403)"
 msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen (403)."
 
 #: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don\\'t have permission to perform this request."
+msgid "You don't have permission to perform this request."
 msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen."
 
 #: src/main/webapp/jsp/error_page_403.jsp:31
@@ -6947,26 +6950,28 @@ msgstr ""
 "ist."
 
 #: src/main/webapp/jsp/error_page_404.jsp:27
-msgid "The page you\\'re looking for could not be found (404)"
+msgid "The page you're looking for could not be found (404)"
 msgstr "Die Seite, die du suchst, wurde nicht gefunden (404)"
 
 #: src/main/webapp/jsp/error_page_404.jsp:29
-msgid "The page could not be found, or you don\\'t have permission to view it."
+msgid "The page could not be found, or you don't have permission to view it."
 msgstr ""
 "Die Seite wurde nicht gefunden oder du hast keine Berechtigung, sie "
 "anzuzeigen."
 
 #: src/main/webapp/jsp/error_page_404.jsp:32
 msgid ""
-"The resource that you are attempting to access does not exist, or you "
-"don\\'t have the necessary permissions to view it."
+"The resource that you are attempting to access does not exist, or you don't "
+"have the necessary permissions to view it."
 msgstr ""
 "Die Ressource, auf die du zugreifen willst, ist nicht da oder du hast nicht "
 "die nötigen Rechte, um sie anzusehen."
 
 #: src/main/webapp/jsp/error_page_404.jsp:34
-msgid "Make sure the address is correct and that the page hasn\\'t moved."
-msgstr "Schau mal, ob die Adresse stimmt und die Seite nicht verschoben wurde."
+msgid "Make sure the address is correct and that the page hasn't moved."
+msgstr ""
+"Vergewissere dich, dass die Adresse korrekt ist und dass die Seite nicht "
+"verschoben wurde."
 
 #: src/main/webapp/jsp/error_page_500.jsp:27
 msgid "Internal Server Error (500)"
@@ -7769,10 +7774,6 @@ msgstr "Ermöglicht es den Spielern, miteinander zu chatten."
 msgid "Maximum duration:"
 msgstr "Maximale Dauer:"
 
-#: src/main/webapp/jsp/melee/details_view.jsp:188
-msgid "The game\\'s duration"
-msgstr "Die Spieldauer"
-
 #: src/main/webapp/jsp/melee/details_view.jsp:239
 msgid "You are an observer in this game."
 msgstr "Du bist ein Beobachter in diesem Spiel."
@@ -8031,8 +8032,8 @@ msgid "Mutant is proven to <b>not</b> be equivalent:"
 msgstr "Mutant ist nachweislich <b>nicht</b> äquivalent:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:64
-msgid "Keep the mutant\\'s points and get an extra point"
-msgstr "Behalte die Punkte des Mutanten und hol dir einen Extrapunkt"
+msgid "Keep the mutant's points and get an extra point"
+msgstr "Behalte die Punkte des Mutanten und erhalte einen Extrapunkt"
 
 #: src/main/webapp/jsp/scoring_system.jsp:73
 msgid "Your score does not change"
@@ -8045,8 +8046,8 @@ msgstr ""
 "Test vorgelegt:"
 
 #: src/main/webapp/jsp/scoring_system.jsp:87
-msgid "Lose the mutant\\'s points"
-msgstr "Verlier die Punkte des Mutanten"
+msgid "Lose the mutant's points"
+msgstr "Verliere die Punkte des Mutanten"
 
 #: src/main/webapp/jsp/scoring_system.jsp:96
 msgid "Gain one additional point"
@@ -8172,8 +8173,8 @@ msgstr ""
 "Spiele mit vorhandenen Tests zu initialisieren."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:171
-msgid "Multiple tests can have the same name, but they don\\'t have to."
-msgstr "Mehrere Tests können denselben Namen haben, müssen es aber nicht."
+msgid "Multiple tests can have the same name, but they don't have to."
+msgstr "Mehrere Tests können denselben Namen haben, müssen dies aber nicht."
 
 #: src/main/webapp/jsp/upload_class_view.jsp:202
 msgid "Upload and stay on this page"
@@ -8768,10 +8769,6 @@ msgstr "Die Intentionen der Spieler erfassen"
 msgid "Automatically start games once they are created."
 msgstr "Spiele automatisch starten, sobald sie erstellt wurden."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:300
-msgid "Set the game's duration:"
-msgstr "Leg die Spieldauer fest:"
-
 #: src/main/webapp/WEB-INF/tags/create_games.tag:311
 msgid "If the value is greater, it will be limited to this maximum."
 msgstr "Wenn der Wert größer ist, wird er auf diesen Höchstwert begrenzt."
@@ -8962,8 +8959,7 @@ msgstr ""
 #: src/main/webapp/WEB-INF/tags/create_games.tag:558
 msgid "The settings for the staged games are specified in the left card."
 msgstr ""
-"Die Einstellungen für die Spielentwürfe sind auf der linken Karte "
-"angegeben."
+"Die Einstellungen für die Spielentwürfe sind auf der linken Karte angegeben."
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:555
 msgid "Stage Empty Games Explanation"
@@ -9199,7 +9195,7 @@ msgid "This game will end at"
 msgstr "Dieses Spiel endet um"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:106
-msgid "Set the game\\'s new remaining duration:"
+msgid "Set the game's new remaining duration:"
 msgstr "Stell die neue verbleibende Spieldauer ein:"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:131
@@ -9356,6 +9352,19 @@ msgstr ""
 "# (Optional) Der erste und letzte Teil des CUT, den Angreifer bearbeiten "
 "dürfen (inklusive)."
 
+#: src/main/webapp/WEB-INF/tags/js_init.tag:69
+#: src/main/webapp/WEB-INF/tags/js_init.tag:91
+msgid "Any role"
+msgstr "Beliebige Rolle"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:102
+msgid "Invite received"
+msgstr "Einladung erhalten"
+
+#: src/main/webapp/WEB-INF/tags/js_init.tag:103
+msgid "You have been invited to join a game.\\n Join as: "
+msgstr "Du wurdest zu einem Spiel eingeladen.\\n Teilnehmen als: "
+
 #: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:32
 msgid "Kill-maps by Mutants"
 msgstr "Kill-Maps von Mutanten"
@@ -9394,12 +9403,12 @@ msgid "Killed:"
 msgstr "Getötet:"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:26
-msgid "Players are allowed to view other players\\' submissions."
-msgstr "Die Spieler dürfen die Beiträge der anderen Spieler anschauen."
+msgid "Players are allowed to view other players' submissions."
+msgstr "Die Spieler dürfen die Beiträge anderer Spieler einsehen."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
-msgid "Players are not allowed to view other players\\' submissions."
-msgstr "Die Spieler dürfen die Beiträge der anderen Spieler nicht anschauen."
+msgid "Players are not allowed to view other players' submissions."
+msgstr "Spieler dürfen die Beiträge anderer Spieler nicht einsehen."
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:31
 msgid "not"
@@ -9407,7 +9416,7 @@ msgstr "nicht"
 
 #: src/main/webapp/WEB-INF/tags/level_explanation_melee.tag:32
 msgid ""
-"But: Players can still view others\\' mutants after they have been killed or "
+"But: Players can still view others' mutants after they have been killed or "
 "accepted as equivalent."
 msgstr ""
 "Aber: Du kannst immer noch die Mutanten von anderen Spielern sehen, auch "
@@ -9520,7 +9529,7 @@ msgid "My mutant is equivalent"
 msgstr "Mein Mutant ist äquivalent"
 
 #: src/main/webapp/WEB-INF/tags/submit_mutant_button.tag:73
-msgid "I don\\'t know if my mutant is killable"
+msgid "I don't know if my mutant is killable"
 msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
 #: src/main/webapp/WEB-INF/tags/validator_explanation_test.tag:41
@@ -9583,6 +9592,178 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid ""
+#~ "You have been invited to join a game. \n"
+#~ " Join as: "
+#~ msgstr ""
+#~ "Du wurdest zu einem Spiel eingeladen. \n"
+#~ " Teilnehmen als: "
+
+#~ msgid ""
+#~ "Set class as inactive. This class won\\'t be available for games "
+#~ "afterwards."
+#~ msgstr ""
+#~ "Klasse als inaktiv markieren. Diese Klasse steht danach nicht mehr für "
+#~ "Spiele zur Verfügung."
+
+#~ msgid ""
+#~ "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” auf inaktiv setzen "
+#~ "willst?"
+
+#~ msgid ""
+#~ "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” als aktiv setzen "
+#~ "willst?"
+
+#~ msgid ""
+#~ "Delete class from the system. This class won\\'t be available for games "
+#~ "afterwards."
+#~ msgstr ""
+#~ "Lösch die Klasse aus dem System. Diese Klasse steht danach nicht mehr für "
+#~ "Spiele zur Verfügung."
+
+#~ msgid ""
+#~ "Are you sure you want to delete class \\'${gameClass.name}\\' forever? "
+#~ "This cannot be undone."
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
+#~ "willst? Das kann nicht rückgängig gemacht werden."
+
+#~ msgid "Class can\\'t be deleted, since games were already played on it."
+#~ msgstr ""
+#~ "Die Klasse kann nicht gelöscht werden, weil damit schon Spiele gespielt "
+#~ "wurden."
+
+#~ msgid "There aren\\'t any classrooms... yet."
+#~ msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
+
+#~ msgid "You don\\'t control any unfinished multiplayer games at the moment."
+#~ msgstr ""
+#~ "Du hast im Moment keine Kontrolle über noch nicht beendete Multiplayer-"
+#~ "Spiele."
+
+#~ msgid "You don\\'t control any unfinished melee games at the moment."
+#~ msgstr "Du hast im Moment keine laufenden Melee-Spiele unter Kontrolle."
+
+#~ msgid "Are you sure you want to set {0}\\'s account to inactive?"
+#~ msgstr "Bist du sicher, dass du das Konto von {0} inaktiv setzen willst?"
+
+#~ msgid ""
+#~ "Please consider that you can\\'t reuse a username from an inactive user."
+#~ msgstr ""
+#~ "Bitte denk dran, dass du den Benutzernamen eines inaktiven Nutzers nicht "
+#~ "wiederverwenden kannst."
+
+#~ msgid "Enable Capturing Players\\' Intentions"
+#~ msgstr "Spieler-Intentionen erfassen"
+
+#~ msgid "Set the game\\'s duration:"
+#~ msgstr "Leg die Spieldauer fest:"
+
+#~ msgid "Passwords don\\'t match."
+#~ msgstr "Die Passwörter passen nicht zusammen."
+
+#~ msgid ""
+#~ "Are you sure you want to disable joining? Students won\\'t be able to "
+#~ "join the classroom via invite link or from the public list."
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Teilnahme deaktivieren willst? Die Schüler "
+#~ "können dann nicht mehr über den Einladungslink oder die öffentliche Liste "
+#~ "dem Raum beitreten."
+
+#~ msgid ""
+#~ "Are you sure you want to change the classroom\\'s visibility to private? "
+#~ "The classroom will no longer be shown in the public list and players "
+#~ "won\\'t be able to join from there."
+#~ msgstr ""
+#~ "Bist du sicher, dass du die Sichtbarkeit des Raumes auf „privat” ändern "
+#~ "willst? Der Raum wird dann nicht mehr in der öffentlichen Liste angezeigt "
+#~ "und Spieler können von dort aus nicht mehr beitreten."
+
+#~ msgid ""
+#~ "Are you sure you want to make {0} the owner of this classroom? This will "
+#~ "change the current owner\\'s role to Moderator."
+#~ msgstr ""
+#~ "Bist du sicher, dass du {0} zum Besitzer diesen Raumes machen willst? "
+#~ "Dadurch wird der aktuelle Besitzer zum Moderator."
+
+#~ msgid "You\\'re not part of any classrooms."
+#~ msgstr "Du bist in keinem Raum."
+
+#~ msgid ""
+#~ "A teacher account lets you create classrooms for your students, so you "
+#~ "can manage games more easily. If you\\'re interested in turning your "
+#~ "account into a teacher account, please use the template below to email "
+#~ "us. You can also use this <a href='{0}'>mailto link</a> to automatically "
+#~ "create an email with the template."
+#~ msgstr ""
+#~ "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um "
+#~ "Spiele einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto "
+#~ "umwandeln möchtest, schick uns bitte eine E-Mail mit der unten stehenden "
+#~ "Vorlage. Du kannst auch diesen <a href=\"{0}\">Mailto-Link</a> verwenden, "
+#~ "um automatisch eine E-Mail mit der Vorlage zu erstellen."
+
+#~ msgid "You don\\'t have permission to perform this request (403)"
+#~ msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen (403)."
+
+#~ msgid "You don\\'t have permission to perform this request."
+#~ msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen."
+
+#~ msgid "The page you\\'re looking for could not be found (404)"
+#~ msgstr "Die Seite, die du suchst, wurde nicht gefunden (404)"
+
+#~ msgid ""
+#~ "The page could not be found, or you don\\'t have permission to view it."
+#~ msgstr ""
+#~ "Die Seite wurde nicht gefunden oder du hast keine Berechtigung, sie "
+#~ "anzuzeigen."
+
+#~ msgid ""
+#~ "The resource that you are attempting to access does not exist, or you "
+#~ "don\\'t have the necessary permissions to view it."
+#~ msgstr ""
+#~ "Die Ressource, auf die du zugreifen willst, ist nicht da oder du hast "
+#~ "nicht die nötigen Rechte, um sie anzusehen."
+
+#~ msgid "Make sure the address is correct and that the page hasn\\'t moved."
+#~ msgstr ""
+#~ "Schau mal, ob die Adresse stimmt und die Seite nicht verschoben wurde."
+
+#~ msgid "The game\\'s duration"
+#~ msgstr "Die Spieldauer"
+
+#~ msgid "Keep the mutant\\'s points and get an extra point"
+#~ msgstr "Behalte die Punkte des Mutanten und hol dir einen Extrapunkt"
+
+#~ msgid "Lose the mutant\\'s points"
+#~ msgstr "Verlier die Punkte des Mutanten"
+
+#~ msgid "Multiple tests can have the same name, but they don\\'t have to."
+#~ msgstr "Mehrere Tests können denselben Namen haben, müssen es aber nicht."
+
+#~ msgid "Set the game\\'s new remaining duration:"
+#~ msgstr "Stell die neue verbleibende Spieldauer ein:"
+
+#~ msgid "Players are allowed to view other players\\' submissions."
+#~ msgstr "Die Spieler dürfen die Beiträge der anderen Spieler anschauen."
+
+#~ msgid "Players are not allowed to view other players\\' submissions."
+#~ msgstr ""
+#~ "Die Spieler dürfen die Beiträge der anderen Spieler nicht anschauen."
+
+#~ msgid ""
+#~ "But: Players can still view others\\' mutants after they have been killed "
+#~ "or accepted as equivalent."
+#~ msgstr ""
+#~ "Aber: Du kannst immer noch die Mutanten von anderen Spielern sehen, auch "
+#~ "wenn sie schon tot sind oder als äquivalenz akzeptiert wurden."
+
+#~ msgid "I don\\'t know if my mutant is killable"
+#~ msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
 #~ msgid ""
 #~ "Your test is not valid. Remember the rules: Only one non-empty test, at "
@@ -9759,130 +9940,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ msgid "University of Leicester"
 #~ msgstr "Universität Leicester"
 
-#~ msgid ""
-#~ "Set class as inactive. This class won't be available for games afterwards."
-#~ msgstr ""
-#~ "Klasse als inaktiv festlegen. Diese Klasse steht danach nicht mehr für "
-#~ "Spiele zur Verfügung."
-
-#~ msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die Klasse '${gameClass.name}' auf inaktiv "
-#~ "setzen möchten?"
-
-#~ msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die Klasse „${gameClass.name}“ als aktiv "
-#~ "festlegen möchten?"
-
-#~ msgid ""
-#~ "Delete class from the system. This class won't be available for games "
-#~ "afterwards."
-#~ msgstr ""
-#~ "Klasse aus dem System löschen. Diese Klasse steht danach für Spiele nicht "
-#~ "mehr zur Verfügung."
-
-#~ msgid ""
-#~ "Are you sure you want to delete class '${gameClass.name}' forever? This "
-#~ "cannot be undone."
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die Klasse '${gameClass.name}' endgültig "
-#~ "löschen möchten? Dieser Vorgang kann nicht rückgängig gemacht werden."
-
-#~ msgid "Class can't be deleted, since games were already played on it."
-#~ msgstr ""
-#~ "Die Klasse kann nicht gelöscht werden, da bereits Spiele darauf gespielt "
-#~ "wurden."
-
-#~ msgid "There aren't any classrooms... yet."
-#~ msgstr "Es gibt noch keine Klassenzimmer... noch keine."
-
-#~ msgid "You don't control any unfinished multiplayer games at the moment."
-#~ msgstr "Du kontrollierst derzeit keine unvollendeten Multiplayer-Spiele."
-
-#~ msgid "You don't control any unfinished melee games at the moment."
-#~ msgstr "Du kontrollierst derzeit keine unvollendeten Melee-Spiele."
-
-#~ msgid "Are you sure you want to set {0}'s account to inactive?"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie das Konto von {0} als inaktiv setzen möchten?"
-
-#~ msgid ""
-#~ "Please consider that you can't reuse a username from an inactive user."
-#~ msgstr ""
-#~ "Bitte beachten Sie, dass Sie einen Benutzernamen eines inaktiven "
-#~ "Benutzers nicht wiederverwenden können."
-
-#~ msgid "Enable Capturing Players' Intentions"
-#~ msgstr "Erfassen der Intentions der Spieler aktivieren"
-
-#~ msgid ""
-#~ "Are you sure you want to disable joining? Students won't be able to join "
-#~ "the classroom via invite link or from the public list."
-#~ msgstr ""
-#~ "Möchten Sie den Beitritt wirklich deaktivieren? Die Schüler können dann "
-#~ "weder über den Einladungslink noch über die öffentliche Liste dem Raum "
-#~ "beitreten."
-
-#~ msgid ""
-#~ "Are you sure you want to change the classroom's visibility to private? "
-#~ "The classroom will no longer be shown in the public list and players "
-#~ "won't be able to join from there."
-#~ msgstr ""
-#~ "Möchten Sie wirklich die Sichtbarkeit des Raums auf „privat” ändern? Der "
-#~ "Raum wird dann nicht mehr in der öffentlichen Liste angezeigt und Spieler "
-#~ "können von dort aus nicht mehr beitreten."
-
-#~ msgid ""
-#~ "Are you sure you want to make {0} the owner of this classroom? This will "
-#~ "change the current owner's role to Moderator."
-#~ msgstr ""
-#~ "Möchten Sie {0} wirklich zum Eigentümer dieses Raumes machen? Dadurch "
-#~ "wird die Rolle des aktuellen Eigentümers in „Moderator” geändert."
-
-#~ msgid "You're not part of any classrooms."
-#~ msgstr "Sie sind in keinem Raum."
-
-#~ msgid ""
-#~ "A teacher account lets you create classrooms for your students, so you "
-#~ "can manage games more easily. If you're interested in turning your "
-#~ "account into a teacher account, please use the template below to email "
-#~ "us. You can also use this <a href='{0}'>mailto link</a> to automatically "
-#~ "create an email with the template."
-#~ msgstr ""
-#~ "Mit einem Lehrerkonto können Sie Räume für Ihre Schüler erstellen, um "
-#~ "Spiele einfacher zu verwalten. Wenn Sie Ihr Konto in ein Lehrerkonto "
-#~ "umwandeln möchten, senden Sie uns bitte eine E-Mail mit der unten "
-#~ "stehenden Vorlage. Sie können auch diesen <a href='{0}'>Mailto-Link</a> "
-#~ "verwenden, um automatisch eine E-Mail mit der Vorlage zu erstellen."
-
-#~ msgid "You don't have permission to perform this request (403)"
-#~ msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen (403)."
-
-#~ msgid "You don't have permission to perform this request."
-#~ msgstr "Sie haben keine Berechtigung, diese Anfrage auszuführen."
-
-#~ msgid "The page you're looking for could not be found (404)"
-#~ msgstr "Die gesuchte Seite konnte nicht gefunden werden (404)"
-
-#~ msgid ""
-#~ "The page could not be found, or you don't have permission to view it."
-#~ msgstr ""
-#~ "Die Seite konnte nicht gefunden werden oder Sie haben keine Berechtigung, "
-#~ "sie anzuzeigen."
-
-#~ msgid ""
-#~ "The resource that you are attempting to access does not exist, or you "
-#~ "don't have the necessary permissions to view it."
-#~ msgstr ""
-#~ "Die Ressource, auf die Sie zugreifen möchten, existiert nicht oder Sie "
-#~ "verfügen nicht über die erforderlichen Berechtigungen, um sie anzuzeigen."
-
-#~ msgid "Make sure the address is correct and that the page hasn't moved."
-#~ msgstr ""
-#~ "Vergewissern Sie sich, dass die Adresse korrekt ist und dass die Seite "
-#~ "nicht verschoben wurde."
-
 #~ msgid "Imprint"
 #~ msgstr "Impressum"
 
@@ -9907,15 +9964,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ msgid "[Bibtex]"
 #~ msgstr "[Bibtex]"
 
-#~ msgid "Keep the mutant's points and get an extra point"
-#~ msgstr "Behalte die Punkte des Mutanten und erhalte einen Extrapunkt"
-
-#~ msgid "Lose the mutant's points"
-#~ msgstr "Verliere die Punkte des Mutanten"
-
-#~ msgid "Multiple tests can have the same name, but they don't have to."
-#~ msgstr "Mehrere Tests können denselben Namen haben, müssen dies aber nicht."
-
 #~ msgid ""
 #~ "Password requirements: {0}-20 alphanumeric characters, no whitespace or "
 #~ "special characters."
@@ -9925,25 +9973,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 
 #~ msgid "Change \"Keep previous test in editor\" setting"
 #~ msgstr "Ändern Sie die Einstellung „Vorherigen Test im Editor behalten“"
-
-#~ msgid "Set the game's new remaining duration:"
-#~ msgstr "Legen Sie die neue verbleibende Spieldauer fest:"
-
-#~ msgid "Players are allowed to view other players' submissions."
-#~ msgstr "Die Spieler dürfen die Beiträge anderer Spieler einsehen."
-
-#~ msgid "Players are not allowed to view other players' submissions."
-#~ msgstr "Spieler dürfen die Beiträge anderer Spieler nicht einsehen."
-
-#~ msgid ""
-#~ "But: Players can still view others' mutants after they have been killed "
-#~ "or accepted as equivalent."
-#~ msgstr ""
-#~ "Aber: Spieler können weiterhin die Mutanten anderer Spieler sehen, "
-#~ "nachdem diese getötet oder als äquivalent akzeptiert wurden."
-
-#~ msgid "I don't know if my mutant is killable"
-#~ msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
 
 #~ msgid "The user with the name \\\"{0}\\\" does not exist."
 #~ msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."

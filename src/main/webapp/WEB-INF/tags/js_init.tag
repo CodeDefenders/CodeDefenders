@@ -61,17 +61,17 @@
             if (event.mayChooseRole) {
                 const defenderButton = document.createElement('a');
                 defenderButton.classList.add('btn', 'btn-defender');
-                defenderButton.textContent = 'Defender';
+                defenderButton.textContent = "${i18n.tr('Defender')}";
                 defenderButton.href = event.inviteLink + '&role=defender';
 
                 const flexButton = document.createElement('a');
                 flexButton.classList.add('btn', 'btn-secondary');
-                flexButton.textContent = 'Any role';
+                flexButton.textContent = "${i18n.tr('Any role')}";
                 flexButton.href = event.inviteLink + '&role=flex';
 
                 const attackerButton = document.createElement('a');
                 attackerButton.classList.add('btn', 'btn-attacker');
-                attackerButton.textContent = 'Attacker';
+                attackerButton.textContent = "${i18n.tr('Attacker')}";
                 attackerButton.href = event.inviteLink + '&role=attacker';
 
                 extraElements = [defenderButton, flexButton, attackerButton];
@@ -80,26 +80,27 @@
                 joinButton.classList.add('btn');
                 switch (event.role) {
                     case "DEFENDER":
-                        joinButton.textContent = "Defender";
+                        joinButton.textContent = "${i18n.tr('Defender')}";
                         joinButton.classList.add("btn-defender");
                         break;
                     case "ATTACKER":
-                        joinButton.textContent = "Attacker";
+                        joinButton.textContent = "${i18n.tr('Attacker')}";
                         joinButton.classList.add("btn-attacker");
                         break;
                     case "FLEX":
-                        joinButton.textContent = "Any role";
+                        joinButton.textContent = "${i18n.tr('Any role')}";
                         joinButton.classList.add("btn-secondary");
-                    case null:
-                        joinButton.textContent = "Player";
+                        break;
+                    default:
+                        joinButton.textContent = "${i18n.tr('Join')}";
                         joinButton.classList.add("btn-player");
                 }
                 joinButton.href = event.inviteLink;
                 extraElements = [joinButton];
             }
             ShowToasts.showToast({
-                title: 'Invite received',
-                body: `You have been invited to join a game. \n Join as: `,
+                title: "${i18n.tr('Invite received')}",
+                body: "${i18n.tr('You have been invited to join a game.\\n Join as: ')}",
                 extraElements: extraElements,
                 timeout: false
             });
