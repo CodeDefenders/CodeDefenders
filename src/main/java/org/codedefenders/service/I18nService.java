@@ -75,6 +75,12 @@ public class I18nService {
 
     // JS localize
 
+    /**
+     * Returns the set of strings for which translations need to be supplied in JavaScript, as they're marked for
+     * translation in JS modules.
+     *
+     * @return A set of strings that need to be translated in JavaScript.
+     */
     public Set<String> getJavascriptStrings() {
         return new HashSet<>(javascriptStrings);
     }
