@@ -11,83 +11,83 @@ msgstr "Teacher Account Application for {0}"
 msgid "Greetings,\n\nI would like to request a teacher account for {0} on {1}.\n\nRegards,\n{0}\n"
 msgstr "Greetings,\n\nI would like to request a teacher account for {0} on {1}.\n\nRegards,\n{0}\n"
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:225
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:226
 msgid "Created {0} staged games."
 msgstr "Created {0} staged games."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:238
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:239
 msgid "Created {0} empty staged games."
 msgstr "Created {0} empty staged games."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:250
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:251
 msgid "Deleted {0} staged games."
 msgstr "Deleted {0} staged games."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:264
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:265
 msgid "Created games for {0} staged games."
 msgstr "Created games for {0} staged games."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:278
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:279
 msgid "Removed user {0} from staged game {1}."
 msgstr "Removed user {0} from staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:284
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:285
 msgid "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game."
 msgstr "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:302
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:303
 msgid "Removed you from staged game {0}. Your role is now {1} again."
 msgstr "Removed you from staged game {0}. Your role is now {1} again."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:316
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:317
 msgid "Switched role of user {0} in staged game {1}."
 msgstr "Switched role of user {0} in staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:322
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:323
 msgid "ERROR: Cannot switch role of user {0} in staged game {1}."
 msgstr "ERROR: Cannot switch role of user {0} in staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:337
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:338
 msgid "Switched your role in staged game {0}."
 msgstr "Switched your role in staged game {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:343
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:344
 msgid "ERROR: Cannot switch your role in staged game {0}."
 msgstr "ERROR: Cannot switch your role in staged game {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:361
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:362
 msgid "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game."
 msgstr "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:376
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:377
 msgid "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 msgstr "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:381
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:382
 msgid "Moved user {0} from staged game {1} to staged game {2} as {3}."
 msgstr "Moved user {0} from staged game {1} to staged game {2} as {3}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:400
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:401
 msgid "Added user {0} to staged game {1} as {2}."
 msgstr "Added user {0} to staged game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:404
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:405
 msgid "ERROR: Cannot add user {0} to staged game {1}."
 msgstr "ERROR: Cannot add user {0} to staged game {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:419
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:420
 msgid "ERROR: Cannot add user {0} to existing game {1} as {2}."
 msgstr "ERROR: Cannot add user {0} to existing game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:424
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:425
 msgid "Added user {0} to existing game {1} as {2}."
 msgstr "Added user {0} to existing game {1} as {2}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:446
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:447
 msgid "ERROR: No valid user with the ID {0} exists."
 msgstr "ERROR: No valid user with the ID {0} exists."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:483
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:484
 msgid "ERROR: No valid user with name/email {0} exists."
 msgstr "ERROR: No valid user with name/email {0} exists."
 
@@ -7416,12 +7416,12 @@ msgid "project page for more details."
 msgstr "project page for more details."
 
 #: src/main/webapp/jsp/error_page_403.jsp:27
-msgid "You don't have permission to perform this request (403)"
-msgstr "You don't have permission to perform this request (403)"
+msgid "You don\'t have permission to perform this request (403)"
+msgstr "You don\'t have permission to perform this request (403)"
 
 #: src/main/webapp/jsp/error_page_403.jsp:29
-msgid "You don't have permission to perform this request."
-msgstr "You don't have permission to perform this request."
+msgid "You don\'t have permission to perform this request."
+msgstr "You don\'t have permission to perform this request."
 
 #: src/main/webapp/jsp/error_page_403.jsp:31
 msgid "Your accounts permissions do not include the accessed page or performed action."
@@ -7432,22 +7432,22 @@ msgid "Please contact your administrator if you think this is a mistake."
 msgstr "Please contact your administrator if you think this is a mistake."
 
 #: src/main/webapp/jsp/error_page_404.jsp:27
-msgid "The page you're looking for could not be found (404)"
-msgstr "The page you're looking for could not be found (404)"
+msgid "The page you\'re looking for could not be found (404)"
+msgstr "The page you\'re looking for could not be found (404)"
 
 #: src/main/webapp/jsp/error_page_404.jsp:29
-msgid "The page could not be found, or you don't have permission to view it."
-msgstr "The page could not be found, or you don't have permission to view it."
+msgid "The page could not be found, or you don\'t have permission to view it."
+msgstr "The page could not be found, or you don\'t have permission to view it."
 
-#: src/main/webapp/jsp/error_page_404.jsp:32
+#: src/main/webapp/jsp/error_page_404.jsp:31
 msgid "The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it."
 msgstr "The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it."
 
-#: src/main/webapp/jsp/error_page_404.jsp:34
+#: src/main/webapp/jsp/error_page_404.jsp:32
 msgid "Make sure the address is correct and that the page hasn\'t moved."
 msgstr "Make sure the address is correct and that the page hasn\'t moved."
 
-#: src/main/webapp/jsp/error_page_404.jsp:35
+#: src/main/webapp/jsp/error_page_404.jsp:33
 msgid "Please contact your administrator if you think this is a mistake."
 msgstr "Please contact your administrator if you think this is a mistake."
 
@@ -7476,8 +7476,8 @@ msgid "The user with the name \"{0}\" does not exist."
 msgstr "The user with the name \"{0}\" does not exist."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:35
-msgid "Make sure the address and the username are correct and that the page hasn't moved."
-msgstr "Make sure the address and the username are correct and that the page hasn't moved."
+msgid "Make sure the address and the username are correct."
+msgstr "Make sure the address and the username are correct."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:36
 msgid "Please contact your administrator if you think this is a mistake."

@@ -30,10 +30,10 @@
 <t:error_page
         title="${i18n.tr('User not found (404)')}"
         statusCode="404"
-        shortDescription="${i18n.tr('The user with the name "{0}" does not exist.', fn:escapeXml(param.user))}">
+        shortDescription="${i18n.tr('The user with the name \"{0}\" does not exist.', fn:escapeXml(param.user))}">
     <jsp:attribute name="message">
-        <p>${i18n.tr("Make sure the address and the username are correct and that the page hasn't moved.")}</p>
-            <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
+        <p>${i18n.tr("Make sure the address and the username are correct.")}</p>
+        <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
         <p>
             ${i18n.tr("Looking for your own profile?")}
             <a href="${url.forPath(Paths.USER_PROFILE)}" title="${i18n.tr('your profile')}">${i18n.tr("Click here.")}</a>

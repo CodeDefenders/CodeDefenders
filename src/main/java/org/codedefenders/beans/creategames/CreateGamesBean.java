@@ -55,8 +55,8 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.creategames.CreateGamesServlet;
 import org.codedefenders.util.JSONUtils;
-import org.xnap.commons.i18n.I18n;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

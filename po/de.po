@@ -32,27 +32,27 @@ msgstr ""
 "Mit freundlichen Grüßen\n"
 "{0} \n"
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:225
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:226
 msgid "Created {0} staged games."
 msgstr "{0} Spielentwürfe erstellt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:238
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:239
 msgid "Created {0} empty staged games."
 msgstr "{0} leere Spielentwürfe erstellt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:250
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:251
 msgid "Deleted {0} staged games."
 msgstr "{0} Spielentwürfe gelöscht."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:264
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:265
 msgid "Created games for {0} staged games."
 msgstr "Ich hab Spiele basierend auf {0} Spielentwürfen erstellt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:278
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:279
 msgid "Removed user {0} from staged game {1}."
 msgstr "Benutzer {0} aus dem Spielentwirf {1} rausgeschmissen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:284
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:285
 msgid ""
 "ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to "
 "the staged game."
@@ -60,30 +60,30 @@ msgstr ""
 "Fehler: Kann den Benutzer {0} nicht aus dem Spielentwurf {1} löschen. Der "
 "Benutzer ist dem Spielentwurf nicht zugewiesen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:302
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:303
 msgid "Removed you from staged game {0}. Your role is now {1} again."
 msgstr ""
 "Du wurdest aus dem Spielentwurf {0} rausgenommen. Deine Rolle ist jetzt "
 "wieder {1}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:316
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:317
 msgid "Switched role of user {0} in staged game {1}."
 msgstr "Die Rolle von Nutzer {0} im Spielentwurf {1} wurde getauscht."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:322
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:323
 msgid "ERROR: Cannot switch role of user {0} in staged game {1}."
 msgstr ""
 "FEHLER: Kann die Rolle von Benutzer {0} im Spielentwurf {1} nicht wechseln."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:337
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:338
 msgid "Switched your role in staged game {0}."
 msgstr "Deine Rolle im Spielentwurf {0} wurde geändert."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:343
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:344
 msgid "ERROR: Cannot switch your role in staged game {0}."
 msgstr "Fehler: Du kannst deine Rolle im Spielentwurf nicht wechseln {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:361
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:362
 msgid ""
 "ERROR: Cannot move user {0} from staged game {1}. User is not assigned to "
 "the staged game."
@@ -91,42 +91,42 @@ msgstr ""
 "Fehler: Der Benutzer {0} kann nicht aus dem Spielentwurf {1} entfernt "
 "werden. Der Benutzer ist dem Spielentwurf nicht zugewiesen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:376
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:377
 msgid "ERROR: Cannot move player to staged game with role {0}. Invalid role."
 msgstr ""
 "FEHLER: Kann den Spieler nicht mit der Rolle {0} nicht in den Spielentwurf "
 "verschieben: Ungültige Rolle."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:381
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:382
 msgid "Moved user {0} from staged game {1} to staged game {2} as {3}."
 msgstr ""
 "Benutzer {0} wurde vom Spielentwurf {1} zum Spielentwurf {2} als {3} "
 "verschoben."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:400
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:401
 msgid "Added user {0} to staged game {1} as {2}."
 msgstr "Benutzer {0} wurde als {2} zum Spiel {1} hinzugefügt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:404
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:405
 msgid "ERROR: Cannot add user {0} to staged game {1}."
 msgstr ""
 "FEHLER: Der Benutzer {0} kann nicht zum Spielentwurf {1} hinzugefügt werden."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:419
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:420
 msgid "ERROR: Cannot add user {0} to existing game {1} as {2}."
 msgstr ""
 "Fehler: Kann den Benutzer {0} nicht als {2} zum bestehenden Spiel {1} "
 "hinzufügen."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:424
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:425
 msgid "Added user {0} to existing game {1} as {2}."
 msgstr "Benutzer {0} wurde als {2} zum bestehenden Spiel {1} hinzugefügt."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:446
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:447
 msgid "ERROR: No valid user with the ID {0} exists."
 msgstr "FEHLER: Es gibt keinen gültigen Benutzer mit der ID {0}."
 
-#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:483
+#: src/main/java/org/codedefenders/beans/creategames/CreateGamesBean.java:484
 msgid "ERROR: No valid user with name/email {0} exists."
 msgstr ""
 "FEHLER: Es gibt keinen gültigen Benutzer mit dem Namen/der E-Mail-Adresse "
@@ -6945,7 +6945,7 @@ msgstr ""
 "durchgeführte Aktion."
 
 #: src/main/webapp/jsp/error_page_403.jsp:33
-#: src/main/webapp/jsp/error_page_404.jsp:35
+#: src/main/webapp/jsp/error_page_404.jsp:33
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:36
 msgid "Please contact your administrator if you think this is a mistake."
 msgstr ""
@@ -6962,7 +6962,7 @@ msgstr ""
 "Die Seite wurde nicht gefunden oder du hast keine Berechtigung, sie "
 "anzuzeigen."
 
-#: src/main/webapp/jsp/error_page_404.jsp:32
+#: src/main/webapp/jsp/error_page_404.jsp:31
 msgid ""
 "The resource that you are attempting to access does not exist, or you don't "
 "have the necessary permissions to view it."
@@ -6970,7 +6970,7 @@ msgstr ""
 "Die Ressource, auf die du zugreifen willst, ist nicht da oder du hast nicht "
 "die nötigen Rechte, um sie anzusehen."
 
-#: src/main/webapp/jsp/error_page_404.jsp:34
+#: src/main/webapp/jsp/error_page_404.jsp:32
 msgid "Make sure the address is correct and that the page hasn't moved."
 msgstr ""
 "Vergewissere dich, dass die Adresse korrekt ist und dass die Seite nicht "
@@ -7004,10 +7004,8 @@ msgid "The user with the name \"{0}\" does not exist."
 msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:35
-msgid ""
-"Make sure the address and the username are correct and that the page hasn't "
-"moved."
-msgstr "Vergewissere dich, dass die URL und der Benutzername korrekt sind."
+msgid "Make sure the address and the username are correct."
+msgstr "Vergewissere dich, dass die Adresse und der Benutzername korrekt sind."
 
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:38
 msgid "Looking for your own profile?"
@@ -9596,6 +9594,11 @@ msgstr "Kopieren fehlgeschlagen"
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
 
+#~ msgid ""
+#~ "Make sure the address and the username are correct and that the page "
+#~ "hasn't moved."
+#~ msgstr "Vergewissere dich, dass die URL und der Benutzername korrekt sind."
+
 #~ msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
 #~ msgstr ""
 #~ "Bist du sicher, dass du die Klasse '${gameClass.name}' auf inaktiv setzen "
@@ -9993,9 +9996,6 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 
 #~ msgid "Change \"Keep previous test in editor\" setting"
 #~ msgstr "Ändern Sie die Einstellung „Vorherigen Test im Editor behalten“"
-
-#~ msgid "The user with the name \\\"{0}\\\" does not exist."
-#~ msgstr "Der Benutzer mit dem Namen „{0}“ existiert nicht."
 
 #~ msgid "Puzzle solved in {0} {1}."
 #~ msgstr "Rätsel gelöst in {0} {1}."
