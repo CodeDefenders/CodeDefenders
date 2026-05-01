@@ -19,9 +19,22 @@
 
 --%>
 <%@ page pageEncoding="UTF-8" %>
+
+<%@ page import="org.xnap.commons.i18n.I18n" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+<%@ page import="org.codedefenders.service.I18nService" %>
+
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<%
+    // in case of access denied from "/admin" the I18nFilter is bypassed
+    if (request.getAttribute("i18n") == null) {
+        I18n i18n = CDIUtil.getBeanFromCDI(I18nService.class).getI18n(request);
+        pageContext.setAttribute("i18n", i18n);
+    }
+%>
 
 <t:error_page
         title='${i18n.tr("The page you\'re looking for could not be found (404)")}'

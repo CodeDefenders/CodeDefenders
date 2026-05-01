@@ -19,9 +19,22 @@
 
 --%>
 <%@ page pageEncoding="UTF-8" %>
+
+<%@ page import="org.codedefenders.service.I18nService" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<%
+    // in case of access bypassing the I18nFilter
+    if (request.getAttribute("i18n") == null) {
+        I18n i18n = CDIUtil.getBeanFromCDI(I18nService.class).getI18n(request);
+        pageContext.setAttribute("i18n", i18n);
+    }
+%>
 
 <t:error_page
         title='${i18n.tr("You don\'t have permission to perform this request (403)")}'
