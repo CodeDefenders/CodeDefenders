@@ -330,9 +330,10 @@ class GameHighlighting {
      * @private
      */
     _createEquivalenceButton (line) {
+        const confirmText = i18n.tr('This will mark all player-created mutants on line {0} as equivalent. Are you sure?', line);
         return '' +
                 `<form class="mt-3" id="equiv" action="equivalence-duels" method="post"
-                    onsubmit="return window.confirm('This will mark all player-created mutants on line ${line} as equivalent. Are you sure?')">
+                    onsubmit="return confirm('${confirmText}')">
                     <input type="hidden" name="formType" value="claimEquivalent">
                     <input type="hidden" name="equivLines" value="${line}">
                     <input type="hidden" name="gameId" value="${this._gameId}">

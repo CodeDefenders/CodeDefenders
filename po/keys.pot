@@ -3743,6 +3743,10 @@ msgstr "Score"
 msgid "Changed Lines"
 msgstr "Changed Lines"
 
+#: src/main/javascript/game/game_highlighting.js:335
+msgid "This will mark all player-created mutants on line {0} as equivalent. Are you sure?"
+msgstr "This will mark all player-created mutants on line {0} as equivalent. Are you sure?"
+
 #: src/main/javascript/game/game_highlighting.js:341
 msgid "Claim Equivalent"
 msgstr "Claim Equivalent"
@@ -4115,7 +4119,7 @@ msgstr "Test Failed Against Original"
 msgid "Done"
 msgstr "Done"
 
-#: src/main/javascript/main/achievement_notifications.js:60
+#: src/main/javascript/main/achievement_notifications.js:61
 msgid "New Achievement Unlocked:"
 msgstr "New Achievement Unlocked:"
 

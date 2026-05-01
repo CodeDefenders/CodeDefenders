@@ -3774,6 +3774,14 @@ msgstr "Punkte"
 msgid "Changed Lines"
 msgstr "Veränderte Zeilen"
 
+#: src/main/javascript/game/game_highlighting.js:335
+msgid ""
+"This will mark all player-created mutants on line {0} as equivalent. Are you "
+"sure?"
+msgstr ""
+"Dadurch werden alle von Spielern erstellten Mutanten in Zeile {0} als "
+"äquivalent markiert. Bist du sicher?"
+
 #: src/main/javascript/game/game_highlighting.js:341
 #: src/main/javascript/game/game_highlighting.js:357
 #: src/main/javascript/game/mutant_accordion.js:344
@@ -4007,7 +4015,7 @@ msgid ""
 "This will mark all player-created mutants on line(s) {0} as equivalent. Are "
 "you sure?"
 msgstr ""
-"Dadurch werden alle vom Spieler erstellten Mutanten in Zeile(n) {0} als "
+"Dadurch werden alle von Spielern erstellten Mutanten in Zeile(n) {0} als "
 "äquivalent markiert. Bist du sicher?"
 
 #: src/main/javascript/game/mutant_accordion.js:363
@@ -4100,7 +4108,7 @@ msgstr "Test gegen Mutanten ausführen"
 msgid "Test Failed Against Original"
 msgstr "Testausführung gegenüber Original fehlgeschlagen"
 
-#: src/main/javascript/main/achievement_notifications.js:60
+#: src/main/javascript/main/achievement_notifications.js:61
 msgid "New Achievement Unlocked:"
 msgstr "Neue Errungenschaft freigeschaltet:"
 
