@@ -80,6 +80,7 @@ public class MultiplayerGame extends AbstractGame {
     private int gameDurationMinutes;
 
     private long startTimeUnixSeconds;
+    private long finishTimeUnixSeconds;
 
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
@@ -108,6 +109,7 @@ public class MultiplayerGame extends AbstractGame {
         private boolean chatEnabled = false;
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
+        private long finishTimeUnixSeconds;
         private float lineCoverage = 1f;
         private float mutantCoverage = 1f;
         private float prize = 1f;
@@ -160,6 +162,11 @@ public class MultiplayerGame extends AbstractGame {
 
         public Builder startTimeUnixSeconds(long startTimeUnixSeconds) {
             this.startTimeUnixSeconds = startTimeUnixSeconds;
+            return this;
+        }
+
+        public Builder finishTimeUnixSeconds(long finishTimeUnixSeconds) {
+            this.finishTimeUnixSeconds = finishTimeUnixSeconds;
             return this;
         }
 
@@ -272,6 +279,7 @@ public class MultiplayerGame extends AbstractGame {
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
+        this.finishTimeUnixSeconds = builder.finishTimeUnixSeconds;
         this.classroomId = builder.classroomId;
         this.inviteOnly = builder.inviteOnly;
         this.mayChooseRoles = builder.mayChooseRoles;
@@ -289,6 +297,10 @@ public class MultiplayerGame extends AbstractGame {
 
     public long getStartTimeUnixSeconds() {
         return startTimeUnixSeconds;
+    }
+
+    public long getFinishTimeUnixSeconds() {
+        return finishTimeUnixSeconds;
     }
 
     public int getDefenderValue() {

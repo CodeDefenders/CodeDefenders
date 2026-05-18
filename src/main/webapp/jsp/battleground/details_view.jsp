@@ -152,8 +152,9 @@
                 <div class="details-content__item">
                     <h3>The game's duration</h3>
 
-                    <c:set var="duration" value="${game.gameDurationMinutes}"/>
                     <c:set var="startTime" value="${game.startTimeUnixSeconds}"/>
+                    <!-- This distinction is for backwards compatability, in older versions, "finishTime" was not correctly set -->
+                    <c:set var="duration" value="${game.finishTimeUnixSeconds > startTime ? (game.finishTimeUnixSeconds - startTime) / 60 : game.gameDurationMinutes}"/>
 
                     <%-- Progress Bar --%>
                     <div class="progress mb-3" style="height: 1em;">
