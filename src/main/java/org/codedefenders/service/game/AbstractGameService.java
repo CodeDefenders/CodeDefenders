@@ -45,10 +45,12 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -74,6 +76,9 @@ public abstract class AbstractGameService implements IGameService {
 
     @Inject
     private INotificationService notificationService;
+
+    @Inject
+    private I18nService i18nService;
 
     @Inject
     public AbstractGameService(GameManagingUtils gameManagingUtils, UserService userService,
@@ -150,13 +155,15 @@ public abstract class AbstractGameService implements IGameService {
         boolean canMarkEquivalent = canMarkMutantEquivalent(mutant, game, user, playerRole);
         boolean isCovered = isMutantCovered(mutant, game, player);
 
+        I18n i18n = i18nService.getI18n(user.getId());
+        String description = mutant.getDescription(i18n);
+
         return new MutantDTO(
                 mutant.getId(),
                 new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName()),
                 mutant.getState(),
                 mutant.getScore(),
-                mutant.getHTMLReadout().stream()
-                        .filter(Objects::nonNull).collect(Collectors.joining("<br>")),
+                description,
                 mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
                 isCovered,
                 canView,

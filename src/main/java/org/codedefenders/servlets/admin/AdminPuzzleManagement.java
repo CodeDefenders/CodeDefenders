@@ -20,7 +20,6 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -117,10 +116,9 @@ public class AdminPuzzleManagement extends HttpServlet {
      */
     private void displayPuzzlePreview(HttpServletRequest request, HttpServletResponse response, int puzzleId)
             throws ServletException, IOException {
-
+        I18n i18n = i18nService.getI18n(request);
         Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
-            I18n i18n = i18nService.getI18n(request);
             response.setStatus(HttpStatus.SC_NOT_FOUND);
             response.getWriter().println(i18n.tr("Puzzle not found."));
             return;
@@ -138,7 +136,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 .toList();
 
         List<MutantDTO> mutantDTOs = mutants.stream()
-                .map(mutant -> convertMutant(mutant, attacker, tests))
+                .map(mutant -> convertMutant(mutant, attacker, tests, i18n))
                 .toList();
 
         classViewer.init(cut);
@@ -176,7 +174,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 test.getAsString());
     }
 
-    private MutantDTO convertMutant(Mutant mutant, SimpleUser creator, List<Test> tests) {
+    private MutantDTO convertMutant(Mutant mutant, SimpleUser creator, List<Test> tests, I18n i18n) {
         Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
         SimpleUser killedBy = null;
         int killedByTestId = -1;
@@ -195,8 +193,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 creator,
                 killingTest == null ? Mutant.State.ALIVE : Mutant.State.KILLED,
                 mutant.getScore(),
-                mutant.getHTMLReadout().stream()
-                        .filter(Objects::nonNull).collect(Collectors.joining("<br>")),
+                mutant.getDescription(i18n),
                 mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
                 tests.stream().anyMatch(test -> test.isMutantCovered(mutant)),
                 true,

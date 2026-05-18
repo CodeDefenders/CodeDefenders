@@ -260,6 +260,26 @@ msgstr "Mittel"
 msgid "Hard"
 msgstr "Schwer"
 
+#: src/main/java/org/codedefenders/game/Mutant.java:488
+msgid "line {0}"
+msgstr "Zeile {0}"
+
+#: src/main/java/org/codedefenders/game/Mutant.java:491
+msgid "lines {0}-{0}"
+msgstr "Zeilen {0}–{0}"
+
+#: src/main/java/org/codedefenders/game/Mutant.java:505
+msgid "Modified {0}"
+msgstr "Änderte {0}"
+
+#: src/main/java/org/codedefenders/game/Mutant.java:510
+msgid "Deleted {0}"
+msgstr "Löschte {0}"
+
+#: src/main/java/org/codedefenders/game/Mutant.java:515
+msgid "Added {0}"
+msgstr "Fügte {0} hinzu"
+
 #: src/main/java/org/codedefenders/game/Role.java:30
 #: src/main/javascript/game/game_chat.js:192
 #: src/main/webapp/jsp/classroom_page.jsp:928
@@ -1624,7 +1644,7 @@ msgstr "Das Spiel existiert nicht: {0}"
 msgid "You're already the creator of this game."
 msgstr "Du bist bereits der Ersteller dieses Spiels."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:125
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:123
 #: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:204
 #: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:280
 #: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:317
@@ -6928,15 +6948,15 @@ msgstr "Bitte sieh dir die"
 msgid "project page for more details."
 msgstr "Projektseite für weitere Details an."
 
-#: src/main/webapp/jsp/error_page_403.jsp:27
+#: src/main/webapp/jsp/error_page_403.jsp:40
 msgid "You don't have permission to perform this request (403)"
 msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen (403)."
 
-#: src/main/webapp/jsp/error_page_403.jsp:29
+#: src/main/webapp/jsp/error_page_403.jsp:42
 msgid "You don't have permission to perform this request."
 msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen."
 
-#: src/main/webapp/jsp/error_page_403.jsp:31
+#: src/main/webapp/jsp/error_page_403.jsp:44
 msgid ""
 "Your accounts permissions do not include the accessed page or performed "
 "action."
@@ -6944,25 +6964,25 @@ msgstr ""
 "Deine Kontoberechtigungen umfassen nicht die aufgerufene Seite oder die "
 "durchgeführte Aktion."
 
-#: src/main/webapp/jsp/error_page_403.jsp:33
-#: src/main/webapp/jsp/error_page_404.jsp:33
+#: src/main/webapp/jsp/error_page_403.jsp:46
+#: src/main/webapp/jsp/error_page_404.jsp:46
 #: src/main/webapp/jsp/error_page_user_not_found.jsp:36
 msgid "Please contact your administrator if you think this is a mistake."
 msgstr ""
 "Bitte wende dich an den Administrator, wenn du glaubst, dass dies ein Fehler "
 "ist."
 
-#: src/main/webapp/jsp/error_page_404.jsp:27
+#: src/main/webapp/jsp/error_page_404.jsp:40
 msgid "The page you're looking for could not be found (404)"
 msgstr "Die Seite, die du suchst, wurde nicht gefunden (404)"
 
-#: src/main/webapp/jsp/error_page_404.jsp:29
+#: src/main/webapp/jsp/error_page_404.jsp:42
 msgid "The page could not be found, or you don't have permission to view it."
 msgstr ""
 "Die Seite wurde nicht gefunden oder du hast keine Berechtigung, sie "
 "anzuzeigen."
 
-#: src/main/webapp/jsp/error_page_404.jsp:31
+#: src/main/webapp/jsp/error_page_404.jsp:44
 msgid ""
 "The resource that you are attempting to access does not exist, or you don't "
 "have the necessary permissions to view it."
@@ -6970,7 +6990,7 @@ msgstr ""
 "Die Ressource, auf die du zugreifen willst, ist nicht da oder du hast nicht "
 "die nötigen Rechte, um sie anzusehen."
 
-#: src/main/webapp/jsp/error_page_404.jsp:32
+#: src/main/webapp/jsp/error_page_404.jsp:45
 msgid "Make sure the address is correct and that the page hasn't moved."
 msgstr ""
 "Vergewissere dich, dass die Adresse korrekt ist und dass die Seite nicht "
