@@ -86,6 +86,7 @@ public class Constants {
     public static final String ADMIN_GAMES_JSP = "/jsp/admin_create_games.jsp";
     public static final String ADMIN_CLASSES_JSP = "/jsp/admin_class_management.jsp";
     public static final String ADMIN_SETTINGS_JSP = "/jsp/admin_system_settings.jsp";
+    public static final String ADMIN_TEXT_SETTINGS_JSP = "/jsp/admin_text_settings.jsp";
     public static final String ADMIN_MONITOR_JSP = "/jsp/admin_monitor_games.jsp";
     public static final String ADMIN_KILLMAPS_JSP = "/jsp/admin_killmap_management.jsp";
     public static final String ADMIN_PUZZLE_MANAGEMENT_JSP = "/jsp/admin_puzzle_management.jsp";

@@ -30,21 +30,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.xnap.commons.i18n.I18n;
 
-@WebServlet(Paths.ADMIN_SETTINGS)
-// TODO Does this enable CDI using @Property@Inject ?
+import static org.codedefenders.util.Paths.ADMIN_SETTINGS;
+
+@WebServlet(ADMIN_SETTINGS)
 public class AdminSystemSettings extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
-
-    @Inject
-    private ConnectionFactory connectionFactory;
 
     @Inject
     private URLUtils url;
@@ -107,18 +103,6 @@ public class AdminSystemSettings extends HttpServlet {
                     Language codes like en, de, fr are sufficient.
                     """
                 )
-        ),
-        SITE_NOTICE(
-                I18n.marktr("Site Notice"),
-                I18n.marktr("HTML formatted text shown in the site notice. This is mandatory in many regions.")
-        ),
-        PRIVACY_NOTICE(
-                I18n.marktr("Privacy Notice"),
-                I18n.marktr("HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance.")
-        ),
-        CONTACT_NOTICE(
-                I18n.marktr("Contact Notice"),
-                I18n.marktr("HTML formatted text shown on the 'Contact Us' page just below heading.")
         ),
         EMAIL_SMTP_HOST(
                 I18n.marktr("Email Smtp Host"),
@@ -287,7 +271,7 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = url.forPath("/admin/settings");
+        String responsePath = url.forPath(ADMIN_SETTINGS);
 
         switch (request.getParameter("formType")) {
             case "saveSettings":
@@ -309,7 +293,7 @@ public class AdminSystemSettings extends HttpServlet {
         for (SettingsDTO setting : settings) {
             String valueString = request.getParameter(setting.getName().name());
             if (setting.getType().equals(SETTING_TYPE.BOOL_VALUE)
-                    || (valueString != null && (!valueString.equals(""))
+                    || (valueString != null && (!valueString.isEmpty())
                     || setting.getType().equals(SETTING_TYPE.STRING_VALUE))) {
                 switch (setting.getType()) {
                     case STRING_VALUE:
@@ -317,12 +301,6 @@ public class AdminSystemSettings extends HttpServlet {
                         break;
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
-                            // connectionFactory.updateSize(Integer.parseInt(valueString));
-                        }
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
-                            // connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
-                        }
                         break;
                     case BOOL_VALUE:
                         setting.setBoolValue(valueString != null);

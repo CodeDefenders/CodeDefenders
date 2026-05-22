@@ -38,9 +38,6 @@
 
     pageContext.setAttribute("AUTOMATIC_KILLMAP_COMPUTATION", SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
     pageContext.setAttribute("SUPPORTED_LANGUAGES", SETTING_NAME.SUPPORTED_LANGUAGES);
-    pageContext.setAttribute("SITE_NOTICE", SETTING_NAME.SITE_NOTICE);
-    pageContext.setAttribute("PRIVACY_NOTICE", SETTING_NAME.PRIVACY_NOTICE);
-    pageContext.setAttribute("CONTACT_NOTICE", SETTING_NAME.CONTACT_NOTICE);
     pageContext.setAttribute("EMAILS_ENABLED", SETTING_NAME.EMAILS_ENABLED);
     pageContext.setAttribute("EMAIL_ADDRESS", SETTING_NAME.EMAIL_ADDRESS);
     pageContext.setAttribute("EMAIL_PASSWORD", SETTING_NAME.EMAIL_PASSWORD);
@@ -77,32 +74,19 @@
                         </label>
                         <c:choose>
                             <c:when test="${setting.type == STRING_VALUE}">
-                                <c:choose>
-                                    <c:when test="${setting.name == SITE_NOTICE
-                                                 || setting.name == PRIVACY_NOTICE
-                                                 || setting.name == CONTACT_NOTICE}">
-                                        <div class="col-8">
-                                            <textarea class="form-control" rows="3"
-                                                      name="${settingId}"
-                                                      id="${settingId}">${setting.stringValue}</textarea>
+                                <div class="col-8">
+                                    <input type="${settingId.contains('PASSWORD') ? 'password' : 'text'}"
+                                           class="form-control"
+                                           name="${settingId}"
+                                           id="${settingId}"
+                                           value="${setting.stringValue}">
+                                    <c:if test="${settingId.startsWith('EMAIL')}">
+                                        <div class="invalid-feedback">
+                                                ${i18n.tr('This setting is required for sending emails.')}
+                                                ${i18n.tr('Please provide a valid value, or disable emails.')}
                                         </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="col-8">
-                                            <input type="${settingId.contains('PASSWORD') ? 'password' : 'text'}"
-                                                   class="form-control"
-                                                   name="${settingId}"
-                                                   id="${settingId}"
-                                                   value="${setting.stringValue}">
-                                            <c:if test="${settingId.startsWith('EMAIL')}">
-                                                <div class="invalid-feedback">
-                                                        ${i18n.tr('This setting is required for sending emails.')}
-                                                        ${i18n.tr('Please provide a valid value, or disable emails.')}
-                                                </div>
-                                            </c:if>
-                                        </div>
-                                    </c:otherwise>
-                                </c:choose>
+                                    </c:if>
+                                </div>
                             </c:when>
                             <c:when test="${setting.type == BOOL_VALUE}">
                                 <div class="col-8 d-flex align-items-center">

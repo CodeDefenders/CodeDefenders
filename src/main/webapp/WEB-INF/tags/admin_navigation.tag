@@ -57,4 +57,7 @@
     <li class="nav-item">
         <a class="nav-link ${activePage.equals('adminSystemSettings') ? 'active' : ''}" id="adminSystemSettings" href="${url.forPath(Paths.ADMIN_SETTINGS)}">${i18n.tr('System Settings')}</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link ${activePage.equals('adminTextSettings') ? 'active' : ''}" id="adminTextSettings" href="${url.forPath(Paths.ADMIN_TEXT_SETTINGS)}">${i18n.tr('Text Settings')}</a>
+    </li>
 </ul>

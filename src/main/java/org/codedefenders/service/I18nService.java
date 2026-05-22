@@ -157,17 +157,18 @@ public class I18nService {
      * Checks if the given language is among the supported locales.
      * If so, returns the corresponding locale, else returns the default locale.
      *
-     * @param language The language to check, e.g. "en" or "de". Should not be null, but may be empty or invalid.
+     * @param language The language to check, e.g. "en" or "de". May be null, empty or invalid.
      * @return The locale corresponding to the given language if it is supported, else the default locale.
      */
     public Locale toSupportedLocale(String language) {
         var supportedLocales = getSupportedLocales();
-        var locale = new Locale(language);
-        if (Arrays.asList(supportedLocales).contains(locale)) {
-            return locale;
-        } else {
-            return supportedLocales[0];
+        if (language != null) {
+            var locale = new Locale(language);
+            if (Arrays.asList(supportedLocales).contains(locale)) {
+                return locale;
+            }
         }
+        return supportedLocales[0];
     }
 
 
