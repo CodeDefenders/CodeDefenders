@@ -32,12 +32,16 @@ import org.codedefenders.service.I18nService;
 import org.codedefenders.service.TextSettingsService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.util.Paths.ADMIN_TEXT_SETTINGS;
 
 @WebServlet(ADMIN_TEXT_SETTINGS)
 public class AdminTextSettings extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminTextSettings.class);
 
     @Inject
     private MessagesBean messages;
@@ -63,15 +67,13 @@ public class AdminTextSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = url.forPath(ADMIN_TEXT_SETTINGS);
-
         if (request.getParameter("formType").equals("saveTextSettings")) {
             updateTextSettings(request);
         } else {
-            System.err.println("Action not recognised");
+            logger.error("Action not recognised");
         }
 
-        response.sendRedirect(responsePath);
+        response.sendRedirect(url.forPath(ADMIN_TEXT_SETTINGS));
     }
 
     private void updateTextSettings(HttpServletRequest request) {

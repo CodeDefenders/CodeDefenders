@@ -32,12 +32,16 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.util.Paths.ADMIN_SETTINGS;
 
 @WebServlet(ADMIN_SETTINGS)
 public class AdminSystemSettings extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminSystemSettings.class);
 
     @Inject
     private MessagesBean messages;
@@ -278,7 +282,7 @@ public class AdminSystemSettings extends HttpServlet {
                 updateSystemSettings(request);
                 break;
             default:
-                System.err.println("Action not recognised");
+                logger.error("Action not recognised");
                 break;
         }
 

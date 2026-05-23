@@ -191,7 +191,7 @@ public class AdminMonitorGames extends HttpServlet {
                 joinGameAsObserver(request, response);
                 break;
             default:
-                System.err.println("Action not recognised");
+                logger.error("Action not recognised");
                 Redirect.redirectBack(request, response);
                 break;
         }
