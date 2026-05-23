@@ -30,110 +30,106 @@
 <%--@elvariable id="language" type="java.lang.String"--%>
 <%--@elvariable id="settings" type="java.util.List"--%>
 
-<%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <p:main_page title="${i18n.tr('Text Settings')}">
 
-    <div class="container">
-        <t:admin_navigation activePage="adminTextSettings"/>
+    <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/admin.css")}" rel="stylesheet">
+    </jsp:attribute>
 
-        <form id="textSettings"
-              name="textSettings"
-              action="${url.forPath(Paths.ADMIN_TEXT_SETTINGS)}"
-              method="post"
-              autocomplete="off">
-            <input type="hidden" name="formType" value="saveTextSettings">
+    <jsp:body>
+        <div class="container">
+            <t:admin_navigation activePage="adminTextSettings"/>
 
-            <c:set var="supportedLocales" value="${i18nService.supportedLocales}"/>
-            <c:if test="${fn:length(supportedLocales) > 1}">
-                <div class="row mb-4 align-items-center">
-                    <label for="language-switch" class="col-4 col-form-label">${i18n.tr("Select a language")}</label>
-                    <div class="col-8">
-                        <select id="language-switch" class="form-control" name="language">
-                            <c:forEach items="${supportedLocales}" var="l">
-                                <option value="${l.language}"
-                                        <c:if test="${language == l.language}">selected</c:if>
-                                >
-                                    <c:choose>
-                                        <c:when test="${login.user.locale == l}">
-                                            ${l.getDisplayLanguage(login.user.locale)}
-                                        </c:when>
-                                        <c:otherwise>
-                                            ${l.getDisplayLanguage(login.user.locale)} (${l.getDisplayLanguage(l)})
-                                        </c:otherwise>
-                                    </c:choose>
-                                </option>
-                            </c:forEach>
-                        </select>
+            <form id="textSettings"
+                  name="textSettings"
+                  action="${url.forPath(Paths.ADMIN_TEXT_SETTINGS)}"
+                  method="post"
+                  autocomplete="off">
+                <input type="hidden" name="formType" value="saveTextSettings">
+
+                <c:set var="supportedLocales" value="${i18nService.supportedLocales}"/>
+                <c:if test="${fn:length(supportedLocales) > 1}">
+                    <div class="d-flex">
+                        <div class="mb-4 d-flex gap-2 align-items-center admin-language-switch">
+                            <label for="language-switch" class="form-label mb-0">${i18n.tr("Edit for language")}</label>
+                            <select id="language-switch" class="form-select form-select-sm" name="language">
+                                <c:forEach items="${supportedLocales}" var="l">
+                                    <option value="${l.language}"
+                                            <c:if test="${language == l.language}">selected</c:if>
+                                    >
+                                        ${l.getDisplayLanguage(login.user.locale)}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
+                </c:if>
+
+                <c:forEach var="setting" items="${settings}">
+                    <%--@elvariable id="setting" type="org.codedefenders.dto.TextSetting"--%>
+                    <c:set var="readableName" value="${i18n.tr(setting.name().readableName)}"/>
+                    <c:set var="explanation" value="${i18n.tr(setting.name().description)}"/>
+                    <c:set var="settingId" value="${setting.name().name()}"/>
+
+                    <div class="mb-4">
+                        <label class="" for="${settingId}">
+                            <strong>${readableName}</strong>
+                            <br>
+                            <small>${explanation}</small>
+                        </label>
+                        <div class="">
+                            <textarea
+                                    class="form-control"
+                                    rows="3"
+                                    name="${settingId}"
+                                    id="${settingId}"
+                                    data-original-value="${setting.value()}"
+                            >${setting.value()}</textarea>
+                        </div>
+                    </div>
+                </c:forEach>
+
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary" name="saveSettingsBtn"
+                                id="saveSettingsBtn">${i18n.tr('Save')}</button>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn"
+                                onclick="window.location.reload();">${i18n.tr('Cancel')}</button>
                     </div>
                 </div>
+            </form>
 
-                <hr>
-            </c:if>
+            <script type="module">
+                const languageSwitch = document.getElementById("language-switch");
+                languageSwitch.addEventListener("change", function (e) {
+                    const selectedLanguage = e.target.value;
+                    const changeLanguage = !formHasChanges() || confirm('${i18n.tr(
+                        "Changing the language will reload the page and discard any unsaved changes. Do you want to continue?")}');
 
-            <c:forEach var="setting" items="${settings}">
-                <%--@elvariable id="setting" type="org.codedefenders.dto.TextSetting"--%>
-                <c:set var="readableName" value="${i18n.tr(setting.name().readableName)}"/>
-                <c:set var="explanation" value="${i18n.tr(setting.name().description)}"/>
-                <c:set var="settingId" value="${setting.name().name()}"/>
-
-                <div class="mb-4">
-                    <label class="" for="${settingId}">
-                        <strong>${readableName}</strong>
-                        <br>
-                        <small>${explanation}</small>
-                    </label>
-                    <div class="">
-                        <textarea
-                                class="form-control"
-                                rows="3"
-                                name="${settingId}"
-                                id="${settingId}"
-                                data-original-value="${setting.value()}"
-                        >${setting.value()}</textarea>
-                    </div>
-                </div>
-            </c:forEach>
-
-            <div class="row g-2">
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary" name="saveSettingsBtn"
-                            id="saveSettingsBtn">${i18n.tr('Save')}</button>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn"
-                            onclick="window.location.reload();">${i18n.tr('Cancel')}</button>
-                </div>
-            </div>
-        </form>
-
-        <script type="module">
-            const languageSwitch = document.getElementById("language-switch");
-            languageSwitch.addEventListener("change", function (e) {
-                const selectedLanguage = e.target.value;
-                const changeLanguage = !formHasChanges() || confirm('${i18n.tr(
-                    "Changing the language will reload the page and discard any unsaved changes. Do you want to continue?")}');
-
-                if (changeLanguage) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set("language", selectedLanguage);
-                    window.location.href = url.toString();
-                } else {
-                    // revert the selection back to the original language
-                    e.target.value = '${language}';
-                }
-            });
-
-            function formHasChanges() {
-                const ts = document.querySelectorAll("#textSettings textarea");
-                for (const textarea of ts) {
-                    if (textarea.value !== textarea.dataset.originalValue) {
-                        return true;
+                    if (changeLanguage) {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set("language", selectedLanguage);
+                        window.location.href = url.toString();
+                    } else {
+                        // revert the selection back to the original language
+                        e.target.value = '${language}';
                     }
+                });
+
+                function formHasChanges() {
+                    const ts = document.querySelectorAll("#textSettings textarea");
+                    for (const textarea of ts) {
+                        if (textarea.value !== textarea.dataset.originalValue) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
-                return false;
-            }
-        </script>
-    </div>
+            </script>
+        </div>
+    </jsp:body>
 </p:main_page>

@@ -195,6 +195,30 @@ msgstr "Mutants outside methods"
 msgid "All Tests"
 msgstr "All Tests"
 
+#: src/main/java/org/codedefenders/dto/TextSetting.java:52
+msgid "Site Notice"
+msgstr "Site Notice"
+
+#: src/main/java/org/codedefenders/dto/TextSetting.java:53
+msgid "HTML formatted text shown in the site notice. This is mandatory in many regions."
+msgstr "HTML formatted text shown in the site notice. This is mandatory in many regions."
+
+#: src/main/java/org/codedefenders/dto/TextSetting.java:56
+msgid "Privacy Notice"
+msgstr "Privacy Notice"
+
+#: src/main/java/org/codedefenders/dto/TextSetting.java:57
+msgid "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance."
+msgstr "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance."
+
+#: src/main/java/org/codedefenders/dto/TextSetting.java:60
+msgid "Contact Notice"
+msgstr "Contact Notice"
+
+#: src/main/java/org/codedefenders/dto/TextSetting.java:61
+msgid "HTML formatted text shown on the 'Contact Us' page just below heading."
+msgstr "HTML formatted text shown on the 'Contact Us' page just below heading."
+
 #: src/main/java/org/codedefenders/game/GameLevel.java:27
 msgid "Easy"
 msgstr "Easy"
@@ -1944,164 +1968,152 @@ msgid "Comma separated list of supported locales where full translations exist.\
 msgstr "Comma separated list of supported locales where full translations exist.\nThe first locale in the list will be used by default.\nLanguage codes like en, de, fr are sufficient.\n"
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:112
-msgid "Site Notice"
-msgstr "Site Notice"
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:113
-msgid "HTML formatted text shown in the site notice. This is mandatory in many regions."
-msgstr "HTML formatted text shown in the site notice. This is mandatory in many regions."
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:116
-msgid "Privacy Notice"
-msgstr "Privacy Notice"
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:117
-msgid "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance."
-msgstr "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance."
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
-msgid "Contact Notice"
-msgstr "Contact Notice"
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:121
-msgid "HTML formatted text shown on the 'Contact Us' page just below heading."
-msgstr "HTML formatted text shown on the 'Contact Us' page just below heading."
-
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:124
 msgid "Email Smtp Host"
 msgstr "Email Smtp Host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:125
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:113
 msgid "SMTP host"
 msgstr "SMTP host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:116
 msgid "Email Smtp Port"
 msgstr "Email Smtp Port"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:129
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:117
 msgid "SMTP port"
 msgstr "SMTP port"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:132
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
 msgid "Email Address"
 msgstr "Email Address"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:133
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:121
 msgid "System mail account"
 msgstr "System mail account"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:136
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:124
 msgid "Email Password"
 msgstr "Email Password"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:125
 msgid "Password for the system mail account"
 msgstr "Password for the system mail account"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:140
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
 msgid "Email Username"
 msgstr "Email Username"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:142
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:130
 msgid "Username for the system mail account.\nShould usually be the same as the address. If left blank, will default to the address.\n"
 msgstr "Username for the system mail account.\nShould usually be the same as the address. If left blank, will default to the address.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:149
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
 msgid "Emails Enabled"
 msgstr "Emails Enabled"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:151
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:139
 msgid "Send emails from the specified account for verification,\nresetting passwords and when the admin changes user info\n"
 msgstr "Send emails from the specified account for verification,\nresetting passwords and when the admin changes user info\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:158
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:146
 msgid "Password Reset Secret Lifespan"
 msgstr "Password Reset Secret Lifespan"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:159
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:147
 msgid "How long (in hours) a password reset secret is valid"
 msgstr "How long (in hours) a password reset secret is valid"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:150
 msgid "Debug Mode"
 msgstr "Debug Mode"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:151
 msgid "Turn on certain debugging features such as detailed debug prints for javax.mail"
 msgstr "Turn on certain debugging features such as detailed debug prints for javax.mail"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:154
 msgid "Automatic Killmap Computation"
 msgstr "Automatic Killmap Computation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:155
 msgid "Turn on the automatic killmaps computation"
 msgstr "Turn on the automatic killmaps computation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:158
 msgid "Public User Profile"
 msgstr "Public User Profile"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:159
 msgid "Let users visit the profile pages of others."
 msgstr "Let users visit the profile pages of others."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
 msgid "Allow Puzzle Section"
 msgstr "Allow Puzzle Section"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
 msgid "Let users play the puzzles in the puzzle section."
 msgstr "Let users play the puzzles in the puzzle section."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
 msgid "Failed Duel Validation Threshold"
 msgstr "Failed Duel Validation Threshold"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:179
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
 msgid "The maximum number of tests that will run to validate a lost equivalence duel."
 msgstr "The maximum number of tests that will run to validate a lost equivalence duel."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:182
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
 msgid "Game Duration Minutes Max"
 msgstr "Game Duration Minutes Max"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:183
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
 msgid "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 msgstr "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:186
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
 msgid "Game Duration Minutes Default"
 msgstr "Game Duration Minutes Default"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
 msgid "The default duration a multiplayer/melee game is open (in minutes)."
 msgstr "The default duration a multiplayer/melee game is open (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:190
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
 msgid "Teacher Applications Enabled"
 msgstr "Teacher Applications Enabled"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:192
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:180
 msgid "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 msgstr "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:199
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
 msgid "Teacher Applications Email"
 msgstr "Teacher Applications Email"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:200
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:188
 msgid "The email address to use for teacher account applications."
 msgstr "The email address to use for teacher account applications."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:337
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:319
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:338
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:320
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminTextSettings.java:79
+msgid "Unsupported language: {0}"
+msgstr "Unsupported language: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminTextSettings.java:98
+msgid "Text settings for language {0} updated successfully."
+msgstr "Text settings for language {0} updated successfully."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminTextSettings.java:103
+msgid "Failed to update text settings for language {0}."
+msgstr "Failed to update text settings for language {0}."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminUserManagement.java:90
 msgid "Welcome to Code Defenders!\n\nAn account has been created for you with Username {0} and Password {1}.\nYou can log in at {2}.\n\nHappy coding!"
@@ -3167,151 +3179,151 @@ msgstr "Failed to set your account as inactive. Please contact the page administ
 msgid "Game is now in grace period."
 msgstr "Game is now in grace period."
 
-#: src/main/java/org/codedefenders/util/Constants.java:98
+#: src/main/java/org/codedefenders/util/Constants.java:99
 msgid "You won!"
 msgstr "You won!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:99
+#: src/main/java/org/codedefenders/util/Constants.java:100
 msgid "You lost!"
 msgstr "You lost!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:100
+#: src/main/java/org/codedefenders/util/Constants.java:101
 msgid "It was a draw!"
 msgstr "It was a draw!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:102
+#: src/main/java/org/codedefenders/util/Constants.java:103
 msgid "Sorry! An error on the server prevented the compilation of your test."
 msgstr "Sorry! An error on the server prevented the compilation of your test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:103
+#: src/main/java/org/codedefenders/util/Constants.java:104
 msgid "Your test did not compile. Try again, but with compilable code."
 msgstr "Your test did not compile. Try again, but with compilable code."
 
-#: src/main/java/org/codedefenders/util/Constants.java:104
+#: src/main/java/org/codedefenders/util/Constants.java:105
 msgid "Your test is not valid. Remember the rules: Only one non-empty test, at most {0} assertions per test, no conditionals and no loops!"
 msgstr "Your test is not valid. Remember the rules: Only one non-empty test, at most {0} assertions per test, no conditionals and no loops!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:105
+#: src/main/java/org/codedefenders/util/Constants.java:106
 msgid "Great! Your test compiled and passed on the original class under test."
 msgstr "Great! Your test compiled and passed on the original class under test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:106
+#: src/main/java/org/codedefenders/util/Constants.java:107
 msgid "Your test did not pass on the original class under test. Try again."
 msgstr "Your test did not pass on the original class under test. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:107
+#: src/main/java/org/codedefenders/util/Constants.java:108
 msgid "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 msgstr "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:108
+#: src/main/java/org/codedefenders/util/Constants.java:109
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 
-#: src/main/java/org/codedefenders/util/Constants.java:109
+#: src/main/java/org/codedefenders/util/Constants.java:110
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:110
+#: src/main/java/org/codedefenders/util/Constants.java:111
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:111
+#: src/main/java/org/codedefenders/util/Constants.java:112
 msgid "Test submitted and ready to kill mutants!"
 msgstr "Test submitted and ready to kill mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:112
+#: src/main/java/org/codedefenders/util/Constants.java:113
 msgid "Your test has not killed any mutants, just yet."
 msgstr "Your test has not killed any mutants, just yet."
 
-#: src/main/java/org/codedefenders/util/Constants.java:113
+#: src/main/java/org/codedefenders/util/Constants.java:114
 msgid "Great, your test killed the last mutant!"
 msgstr "Great, your test killed the last mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:114
+#: src/main/java/org/codedefenders/util/Constants.java:115
 msgid "Great, your test killed a mutant!"
 msgstr "Great, your test killed a mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:115
+#: src/main/java/org/codedefenders/util/Constants.java:116
 msgid "Awesome! Your test killed {0} mutants!"
 msgstr "Awesome! Your test killed {0} mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:117
+#: src/main/java/org/codedefenders/util/Constants.java:118
 msgid "Your mutant was compiled successfully."
 msgstr "Your mutant was compiled successfully."
 
-#: src/main/java/org/codedefenders/util/Constants.java:118
+#: src/main/java/org/codedefenders/util/Constants.java:119
 msgid "The mutant was accepted as equivalent."
 msgstr "The mutant was accepted as equivalent."
 
-#: src/main/java/org/codedefenders/util/Constants.java:119
+#: src/main/java/org/codedefenders/util/Constants.java:120
 msgid "The mutant was accepted as equivalent. However, the mutant was killable!"
 msgstr "The mutant was accepted as equivalent. However, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:120
+#: src/main/java/org/codedefenders/util/Constants.java:121
 msgid "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
 msgstr "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
 
-#: src/main/java/org/codedefenders/util/Constants.java:121
+#: src/main/java/org/codedefenders/util/Constants.java:122
 msgid "Your mutant failed to compile. Try again."
 msgstr "Your mutant failed to compile. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:122
+#: src/main/java/org/codedefenders/util/Constants.java:123
 msgid "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 msgstr "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 
-#: src/main/java/org/codedefenders/util/Constants.java:123
+#: src/main/java/org/codedefenders/util/Constants.java:124
 msgid "Oops! Something went wrong and the mutant was not created."
 msgstr "Oops! Something went wrong and the mutant was not created."
 
-#: src/main/java/org/codedefenders/util/Constants.java:124
+#: src/main/java/org/codedefenders/util/Constants.java:125
 msgid "Sorry, your mutant already exists in this game!"
 msgstr "Sorry, your mutant already exists in this game!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:125
+#: src/main/java/org/codedefenders/util/Constants.java:126
 msgid "Mutant claimed as equivalent, waiting for attacker to respond."
 msgstr "Mutant claimed as equivalent, waiting for attacker to respond."
 
-#: src/main/java/org/codedefenders/util/Constants.java:126
+#: src/main/java/org/codedefenders/util/Constants.java:127
 msgid "Something went wrong claiming an equivalent mutant"
 msgstr "Something went wrong claiming an equivalent mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:127
+#: src/main/java/org/codedefenders/util/Constants.java:128
 msgid "Cheeky! You cannot claim equivalence on untested lines!"
 msgstr "Cheeky! You cannot claim equivalence on untested lines!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:128
+#: src/main/java/org/codedefenders/util/Constants.java:129
 msgid "Test {0} killed your mutant. Better luck with the next one!"
 msgstr "Test {0} killed your mutant. Better luck with the next one!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:129
+#: src/main/java/org/codedefenders/util/Constants.java:130
 msgid "Mutant submitted, may the force be with it."
 msgstr "Mutant submitted, may the force be with it."
 
-#: src/main/java/org/codedefenders/util/Constants.java:130
+#: src/main/java/org/codedefenders/util/Constants.java:131
 msgid "Cool, your mutant survived its first test."
 msgstr "Cool, your mutant survived its first test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:131
+#: src/main/java/org/codedefenders/util/Constants.java:132
 msgid "Awesome, your mutant survived {0} tests!"
 msgstr "Awesome, your mutant survived {0} tests!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:133
+#: src/main/java/org/codedefenders/util/Constants.java:134
 msgid "You must declare your intention."
 msgstr "You must declare your intention."
 
-#: src/main/java/org/codedefenders/util/Constants.java:136
+#: src/main/java/org/codedefenders/util/Constants.java:137
 msgid "Success!"
 msgstr "Success!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:141
+#: src/main/java/org/codedefenders/util/Constants.java:142
 msgid "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 msgstr "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 
-#: src/main/java/org/codedefenders/util/Constants.java:143
+#: src/main/java/org/codedefenders/util/Constants.java:144
 msgid "Sorry, no kill message available for this mutant"
 msgstr "Sorry, no kill message available for this mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:145
+#: src/main/java/org/codedefenders/util/Constants.java:146
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
@@ -5515,483 +5527,483 @@ msgstr "Stop Games"
 msgid "Puzzle Management"
 msgstr "Puzzle Management"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:45
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:46
 msgid "Upload chapters"
 msgstr "Upload chapters"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:49
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:50
 msgid "Upload puzzles"
 msgstr "Upload puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:53
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:54
 msgid "Add empty chapter"
 msgstr "Add empty chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:57
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:58
 msgid "Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language."
 msgstr "Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:58
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:59
 msgid "Language"
 msgstr "Language"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:69
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:70
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:76
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:77
 msgid "Unassigned Puzzles"
 msgstr "Unassigned Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:85
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:86
 msgid "Archived Puzzles"
 msgstr "Archived Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:92
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:93
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:93
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:94
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:95
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:96
 msgid "You have unsaved changes. Please save first."
 msgstr "You have unsaved changes. Please save first."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:99
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:100
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:110
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:111
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:115
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:116
 msgid "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
 msgstr "Puzzles are uploaded in <code>.zip</code> archives. You can upload multiple puzzle archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanations."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:122
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:123
 msgid "Puzzle Format Explanation"
 msgstr "Puzzle Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:128
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:129
 msgid "Puzzle Properties Explanation"
 msgstr "Puzzle Properties Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:134
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:135
 msgid "Downloads"
 msgstr "Downloads"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:138
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:139
 msgid "Empty puzzle template:"
 msgstr "Empty puzzle template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:144
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:145
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:150
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:151
 msgid "Example attacker puzzle:"
 msgstr "Example attacker puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:156
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:157
 msgid "Example defender puzzle:"
 msgstr "Example defender puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:162
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:163
 msgid "Example puzzle with dependencies:"
 msgstr "Example puzzle with dependencies:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:174
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:175
 msgid "Uploading..."
 msgstr "Uploading..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:175
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:176
 msgid "Upload"
 msgstr "Upload"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:185
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:186
 msgid "Upload Chapters"
 msgstr "Upload Chapters"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:190
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:191
 msgid "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
 msgstr "Chapters are uploaded in <code>.zip</code> archives. You can upload multiple chapter archives at once by selecting multiple in the file dialog. For details on the convention, please expand the explanation."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:194
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:195
 msgid "Uploading large chapters may take several minutes."
 msgstr "Uploading large chapters may take several minutes."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:201
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:202
 msgid "Chapter Format Explanation"
 msgstr "Chapter Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:207
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:208
 msgid "Puzzle Format Explanation"
 msgstr "Puzzle Format Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:213
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:214
 msgid "Puzzle Properties Explanation"
 msgstr "Puzzle Properties Explanation"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:219
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:220
 msgid "Downloads"
 msgstr "Downloads"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:223
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:224
 msgid "Example chapter:"
 msgstr "Example chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:229
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:230
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:235
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:236
 msgid "Empty chapter template:"
 msgstr "Empty chapter template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:241
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:242
 msgid "Puzzle Downloads:"
 msgstr "Puzzle Downloads:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:244
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:245
 msgid "Empty puzzle template:"
 msgstr "Empty puzzle template:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:250
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:251
 msgid "Example properties file:"
 msgstr "Example properties file:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:256
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:257
 msgid "Example attacker puzzle:"
 msgstr "Example attacker puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:262
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:263
 msgid "Example defender puzzle:"
 msgstr "Example defender puzzle:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:268
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:269
 msgid "Example puzzle with dependencies:"
 msgstr "Example puzzle with dependencies:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:280
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:281
 msgid "Uploading..."
 msgstr "Uploading..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:281
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:282
 msgid "Upload"
 msgstr "Upload"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:397
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:398
 msgid "Drag to move chapter"
 msgstr "Drag to move chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:398
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:399
 msgid "Edit"
 msgstr "Edit"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:401
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:402
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:404
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:405
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:413
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:414
 msgid "Move to position:"
 msgstr "Move to position:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:414
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:415
 msgid "Move to position"
 msgstr "Move to position"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:492
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:493
 msgid "Puzzle ID"
 msgstr "Puzzle ID"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:493
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:494
 msgid "Number of games with the puzzle"
 msgstr "Number of games with the puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:494
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:495
 msgid "Puzzle level"
 msgstr "Puzzle level"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:495
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:496
 msgid "Mutant is equivalent"
 msgstr "Mutant is equivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:501
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:502
 msgid "Edit"
 msgstr "Edit"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:505
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:506
 msgid "Unassign"
 msgstr "Unassign"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:509
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:510
 msgid "Archive"
 msgstr "Archive"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:513
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:514
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:521
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:522
 msgid "Move to chapter:"
 msgstr "Move to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:522
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:523
 msgid "Move to chapter"
 msgstr "Move to chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:538
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:539
 msgid "game"
 msgstr "game"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:538
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:539
 msgid "games"
 msgstr "games"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:540
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:541
 msgid "easy"
 msgstr "easy"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:541
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:542
 msgid "hard"
 msgstr "hard"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:556
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:557
 msgid "Puzzles with existing games can\'t be deleted"
 msgstr "Puzzles with existing games can\'t be deleted"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:587
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:588
 msgid "Move to chapter:"
 msgstr "Move to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:687
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:688
 msgid "Scroll to chapter"
 msgstr "Scroll to chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:688
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:689
 msgid "Scroll to chapter:"
 msgstr "Scroll to chapter:"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:689
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:690
 msgid "Go"
 msgstr "Go"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:691
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:692
 msgid "Scroll to chapter"
 msgstr "Scroll to chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:788
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:789
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:796
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:797
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:801
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:802
 msgid "Edit Chapter"
 msgstr "Edit Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:802
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:803
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:830
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:831
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:832
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:833
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:857
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:858
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:859
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:860
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:861
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:862
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:867
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:868
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:869
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:870
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:875
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:876
 msgid "Max. Assertions"
 msgstr "Max. Assertions"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:883
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:884
 msgid "First Editable Line"
 msgstr "First Editable Line"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:888
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:889
 msgid "Last Editable Line"
 msgstr "Last Editable Line"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:896
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:897
 msgid "Game Level"
 msgstr "Game Level"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:900
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:901
 msgid "Easy"
 msgstr "Easy"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:901
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:902
 msgid "Please select a level."
 msgstr "Please select a level."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:907
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:908
 msgid "Hard"
 msgstr "Hard"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:914
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:915
 msgid "Equivalence"
 msgstr "Equivalence"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:918
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:919
 msgid "Mutant equivalent"
 msgstr "Mutant equivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:924
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:925
 msgid "Edit Puzzle"
 msgstr "Edit Puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:925
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:926
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:986
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:987
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:988
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:989
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1011
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
 msgid "Are you sure you want to delete chapter {0}?"
 msgstr "Are you sure you want to delete chapter {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1013
 msgid "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
 msgstr "Any puzzles left in the chapter will be moved to <span class=\"px-1 border rounded-1\">Unassigned</span>."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1015
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1016
 msgid "Delete Chapter"
 msgstr "Delete Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1016
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1017
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1035
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1036
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1037
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1038
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1060
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1061
 msgid "Are you sure you want to permanently delete puzzle {0}?"
 msgstr "Are you sure you want to permanently delete puzzle {0}?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1064
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
 msgid "Delete Puzzle"
 msgstr "Delete Puzzle"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1066
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1073
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1074
 msgid "Delete"
 msgstr "Delete"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1080
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1081
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1082
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1083
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1101
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1102
 msgid "Title"
 msgstr "Title"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1103
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1104
 msgid "Please enter a title."
 msgstr "Please enter a title."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1109
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1110
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1111
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1112
 msgid "Description"
 msgstr "Description"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1116
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1117
 msgid "Create New Chapter"
 msgstr "Create New Chapter"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1117
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1122
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1123
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1144
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1145
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1146
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1147
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1170
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1171
 msgid "Close"
 msgstr "Close"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1274
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1275
 msgid "Saving..."
 msgstr "Saving..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1279
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1280
 msgid "Success"
 msgstr "Success"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1281
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1282
 msgid "Error"
 msgstr "Error"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1282
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1283
 msgid "Could not save changes."
 msgstr "Could not save changes."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1288
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1289
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1315
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1316
 msgid "Upload Puzzles"
 msgstr "Upload Puzzles"
 
@@ -6103,33 +6115,53 @@ msgstr "Editable lines start below"
 msgid "Editable lines end above"
 msgstr "Editable lines end above"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:53
+#: src/main/webapp/jsp/admin_system_settings.jsp:50
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:99
+#: src/main/webapp/jsp/admin_system_settings.jsp:85
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:100
+#: src/main/webapp/jsp/admin_system_settings.jsp:86
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:130
+#: src/main/webapp/jsp/admin_system_settings.jsp:114
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:131
+#: src/main/webapp/jsp/admin_system_settings.jsp:115
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:144
+#: src/main/webapp/jsp/admin_system_settings.jsp:128
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:148
+#: src/main/webapp/jsp/admin_system_settings.jsp:132
 msgid "Cancel"
 msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_text_settings.jsp:35
+msgid "Text Settings"
+msgstr "Text Settings"
+
+#: src/main/webapp/jsp/admin_text_settings.jsp:56
+msgid "Edit for language"
+msgstr "Edit for language"
+
+#: src/main/webapp/jsp/admin_text_settings.jsp:97
+msgid "Save"
+msgstr "Save"
+
+#: src/main/webapp/jsp/admin_text_settings.jsp:101
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/main/webapp/jsp/admin_text_settings.jsp:111
+msgid "Changing the language will reload the page and discard any unsaved changes. Do you want to continue?"
+msgstr "Changing the language will reload the page and discard any unsaved changes. Do you want to continue?"
 
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:74
 msgid "User Management"
@@ -7339,99 +7371,99 @@ msgstr "Code Defenders Logo"
 msgid "The game is currently closing&hellip;<br>User interactions are no longer possible while open equivalence duels are automatically resolved."
 msgstr "The game is currently closing&hellip;<br>User interactions are no longer possible while open equivalence duels are automatically resolved."
 
-#: src/main/webapp/jsp/contact.jsp:43
+#: src/main/webapp/jsp/contact.jsp:33
 msgid "Contact Us"
 msgstr "Contact Us"
 
-#: src/main/webapp/jsp/contact.jsp:56
+#: src/main/webapp/jsp/contact.jsp:46
 msgid "You can use the form below to contact the site owners."
 msgstr "You can use the form below to contact the site owners."
 
-#: src/main/webapp/jsp/contact.jsp:57
+#: src/main/webapp/jsp/contact.jsp:47
 msgid "For technical questions about Code Defenders, please contact the developers."
 msgstr "For technical questions about Code Defenders, please contact the developers."
 
-#: src/main/webapp/jsp/contact.jsp:68
+#: src/main/webapp/jsp/contact.jsp:58
 msgid "Name"
 msgstr "Name"
+
+#: src/main/webapp/jsp/contact.jsp:60
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/contact.jsp:64
+msgid "Email"
+msgstr "Email"
+
+#: src/main/webapp/jsp/contact.jsp:66
+msgid "Email"
+msgstr "Email"
 
 #: src/main/webapp/jsp/contact.jsp:70
-msgid "Name"
-msgstr "Name"
-
-#: src/main/webapp/jsp/contact.jsp:74
-msgid "Email"
-msgstr "Email"
-
-#: src/main/webapp/jsp/contact.jsp:76
-msgid "Email"
-msgstr "Email"
-
-#: src/main/webapp/jsp/contact.jsp:80
 msgid "Subject"
 msgstr "Subject"
+
+#: src/main/webapp/jsp/contact.jsp:72
+msgid "Subject"
+msgstr "Subject"
+
+#: src/main/webapp/jsp/contact.jsp:75
+msgid "Message"
+msgstr "Message"
+
+#: src/main/webapp/jsp/contact.jsp:77
+msgid "Message"
+msgstr "Message"
 
 #: src/main/webapp/jsp/contact.jsp:82
-msgid "Subject"
-msgstr "Subject"
-
-#: src/main/webapp/jsp/contact.jsp:85
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/jsp/contact.jsp:87
-msgid "Message"
-msgstr "Message"
-
-#: src/main/webapp/jsp/contact.jsp:92
 msgid "Send"
 msgstr "Send"
 
-#: src/main/webapp/jsp/contact.jsp:100
+#: src/main/webapp/jsp/contact.jsp:90
 msgid "Teacher Account Applications"
 msgstr "Teacher Account Applications"
 
-#: src/main/webapp/jsp/contact.jsp:103
+#: src/main/webapp/jsp/contact.jsp:93
 msgid "Error: No email address was configured for teacher account applications."
 msgstr "Error: No email address was configured for teacher account applications."
 
-#: src/main/webapp/jsp/contact.jsp:107
+#: src/main/webapp/jsp/contact.jsp:97
 msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page."
 msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page."
 
-#: src/main/webapp/jsp/contact.jsp:112
+#: src/main/webapp/jsp/contact.jsp:102
 msgid "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
 msgstr "A teacher account lets you create classrooms for your students, so you can manage games more easily. If you're interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href='{0}'>mailto link</a> to automatically create an email with the template."
 
-#: src/main/webapp/jsp/contact.jsp:116
+#: src/main/webapp/jsp/contact.jsp:106
 msgid "Show template"
 msgstr "Show template"
 
-#: src/main/webapp/jsp/contact.jsp:132
+#: src/main/webapp/jsp/contact.jsp:122
 msgid "To:"
 msgstr "To:"
 
-#: src/main/webapp/jsp/contact.jsp:136
+#: src/main/webapp/jsp/contact.jsp:126
 msgid "Subject:"
 msgstr "Subject:"
 
-#: src/main/webapp/jsp/contact.jsp:140
+#: src/main/webapp/jsp/contact.jsp:130
 msgid "Body:"
 msgstr "Body:"
 
-#: src/main/webapp/jsp/contact.jsp:167
+#: src/main/webapp/jsp/contact.jsp:157
 msgid "Contact the Developers"
 msgstr "Contact the Developers"
 
-#: src/main/webapp/jsp/contact.jsp:169
+#: src/main/webapp/jsp/contact.jsp:159
 msgid "Code Defenders is an open source project."
 msgstr "Code Defenders is an open source project."
 
-#: src/main/webapp/jsp/contact.jsp:170
+#: src/main/webapp/jsp/contact.jsp:160
 msgid "Please check out the"
 msgstr "Please check out the"
 
-#: src/main/webapp/jsp/contact.jsp:171
+#: src/main/webapp/jsp/contact.jsp:161
 msgid "project page for more details."
 msgstr "project page for more details."
 
@@ -8059,23 +8091,23 @@ msgstr "Code Editor Keyboard Shortcuts"
 msgid "Keyboard shortcuts can be configured by clicking on the \"editor mode\" button at the top of the page."
 msgstr "Keyboard shortcuts can be configured by clicking on the \"editor mode\" button at the top of the page."
 
-#: src/main/webapp/jsp/imprint.jsp:36
+#: src/main/webapp/jsp/imprint.jsp:28
 msgid "Imprint & Privacy Policy"
 msgstr "Imprint & Privacy Policy"
 
-#: src/main/webapp/jsp/imprint.jsp:39
+#: src/main/webapp/jsp/imprint.jsp:31
 msgid "Site Notice"
 msgstr "Site Notice"
 
-#: src/main/webapp/jsp/imprint.jsp:44
+#: src/main/webapp/jsp/imprint.jsp:36
 msgid "Please add an imprint in the system settings."
 msgstr "Please add an imprint in the system settings."
 
-#: src/main/webapp/jsp/imprint.jsp:52
+#: src/main/webapp/jsp/imprint.jsp:44
 msgid "Privacy Policy"
 msgstr "Privacy Policy"
 
-#: src/main/webapp/jsp/imprint.jsp:57
+#: src/main/webapp/jsp/imprint.jsp:49
 msgid "Please add a privacy policy in the system settings."
 msgstr "Please add a privacy policy in the system settings."
 
@@ -9990,6 +10022,10 @@ msgstr "KillMaps"
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
 msgid "System Settings"
 msgstr "System Settings"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
+msgid "Text Settings"
+msgstr "Text Settings"
 
 #: src/main/webapp/WEB-INF/tags/automatic_duels_explanation.tag:23
 msgid "This value refers to the number of tests which cover, but do not kill, mutants and controls if and when equivalence duels are automatically triggered."

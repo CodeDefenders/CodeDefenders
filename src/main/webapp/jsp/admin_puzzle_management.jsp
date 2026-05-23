@@ -33,6 +33,7 @@
 
 <p:main_page title="${i18n.tr('Puzzle Management')}">
     <jsp:attribute name="additionalImports">
+        <link href="${url.forPath("/css/specific/admin.css")}" rel="stylesheet">
         <link href="${url.forPath("/css/specific/puzzle_management.css")}" rel="stylesheet">
     </jsp:attribute>
     <jsp:body>
@@ -53,7 +54,7 @@
                             ${i18n.tr('Add empty chapter')}
                             <i class="fa fa-plus ms-1"></i>
                         </button>
-                        <div class="d-flex gap-2 align-items-center puzzle-language-switch"
+                        <div class="d-flex gap-2 align-items-center admin-language-switch"
                              title="${i18n.tr('Select the language for preview and editing. Italic titles/descriptions indicate missing translations that fall back to the default language.')}">
                             <label class="form-label mb-0" for="locale-switch">${i18n.tr('Language')}:</label>
                             <select class="form-select form-select-sm" id="locale-switch">
