@@ -19,6 +19,7 @@
 package org.codedefenders.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -30,10 +31,12 @@ import org.codedefenders.persistence.database.TextSettingsRepository;
 public class TextSettingsService {
 
     private final TextSettingsRepository textSettingsRepository;
+    private final I18nService i18nService;
 
     @Inject
-    public TextSettingsService(TextSettingsRepository textSettingsRepository) {
+    public TextSettingsService(TextSettingsRepository textSettingsRepository, I18nService i18nService) {
         this.textSettingsRepository = textSettingsRepository;
+        this.i18nService = i18nService;
     }
 
     public List<TextSetting> getAllTextSettings(String language) {
@@ -54,7 +57,21 @@ public class TextSettingsService {
         return textSettingsRepository.updateTextSetting(setting);
     }
 
-    public TextSetting getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
+    public Optional<TextSetting> getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
         return textSettingsRepository.getTextSetting(language, settingName);
+    }
+
+    public Optional<TextSetting> getTextSettingOrDefault(String language, TextSetting.SETTING_NAME settingName) {
+        var setting = getTextSetting(language, settingName);
+        if (setting.isPresent()) {
+            return setting;
+        }
+
+        var defaultLanguage = i18nService.getDefaultLocale().getLanguage();
+        if (!language.equals(defaultLanguage)) {
+            return getTextSetting(defaultLanguage, settingName);
+        }
+
+        return Optional.empty();
     }
 }

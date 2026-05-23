@@ -28,7 +28,7 @@
 <p:main_page title="${i18n.tr('Imprint & Privacy Policy')}">
     <div class="container">
 
-        <h3 class="mb-3">${i18n.tr('Site Notice')}</h3>
+        <h1 class="mb-3">${i18n.tr('Site Notice')}</h1>
 
         <div class="bg-light rounded-3 p-3 mb-3">
             <c:choose>

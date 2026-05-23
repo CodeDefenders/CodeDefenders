@@ -21,6 +21,7 @@ package org.codedefenders.persistence.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -84,7 +85,7 @@ public class TextSettingsRepository {
         return rowsAffected > 0;
     }
 
-    public TextSetting getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
+    public Optional<TextSetting> getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
         @Language("SQL")
         String query = """
         SELECT *
@@ -92,7 +93,7 @@ public class TextSettingsRepository {
         WHERE Language = ? AND Name = ?
         """;
 
-        return queryRunner.query(
+        return Optional.ofNullable(queryRunner.query(
                 query,
                 rs -> {
                     if (rs.next()) {
@@ -103,6 +104,6 @@ public class TextSettingsRepository {
                 },
                 language,
                 settingName.name()
-        );
+        ));
     }
 }

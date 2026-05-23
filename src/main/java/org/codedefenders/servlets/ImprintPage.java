@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.dto.TextSetting;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.TextSettingsService;
 
@@ -46,10 +47,10 @@ public class ImprintPage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         var language = i18nService.getI18n(req).getLocale().getLanguage();
-        var siteNotice = textSettingsService.getTextSetting(language, SITE_NOTICE);
-        var privacyNotice = textSettingsService.getTextSetting(language, PRIVACY_NOTICE);
-        req.setAttribute("siteNotice", siteNotice.value());
-        req.setAttribute("privacyNotice", privacyNotice.value());
+        var siteNotice = textSettingsService.getTextSettingOrDefault(language, SITE_NOTICE);
+        var privacyNotice = textSettingsService.getTextSettingOrDefault(language, PRIVACY_NOTICE);
+        req.setAttribute("siteNotice", siteNotice.map(TextSetting::value).orElse(null));
+        req.setAttribute("privacyNotice", privacyNotice.map(TextSetting::value).orElse(null));
         req.getRequestDispatcher("/jsp/imprint.jsp").forward(req, resp);
     }
 }

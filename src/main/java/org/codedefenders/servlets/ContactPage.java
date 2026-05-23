@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.dto.TextSetting;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.TextSettingsService;
 
@@ -47,13 +48,13 @@ public class ContactPage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         var language = i18nService.getI18n(req).getLocale().getLanguage();
-        var contactNotice = textSettingsService.getTextSetting(language, CONTACT_NOTICE);
+        var contactNotice = textSettingsService.getTextSettingOrDefault(language, CONTACT_NOTICE);
 
         var emailsEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
         var teacherApplicationsEnabled = AdminDAO.getSystemSetting(TEACHER_APPLICATIONS_ENABLED).getBoolValue();
         var teacherApplicationsEmail = AdminDAO.getSystemSetting(TEACHER_APPLICATIONS_EMAIL).getStringValue();
 
-        req.setAttribute("contactNotice", contactNotice.value());
+        req.setAttribute("contactNotice", contactNotice.map(TextSetting::value).orElse(null));
         req.setAttribute("emailsEnabled", emailsEnabled);
         req.setAttribute("teacherApplicationsEnabled", teacherApplicationsEnabled);
         req.setAttribute("teacherApplicationsEmail", teacherApplicationsEmail);
