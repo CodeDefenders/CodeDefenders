@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 
 import { defineConfig } from 'rolldown';
-import { i18nCollectPlugin } from './rollup.i18n.js';
+import { i18nCollectPlugin } from './rolldown.i18n.js';
 
 
 /* Constants.
