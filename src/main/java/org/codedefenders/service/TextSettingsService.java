@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,9 @@ public class TextSettingsService {
                 settings.add(new TextSetting(settingName, language, ""));
             }
         }
+
+        // order settings by enum order to ensure consistent order across languages
+        settings.sort(Comparator.comparingInt(s -> s.name().ordinal()));
 
         return settings;
     }
