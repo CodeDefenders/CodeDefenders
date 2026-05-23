@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -67,25 +68,26 @@ public class AdminTextSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        var redirectUrl = url.forPath(ADMIN_TEXT_SETTINGS);
         if (request.getParameter("formType").equals("saveTextSettings")) {
-            updateTextSettings(request);
+            var language = request.getParameter("language");
+            var locale = i18nService.toSupportedLocale(language);
+            if (locale.getLanguage().equals(language)) {
+                updateTextSettings(request, locale);
+                redirectUrl += "?language=" + language;
+            } else {
+                messages.addFormatted(I18n.marktr("Unsupported language: {0}"), language);
+            }
         } else {
             logger.error("Action not recognised");
         }
 
-        response.sendRedirect(url.forPath(ADMIN_TEXT_SETTINGS));
+        response.sendRedirect(redirectUrl);
     }
 
-    private void updateTextSettings(HttpServletRequest request) {
-        var language = request.getParameter("language");
-        var locale = i18nService.toSupportedLocale(language);
-        if (!locale.getLanguage().equals(language)) {
-            messages.addFormatted(I18n.marktr("Unsupported language: {0}"), language);
-            return;
-        }
-
+    private void updateTextSettings(HttpServletRequest request, Locale locale) {
         var success = true;
-        var settings = textSettingsService.getAllTextSettings(language);
+        var settings = textSettingsService.getAllTextSettings(locale.getLanguage());
         for (var setting : settings) {
             setting.value(request.getParameter(setting.name().name()));
             success &= textSettingsService.updateTextSetting(setting);
