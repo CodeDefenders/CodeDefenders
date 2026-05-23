@@ -63,7 +63,7 @@ public class TextSettingsService {
 
     public Optional<TextSetting> getTextSettingOrDefault(String language, TextSetting.SETTING_NAME settingName) {
         var setting = getTextSetting(language, settingName);
-        if (setting.isPresent()) {
+        if (setting.isPresent() && !setting.get().value().isEmpty()) {
             return setting;
         }
 
