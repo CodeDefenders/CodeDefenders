@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-import {LoadingAnimation} from "../main";
-//import CodeMirror from '../thirdparty/codemirror';
+
+import {InfoApi, LoadingAnimation} from '../main';
 
 /**
  * This class is intended for use in overview pages outside the game, where code of many different classes
@@ -90,7 +90,6 @@ class DynamicClassViewer {
 
         //----------------------------------------------
 
-        const {InfoApi, LoadingAnimation} = await import('../main/index.js');
         const classInfo = await InfoApi.getClassInfo(classId, true);
         const hasDependencies = classInfo.dependency_names.length > 0;
 

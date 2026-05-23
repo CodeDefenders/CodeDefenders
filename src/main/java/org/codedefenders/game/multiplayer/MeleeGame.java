@@ -92,6 +92,7 @@ public class MeleeGame extends AbstractGame {
     private int gameDurationMinutes;
 
     private long startTimeUnixSeconds;
+    private long finishTimeUnixSeconds;
 
     // We need a temporary location where to store information about system tests
     // and mutants
@@ -130,6 +131,7 @@ public class MeleeGame extends AbstractGame {
 
         private int gameDurationMinutes;
         private long startTimeUnixSeconds;
+        private long finishTimeUnixSeconds;
 
         private boolean withTests = false;
         private boolean withMutants = false;
@@ -218,6 +220,11 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
+        public Builder finishTimeUnixSeconds(long finishTimeUnixSeconds) {
+            this.finishTimeUnixSeconds = finishTimeUnixSeconds;
+            return this;
+        }
+
         public Builder withTests(boolean withTests) {
             this.withTests = withTests;
             return this;
@@ -278,6 +285,7 @@ public class MeleeGame extends AbstractGame {
         this.capturePlayersIntention = builder.capturePlayersIntention;
         this.gameDurationMinutes = builder.gameDurationMinutes;
         this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
+        this.finishTimeUnixSeconds = builder.finishTimeUnixSeconds;
 
         // This is mostly a temporary patch
         this.withMutants = builder.withMutants;
@@ -344,6 +352,10 @@ public class MeleeGame extends AbstractGame {
 
     public long getStartTimeUnixSeconds() {
         return startTimeUnixSeconds;
+    }
+
+    public long getFinishTimeUnixSeconds() {
+        return finishTimeUnixSeconds;
     }
 
     public Optional<Integer> getClassroomId() {

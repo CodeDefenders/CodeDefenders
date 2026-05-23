@@ -282,6 +282,7 @@ public abstract class AbstractGameService implements IGameService {
     public boolean closeGame(AbstractGame game) {
         game.setState(GameState.FINISHED);
         boolean updated = game.update();
+        gameRepo.setFinishTime(game.getId());
 
         if (updated) {
             GameStoppedEvent gse = new GameStoppedEvent();
