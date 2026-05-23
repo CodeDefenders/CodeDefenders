@@ -21,17 +21,9 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
-
-<%
-    String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
-    String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
-    pageContext.setAttribute("siteNotice", siteNotice);
-    pageContext.setAttribute("privacyNotice", privacyNotice);
-%>
+<%--@elvariable id="siteNotice" type="java.lang.String"--%>
+<%--@elvariable id="privacyNotice" type="java.lang.String"--%>
 
 <p:main_page title="${i18n.tr('Imprint & Privacy Policy')}">
     <div class="container">

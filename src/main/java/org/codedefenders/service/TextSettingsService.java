@@ -53,4 +53,8 @@ public class TextSettingsService {
     public boolean updateTextSetting(TextSetting setting) {
         return textSettingsRepository.updateTextSetting(setting);
     }
+
+    public TextSetting getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
+        return textSettingsRepository.getTextSetting(language, settingName);
+    }
 }

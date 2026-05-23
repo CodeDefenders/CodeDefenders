@@ -25,21 +25,11 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="teacherApplicationTemplate" type="org.codedefenders.beans.contact.TeacherApplicationTemplate"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="contactNotice" type="java.lang.String"--%>
+<%--@elvariable id="emailsEnabled" type="java.lang.Boolean"--%>
+<%--@elvariable id="teacherApplicationsEnabled" type="java.lang.Boolean"--%>
+<%--@elvariable id="teacherApplicationsEmail" type="java.lang.String"--%>
 
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-
-<%
-    boolean emailsEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
-    String contactNotice = AdminDAO.getSystemSetting(CONTACT_NOTICE).getStringValue();
-    boolean teacherApplicationsEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_ENABLED).getBoolValue();
-    String teacherApplicationsEmail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_EMAIL).getStringValue();
-    pageContext.setAttribute("emailsEnabled", emailsEnabled);
-    pageContext.setAttribute("contactNotice", contactNotice);
-    pageContext.setAttribute("teacherApplicationsEnabled", teacherApplicationsEnabled);
-    pageContext.setAttribute("teacherApplicationsEmail", teacherApplicationsEmail);
-%>
 <c:set var="title" value="${i18n.tr('Contact Us')}"/>
 
 <p:main_page title="${title}">

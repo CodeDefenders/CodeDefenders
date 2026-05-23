@@ -83,4 +83,26 @@ public class TextSettingsRepository {
         );
         return rowsAffected > 0;
     }
+
+    public TextSetting getTextSetting(String language, TextSetting.SETTING_NAME settingName) {
+        @Language("SQL")
+        String query = """
+        SELECT *
+        FROM text_settings
+        WHERE Language = ? AND Name = ?
+        """;
+
+        return queryRunner.query(
+                query,
+                rs -> {
+                    if (rs.next()) {
+                        return textSettingFromRS(rs);
+                    } else {
+                        return null;
+                    }
+                },
+                language,
+                settingName.name()
+        );
+    }
 }
