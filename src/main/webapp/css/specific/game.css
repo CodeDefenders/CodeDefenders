@@ -89,3 +89,23 @@
     width: 100%;
     padding: .5rem 1rem;
 }
+
+
+/* Live Game Highlighting
+----------------------------------------------------------------------------- */
+.mutant-update-animation {
+    animation: mutant-update-animation .66s ease-out;
+}
+@keyframes mutant-update-animation {
+    0% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+    90% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}

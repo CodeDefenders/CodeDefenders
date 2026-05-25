@@ -119,6 +119,14 @@ class GameHighlighting {
          * @private
          */
         this._activePopover = null;
+
+        /**
+         * Maps line numbers (1-indexed) and mutant status to the HTML element containing the mutant icons for the line.
+         *
+         * @type {Map<number, Map<string, HTMLElement>>}
+         * @private
+         */
+        this._mutantIconsPerLine = new Map();
     }
 
     async initAsync () {
@@ -166,6 +174,10 @@ class GameHighlighting {
      * @private
      */
     _createMutantIcons (line, mutantsOnLine) {
+        if (!this._mutantIconsPerLine.has(line)) {
+            this._mutantIconsPerLine.set(line, new Map());
+        }
+
         /* Split the mutants list by the mutant status: {ALIVE: [...], KILLED: [...], ...} */
         const sortedMutants = {};
         for (const mutantStatus in GameHighlighting.MutantStatuses) {
@@ -189,6 +201,7 @@ class GameHighlighting {
             mutantIcon.dataset.count = sortedMutants[mutantStatus].length;
             mutantIcon.dataset.canClaim = String(mutantsOnLine.some(element => element.canClaim));
 
+            this._mutantIconsPerLine.get(line).set(mutantStatus, mutantIcon);
             mutantIcons.appendChild(mutantIcon);
         }
 
@@ -471,7 +484,6 @@ class GameHighlighting {
     _onMutantAdded (event) {
         const mutantId = event.mutant.id;
         console.log("added mutant: ", event.mutant);
-        this.clearMutants();
 
         this._mutants.set(mutantId, event.mutant);
         for (const line of event.mutant.mutatedLines) {
@@ -479,11 +491,25 @@ class GameHighlighting {
                 this._mutantIdsPerLine.set(line, []);
             }
             this._mutantIdsPerLine.get(line).push(mutantId);
+
+            // add mutant icon if no previous mutants with the same status exist on the line or change count on icon
+            const mutantsOnLine = this._mutantIdsPerLine.get(line).map(mId => this._mutants.get(mId));
+            const other = mutantsOnLine.filter(m => m.id !== mutantId && m.status === event.mutant.status);
+            if (other.length) {
+                this._mutantIconsPerLine.get(line).get(event.mutant.status).dataset.count = String(other.length + 1);
+            } else {
+                const marker = this._createMutantIcons(line, mutantsOnLine);
+                this._addPopoverTriggerToMutantIcons(marker);
+                this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+            }
+
+            // animate icon
+            const icon = this._mutantIconsPerLine.get(line).get(event.mutant.status);
+            icon.classList.add('mutant-update-animation');
+            icon.addEventListener('animationend', function () {
+                icon.classList.remove('mutant-update-animation');
+            }, {once: true});
         }
-
-        this.highlightMutants();
-
-        // TODO: instead of clear & rerender: only change the affected line(s) and play an animation on the new or updated mutant icon(s)
     }
 
     _onTestAdded (event) {
