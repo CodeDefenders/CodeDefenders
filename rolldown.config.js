@@ -93,13 +93,14 @@ export default defineConfig({
         sourcemap: true,
         extend: true,
         entryFileNames: function (chunkInfo) {
+            const src = chunkInfo.facadeModuleId.replace(new RegExp(`.*(${SRC_DIR}/)`), '$1');
             const manualChunkNames = {
                 [`${SRC_DIR}/game/index.js`]: 'codedefenders_game',
                 [`${SRC_DIR}/main/index.js`]: 'codedefenders_main',
                 [`${SRC_DIR}/init/index.js`]: 'codedefenders_init'
             };
-            if (manualChunkNames.hasOwnProperty(chunkInfo.facadeModuleId)) {
-                return `${manualChunkNames[chunkInfo.facadeModuleId]}.mjs`;
+            if (manualChunkNames.hasOwnProperty(src)) {
+                return `${manualChunkNames[src]}.mjs`;
             } else {
                 return `${chunkInfo.name}.mjs`;
             }
