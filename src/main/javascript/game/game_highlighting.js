@@ -526,6 +526,14 @@ class GameHighlighting {
         }
 
         this.highlightCoverage();
+
+        // animate coverage update
+        for (const line of event.coveredLines) {
+            this._editor.addLineClass(line - 1, 'background', 'coverage-update-animation');
+            setTimeout(() => {
+                this._editor.removeLineClass(line - 1, 'background', 'coverage-update-animation');
+            }, 400); // animation duration
+        }
     }
 
 }

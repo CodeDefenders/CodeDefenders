@@ -109,3 +109,11 @@
         transform: scale(1);
     }
 }
+.coverage-update-animation {
+    animation: coverage-update-animation 400ms ease-out; /* animation-duration has to match JS timeout */
+}
+@keyframes coverage-update-animation {
+    50% {
+        background-color: var(--fg-defender);
+    }
+}
