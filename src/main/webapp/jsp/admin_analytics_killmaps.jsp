@@ -100,8 +100,8 @@
 
     <script type="module">
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
-
 
         $(document).ready(function () {
             const table = new DataTable('#tableKillmaps', {
