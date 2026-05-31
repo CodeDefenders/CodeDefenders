@@ -31,9 +31,12 @@
 <%@ tag import="org.codedefenders.validation.code.MutantValidationRuleSet" %>
 <%@ tag import="org.codedefenders.validation.code.DefaultRuleSets" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <c:set var="createGamesBean" value="${requestScope.createGamesBean}"/>
 
@@ -43,24 +46,24 @@
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-        Staged Games
+        ${i18n.tr('Staged Games')}
         <div class="d-flex flex-wrap gap-2">
             <button id="select-visible-games" class="btn btn-xs btn-secondary"
-                    title="Select all games (that your search applies to)">
-                Select All
+                    title="${i18n.tr('Select all games (that your search applies to)')}">
+                ${i18n.tr('Select All')}
             </button>
             <button id="deselect-visible-games" class="btn btn-xs btn-secondary"
-                    title="Deselect all games (that your search applies to)">
-                Deselect All
+                    title="${i18n.tr('Deselect all games (that your search applies to)')}">
+                ${i18n.tr('Deselect All')}
             </button>
             <div class="mx-2">
                 <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
                 <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
-                    Hide Players
+                    ${i18n.tr('Hide Players')}
                     <i class="fa fa-check btn-check-active"></i>
                 </label>
             </div>
-            <input type="search" id="search-staged-games" class="form-control input-xs" placeholder="Search">
+            <input type="search" id="search-staged-games" class="form-control input-xs" placeholder="${i18n.tr('Search')}">
         </div>
     </div>
     <div class="card-body">
@@ -71,13 +74,13 @@
                 <div class="col-auto">
                     <button class="btn btn-md btn-primary" type="button" name="create-games-button"
                             id="create-games-button" disabled>
-                        Create Games
+                        ${i18n.tr('Create Games')}
                     </button>
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-md btn-danger" type="button" name="delete-games-button"
                             id="delete-games-button" disabled>
-                        Delete Games
+                        ${i18n.tr('Delete Games')}
                     </button>
                 </div>
             </div>
@@ -87,27 +90,27 @@
 
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-        Unassigned Users
+        ${i18n.tr('Unassigned Users')}
         <div class="d-flex flex-wrap gap-2">
             <button id="select-visible-users" class="btn btn-xs btn-secondary"
-                    title="Select all users (that your search applies to)">
-                Select All
+                    title="${i18n.tr('Select all users (that your search applies to)')}">
+                ${i18n.tr('Select All')}
             </button>
             <button id="deselect-visible-users" class="btn btn-xs btn-secondary"
-                    title="Deselect all users (that your search applies to)">
-                Deselect All
+                    title="${i18n.tr('Deselect all users (that your search applies to)')}">
+                ${i18n.tr('Deselect All')}
             </button>
             <div class="mx-2">
                 <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
                 <label for="toggle-show-assigned-users"
                        class="btn btn-xs btn-outline-secondary d-flex align-items-center gap-1"
                        style="height: 100%"
-                       title="Show users that are part of an existing active game.">
-                    Show Assigned Users (in active games)
+                       title="${i18n.tr('Show users that are part of an existing active game.')}">
+                    ${i18n.tr('Show Assigned Users (in active games)')}
                     <i class="fa fa-check btn-check-active"></i>
                 </label>
             </div>
-            <input type="search" id="search-users" class="form-control input-xs" placeholder="Search">
+            <input type="search" id="search-users" class="form-control input-xs" placeholder="${i18n.tr('Search')}">
         </div>
     </div>
 
@@ -126,33 +129,33 @@
 
             <div class="card mb-4">
                 <div class="card-header">
-                    Game Settings
+                    ${i18n.tr('Game Settings')}
                 </div>
                 <div class="card-body">
 
                     <div class="row g-3 mb-3">
                         <div class="col-12">
-                            <label class="form-label" for="gameType-group">Game Type</label>
+                            <label class="form-label" for="gameType-group">${i18n.tr('Game Type')}</label>
                             <div id="gameType-group">
                                 <div class="form-check">
                                     <input type="radio" class="form-check-input" id="gameType-radio-battleground"
                                            name="gameType"
-                                           value="<%=GameType.MULTIPLAYER%>"
+                                           value="${GameType.MULTIPLAYER}"
                                            checked>
                                     <label class="form-check-label"
-                                           for="gameType-radio-battleground">Battleground</label>
+                                           for="gameType-radio-battleground">${i18n.tr('Battleground')}</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" class="form-check-input" id="gameType-radio-melee"
                                            name="gameType"
-                                           value="<%=GameType.MELEE%>">
-                                    <label class="form-check-label" for="gameType-radio-melee">Melee</label>
+                                           value="${GameType.MELEE}">
+                                    <label class="form-check-label" for="gameType-radio-melee">${i18n.tr('Melee')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-12">
-                            <label for="class-select" class="form-label">Class Under Test</label>
+                            <label for="class-select" class="form-label">${i18n.tr('Class Under Test')}</label>
                             <div class="input-group mb-2">
                                 <select id="class-select" name="cut" class="form-control form-select">
                                     <% for (GameClass clazz : gameClassRepo.getAllPlayableClasses()) { %>
@@ -161,7 +164,7 @@
                                 </select>
                                 <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
                                 <span class="input-group-text position-relative cursor-pointer"
-                                      title="Upload a class.">
+                                      title="${i18n.tr('Upload a class.')}">
                                             <a class="stretched-link text-decoration-none"
                                                href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_GAMES%>">
                                                 <i class="fa fa-upload"></i>
@@ -171,14 +174,14 @@
                             </div>
 
                             <div class="form-check form-switch"
-                                 title="Include mutants uploaded together with the class.">
+                                 title="${i18n.tr('Include mutants uploaded together with the class.')}">
                                 <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
-                                <label class="form-check-label" for="predefined-mutants-switch">Include predefined mutants (if available)</label>
+                                <label class="form-check-label" for="predefined-mutants-switch">${i18n.tr('Include predefined mutants (if available)')}</label>
                             </div>
 
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="predefined-tests-switch" name="withTests">
-                                <label class="form-check-label" for="predefined-tests-switch">Include predefined tests (if available)</label>
+                                <label class="form-check-label" for="predefined-tests-switch">${i18n.tr('Include predefined tests (if available)')}</label>
                             </div>
                         </div>
 
@@ -186,7 +189,7 @@
                             <label class="form-label" for="level-group">
                                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                                    data-bs-toggle="modal" data-bs-target="#levelExplanation">
-                                    Game Level
+                                    ${i18n.tr('Game Level')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
@@ -195,12 +198,12 @@
                                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
                                            value="<%=GameLevel.HARD%>"
                                            checked>
-                                    <label class="form-check-label" for="level-radio-hard">Hard</label>
+                                    <label class="form-check-label" for="level-radio-hard">${i18n.tr('Hard')}</label>
                                 </div>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
                                            value="<%=GameLevel.EASY%>">
-                                    <label class="form-check-label" for="level-radio-easy">Easy</label>
+                                    <label class="form-check-label" for="level-radio-easy">${i18n.tr('Easy')}</label>
                                 </div>
                             </div>
                         </div>
@@ -209,11 +212,12 @@
                             <label class="form-label" id="mutant-validator-label" for="mutant-validator-group">
                                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                                    data-bs-toggle="modal" data-bs-target="#validatorExplanation">
-                                    Mutant Validator Level
+                                    ${i18n.tr('Mutant Validator Level')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
                             <div id="mutant-validator-group">
+                                <% I18n i18n = (I18n) request.getAttribute("i18n"); %>
                                 <% for (MutantValidationRuleSet level : DefaultRuleSets.getValues()) { %>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"
@@ -221,7 +225,7 @@
                                            value="<%=level.getName()%>"
                                         <%=level == DefaultRuleSets.MODERATE ? "checked" : ""%>>
                                     <label class="form-check-label" for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
-                                        <%=level.getName()%>
+                                        <%=i18n.tr(level.getName())%>
                                     </label>
                                 </div>
                                 <% } %>
@@ -229,9 +233,9 @@
                         </div>
 
                         <div class="col-12"
-                             title="Maximum number of assertions per test. Increase this for difficult to test classes.">
+                             title="${i18n.tr('Maximum number of assertions per test. Increase this for difficult to test classes.')}">
                             <label class="form-label" id="max-assertions-label" for="max-assertions-input">
-                                Max. Assertions Per Test
+                                ${i18n.tr('Max. Assertions Per Test')}
                             </label>
                             <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
                                    value="<%=Constants.DEFAULT_NB_ASSERTIONS%>" min="1" required>
@@ -241,7 +245,7 @@
                             <label class="form-label" id="equiv-threshold-label" for="equiv-threshold-input">
                                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                                    data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
-                                    Auto Equiv. Threshold
+                                    ${i18n.tr('Auto Equiv. Threshold')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
@@ -250,60 +254,61 @@
                         </div>
 
                         <div class="col-12"
-                             title="Select the role you will have in the game.">
-                            <label for="role-select" class="form-label">Your Role</label>
+                             title="${i18n.tr('Select the role you will have in the game.')}">
+                            <label for="role-select" class="form-label">${i18n.tr('Your Role')}</label>
                             <select id="role-select" name="creatorRole" class="form-control form-select">
-                                <option value="OBSERVER" selected>Observer</option>
-                                <option value="ATTACKER">Attacker</option>
-                                <option value="DEFENDER">Defender</option>
+                                <option value="OBSERVER" selected>${i18n.tr('Observer')}</option>
+                                <option value="ATTACKER">${i18n.tr('Attacker')}</option>
+                                <option value="DEFENDER">${i18n.tr('Defender')}</option>
                             </select>
                         </div>
                     </div>
 
+
                     <div class="row g-2 mt-2">
                         <div class="col-12"
-                             title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
+                             title="${i18n.tr('Forces players to specify the intentions of their mutants/tests before they can submit them.')}">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
-                                <label class="form-check-label" for="capture-intentions-switch">Enable Capture Players' Intentions</label>
+                                <label class="form-check-label" for="capture-intentions-switch">${i18n.tr("Enable Capture Players' Intentions")}</label>
                             </div>
                         </div>
 
                         <div class="col-12"
-                             title="Allows players to chat within their team and with the enemy team.">
+                             title="${i18n.tr('Allows players to chat within their team and with the enemy team.')}">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled" checked>
-                                <label class="form-check-label" for="chat-switch">Game Chat</label>
+                                <label class="form-check-label" for="chat-switch">${i18n.tr('Game Chat')}</label>
                             </div>
                         </div>
 
                         <div class="col-12"
-                             title="Automatically start games once they are created.">
+                             title="${i18n.tr('Automatically start games once they are created.')}">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="start-games-switch" name="startGames">
-                                <label class="form-check-label" for="start-games-switch">Start Games</label>
+                                <label class="form-check-label" for="start-games-switch">${i18n.tr('Start Games')}</label>
                             </div>
                         </div>
 
-                        <div class="col-12" title="The duration for how long the games will be open.">
+                        <div class="col-12" title="${i18n.tr('The duration for how long the games will be open.')}">
                             <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
                             <%
                                 request.setAttribute("defaultDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue());
                                 request.setAttribute("maximumDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
                             %>
 
-                            <label class="form-label">Set the game's duration:</label>
+                            <label class="form-label">${i18n.tr("Set the game's duration:")}</label>
                             <div class="input-group input-group-sm">
                                 <input type="number" name="days" class="form-control" id="days-input" min="0">
-                                <label for="days-input" class="input-group-text">days</label>
+                                <label for="days-input" class="input-group-text">${i18n.tr('days')}</label>
                                 <input type="number" name="hours" class="form-control" id="hours-input" min="0">
-                                <label for="hours-input" class="input-group-text">hours</label>
+                                <label for="hours-input" class="input-group-text">${i18n.tr('hours')}</label>
                                 <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
-                                <label for="minutes-input" class="input-group-text">minutes</label>
+                                <label for="minutes-input" class="input-group-text">${i18n.tr('minutes')}</label>
                             </div>
                             <small id="maxDurationInfo" class="mt-1">
-                                Maximum duration: <span id="displayMaxDuration">&hellip;</span>.
-                                If the value is greater, it will be limited to this maximum.
+                                ${i18n.tr('Maximum duration:')} <span id="displayMaxDuration">&hellip;</span>.
+                                ${i18n.tr('If the value is greater, it will be limited to this maximum.')}
                             </small>
 
                             <script type="module">
@@ -341,7 +346,7 @@
                 <div class="card-header">
                     <a class="text-decoration-none text-reset cursor-pointer"
                        data-bs-toggle="modal" data-bs-target="#stageGamesWithUsersExplanation">
-                        Create Staged Games With Users
+                        ${i18n.tr('Create Staged Games With Users')}
                         <i class="fa fa-question-circle ms-1"></i>
                     </a>
                 </div>
@@ -352,7 +357,7 @@
                             <label for="userNames" class="form-label">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#userNamesExplanation">
-                                    User Names
+                                    ${i18n.tr('User Names')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
@@ -360,11 +365,11 @@
                         </div>
 
                         <div class="col-12 multiplayer-specific"
-                             title="Method of assigning roles to players.">
+                             title="${i18n.tr('Method of assigning roles to players.')}">
                             <label class="form-label" for="roleAssignment-group">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#roleAssignmentExplanation">
-                                    Role Assignment
+                                    ${i18n.tr('Role Assignment')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
@@ -374,23 +379,23 @@
                                            class="form-check-input" id="roleAssignment-radio-random"
                                            value="<%=RoleAssignmentStrategy.Type.RANDOM%>"
                                            checked>
-                                    <label class="form-check-label" for="roleAssignment-radio-random">Random</label>
+                                    <label class="form-check-label" for="roleAssignment-radio-random">${i18n.tr('Random')}</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="roleAssignmentMethod"
                                            class="form-check-input" id="roleAssignment-radio-opposite"
                                            value="<%=RoleAssignmentStrategy.Type.OPPOSITE%>">
-                                    <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite Role</label>
+                                    <label class="form-check-label" for="roleAssignment-radio-opposite">${i18n.tr('Opposite Role')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-12"
-                             title="Method of assigning players to teams. Click the question mark for more information.">
+                             title="${i18n.tr('Method of assigning players to teams. Click the question mark for more information.')}">
                             <label class="form-label" for="gameAssignmentMethod-group">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#gameAssignmentExplanation">
-                                    Game Assignment
+                                    ${i18n.tr('Game Assignment')}
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
@@ -400,39 +405,39 @@
                                            class="form-check-input" id="gameAssignmentMethod-radio-random"
                                            value="<%=GameAssignmentStrategy.Type.RANDOM%>"
                                            checked>
-                                    <label class="form-check-label" for="gameAssignmentMethod-radio-random">Random</label>
+                                    <label class="form-check-label" for="gameAssignmentMethod-radio-random">${i18n.tr('Random')}</label>
                                 </div>
                                 <div class="form-check">
                                     <input type="radio" name="gameAssignmentMethod"
                                            class="form-check-input" id="gameAssignmentMethod-radio-score-descending"
                                            value="<%=GameAssignmentStrategy.Type.SCORE_DESCENDING%>">
-                                    <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">Score Descending</label>
+                                    <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">${i18n.tr('Score Descending')}</label>
                                 </div>
                             </div>
                         </div>
 
                         <div class="col-12 multiplayer-specific"
-                             title="Number of attackers per game.">
-                            <label for="attackersPerGame" class="form-label">Attackers per Game</label>
+                             title="${i18n.tr('Number of attackers per game.')}">
+                            <label for="attackersPerGame" class="form-label">${i18n.tr('Attackers per Game')}</label>
                             <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1" class="form-control">
                         </div>
 
                         <div class="col-12 multiplayer-specific"
-                             title="Number of defenders per game.">
-                            <label for="defendersPerGame" class="form-label">Defenders per Game</label>
+                             title="${i18n.tr('Number of defenders per game.')}">
+                            <label for="defendersPerGame" class="form-label">${i18n.tr('Defenders per Game')}</label>
                             <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control">
                         </div>
 
                         <div class="col-12 melee-specific" hidden
-                             title="Players per game.">
-                            <label for="playersPerGame" class="form-label">Players per Game</label>
+                             title="${i18n.tr('Players per game.')}">
+                            <label for="playersPerGame" class="form-label">${i18n.tr('Players per Game')}</label>
                             <input type="number" value="6" id="playersPerGame" name="playersPerGame" min="1" class="form-control">
                         </div>
 
                         <div class="col-12">
                             <button class="btn btn-md btn-primary" type="button" name="stage-games-button"
                                     id="stage-games-button" disabled>
-                                Stage Games
+                                ${i18n.tr('Stage Games')}
                             </button>
                         </div>
                     </div>
@@ -444,7 +449,7 @@
                 <div class="card-header">
                     <a class="text-decoration-none text-reset cursor-pointer"
                        data-bs-toggle="modal" data-bs-target="#stageEmptyGamesExplanation">
-                        Create Empty Staged Games
+                        ${i18n.tr('Create Empty Staged Games')}
                         <i class="fa fa-question-circle ms-1"></i>
                     </a>
                 </div>
@@ -452,15 +457,15 @@
 
                     <div class="row g-3">
                         <div class="col-12"
-                             title="Number of staged games to create.">
-                            <label for="numGames" class="form-label">Number of Games</label>
+                             title="${i18n.tr('Number of staged games to create.')}">
+                            <label for="numGames" class="form-label">${i18n.tr('Number of Games')}</label>
                             <input type="number" value="1" id="numGames" name="numGames" min="1" max="100" class="form-control">
                         </div>
 
                         <div class="col-12">
                             <button class="btn btn-md btn-primary" type="button" name="stage-games-empty-button"
                                     id="stage-games-empty-button">
-                                Stage Games
+                                ${i18n.tr('Stage Games')}
                             </button>
                         </div>
                     </div>
@@ -472,16 +477,16 @@
     </div> <%-- row --%>
 </form>
 
-<t:modal id="levelExplanation" title="Level Explanation">
+<t:modal id="levelExplanation" title="${i18n.tr('Level Explanation')}">
         <jsp:attribute name="content">
-            <h3>Battleground Games</h3>
+            <h3>${i18n.tr('Battleground Games')}</h3>
             <t:level_explanation_multiplayer/>
-            <h3 class="mt-3">Melee Games</h3>
+            <h3 class="mt-3">${i18n.tr('Melee Games')}</h3>
             <t:level_explanation_melee/>
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="validatorExplanation" title="Validator Explanation">
+<t:modal id="validatorExplanation" title="${i18n.tr('Validator Explanation')}">
         <jsp:attribute name="content">
             <t:validator_explanation_mutant/>
             <div class="mt-3"></div> <%-- spacing --%>
@@ -489,76 +494,75 @@
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="automaticEquivalenceTriggerExplanation" title="Auto Equivalence Duel Threshold Explanation">
+<t:modal id="automaticEquivalenceTriggerExplanation" title="${i18n.tr('Auto Equivalence Duel Threshold Explanation')}">
         <jsp:attribute name="content">
             <t:automatic_duels_explanation/>
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="roleAssignmentExplanation" title="Role Assignment Explanation">
+<t:modal id="roleAssignmentExplanation" title="${i18n.tr('Role Assignment Explanation')}">
         <jsp:attribute name="content">
-            <p>Specifies how roles are assigned to players:</p>
+            <p>${i18n.tr('Specifies how roles are assigned to players:')}</p>
             <ul>
                 <li>
-                    <b>Random:</b>
-                    Players are assigned roles randomly.
+                    <b>${i18n.tr('Random:')}</b>
+                    ${i18n.tr('Players are assigned roles randomly.')}
                 </li>
                 <li>
-                    <b>Opposite:</b>
-                    Players are assigned the opposite of their last played role, if possible.
+                    <b>${i18n.tr('Opposite:')}</b>
+                    ${i18n.tr('Players are assigned the opposite of their last played role, if possible.')}
                 </li>
             </ul>
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="gameAssignmentExplanation" title="Game Assignment Explanation">
+<t:modal id="gameAssignmentExplanation" title="${i18n.tr('Game Assignment Explanation')}">
         <jsp:attribute name="content">
-            <p>Specifies how players are assigned to games:</p>
+            <p>${i18n.tr('Specifies how players are assigned to games:')}</p>
             <ul>
                 <li>
-                    <b>Random:</b>
-                    Players are assigned to games randomly.
+                    <b>${i18n.tr('Random:')}</b>
+                    ${i18n.tr('Players are assigned to games randomly.')}
                 </li>
                 <li>
-                    <b>Scores Descending:</b>
-                    Players are assigned to games based on their total score in past games.
-                    The players with the highest scores are assigned to the first games,
-                    the players with the lowest scores are assigned to the last games.
+                    <b>${i18n.tr('Scores Descending:')}</b>
+                    ${i18n.tr('Players are assigned to games based on their total score in past games.')}
+                    ${i18n.tr('The players with the highest scores are assigned to the first games,')}
+                    ${i18n.tr('the players with the lowest scores are assigned to the last games.')}
                 </li>
             </ul>
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="userNamesExplanation" title="User Names Explanation">
+<t:modal id="userNamesExplanation" title="${i18n.tr('User Names Explanation')}">
         <jsp:attribute name="content">
-            Newline-separated list of usernames or emails. The users with these names/emails, as well as the
-            users selected in the table, will be assigned to created staged games.
+            ${i18n.tr('Newline-separated list of usernames or emails. The users with these names/emails, as well as the users selected in the table, will be assigned to created staged games.')}
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="stageGamesWithUsersExplanation" title="Stage Games With Users Explanation">
+<t:modal id="stageGamesWithUsersExplanation" title="${i18n.tr('Stage Games With Users Explanation')}">
         <jsp:attribute name="content">
             <p>
-                Selected users from the table, as well as users entered in the text area, will be assigned to new
-                staged games. The number of games is decided by the number of users and the selected method of
-                distributing the users to teams.
+                ${i18n.tr('Selected users from the table, as well as users entered in the text area, will be assigned to new staged games.')}
+                ${i18n.tr('The number of games is decided by the number of users and the selected method of distributing the users to teams.')}
             </p>
             <p class="mb-0">
-                The settings for the staged games are specified in the left card.
+                ${i18n.tr('The settings for the staged games are specified in the left card.')}
             </p>
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="stageEmptyGamesExplanation" title="Stage Empty Games Explanation">
+<t:modal id="stageEmptyGamesExplanation" title="${i18n.tr('Stage Empty Games Explanation')}">
         <jsp:attribute name="content">
-            <p>Create a number staged games without users assigned to them.</p>
-            <p class="mb-0">The settings for the staged games are specified in the left card.</p>
+            <p>${i18n.tr('Create a number staged games without users assigned to them.')}</p>
+            <p class="mb-0">${i18n.tr('The settings for the staged games are specified in the left card.')}</p>
         </jsp:attribute>
 </t:modal>
 
 <script type="module">
     import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
     import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
     import {parseHTML} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
@@ -633,25 +637,25 @@
 
     // TODO: Generate these automatically with a bean?.
     const GameType = {
-        MULTIPLAYER:    {name: 'MULTIPLAYER',   display: 'Battleground'},
-        MELEE:          {name: 'MELEE',         display: 'Melee'}
+        MULTIPLAYER:    {name: 'MULTIPLAYER',   display: '${i18n.tr("Battleground")}'},
+        MELEE:          {name: 'MELEE',         display: '${i18n.tr("Melee")}' }
     };
     const CodeValidatorLevel = {
-        RELAXED:        {name: 'RELAXED',       display: 'Relaxed'},
-        MODERATE:       {name: 'MODERATE',      display: 'Moderate'},
-        STRICT:         {name: 'STRICT',        display: 'Strict'}
+        RELAXED:        {name: 'RELAXED',       display: '${i18n.tr("Relaxed")}'},
+        MODERATE:       {name: 'MODERATE',      display: '${i18n.tr("Moderate")}'},
+        STRICT:         {name: 'STRICT',        display: '${i18n.tr("Strict")}'}
     };
     const GameLevel = {
-        HARD:           {name: 'HARD',          display: 'Hard'},
-        MEDIUM:         {name: 'MEDIUM',        display: 'Medium'},
-        EASY:           {name: 'EASY',          display: 'Easy'}
+        HARD:           {name: 'HARD',          display: '${i18n.tr("Hard")}'},
+        MEDIUM:         {name: 'MEDIUM',        display: '${i18n.tr("Medium")}'},
+        EASY:           {name: 'EASY',          display: '${i18n.tr("Easy")}'}
     };
     const Role = {
-        ATTACKER:       {name: 'ATTACKER',      display: 'Attacker'},
-        DEFENDER:       {name: 'DEFENDER',      display: 'Defender'},
-        OBSERVER:       {name: 'OBSERVER',      display: 'Observer'},
-        PLAYER:         {name: 'PLAYER',        display: 'Player'},
-        NONE:           {name: 'NONE',          display: 'None'}
+        ATTACKER:       {name: 'ATTACKER',      display: '${i18n.tr("Attacker")}'},
+        DEFENDER:       {name: 'DEFENDER',      display: '${i18n.tr("Defender")}'},
+        OBSERVER:       {name: 'OBSERVER',      display: '${i18n.tr("Observer")}'},
+        PLAYER:         {name: 'PLAYER',        display: '${i18n.tr("Player")}'},
+        NONE:           {name: 'NONE',          display: '${i18n.tr("None")}'}
     };
 
     /* Timezone and date format to format the last login date for users. */
@@ -732,7 +736,7 @@
                 const span = document.createElement('span');
                 if (lastRole === null) {
                     span.style.color = 'gray';
-                    span.textContent = 'none';
+                    span.textContent = '${i18n.tr("none")}';
                 } else {
                     span.textContent = Role[lastRole].display;
                 }
@@ -754,9 +758,9 @@
                 const span = document.createElement('span');
                 if (lastLogin === null) {
                     span.style.color = 'gray';
-                    span.textContent = 'never';
+                    span.textContent = '${i18n.tr("never")}';
                 } else {
-                    span.title = 'Dates are converted to you local timezone: ' + timezone;
+                    span.title = '${i18n.tr("Dates are converted to you local timezone: {0}", "" )}'.replace('{0}', timezone);
                     // lastLogin is an Epoch (seconds since 1970), dateFormat needs a Date (or milliseconds)
                     span.textContent = dateFormat.format(lastLogin * 1000);
                 }
@@ -774,7 +778,7 @@
         container.appendChild(gameIdSelect);
 
         const gamePlaceholder = document.createElement('option');
-        gamePlaceholder.textContent = 'Game';
+        gamePlaceholder.textContent = '${i18n.tr("Game")}';
         gamePlaceholder.value = '';
         gamePlaceholder.disabled = true;
         gameIdSelect.add(gamePlaceholder);
@@ -803,13 +807,13 @@
         container.appendChild(roleSelect);
 
         const rolePlaceholder = document.createElement('option');
-        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.textContent = '${i18n.tr("Role")}';
         rolePlaceholder.value = '';
         rolePlaceholder.disabled = true;
         roleSelect.add(rolePlaceholder);
 
         const addToGameButton = parseHTML(`
-            <button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
+            <button disabled class="add-player-button btn btn-sm btn-primary" title="${i18n.tr('Add player to selected game')}">
                 <i class="fa fa-plus"></i>
             </button>
         `);
@@ -830,13 +834,13 @@
     };
 
     const renderStagedGameClass = function (classId, type, row, meta) {
-        const cut = classes.get(classId) ?? {id: -1, name: 'unknown', alias: 'unknown'};
+        const cut = classes.get(classId) ?? {id: -1, name: '${i18n.tr("unknown")}', alias: '${i18n.tr("unknown")}'};
         const name = cut.name;
         const alias = cut.alias;
         if (name === alias) {
             return name;
         } else {
-            return name + ' (alias ' + alias + ')';
+            return name + ' (${i18n.tr("alias")} ' + alias + ')';
         }
     };
 
@@ -858,7 +862,7 @@
                 return players.length;
             case 'display':
                 if (hideStagedGamePlayers) {
-                    return '<span style="color: gray;">(hidden)</span>'
+                    return '<span style="color: gray;">(${i18n.tr("hidden")})</span>'
                 } else {
                     return createStagedGamePlayersTable(stagedGame, attackers, defenders);
                 }
@@ -954,7 +958,7 @@
         controlsCell.appendChild(controlsContainer);
 
         const switchRolesButton = parseHTML(`
-            <button class="switch-creator-role-button btn btn-sm btn-primary" title="Switch your role">
+            <button class="switch-creator-role-button btn btn-sm btn-primary" title="${i18n.tr('Switch your role')}">
                 <i class="fa fa-exchange"></i>
             </button>
         `);
@@ -966,7 +970,7 @@
         }
 
         const removeButton = parseHTML(`
-            <button class="remove-creator-button btn btn-sm btn-danger" title="Change to Observer">
+            <button class="remove-creator-button btn btn-sm btn-danger" title="${i18n.tr('Change to Observer')}">
                 <i class="fa fa-trash"></i>
             </button>
         `);
@@ -1016,7 +1020,7 @@
         controlsCell.appendChild(controlsContainer);
 
         const switchRolesButton = parseHTML(`
-            <button class="switch-role-button btn btn-sm btn-primary" title="Switch role of player">
+            <button class="switch-role-button btn btn-sm btn-primary" title="${i18n.tr('Switch role of player')}">
                  <i class="fa fa-exchange"></i>
             </button>
         `);
@@ -1028,7 +1032,7 @@
         }
 
         const removeButton = parseHTML(`
-            <button class="remove-player-button btn btn-sm btn-danger" title="Remove player from game">
+            <button class="remove-player-button btn btn-sm btn-danger" title="${i18n.tr('Remove player from game')}">
                 <i class="fa fa-trash"></i>
             </button>
         `)
@@ -1040,7 +1044,7 @@
         controlsContainer.appendChild(gameIdSelect);
 
         const gamePlaceholder = document.createElement('option');
-        gamePlaceholder.textContent = 'Game';
+        gamePlaceholder.textContent = '${i18n.tr("Game")}';
         gamePlaceholder.value = '';
         gamePlaceholder.disabled = true;
         gameIdSelect.add(gamePlaceholder);
@@ -1059,18 +1063,17 @@
 
         const roleSelect = document.createElement('select');
         roleSelect.classList.add('move-player-role', 'form-select', 'form-select-sm');
-        roleSelect.style.flex = '1 1 35%';
         roleSelect.disabled = true;
         controlsContainer.appendChild(roleSelect);
 
         const rolePlaceholder = document.createElement('option');
-        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.textContent = '${i18n.tr("Role")}';
         rolePlaceholder.value = '';
         rolePlaceholder.disabled = true;
         roleSelect.add(rolePlaceholder);
 
         const moveButton = parseHTML(`
-            <button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
+            <button disabled class="move-player-button btn btn-sm btn-primary" title="${i18n.tr('Move player to selected game')}">
                 <i class="fa fa-arrow-right"></i>
             </button>;
         `)
@@ -1102,7 +1105,7 @@
         }
 
         const rolePlaceholder = document.createElement('option');
-        rolePlaceholder.textContent = 'Role';
+        rolePlaceholder.textContent = '${i18n.tr("Role")}';
         rolePlaceholder.value = '';
         rolePlaceholder.disabled = true;
 
@@ -1162,55 +1165,55 @@
         table.classList.add('table', 'table-sm', 'table-no-last-border', 'm-0');
 
         let tr = table.insertRow();
-        tr.insertCell().textContent = 'Game Type';
+        tr.insertCell().textContent = '${i18n.tr("Game Type")}';
         tr.insertCell().textContent = GameType[gameSettings.gameType].display;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Class';
+        tr.insertCell().textContent = '${i18n.tr("Class")}';
         tr.insertCell().innerHTML = renderStagedGameClass(gameSettings.classId);
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Level';
+        tr.insertCell().textContent = '${i18n.tr("Level")}';
         tr.insertCell().textContent = GameLevel[gameSettings.level].display;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Include Predefined Mutants';
+        tr.insertCell().textContent = '${i18n.tr("Include Predefined Mutants")}';
         tr.insertCell().textContent = gameSettings.withMutants;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Include Predefined Tests';
+        tr.insertCell().textContent = '${i18n.tr("Include Predefined Tests")}';
         tr.insertCell().textContent = gameSettings.withTests;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Max Assertions Per Test';
+        tr.insertCell().textContent = '${i18n.tr("Max Assertions Per Test")}';
         tr.insertCell().textContent = gameSettings.maxAssertionsPerTest;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Mutant Validator Level';
+        tr.insertCell().textContent = '${i18n.tr("Mutant Validator Level")}';
         tr.insertCell().textContent = gameSettings.mutantValidatorLevel;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Creator Role';
+        tr.insertCell().textContent = '${i18n.tr("Creator Role")}';
         tr.insertCell().textContent = Role[gameSettings.creatorRole].display;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Chat Enabled';
+        tr.insertCell().textContent = '${i18n.tr("Chat Enabled")}';
         tr.insertCell().textContent = gameSettings.chatEnabled;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Capture Player Intentions';
+        tr.insertCell().textContent = '${i18n.tr("Capture Player Intentions")}';
         tr.insertCell().textContent = gameSettings.captureIntentions;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Equivalence Threshold';
+        tr.insertCell().textContent = '${i18n.tr("Equivalence Threshold")}';
         tr.insertCell().textContent = gameSettings.equivalenceThreshold;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Start Game';
+        tr.insertCell().textContent = '${i18n.tr("Start Game")}';
         tr.insertCell().textContent = gameSettings.startGame;
 
         tr = table.insertRow();
-        tr.insertCell().textContent = 'Game Duration';
+        tr.insertCell().textContent = '${i18n.tr("Game Duration")}';
         tr.insertCell().textContent = GameTime.formatTime(gameSettings.gameDurationMinutes);
 
         return table;
@@ -1235,7 +1238,7 @@
         columns: [
             {
                 data: null,
-                title: 'Select',
+                title: '${i18n.tr("Select")}',
                 defaultContent: '',
                 className: 'select-checkbox',
                 orderDataType: 'select-extension',
@@ -1245,26 +1248,26 @@
                 data: 'id',
                 render: renderStagedGameId,
                 type: 'num-fmt',
-                title: 'ID'
+                title: '${i18n.tr("ID")}'
             },
             {
                 data: 'gameSettings.classId',
                 render: renderStagedGameClass,
                 type: 'string',
-                title: 'Class'
+                title: '${i18n.tr("Class")}'
             },
             {
                 data: 'gameSettings.gameType',
                 render: renderStagedGameType,
                 type: 'string',
-                title: 'Game Type'
+                title: '${i18n.tr("Game Type")}'
             },
             {
                 data: null,
                 orderable: false,
-                defaultContent: '<span class="btn btn-xs btn-secondary show-settings">Show</span>',
+                defaultContent: '<span class="btn btn-xs btn-secondary show-settings">${i18n.tr("Show")}</span>',
                 type: 'html',
-                title: 'Settings'
+                title: '${i18n.tr("Settings")}'
             },
             {
                 data: null,
@@ -1272,8 +1275,8 @@
                 type: 'html',
                 width: '65%',
                 title: kind == 'CLASSROOM'
-                    ? 'Players (Username, Classroom Role, Last Game Role, Total Score)'
-                    : 'Players (Username, Last Game Role, Total Score)'
+                    ? '${i18n.tr("Players (Username, Classroom Role, Last Game Role, Total Score)")}'
+                    : '${i18n.tr("Players (Username, Last Game Role, Total Score)")}'
             },
         ],
         select: {
@@ -1295,7 +1298,7 @@
                     placement: 'right',
                     trigger: 'hover',
                     html: true,
-                    title: 'Game Settings',
+                    title: '${i18n.tr("Game Settings")}',
                     content: function () {
                         const tr = this.closest('tr');
                         const row = stagedGamesTable.row(tr);
@@ -1310,10 +1313,10 @@
         scrollCollapse: true,
         paging: false,
         dom: 't',
-        language: {
-            emptyTable: 'There are currently no staged games.',
-            zeroRecords: 'No matching staged games found.'
-        }
+        language: DataTablesUtils.language({
+            emptyTable: '${i18n.tr("There are currently no staged games.")}',
+            zeroRecords: '${i18n.tr("No matching staged games found.")}'
+        })
     });
 
     /* Search bar. */
@@ -1472,7 +1475,7 @@
         columns: [
             {
                 data: null,
-                title: 'Select',
+                title: '${i18n.tr("Select")}',
                 defaultContent: '',
                 className: 'select-checkbox',
                 orderDataType: 'select-extension',
@@ -1481,43 +1484,43 @@
             {
                 data: 'id',
                 type: 'num',
-                title: 'ID'
+                title: '${i18n.tr("ID")}'
             },
             {
                 data: 'name',
                 type: 'string',
-                title: 'Name'
+                title: '${i18n.tr("Name")}'
             },
             kind !== 'CLASSROOM' ? null :
                 {
                     data: 'classroomRole',
                     type: 'string',
-                    title: 'Classroom Role',
+                    title: '${i18n.tr("Classroom Role")}',
                     render: renderClassroomRole
                 },
             {
                 data: 'lastRole',
                 render: renderUserLastRole,
                 type: 'html',
-                title: 'Last Game Role'
+                title: '${i18n.tr("Last Game Role")}'
             },
             {
                 data: 'totalScore',
                 type: 'num',
-                title: 'Total Score'
+                title: '${i18n.tr("Total Score")}'
             },
             {
                 data: 'lastLogin',
                 render: renderUserLastLogin,
                 type: 'html',
-                title: 'Last Login'
+                title: '${i18n.tr("Last Login")}'
             },
             {
                 data: null,
                 render: renderUserAddToGame,
                 orderable: false,
                 type: 'html',
-                title: 'Add to existing game',
+                title: '${i18n.tr("Add to existing game")}',
                 width: '20em'
             }
         ].filter(col => col !== null),
@@ -1540,10 +1543,10 @@
         scrollCollapse: true,
         paging: false,
         dom: 't',
-        language: {
-            emptyTable: 'No users found.',
-            zeroRecords: 'No matching users found.'
-        }
+        language: DataTablesUtils.language({
+            emptyTable: '${i18n.tr("No users found.")}',
+            zeroRecords: '${i18n.tr("No matching users found.")}'
+        })
     });
 
     /* Search bar. */
@@ -1689,11 +1692,11 @@
         const userNames = document.getElementById('userNames').value;
 
         if (getSelected(usersTable).length > 0) {
-            if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
+            if (!confirm("${i18n.tr('You have users selected. Are you sure you want to stage empty games?')}")) {
                 return;
             }
         } else if (userNames.length > 0) {
-            if (!confirm("You entered user names/emails. Are you sure you want to stage empty games?")) {
+            if (!confirm("${i18n.tr('You entered user names/emails. Are you sure you want to stage empty games?')}")) {
                 return;
             }
         }

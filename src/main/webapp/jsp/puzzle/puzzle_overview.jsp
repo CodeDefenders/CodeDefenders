@@ -22,6 +22,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
@@ -32,7 +34,7 @@ or are locked for the logged in user.
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 
-<c:set var="title" value="Puzzles"/>
+<c:set var="title" value="${i18n.tr('Puzzles')}"/>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -48,7 +50,8 @@ or are locked for the logged in user.
                 <c:set var="nextPuzzleObj" value="${puzzleNavigation.nextPuzzle.get()}"/>
                 <a class="next-puzzle" href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=${nextPuzzleObj.puzzleId}">
                     <div class="next-puzzle__image">
-                        <img src="${url.forPath("/images/defender_puzzle.png")}" alt="Preview Image Puzzle Game">
+                        <img src="${url.forPath("/images/defender_puzzle.png")}"
+                             alt="${i18n.tr('Preview Image Puzzle Game')}">
                         <div class="next-puzzle__play-btn">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
                                 <path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"></path>
@@ -67,23 +70,23 @@ or are locked for the logged in user.
                                 </c:choose>
                         />
                         <h2>
-                            <span class="next-puzzle__title__next-puzzle">Next puzzle:</span><br>
-                            <span class="next-puzzle__title__chapter">${nextPuzzleObj.puzzle.chapter.title},</span>
-                            <span class="next-puzzle__title__title">${nextPuzzleObj.puzzle.title}</span>
+                            <span class="next-puzzle__title__next-puzzle">${i18n.tr('Next puzzle:')}</span><br>
+                            <span class="next-puzzle__title__chapter">${nextPuzzleObj.chapterTitle},</span>
+                            <span class="next-puzzle__title__title">${nextPuzzleObj.title}</span>
                         </h2>
-                        <p>${nextPuzzleObj.puzzle.description}</p>
+                        <p>${nextPuzzleObj.description}</p>
                     </div>
                 </a>
             </c:if>
             <c:if test="${puzzleNavigation.puzzleChapters.size() == 0}">
-                <div class="no-puzzles">There are currently no puzzles available.</div>
+                <div class="no-puzzles">${i18n.tr('There are currently no puzzles available.')}</div>
             </c:if>
             <c:forEach items="${puzzleNavigation.puzzleChapters}" var="ChapterEntry">
                 <%--@elvariable id="ChapterEntry" type="org.codedefenders.model.PuzzleChapterEntry"--%>
                 <c:set var="chapter" value="${ChapterEntry.chapter}"/>
                 <div class="chapter">
                     <div class="chapter__title">
-                        <h2>${chapter.title}</h2>
+                        <h2>${ChapterEntry.title}</h2>
                     </div>
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
@@ -98,7 +101,7 @@ or are locked for the logged in user.
                                         <c:otherwise>
                                             disabled="disabled"
                                             data-bs-toggle="tooltip"
-                                            title="This puzzle is locked."
+                                            title="${i18n.tr('This puzzle is locked.')}"
                                         </c:otherwise>
                                     </c:choose>
                             >
@@ -124,7 +127,7 @@ or are locked for the logged in user.
                                         </svg>
                                         <span class="puzzle-attempt-counter"
                                               data-bs-toggle="tooltip"
-                                              title="Puzzle solved in ${puzzleEntry.rounds} ${fn:pluralizeWithS(puzzleEntry.rounds, "attempt")}."
+                                              title="${i18n.trn('Puzzle solved in {0} attempt.', 'Puzzle solved in {0} attempts.', puzzleEntry.rounds, puzzleEntry.rounds)}"
                                         >${puzzleEntry.rounds}</span>
                                     </c:if>
                                     <c:if test="${status == 'locked'}">
@@ -134,8 +137,8 @@ or are locked for the logged in user.
                                     </c:if>
                                 </div>
                                 <div class="chapter__level__title">
-                                    <h3>${puzzle.title}</h3>
-                                    <p>${puzzle.description}</p>
+                                    <h3>${puzzleEntry.title}</h3>
+                                    <p>${puzzleEntry.description}</p>
                                 </div>
                             </a>
                         </c:forEach>
@@ -145,5 +148,3 @@ or are locked for the logged in user.
         </div>
     </jsp:body>
 </p:main_page>
-
-

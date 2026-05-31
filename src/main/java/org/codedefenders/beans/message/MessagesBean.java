@@ -26,6 +26,8 @@ import java.util.List;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 
+import org.codedefenders.util.PreparedMessage;
+
 /**
  * <p>Implements a container for messages that are displayed to the user on page load.</p>
  * <p>
@@ -84,9 +86,34 @@ public class MessagesBean implements Serializable {
         return add(text).setTitle(title);
     }
 
-    public void addAll(Collection<? extends String> texts) {
-        for (String text : texts) {
-            add(text);
+    public synchronized Message add(PreparedMessage pMessage) {
+        var msg = add(pMessage.pattern());
+        if (pMessage.hasArguments()) msg.setArgs(pMessage.arguments());
+        return msg;
+    }
+
+    public synchronized Message addFormatted(String text, Object... args) {
+        return add(text).setArgs(args);
+    }
+
+    /**
+     * Adds all messages in the given collection.
+     * The collection can contain both {@link String} and {@link PreparedMessage} objects.
+     *
+     * @param texts The collection of messages to add.
+     *              Each message needs to be either a {@link String} or a {@link PreparedMessage}.
+     * @throws IllegalArgumentException If the collection contains an object that is not a {@link String} or
+     *                                  a {@link PreparedMessage}.
+     */
+    public void addAll(Collection<?> texts) {
+        for (var text : texts) {
+            if (text instanceof PreparedMessage pMessage) {
+                add(pMessage);
+            } else if (text instanceof String str) {
+                add(str);
+            } else {
+                throw new IllegalArgumentException("Unsupported message type: " + text.getClass());
+            }
         }
     }
 

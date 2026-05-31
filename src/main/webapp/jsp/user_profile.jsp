@@ -24,11 +24,12 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="profile" type="org.codedefenders.beans.user.UserProfileBean"--%>
 
-<c:set var="title" value="${profile.self ? 'My Profile' : 'Profile of ' += profile.user.username}"/>
+<c:set var="title" value="${profile.self ? i18n.tr('My Profile') : i18n.tr('Profile of {0}', profile.user.username)}"/>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -40,11 +41,11 @@
             <h1>${title}</h1>
 
             <section>
-                <h2>Achievements</h2>
+                <h2>${i18n.tr('Achievements')}</h2>
                 <div class="achievements">
                         <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
                     <c:if test="${profile.unlockedAchievements.size() == 0}">
-                        <div class="no-achievements">No achievement unlocked yet.</div>
+                        <div class="no-achievements">${i18n.tr('No achievement unlocked yet.')}</div>
                     </c:if>
                     <c:forEach items="${profile.unlockedAchievements}" var="achievement">
                         <t:achievement_badge achievement="${achievement}"/>
@@ -52,15 +53,15 @@
                 </div>
                 <c:if test="${profile.lockedAchievements.size() > 0}">
                     <button class="btn btn-outline-primary btn-sm mt-3">
-                        Show all achievements
+                            ${i18n.tr('Show all achievements')}
                     </button>
                     <script>
                         const button = document.currentScript.previousElementSibling;
                         button.addEventListener("click", function (event) {
                             document.querySelector('.locked-achievements').classList.toggle('hidden');
-                            button.innerText = button.innerText === 'Show all achievements'
-                                ? 'Hide locked achievements'
-                                : 'Show all achievements';
+                            button.innerText = button.innerText === '${i18n.tr('Show all achievements')}'
+                                ? '${i18n.tr('Hide locked achievements')}'
+                                : '${i18n.tr('Show all achievements')}';
                         });
                     </script>
                     <div class="achievements locked-achievements hidden">
@@ -72,136 +73,136 @@
             </section>
 
             <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
-                <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
+                <h2 class="mb-3" id="stats-multiplayer">${i18n.tr('Statistics for Multiplayer Games')}</h2>
 
                 <div class="dashboards">
                         <%--@elvariable id="stats" type="org.codedefenders.dto.UserStats"--%>
                     <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
 
                     <t:dashboard_pie
-                            type="mutants" title="Mutants created"
+                            type="mutants" title="${i18n.tr('Mutants created')}"
                             total="${stats.totalMutants}"
                             percentage="${stats.aliveMutantsPercentage}"
-                            label1="Mutants still alive:" value1="${stats.aliveMutants}"
-                            label2="Killed mutants:" value2="${stats.killedMutants}"
+                            label1="${i18n.tr('Mutants still alive:')}" value1="${stats.aliveMutants}"
+                            label2="${i18n.tr('Killed mutants:')}" value2="${stats.killedMutants}"
                     />
 
                     <t:dashboard_pie
-                            type="tests" title="Tests written"
+                            type="tests" title="${i18n.tr('Tests written')}"
                             total="${stats.totalTests}"
                             percentage="${stats.killingTestsPercentage}"
-                            label1="Tests that killed mutants:" value1="${stats.killingTests}"
-                            label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+                            label1="${i18n.tr('Tests that killed mutants:')}" value1="${stats.killingTests}"
+                            label2="${i18n.tr('Non-killing tests:')}" value2="${stats.nonKillingTests}"
                     />
 
                     <t:dashboard_pie
-                            type="points" title="Points earned"
+                            type="points" title="${i18n.tr('Points earned')}"
                             total="${stats.totalPoints}"
                             percentage="${stats.testPointsPercentage}"
-                            label1="By writing tests:" value1="${stats.totalPointsTests}"
-                            label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+                            label1="${i18n.tr('By writing tests:')}" value1="${stats.totalPointsTests}"
+                            label2="${i18n.tr('By creating mutants:')}" value2="${stats.totalPointsMutants}"
                     />
 
                     <t:dashboard_pie
-                            type="games" title="Games played"
+                            type="games" title="${i18n.tr('Games played')}"
                             total="${stats.totalGames}"
                             percentage="${stats.defenderGamesPercentage}"
-                            label1="As defender:" value1="${stats.defenderGames}"
-                            label2="As attacker:" value2="${stats.attackerGames}"
+                            label1="${i18n.tr('As defender:')}" value1="${stats.defenderGames}"
+                            label2="${i18n.tr('As attacker:')}" value2="${stats.attackerGames}"
                     />
                 </div>
 
                 <dl class="other-stats mt-3">
-                    <dt>Average points per tests:</dt>
+                    <dt>${i18n.tr('Average points per tests:')}</dt>
                     <dd>${stats.avgPointsTests}</dd>
 
-                    <dt>Average points per mutant:</dt>
+                    <dt>${i18n.tr('Average points per mutant:')}</dt>
                     <dd>${stats.avgPointsMutants}</dd>
                 </dl>
             </section>
 
             <section class="mt-5 statistics" aria-labelledby="stats-melee">
-                <h2 class="mb-3" id="stats-melee">Statistics for Melee Games</h2>
+                <h2 class="mb-3" id="stats-melee">${i18n.tr('Statistics for Melee Games')}</h2>
 
                 <div class="dashboards">
                     <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
 
                     <t:dashboard_pie
-                            type="mutants" title="Mutants created"
+                            type="mutants" title="${i18n.tr('Mutants created')}"
                             total="${stats.totalMutants}"
                             percentage="${stats.aliveMutantsPercentage}"
-                            label1="Mutants still alive:" value1="${stats.aliveMutants}"
-                            label2="Killed mutants:" value2="${stats.killedMutants}"
+                            label1="${i18n.tr('Mutants still alive:')}" value1="${stats.aliveMutants}"
+                            label2="${i18n.tr('Killed mutants:')}" value2="${stats.killedMutants}"
                     />
 
                     <t:dashboard_pie
-                            type="tests" title="Tests written"
+                            type="tests" title="${i18n.tr('Tests written')}"
                             total="${stats.totalTests}"
                             percentage="${stats.killingTestsPercentage}"
-                            label1="Tests that killed mutants:" value1="${stats.killingTests}"
-                            label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+                            label1="${i18n.tr('Tests that killed mutants:')}" value1="${stats.killingTests}"
+                            label2="${i18n.tr('Non-killing tests:')}" value2="${stats.nonKillingTests}"
                     />
 
                     <t:dashboard_pie
-                            type="points" title="Points earned"
+                            type="points" title="${i18n.tr('Points earned')}"
                             total="${stats.totalPoints}"
                             percentage="${stats.testPointsPercentage}"
-                            label1="By writing tests:" value1="${stats.totalPointsTests}"
-                            label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+                            label1="${i18n.tr('By writing tests:')}" value1="${stats.totalPointsTests}"
+                            label2="${i18n.tr('By creating mutants:')}" value2="${stats.totalPointsMutants}"
                     />
                 </div>
 
                 <dl class="other-stats mt-3">
-                    <dt>Total melee games played:</dt>
+                    <dt>${i18n.tr('Total melee games played:')}</dt>
                     <dd>${stats.totalGames}</dd>
 
-                    <dt>Average points per tests:</dt>
+                    <dt>${i18n.tr('Average points per tests:')}</dt>
                     <dd>${stats.avgPointsTests}</dd>
 
-                    <dt>Average points per mutant:</dt>
+                    <dt>${i18n.tr('Average points per mutant:')}</dt>
                     <dd>${stats.avgPointsMutants}</dd>
                 </dl>
             </section>
 
             <section class="mt-5 statistics" aria-labelledby="stats-melee">
-                <h2 class="mb-3" id="stats-duel">Statistics for Equivalence Duels</h2>
+                <h2 class="mb-3" id="stats-duel">${i18n.tr('Statistics for Equivalence Duels')}</h2>
 
                 <div class="dashboards">
                     <c:set var="duelStats" value="${profile.totalDuelStats}"/>
                     <t:dashboard_pie
-                            type="duels" title="All duels"
+                            type="duels" title="${i18n.tr('All duels')}"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Equivalence duels won:" value1="${duelStats.duelsWon}"
-                            label2="Equivalence duels lost:" value2="${duelStats.duelsLost}"
+                            label1="${i18n.tr('Equivalence duels won:')}" value1="${duelStats.duelsWon}"
+                            label2="${i18n.tr('Equivalence duels lost:')}" value2="${duelStats.duelsLost}"
                     />
 
                     <c:set var="duelStats" value="${profile.attackerDuelStats}"/>
                     <t:dashboard_pie
-                            type="duels" title="Duels as attacker"
+                            type="duels" title="${i18n.tr('Duels as attacker')}"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Rejected equivalence claim:" value1="${duelStats.duelsWon}"
-                            label2="Failed to reject claim:" value2="${duelStats.duelsLost}"
+                            label1="${i18n.tr('Rejected equivalence claim:')}" value1="${duelStats.duelsWon}"
+                            label2="${i18n.tr('Failed to reject claim:')}" value2="${duelStats.duelsLost}"
                     />
 
                     <c:set var="duelStats" value="${profile.defenderDuelStats}"/>
                     <t:dashboard_pie
-                            type="duels" title="Duels as defender"
+                            type="duels" title="${i18n.tr('Duels as defender')}"
                             total="${duelStats.duelsTotal}"
                             percentage="${duelStats.winPercentage}"
-                            label1="Successfully claimed as equivalent:" value1="${duelStats.duelsWon}"
-                            label2="Incorrectly claimed mutants:" value2="${duelStats.duelsLost}"
+                            label1="${i18n.tr('Successfully claimed as equivalent:')}" value1="${duelStats.duelsWon}"
+                            label2="${i18n.tr('Incorrectly claimed mutants:')}" value2="${duelStats.duelsLost}"
                     />
                 </div>
             </section>
 
             <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
-                <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
+                <h2 class="mb-3" id="stats-puzzle">${i18n.tr('Statistics for Puzzle Games')}</h2>
 
                 <dl class="puzzle-stats">
                     <c:forEach items="${profile.puzzleGames}" var="chapter">
-                        <dt>Chapter ${chapter.chapter.position} - ${chapter.chapter.title}</dt>
+                        <dt>${i18n.tr('Chapter {0} - {1}', chapter.chapter.position, chapter.title)}</dt>
                         <dd>
                             <div class="chapter__levels">
                                 <c:set var="solvedPuzzles"
@@ -227,14 +228,14 @@
                                                 </svg>
                                                 <span class="puzzle-attempt-counter"
                                                       data-bs-toggle="tooltip"
-                                                      title="Puzzle solved in ${puzzle.rounds} ${fn:pluralizeWithS(puzzle.rounds, "attempt")}."
+                                                      title="${i18n.trn('Puzzle solved in {0} attempt.', 'Puzzle solved in {0} attempts.', puzzle.rounds, puzzle.rounds)}"
                                                 >${puzzle.rounds}</span>
                                             </div>
                                             <div class="chapter__level__title">
-                                                <h3>${puzzle.puzzle.title}</h3>
-                                                <p>${puzzle.puzzle.type == 'EQUIVALENCE' ? 'Equivalence'
-                                                        : puzzle.puzzle.type == 'ATTACKER' ? 'Attacker' : 'Defender'}
-                                                    puzzle</p>
+                                                <h3>${puzzle.title}</h3>
+                                                <p>${puzzle.puzzle.type == 'EQUIVALENCE' ? i18n.tr('Equivalence')
+                                                        : puzzle.puzzle.type == 'ATTACKER' ? i18n.tr('Attacker') : i18n.tr('Defender')}
+                                                        ${i18n.tr('puzzle')}</p>
                                             </div>
                                         </div>
                                     </c:if>
@@ -247,8 +248,7 @@
                                             </svg>
                                         </div>
                                         <div class="chapter__level__title">
-                                            <h3>${unsolvedPuzzles} ${fn:pluralizeWithS(unsolvedPuzzles, "puzzle")}
-                                                unsolved</h3>
+                                            <h3>${i18n.trn("{0} puzzle unsolved", "{0} puzzles unsolved", unsolvedPuzzles, unsolvedPuzzles)}</h3>
                                         </div>
                                     </div>
                                 </c:if>
@@ -260,23 +260,23 @@
 
             <c:if test="${profile.self}">
                 <section class="mt-5" aria-labelledby="played-games">
-                    <h2 class="mb-3" id="played-games">Played games</h2>
+                    <h2 class="mb-3" id="played-games">${i18n.tr('Played games')}</h2>
                     <p>
-                        You can find a list of your past games in the
-                        <a href="${url.forPath(Paths.GAMES_HISTORY)}">games history</a>.
+                            ${i18n.tr('You can find a list of your past games in the')}
+                        <a href="${url.forPath(Paths.GAMES_HISTORY)}">${i18n.tr('games history')}</a>.
                     </p>
                 </section>
 
                 <section class="mt-5" aria-labelledby="account-information">
-                    <h2 class="mb-3" id="account-information">Account Information</h2>
+                    <h2 class="mb-3" id="account-information">${i18n.tr('Account Information')}</h2>
                     <p>
-                        Your current email:
+                            ${i18n.tr('Your current email:')}
                         <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
                     </p>
                     <p>
-                        Change your account information, password or delete your account in the
+                            ${i18n.tr('Change your account information, password or delete your account in the')}
                         <a href="${url.forPath(Paths.USER_SETTINGS)}"
-                           title="Edit or delete your CodeDefenders account.">account settings</a>.
+                           title="${i18n.tr('Edit or delete your CodeDefenders account.')}">${i18n.tr('account settings')}</a>.
                     </p>
                 </section>
             </c:if>

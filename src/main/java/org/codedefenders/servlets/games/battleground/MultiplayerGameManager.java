@@ -68,6 +68,7 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
@@ -80,6 +81,7 @@ import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE_KILLABLE_2;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
@@ -343,7 +345,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Optional<String> testText = ServletUtils.getStringParameter(request, "test");
         if (testText.isEmpty()) {
             previousSubmission.clear();
-            messages.add("Parameter 'test' is missing.");
+            messages.add(I18n.marktr("Parameter 'test' is missing."));
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -353,20 +355,20 @@ public class MultiplayerGameManager extends HttpServlet {
         var selectedLines = ServletUtils.getStringParameter(request, "selected_lines")
                 .map(DefenderIntention::parseIntentionFromCommaSeparatedValueString);
         if (game.isCapturePlayersIntention() && (selectedLines.isEmpty() || selectedLines.get().isEmpty())) {
-            messages.add("You cannot submit a test without specifying a line to cover.");
+            messages.add(I18n.marktr("You cannot submit a test without specifying a line to cover."));
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
         switch (gameManagingUtils.canUserSubmitTest(game, login.getUserId())) {
             case USER_NOT_PART_OF_THE_GAME -> {
-                messages.add("User is not a player in the game.");
+                messages.add(I18n.marktr("User is not a player in the game."));
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
             case USER_NOT_A_DEFENDER -> {
-                messages.add("Can only submit tests if you are an Defender!");
+                messages.add(I18n.marktr("Can only submit tests if you are an Defender!"));
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
                 return;
             }
@@ -448,7 +450,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Optional<String> mutantText = ServletUtils.getStringParameter(request, "mutant");
         if (mutantText.isEmpty()) {
             previousSubmission.clear();
-            messages.add("Parameter 'mutant' is missing.");
+            messages.add(I18n.marktr("Parameter 'mutant' is missing."));
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
@@ -464,13 +466,13 @@ public class MultiplayerGameManager extends HttpServlet {
 
         switch (gameManagingUtils.canUserSubmitMutant(game, login.getUserId(), config.isBlockAttacker())) {
             case USER_NOT_PART_OF_THE_GAME -> {
-                messages.add("User is not a player in the game.");
+                messages.add(I18n.marktr("User is not a player in the game."));
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
             case USER_NOT_AN_ATTACKER -> {
-                messages.add("Can only submit mutants if you are an Attacker.");
+                messages.add(I18n.marktr("Can only submit mutants if you are an Attacker."));
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
                 return;
             }
@@ -502,9 +504,9 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
-                messages.add("Error submitting the mutant: data too long. Maybe you made too many changes?").alert();
+                messages.add(I18n.marktr("Error submitting the mutant: data too long. Maybe you made too many changes?")).alert();
             } else {
-                messages.add("Database error while saving the mutant.");
+                messages.add(I18n.marktr("Database error while saving the mutant."));
                 logger.error("Database error while saving the mutant: {}", e.getMessage());
             }
             response.sendRedirect(
@@ -561,22 +563,22 @@ public class MultiplayerGameManager extends HttpServlet {
 
         switch (gameManagingUtils.canUserResolveEquivalence(game, login.getUserId(), equivMutantId.get())) {
             case USER_NOT_PART_OF_THE_GAME -> {
-                messages.add("User is not a player in the game.");
+                messages.add(I18n.marktr("User is not a player in the game."));
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
             case USER_NOT_AN_ATTACKER -> {
-                messages.add("Can only resolve equivalence duels if you are an Attacker!");
+                messages.add(I18n.marktr("Can only resolve equivalence duels if you are an Attacker!"));
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
             case GAME_NOT_ACTIVE -> {
-                messages.add(String.format("Game %d has finished.", gameId));
+                messages.addFormatted(I18n.marktr("Game {0} has finished."), gameId);
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
             case MUTANT_DOES_NOT_EXIST -> {
-                messages.add("Mutant does not exist.");
+                messages.add(I18n.marktr("Mutant does not exist."));
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
@@ -590,7 +592,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                         login.getUserId(), equivMutantId.get());
                 if (equivMutant.getState() == KILLED) {
-                    messages.add("Too late. The mutant was already killed and therefore proven to be not equivalent.");
+                    messages.add(I18n.marktr("Too late. The mutant was already killed and therefore proven to be not equivalent."));
                     // TODO: Continue with the resolution to give them the option to win other duels? (only if action=="reject")
                 }
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
@@ -604,8 +606,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if ("accept".equals(resolveAction)) {
             var result = gameManagingUtils.acceptBattlegroundEquivalence(game, login.getUserId(), equivMutant);
             if (result.mutantKillable()) {
-                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE + " " +
-                        "However, the mutant was killable! You can view an example for a killing test in the mutant accordion.");
+                messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE_KILLABLE_VIEWABLE);
             } else {
                 messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
             }
@@ -632,18 +633,19 @@ public class MultiplayerGameManager extends HttpServlet {
                 if (result.killedPendingMutant().orElseThrow()) {
                     messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
                 } else {
-                    String message = TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-                    if (result.isMutantKillable().orElseThrow()) {
-                        message = message + " " + "Unfortunately, the mutant was killable!";
-                    }
-                    messages.add(message);
+                    messages.add(result.isMutantKillable().orElseThrow()
+                            ? TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE_KILLABLE_2
+                            : TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
                 }
 
                 int numKilledOthers = result.numOtherPendingMutantsKilled().orElseThrow();
                 if (numKilledOthers == 1) {
-                    messages.add("Additionally, your test did kill another claimed mutant!");
+                    messages.add(I18n.marktr("Additionally, your test did kill another claimed mutant!"));
                 } else if (numKilledOthers > 1) {
-                    messages.add(String.format("Additionally, your test killed other %d claimed mutants!", numKilledOthers));
+                    messages.addFormatted(
+                            I18n.marktr("Additionally, your test killed other {0} claimed mutants!"),
+                            numKilledOthers
+                    );
                 }
                 previousSubmission.clear();
 
@@ -674,20 +676,20 @@ public class MultiplayerGameManager extends HttpServlet {
                                  MultiplayerGame game) throws IOException {
         switch (gameManagingUtils.canUserClaimEquivalence(game, login.getUserId())) {
             case USER_NOT_PART_OF_THE_GAME -> {
-                messages.add("User is not a player in the game.");
+                messages.add(I18n.marktr("User is not a player in the game."));
                 logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), game.getId());
                 response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
                 return;
             }
             case USER_NOT_A_DEFENDER -> {
                 Role role = game.getRole(login.getUserId());
-                messages.add("Can only claim mutant as equivalent if you are a Defender!");
+                messages.add(I18n.marktr("Can only claim mutant as equivalent if you are a Defender!"));
                 logger.info("Non defender (role={}) tried to claim mutant as equivalent.", role);
                 response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
                 return;
             }
             case GAME_NOT_ACTIVE -> {
-                messages.add("You cannot claim mutants as equivalent in this game anymore.");
+                messages.add(I18n.marktr("You cannot claim mutants as equivalent in this game anymore."));
                 logger.info("Mutant claimed for non-active game.");
                 Redirect.redirectBack(request, response);
                 return;

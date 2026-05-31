@@ -18,13 +18,15 @@
  */
 package org.codedefenders.model;
 
+import org.xnap.commons.i18n.I18n;
+
 /**
  * This class represents key maps users can choose from.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public enum KeyMap {
-    DEFAULT("default"),
+    DEFAULT(I18n.marktr("default")),
     SUBLIME("sublime"),
     VIM("vim"),
     EMACS("emacs");

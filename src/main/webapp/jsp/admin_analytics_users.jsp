@@ -21,24 +21,26 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<p:main_page title="User Analytics">
+<p:main_page title="${i18n.tr('User Analytics')}">
     <div class="container">
         <t:admin_navigation activePage="adminAnalytics"/>
 
-        <h3>User Analytics</h3>
+        <h3>${i18n.tr('User Analytics')}</h3>
 
         <table id="tableUsers" class="table table-striped">
             <thead>
                 <tr>
                     <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Games Played</th>
-                    <th>Attacker Score</th>
-                    <th>Defender Score</th>
-                    <th>Total Score</th>
+                    <th>${i18n.tr('ID')}</th>
+                    <th>${i18n.tr('Username')}</th>
+                    <th>${i18n.tr('Games Played')}</th>
+                    <th>${i18n.tr('Attacker Score')}</th>
+                    <th>${i18n.tr('Defender Score')}</th>
+                    <th>${i18n.tr('Total Score')}</th>
                 </tr>
             </thead>
         </table>
@@ -49,15 +51,15 @@
                     <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download">
                         <i class="fa fa-download me-1"></i>
-                        Download table
+                            ${i18n.tr('Download table')}
                     </a>
                     <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                        as CSV
+                            ${i18n.tr('as CSV')}
                     </a>
                     <a download="user-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json"
                        type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
-                        as JSON
+                            ${i18n.tr('as JSON')}
                     </a>
                 </div>
             </div>
@@ -80,60 +82,60 @@
                     <table class="child-row-details">
                         <thead>
                             <tr>
-                                <th>Games Played</td>
+                                <th>${i18n.tr('Games Played')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Games as Attacker:</td>
+                                <td>${i18n.tr('Games as Attacker:')}</td>
                                 <td>\${valPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
-                                <td>Games as Defender:</td>
+                                <td>${i18n.tr('Games as Defender:')}</td>
                                 <td>\${valPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
                             </tr>
                         </tbody>
                         <thead>
                             <tr>
-                                <th>Mutants</td>
+                                <th>${i18n.tr('Mutants')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Mutants Submitted:</td>
+                                <td>${i18n.tr('Mutants Submitted:')}</td>
                                 <td>\${data.mutantsSubmitted}</td>
-                                <td>Per Game (as Attacker):</td>
+                                <td>${i18n.tr('Per Game (as Attacker):')}</td>
                                 <td>\${div(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
                             </tr>
                             <tr>
-                                <td>Alive Mutants:</td>
+                                <td>${i18n.tr('Alive Mutants:')}</td>
                                 <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
-                                <td>Per Game (as Attacker):</td>
+                                <td>${i18n.tr('Per Game (as Attacker):')}</td>
                                 <td>\${div(data.mutantsAlive, data.attackerGamesPlayed)}</td>
                             </tr>
                             <tr>
-                                <td>Equivalent Mutants:</td>
+                                <td>${i18n.tr('Equivalent Mutants:')}</td>
                                 <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
-                                <td>Per Game (as Attacker):</td>
+                                <td>${i18n.tr('Per Game (as Attacker):')}</td>
                                 <td>\${div(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
                             </tr>
                         </tbody>
                         <thead>
                             <tr>
-                                <th>Tests</td>
+                                <th>${i18n.tr('Tests')}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Tests Submitted:</td>
+                                <td>${i18n.tr('Tests Submitted:')}</td>
                                 <td>\${data.testsSubmitted}</td>
-                                <td>Per Game (as Defender):</td>
+                                <td>${i18n.tr('Per Game (as Defender):')}</td>
                                 <td>\${div(data.testsSubmitted, data.defenderGamesPlayed)}</td>
                             </tr>
                             <tr>
-                                <td>Mutants Killed:</td>
+                                <td>${i18n.tr('Mutants Killed:')}</td>
                                 <td>\${data.mutantsKilled}</td>
-                                <td>Per Game (as Defender):</td>
+                                <td>${i18n.tr('Per Game (as Defender):')}</td>
                                 <td>\${div(data.mutantsKilled, data.defenderGamesPlayed)}</td>
-                                <td>Per Test:</td>
+                                <td>${i18n.tr('Per Test:')}</td>
                                 <td>\${div(data.mutantsKilled, data.testsSubmitted)}</td>
                             </tr>
                         </tbody>
@@ -170,7 +172,7 @@
                 "scrollY": '600px',
                 "scrollCollapse": true,
                 "paging": false,
-                "language": {"info": "Showing _TOTAL_ entries"}
+                "language": DataTablesUtils.language({"info": "${i18n.tr('Showing _TOTAL_ entries')}"})
             });
 
             DataTablesUtils.setupChildRows(table, format);

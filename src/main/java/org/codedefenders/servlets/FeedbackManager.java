@@ -41,6 +41,7 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 @WebServlet(Paths.API_FEEDBACK)
 public class FeedbackManager extends HttpServlet {
@@ -70,7 +71,7 @@ public class FeedbackManager extends HttpServlet {
         switch (request.getParameter("formType")) {
             case "sendFeedback":
                 if (!saveFeedback(request, login.getUserId(), gameId)) {
-                    messages.add("Could not save your feedback. Please try again later!");
+                    messages.add(I18n.marktr("Could not save your feedback. Please try again later!"));
                 }
                 break;
             default:

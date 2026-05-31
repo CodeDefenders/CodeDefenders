@@ -39,6 +39,7 @@ import org.codedefenders.servlets.api.llm.MutantAPI.SubmitMutantResponseDTO.Muta
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.PreparedMessage;
 
 import com.github.javaparser.quality.Nullable;
 
@@ -130,7 +131,7 @@ public class MutantAPI extends APIServlet {
             Mutant mutant = result.mutant().orElseThrow();
 
             messages.add(MUTANT_COMPILED_MESSAGE);
-            result.mutationTesterMessage().ifPresent(messages::add);
+            result.mutationTesterMessage().map(PreparedMessage::resolve).ifPresent(messages::add);
 
             writeResponse(response, HttpServletResponse.SC_OK,
                     new SubmitMutantResponseDTO(

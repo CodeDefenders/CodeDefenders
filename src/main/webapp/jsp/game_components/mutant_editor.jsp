@@ -21,6 +21,7 @@
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="mutantEditor" type="org.codedefenders.beans.game.MutantEditorBean"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
@@ -33,7 +34,8 @@
         <c:when test="${!mutantEditor.hasDependencies()}">
             <%-- no dependencies -> no tabs --%>
             <div class="card-body p-0 codemirror-fill loading">
-                <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
+                <pre class="m-0"><textarea id="mutant-code" name="mutant"
+                                           title="${i18n.tr('mutant')}">${mutantEditor.mutantCode}</textarea></pre>
             </div>
         </c:when>
         <c:otherwise>
@@ -70,7 +72,8 @@
                          id="mutant-editor-pane-0"
                          aria-labelledby="mutant-editor-tab-0"
                          role="tabpanel">
-                        <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
+                        <pre class="m-0"><textarea id="mutant-code" name="mutant"
+                                                   title="${i18n.tr('mutant')}">${mutantEditor.mutantCode}</textarea></pre>
                     </div>
                     <c:forEach var="depCode" items="${mutantEditor.dependencies.values()}" varStatus="s">
                         <c:set var="id" value="${s.index + 1}"/>

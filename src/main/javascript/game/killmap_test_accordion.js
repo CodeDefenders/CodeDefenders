@@ -18,6 +18,7 @@
  */
 import {Collapse} from '../thirdparty/bootstrap';
 import DataTable from '../thirdparty/datatables';
+import {DataTablesUtils} from '../main';
 import {LoadingAnimation} from '../main';
 import KillMapAccordion from "./killmap_accordion";
 
@@ -86,12 +87,12 @@ class KillMapTestAccordion extends KillMapAccordion {
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
+                    language: DataTablesUtils.language({
                         emptyTable: category.id === 'all'
-                            ? 'No mutants.'
-                            : "This test doesn't cover any mutants.",
-                        zeroRecords: 'No mutants match the selected category and filter.'
-                    },
+                            ? i18n.tr('No mutants.')
+                            : i18n.tr("This test doesn't cover any mutants."),
+                        zeroRecords: i18n.tr('No mutants match the selected category and filter.')
+                    }),
                     createdRow: function (row, data, index) {
                         self._setupPopover(
                             row.querySelector('.killMapImage'),
@@ -163,10 +164,10 @@ class KillMapTestAccordion extends KillMapAccordion {
     /** @private */
     _renderId(data) {
         const killedByText = data.killedBy
-            ? `<span class="kta-column-name mx-2">killed by</span>${data.killedBy.name}`
+            ? `<span class="kta-column-name mx-2">${i18n.tr("killed by")}</span>${data.killedBy.name}`
             : '';
-        return `<span class="ma-mutant-link">Mutant ${data.id}</span>
-            <span class="kta-column-name mx-2">by</span>${data.creator.name}
+        return `<span class="ma-mutant-link">${i18n.tr("Mutant")} ${data.id}</span>
+            <span class="kta-column-name mx-2">${i18n.tr("by")}</span>${data.creator.name}
             ${killedByText}`;
     }
 
@@ -192,14 +193,16 @@ class KillMapTestAccordion extends KillMapAccordion {
     /** @private */
     _renderViewButton(data) {
         return data.canView
-            ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>'
+            ? `<button class="ma-view-button btn btn-primary btn-xs pull-right">${i18n.tr("View")}</button>`
             : '';
     }
 
     /** @private */
     _renderAdditionalButton(data) {
         if (data.state === "KILLED") {
-            return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
+            return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">
+                        ${i18n.tr("View Killing Test")}
+                    </button>`;
         } else {
             return '';
         }

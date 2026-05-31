@@ -22,6 +22,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ attribute name="gameId" required="true" type="java.lang.Integer" %>
@@ -38,7 +39,7 @@
 
     <%-- Button with remaining duration. --%>
 
-    <div data-bs-toggle="tooltip" title="${canSetDuration ? 'Change' : 'View'} the game duration.">
+    <div data-bs-toggle="tooltip" title="${canSetDuration ? i18n.tr('Change') : i18n.tr('View')} ${i18n.tr('the game duration.')}">
         <button type="button"
                 class="btn btn-sm btn-outline-${canSetDuration ? 'danger' : 'secondary'}"
                 form="durationModalForm"
@@ -49,13 +50,13 @@
                   data-type="remaining"
                   data-duration="${duration}"
                   data-start="${startTime}">
-            Game Duration
+            ${i18n.tr('Game Duration')}
         </span>
         </button>
     </div>
 
-    <t:modal title="Game Duration" id="duration-change-modal"
-             closeButtonText="${canSetDuration ? 'Cancel' : 'Close'}">
+    <t:modal title="${i18n.tr('Game Duration')}" id="duration-change-modal"
+             closeButtonText="${i18n.tr(canSetDuration ? 'Cancel' : 'Close')}">
         <jsp:attribute name="content">
 
             <%-- Progress Bar --%>
@@ -72,7 +73,7 @@
             <%-- Duration Info --%>
             <div class="row text-center">
                 <div class="col-4 d-flex flex-column align-items-center">
-                    <small>Total Duration</small>
+                    <small>${i18n.tr('Total Duration')}</small>
                     <span class="time-left"
                           data-type="total"
                           data-duration="${duration}">
@@ -80,7 +81,7 @@
                     </span>
                 </div>
                 <div class="col-4 d-flex flex-column align-items-center">
-                    <small>Remaining Duration</small>
+                    <small>${i18n.tr('Remaining Duration')}</small>
                     <span class="time-left"
                           data-type="remaining"
                           data-duration="${duration}"
@@ -89,7 +90,7 @@
                     </span>
                 </div>
                 <div class="col-4 d-flex flex-column align-items-center">
-                    <small>This game ${startTime == -1 ? 'would' : 'will'} end at</small>
+                    <small>${startTime == -1 ? i18n.tr('This game would end at') : i18n.tr('This game will end at')}</small>
                     <span class="time-left"
                           data-type="end"
                           data-duration="${duration}"
@@ -102,17 +103,17 @@
             <%-- Duration Controls --%>
             <c:if test="${canSetDuration}">
                 <div class="mt-3">
-                    <label class="form-label">Set the game's new remaining duration:</label>
+                    <label class="form-label">${i18n.tr('Set the game\'s new remaining duration:')}</label>
                     <div class="input-group input-group-sm has-validation">
                         <input type="number" name="days" class="form-control" id="days-input" min="0">
-                        <label for="days-input" class="input-group-text">days</label>
+                        <label for="days-input" class="input-group-text">${i18n.tr('days')}</label>
                         <input type="number" name="hours" class="form-control" id="hours-input" min="0">
-                        <label for="hours-input" class="input-group-text">hours</label>
+                        <label for="hours-input" class="input-group-text">${i18n.tr('hours')}</label>
                         <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
-                        <label for="minutes-input" class="input-group-text">minutes</label>
+                        <label for="minutes-input" class="input-group-text">${i18n.tr('minutes')}</label>
                         <div class="invalid-feedback">
-                            Please input a valid duration.
-                            Maximum duration:
+                            ${i18n.tr('Please input a valid duration.')}
+                            ${i18n.tr('Maximum duration:')}
                             <span class="time-left"
                                   data-type="total"
                                   data-duration="${maxDuration}">
@@ -127,7 +128,7 @@
         <jsp:attribute name="footer">
             <c:if test="${canSetDuration}">
                 <button type="submit" form="durationModalForm" class="btn btn-primary" id="durationChange">
-                    Change Game Duration
+                    ${i18n.tr('Change Game Duration')}
                 </button>
             </c:if>
         </jsp:attribute>

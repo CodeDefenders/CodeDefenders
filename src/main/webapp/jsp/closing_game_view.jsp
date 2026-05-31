@@ -24,6 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MultiplayerGame"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <c:set var="title" value="${'Game ' += game.id += ' is closing.'}"/>
 
@@ -36,13 +37,12 @@
         <div class="content">
             <div class="branding">
                 <img src="${url.forPath("/images/logo.png")}"
-                     alt="Code Defenders Logo"
+                     alt="${i18n.tr("Code Defenders Logo")}"
                      width="58">
                 <h1>${title}</h1>
             </div>
             <p>
-                The game is currently closing&hellip;<br>
-                User interactions are no longer possible while open equivalence duels are automatically resolved.
+                    ${i18n.tr("The game is currently closing&hellip;<br>User interactions are no longer possible while open equivalence duels are automatically resolved.")}
             </p>
         </div>
         <t:game_js_init/>

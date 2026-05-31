@@ -38,6 +38,7 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.
@@ -74,41 +75,45 @@ public class AdminClassesManagement extends HttpServlet {
                 String newState = active ? "active" : "inactive";
 
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
-                if (classId.isEmpty()) {
+                if (classId.isPresent()) {
+                    logger.info("Setting class as " + newState + "...");
+                    if (setClassActive(classId.get(), active)) {
+                        logger.info("Successfully set class as " + newState + "!");
+                        messages.add(active
+                                ? I18n.marktr("Successfully set class as active!")
+                                : I18n.marktr("Successfully set class as inactive!"));
+                        break;
+                    } else {
+                        logger.info("Failed to set class as " + newState + "!");
+                    }
+                } else {
                     logger.warn("Setting class as " + newState + " failed. Missing request parameter 'classId'.");
-                    messages.add("Failed to set class as " + newState + ".");
-                    break;
                 }
 
-                logger.info("Setting class as " + newState + "...");
-                if (setClassActive(classId.get(), active)) {
-                    logger.info("Successfully set class as " + newState + "!");
-                    messages.add("Successfully set class as " + newState + "!");
-                } else {
-                    logger.info("Failed to set class as " + newState + "!");
-                    messages.add("Failed to set class as " + newState + "!");
-                }
+                messages.add(active
+                        ? I18n.marktr("Failed to set class as active.")
+                        : I18n.marktr("Failed to set class as inactive."));
                 break;
             }
             case "classRemoval": {
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
                 if (classId.isEmpty()) {
                     logger.warn("Removing class failed. Missing request parameter 'classId'.");
-                    messages.add("Failed to remove class.");
+                    messages.add(I18n.marktr("Failed to remove class."));
                     break;
                 }
                 logger.info("Removing class...");
                 if (gameClassRepo.gamesExistsForClass(classId.get())) {
                     logger.info("Failed to remove class {}! At least one game already exists.", classId.get());
-                    messages.add("Failed to remove class! There are existing games with this class.");
+                    messages.add(I18n.marktr("Failed to remove class! There are existing games with this class."));
                     break;
                 }
                 if (forceRemoveClass(classId.get())) {
                     logger.info("Successfully removed class {}", classId.get());
-                    messages.add("Successfully removed class!");
+                    messages.add(I18n.marktr("Successfully removed class!"));
                 } else {
                     logger.warn("Failed to remove class {}!", classId.get());
-                    messages.add("Failed to remove class!");
+                    messages.add(I18n.marktr("Failed to remove class!"));
                 }
                 break;
             }

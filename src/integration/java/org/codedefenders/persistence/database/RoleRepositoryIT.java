@@ -18,6 +18,8 @@
  */
 package org.codedefenders.persistence.database;
 
+import java.util.Locale;
+
 import org.codedefenders.auth.roles.AdminRole;
 import org.codedefenders.auth.roles.TeacherRole;
 import org.codedefenders.database.UncheckedSQLException;
@@ -53,7 +55,7 @@ public class RoleRepositoryIT {
 
     @Test
     public void testAddRoleName() {
-        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org"))
+        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org", Locale.ENGLISH))
                 .orElseThrow();
 
         assume().that(roleRepo.getRoleNamesForUser(userId))
@@ -72,7 +74,7 @@ public class RoleRepositoryIT {
 
     @Test
     public void testAddInvalidRoleName() {
-        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org"))
+        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org", Locale.ENGLISH))
                 .orElseThrow();
 
         assertThrows(UncheckedSQLException.class,
@@ -81,7 +83,7 @@ public class RoleRepositoryIT {
 
     @Test
     public void testRemoveRoleName() {
-        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org"))
+        int userId = userRepo.insert(new UserEntity("userA", "", "userA@example.org", Locale.ENGLISH))
                 .orElseThrow();
 
         roleRepo.addRoleNameForUser(userId, AdminRole.name);
@@ -103,16 +105,16 @@ public class RoleRepositoryIT {
 
     @Test
     public void getAllUserRoleNames() {
-        int idA = userRepo.insert(new UserEntity("userA", "", "userA@example.org"))
+        int idA = userRepo.insert(new UserEntity("userA", "", "userA@example.org", Locale.ENGLISH))
                 .orElseThrow();
         roleRepo.addRoleNameForUser(idA, AdminRole.name);
         roleRepo.addRoleNameForUser(idA, TeacherRole.name);
 
-        int idB = userRepo.insert(new UserEntity("userB", "", "userB@example.org"))
+        int idB = userRepo.insert(new UserEntity("userB", "", "userB@example.org", Locale.ENGLISH))
                 .orElseThrow();
         roleRepo.addRoleNameForUser(idB, AdminRole.name);
 
-        int idC = userRepo.insert(new UserEntity("userC", "", "userC@example.org"))
+        int idC = userRepo.insert(new UserEntity("userC", "", "userC@example.org", Locale.ENGLISH))
                 .orElseThrow();
 
         var roleNames = roleRepo.getAllUserRoleNames();

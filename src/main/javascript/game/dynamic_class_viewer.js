@@ -99,7 +99,7 @@ class DynamicClassViewer {
                 cutHeader.textContent = classInfo.name;
             }
         } catch (e) {
-            cutEditor.setValue("Could not fetch class.\nPlease try again later.");
+            cutEditor.setValue(i18n.tr("Could not fetch class.\nPlease try again later."));
             if (hasDependencies) {
                 cutHeader.textContent = "Error";
             }

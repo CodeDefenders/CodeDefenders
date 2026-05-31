@@ -21,14 +21,16 @@ package org.codedefenders.game;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xnap.commons.i18n.I18n;
+
 /**
  * This enumeration represents roles players can have in a game.
  */
 public enum Role {
-    ATTACKER("Attacker"),
-    DEFENDER("Defender"),
-    OBSERVER("Observer"),
-    PLAYER("Player"),
+    ATTACKER(I18n.marktr("Attacker")),
+    DEFENDER(I18n.marktr("Defender")),
+    OBSERVER(I18n.marktr("Observer")),
+    PLAYER(I18n.marktr("Player")),
     NONE;
 
     private final String displayName;

@@ -41,12 +41,12 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.importer.PuzzleImporter;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.SimpleFile;
 import org.codedefenders.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
@@ -72,7 +72,7 @@ public class AdminPuzzleUpload extends HttpServlet {
             parameters = fileUpload.parseRequest(request);
         } catch (FileUploadException e) {
             logger.error("Failed to get file upload parameters.", e);
-            messages.add("Failed to get file upload parameters.");
+            messages.add(I18n.marktr("Failed to get file upload parameters."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -85,7 +85,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                 .findAny();
         if (formType.isEmpty()) {
             logger.warn("No formType provided. Aborting request.");
-            messages.add("No formType provided.");
+            messages.add(I18n.marktr("No formType provided."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -101,7 +101,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                     .findAny();
         } catch (NumberFormatException e) {
             logger.warn("Invalid chapterId. Aborting request.", e);
-            messages.add("Invalid chapterId.");
+            messages.add(I18n.marktr("Invalid chapterId."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -121,7 +121,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                 .toList();
 
         if (fileParametersContents.isEmpty()) {
-            messages.add("No file parameters found.");
+            messages.add(I18n.marktr("No file parameters found."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -149,19 +149,19 @@ public class AdminPuzzleUpload extends HttpServlet {
                 puzzleImporter.importPuzzle(puzzleFiles, chapterId);
                 logger.info("Successfully uploaded puzzle.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
-                messages.add("Error while computing coverage.");
+                messages.add(I18n.marktr("Error while computing coverage."));
                 logger.info("Error while computing coverage", e);
             } catch (CompileException e) {
-                messages.add("Error while compiling.");
+                messages.add(I18n.marktr("Error while compiling."));
                 logger.info("Error while compiling", e);
             } catch (IOException e) {
-                messages.add("IO Error.");
+                messages.add(I18n.marktr("IO Error."));
                 logger.info("IO Error", e);
             } catch (BackendExecutorService.ExecutionException e) {
-                messages.add("Execution Error");
+                messages.add(I18n.marktr("Execution Error"));
                 logger.info("Execution Error", e);
             }
-            messages.add("Successfully uploaded puzzle(s). As of now, please check the logs for errors.");
+            messages.add(I18n.marktr("Successfully uploaded puzzle(s). As of now, please check the logs for errors."));
         }
     }
 
@@ -172,19 +172,19 @@ public class AdminPuzzleUpload extends HttpServlet {
                 puzzleImporter.importPuzzleChapter(chapterFiles);
                 logger.info("Successfully uploaded chapter.");
             } catch (CoverageGenerator.CoverageGeneratorException e) {
-                messages.add("Error while computing coverage.");
+                messages.add(I18n.marktr("Error while computing coverage."));
                 logger.info("Error while computing coverage", e);
             } catch (CompileException e) {
-                messages.add("Error while compiling.");
+                messages.add(I18n.marktr("Error while compiling."));
                 logger.info("Error while compiling", e);
             } catch (IOException e) {
-                messages.add("IO Error.");
+                messages.add(I18n.marktr("IO Error."));
                 logger.info("IO Error", e);
             } catch (BackendExecutorService.ExecutionException e) {
-                messages.add("Execution Error:" + e.getMessage());
+                messages.addFormatted(I18n.marktr("Execution Error: {0}"), e.getMessage());
                 logger.info("Execution Error", e);
             }
         }
-        messages.add("Successfully uploaded chapter(s). As of now, please check the logs for errors.");
+        messages.add(I18n.marktr("Successfully uploaded chapter(s). As of now, please check the logs for errors."));
     }
 }

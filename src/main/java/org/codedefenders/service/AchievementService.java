@@ -46,6 +46,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Achievement;
+import org.codedefenders.model.AchievementType;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
@@ -67,10 +68,12 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.eventbus.Subscribe;
 
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.Locale.ENGLISH;
 import static org.codedefenders.model.EventType.ATTACKER_MUTANT_CREATED;
 import static org.codedefenders.model.EventType.DEFENDER_TEST_CREATED;
 import static org.codedefenders.model.EventType.PLAYER_MUTANT_CREATED;
@@ -93,6 +96,7 @@ public class AchievementService {
     private final TestRepository testRepo;
     private final PlayerRepository playerRepo;
     private final AchievementEventHandler handler;
+    private final I18nService i18nService;
     private boolean isEventHandlerRegistered = false;
     private final Map<Integer, List<Achievement>> notificationQueue;
 
@@ -107,9 +111,9 @@ public class AchievementService {
      */
     @Inject
     public AchievementService(AchievementRepository achievementRepository, INotificationService notificationService,
-                              TestSmellRepository testSmellRepo, EventDAO eventDAO,
-                              GameRepository gameRepo, PuzzleRepository puzzleRepo,
-                              TestRepository testRepo, PlayerRepository playerRepo) {
+                              TestSmellRepository testSmellRepo, EventDAO eventDAO, GameRepository gameRepo,
+                              PuzzleRepository puzzleRepo, TestRepository testRepo, PlayerRepository playerRepo,
+                              I18nService i18nService) {
         repo = achievementRepository;
         this.testSmellRepo = testSmellRepo;
         this.eventDAO = eventDAO;
@@ -118,6 +122,7 @@ public class AchievementService {
         this.puzzleRepo = puzzleRepo;
         this.testRepo = testRepo;
         this.playerRepo = playerRepo;
+        this.i18nService = i18nService;
         handler = new AchievementEventHandler();
         notificationQueue = new HashMap<>();
     }
@@ -133,16 +138,18 @@ public class AchievementService {
     }
 
     /**
-     * Sends all queued achievement notifications as events via the notification service.
+     * Translates and sends all queued achievement notifications as events via the notification service.
      */
     public void sendAchievementNotifications() {
         synchronized (notificationQueue) {
             notificationQueue.forEach((userId, achievements) -> {
+                I18n i18n = i18nService.getI18n(userId);
                 achievements.forEach(achievement -> {
                     logger.debug("Sending achievement notification for user with id {} and achievement {}",
-                            userId, achievement.getId());
+                            userId, achievement.getType());
+
                     AchievementUnlockedEvent newEvent = new AchievementUnlockedEvent();
-                    newEvent.setAchievement(achievement);
+                    newEvent.setAchievement(achievement.translate(i18n));
                     newEvent.setUserId(userId);
                     notificationService.post(newEvent);
                 });
@@ -150,58 +157,58 @@ public class AchievementService {
         }
     }
 
-    private Achievement.Id getGamePlayedAchievementIdForRole(Role role) {
+    private AchievementType getGamePlayedAchievementTypeForRole(Role role) {
         return switch (role) {
-            case DEFENDER -> Achievement.Id.PLAY_AS_DEFENDER;
-            case ATTACKER -> Achievement.Id.PLAY_AS_ATTACKER;
-            case PLAYER -> Achievement.Id.PLAY_MELEE_GAMES;
+            case DEFENDER -> AchievementType.PLAY_AS_DEFENDER;
+            case ATTACKER -> AchievementType.PLAY_AS_ATTACKER;
+            case PLAYER -> AchievementType.PLAY_MELEE_GAMES;
             default -> throw new IllegalArgumentException();
         };
     }
 
     private void addGamePlayed(List<Player> players, Role role) {
-        Achievement.Id achievementId = getGamePlayedAchievementIdForRole(role);
+        AchievementType achievementType = getGamePlayedAchievementTypeForRole(role);
         players.stream()
                 .map(Player::getUser)
                 .mapToInt(UserEntity::getId)
                 .forEach(userId -> {
-                    updateAchievement(userId, Achievement.Id.PLAY_GAMES, 1);
-                    updateAchievement(userId, achievementId, 1);
+                    updateAchievement(userId, AchievementType.PLAY_GAMES, 1);
+                    updateAchievement(userId, achievementType, 1);
                 });
     }
 
-    private List<Achievement.Id> getMultiplayerGameResultAchievementIdForStatus(ScoreboardBean.PlayerStatus status) {
-        List<Achievement.Id> ids = new ArrayList<>();
+    private List<AchievementType> getMultiplayerGameResultAchievementTypesForStatus(ScoreboardBean.PlayerStatus status) {
+        List<AchievementType> types = new ArrayList<>();
         switch (status) {
             case WINNING_ATTACKER -> {
-                ids.add(Achievement.Id.WIN_GAMES_AS_ATTACKER);
-                ids.add(Achievement.Id.WIN_GAMES);
+                types.add(AchievementType.WIN_GAMES_AS_ATTACKER);
+                types.add(AchievementType.WIN_GAMES);
             }
             case WINNING_DEFENDER -> {
-                ids.add(Achievement.Id.WIN_GAMES_AS_DEFENDER);
-                ids.add(Achievement.Id.WIN_GAMES);
+                types.add(AchievementType.WIN_GAMES_AS_DEFENDER);
+                types.add(AchievementType.WIN_GAMES);
             }
         }
-        return ids;
+        return types;
     }
 
     private void addMultiplayerGameResult(int userId, ScoreboardBean.PlayerStatus status) {
-        getMultiplayerGameResultAchievementIdForStatus(status)
+        getMultiplayerGameResultAchievementTypesForStatus(status)
                 .forEach(achievementId -> updateAchievement(userId, achievementId, 1));
     }
 
     private void addPuzzleSolved(int userId) {
-        updateAchievement(userId, Achievement.Id.SOLVE_PUZZLES, 1);
+        updateAchievement(userId, AchievementType.SOLVE_PUZZLES, 1);
     }
 
     private void addPuzzleSolvedInFewTries(int userId, int currentRound) {
         if (currentRound == 1) {
-            updateAchievement(userId, Achievement.Id.PUZZLES_SOLVED_ON_FIRST_TRY, 1);
+            updateAchievement(userId, AchievementType.PUZZLES_SOLVED_ON_FIRST_TRY, 1);
         }
     }
 
     private void addTestWritten(int userId) {
-        updateAchievement(userId, Achievement.Id.WRITE_TESTS, 1);
+        updateAchievement(userId, AchievementType.WRITE_TESTS, 1);
     }
 
     private int getAmountOfRecentEvents(int userId, int gameId, List<EventType> events) {
@@ -215,23 +222,23 @@ public class AchievementService {
     private void checkAmountOfRecentTests(int userId, int gameId) {
         final int testCount =
                 getAmountOfRecentEvents(userId, gameId, List.of(DEFENDER_TEST_CREATED, PLAYER_TEST_CREATED));
-        setAchievementMax(userId, Achievement.Id.MAX_TESTS_IN_SHORT_TIME, testCount);
+        setAchievementMax(userId, AchievementType.MAX_TESTS_IN_SHORT_TIME, testCount);
     }
 
     private void checkAmountOfRecentMutants(int userId, int gameId) {
         final int mutantCount =
                 getAmountOfRecentEvents(userId, gameId, List.of(ATTACKER_MUTANT_CREATED, PLAYER_MUTANT_CREATED));
-        setAchievementMax(userId, Achievement.Id.MAX_MUTANTS_IN_SHORT_TIME, mutantCount);
+        setAchievementMax(userId, AchievementType.MAX_MUTANTS_IN_SHORT_TIME, mutantCount);
     }
 
     private void addMutantCreated(int userId) {
-        updateAchievement(userId, Achievement.Id.CREATE_MUTANTS, 1);
+        updateAchievement(userId, AchievementType.CREATE_MUTANTS, 1);
     }
 
     private void checkTestSmells(int userId, int testId) {
         List<String> smells = testSmellRepo.getDetectedTestSmellsForTest(testId);
         if (smells.isEmpty()) {
-            updateAchievement(userId, Achievement.Id.WRITE_CLEAN_TESTS, 1);
+            updateAchievement(userId, AchievementType.WRITE_CLEAN_TESTS, 1);
         }
     }
 
@@ -239,7 +246,7 @@ public class AchievementService {
         Set<Mutant> killedMutants = testRepo.getKilledMutantsForTestId(testId);
         int killCount = killedMutants.size();
         if (killCount > 0) {
-            updateAchievement(userId, Achievement.Id.KILL_MUTANTS, killCount);
+            updateAchievement(userId, AchievementType.KILL_MUTANTS, killCount);
         }
     }
 
@@ -250,7 +257,7 @@ public class AchievementService {
             Player player = playerRepo.getPlayer(playerId);
             if (player != null) { // Player can be null if a system player killed the mutant.
                 int userId = player.getUser().getId();
-                updateAchievement(userId, Achievement.Id.KILL_MUTANTS, 1);
+                updateAchievement(userId, AchievementType.KILL_MUTANTS, 1);
             }
         }
     }
@@ -272,46 +279,46 @@ public class AchievementService {
                     .filter(line -> !prevCoveredLines.contains(line))
                     .mapToInt(l -> 1).sum();
 
-            updateAchievement(userId, Achievement.Id.TOTAL_COVERAGE, newLinesCovered);
-            setAchievementMax(userId, Achievement.Id.MAX_COVERAGE, totalLinesCovered);
+            updateAchievement(userId, AchievementType.TOTAL_COVERAGE, newLinesCovered);
+            setAchievementMax(userId, AchievementType.MAX_COVERAGE, totalLinesCovered);
         }
     }
 
     private void equivalenceDuelWon(int userId) {
-        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS, 1);
+        updateAchievement(userId, AchievementType.WIN_EQUIVALENCE_DUELS, 1);
     }
 
     private void equivalenceDuelAttackerWon(int userId) {
-        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS_AS_ATTACKER, 1);
+        updateAchievement(userId, AchievementType.WIN_EQUIVALENCE_DUELS_AS_ATTACKER, 1);
     }
 
     private void equivalenceDuelDefenderWon(int userId) {
-        updateAchievement(userId, Achievement.Id.WIN_EQUIVALENCE_DUELS_AS_DEFENDER, 1);
+        updateAchievement(userId, AchievementType.WIN_EQUIVALENCE_DUELS_AS_DEFENDER, 1);
     }
 
-    private void updateAchievement(int userId, Achievement.Id achievementId, int metricChange) {
-        int affected = repo.updateAchievementForUser(userId, achievementId, metricChange);
+    private void updateAchievement(int userId, AchievementType achievementType, int metricChange) {
+        int affected = repo.updateAchievementForUser(userId, achievementType, metricChange);
         if (affected > 0) {
-            logger.info("Updated achievement {} for user with id {}", achievementId.name(), userId);
-            enqueueAchievementNotification(userId, achievementId);
+            logger.info("Updated achievement {} for user with id {}", achievementType.name(), userId);
+            enqueueAchievementNotification(userId, achievementType);
         }
     }
 
-    private void setAchievementMax(int userId, Achievement.Id achievementId, int newMetricAbsolute) {
-        int affected = repo.setAchievementForUser(userId, achievementId, newMetricAbsolute);
+    private void setAchievementMax(int userId, AchievementType achievementType, int newMetricAbsolute) {
+        int affected = repo.setAchievementForUser(userId, achievementType, newMetricAbsolute);
         if (affected > 0) {
-            logger.info("Updated achievement {} for user with id {}", achievementId.name(), userId);
-            enqueueAchievementNotification(userId, achievementId);
+            logger.info("Updated achievement {} for user with id {}", achievementType.name(), userId);
+            enqueueAchievementNotification(userId, achievementType);
         }
     }
 
-    private void enqueueAchievementNotification(int userId, Achievement.Id achievementId) {
-        Achievement achievement = repo.getAchievementForUser(userId, achievementId).orElseThrow();
+    private void enqueueAchievementNotification(int userId, AchievementType achievementType) {
+        Achievement achievement = repo.getAchievementForUser(userId, achievementType).orElseThrow();
         synchronized (notificationQueue) {
             notificationQueue.computeIfAbsent(userId, k -> new LinkedList<>()).add(achievement);
         }
-        logger.debug("Achievement unlocked & added to queue: {} (Level {})", achievement.getName(),
-                achievement.getLevel());
+        logger.debug("Achievement unlocked & added to queue: {} (Level {})",
+                achievement.getName(I18nService.getI18n(ENGLISH)), achievement.getLevel());
     }
 
     private void achievementNotificationSent(int userId, int achievementId) {
@@ -321,7 +328,7 @@ public class AchievementService {
                 return;
             }
 
-            achievements.removeIf(achievement -> achievement.getId().getAsInt() == achievementId);
+            achievements.removeIf(achievement -> achievement.getType().getId() == achievementId);
             if (achievements.isEmpty()) {
                 notificationQueue.remove(userId);
             }

@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
@@ -36,9 +37,7 @@
     pageContext.setAttribute("STRING_VALUE", SETTING_TYPE.STRING_VALUE);
 
     pageContext.setAttribute("AUTOMATIC_KILLMAP_COMPUTATION", SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
-    pageContext.setAttribute("SITE_NOTICE", SETTING_NAME.SITE_NOTICE);
-    pageContext.setAttribute("PRIVACY_NOTICE", SETTING_NAME.PRIVACY_NOTICE);
-    pageContext.setAttribute("CONTACT_NOTICE", SETTING_NAME.CONTACT_NOTICE);
+    pageContext.setAttribute("SUPPORTED_LANGUAGES", SETTING_NAME.SUPPORTED_LANGUAGES);
     pageContext.setAttribute("EMAILS_ENABLED", SETTING_NAME.EMAILS_ENABLED);
     pageContext.setAttribute("EMAIL_ADDRESS", SETTING_NAME.EMAIL_ADDRESS);
     pageContext.setAttribute("EMAIL_PASSWORD", SETTING_NAME.EMAIL_PASSWORD);
@@ -48,7 +47,8 @@
     pageContext.setAttribute("TEACHER_APPLICATIONS_EMAIL", SETTING_NAME.TEACHER_APPLICATIONS_EMAIL);
 %>
 
-<p:main_page title="System Settings">
+<p:main_page title="${i18n.tr('System Settings')}">
+
     <div class="container">
         <t:admin_navigation activePage="adminSystemSettings"/>
 
@@ -58,46 +58,35 @@
               autocomplete="off">
             <input type="hidden" name="formType" value="saveSettings">
 
-            <c:forEach var="setting" items="${AdminDAO.getSystemSettings()}">
+            <c:forEach var="setting" items="${AdminDAO.getSystemSettings()}"><%-- AdminDAO.systemSettings does not work! --%>
                 <%--@elvariable id="setting" type="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"--%>
-                <c:set var="readableName" value="${setting.name.readableName}"/>
-                <c:set var="explanation" value="${setting.name.toString()}"/>
+                <c:set var="readableName" value="${i18n.tr(setting.name.readableName)}"/>
+                <c:set var="explanation" value="${i18n.tr(setting.name.description)}"/>
                 <c:set var="settingId" value="${setting.name.name()}"/>
 
                 <%-- Do not show Killmap Setting here. --%>
                 <c:if test="${setting.name != AUTOMATIC_KILLMAP_COMPUTATION}">
-                    <div class="row mb-3">
-                        <label class="col-4 col-form-label" id="class-label"
-                               for="${settingId}"
-                               title="${explanation}">
-                            ${readableName}
+                    <div class="row mb-4 align-items-center">
+                        <label class="col-4 col-form-label" id="class-label" for="${settingId}">
+                            <strong>${readableName}</strong>
+                            <br>
+                            <small>${explanation}</small>
                         </label>
                         <c:choose>
                             <c:when test="${setting.type == STRING_VALUE}">
-                                <c:choose>
-                                    <c:when test="${setting.name == SITE_NOTICE || setting.name == PRIVACY_NOTICE || setting.name == CONTACT_NOTICE}">
-                                        <div class="col-8">
-                                            <textarea class="form-control" rows="3"
-                                                      name="${settingId}"
-                                                      id="${settingId}">${setting.stringValue}</textarea>
+                                <div class="col-8">
+                                    <input type="${settingId.contains('PASSWORD') ? 'password' : 'text'}"
+                                           class="form-control"
+                                           name="${settingId}"
+                                           id="${settingId}"
+                                           value="${setting.stringValue}">
+                                    <c:if test="${settingId.startsWith('EMAIL')}">
+                                        <div class="invalid-feedback">
+                                                ${i18n.tr('This setting is required for sending emails.')}
+                                                ${i18n.tr('Please provide a valid value, or disable emails.')}
                                         </div>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <div class="col-8">
-                                            <input type="${settingId.contains("PASSWORD") ? 'password' : 'text'}"
-                                                   class="form-control"
-                                                   name="${settingId}"
-                                                   id="${settingId}"
-                                                   value="${setting.stringValue}">
-                                            <c:if test="${settingId.startsWith('EMAIL')}">
-                                                <div class="invalid-feedback">
-                                                    This setting is required for sending emails.
-                                                    Please provide a valid value, or disable emails.
-                                                </div>
-                                            </c:if>
-                                        </div>
-                                    </c:otherwise>
-                                </c:choose>
+                                    </c:if>
+                                </div>
                             </c:when>
                             <c:when test="${setting.type == BOOL_VALUE}">
                                 <div class="col-8 d-flex align-items-center">
@@ -122,8 +111,8 @@
                                            value="${setting.intValue}">
                                     <c:if test="${settingId.startsWith('EMAIL')}">
                                         <div class="invalid-feedback">
-                                            This setting is required for sending emails.
-                                            Please provide a valid value, or disable emails.
+                                                ${i18n.tr('This setting is required for sending emails.')}
+                                                ${i18n.tr('Please provide a valid value, or disable emails.')}
                                         </div>
                                     </c:if>
                                 </div>
@@ -135,16 +124,20 @@
 
             <div class="row g-2">
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn">Save</button>
+                    <button type="submit" class="btn btn-primary" name="saveSettingsBtn"
+                            id="saveSettingsBtn">${i18n.tr('Save')}</button>
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="window.location.reload();">Cancel</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn"
+                            onclick="window.location.reload();">${i18n.tr('Cancel')}</button>
                 </div>
             </div>
         </form>
 
         <script type="module">
             import $ from '${url.forPath("/js/jquery.mjs")}';
+
+            const valueMissingKey = "value-missing";
 
             // Validate regular contact email settings.
             $(document).ready(() => {
@@ -159,7 +152,7 @@
                 const validateEmailSettings = function () {
                     for (const emailInput of otherEmailInputs) {
                         const valid = !emailSwitch.checked || emailInput.value.trim().length > 0;
-                        emailInput.setCustomValidity(valid ? '' : 'value-missing');
+                        emailInput.setCustomValidity(valid ? '' : valueMissingKey);
                     }
                 };
 
@@ -178,7 +171,7 @@
 
                 const validateEmailSettings = function () {
                     const valid = !teacherApplicationsSwitch.checked || teacherApplicationsEmail.value.trim().length > 0;
-                    teacherApplicationsEmail.setCustomValidity(valid ? '' : 'value-missing');
+                    teacherApplicationsEmail.setCustomValidity(valid ? '' : valueMissingKey);
                 };
 
                 teacherApplicationsSwitch.addEventListener('change', validateEmailSettings);
@@ -189,4 +182,3 @@
         </script>
     </div>
 </p:main_page>
-

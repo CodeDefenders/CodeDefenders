@@ -20,12 +20,14 @@ package org.codedefenders.validation.code;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.FileUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -35,6 +37,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.xnap.commons.i18n.I18n;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
@@ -204,13 +207,14 @@ public class CodeValidatorTest {
                                                                       AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
         String testCode = loadTest(test);
             TestValidator testValidator = new TestValidator();
+            I18n i18n = I18nService.getI18n(Locale.ENGLISH);
 
             CodeValidationResult actual = testValidator.validateTestCode(testCode, maxNumberOfAssertions, assertionLibrary);
 
 
             assertThat(actual.isValid()).isFalse();
             for (String expected : expectedValidationMessages) {
-                assertThat(actual.toString()).contains(expected);
+                assertThat(actual.getMessage(i18n)).contains(expected);
             }
 
     }
@@ -458,7 +462,8 @@ public class CodeValidatorTest {
             String mutated = loadMutantMutated(mutant);
 
             MutantValidator mutantValidator = new MutantValidator();
-            String actual = mutantValidator.validateMutant(original, mutated, ruleSet).toString();
+            I18n i18n = I18nService.getI18n(Locale.ENGLISH);
+            String actual = mutantValidator.validateMutant(original, mutated, ruleSet, i18n).getMessage(i18n);
 
             String expectedRegex = expectedValidationMessages.stream().map(Pattern::quote)
                     .collect(Collectors.joining("|"));

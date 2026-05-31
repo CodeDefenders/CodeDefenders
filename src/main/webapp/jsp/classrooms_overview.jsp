@@ -27,19 +27,20 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
-<p:main_page title="My Classrooms">
+<p:main_page title="${i18n.tr('My Classrooms')}">
     <div class="container">
 
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
 
             <div class="mb-3 d-flex gap-3">
-                <h2 class="mb-0">My Classrooms</h2>
+                <h2 class="mb-0">${i18n.tr('My Classrooms')}</h2>
 
                 <shiro:hasPermission name="${CreateClassroomPermission.name}">
                     <button id="create-classroom" type="button" class="btn btn-primary rounded-pill"
                             data-bs-toggle="modal" data-bs-target="#create-classroom-modal">
-                        New Classroom
+                            ${i18n.tr('New Classroom')}
                         <i class="fa fa-plus ms-1" aria-hidden="true"></i>
                     </button>
                 </shiro:hasPermission>
@@ -48,12 +49,14 @@
             <div class="d-flex gap-3">
                 <div>
                     <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
-                    <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-active">Active</label>
+                    <label class="btn btn-sm btn-outline-secondary rounded-pill"
+                           for="radio-active">${i18n.tr('Active')}</label>
 
                     <input type="radio" class="btn-check" name="classroom-type" id="radio-archived" autocomplete="off">
-                    <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-archived">Archived</label>
+                    <label class="btn btn-sm btn-outline-secondary rounded-pill"
+                           for="radio-archived">${i18n.tr('Archived')}</label>
                 </div>
-                <input type="search" id="search-user" placeholder="Search"
+                <input type="search" id="search-user" placeholder="${i18n.tr('Search')}"
                        class="form-control form-control-sm" style="width: 15em;">
             </div>
         </div>
@@ -62,8 +65,8 @@
         </div>
 
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-            <h2 class="mt-5 mb-3">Public Classrooms</h2>
-            <input type="search" id="search-public" placeholder="Search"
+            <h2 class="mt-5 mb-3">${i18n.tr('Public Classrooms')}</h2>
+            <input type="search" id="search-public" placeholder="${i18n.tr('Search')}"
                    class="form-control form-control-sm" style="width: 15em;">
         </div>
         <div class="loading loading-border-card loading-height-200">
@@ -73,20 +76,21 @@
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="create-classroom"/>
 
-            <t:modal title="Create classroom" id="create-classroom-modal" closeButtonText="Cancel">
+            <t:modal title="${i18n.tr('Create classroom')}" id="create-classroom-modal"
+                     closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    <label for="name-input" class="form-label">Name</label>
+                    <label for="name-input" class="form-label">${i18n.tr('Name')}</label>
                     <input type="text" class="form-control" id="name-input" name="name"
-                           required maxlength="100" placeholder="Name">
+                           required maxlength="100" placeholder="${i18n.tr('Name')}">
                     <div class="invalid-feedback">
-                        Please enter a valid name.
+                            ${i18n.tr('Please enter a valid name.')}
                     </div>
                     <div class="form-text">
-                        Maximum length: 100 characters.
+                            ${i18n.tr('Maximum length: 100 characters.')}
                     </div>
                 </jsp:attribute>
                 <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-primary">Create Classroom</button>
+                    <button type="submit" class="btn btn-primary">${i18n.tr('Create Classroom')}</button>
                 </jsp:attribute>
             </t:modal>
         </form>
@@ -94,6 +98,7 @@
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
             const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
             const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
@@ -123,7 +128,7 @@
                     case 'filter':
                         return memberCount;
                     case 'display':
-                        const members = memberCount > 1 ? 'Members' : 'Member';
+                        const members = memberCount === 1 ? '${i18n.tr('Member')}' : '${i18n.tr('Members')}';
                         return `
                             <span class="text-muted">\${memberCount} \${members}</span>
                         `;
@@ -157,7 +162,7 @@
                     case 'display':
                         if (!data.open) {
                             return `
-                                <span class="float-end px-2" title="Not open for joining">
+                                <span class="float-end px-2" title="${i18n.tr('Not open for joining')}">
                                     <i class="fa fa-external-link text-muted"></i>
                                 </a>
                             `;
@@ -173,19 +178,19 @@
                         {
                             data: 'name',
                             type: 'string',
-                            title: 'Name',
+                            title: '${i18n.tr('Name')}',
                             width: '25em',
                             className: 'truncate'
                         },
                         {
                             data: 'memberCount',
                             type: 'html',
-                            title: 'Members',
+                            title: '${i18n.tr('Members')}',
                             render: renderMemberCount
                         },
                         {
                             data: null,
-                            title: 'Link',
+                            title: '${i18n.tr('Link')}',
                             render: renderClassroomLink,
                             width: '2em'
                         },
@@ -195,10 +200,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
-                        emptyTable: "You're not part of any classrooms.",
-                        zeroRecords: 'No classrooms found.'
-                    }
+                    language: DataTablesUtils.language({
+                        emptyTable: "${i18n.tr('You\'re not part of any classrooms.')}",
+                        zeroRecords: '${i18n.tr('No classrooms found.')}'
+                    })
                 });
 
                 LoadingAnimation.hideAnimation(userTable.table().container());
@@ -237,19 +242,19 @@
                         {
                             data: 'name',
                             type: 'string',
-                            title: 'Name',
+                            title: '${i18n.tr('Name')}',
                             width: '25em',
                             className: 'truncate'
                         },
                         {
                             data: 'memberCount',
                             type: 'html',
-                            title: 'Members',
+                            title: '${i18n.tr('Members')}',
                             render: renderMemberCount
                         },
                         {
                             data: null,
-                            title: 'Link',
+                            title: '${i18n.tr('Link')}',
                             render: renderPublicClassroomLink,
                             width: '2em'
                         },
@@ -259,10 +264,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
-                        emptyTable: 'There are currently no public classrooms.',
-                        zeroRecords: 'No Classrooms found.'
-                    }
+                    language: DataTablesUtils.language({
+                        emptyTable: '${i18n.tr('There are currently no public classrooms.')}',
+                        zeroRecords: '${i18n.tr('No Classrooms found.')}'
+                    })
                 });
 
                 LoadingAnimation.hideAnimation(publicTable.table().container());
@@ -280,4 +285,3 @@
 
     </div>
 </p:main_page>
-

@@ -41,6 +41,7 @@ import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -146,17 +147,14 @@ public class RoleService {
         }
 
         StringJoiner messages = new StringJoiner("\n");
-        messages.add("""
-                     You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to \
-                     disable this setting in the config after you finish setting up Code Defenders."""
-                .stripIndent().formatted(String.join(", ", userNames)));
+        messages.add(I18n.marktr(
+                "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
+                ).formatted(String.join(", ", userNames)));
 
         boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
 
         if (missingUser) {
-        messages.add("""
-                    Some users were not found. If you want to add these users as administrators, please create the \
-                    accounts and restart the application.""".stripIndent());
+            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."));
         }
 
         logger.warn(messages.toString());
@@ -187,18 +185,16 @@ public class RoleService {
         }
 
         StringJoiner messages = new StringJoiner("\n");
-        messages.add("""
+        messages.add(I18n.marktr("""
                      Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now \
                      migrate your existing admin users from the Tomcat user database to our new system. You can safely \
-                     remove auth.admin.role after this is done."""
+                     remove auth.admin.role after this is done.""")
                 .stripIndent());
 
         boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
 
         if (missingUser) {
-            messages.add("""
-                    Some users were not found. If you want to add these users as administrators, please create the \
-                    accounts and restart the application.""".stripIndent());
+            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."));
         }
 
         logger.warn(messages.toString());

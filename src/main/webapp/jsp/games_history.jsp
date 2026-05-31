@@ -21,6 +21,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="java.util.List" %>
@@ -54,20 +55,20 @@
 
 <div class="container">
 
-    <h2 class="mb-4">Game History</h2>
+    <h2 class="mb-4">${i18n.tr('Game History')}</h2>
 
-    <h3 class="mt-4 mb-3">Battlegrounds</h3>
+    <h3 class="mt-4 mb-3">${i18n.tr('Battlegrounds')}</h3>
     <table class="table table-striped table-v-align-middle">
         <thead>
             <tr>
                 <th></th>
-                <th>ID</th>
-                <th>Owner</th>
-                <th>Class</th>
-                <th>Attackers</th>
-                <th>Defenders</th>
-                <th>Level</th>
-                <th>Actions</th>
+                <th>${i18n.tr('ID')}</th>
+                <th>${i18n.tr('Owner')}</th>
+                <th>${i18n.tr('Class')}</th>
+                <th>${i18n.tr('Attackers')}</th>
+                <th>${i18n.tr('Defenders')}</th>
+                <th>${i18n.tr('Level')}</th>
+                <th>${i18n.tr('Actions')}</th>
             </tr>
         </thead>
         <tbody>
@@ -78,7 +79,7 @@
             %>
 
                 <tr class="<%=oddEven()%>">
-                    <td colspan="100" class="text-center">Your battleground game history is empty.</td>
+                    <td colspan="100" class="text-center">${i18n.tr('Your battleground game history is empty.')}</td>
                 </tr>
 
             <%
@@ -116,7 +117,7 @@
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
                            href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
-                            View Results
+                            ${i18n.tr('View Results')}
                         </a>
                     </td>
                 </tr>
@@ -127,10 +128,10 @@
                         <table class="child-row-details">
                             <thead>
                                     <tr>
-                                        <th class="text-end">Attacker</th>
-                                        <th class="text-end">Mutants</th>
-                                        <th class="text-end">Alive Mutants</th>
-                                        <th>Points</th>
+                                        <th class="text-end">${i18n.tr('Attacker')}</th>
+                                        <th class="text-end">${i18n.tr('Mutants')}</th>
+                                        <th class="text-end">${i18n.tr('Alive Mutants')}</th>
+                                        <th>${i18n.tr('Points')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -138,7 +139,8 @@
                                         if (attackers.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="100" class="text-center">There are no Attackers.</td>
+                                            <td colspan="100"
+                                                class="text-center">${i18n.tr('There are no Attackers.')}</td>
                                         </tr>
                                     <%
                                         } else {
@@ -159,10 +161,10 @@
                                 </tbody>
                                 <thead>
                                     <tr>
-                                        <th>Defender</th>
-                                        <th class="text-end">Tests</th>
-                                        <th class="text-end">Mutants Killed</th>
-                                        <th class="text-end">Points</th>
+                                        <th>${i18n.tr('Defender')}</th>
+                                        <th class="text-end">${i18n.tr('Tests')}</th>
+                                        <th class="text-end">${i18n.tr('Mutants Killed')}</th>
+                                        <th class="text-end">${i18n.tr('Points')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -170,7 +172,8 @@
                                         if (defenders.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="100" class="text-center">There are no Defenders.</td>
+                                            <td colspan="100"
+                                                class="text-center">${i18n.tr('There are no Defenders.')}</td>
                                         </tr>
                                     <%
                                         } else {
@@ -201,17 +204,17 @@
         </tbody>
     </table>
 
-    <h3 class="mt-4 mb-3">Melee games</h3>
+    <h3 class="mt-4 mb-3">${i18n.tr('Melee games')}</h3>
     <table class="table table-striped table-v-align-middle">
         <thead>
             <tr>
                 <th></th>
-                <th>ID</th>
-                <th>Owner</th>
-                <th>Class</th>
-                <th>Players</th>
-                <th>Level</th>
-                <th>Actions</th>
+                <th>${i18n.tr('ID')}</th>
+                <th>${i18n.tr('Owner')}</th>
+                <th>${i18n.tr('Class')}</th>
+                <th>${i18n.tr('Players')}</th>
+                <th>${i18n.tr('Level')}</th>
+                <th>${i18n.tr('Actions')}</th>
             </tr>
         </thead>
         <tbody>
@@ -222,7 +225,7 @@
             %>
 
                 <tr class="<%=oddEven()%>">
-                    <td colspan="100" class="text-center">Your melee game history is empty.</td>
+                    <td colspan="100" class="text-center">${i18n.tr('Your melee game history is empty.')}</td>
                 </tr>
 
             <%
@@ -255,7 +258,7 @@
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
                            href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gameId%>">
-                            View Results
+                            ${i18n.tr('View Results')}
                         </a>
                     </td>
                 </tr>
@@ -266,8 +269,8 @@
                         <table class="child-row-details">
                             <thead>
                                     <tr>
-                                        <th>Player</th>
-                                        <th class="text-end">Points</th>
+                                        <th>${i18n.tr('Player')}</th>
+                                        <th class="text-end">${i18n.tr('Points')}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -275,7 +278,8 @@
                                         if (players.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="100" class="text-center">There are no Players.</td>
+                                            <td colspan="100"
+                                                class="text-center">${i18n.tr('There are no Players.')}</td>
                                         </tr>
                                     <%
                                         } else {

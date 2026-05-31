@@ -19,9 +19,7 @@
 package org.codedefenders.service.game;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,7 +48,6 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
-import org.codedefenders.notification.events.server.invite.InviteEvent;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
@@ -62,11 +59,10 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.persistence.database.WhitelistRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
@@ -171,7 +167,7 @@ public class MultiplayerGameService extends AbstractGameService {
         if (!canCreateGames) {
             logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
                     login.getUserId());
-            messages.add("Creating games is currently not enabled.");
+            messages.add(I18n.marktr("Creating games is currently not enabled."));
             return false;
         }
 
@@ -224,7 +220,7 @@ public class MultiplayerGameService extends AbstractGameService {
         if (!canCreateGames) {
             logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
                     login.getUserId());
-            messages.add("Creating games is currently not enabled.");
+            messages.add(I18n.marktr("Creating games is currently not enabled."));
             return Optional.empty();
         }
 

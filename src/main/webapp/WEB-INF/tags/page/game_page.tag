@@ -26,9 +26,9 @@
 <%@ tag import="org.codedefenders.game.Role" %>
 <%@ tag import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ tag import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ tag import="org.xnap.commons.i18n.I18n" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%@ attribute name="additionalImports" required="false" fragment="true"
@@ -41,6 +41,7 @@
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%
+    I18n i18n = (I18n) request.getAttribute("i18n");
     AbstractGame game = (AbstractGame) request.getAttribute("game");
 
     Role role = null;
@@ -50,12 +51,12 @@
         role = ((MultiplayerGame) game).getRole(login.getUserId());
     }
 
-    String roleStr = role.getFormattedString();
+    String roleStr = i18n.tr(role.getFormattedString());
     if (roleStr == null) {
-        roleStr = "no role";
+        roleStr = i18n.tr("no role");
     }
 
-    request.setAttribute("title", "Game " + game.getId() + " (" + roleStr + ")");
+    request.setAttribute("title", i18n.tr("Game {0} ({1})", game.getId(), roleStr));
 %>
 
 <p:main_page title="${title}">

@@ -56,6 +56,7 @@ import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.creategames.CreateGamesServlet;
 import org.codedefenders.util.JSONUtils;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -65,7 +66,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.Expose;
 
-import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
 
 /**
@@ -223,7 +223,7 @@ public abstract class CreateGamesBean implements Serializable {
                 roleAssignmentStrategy, gameAssignmentStrategy,
                 attackersPerGame, defendersPerGame);
 
-        messages.add(format("Created {0} staged games.", newGames.size()));
+        messages.addFormatted(I18n.marktr("Created {0} staged games."), newGames.size());
     }
 
     /**
@@ -236,7 +236,7 @@ public abstract class CreateGamesBean implements Serializable {
             stagedGames.addStagedGame(gameSettings);
         }
 
-        messages.add(format("Created {0} empty staged games.", numGames));
+        messages.addFormatted(I18n.marktr("Created {0} empty staged games."), numGames);
     }
 
     /**
@@ -248,7 +248,7 @@ public abstract class CreateGamesBean implements Serializable {
             this.stagedGames.removeStagedGame(stagedGame.getId());
         }
 
-        messages.add(format("Deleted {0} staged games.", stagedGames.size()));
+        messages.addFormatted(I18n.marktr("Deleted {0} staged games."), stagedGames.size());
     }
 
     /**
@@ -262,7 +262,7 @@ public abstract class CreateGamesBean implements Serializable {
             }
         }
 
-        messages.add(format("Created games for {0} staged games.", stagedGames.size()));
+        messages.addFormatted(I18n.marktr("Created games for {0} staged games."), stagedGames.size());
     }
 
     /**
@@ -275,16 +275,16 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public boolean removePlayerFromStagedGame(StagedGame stagedGame, int userId) {
         if (stagedGame.removePlayer(userId)) {
-            messages.add(format(
-                    "Removed user {0} from staged game {1}.",
-                    userId, stagedGame.getFormattedId())
+            messages.addFormatted(
+                    I18n.marktr("Removed user {0} from staged game {1}."),
+                    userId, stagedGame.getFormattedId()
             );
             return true;
         } else {
-            messages.add(format(
-                    "ERROR: Cannot remove user {0} from staged game {1}. "
-                    + "User is not assigned to the staged game.",
-                    userId, stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot remove user {0} from staged game {1}. User is not assigned to the staged game."),
+                    userId, stagedGame.getFormattedId()
+            );
             return false;
         }
     }
@@ -299,9 +299,9 @@ public abstract class CreateGamesBean implements Serializable {
                 .setCreatorRole(Role.OBSERVER)
                 .build();
         stagedGame.setGameSettings(gameSettings);
-        messages.add(format(
-                "Removed you from staged game {0}. Your role is now {1} again.",
-                stagedGame.getFormattedId(), Role.OBSERVER)
+        messages.addFormatted(
+                I18n.marktr("Removed you from staged game {0}. Your role is now {1} again."),
+                stagedGame.getFormattedId(), Role.OBSERVER
         );
     }
 
@@ -313,12 +313,16 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public boolean switchRole(StagedGame stagedGame, int userId) {
         if (stagedGame.switchRole(userId)) {
-            messages.add(format("Switched role of user {0} in staged game {1}.",
-                    userId, stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("Switched role of user {0} in staged game {1}."),
+                    userId, stagedGame.getFormattedId()
+            );
             return true;
         } else {
-            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}.",
-                    userId, stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot switch role of user {0} in staged game {1}."),
+                    userId, stagedGame.getFormattedId()
+            );
             return false;
         }
     }
@@ -330,12 +334,16 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public boolean switchCreatorRole(StagedGame stagedGame) {
         if (stagedGame.switchCreatorRole()) {
-            messages.add(format("Switched your role in staged game {0}.",
-                    stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("Switched your role in staged game {0}."),
+                    stagedGame.getFormattedId()
+            );
             return true;
         } else {
-            messages.add(format("ERROR: Cannot switch your role in staged game {0}.",
-                    stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot switch your role in staged game {0}."),
+                    stagedGame.getFormattedId()
+            );
             return false;
         }
     }
@@ -350,10 +358,9 @@ public abstract class CreateGamesBean implements Serializable {
     public boolean movePlayerBetweenStagedGames(StagedGame stagedGameFrom, StagedGame stagedGameTo,
                                                 int userId, Role role) {
         if (!stagedGameFrom.removePlayer(userId)) {
-            messages.add(format(
-                    "ERROR: Cannot move user {0} from staged game {1}. "
-                    + "User is not assigned to the staged game.",
-                    userId, stagedGameFrom.getFormattedId())
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot move user {0} from staged game {1}. User is not assigned to the staged game."),
+                    userId, stagedGameFrom.getFormattedId()
             );
             return false;
         }
@@ -367,13 +374,17 @@ public abstract class CreateGamesBean implements Serializable {
                 stagedGameTo.addDefender(userId);
                 break;
             default:
-                messages.add(format("ERROR: Cannot move player to staged game with role {0}. Invalid role.", role));
+                messages.addFormatted(I18n.marktr("ERROR: Cannot move player to staged game with role {0}. Invalid role."), role);
                 return false;
         }
 
-        messages.add(format("Moved user {0} from staged game {1} to staged game {2} as {3}.",
-                userId, stagedGameFrom.getFormattedId(), stagedGameTo.getFormattedId(),
-                role.getFormattedString()));
+        messages.addFormatted(
+                I18n.marktr("Moved user {0} from staged game {1} to staged game {2} as {3}."),
+                userId,
+                stagedGameFrom.getFormattedId(),
+                stagedGameTo.getFormattedId(),
+                role.getFormattedString()
+        );
         return true;
     }
 
@@ -386,11 +397,13 @@ public abstract class CreateGamesBean implements Serializable {
     public boolean addPlayerToStagedGame(StagedGame stagedGame, int userId, Role role) {
         boolean success = stagedGame.addPlayer(userId, role);
         if (success) {
-            messages.add(format("Added user {0} to staged game {1} as {2}.",
-                    userId, stagedGame.getFormattedId(), role.getFormattedString()));
+            messages.addFormatted(
+                    I18n.marktr("Added user {0} to staged game {1} as {2}."),
+                    userId, stagedGame.getFormattedId(), role.getFormattedString());
         } else {
-            messages.add(format("ERROR: Cannot add user {0} to staged game {1}. ",
-                    userId, stagedGame.getFormattedId()));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot add user {0} to staged game {1}."),
+                    userId, stagedGame.getFormattedId());
         }
         return success;
     }
@@ -403,11 +416,14 @@ public abstract class CreateGamesBean implements Serializable {
      */
     public boolean addPlayerToExistingGame(AbstractGame game, int userId, Role role) {
         if (!game.addPlayer(userId, role)) {
-            messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
-                    userId, game.getId(), role));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot add user {0} to existing game {1} as {2}."),
+                    userId, game.getId(), role);
             return false;
         }
-        messages.add(format("Added user {0} to existing game {1} as {2}.", userId, game.getId(), role));
+        messages.addFormatted(
+                I18n.marktr("Added user {0} to existing game {1} as {2}."),
+                userId, game.getId(), role);
         return true;
     }
 
@@ -428,7 +444,7 @@ public abstract class CreateGamesBean implements Serializable {
                 users.add(user);
                 continue;
             }
-            messages.add(format("ERROR: No valid user with the ID {0} exists.", userId));
+            messages.addFormatted(I18n.marktr("ERROR: No valid user with the ID {0} exists."), userId);
             success = false;
         }
 
@@ -465,7 +481,7 @@ public abstract class CreateGamesBean implements Serializable {
                 users.add(user);
                 continue;
             }
-            messages.add(format("ERROR: No valid user with name/email {0} exists.", userNameOrEmail));
+            messages.addFormatted(I18n.marktr("ERROR: No valid user with name/email {0} exists."), userNameOrEmail);
             success = false;
         }
 

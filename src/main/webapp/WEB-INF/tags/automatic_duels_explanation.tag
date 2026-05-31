@@ -18,14 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <p>
-    This value refers to the number of tests which cover, but do not
-    kill, mutants and controls if and when equivalence duels are
-    automatically triggered.
+    ${i18n.tr('This value refers to the number of tests which cover, but do not kill, mutants and controls if and when equivalence duels are automatically triggered.')}
 </p>
 <ul class="mb-0">
-    <li><b>0</b> disables the automatic triggering of equivalence
-        mutants.
-    <li><b>N > 0</b> triggers an equivalence duels for every mutant
-        which survives N tests.
+    <li><b>0</b> ${i18n.tr('disables the automatic triggering of equivalence mutants.')}
+    <li><b>N > 0</b> ${i18n.tr('triggers an equivalence duels for every mutant which survives N tests.')}
 </ul>

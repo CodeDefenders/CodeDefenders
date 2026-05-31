@@ -24,7 +24,6 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
 <%@ attribute name="title" required="true" type="java.lang.String"
               description="Title of the page" %>

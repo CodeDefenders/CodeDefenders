@@ -38,6 +38,7 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.PreparedMessage;
 
 @WebServlet("/llm-api/battleground/claim-equivalence")
 public class ClaimEquivalenceAPI extends APIServlet {
@@ -111,9 +112,8 @@ public class ClaimEquivalenceAPI extends APIServlet {
             .map(m -> gameService.getMutant(login.getUserId(), m))
             .map(Common.MutantDTO::fromMutantDTO)
             .toList();
-        writeResponse(response, HttpServletResponse.SC_OK,
-                new ClaimEquivalenceResponseDTO(mutantDTOs, result.messages()));
-        return;
+        writeResponse(response, HttpServletResponse.SC_OK, new ClaimEquivalenceResponseDTO(mutantDTOs,
+                result.messages().stream().map(PreparedMessage::resolve).toList()));
     }
 
     public record ClaimEquivalenceResponseDTO(

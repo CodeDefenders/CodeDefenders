@@ -33,6 +33,7 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This {@link HttpServlet} handles requests to send mails. Mails are sent
@@ -65,10 +66,10 @@ public class SendEmail extends HttpServlet {
 
         if (EmailUtils.sendEmailToSelf(subject, message, email)) {
             logger.debug("Successfully sent email to {}", email);
-            messages.add("Thanks for your message, we'll get back to you soon! --The Code Defenders Team");
+            messages.add(I18n.marktr("Thanks for your message, we'll get back to you soon! --The Code Defenders Team"));
         } else {
             logger.warn("Sending email to {} failed.", email);
-            messages.add("Sorry! There was an error when trying to send the message.");
+            messages.add(I18n.marktr("Sorry! There was an error when trying to send the message."));
         }
 
         response.sendRedirect(url.forPath(Paths.CONTACT_PAGE));

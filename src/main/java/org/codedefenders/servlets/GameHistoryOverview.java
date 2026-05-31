@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,6 +34,7 @@ import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JspWorkaround;
 
@@ -53,6 +55,10 @@ public class GameHistoryOverview extends HttpServlet {
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
 
+    @Named
+    @Inject
+    private I18nService i18nService;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<UserMultiplayerGameInfo> games = multiplayerGameRepo.getFinishedMultiplayerGamesForUser(login.getUserId());
@@ -60,6 +66,7 @@ public class GameHistoryOverview extends HttpServlet {
         List<UserMeleeGameInfo> meleeGames = meleeGameRepo.getFinishedMeleeGamesForUser(login.getUserId());
         request.setAttribute("finishedMeleeGames", meleeGames);
 
-        JspWorkaround.forwardInWrapper(request, response, "Game History", Constants.GAMES_HISTORY_JSP);
+        var i18n = i18nService.getI18n(request);
+        JspWorkaround.forwardInWrapper(request, response, i18n.tr("Game History"), Constants.GAMES_HISTORY_JSP);
     }
 }

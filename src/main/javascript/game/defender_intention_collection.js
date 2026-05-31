@@ -108,7 +108,7 @@ class DefenderIntentionCollection {
         this._lockTestEditor();
         this._removeLineMarker(previousSelectedLine);
         this._showLineChooseNote();
-        this._setButtonText('Defend');
+        this._setButtonText(i18n.tr('Defend'));
     }
 
     selectLine (line) {
@@ -128,7 +128,7 @@ class DefenderIntentionCollection {
         this._unlockTestEditor();
         this._setLineMarker(line);
         this._hideLineChooseNote();
-        this._setButtonText(`Defend Line ${line}`);
+        this._setButtonText(i18n.tr(`Defend Line {0}`, line));
     }
 
     /** @private */

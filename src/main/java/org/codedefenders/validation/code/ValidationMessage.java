@@ -18,37 +18,38 @@
  */
 package org.codedefenders.validation.code;
 
+
+import org.xnap.commons.i18n.I18n;
+
 /**
  * This enumeration represents states and their
  * message during code validation.
  *
- *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class ValidationMessage {
-    public static final String MUTANT_ONLY_COMMENT_CHANGES = "Your mutant only changes comments.";
-    public static final String MUTANT_PACKAGE = "Your mutant changes the package signature.";
-    public static final String MUTANT_CLASS = "Your mutant adds a new class or changes a class signature.";
-    public static final String MUTANT_ADDS_OR_RENAMES_FIELD = "Your mutant adds or renames a field.";
-    public static final String MUTANT_ADDS_OR_RENAMES_METHOD = "Your mutant adds or renames a method.";
-    public static final String MUTANT_METHOD_SIGNATURE = "Your mutant changes one or more method signatures.";
-    public static final String MUTANT_IMPORT_STATEMENT = "Your mutant changes one or more import statements.";
-    public static final String MUTANT_INSTANCEOF = "Your mutant modifies an instanceof condition.";
-    public static final String MUTANT_IDENTICAL = "Your mutant is identical to the CUT.";
-    public static final String MUTANT_COMMENT = "Your mutant adds or modifies a comment.";
-    public static final String MUTANT_MODIFIER = "Your mutant changes a modifier like 'static' or 'private'.";
-    public static final String MUTANT_LOGIC = "Your mutant adds a new logical operator like '&&' or '||'.";
-    public static final String MUTANT_BITWISE = "Your mutant adds new bitwise operators like '&' or '>>'";
-    public static final String MUTANT_CONDITIONALS = "Your mutant adds a new conditional statement like 'if', 'switch' etc.";
-    public static final String MUTANT_LOOPS = "Your mutant adds a new loop.";
-    public static final String MUTANT_CALL_SYSTEM = "Your mutant adds a call to System.*.";
-    public static final String MUTANT_CALL_RANDOM = "Your mutant calls a random number generator.";
-    public static final String MUTANT_CALL_DATE = "Your mutant calls a Date class";
-    public static final String MUTANT_CALL_THREAD = "Your mutant calls a multithreading class";
-    public static final String MUTANT_CALL_IO = "Your mutant calls an IO class";
+    public static final String MUTANT_ONLY_COMMENT_CHANGES = I18n.marktr("Your mutant only changes comments.");
+    public static final String MUTANT_PACKAGE = I18n.marktr("Your mutant changes the package signature.");
+    public static final String MUTANT_CLASS = I18n.marktr("Your mutant adds a new class or changes a class signature.");
+    public static final String MUTANT_ADDS_OR_RENAMES_FIELD = I18n.marktr("Your mutant adds or renames a field.");
+    public static final String MUTANT_ADDS_OR_RENAMES_METHOD = I18n.marktr("Your mutant adds or renames a method.");
+    public static final String MUTANT_METHOD_SIGNATURE = I18n.marktr("Your mutant changes one or more method signatures.");
+    public static final String MUTANT_IMPORT_STATEMENT = I18n.marktr("Your mutant changes one or more import statements.");
+    public static final String MUTANT_INSTANCEOF = I18n.marktr("Your mutant modifies an instanceof condition.");
+    public static final String MUTANT_IDENTICAL = I18n.marktr("Your mutant is identical to the CUT.");
+    public static final String MUTANT_COMMENT = I18n.marktr("Your mutant adds or modifies a comment.");
+    public static final String MUTANT_MODIFIER = I18n.marktr("Your mutant changes a modifier like 'static' or 'private'.");
+    public static final String MUTANT_LOGIC = I18n.marktr("Your mutant adds a new logical operator like '&&' or '||'.");
+    public static final String MUTANT_BITWISE = I18n.marktr("Your mutant adds new bitwise operators like '&' or '>>'");
+    public static final String MUTANT_CONDITIONALS = I18n.marktr("Your mutant adds a new conditional statement like 'if', 'switch' etc.");
+    public static final String MUTANT_LOOPS = I18n.marktr("Your mutant adds a new loop.");
+    public static final String MUTANT_CALL_SYSTEM = I18n.marktr("Your mutant adds a call to System.*.");
+    public static final String MUTANT_CALL_RANDOM = I18n.marktr("Your mutant calls a random number generator.");
+    public static final String MUTANT_CALL_DATE = I18n.marktr("Your mutant calls a Date class");
+    public static final String MUTANT_CALL_THREAD = I18n.marktr("Your mutant calls a multithreading class");
+    public static final String MUTANT_CALL_IO = I18n.marktr("Your mutant calls an IO class");
 
     //These are never shown in the UI, only used for tests
     public static final String VALIDATION_FAILED_PARSING = "PARSING_FAILED";
     public static final String VALIDATION_SUCCESS = "SUCCESS";
-
 }

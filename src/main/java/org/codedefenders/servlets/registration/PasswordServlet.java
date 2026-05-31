@@ -34,7 +34,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -42,7 +42,9 @@ import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
@@ -60,18 +62,21 @@ public class PasswordServlet extends HttpServlet {
     private URLUtils url;
 
     @Inject
+    private I18nService i18nService;
+
+    @Inject
     private PasswordEncoder passwordEncoder;
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
 
-    private static final String CHANGE_PASSWORD_MSG = """
-            Hello %s!
+    private static final String CHANGE_PASSWORD_MSG = I18n.marktr("""
+            Hello {0}!
 
-            Change your password here: %s
-            This link is only valid for %d hours.
+            Change your password here: {1}
+            This link is only valid for {2} hours.
 
-            Greetings, your Code Defenders team""".stripIndent();
+            Greetings, your Code Defenders team""").stripIndent();
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -86,20 +91,28 @@ public class PasswordServlet extends HttpServlet {
             case "resetPassword":
                 String email = request.getParameter("accountEmail");
                 String username = request.getParameter("accountUsername");
-                Optional<UserEntity> u = userRepo.getUserByEmail(email);
-                if (u.isEmpty() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
-                    messages.add("No user was found for this username and email. Please check if the username and email match.");
+                Optional<UserEntity> userOpt = userRepo.getUserByEmail(email);
+                if (userOpt.isEmpty()
+                        || !userOpt.get().getUsername().equals(username)
+                        || !userOpt.get().getEmail().equalsIgnoreCase(email)) {
+                    messages.add(I18n.marktr("No user was found for this username and email. Please check if the username and email match."));
                 } else {
-                    String resetPwSecret = generatePasswordResetSecret();
-                    userRepo.setPasswordResetSecret(u.get().getId(), resetPwSecret);
-                    String resetUrl =  url.getAbsoluteURLForPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
-                    String msg = String.format(CHANGE_PASSWORD_MSG, u.get().getUsername(), resetUrl,
-                            AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
-                                    .getIntValue());
-                    if (EmailUtils.sendEmail(u.get().getEmail(), "Code Defenders Password reset", msg)) {
-                        messages.add("A password reset link has been sent to " + email);
+                    var user = userOpt.get();
+                    var resetPwSecret = generatePasswordResetSecret();
+                    userRepo.setPasswordResetSecret(user.getId(), resetPwSecret);
+
+                    var resetUrl =  url.getAbsoluteURLForPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
+                    var lifespan = AdminDAO.getSystemSetting(PASSWORD_RESET_SECRET_LIFESPAN).getIntValue();
+
+                    var locale = user.getLocale() != null ? user.getLocale() : i18nService.getDefaultLocale();
+                    var i18n = I18nService.getI18n(locale);
+                    var message = i18n.tr(CHANGE_PASSWORD_MSG, user.getUsername(), resetUrl, lifespan);
+                    var subject = i18n.tr("Code Defenders Password reset");
+
+                    if (EmailUtils.sendEmail(user.getEmail(), subject, message)) {
+                        messages.addFormatted(I18n.marktr("A password reset link has been sent to {0}"), email);
                     } else {
-                        messages.add("Something went wrong. No email could be sent.");
+                        messages.add(I18n.marktr("Something went wrong. No email could be sent."));
                     }
                 }
                 response.sendRedirect(url.forPath(Paths.LOGIN));
@@ -114,7 +127,7 @@ public class PasswordServlet extends HttpServlet {
                 Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);
                 if (resetPwSecret != null && userId.isPresent()) {
                     if (!(validator.validPassword(password))) {
-                        messages.add("Password not changed. Make sure it is valid.");
+                        messages.add(I18n.marktr("Password not changed. Make sure it is valid."));
                     } else if (password.equals(confirm)) {
                         Optional<UserEntity> user = userRepo.getUserById(userId.get());
                         if (user.isPresent()) {
@@ -122,14 +135,14 @@ public class PasswordServlet extends HttpServlet {
                             if (userRepo.update(user.get())) {
                                 userRepo.setPasswordResetSecret(user.get().getId(), null);
                                 responseURL = url.forPath(Paths.LOGIN);
-                                messages.add("Successfully changed your password.");
+                                messages.add(I18n.marktr("Successfully changed your password."));
                             }
                         }
                     } else {
-                        messages.add("Your two password entries did not match");
+                        messages.add(I18n.marktr("Your two password entries did not match"));
                     }
                 } else {
-                    messages.add("Your password reset link is not valid or has expired.");
+                    messages.add(I18n.marktr("Your password reset link is not valid or has expired."));
                     responseURL = url.forPath(Paths.LOGIN);
                 }
                 response.sendRedirect(responseURL);

@@ -46,6 +46,7 @@ import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -117,12 +118,12 @@ public class MutantAccordionBean {
         categories = new ArrayList<>();
         categories.add(
                 new MutantAccordionCategory(
-                        "All Mutants",
+                        I18n.marktr("All Mutants"),
                         GameAccordionMapping.ALL_CATEGORY_ID,
                         mapping.allElements));
         categories.add(
                 new MutantAccordionCategory(
-                        "Mutants outside methods",
+                        I18n.marktr("Mutants outside methods"),
                         GameAccordionMapping.OUTSIDE_METHODS_CATEGORY_ID,
                         mapping.elementsOutsideMethods));
 

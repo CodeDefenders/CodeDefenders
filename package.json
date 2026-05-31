@@ -26,6 +26,7 @@
         "@babel/core": "^7.17.5",
         "@babel/preset-env": "^7.16.11",
         "file-changed": "^1.4.1",
-        "rolldown": "^1.0.0-rc.15"
+        "rolldown": "^1.0.0-rc.15",
+      "@tim-greller/xgettext-regex": "^0.8.2"
     }
 }

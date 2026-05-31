@@ -18,65 +18,69 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <div id="editor-help-modal" class="modal fade" role="dialog" tabindex="-1" aria-labelledby="editor-help-modal-title" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editor-help-modal-title">Editor Keyboard Shortcuts</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="editor-help-modal-title">${i18n.tr("Editor Keyboard Shortcuts")}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="${i18n.tr('Close')}"></button>
             </div>
 
             <div class="modal-body">
                 <table class="table table-striped table-condensed">
                     <thead>
                         <tr>
-                            <th>Action</th>
-                            <th>Key</th>
-                            <th>Key (Mac)</th>
+                            <th>${i18n.tr("Action")}</th>
+                            <th>${i18n.tr("Key")}</th>
+                            <th>${i18n.tr("Key (Mac)")}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Autocomplete</td>
-                            <td>Ctrl + Space</td>
-                            <td>Cmd + Space</td>
+                            <td>${i18n.tr("Autocomplete")}</td>
+                            <td>${i18n.tr("Ctrl + Space")}</td>
+                            <td>${i18n.tr("Cmd + Space")}</td>
                         </tr>
                         <tr>
-                            <td>Search</td>
-                            <td>Ctrl + F</td>
-                            <td>Cmd + F</td>
+                            <td>${i18n.tr("Search")}</td>
+                            <td>${i18n.tr("Ctrl + F")}</td>
+                            <td>${i18n.tr("Cmd + F")}</td>
                         </tr>
                         <tr>
-                            <td>Find Next</td>
-                            <td>Ctrl + G</td>
-                            <td>Cmd + G</td>
+                            <td>${i18n.tr("Find Next")}</td>
+                            <td>${i18n.tr("Ctrl + G")}</td>
+                            <td>${i18n.tr("Cmd + G")}</td>
                         </tr>
                         <tr>
-                            <td>Find Previous</td>
-                            <td>Ctrl + Shift + G</td>
-                            <td>Cmd + Shift + G</td>
+                            <td>${i18n.tr("Find Previous")}</td>
+                            <td>${i18n.tr("Ctrl + Shift + G")}</td>
+                            <td>${i18n.tr("Cmd + Shift + G")}</td>
                         </tr>
                         <tr>
-                            <td>Search and Replace</td>
-                            <td>Ctrl + Shift + F</td>
-                            <td>Cmd + Shift + F</td>
+                            <td>${i18n.tr("Search and Replace")}</td>
+                            <td>${i18n.tr("Ctrl + Shift + F")}</td>
+                            <td>${i18n.tr("Cmd + Shift + F")}</td>
                         </tr>
                         <tr>
-                            <td>Search and Replace All</td>
-                            <td>Ctrl + Shift + R</td>
-                            <td>Cmd + Shift + R</td>
+                            <td>${i18n.tr("Search and Replace All")}</td>
+                            <td>${i18n.tr("Ctrl + Shift + R")}</td>
+                            <td>${i18n.tr("Cmd + Shift + R")}</td>
                         </tr>
                         <tr>
-                            <td>Jump to Line</td>
-                            <td>Alt + R</td>
-                            <td>Alt + R</td>
+                            <td>${i18n.tr("Jump to Line")}</td>
+                            <td>${i18n.tr("Alt + R")}</td>
+                            <td>${i18n.tr("Alt + R")}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.tr("Close")}</button>
             </div>
         </div>
     </div>

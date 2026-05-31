@@ -22,7 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ attribute name="title" required="true" type="java.lang.String"
               description="Title of the page" %>
@@ -34,7 +34,7 @@
 --%>
 
 <!DOCTYPE html>
-<html>
+<html lang="${i18n.locale.language}">
     <head>
         <title>${title}</title>
 

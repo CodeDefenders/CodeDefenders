@@ -35,6 +35,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MeleeGame"--%>
 <%--@elvariable id="playerId" type="java.util.Optional"--%>
@@ -113,7 +114,7 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setMutantRuleSet(game.getMutantValidatorLevel()); %>
 
-<c:set var="title" value="${'Details of Game ' += game.id += ' (' += role.formattedString += ')'}"/>
+<c:set var="title" value="${i18n.tr('Details of Game {0} ({1})', game.id, i18n.tr(role.formattedString))}"/>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -133,21 +134,22 @@
                     <c:if test="${game.creatorId == login.userId && (game.state == GameState.ACTIVE || game.state == GameState.FINISHED)}">
                         <div>
                             <div data-bs-toggle="tooltip"
-                                 title="Start a new game with the same settings and opposite roles.">
+                                 title="${i18n.tr('Start a new game with the same settings and opposite roles.')}">
                                 <button type="submit" class="btn btn-sm btn-warning" id="rematch"
                                         data-bs-toggle="modal" data-bs-target="#rematch-modal">
-                                    Rematch
+                                        ${i18n.tr('Rematch')}
                                 </button>
                             </div>
                             <form id="rematch-form" action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
                                 <input type="hidden" name="formType" value="rematch">
                                 <input type="hidden" name="gameId" value="${game.id}">
-                                <t:modal title="Confirm Rematch" id="rematch-modal" closeButtonText="Cancel">
+                                <t:modal title="${i18n.tr('Confirm Rematch')}" id="rematch-modal"
+                                         closeButtonText="${i18n.tr('Cancel')}">
                                 <jsp:attribute name="content">
-                                    Are you sure you want to create a new game with opposite roles?
+                                    ${i18n.tr('Are you sure you want to create a new game with opposite roles?')}
                                 </jsp:attribute>
                                     <jsp:attribute name="footer">
-                                    <button type="submit" class="btn btn-primary">Confirm Rematch</button>
+                                    <button type="submit" class="btn btn-primary">${i18n.tr('Confirm Rematch')}</button>
                                 </jsp:attribute>
                                 </t:modal>
                             </form>
@@ -156,9 +158,9 @@
 
                     <a href="${url.forPath(Paths.PROJECT_EXPORT)}?gameId=${game.id}"
                        class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
-                       title="Export as a Gradle project to import into an IDE.">
+                       title="${i18n.tr('Export as a Gradle project to import into an IDE.')}">
                         <i class="fa fa-download"></i>
-                        Gradle Export
+                            ${i18n.tr('Gradle Export')}
                     </a>
                 </div>
             </div>
@@ -167,14 +169,14 @@
             <div class="details-content">
                 <div class="details-content__item">
                     <h3 class="align-items-center d-flex gap-2 justify-content-between">
-                        Scoreboard
+                            ${i18n.tr('Scoreboard')}
                         <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
                                 data-bs-toggle="modal" data-bs-target="#scoringModal">
-                            <i class="fa fa-question-circle"></i> Info
+                            <i class="fa fa-question-circle"></i> ${i18n.tr('Info')}
                         </button>
                     </h3>
 
-                    <t:modal title="Scoring System" id="scoringModal" modalBodyClasses="bg-light">
+                    <t:modal title="${i18n.tr('Scoring System')}" id="scoringModal" modalBodyClasses="bg-light">
                     <jsp:attribute name="content">
                         <jsp:include page="/jsp/scoring_system.jsp"/>
                     </jsp:attribute>
@@ -183,7 +185,7 @@
                     <t:melee_game_scoreboard/>
                 </div>
                 <div class="details-content__item">
-                    <h3>The game's duration</h3>
+                    <h3>${i18n.tr('The game\'s duration')}</h3>
 
                     <c:set var="startTime" value="${game.startTimeUnixSeconds}"/>
                     <!-- This distinction is for backwards compatability, in older versions, "finishTime" was not correctly set -->
@@ -203,7 +205,7 @@
                         <%-- Duration Info --%>
                     <div class="row text-center">
                         <div class="col-6 d-flex flex-column align-items-center">
-                            <small>Total Duration</small>
+                            <small>${i18n.tr('Total Duration')}</small>
                             <span class="time-left"
                                   data-type="total"
                                   data-duration="${duration}">
@@ -212,7 +214,7 @@
                         </div>
 
                         <div class="col-6 d-flex flex-column align-items-center">
-                            <small>End date of the game</small>
+                            <small>${i18n.tr('End date of the game')}</small>
                             <span class="time-left"
                                   data-type="end"
                                   data-duration="${duration}"
@@ -231,21 +233,22 @@
 
                 <div class="details-content__item">
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h3 class="mb-0">Class under test</h3>
+                        <h3 class="mb-0">${i18n.tr('Class under test')}</h3>
                         <c:choose>
                             <c:when test="${role == Role.OBSERVER}">
                                 <div data-bs-toggle="tooltip" data-bs-html="true"
-                                     title="<p>You are an observer in this game.<br>The coverage of all player tests is shown.</p>">
+                                     title="<p>${i18n.tr('You are an observer in this game.')}<br>${i18n.tr('The coverage of all player tests is shown.')}
+                                     ">
                                     <i class="fa fa-eye"></i>
                                 </div>
                             </c:when>
                             <c:otherwise>
                                 <div data-bs-toggle="tooltip" data-bs-html="true"
-                                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p>'>
+                                     title='<p>${i18n.tr('Switch between showing coverage of your tests (off) and enemy tests (on).')}</p>'>
                                     <input class="btn-check" type="checkbox" id="highlighting-switch"
                                            autocomplete="off">
                                     <label class="btn btn-outline-secondary" for="highlighting-switch">
-                                        Enemy Coverage
+                                            ${i18n.tr('Enemy Coverage')}
                                         <i class="fa fa-check ms-1 btn-check-active"></i>
                                     </label>
                                 </div>
@@ -276,7 +279,7 @@
                 </div>
 
                 <div class="details-content__item">
-                    <h3>Timeline</h3>
+                    <h3>${i18n.tr('Timeline')}</h3>
                     <t:game_timeline/>
                 </div>
 

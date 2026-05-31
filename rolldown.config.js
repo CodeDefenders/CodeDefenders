@@ -1,6 +1,9 @@
 import path from 'path';
 import fs from 'fs';
+
 import { defineConfig } from 'rolldown';
+import { i18nCollectPlugin } from './rolldown.i18n.js';
+
 
 /* Constants.
 ----------------------------------------------------------------------------- */
@@ -85,6 +88,14 @@ export default defineConfig({
         `${SRC_DIR}/init/index.js`,
         ...fs.readdirSync(`${SRC_DIR}/thirdparty`)
                 .map(name => `${SRC_DIR}/thirdparty/${name}`)
+    ],
+    plugins: [
+        /* Extract i18n strings into JSON grouped by folder names. */
+        i18nCollectPlugin({
+            roots: ['src/main/javascript'],
+            exts: new Set(['.js', '.mjs']),
+            output: 'src/main/resources/i18n.js.json'
+        }),
     ],
     platform: 'browser',
     output: {

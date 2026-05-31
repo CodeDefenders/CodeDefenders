@@ -37,7 +37,7 @@ class MutantProgressBar extends ProgressBar {
     }
 
     async activate () {
-        this.setProgress(16, 'Submitting Mutant');
+        this.setProgress(16, i18n.tr('Submitting Mutant'));
         await this._register();
         await this._subscribe();
 
@@ -65,35 +65,35 @@ class MutantProgressBar extends ProgressBar {
     }
 
     _onMutantSubmitted (event) {
-        this.setProgress(33, 'Validating Mutant');
+        this.setProgress(33, i18n.tr('Validating Mutant'));
     }
 
     _onMutantValidated (event) {
         if (event.success) {
-            this.setProgress(50, 'Checking For Duplicate Mutants');
+            this.setProgress(50, i18n.tr('Checking For Duplicate Mutants'));
         } else {
-            this.setProgress(100, 'Mutant Is Not Valid');
+            this.setProgress(100, i18n.tr('Mutant Is Not Valid'));
         }
     }
 
     _onDuplicateChecked (event) {
         if (event.success) {
-            this.setProgress(66, 'Compiling Mutant');
+            this.setProgress(66, i18n.tr('Compiling Mutant'));
         } else {
-            this.setProgress(100, 'Found Duplicate Mutant');
+            this.setProgress(100, i18n.tr('Found Duplicate Mutant'));
         }
     }
 
     _onMutantCompiled (event) {
         if (event.success) {
-            this.setProgress(83, 'Running Tests Against Mutant');
+            this.setProgress(83, i18n.tr('Running Tests Against Mutant'));
         } else {
-            this.setProgress(100, 'Mutant Did Not Compile');
+            this.setProgress(100, i18n.tr('Mutant Did Not Compile'));
         }
     }
 
     _onMutantTested (event) {
-        this.setProgress(100, 'Done');
+        this.setProgress(100, i18n.tr('Done'));
         // if (event.survived) {
         //     setProgress(100, 'Mutant Survived');
         // } else {

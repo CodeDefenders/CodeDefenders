@@ -20,7 +20,9 @@
 --%>
 <%@ tag pageEncoding="UTF-8" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c;" hidden>
     <i class="fa fa-arrow-down me-1"></i>
-    Indicate which line you are defending to enable the test editor. Click on a line number.
+    ${i18n.tr("Indicate which line you are defending to enable the test editor. Click on a line number.")}
 </div>

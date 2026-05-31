@@ -78,7 +78,8 @@ SELECT p.*,
        u.Active           AS usersActive,
        u.AllowContact     AS usersAllowContact,
        u.KeyMap           AS usersKeyMap,
-       u.KeepPreviousTest AS usersKeepPreviousTest
+       u.KeepPreviousTest AS usersKeepPreviousTest,
+       u.Language         AS usersLanguage
 FROM players AS p,
      view_valid_users AS u
 WHERE p.User_ID = u.User_ID;

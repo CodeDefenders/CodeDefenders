@@ -37,11 +37,14 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.net.InetAddresses;
 
@@ -59,19 +62,22 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     private final MessagesBean messages;
     private final UserService userService;
     private final URLUtils url;
+    private final UserRepository userRepository;
 
     @Inject
-    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils) {
+    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils,
+                                                 UserRepository userRepository) {
         super();
 
         this.messages = messages;
         this.userService = userService;
+        this.userRepository = userRepository;
         this.url = urlUtils;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
-        this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        this.setLoginUrl(Paths.LOGIN);
         // Go to game overview page after successful login
-        this.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        this.setSuccessUrl(Paths.GAMES_OVERVIEW);
     }
 
     /**
@@ -97,6 +103,20 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             ((UsernamePasswordToken) token).clear();
         }
 
+        // save browser locale if user has no locale (first login)
+        var userOpt = userRepository.getUserById(userId);
+        if (userOpt.isPresent()) {
+            var user = userOpt.get();
+            if (user.getLocale() == null) {
+                var locale = I18nService.getSessionLocale((HttpServletRequest) request);
+                user.setLocale(locale);
+                userRepository.update(user);
+                logger.info("Changed language of user '{}' to {}", user.getUsername(), locale.getLanguage());
+            }
+        } else {
+            logger.error("User not found.");
+        }
+
         // Call the super method, as this is the one doing the redirect after a successful login.
         return super.onLoginSuccess(token, subject, request, response);
     }
@@ -110,7 +130,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
             ServletResponse response) {
 
-        messages.add("Username not found or password incorrect.");
+        messages.add(I18n.marktr("Username not found or password incorrect."));
 
         if (request instanceof HttpServletRequest httpRequest
                 && response instanceof HttpServletResponse httpResponse) {

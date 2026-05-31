@@ -37,7 +37,7 @@ class TestProgressBar extends ProgressBar {
     }
 
     async activate () {
-        this.setProgress(16, 'Submitting Test');
+        this.setProgress(16, i18n.tr('Submitting Test'));
         await this._register();
         await this._subscribe();
 
@@ -65,35 +65,35 @@ class TestProgressBar extends ProgressBar {
     }
 
     _onTestSubmitted (event) {
-        this.setProgress(33, 'Validating Test');
+        this.setProgress(33, i18n.tr('Validating Test'));
     }
 
     _onTestValidated (event) {
         if (event.success) {
-            this.setProgress(50, 'Compiling Test');
+            this.setProgress(50, i18n.tr('Compiling Test'));
         } else {
-            this.setProgress(100, 'Test Is Not Valid');
+            this.setProgress(100, i18n.tr('Test Is Not Valid'));
         }
     }
 
     _onTestCompiled (event) {
         if (event.success) {
-            this.setProgress(66, 'Running Test Against Original');
+            this.setProgress(66, i18n.tr('Running Test Against Original'));
         } else {
-            this.setProgress(100, 'Test Did Not Compile');
+            this.setProgress(100, i18n.tr('Test Did Not Compile'));
         }
     }
 
     _onTestTestedOriginal (event) {
         if (event.success) {
-            this.setProgress(83, 'Running Test Against Mutants');
+            this.setProgress(83, i18n.tr('Running Test Against Mutants'));
         } else {
-            this.setProgress(100, 'Test Failed Against Original');
+            this.setProgress(100, i18n.tr('Test Failed Against Original'));
         }
     }
 
     _onTestTestedMutants (event) {
-        this.setProgress(100, 'Done');
+        this.setProgress(100, i18n.tr('Done'));
     }
 }
 

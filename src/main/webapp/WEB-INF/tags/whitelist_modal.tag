@@ -22,6 +22,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
@@ -33,22 +35,22 @@
 <%@ attribute name="type" required="true" %>
 
 <div>
-    <t:modal title="Invite players" id="${htmlId}"
+    <t:modal title="${i18n.tr('Invite players')}" id="${htmlId}"
              modalDialogClasses="modal-lg">
         <jsp:attribute name="content">
             <div id="whitelist-inputs" type="hidden"></div>
             <div class="card" id="whitelist-modal-card">
                 <div class="card-header">
-                    <label for="searchInput">Search: </label>
+                    <label for="searchInput">${i18n.tr('Search')}: </label>
                 </div>
                 <div class="card-body">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Invite users">
+                    <input type="text" id="searchInput" class="form-control" placeholder="${i18n.tr('Invite users')}">
                     <div id="autocompleteList" class="list-group overflow-auto" style="max-height: 50vh"></div>
                 </div>
             </div>
             <div class="card mt-2 mb-2">
                 <div class="card-header">
-                    <h6>Users to invite:</h6>
+                    <h6>${i18n.tr('Users to invite')}:</h6>
                 </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2" id="invited"></div>
@@ -58,7 +60,7 @@
                 <c:when test="${liveGame}">
                     <div class="card">
                         <div class="card-header">
-                            <h6>Already invited users:</h6>
+                            <h6>${i18n.tr('Already invited users')}:</h6>
                         </div>
                         <div class="card-body">
                             <div class="d-flex flex-wrap gap-2" id="already-whitelisted"></div>
@@ -70,11 +72,11 @@
         </jsp:attribute>
         <jsp:attribute name="footer">
             <button type="button" id="copy-link-button" class="btn-primary btn">
-                Copy invite link
+                ${i18n.tr('Copy invite link')}
             </button>
             <c:choose>
                 <c:when test="${liveGame}">
-                    <button type="button" class="btn btn-primary disabled" id="update-button">Save changes</button>
+                    <button type="button" class="btn btn-primary disabled" id="update-button">${i18n.tr('Save changes')}</button>
                 </c:when>
             </c:choose>
         </jsp:attribute>
@@ -359,7 +361,7 @@
                 item.appendChild(name);
                 if (!mayChooseRole()) {
                     const defenderInvite = document.createElement("button");
-                    defenderInvite.textContent = "Invite as defender";
+                    defenderInvite.textContent = "${i18n.tr('Invite as defender')}";
                     defenderInvite.type = "button";
                     defenderInvite.classList.add("btn", "btn-primary", "btn-sm");
                     defenderInvite.addEventListener("click", function () {
@@ -372,9 +374,9 @@
                 }
 
                 const flexInvite = document.createElement("button");
-                flexInvite.textContent = mayChooseRole() ? "Invite" : "Balance teams";
+                flexInvite.textContent = mayChooseRole() ? "${i18n.tr('Invite')}" : "${i18n.tr('Balance teams')}";
                 if (!mayChooseRole()) {
-                    flexInvite.title = "Player will join the team with fewer players.";
+                    flexInvite.title = "${i18n.tr('Player will join the team with fewer players.')}";
                 }
                 flexInvite.type = "button";
                 flexInvite.classList.add("btn", "btn-secondary", "btn-sm");
@@ -388,7 +390,7 @@
 
                 if (!mayChooseRole()) {
                     const attackerInvite = document.createElement("button");
-                    attackerInvite.textContent = "Add as attacker";
+                    attackerInvite.textContent = "${i18n.tr('Add as attacker')}";
                     attackerInvite.classList.add("btn", "btn-danger", "btn-sm");
                     attackerInvite.addEventListener("click", function () {
                         addUserToWhitelist(match, "attacker");
@@ -468,13 +470,13 @@
         async function copyLink(inviteLink) {
             navigator.clipboard.writeText(inviteLink)
                     .then(() => {
-                        linkButton.innerText = "Copied!";
+                        linkButton.innerText = "${i18n.tr('Copied!')}";
                         setTimeout(() => {
-                            linkButton.innerText = "Copy invite link";
+                            linkButton.innerText = "${i18n.tr('Copy invite link')}";
                         }, 2000);
                     })
                     .catch(err => {
-                        console.error('Failed to copy: ', err);
+                        console.error('${i18n.tr("Failed to copy")}: ', err);
                     });
         }
 
@@ -579,7 +581,7 @@
                     } else if (!flexResponse.ok) {
                         errorMessage = flexResponse.text();
                     }
-                    console.error("Error updating whitelist:", errorMessage);
+                    console.error("${i18n.tr('Error updating whitelist')}", errorMessage);
                 }
 
             });

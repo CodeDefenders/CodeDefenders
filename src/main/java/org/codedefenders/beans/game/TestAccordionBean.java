@@ -34,7 +34,6 @@ import jakarta.inject.Named;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
@@ -42,6 +41,7 @@ import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -86,9 +86,11 @@ public class TestAccordionBean {
         categories = new ArrayList<>();
         categories.add(
                 new TestAccordionCategory(
-                        "All Tests",
+                        I18n.marktr("All Tests"),
                         GameAccordionMapping.ALL_CATEGORY_ID,
-                        mapping.allElements));
+                        mapping.allElements
+                )
+        );
 
         for (int i = 0; i < methodDescriptions.size(); i++) {
             MethodDescription method = methodDescriptions.get(i);

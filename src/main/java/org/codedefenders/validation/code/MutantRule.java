@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import org.apache.commons.lang3.function.TriFunction;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.difflib.patch.AbstractDelta;
 import com.github.javaparser.ast.CompilationUnit;
@@ -43,7 +45,7 @@ import com.github.javaparser.ast.Node;
  */
 public class MutantRule extends ValidationRule {
 
-    private final List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>> compilationUnitRules;
+    private final List<TriFunction<CompilationUnit, CompilationUnit, I18n, Optional<String>>> compilationUnitRules;
     private final List<LineDiffRule> lineDiffRules;
     private final List<BiPredicate<String, String>> codeRules;
     private final List<Predicate<Node>> insertionNodeRules;
@@ -55,7 +57,7 @@ public class MutantRule extends ValidationRule {
                        List<Predicate<Node>> insertionNodeRules,
                        List<BiPredicate<String, String>> codeRules,
                        List<LineDiffRule> lineDiffRules,
-                       List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>> compilationUnitRules) {
+                       List<TriFunction<CompilationUnit, CompilationUnit, I18n, Optional<String>>> compilationUnitRules) {
         super(generalDescription, detailedDescription, message, visible);
         this.insertionRules = insertionRules;
         this.insertionNodeRules = insertionNodeRules;
@@ -64,10 +66,10 @@ public class MutantRule extends ValidationRule {
         this.compilationUnitRules = compilationUnitRules;
     }
 
-    CodeValidationResult fails(CompilationUnit original, CompilationUnit changed) {
+    CodeValidationResult fails(CompilationUnit original, CompilationUnit changed, I18n i18n) {
         CodeValidationResult validationResult = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         for (var rule : compilationUnitRules) {
-            Optional<String> result = rule.apply(original, changed);
+            Optional<String> result = rule.apply(original, changed, i18n);
             if (result.isPresent()) {
                 if (result.get().isEmpty()) {
                     validationResult.add(this);
@@ -109,7 +111,7 @@ public class MutantRule extends ValidationRule {
     }
 
     static class Builder {
-        private final List<BiFunction<CompilationUnit, CompilationUnit, Optional<String>>>
+        private final List<TriFunction<CompilationUnit, CompilationUnit, I18n, Optional<String>>>
                 compilationUnitRules = new ArrayList<>();
         private final List<LineDiffRule> lineDiffRules = new ArrayList<>();
         private final List<BiPredicate<String, String>> codeRules = new ArrayList<>();
@@ -142,7 +144,7 @@ public class MutantRule extends ValidationRule {
          *             should be an empty String. If the rule has not been broken, the function should return an empty
          *             Optional.
          */
-        Builder withCompilation(BiFunction<CompilationUnit, CompilationUnit, Optional<String>> rule) {
+        Builder withCompilation(TriFunction<CompilationUnit, CompilationUnit, I18n, Optional<String>> rule) {
             compilationUnitRules.add(rule);
             return this;
         }
@@ -153,7 +155,7 @@ public class MutantRule extends ValidationRule {
          *             (2nd param) code and return true if the change violates this rule.
          */
         Builder withCompilationPredicate(BiPredicate<CompilationUnit, CompilationUnit> rule) {
-            compilationUnitRules.add((o,m)
+            compilationUnitRules.add((o,m, i18n)
                     -> rule.test(o, m) ? Optional.of("") : Optional.empty());
             return this;
         }

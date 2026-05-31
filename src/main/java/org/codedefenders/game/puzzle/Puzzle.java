@@ -87,16 +87,6 @@ public class Puzzle {
     private Integer position;
 
     /**
-     * Title of the puzzle. Can be null.
-     */
-    private String title;
-
-    /**
-     * Description of the puzzle. Can be null.
-     */
-    private String description;
-
-    /**
      * The {@link PuzzleChapter} this puzzle belongs to.
      */
     private PuzzleChapter chapter;
@@ -116,8 +106,6 @@ public class Puzzle {
      * @param editableLinesEnd     Last editable line of the class or test. Can be null.
      * @param chapterId            ID of the chapter the puzzle belongs to. Can be null.
      * @param position             Position of the puzzle inside the chapter. Can be null.
-     * @param title                Title of the puzzle. Can be null.
-     * @param description          Description of the puzzle. Can be null.
      */
     public Puzzle(int puzzleId,
                   int classId,
@@ -129,9 +117,7 @@ public class Puzzle {
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
                   Integer chapterId,
-                  Integer position,
-                  String title,
-                  String description) {
+                  Integer position) {
         this.puzzleId = puzzleId;
         this.classId = classId;
         this.type = type;
@@ -143,21 +129,17 @@ public class Puzzle {
         this.editableLinesEnd = editableLinesEnd;
         this.chapterId = chapterId;
         this.position = position;
-        this.title = title;
-        this.description = description;
         this.chapter = null;
     }
 
     public static Puzzle forPuzzleInfo(int puzzleId,
                                        Integer chapterId,
                                        Integer position,
-                                       String title,
-                                       String description,
                                        int maxAssertionsPerTest,
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
         return new Puzzle(puzzleId, -1, null, false, null, maxAssertionsPerTest,
-            null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+            null, editableLinesStart, editableLinesEnd, chapterId, position);
     }
 
     public int getPuzzleId() {
@@ -240,21 +222,7 @@ public class Puzzle {
         this.position = position;
     }
 
-    public String getTitle() {
-        return title;
-    }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
     /**
      * Returns the {@link PuzzleChapter} this puzzle belongs to. If the {@link PuzzleChapter} is requested for the first

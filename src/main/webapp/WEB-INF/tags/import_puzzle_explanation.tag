@@ -19,9 +19,10 @@
 
 --%>
 <%@ tag pageEncoding="UTF-8" %>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <p>
-    The file tree below shows the file structure for a puzzle.
+    ${i18n.tr('The file tree below shows the file structure for a puzzle.')}
 </p>
 
 <pre class="mb-3 p-3 bg-light" style="line-height: 1.15;">puzzle.zip
@@ -48,25 +49,25 @@
 <ul>
     <li>
         <code>cut</code>:
-        Contains a single <code>.java</code> file to be used as the CUT (class under test).
+        ${i18n.tr('Contains a single .java file to be used as the CUT (class under test).')}
     </li>
     <li>
         <code>cut/deps</code>:
-        Contains any dependencies of the CUT as plain <code>.java</code> files.
-        This folder is allowed to have arbitrary sub-folders.
+        ${i18n.tr('Contains any dependencies of the CUT as plain .java files.')}
+        ${i18n.tr('This folder is allowed to have arbitrary sub-folders.')}
     </li>
     <li>
         <code>mutants</code>:
-        Contains the mutants, each in its separate sub-folder.
-        All mutants should have the same name as the CUT.
+        ${i18n.tr('Contains the mutants, each in its separate sub-folder.')}
+        ${i18n.tr('All mutants should have the same name as the CUT.')}
     </li>
     <li>
         <code>tests</code>:
-        Contains the tests, each in its separate sub-folder.
-        Tests can have any name, except the name of the CUT.
+        ${i18n.tr('Contains the tests, each in its separate sub-folder.')}
+        ${i18n.tr('Tests can have any name, except the name of the CUT.')}
     </li>
     <li>
         <code>puzzle.properties</code>:
-        The configuration file of the puzzle.
+        ${i18n.tr('The configuration file of the puzzle.')}
     </li>
 </ul>

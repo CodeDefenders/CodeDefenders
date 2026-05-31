@@ -41,9 +41,11 @@ import org.codedefenders.notification.web.PushSocket;
 import org.codedefenders.persistence.database.GameChatRepository;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.game.ChatCommand.ALL;
 import static org.codedefenders.game.ChatCommand.TEAM;
@@ -61,6 +63,7 @@ public class ClientEventHandler {
     private final PlayerRepository playerRepo;
     private final SimpleUser user;
     private final String ticket;
+    private final I18nService i18nService;
 
     public ClientEventHandler(
             INotificationService notificationService,
@@ -68,13 +71,16 @@ public class ClientEventHandler {
             GameRepository gameRepo,
             PlayerRepository playerRepo,
             SimpleUser user,
-            String ticket) {
+            String ticket,
+            I18nService i18nService
+    ) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
         this.gameRepo = gameRepo;
         this.playerRepo = playerRepo;
         this.user = user;
         this.ticket = ticket;
+        this.i18nService = i18nService;
     }
 
     /**
@@ -121,12 +127,14 @@ public class ClientEventHandler {
             } else if (command.equals(TEAM.getCommandString())) {
                 isAllChat = false;
             } else {
-                sendSystemMessage("/" + command + " is not a valid chat command.");
+                I18n i18n = i18nService.getI18n(user.getId());
+                sendSystemMessage(i18n.tr("/{0} is not a valid chat command.", command));
                 return;
             }
             message = message.substring(command.length() + 1).trim();
             if (message.isEmpty()) {
-                sendSystemMessage("Your message cannot be empty.");
+                I18n i18n = i18nService.getI18n(user.getId());
+                sendSystemMessage(i18n.tr("Your message cannot be empty."));
                 return;
             }
         }

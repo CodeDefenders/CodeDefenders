@@ -19,18 +19,30 @@
 
 --%>
 <%@ page pageEncoding="UTF-8" %>
+
+<%@ page import="org.xnap.commons.i18n.I18n" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+<%@ page import="org.codedefenders.service.I18nService" %>
+
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<%
+    // in case of access denied from "/admin" the I18nFilter is bypassed
+    if (request.getAttribute("i18n") == null) {
+        I18n i18n = CDIUtil.getBeanFromCDI(I18nService.class).getI18n(request);
+        pageContext.setAttribute("i18n", i18n);
+    }
+%>
+
 <t:error_page
-        title="The page you're looking for could not be found (404)"
+        title='${i18n.tr("The page you\'re looking for could not be found (404)")}'
         statusCode="404"
-        shortDescription="The page could not be found, or you don't have permission to view it.">
+        shortDescription='${i18n.tr("The page could not be found, or you don\'t have permission to view it.")}'>
     <jsp:attribute name="message">
-        <p>
-            The resource that you are attempting to access does not exist,
-            or you don't have the necessary permissions to view it.
-        </p>
-        <p>Make sure the address is correct and that the page hasn't moved.</p>
-        <p>Please contact your administrator if you think this is a mistake.</p>
+        <p>${i18n.tr("The resource that you are attempting to access does not exist, or you don\'t have the necessary permissions to view it.")}</p>
+        <p>${i18n.tr("Make sure the address is correct and that the page hasn\'t moved.")}</p>
+        <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
     </jsp:attribute>
 </t:error_page>

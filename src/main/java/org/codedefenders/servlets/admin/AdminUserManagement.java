@@ -35,17 +35,20 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.RoleService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
@@ -73,6 +76,9 @@ public class AdminUserManagement extends HttpServlet {
     private URLUtils url;
 
     @Inject
+    private I18nService i18nService;
+
+    @Inject
     private PasswordEncoder passwordEncoder;
 
     @Inject
@@ -81,19 +87,14 @@ public class AdminUserManagement extends HttpServlet {
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-    private static final String NEW_ACCOUNT_MSG = """
+    private static final String NEW_ACCOUNT_MSG = I18n.marktr("""
             Welcome to Code Defenders!
 
-            An account has been created for you with Username %s and Password %s.
-            You can log in at %s.
+            An account has been created for you with Username {0} and Password {1}.
+            You can log in at {2}.
 
-            Happy coding!""".stripIndent();
+            Happy coding!""").stripIndent();
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = """
-            %s,
-
-            your password has been reset to %s
-            Please change it at your next convenience.""".stripIndent();
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -130,16 +131,15 @@ public class AdminUserManagement extends HttpServlet {
                 if (userId.isPresent()) {
                     final boolean success = setUserInactive(userId.get());
                     if (success) {
-                        messages.add("Successfully set user with id " + userId.get() + " as inactive.");
+                        messages.addFormatted(I18n.marktr("Successfully set user with id {0} as inactive."), userId.get());
                     } else {
                         logger.warn("Setting user as inactive failed.");
-                        messages.add("Failed to set user as inactive.");
+                        messages.add(I18n.marktr("Failed to set user as inactive."));
                     }
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
                 if (userToEdit.isPresent()) {
-                    responsePath = url.forPath(Paths.ADMIN_USERS)
-                            + "?editUser=" + userToEdit.get();
+                    responsePath = url.forPath(Paths.ADMIN_USERS) + "?editUser=" + userToEdit.get();
                 }
                 break;
             }
@@ -168,20 +168,19 @@ public class AdminUserManagement extends HttpServlet {
                     boolean isTeacher = request.getParameter("role-teacher") != null;
                     boolean isAdmin = request.getParameter("role-admin") != null;
 
-                    String msg;
+                    PreparedMessage msg;
 
                     if (!password.equals(confirmPassword)) {
-                        msg = "Passwords don't match";
+                        msg = new PreparedMessage(I18n.marktr("Passwords don't match"));
                     } else {
                         String newPassword = null;
-                        if (!password.equals("")) {
+                        if (!password.isEmpty()) {
                             newPassword = password;
                         }
 
-                        Optional<String> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
+                        Optional<PreparedMessage> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
                         if (result.isPresent()) { // There was an error
-                            responsePath = url.forPath(Paths.ADMIN_USERS)
-                                    + "?editUser=" + userId.get();
+                            responsePath = url.forPath(Paths.ADMIN_USERS) + "?editUser=" + userId.get();
                             msg = result.get();
                         } else {
                             if (isTeacher) {
@@ -195,7 +194,10 @@ public class AdminUserManagement extends HttpServlet {
                                 roleService.removeRoleForUser(userId.get(), new AdminRole());
                             }
 
-                            msg = "Successfully updated info for User " + userId.get();
+                            msg = new PreparedMessage(
+                                    I18n.marktr("Successfully updated info for User {0}"),
+                                    userId.get()
+                            );
                         }
                     }
 
@@ -247,32 +249,39 @@ public class AdminUserManagement extends HttpServlet {
         final String[] credentials = userCredentials.split("[,;]+");
         if (credentials.length < 2) {
             logger.info("Failed to create user due to not enough arguments:" + credentials.length);
-            messages.add("Please provide at least username and password");
+            messages.add(I18n.marktr("Please provide at least username and password"));
             return;
         } else if (credentials.length > 3) {
             logger.info("Failed to create user due to too many arguments:" + credentials.length);
-            messages.add("Please provide at maximum username,password and email");
+            messages.add(I18n.marktr("Please provide at maximum username,password and email"));
             return;
         }
 
         final String username = credentials[0].trim();
         if (userRepo.getUserByName(username).isPresent()) {
             logger.info("Failed to create user. Username already in use:" + username);
-            messages.add("Username '" + username + "' already in use.");
+            messages.addFormatted(I18n.marktr("Username '{0}' already in use."), username);
             return;
         }
         if (!validator.validUsername(username)) {
             logger.info("Failed to create user. Username invalid:" + username);
-            messages.add("Username '" + username + "' invalid, user not created");
+            messages.addFormatted(I18n.marktr("Username '{0}' invalid, user not created"), username);
             return;
         }
 
         final String password = credentials[1].trim();
         if (!validator.validPassword(password)) {
             logger.info("Failed to create user. Password invalid:" + password);
-            messages.add("Password for user " + username + " invalid, user not created. Please notice that only >= "
-                    + AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()
-                    + " alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.");
+            messages.addFormatted(
+                    I18n.marktr(
+                        """
+                        Password for user {0} invalid, user not created.
+                        Please notice that only >= {0} alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.
+                        """
+                    ),
+                    username,
+                    AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()
+            );
             return;
         }
 
@@ -283,31 +292,37 @@ public class AdminUserManagement extends HttpServlet {
             email = credentials[2].trim();
             if (userRepo.getUserByEmail(email).isPresent()) {
                 logger.info("Failed to create user. Email address already in use:" + email);
-                messages.add("Email '" + email + "' already in use.");
+                messages.addFormatted(I18n.marktr("Email '{0}' already in use."), email);
                 return;
             }
             if (!validator.validEmailAddress(email)) {
                 logger.info("Failed to create user. Email invalid:" + email);
-                messages.add("Email for user " + username + " invalid, user not created.");
+                messages.addFormatted(I18n.marktr("Email for user {0} invalid, user not created."), username);
                 return;
             }
         } else {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email);
+        final UserEntity user = new UserEntity(username, passwordEncoder.encode(password), email, null);
         final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {
-            final String errorMsg = "Failed to create account for user '" + username + "'";
-            logger.error(errorMsg);
-            messages.add(errorMsg);
+            final String errorMsg = I18n.marktr("Failed to create account for user '{0}'");
+            logger.error(errorMsg, username);
+            messages.addFormatted(errorMsg, username);
         } else {
-            messages.add("Created user " + username + (hasMail ? " (" + email + ")" : ""));
+            messages.addFormatted(
+                    I18n.marktr("Created user {0}"),
+                    username + (hasMail ? " (" + email + ")" : "")
+            );
             if (hasMail && sendMail && hostAddress != null) {
                 final boolean mailSuccess = sendNewAccountMsg(email, username, password, hostAddress);
                 if (!mailSuccess) {
-                    messages.add("Could not send email to user " + username + " with email " + email);
+                    messages.addFormatted(
+                            I18n.marktr("Could not send email to user {0} with email {1}"),
+                            username, email
+                    );
                     logger.error("Failed to send account creation mail to user " + username + "<" + email + ">");
                 } else {
                     logger.info("Successfully sent account creation mail to user " + username + "<" + email + ">");
@@ -317,11 +332,19 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private boolean sendNewAccountMsg(String email, String name, String password, String hostAddr) {
-        String message = String.format(NEW_ACCOUNT_MSG, name, password, hostAddr);
-        return EmailUtils.sendEmail(email, "Your Code Defenders Account", message);
+        I18n i18n = I18nService.getI18n(i18nService.getDefaultLocale());
+        String message = i18n.tr(NEW_ACCOUNT_MSG, name, password, hostAddr);
+        String subject = I18n.marktr("Your Code Defenders Account");
+        return EmailUtils.sendEmail(email, subject, message);
     }
 
     /*
+    private static final String PASSWORD_RESET_MSG = """
+            %s,
+
+            your password has been reset to %s
+            Please change it at your next convenience.""".stripIndent();
+
     private String deleteUser(int uid) {
         return "Currently disabled!";
         // return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error

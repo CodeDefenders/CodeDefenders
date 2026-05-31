@@ -20,7 +20,6 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -31,6 +30,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.ClassViewerBean;
 import org.codedefenders.beans.game.MutantAccordionBean;
 import org.codedefenders.beans.game.TestAccordionBean;
@@ -41,12 +41,15 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.ADMIN_PUZZLE_MANAGEMENT_JSP;
@@ -91,6 +94,12 @@ public class AdminPuzzleManagement extends HttpServlet {
     @Inject
     private ClassViewerBean classViewer;
 
+    @Inject
+    private I18nService i18nService;
+
+    @Inject
+    private CodeDefendersAuth login;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -107,11 +116,11 @@ public class AdminPuzzleManagement extends HttpServlet {
      */
     private void displayPuzzlePreview(HttpServletRequest request, HttpServletResponse response, int puzzleId)
             throws ServletException, IOException {
-
+        I18n i18n = i18nService.getI18n(request);
         Puzzle puzzle = puzzleRepo.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpStatus.SC_NOT_FOUND);
-            response.getWriter().println("Puzzle not found.");
+            response.getWriter().println(i18n.tr("Puzzle not found."));
             return;
         }
 
@@ -127,12 +136,19 @@ public class AdminPuzzleManagement extends HttpServlet {
                 .toList();
 
         List<MutantDTO> mutantDTOs = mutants.stream()
-                .map(mutant -> convertMutant(mutant, attacker, tests))
+                .map(mutant -> convertMutant(mutant, attacker, tests, i18n))
                 .toList();
 
         classViewer.init(cut);
         testAccordion.init(cut, testDTOs);
         mutantAccordion.init(cut, mutantDTOs, -1);
+
+        // Resolve the puzzle text for the admin's locale
+        String userLang = login.getUser().getLocale().getLanguage();
+        String defaultLang = i18nService.getDefaultLocale().getLanguage();
+        PuzzleText puzzleText = puzzleRepo.getPuzzleTextWithFallback(puzzleId, userLang, defaultLang);
+        request.setAttribute("puzzleTitle", puzzleText != null ? puzzleText.title() : "");
+        request.setAttribute("puzzleDescription", puzzleText != null ? puzzleText.description() : "");
 
         request.setAttribute("puzzle", puzzle);
         request.setAttribute("mutants", mutants);
@@ -158,7 +174,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 test.getAsString());
     }
 
-    private MutantDTO convertMutant(Mutant mutant, SimpleUser creator, List<Test> tests) {
+    private MutantDTO convertMutant(Mutant mutant, SimpleUser creator, List<Test> tests, I18n i18n) {
         Test killingTest = testRepo.getKillingTestForMutantId(mutant.getId());
         SimpleUser killedBy = null;
         int killedByTestId = -1;
@@ -177,8 +193,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 creator,
                 killingTest == null ? Mutant.State.ALIVE : Mutant.State.KILLED,
                 mutant.getScore(),
-                mutant.getHTMLReadout().stream()
-                        .filter(Objects::nonNull).collect(Collectors.joining("<br>")),
+                mutant.getDescription(i18n),
                 mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
                 tests.stream().anyMatch(test -> test.isMutantCovered(mutant)),
                 true,

@@ -54,8 +54,8 @@ import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
-import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
 import static org.codedefenders.servlets.util.ServletUtils.getEnumParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
@@ -123,9 +123,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
                         break;
                 }
             } catch (NoSuchElementException e) {
-                messages.add("ERROR: Missing parameter");
+                messages.add(I18n.marktr("ERROR: Missing parameter"));
             } catch (IllegalArgumentException e) {
-                messages.add("ERROR: Invalid parameter");
+                messages.add(I18n.marktr("ERROR: Invalid parameter"));
             }
         }
         Redirect.redirectBack(request, response);
@@ -199,16 +199,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
         final int minDuration = 1;
 
         if (duration > maxDuration) {
-            messages.add(String.format(
-                    "INFO: The max. allowed duration is %d minutes.",
-                    maxDuration
-            ));
+            messages.addFormatted(I18n.marktr("INFO: The max. allowed duration is {0} minutes."), maxDuration);
             return maxDuration;
         } else if (duration < minDuration) {
-            messages.add(String.format(
-                    "INFO: The min. allowed duration is %d minutes.",
-                    minDuration
-            ));
+            messages.addFormatted(I18n.marktr("INFO: The min. allowed duration is {0} minutes."), minDuration);
             return minDuration;
         } else {
             return duration;
@@ -279,9 +273,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
         Set<Integer> assignedUsers = getContext().getStagedGames().getAssignedUsers();
         for (UserInfo user : players.get()) {
             if (assignedUsers.contains(user.getId())) {
-                messages.add(format("ERROR: Cannot create staged games with user {0}. "
-                        + "User is already assigned to a staged game.",
-                        user.getName()));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot create staged games with user {0}. User is already assigned to a staged game."),
+                        user.getName()
+                );
                 return;
             }
         }
@@ -289,13 +284,15 @@ public abstract class CreateGamesServlet extends HttpServlet {
         /* Validate team sizes. */
         if (gameSettings.getGameType() == MELEE) {
             if (playersPerGame <= 0) {
-                messages.add(format("Invalid team sizes. Players per game: {0}.", playersPerGame));
+                messages.addFormatted(I18n.marktr("Invalid team sizes. Players per game: {0}."), playersPerGame);
             }
             attackersPerGame = playersPerGame;
         } else {
             if (attackersPerGame < 0 || defendersPerGame < 0 || (attackersPerGame == 0 && defendersPerGame == 0)) {
-                messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
-                        attackersPerGame, defendersPerGame));
+                messages.addFormatted(
+                        I18n.marktr("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}."),
+                        attackersPerGame, defendersPerGame
+                );
                 return;
             }
         }
@@ -317,7 +314,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
         GameSettings gameSettings = extractGameSettings(request);
 
         if (numGames > 100) {
-            messages.add("ERROR: Won't create more than 100 staged games.");
+            messages.add(I18n.marktr("ERROR: Won't create more than 100 staged games."));
             return;
         }
 
@@ -338,13 +335,13 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 .map(StagedGameList::formattedToNumericGameId)
                 .map(Optional::get)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getMap();
 
         /* Verify that all staged games exist. */
         if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
-            messages.add("ERROR: Cannot delete staged games. Not all selected staged games exist.");
+            messages.add(I18n.marktr("ERROR: Cannot delete staged games. Not all selected staged games exist."));
             return;
         }
 
@@ -369,13 +366,13 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 .map(StagedGameList::formattedToNumericGameId)
                 .map(Optional::get)
                 .distinct()
-                .collect(Collectors.toList());
+                .toList();
 
         Map<Integer, StagedGame> existingStagedGames = getContext().getStagedGames().getMap();
 
         /* Verify that all staged games exist. */
         if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
-            messages.add("ERROR: Cannot create staged games. Not all selected staged games exist.");
+            messages.add(I18n.marktr("ERROR: Cannot create staged games. Not all selected staged games exist."));
             return;
         }
 
@@ -398,8 +395,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
-            messages.add(format("ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist.",
-                    userId, StagedGameList.numericToFormattedGameId(gameId)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist."),
+                    userId, StagedGameList.numericToFormattedGameId(gameId)
+            );
             return;
         }
 
@@ -418,8 +417,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
-            messages.add(format("ERROR: Cannot remove you from staged game {1}. Staged game does not exist.",
-                    StagedGameList.numericToFormattedGameId(gameId)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot remove you from staged game {0}. Staged game does not exist."),
+                    StagedGameList.numericToFormattedGameId(gameId)
+            );
             return;
         }
 
@@ -437,14 +438,16 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         UserInfo user = getContext().getUserInfo(userId);
         if (user == null) {
-            messages.add(format("ERROR: Cannot switch role of user {0}. Invalid user.", userId));
+            messages.addFormatted(I18n.marktr("ERROR: Cannot switch role of user {0}. Invalid user."), userId);
             return;
         }
 
         StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
-            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist.",
-                    userId, StagedGameList.numericToFormattedGameId(gameId)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist."),
+                    userId, StagedGameList.numericToFormattedGameId(gameId)
+            );
             return;
         }
 
@@ -462,8 +465,10 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         StagedGame stagedGame = getContext().getStagedGame(gameId);
         if (stagedGame == null) {
-            messages.add(format("ERROR: Cannot switch creator role in staged game {1}. Staged game does not exist.",
-                    StagedGameList.numericToFormattedGameId(gameId)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot switch creator role in staged game {0}. Staged game does not exist."),
+                    StagedGameList.numericToFormattedGameId(gameId)
+            );
             return;
         }
 
@@ -485,22 +490,28 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
         StagedGame stagedGameFrom = getContext().getStagedGame(gameIdFrom);
         if (stagedGameFrom == null) {
-            messages.add(format("ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist.",
-                    userId, StagedGameList.numericToFormattedGameId(gameIdFrom)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist."),
+                    userId, StagedGameList.numericToFormattedGameId(gameIdFrom)
+            );
             return;
         }
 
         StagedGame stagedGameTo = getContext().getStagedGame(gameIdTo);
         if (stagedGameTo == null) {
-            messages.add(format("ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist.",
-                    userId, StagedGameList.numericToFormattedGameId(gameIdTo)));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist."),
+                    userId, StagedGameList.numericToFormattedGameId(gameIdTo)
+            );
             return;
         }
 
         UserInfo user = getContext().getUserInfo(userId);
         if (user == null) {
-            messages.add(format("ERROR: Cannot move user {0}. User does not exist.",
-                    userId, gameIdTo));
+            messages.addFormatted(
+                    I18n.marktr("ERROR: Cannot move user {0}. User does not exist."),
+                    userId, gameIdTo
+            );
             return;
         }
 
@@ -532,11 +543,15 @@ public abstract class CreateGamesServlet extends HttpServlet {
         UserInfo user = getContext().getUserInfo(userId);
         if (user == null) {
             if (isStagedGame) {
-                messages.add(format("ERROR: Cannot add user {0} to staged game {1}. User does not exist.",
-                        userId, StagedGameList.numericToFormattedGameId(gameId)));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot add user {0} to staged game {1}. User does not exist."),
+                        userId, StagedGameList.numericToFormattedGameId(gameId)
+                );
             } else {
-                messages.add(format("ERROR: Cannot add user {0} to existing game {1}. User does not exist.",
-                        userId, gameId));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot add user {0} to existing game {1}. User does not exist."),
+                        userId, gameId
+                );
             }
             return;
         }
@@ -544,24 +559,29 @@ public abstract class CreateGamesServlet extends HttpServlet {
         if (isStagedGame) {
             StagedGame stagedGame = getContext().getStagedGame(gameId);
             if (stagedGame == null) {
-                messages.add(format("ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist.",
-                        userId, StagedGameList.numericToFormattedGameId(gameId)));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist."),
+                        userId, StagedGameList.numericToFormattedGameId(gameId)
+                );
                 return;
             }
             getContext().addPlayerToStagedGame(stagedGame, user.getId(), role);
         } else {
             if (!getContext().getAvailableMultiplayerGames().contains(gameId)
                     && !getContext().getAvailableMeleeGames().contains(gameId)) {
-                messages.add(format(
-                        "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action.",
-                        userId, gameId));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action."),
+                        userId, gameId
+                );
                 return;
             }
 
             AbstractGame game = gameRepo.getGame(gameId);
             if (game == null) {
-                messages.add(format("ERROR: Cannot add user {0} to existing game {1}. Game does not exist.",
-                        userId, gameId));
+                messages.addFormatted(
+                        I18n.marktr("ERROR: Cannot add user {0} to existing game {1}. Game does not exist."),
+                        userId, gameId
+                );
                 return;
             }
             getContext().addPlayerToExistingGame(game, user.getId(), role);

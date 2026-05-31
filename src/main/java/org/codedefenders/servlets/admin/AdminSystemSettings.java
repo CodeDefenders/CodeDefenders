@@ -19,9 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -32,207 +30,178 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
-@WebServlet(Paths.ADMIN_SETTINGS)
-// TODO Does this enable CDI using @Property@Inject ?
+import static org.codedefenders.util.Paths.ADMIN_SETTINGS;
+
+@WebServlet(ADMIN_SETTINGS)
 public class AdminSystemSettings extends HttpServlet {
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminSystemSettings.class);
 
     @Inject
     private MessagesBean messages;
 
     @Inject
-    private ConnectionFactory connectionFactory;
-
-    @Inject
     private URLUtils url;
 
     public enum SETTING_NAME {
-        SHOW_PLAYER_FEEDBACK {
-            @Override
-            public String toString() {
-                return "Show other player's feedback to all players in the game.";
-            }
-        },
-        REGISTRATION {
-            @Override
-            public String toString() {
-                return "Show or hide the link for user registration.";
-            }
-        },
-        CLASS_UPLOAD {
-            @Override
-            public String toString() {
-                return "Show or hide the link for CUT upload.";
-            }
-        },
-        GAME_CREATION {
-            @Override
-            public String toString() {
-                return "Show or hide the link for Game Creation.";
-            }
-        },
-        GAME_JOINING {
-            @Override
-            public String toString() {
-                return "Show or hide links to join/leave games.";
-            }
-        },
-        REQUIRE_MAIL_VALIDATION {
-            @Override
-            public String toString() {
-                return "Require a validated email address for login.";
-            }
-        },
-        MIN_PASSWORD_LENGTH {
-            @Override
-            public String toString() {
-                return "Minimum password length, also length of generated passwords. Recommended: >7";
-            }
-        },
-        CONNECTION_POOL_CONNECTIONS {
-            @Override
-            public String toString() {
-                return """
-                        NOT USED, SET THIS VIA THE CONFIGURATION.
-                        Number of permanently open connections. Recommended: >20
-                        Lowering this number closes the delta in connections!""".stripIndent();
-            }
-        },
-        CONNECTION_WAITING_TIME {
-            @Override
-            public String toString() {
-                return """
-                        NOT USED, SET THIS VIA THE CONFIGURATION.
-                        Amount of time in ms a thread waits to be notified of newly available connections.
-                        Recommended: ~5000ms""".stripIndent();
-            }
-        },
-        SITE_NOTICE {
-            @Override
-            public String toString() {
-                return "HTML formatted text shown in the site notice. This is mandatory in many regions.";
-            }
-        },
-        PRIVACY_NOTICE {
-            @Override
-            public String toString() {
-                return "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance.";
-            }
-        },
-        CONTACT_NOTICE {
-            @Override
-            public String toString() {
-                return "HTML formatted text shown on the 'Contact Us' page just below heading.";
-            }
-        },
-        EMAIL_SMTP_HOST {
-            @Override
-            public String toString() {
-                return "SMTP host";
-            }
-        },
-        EMAIL_SMTP_PORT {
-            @Override
-            public String toString() {
-                return "SMTP port";
-            }
-        },
-        EMAIL_ADDRESS {
-            @Override
-            public String toString() {
-                return "System mail account";
-            }
-        },
-        EMAIL_PASSWORD {
-            @Override
-            public String toString() {
-                return "Password for the system mail account";
-            }
-        },
-        EMAIL_USERNAME {
-            @Override
-            public String toString() {
-                return "Username for the system mail account. Should usually be the same as the address. "
-                        + "If left blank, will default to the address.";
-            }
-        },
-        EMAILS_ENABLED {
-            @Override
-            public String toString() {
-                return "Send emails from the specified account for verification, resetting passwords and when"
-                        + "the admin changes user info";
-            }
-        },
-        PASSWORD_RESET_SECRET_LIFESPAN {
-            @Override
-            public String toString() {
-                return "How long (in hours) a password reset secret is valid";
-            }
-        },
-        DEBUG_MODE {
-            @Override
-            public String toString() {
-                return "Turn on certain debugging features such as detailed debug prints for javax.mail";
-            }
-        },
-        AUTOMATIC_KILLMAP_COMPUTATION {
-            @Override
-            public String toString() {
-                return "Turn on the automatic killmaps computation";
-            }
-        },
-        PUBLIC_USER_PROFILE {
-            @Override
-            public String toString() {
-                return "Let users visit the profile pages of others.";
-            }
-        },
-        ALLOW_PUZZLE_SECTION {
-            @Override
-            public String toString() {
-                return "Let users play the puzzles in the puzzle section.";
-            }
-        },
-        FAILED_DUEL_VALIDATION_THRESHOLD {
-            @Override
-            public String toString() {
-                return "The maximum number of tests that will run to validate a lost equivalence duel.";
-            }
-        },
-        GAME_DURATION_MINUTES_MAX {
-            @Override
-            public String toString() {
-                return "The maximum duration that can be set for multiplayer/melee games (in minutes).";
-            }
-        },
-        GAME_DURATION_MINUTES_DEFAULT {
-            @Override
-            public String toString() {
-                return "The default duration a multiplayer/melee game is open (in minutes).";
-            }
-        },
-        TEACHER_APPLICATIONS_ENABLED {
-            @Override
-            public String toString() {
-                return "Enable teacher account applications using email on the 'Contact Us' page. "
-                        + "Configuring a valid email address is required.";
-            }
-        },
-        TEACHER_APPLICATIONS_EMAIL {
-            @Override
-            public String toString() {
-                return "The email address to use for teacher account applications.";
-            }
-        };
+        SHOW_PLAYER_FEEDBACK(
+                I18n.marktr("Show Player Feedback"),
+                I18n.marktr("Show other player's feedback to all players in the game.")
+        ),
+        REGISTRATION(
+                I18n.marktr("Registration"),
+                I18n.marktr("Show or hide the link for user registration.")
+        ),
+        CLASS_UPLOAD(
+                I18n.marktr("Class Upload"),
+                I18n.marktr("Show or hide the link for CUT upload.")
+        ),
+        GAME_CREATION(
+                I18n.marktr("Game Creation"),
+                I18n.marktr("Show or hide the link for Game Creation.")
+        ),
+        GAME_JOINING(
+                I18n.marktr("Game Joining"),
+                I18n.marktr("Show or hide links to join/leave games.")
+        ),
+        REQUIRE_MAIL_VALIDATION(
+                I18n.marktr("Require Mail Validation"),
+                I18n.marktr("Require a validated email address for login.")
+        ),
+        MIN_PASSWORD_LENGTH(
+                I18n.marktr("Min Password Length"),
+                I18n.marktr("Minimum password length, also length of generated passwords. Recommended: >7")
+        ),
+        CONNECTION_POOL_CONNECTIONS(
+                I18n.marktr("Connection Pool Connections"),
+                I18n.marktr(
+                    """
+                    NOT USED, SET THIS VIA THE CONFIGURATION.
+                    Number of permanently open connections. Recommended: >20
+                    Lowering this number closes the delta in connections!
+                    """
+                )
+        ),
+        CONNECTION_WAITING_TIME(
+                I18n.marktr("Connection Waiting Time"),
+                I18n.marktr(
+                    """
+                    NOT USED, SET THIS VIA THE CONFIGURATION.
+                    Amount of time in ms a thread waits to be notified of newly available connections.
+                    Recommended: ~5000ms
+                    """
+                )
+        ),
+        SUPPORTED_LANGUAGES(
+                I18n.marktr("Supported Languages"),
+                I18n.marktr(
+                    """
+                    Comma separated list of supported locales where full translations exist.
+                    The first locale in the list will be used by default.
+                    Language codes like en, de, fr are sufficient.
+                    """
+                )
+        ),
+        EMAIL_SMTP_HOST(
+                I18n.marktr("Email Smtp Host"),
+                I18n.marktr("SMTP host")
+        ),
+        EMAIL_SMTP_PORT(
+                I18n.marktr("Email Smtp Port"),
+                I18n.marktr("SMTP port")
+        ),
+        EMAIL_ADDRESS(
+                I18n.marktr("Email Address"),
+                I18n.marktr("System mail account")
+        ),
+        EMAIL_PASSWORD(
+                I18n.marktr("Email Password"),
+                I18n.marktr("Password for the system mail account")
+        ),
+        EMAIL_USERNAME(
+                I18n.marktr("Email Username"),
+                I18n.marktr(
+                    """
+                    Username for the system mail account.
+                    Should usually be the same as the address. If left blank, will default to the address.
+                    """
+                )
+        ),
+        EMAILS_ENABLED(
+                I18n.marktr("Emails Enabled"),
+                I18n.marktr(
+                """
+                    Send emails from the specified account for verification,
+                    resetting passwords and when the admin changes user info
+                    """
+                )
+        ),
+        PASSWORD_RESET_SECRET_LIFESPAN(
+                I18n.marktr("Password Reset Secret Lifespan"),
+                I18n.marktr("How long (in hours) a password reset secret is valid")
+        ),
+        DEBUG_MODE(
+                I18n.marktr("Debug Mode"),
+                I18n.marktr("Turn on certain debugging features such as detailed debug prints for javax.mail")
+        ),
+        AUTOMATIC_KILLMAP_COMPUTATION(
+                I18n.marktr("Automatic Killmap Computation"),
+                I18n.marktr("Turn on the automatic killmaps computation")
+        ),
+        PUBLIC_USER_PROFILE(
+                I18n.marktr("Public User Profile"),
+                I18n.marktr("Let users visit the profile pages of others.")
+        ),
+        ALLOW_PUZZLE_SECTION(
+                I18n.marktr("Allow Puzzle Section"),
+                I18n.marktr("Let users play the puzzles in the puzzle section.")
+        ),
+        FAILED_DUEL_VALIDATION_THRESHOLD(
+                I18n.marktr("Failed Duel Validation Threshold"),
+                I18n.marktr("The maximum number of tests that will run to validate a lost equivalence duel.")
+        ),
+        GAME_DURATION_MINUTES_MAX(
+                I18n.marktr("Game Duration Minutes Max"),
+                I18n.marktr("The maximum duration that can be set for multiplayer/melee games (in minutes).")
+        ),
+        GAME_DURATION_MINUTES_DEFAULT(
+                I18n.marktr("Game Duration Minutes Default"),
+                I18n.marktr("The default duration a multiplayer/melee game is open (in minutes).")
+        ),
+        TEACHER_APPLICATIONS_ENABLED(
+                I18n.marktr("Teacher Applications Enabled"),
+                I18n.marktr(
+                    """
+                    Enable teacher account applications using email on the 'Contact Us' page.
+                    Configuring a valid email address is required.
+                    """
+                )
+        ),
+        TEACHER_APPLICATIONS_EMAIL(
+                I18n.marktr("Teacher Applications Email"),
+                I18n.marktr("The email address to use for teacher account applications.")
+        );
+
+        private final String readableName;
+        private final String description;
+
+        SETTING_NAME(String readableName, String description) {
+            this.readableName = readableName;
+            this.description = description;
+        }
 
         public String getReadableName() {
-            return Arrays.stream(this.name().split("_"))
-                    .map(s -> s.charAt(0) + s.substring(1).toLowerCase())
-                    .collect(Collectors.joining(" "));
+            return readableName;
+        }
+
+        public String getDescription() {
+            return description;
         }
     }
 
@@ -306,14 +275,14 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = url.forPath("/admin/settings");
+        String responsePath = url.forPath(ADMIN_SETTINGS);
 
         switch (request.getParameter("formType")) {
             case "saveSettings":
                 updateSystemSettings(request);
                 break;
             default:
-                System.err.println("Action not recognised");
+                logger.error("Action not recognised");
                 break;
         }
 
@@ -328,7 +297,7 @@ public class AdminSystemSettings extends HttpServlet {
         for (SettingsDTO setting : settings) {
             String valueString = request.getParameter(setting.getName().name());
             if (setting.getType().equals(SETTING_TYPE.BOOL_VALUE)
-                    || (valueString != null && (!valueString.equals(""))
+                    || (valueString != null && (!valueString.isEmpty())
                     || setting.getType().equals(SETTING_TYPE.STRING_VALUE))) {
                 switch (setting.getType()) {
                     case STRING_VALUE:
@@ -336,12 +305,6 @@ public class AdminSystemSettings extends HttpServlet {
                         break;
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
-                            // connectionFactory.updateSize(Integer.parseInt(valueString));
-                        }
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
-                            // connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
-                        }
                         break;
                     case BOOL_VALUE:
                         setting.setBoolValue(valueString != null);
@@ -352,7 +315,10 @@ public class AdminSystemSettings extends HttpServlet {
                 success = success && AdminDAO.updateSystemSetting(setting);
             }
         }
-        messages.add(success ? "Updated Settings." : "There was a problem. Please consult the logs");
+        messages.add(success
+                ? I18n.marktr("Updated Settings.")
+                : I18n.marktr("There was a problem. Please consult the logs")
+        );
     }
 
 }

@@ -20,6 +20,7 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Locale;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -89,9 +90,11 @@ public class PlayerRepository {
         boolean allowContact = rs.getBoolean("usersAllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("usersKeyMap"));
         boolean keepPreviousTest = rs.getBoolean("usersKeepPreviousTest");
+        String language = rs.getString("usersLanguage");
+        Locale locale = language != null && !language.isBlank() ? new Locale(language) : null;
 
         final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact,
-                keyMap, keepPreviousTest);
+                keyMap, keepPreviousTest, locale);
 
         return new Player(id, user, gameId, points, role, active);
     }

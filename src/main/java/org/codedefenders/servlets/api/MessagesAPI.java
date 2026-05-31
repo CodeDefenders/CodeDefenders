@@ -30,8 +30,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.gson.Gson;
 
@@ -42,24 +44,47 @@ public class MessagesAPI extends HttpServlet {
     @Inject
     MessagesBean messagesBean;
 
+    @Inject
+    I18nService i18nService;
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Handle GET request
         logger.debug("GET request to MessagesAPI");
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
-        String notificationMessages = getNotificationMessages();
+        String notificationMessages = getNotificationMessages(request);
         response.setStatus(HttpServletResponse.SC_OK);
         out.print(notificationMessages);
         out.flush();
     }
 
-    private String getNotificationMessages() {
+    /**
+     * Retrieves the notification messages from the MessagesBean,
+     * filters out alert messages,
+     * translates the messages,
+     * converts them to JSON,
+     * and clears the messages from the bean.
+     *
+     * @param request the servlet request, used to retrieve the locale for translation
+     * @return a JSON string representing the list of notification messages
+     */
+    private String getNotificationMessages(HttpServletRequest request) {
+        I18n i18n = i18nService.getI18n(request);
         List<Message> messagesList = messagesBean.getMessages();
         Gson gson = new Gson();
         List<Message> notificationMessages = messagesList.stream()
                 .filter(message -> !message.isAlert())
+                .map(message -> translate(message, i18n))
                 .toList();
         messagesBean.clear();
         return gson.toJson(notificationMessages);
     }
+
+    private Message translate(Message message, I18n i18n) {
+        return message
+                .setTitle(I18nService.safeTr(i18n, message.getTitle()))
+                .setSecondary(I18nService.safeTr(i18n, message.getSecondary()))
+                .setText(message.getPreparedText().resolve(i18n));
+    }
+
 }

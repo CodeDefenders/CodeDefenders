@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.javaparser.ast.Node;
 
@@ -95,23 +96,29 @@ public class CodeValidationResult {
     }
 
 
-    @Override
-    public @NotNull String toString() {
+    public @NotNull String getMessage(I18n i18n) {
         if (isValid()) {
-            return failedParsing ? ValidationMessage.VALIDATION_FAILED_PARSING : ValidationMessage.VALIDATION_SUCCESS;
+            return i18n.tr(failedParsing
+                    ? ValidationMessage.VALIDATION_FAILED_PARSING
+                    : ValidationMessage.VALIDATION_SUCCESS
+            );
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Your ").append(type == Type.TEST ? "test" : "mutant")
-                .append(" is not valid, sorry! It failed for the following reasons:\n\n");
+        sb.append(type == Type.TEST
+            ? i18n.tr("Your test is not valid, sorry! It failed for the following reasons:")
+            : i18n.tr("Your mutant is not valid, sorry! It failed for the following reasons:")
+        ).append("\n\n");
 
         int counter = 1;
 
         for (ImmutablePair<ValidationRule, Node> error : nodeErrors) {
             sb.append(counter++)
                     .append(":\t")
-                    .append(error.left.getValidationMessage())
-                    .append(" - Offending statement:\n\t\t")
+                    .append(i18n.tr(error.left.getValidationMessage()))
+                    .append(" - ")
+                    .append(i18n.tr("Offending statement:"))
+                    .append("\n\t\t")
                     .append(error.right.toString().replace("\n", "\n\t\t"))
                     .append("\n\n");
         }
@@ -119,8 +126,10 @@ public class CodeValidationResult {
         for (ImmutablePair<ValidationRule, String> error : stringErrors) {
             sb.append(counter++)
                     .append(":\t")
-                    .append(error.left.getValidationMessage())
-                    .append(" - Offending statement:\n\t\t")
+                    .append(i18n.tr(error.left.getValidationMessage()))
+                    .append(" - ")
+                    .append(i18n.tr("Offending statement:"))
+                    .append("\n\t\t")
                     .append(error.right.replace("\n", "\n\t\t"))
                     .append("\n\n");
         }
@@ -128,12 +137,13 @@ public class CodeValidationResult {
         for (ValidationRule error : anonymousErrors) {
             sb.append(counter++)
                     .append(":\t")
-                    .append(error.getValidationMessage())
+                    .append(i18n.tr(error.getValidationMessage()))
                     .append("\n\n");
         }
-        return StringUtils.removeEnd(sb.toString()
-                .replace("${MAX_ASSERTIONS}", String.valueOf(maxNumberOfAssertions)),
-                "\n\n");
+        return StringUtils.removeEnd(
+                sb.toString().replace("[MAX_ASSERTIONS]", String.valueOf(maxNumberOfAssertions)),
+                "\n\n"
+        );
     }
 
     /**

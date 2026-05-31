@@ -24,22 +24,13 @@
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="teacherApplicationTemplate" type="org.codedefenders.beans.contact.TeacherApplicationTemplate"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="contactNotice" type="java.lang.String"--%>
+<%--@elvariable id="emailsEnabled" type="java.lang.Boolean"--%>
+<%--@elvariable id="teacherApplicationsEnabled" type="java.lang.Boolean"--%>
+<%--@elvariable id="teacherApplicationsEmail" type="java.lang.String"--%>
 
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-
-<%
-    boolean emailsEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
-    String contactNotice = AdminDAO.getSystemSetting(CONTACT_NOTICE).getStringValue();
-    boolean teacherApplicationsEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_ENABLED).getBoolValue();
-    String teacherApplicationsEmail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.TEACHER_APPLICATIONS_EMAIL).getStringValue();
-    pageContext.setAttribute("emailsEnabled", emailsEnabled);
-    pageContext.setAttribute("contactNotice", contactNotice);
-    pageContext.setAttribute("teacherApplicationsEnabled", teacherApplicationsEnabled);
-    pageContext.setAttribute("teacherApplicationsEmail", teacherApplicationsEmail);
-%>
-<c:set var="title" value="Contact Us"/>
+<c:set var="title" value="${i18n.tr('Contact Us')}"/>
 
 <p:main_page title="${title}">
     <div class="container form-width">
@@ -52,8 +43,8 @@
                     <c:out value="${contactNotice}" escapeXml="false"/>
                 </c:when>
                 <c:otherwise>
-                    You can use the form below to contact the site owners.
-                    For technical questions about Code Defenders, please contact the developers.
+                    ${i18n.tr('You can use the form below to contact the site owners.')}
+                    ${i18n.tr('For technical questions about Code Defenders, please contact the developers.')}
                 </c:otherwise>
             </c:choose>
         </div>
@@ -64,29 +55,31 @@
 
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label" for="name-input">Name</label>
-                        <input type="text" id="name-input" name="name" class="form-control" placeholder="Name" required autofocus>
+                        <label class="form-label" for="name-input">${i18n.tr('Name')}</label>
+                        <input type="text" id="name-input" name="name" class="form-control"
+                               placeholder="${i18n.tr('Name')}" required autofocus>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label" for="email-input">Email</label>
-                        <input type="email" id="email-input" name="email" class="form-control" placeholder="Email" required>
+                        <label class="form-label" for="email-input">${i18n.tr('Email')}</label>
+                        <input type="email" id="email-input" name="email" class="form-control"
+                               placeholder="${i18n.tr('Email')}" required>
                     </div>
 
                     <div class="col-12">
-                        <label class="form-label" for="subject-input">Subject</label>
-                        <input type="text" id="subject-input" name="subject" class="form-control" placeholder="Subject" required>
+                        <label class="form-label" for="subject-input">${i18n.tr('Subject')}</label>
+                        <input type="text" id="subject-input" name="subject" class="form-control"
+                               placeholder="${i18n.tr('Subject')}" required>
                     </div>
-
                     <div class="col-12">
-                        <label class="form-label" for="message-input">Message</label>
-                        <textarea id="message-input" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
+                        <label class="form-label" for="message-input">${i18n.tr('Message')}</label>
+                        <textarea id="message-input" name="message" class="form-control"
+                                  placeholder="${i18n.tr('Message')}" rows="8" required></textarea>
                     </div>
-
                     <div class="col-12">
                         <button class="btn btn-primary" type="submit">
                             <i class="fa fa-envelope me-2" aria-hidden="true"></i>
-                            Send
+                                ${i18n.tr('Send')}
                         </button>
                     </div>
                 </div>
@@ -94,30 +87,23 @@
         </c:if>
 
         <c:if test="${teacherApplicationsEnabled}">
-            <h4 class="mt-5">Teacher Account Applications</h4>
+            <h4 class="mt-5">${i18n.tr('Teacher Account Applications')}</h4>
             <c:choose>
                 <c:when test="${empty teacherApplicationsEmail}">
-                    Error: No email address was configured for teacher account applications.
+                    ${i18n.tr('Error: No email address was configured for teacher account applications.')}
                 </c:when>
                 <c:when test="${!login.loggedIn}">
                     <p>
-                        A teacher account lets you create classrooms for your students, so you can manage games more easily.
-                        Being logged-in is required to apply for a teacher account.
-                        Please log in to your account and come back to this page.
+                        ${i18n.tr('A teacher account lets you create classrooms for your students, so you can manage games more easily. Being logged-in is required to apply for a teacher account. Please log in to your account and come back to this page.')}
                     </p>
                 </c:when>
                 <c:otherwise>
                     <p>
-                        A teacher account lets you create classrooms for your students, so you can manage games more easily.
-                        If you're interested in turning your account into a teacher account, please use the template below
-                        to email us.
-                        You can also use this
-                        <a href="<c:out value="${teacherApplicationTemplate.mailtoLink}" escapeXml="false"/>">mailto link</a>
-                        to automatically create an email with the template.
+                        ${i18n.tr('A teacher account lets you create classrooms for your students, so you can manage games more easily. If you\'re interested in turning your account into a teacher account, please use the template below to email us. You can also use this <a href=\'{0}\'>mailto link</a> to automatically create an email with the template.', teacherApplicationTemplate.getMailtoLink(i18n))}
                     </p>
                     <a id="show-email-template" class="btn btn-sm btn-outline-secondary" role="button">
                         <i class="fa fa-envelope me-2" aria-hidden="true"></i>
-                        Show template
+                        ${i18n.tr('Show template')}
                     </a>
                     <div id="email-template" class="fade" hidden>
                         <div class="bg-light p-4 border rounded mt-3">
@@ -133,17 +119,17 @@
                             </style>
                             <table>
                                 <tr>
-                                    <td>To:</td>
+                                    <td>${i18n.tr('To:')}</td>
                                     <td>${teacherApplicationTemplate.address}</td>
                                 </tr>
                                 <tr>
-                                    <td>Subject:</td>
-                                    <td>${teacherApplicationTemplate.subject}</td>
+                                    <td>${i18n.tr('Subject:')}</td>
+                                    <td>${teacherApplicationTemplate.getSubject(i18n)}</td>
                                 </tr>
                                 <tr>
-                                    <td>Body:</td>
+                                    <td>${i18n.tr('Body:')}</td>
                                     <td>
-                                        <p class="mb-0" style="white-space: pre-wrap;">${teacherApplicationTemplate.body}</p>
+                                        <p class="mb-0" style="white-space: pre-wrap;">${teacherApplicationTemplate.getBody(i18n)}</p>
                                     </td>
                                 </tr>
                             </table>
@@ -168,12 +154,11 @@
             </c:choose>
         </c:if>
 
-        <h4 class="mt-5">Contact the Developers</h4>
+        <h4 class="mt-5">${i18n.tr('Contact the Developers')}</h4>
         <p>
-            Code Defenders is an open source project.
-            Please check out the
-            <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a>
-            project page for more details.
+                ${i18n.tr('Code Defenders is an open source project.')}
+                ${i18n.tr('Please check out the')} <a
+                href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> ${i18n.tr('project page for more details.')}
         </p>
     </div>
 </p:main_page>
