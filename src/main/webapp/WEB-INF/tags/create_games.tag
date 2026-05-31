@@ -178,8 +178,7 @@
                                  title="${i18n.tr('Include mutants uploaded together with the class.')}">
                                 <input class="form-check-input" type="checkbox" id="predefined-mutants-switch"
                                        name="withMutants">
-                                <label class="form-check-label" for="predefined-mutants-switch">${i18n.tr('Include predefined
-                                    mutants (if available)')}</label>
+                                <label class="form-check-label" for="predefined-mutants-switch">${i18n.tr('Include predefined mutants (if available)')}</label>
                             </div>
 
                             <div class="form-check form-switch">
