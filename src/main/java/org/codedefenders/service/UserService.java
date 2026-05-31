@@ -18,6 +18,7 @@
  */
 package org.codedefenders.service;
 
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -36,10 +37,12 @@ import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.transaction.Transactional;
+import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -146,7 +149,7 @@ public class UserService {
     @Nonnull
     private User userFromUserEntity(@Nonnull UserEntity user) {
         return new User(user.getId(), user.getUsername(), user.isActive(), user.getEmail(), user.isValidated(),
-                user.getAllowContact(), user.getKeyMap(), user.getKeepPreviousTest());
+                user.getAllowContact(), user.getKeyMap(), user.getKeepPreviousTest(), user.getLocale());
     }
 
     @Nonnull
@@ -167,7 +170,7 @@ public class UserService {
      * may be required.
      */
     @Nonnull
-    public Optional<String> registerUser(String username, String password, String email) {
+    public Optional<String> registerUser(String username, String password, String email, Locale locale) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         String result = null;
@@ -179,22 +182,22 @@ public class UserService {
         // TODO(Alex): Harden against timing attacks!
         if (!(validator.validUsername(username))) {
             // This check should be performed in the user interface too.
-            result = "Could not create user. Invalid username.";
+            result = I18n.marktr("Could not create user. Invalid username.");
         } else if (!validator.validPassword(password)) {
             // This check should be performed in the user interface too.
-            result = "Could not create user. Invalid password.";
+            result = I18n.marktr("Could not create user. Invalid password.");
         } else if (!validator.validEmailAddress(email)) {
             // This check should be performed in the user interface too.
-            result = "Could not create user. Invalid Email address.";
+            result = I18n.marktr("Could not create user. Invalid Email address.");
         } else if (userRepo.getUserByName(username).isPresent()) {
-            result = "Could not create user. Username is already taken.";
+            result = I18n.marktr("Could not create user. Username is already taken.");
         } else if (userRepo.getUserByEmail(email).isPresent()) {
-            result = "Could not create user. Email has already been used. You can reset your password.";
+            result = I18n.marktr("Could not create user. Email has already been used. You can reset your password.");
         } else {
-            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email);
+            UserEntity newUser = new UserEntity(username, passwordEncoder.encode(password), email, locale);
             if (userRepo.insert(newUser).isEmpty()) {
                 // TODO: How about some error handling?
-                result = "Could not create user.";
+                result = I18n.marktr("Could not create user.");
             }
         }
 
@@ -225,31 +228,40 @@ public class UserService {
      * Admin only method!
      */
     @Nonnull
-    public Optional<String> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
-            @Nullable String newPassword) {
+    public Optional<PreparedMessage> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
+                                                @Nullable String newPassword) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
         Optional<UserEntity> u = userRepo.getUserById(userId);
         if (u.isEmpty()) {
-            return Optional.of("Error. User " + userId + " cannot be retrieved from database.");
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Error. User {0} cannot be retrieved from database."),
+                    Integer.toString(userId)
+            ));
         }
         UserEntity user = u.get();
 
         if (!newUsername.equals(user.getUsername()) && userRepo.getUserByName(newUsername).isPresent()) {
-            return Optional.of("Username " + newUsername + " is already taken");
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Username {0} is already taken"),
+                    newUsername
+            ));
         }
 
         if (!newEmail.equals(user.getEmail()) && userRepo.getUserByEmail(newEmail).isPresent()) {
-            return Optional.of("Email " + newEmail + " is already in use");
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Email {0} is already in use"),
+                    newEmail
+            ));
         }
 
         if (!validator.validEmailAddress(newEmail)) {
-            return Optional.of("Email Address is not valid");
+            return Optional.of(new PreparedMessage(I18n.marktr("Email Address is not valid")));
         }
 
         if (newPassword != null) {
             if (!validator.validPassword(newPassword)) {
-                return Optional.of("Password is not valid");
+                return Optional.of(new PreparedMessage(I18n.marktr("Password is not valid")));
             }
             user.setEncodedPassword(passwordEncoder.encode(newPassword));
         }
@@ -257,7 +269,10 @@ public class UserService {
         user.setEmail(newEmail);
 
         if (!userRepo.update(user)) {
-            return Optional.of("Error trying to update info for user " + userId + "!");
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Error trying to update info for user {0}!"),
+                    Integer.toString(userId)
+            ));
         }
 
         simpleUserForUserIdCache.invalidate(userId);

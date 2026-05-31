@@ -44,6 +44,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.PreparedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +73,7 @@ public class ParallelMutationTester extends MutationTester {
     }
 
     @Override
-    public String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
+    public PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
@@ -175,7 +176,7 @@ public class ParallelMutationTester extends MutationTester {
      * java.util.ArrayList, org.codedefenders.execution.TestScheduler)
      */
     @Override
-    public String runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler) {
+    public PreparedMessage runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler) {
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
@@ -252,7 +253,7 @@ public class ParallelMutationTester extends MutationTester {
                     eventDAO.insert(notif);
 
                     // Early return. No need to check for the other executions.
-                    return String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
+                    return new PreparedMessage(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
                 }
             } catch (InterruptedException | ExecutionException e) {
                 logger.warn(
@@ -285,11 +286,11 @@ public class ParallelMutationTester extends MutationTester {
         int nbRelevantTests = missedTests.size();
         // Mutant survived
         if (nbRelevantTests == 0) {
-            return MUTANT_SUBMITTED_MESSAGE;
-        } else if (nbRelevantTests <= 1) {
-            return MUTANT_ALIVE_1_MESSAGE;
+            return new PreparedMessage(MUTANT_SUBMITTED_MESSAGE);
+        } else if (nbRelevantTests == 1) {
+            return new PreparedMessage(MUTANT_ALIVE_1_MESSAGE);
         } else {
-            return String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests);
+            return new PreparedMessage(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests);
         }
     }
 

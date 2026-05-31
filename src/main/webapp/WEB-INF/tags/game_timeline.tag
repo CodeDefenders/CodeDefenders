@@ -20,28 +20,25 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.beans.game.HistoryBean" %>
 
 <%--@elvariable id="history" type="org.codedefenders.beans.game.HistoryBean"--%>
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
-<%
-    // Those return the PlayerID not the UserID
-    final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
-%>
 
 <div class="timeline-centered timeline-sm">
-    <c:forEach items="${history.events}" var="event">
+    <c:forEach items="${history.getEvents(i18n)}" var="event">
         <article class="timeline-entry ${event.alignment}-aligned">
             <div class="timeline-entry-inner">
                 <time datetime="${event.format}" class="timeline-time">
                     <span>${event.time}</span>
-                    <span>${event.date}</span>
+                    <span>${i18n.tr(event.date)}</span>
                 </time>
 
-                <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i>
-                </div>
+                <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i></div>
                 <div class="timeline-label bg-${event.colour}">
                     <span class="h5 timeline-title">${event.userMessage}</span>
                         <%--

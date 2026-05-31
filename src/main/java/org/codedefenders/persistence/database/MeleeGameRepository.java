@@ -93,6 +93,7 @@ public class MeleeGameRepository {
 
         int gameDuration = rs.getInt("Game_Duration_Minutes");
         long startTime = rs.getLong("Timestamp_Start");
+        long finishTime = rs.getLong("Timestamp_Finish");
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
@@ -114,6 +115,7 @@ public class MeleeGameRepository {
                 .mutantCoverage(mutantCoverage)
                 .gameDurationMinutes(gameDuration)
                 .startTimeUnixSeconds(startTime)
+                .finishTimeUnixSeconds(finishTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .classroomId(classroomId)
                 .inviteOnly(inviteOnly)

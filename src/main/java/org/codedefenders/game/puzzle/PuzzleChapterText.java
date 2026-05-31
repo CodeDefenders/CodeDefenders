@@ -16,32 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.beans.page;
-
-import jakarta.enterprise.context.RequestScoped;
+package org.codedefenders.game.puzzle;
 
 /**
- * <p>Provides various page info, like the page title (and maybe other things later).</p>
- * <p>Bean Name: {@code pageInfo}</p>
+ * Represents a localized text entry for a {@link PuzzleChapter}.
+ *
+ * @param chapterId   The chapter ID.
+ * @param language    The language code (e.g. "en", "de").
+ * @param title       The localized title.
+ * @param description The localized description.
  */
-@RequestScoped
-public class PageInfoBean {
-    private String pageTitle;
-    // Put additional information for headers and such here ...
-
-    public PageInfoBean() {
-        pageTitle = null;
-    }
-
-    public String getPageTitle() {
-        return pageTitle == null ? "Code Defenders" : pageTitle;
-    }
-
-    public boolean hasPageTitle() {
-        return pageTitle != null;
-    }
-
-    public void setPageTitle(String pageTitle) {
-        this.pageTitle = pageTitle;
-    }
-}
+public record PuzzleChapterText(int chapterId, String language, String title, String description) {}

@@ -18,13 +18,15 @@
  */
 package org.codedefenders.game;
 
+import org.xnap.commons.i18n.I18n;
+
 /**
  * This enumeration shows different kinds of difficulty levels a game can have.
  */
 public enum GameLevel {
-    EASY("Easy"),
-    MEDIUM("Medium"), // FIXME: Medium is never used.
-    HARD("Hard");
+    EASY(I18n.marktr("Easy")),
+    MEDIUM(I18n.marktr("Medium")), // FIXME: Medium is never used.
+    HARD(I18n.marktr("Hard"));
 
     private final String displayName;
 

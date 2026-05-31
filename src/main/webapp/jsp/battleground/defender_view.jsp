@@ -20,6 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="previousTest" type="org.codedefenders.game.Test"--%>
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MultiplayerGame"--%>
@@ -76,7 +77,7 @@
 
 <div class="row">
     <div class="col-xl-6 col-12" id="cut-div">
-        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr("Class Under Test")}</h3></div>
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -87,13 +88,13 @@
         <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
         <div class="game-component-header">
-            <h3>Write a new JUnit test here</h3>
+            <h3>${i18n.tr("Write a new JUnit test here")}</h3>
             <div>
                 <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
                         <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Defend
+                    ${i18n.tr("Defend")}
                 </button>
 
                 <script type="module">
@@ -130,7 +131,7 @@
     </div>
 
     <div class="col-xl-6 col-12">
-        <div class="game-component-header"><h3>JUnit Tests</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr("JUnit Tests")}</h3></div>
         <t:test_accordion/>
     </div>
 </div>

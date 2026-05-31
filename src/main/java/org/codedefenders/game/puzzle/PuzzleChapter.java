@@ -27,7 +27,7 @@ public class PuzzleChapter {
     /**
      * ID of the chapter.
      */
-    private int chapterId;
+    private int id;
 
     /**
      * Position of the chapter in the chapter list. Can be null.
@@ -35,39 +35,22 @@ public class PuzzleChapter {
     private Integer position;
 
     /**
-     * Title of the chapter. Can be null.
-     */
-    private String title;
-
-    /**
-     * Description of the chapter. Can be null.
-     */
-    private String description;
-
-    /**
      * Constructs a new puzzle chapter instance.
      *
-     * @param chapterId ID of the chapter in the database.
+     * @param id ID of the chapter in the database.
      * @param position Position of the chapter in the chapter list. Can be null.
-     * @param title Title of the chapter. Can be null.
-     * @param description Description of the chapter. Can be null.
      */
-    public PuzzleChapter(int chapterId,
-                         Integer position,
-                         String title,
-                         String description) {
-        this.chapterId = chapterId;
+    public PuzzleChapter(int id, Integer position) {
+        this.id = id;
         this.position = position;
-        this.title = title;
-        this.description = description;
     }
 
-    public int getChapterId() {
-        return chapterId;
+    public int getId() {
+        return id;
     }
 
-    public void setChapterId(int chapterId) {
-        this.chapterId = chapterId;
+    public void setId(int chapterId) {
+        this.id = chapterId;
     }
 
     public Integer getPosition() {
@@ -78,19 +61,5 @@ public class PuzzleChapter {
         this.position = position;
     }
 
-    public String getTitle() {
-        return title;
-    }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

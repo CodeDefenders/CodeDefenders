@@ -76,16 +76,16 @@ async function runLandingPageAnimation() {
 `;
 
     // Initial CUT
-    leftTitle.textContent = "Class Under Test (CUT)";
+    leftTitle.textContent = i18n.tr("Class Under Test (CUT)");
     leftCode.textContent = originalCUT;
-    rightTitle.textContent = "Defender: Test Editor";
+    rightTitle.textContent = i18n.tr("Defender: Test Editor");
     status.textContent = "";
     promptEl.classList.add("hidden");
 
     await sleep(800);
 
     // Defender writes the test (typewriter) on the right
-    await status.set("Defender writes a test");
+    await status.set(i18n.tr("Defender writes a test"));
     await typeInto(
         rightCode,
         `void testMaxPicksHigherNumber() {
@@ -97,7 +97,7 @@ async function runLandingPageAnimation() {
     await sleep(1200);
 
     // Simulate test execution
-    await status.set("Executing test...");
+    await status.set(i18n.tr("Executing test..."));
     rightCode.innerHTML =
         `void testMaxPicksHigherNumber() {
   int result = <span class="highlight-exec">max(2, 5)</span>;
@@ -203,14 +203,14 @@ async function runLandingPageAnimation() {
     await sleep(800);
 
     // Show green check for passing test
-    await status.set(`<span class="ok"><span class="checkmark">✓</span> Test passes!</span>`);
+    await status.set(`<span class="ok"><span class="checkmark">✓</span> ${i18n.tr('Test passes!')}</span>`);
 
     await sleep(1800);
 
     // Reset for mutation
     leftCode.innerHTML = originalCUT;
-    leftTitle.textContent = "Class Under Test (CUT)";
-    rightTitle.textContent = "Defender's test";
+    leftTitle.textContent = i18n.tr("Class Under Test (CUT)");
+    rightTitle.textContent = i18n.tr("Defender's test");
     rightCode.innerHTML =
         `void testMaxPicksHigherNumber() {
   int result = max(2, 5);
@@ -221,10 +221,10 @@ async function runLandingPageAnimation() {
     await sleep(800);
 
     // First mutation in the left CUT
-    await status.set("Attacker mutates the CUT");
+    await status.set(i18n.tr("Attacker mutates the CUT"));
 
     await sleep(1200);
-    leftTitle.textContent = "Attacker's mutant";
+    leftTitle.textContent = i18n.tr("Attacker's mutant");
     leftCode.innerHTML =
         `public int max(int a, int b) {
   if (a <span class="mutant blink"><</span> b) {
@@ -238,7 +238,7 @@ async function runLandingPageAnimation() {
     await sleep(1500);
 
     // Execute test with mutated code
-    await status.set("Executing test on mutant...");
+    await status.set(i18n.tr("Executing test on mutant..."));
     leftCode.innerHTML =
         `public int max(int a, int b) {
   if (a <span class="mutant"><</span> b) {
@@ -332,7 +332,7 @@ async function runLandingPageAnimation() {
     await sleep(800);
 
     // Test fails, mutant killed
-    await status.set(`<span class="fail">Test fails! Mutant killed!</span>The defender gains one point for killing a mutant.`);
+    await status.set(`<span class="fail">${i18n.tr('Test fails! Mutant killed!')}</span>${i18n.tr('The defender gains one point for killing a mutant.')}`);
     await sleep(600);
     leftCode.classList.add("mutant-dead");
     await sleep(2000);
@@ -340,8 +340,8 @@ async function runLandingPageAnimation() {
     // Restore CUT, attacker tries again
     leftCode.classList.remove("mutant-dead");
     leftCode.innerHTML = originalCUT;
-    leftTitle.textContent = "Class Under Test (CUT)";
-    await status.set("Attacker tries again...");
+    leftTitle.textContent = i18n.tr("Class Under Test (CUT)");
+    await status.set(i18n.tr("Attacker tries again..."));
     rightCode.innerHTML =
         `void testMaxPicksHigherNumber() {
   int result = max(2, 5);
@@ -349,9 +349,9 @@ async function runLandingPageAnimation() {
 }`;
 
     // Second, subtler mutation of the CUT
-    await status.set("Attacker creates a subtler mutant");
+    await status.set(i18n.tr("Attacker creates a subtler mutant"));
     await sleep(1200);
-    leftTitle.textContent = "Attacker's mutant";
+    leftTitle.textContent = i18n.tr("Attacker's mutant");
     leftCode.innerHTML =
         `public int max(int a, int b) {
   if (a > b<span class="mutant blink"> - 1</span>) {
@@ -365,7 +365,7 @@ async function runLandingPageAnimation() {
     await sleep(1500);
 
     // Execute test with subtle mutant
-    await status.set("Executing test on mutant...");
+    await status.set(i18n.tr("Executing test on mutant..."));
     leftCode.innerHTML =
         `public int max(int a, int b) {
   if (a > b - 1) {
@@ -471,7 +471,11 @@ async function runLandingPageAnimation() {
 
     // All tests pass; mutant survives
     await status.set(
-        `<span class="ok"><span class="checkmark">✓</span> All current tests pass. The mutant survives!</span>  The attacker gains one point for creating a mutant that survives one test.`
+        `<span class="ok">
+            <span class="checkmark">✓</span> 
+            ${i18n.tr('All current tests pass. The mutant survives!')}
+        </span>  
+        ${i18n.tr('The attacker gains one point for creating a mutant that survives one test.')}`
     );
 
     await sleep(2500);

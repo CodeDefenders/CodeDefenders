@@ -20,19 +20,21 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
-<b>Easy</b>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<b>${i18n.tr('Easy')}</b>
 <ul>
     <li>
-        Teams are allowed to view the other team's submissions.
+        ${i18n.tr("Teams are allowed to view the other team's submissions.")}
         <ul>
-            <li>Attackers are allowed to view the defender team's tests.</li>
-            <li>Defenders are allowed to view the attacker team's mutants.</li>
+            <li>${i18n.tr("Attackers are allowed to view the defender team's tests.")}</li>
+            <li>${i18n.tr("Defenders are allowed to view the attacker team's mutants.")}</li>
         </ul>
     </li>
 </ul>
 
-<b>Hard</b>
+<b>${i18n.tr('Hard')}</b>
 <ul class="mb-0">
-    <li>Teams are <b>not</b> allowed to view the other team's submissions.</li>
-    <li>But: Defenders can still view mutants after they are killed or accepted as equivalent.</li>
+    <li>${i18n.tr("Teams are <b>not</b> allowed to view the other team's submissions.")}</li>
+    <li>${i18n.tr("But: Defenders can still view mutants after they are killed or accepted as equivalent.")}</li>
 </ul>

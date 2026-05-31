@@ -22,15 +22,17 @@
 <%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ attribute name="game" required="true" type="org.codedefenders.game.puzzle.PuzzleGame" %>
 
 <span>
 <c:choose>
     <c:when test="${game.state == 'SOLVED'}">
-        <i class="fa fa-check"></i> Puzzle solved in ${game.currentRound} ${fn:pluralizeWithS(game.currentRound, "attempt")}.
+        <i class="fa fa-check"></i> ${i18n.trn('Puzzle solved in {0} attempt.', 'Puzzle solved in {0} attempts.', game.currentRound, game.currentRound)}
     </c:when>
     <c:otherwise>
-        This is your ${game.currentRound}${fn:ordinalSuffix(game.currentRound)} attempt.
+        ${i18n.tr('This is your {0}{1} attempt.', game.currentRound, fn:ordinalSuffix(game.currentRound))}
     </c:otherwise>
 </c:choose>
 </span>

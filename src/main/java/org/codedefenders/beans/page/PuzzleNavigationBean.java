@@ -36,10 +36,13 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleChapterText;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.game.puzzle.PuzzleText;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
 import org.codedefenders.persistence.database.PuzzleRepository;
+import org.codedefenders.service.I18nService;
 
 /**
  * <p>Provides data for the puzzle navigation in the menu, or puzzle overview page.</p>
@@ -48,22 +51,31 @@ import org.codedefenders.persistence.database.PuzzleRepository;
 @RequestScoped
 @Named("puzzleNavigation")
 public class PuzzleNavigationBean {
-    PuzzleRepository puzzleRepo;
+    final PuzzleRepository puzzleRepo;
+    final CodeDefendersAuth login;
+    final I18nService i18nService;
+    final Map<Integer, PuzzleGame> activePuzzles;
 
     SortedSet<PuzzleChapterEntry> puzzleChapters;
     Optional<PuzzleEntry> nextPuzzle;
 
     @Inject
-    public PuzzleNavigationBean(PuzzleRepository puzzleRepo, CodeDefendersAuth login) {
+    public PuzzleNavigationBean(PuzzleRepository puzzleRepo, CodeDefendersAuth login, I18nService i18nService) {
         this.puzzleRepo = puzzleRepo;
+        this.i18nService = i18nService;
+        this.login = login;
 
         // maps the puzzle id to the puzzle game
-        final Map<Integer, PuzzleGame> activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
+        activePuzzles = puzzleRepo.getActivePuzzleGamesForUser(login.getUserId())
                 .stream().collect(Collectors.toMap(PuzzleGame::getPuzzleId, Function.identity()));
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
-                .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
+                .map(toPuzzleChapterEntry(
+                        login.getUserId(), activePuzzles,
+                        login.getUser().getLocale().getLanguage(),
+                        i18nService.getDefaultLocale().getLanguage()
+                ))
                 .collect(Collectors.toCollection(TreeSet::new));
 
         final List<PuzzleEntry> unsolvedPuzzles = puzzleChapters.stream()
@@ -123,16 +135,24 @@ public class PuzzleNavigationBean {
      * @see PuzzleChapterEntry
      */
     private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId,
-                                                                             Map<Integer, PuzzleGame> activePuzzles) {
+                                                                             Map<Integer, PuzzleGame> activePuzzles,
+                                                                             String userLanguage,
+                                                                             String defaultLanguage) {
         return puzzleChapter -> {
-            final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())
+            // Resolve chapter text
+            PuzzleChapterText chapterText = puzzleRepo.getPuzzleChapterTextWithFallback(
+                    puzzleChapter.getId(), userLanguage, defaultLanguage);
+            String title = chapterText != null ? chapterText.title() : "";
+            String description = chapterText != null ? chapterText.description() : "";
+
+            final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())
                     .stream()
-                    .map(toPuzzleEntry(userId, activePuzzles))
+                    .map(toPuzzleEntry(userId, activePuzzles, userLanguage, defaultLanguage, title))
                     .collect(Collectors.toSet());
-            return new PuzzleChapterEntry(puzzleChapter, puzzleEntries);
+
+            return new PuzzleChapterEntry(puzzleChapter, puzzleEntries, title, description);
         };
     }
-
 
     /**
      * Helper function which converts a {@link Puzzle} to a {@link PuzzleEntry} for a given userId and a
@@ -146,21 +166,26 @@ public class PuzzleNavigationBean {
      * @return a function which converts a puzzle to a puzzle entry.
      * @see PuzzleEntry
      */
-    private Function<Puzzle, PuzzleEntry> toPuzzleEntry(int userId, Map<Integer, PuzzleGame> activePuzzles) {
+    private Function<Puzzle, PuzzleEntry> toPuzzleEntry(int userId, Map<Integer, PuzzleGame> activePuzzles,
+                                                        String userLanguage, String defaultLanguage, String chapterTitle) {
         return entry -> {
             int pid = entry.getPuzzleId();
+
+            // Resolve puzzle text
+            PuzzleText puzzleText = puzzleRepo.getPuzzleTextWithFallback(pid, userLanguage, defaultLanguage);
+            String title = puzzleText != null ? puzzleText.title() : "";
+            String description = puzzleText != null ? puzzleText.description() : "";
 
             if (activePuzzles.containsKey(pid)) {
                 PuzzleGame activePuzzle = activePuzzles.get(pid);
                 boolean solved = activePuzzle.getState().equals(GameState.SOLVED);
-                return new PuzzleEntry(activePuzzle, solved);
+                return new PuzzleEntry(activePuzzle, solved, title, description, chapterTitle);
             }
 
             PuzzleGame puzzleGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(entry.getPuzzleId(), userId);
             boolean solved = puzzleGame != null && puzzleGame.getState().equals(GameState.SOLVED);
             int tries = puzzleGame != null ? puzzleGame.getCurrentRound() : 0;
-            return new PuzzleEntry(entry, false, solved, tries);
+            return new PuzzleEntry(entry, false, solved, tries, title, description, chapterTitle);
         };
     }
 }
-

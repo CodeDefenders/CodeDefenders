@@ -20,6 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="previousTest" type="org.codedefenders.game.Test"--%>
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MeleeGame"--%>
@@ -53,12 +54,13 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
+    org.xnap.commons.i18n.I18n i18n = (org.xnap.commons.i18n.I18n) request.getAttribute("i18n");
     String mutantClaimedMessage = null;
     int mutantLine = 0;
     if (openEquivalenceDuel) {
         mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
-                ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
+                ? i18n.tr("Mutant {0} automatically claimed equivalent", equivMutant.getId())
+                : i18n.tr("Mutant {0} claimed equivalent by {1}", equivMutant.getId(), equivDefender.getName());
         mutantLine = equivMutant.getLines().stream().min(Integer::compare).orElse(0);
     }
 
@@ -144,7 +146,7 @@
 
         <div class="equivalence-container">
 
-            <h3>Diff</h3>
+            <h3>${i18n.tr('Diff')}</h3>
             <div class="card">
                 <div class="card-body p-0 loading loading-height-200">
                     <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff"
@@ -171,7 +173,7 @@
 
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
-            <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
+            <h3 class="mt-3">${i18n.tr('Not equivalent? Write a killing test here:')}</h3>
             <form id="equivalenceForm" action="${url.forPath(Paths.EQUIVALENCE_DUELS_GAME)}" method="post">
                 <input type="hidden" name="formType" value="resolveEquivalence">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
@@ -181,9 +183,11 @@
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <div class="d-flex justify-content-between mt-2 mb-2">
-                    <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent
+                    <button class="btn btn-danger" id="accept-equivalent-button"
+                            type="button">${i18n.tr('Accept As Equivalent')}
                     </button>
-                    <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test
+                    <button class="btn btn-primary" id="reject-equivalent-button"
+                            type="button">${i18n.tr('Submit Killing Test')}
                     </button>
 
                     <script type="module">
@@ -193,7 +197,7 @@
 
 
                         document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
-                            if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
+                            if (confirm('${i18n.tr("Accepting Equivalence will lose all mutant points. Are you sure?")}')) {
                                 this.form['resolveAction'].value = 'accept';
                                 this.form.submit();
                                 this.disabled = true;
@@ -209,14 +213,14 @@
 
                 </div>
 
-                <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
+                <span>${i18n.tr('Note: If the game finishes with this equivalence unsolved, you will lose points!')}</span>
             </form>
         </div>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 
     <div class="col-xl-6 col-12" id="cut-div">
-        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr('Class Under Test')}</h3></div>
         <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -239,14 +243,14 @@
         <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
         <div class="game-component-header">
-            <h3>Create a mutant here</h3>
+            <h3>${i18n.tr('Create a mutant here')}</h3>
             <div>
 
                 <div data-bs-toggle="tooltip" data-bs-html="true"
-                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
+                     title='${i18n.tr("<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class=\\\"mb-0\\\"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>")}'>
                     <input class="btn-check" type="checkbox" id="highlighting-switch" autocomplete="off">
                     <label class="btn btn-outline-secondary" for="highlighting-switch">
-                        Enemy Coverage
+                        ${i18n.tr('Enemy Coverage')}
                         <i class="fa fa-check ms-1 btn-check-active"></i>
                     </label>
                 </div>
@@ -272,7 +276,7 @@
                 <form id="reset" action="${url.forPath(Paths.MELEE_GAME)}" method="post">
                     <input type="hidden" name="formType" value="reset">
                     <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                    <button class="btn btn-warning" id="btnReset">Reset</button>
+                    <button class="btn btn-warning" id="btnReset">${i18n.tr('Reset')}</button>
                 </form>
 
                 <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
@@ -304,14 +308,14 @@
         <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
         <div class="game-component-header">
-            <h3>Write a new JUnit test here</h3>
+            <h3>${i18n.tr('Write a new JUnit test here')}</h3>
             <div>
                 <t:clone_previous_test_button game="${game}" previousTest="${previousTest}"/>
 
                 <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                    Defend
+                    ${i18n.tr('Defend')}
                 </button>
 
                 <script type="module">
@@ -351,7 +355,7 @@
     </div>
 
     <div class="col-xl-6 col-12">
-        <div class="game-component-header"><h3>JUnit Tests</h3></div>
+        <div class="game-component-header"><h3>${i18n.tr('JUnit Tests')}</h3></div>
         <t:test_accordion/>
     </div>
 </div>

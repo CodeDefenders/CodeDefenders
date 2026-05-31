@@ -18,6 +18,7 @@
  */
 package org.codedefenders.dto;
 
+import java.util.Locale;
 import java.util.Objects;
 
 import org.codedefenders.model.KeyMap;
@@ -36,8 +37,10 @@ public class User extends SimpleUser {
     private final KeyMap keyMap;
     private final boolean keepPreviousTest;
 
+    private final Locale locale;
+
     public User(int id, String name, boolean active, String email, boolean emailValidated,
-                boolean contactingAllowed, KeyMap keyMap, boolean keepPreviousTest) {
+                boolean contactingAllowed, KeyMap keyMap, boolean keepPreviousTest, Locale locale) {
         super(id, name);
         this.active = active;
         this.email = email;
@@ -45,6 +48,7 @@ public class User extends SimpleUser {
         this.contactingAllowed = contactingAllowed;
         this.keyMap = keyMap;
         this.keepPreviousTest = keepPreviousTest;
+        this.locale = locale;
     }
 
     public boolean isActive() {
@@ -69,6 +73,10 @@ public class User extends SimpleUser {
 
     public boolean getKeepPreviousTest() {
         return keepPreviousTest;
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     @Override

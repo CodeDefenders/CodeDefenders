@@ -34,6 +34,7 @@
 <%--@elvariable id="classroomService" type="org.codedefenders.service.ClassroomService"--%>
 <%--@elvariable id="userService" type="org.codedefenders.service.UserService"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <c:set var="classroom" value="${requestScope.classroom}"/>
 <%--@elvariable id="classroom" type="org.codedefenders.model.Classroom"--%>
@@ -57,7 +58,7 @@
         <h2 class="d-flex align-items-center gap-3 mb-4 ms-4">
             <c:out value="${classroom.name}"/>
             <c:if test="${classroom.archived}">
-                <span class="badge bg-secondary">Archived</span>
+                <span class="badge bg-secondary">${i18n.tr('Archived')}</span>
             </c:if>
         </h2>
 
@@ -67,23 +68,21 @@
 
                 <c:choose>
                     <c:when test="${login.admin && member == null}">
-                        You are able to fully view and edit this classroom without joining,
-                        because you are logged in as admin.
+                        ${i18n.tr('You are able to fully view and edit this classroom without joining, because you are logged in as admin.')}
                     </c:when>
                     <c:when test="${login.admin && member != null && member.role != ClassroomRole.OWNER}">
-                        You are able to fully view and edit this classroom without being the owner,
-                        because you are logged in as admin.
+                        ${i18n.tr('You are able to fully view and edit this classroom without being the owner, because you are logged in as admin.')}
                     </c:when>
                     <c:when test="${!login.admin && member == null}">
-                        You are viewing this classroom as a guest.
+                        ${i18n.tr('You are viewing this classroom as a guest.')}
                     </c:when>
                 </c:choose>
 
                 <c:if test="${canJoin}">
-                    If you would like to join the classroom, you can do so here:
+                    ${i18n.tr('If you would like to join the classroom, you can do so here:')}
                     <button type="button" class="btn btn-sm btn-outline-primary ms-2"
                             data-bs-toggle="modal" data-bs-target="#join-modal">
-                        Join
+                            ${i18n.tr('Join')}
                     </button>
                 </c:if>
             </div>
@@ -91,23 +90,25 @@
 
         <div class="p-4 border rounded mb-4 loading loading-height-200">
             <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                <h4 class="mb-3">Games</h4>
+                <h4 class="mb-3">${i18n.tr('Games')}</h4>
                 <div class="d-flex gap-3">
                     <c:if test="${canCreateGames}">
                         <a href="${url.forPath(Paths.CLASSROOM_CREATE_GAMES)}?classroomUid=${classroom.UUID}"
                            class="btn btn-sm rounded-pill btn-primary ${disabledIfArchived}">
-                            Create Games
+                                ${i18n.tr('Create Games')}
                             <i class="fa fa-external-link ms-1"></i>
                         </a>
                     </c:if>
                     <div>
                         <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
-                        <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-active">Active</label>
+                        <label class="btn btn-sm btn-outline-secondary rounded-pill"
+                               for="radio-active">${i18n.tr('Active')}</label>
 
                         <input type="radio" class="btn-check" name="classroom-type" id="radio-archived" autocomplete="off">
-                        <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-archived">Archived</label>
+                        <label class="btn btn-sm btn-outline-secondary rounded-pill"
+                               for="radio-archived">${i18n.tr('Archived')}</label>
                     </div>
-                    <input type="search" id="search-games" placeholder="Search"
+                    <input type="search" id="search-games" placeholder="${i18n.tr('Search')}"
                            class="form-control form-control-sm" style="width: 15em;">
                 </div>
             </div>
@@ -120,8 +121,8 @@
             <div class="col-lg-6 col-12">
                 <div class="p-4 border rounded loading loading-height-200">
                     <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                        <h4 class="mb-3">Members</h4>
-                        <input type="search" id="search-members" placeholder="Search"
+                        <h4 class="mb-3">${i18n.tr('Members')}</h4>
+                        <input type="search" id="search-members" placeholder="${i18n.tr('Search')}"
                                class="form-control form-control-sm" style="width: 15em;">
                     </div>
                     <table id="members-table" class="table table-no-last-border" style="width: 100%;"></table>
@@ -134,27 +135,27 @@
                 <%-- Join Settigns --%>
                 <div class="p-4 border rounded ${mutedIfArchived}">
 
-                    <h4 class="mb-4">Join Settings</h4>
+                    <h4 class="mb-4">${i18n.tr('Join Settings')}</h4>
 
                     <div class="d-flex gap-2 mb-1">
                         <c:choose>
                             <c:when test="${classroom.open}">
-                                <span>Joining is <span class="text-success">enabled</span>.</span>
+                                <span>${i18n.tr('Joining is')} <span class="text-success">${i18n.tr('enabled')}</span>.</span>
                                 <c:if test="${canEditClassroom}">
                                     <button id="disable-joining" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
                                         ${disabledIfArchived}>
-                                        Disable Joining
+                                            ${i18n.tr('Disable Joining')}
                                     </button>
                                 </c:if>
                             </c:when>
                             <c:otherwise>
-                                <span>Joining is <span class="text-danger">disabled</span>.</span>
+                                <span>${i18n.tr('Joining is')} <span class="text-danger">${i18n.tr('disabled')}</span>.</span>
                                 <c:if test="${canEditClassroom}">
                                     <button id="enable-joining" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
                                             ${disabledIfArchived}>
-                                        Enable Joining
+                                            ${i18n.tr('Enable Joining')}
                                     </button>
                                 </c:if>
                             </c:otherwise>
@@ -164,22 +165,22 @@
                     <div class="d-flex gap-2 mb-1">
                         <c:choose>
                             <c:when test="${classroom.visible}">
-                                <span>Visibility is <span class="text-success">public</span>.</span>
+                                <span>${i18n.tr('Visibility is')} <span class="text-success">${i18n.tr('public')}</span>.</span>
                                 <c:if test="${canEditClassroom}">
                                     <button id="disable-joining" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#make-private-modal"
                                             ${disabledIfArchived}>
-                                        Make Private
+                                            ${i18n.tr('Make Private')}
                                     </button>
                                 </c:if>
                             </c:when>
                             <c:otherwise>
-                                <span>Visibility is <span class="text-danger">private</span>.</span>
+                                <span>${i18n.tr('Visibility is')} <span class="text-danger">${i18n.tr('private')}</span>.</span>
                                 <c:if test="${canEditClassroom}">
                                     <button id="enable-joining" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#make-public-modal"
                                             ${disabledIfArchived}>
-                                        Make Public
+                                            ${i18n.tr('Make Public')}
                                     </button>
                                 </c:if>
                             </c:otherwise>
@@ -189,10 +190,10 @@
                     <div class="d-flex gap-2 mb-3">
                         <c:choose>
                             <c:when test="${classroom.password.isPresent()}">
-                                <span>Password is <span class="text-success">set</span>.</span>
+                                <span>${i18n.tr('Password is <span class="text-success">set</span>.')}</span>
                             </c:when>
                             <c:otherwise>
-                                <span>Password is <span class="text-danger">not set</span>.</span>
+                                <span>${i18n.tr('Password is <span class="text-danger">not set</span>.')}</span>
                             </c:otherwise>
                         </c:choose>
                         <c:if test="${canEditClassroom}">
@@ -200,13 +201,13 @@
                                 <button id="set-password" class="btn btn-xs btn-secondary me-1"
                                         data-bs-toggle="modal" data-bs-target="#set-password-modal"
                                         ${disabledIfArchived}>
-                                    Set Password
+                                        ${i18n.tr('Set Password')}
                                 </button>
                                 <c:if test="${classroom.password.isPresent()}">
                                     <button id="remove-password" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#remove-password-modal"
                                             ${disabledIfArchived}>
-                                        Remove Password
+                                            ${i18n.tr('Remove Password')}
                                     </button>
                                 </c:if>
                             </div>
@@ -214,7 +215,7 @@
                     </div>
 
                     <div>
-                        <span class="me-1">Classroom UID is</span>
+                        <span class="me-1">${i18n.tr('Classroom UID is')}</span>
                         <span id="classroom-uid" class="border rounded px-2"><c:out value="${classroom.UUID}"/></span>
                         <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
                            data-copy-target="#classroom-uid"></i>
@@ -222,7 +223,7 @@
 
                     <c:if test="${classroom.open}">
                         <div class="mt-1">
-                            <span class="me-1">Invite link is</span>
+                            <span class="me-1">${i18n.tr('Invite link is')}</span>
                             <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
                             <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
                                data-copy-target="#invite-link"></i>
@@ -235,13 +236,13 @@
                 <c:if test="${canEditClassroom}">
                     <div class="p-4 border rounded ${mutedIfArchived}">
 
-                        <h4 class="mb-4">Classroom Settings</h4>
+                        <h4 class="mb-4">${i18n.tr('Classroom Settings')}</h4>
 
                         <div class="mb-1">
                             <button id="change-name" class="btn btn-xs btn-secondary"
                                     data-bs-toggle="modal" data-bs-target="#change-name-modal"
                                     ${disabledIfArchived}>
-                                Change Name
+                                    ${i18n.tr('Change Name')}
                             </button>
                         </div>
 
@@ -250,13 +251,13 @@
                                 <c:when test="${classroom.archived}">
                                     <button id="restore" class="btn btn-xs btn-success"
                                             data-bs-toggle="modal" data-bs-target="#restore-classroom-modal">
-                                        Restore Classroom
+                                            ${i18n.tr('Restore Classroom')}
                                     </button>
                                 </c:when>
                                 <c:otherwise>
                                     <button id="archive" class="btn btn-xs btn-danger"
                                             data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
-                                        Archive Classroom
+                                            ${i18n.tr('Archive Classroom')}
                                     </button>
                                 </c:otherwise>
                             </c:choose>
@@ -269,12 +270,12 @@
                 <c:if test="${canLeave}">
                     <div class="p-4 border rounded ${mutedIfArchived}">
 
-                        <h4 class="mb-4">Member Actions</h4>
+                        <h4 class="mb-4">${i18n.tr('Member Actions')}</h4>
 
                         <div>
                             <button id="leave" class="btn btn-xs btn-secondary"
                                     data-bs-toggle="modal" data-bs-target="#leave-modal">
-                                Leave Classroom
+                                    ${i18n.tr('Leave Classroom')}
                             </button>
                         </div>
 
@@ -290,22 +291,23 @@
                 <input type="hidden" name="action" value="change-name"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Change classroom name" id="change-name-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Change classroom name')}" id="change-name-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        <label for="name-input" class="form-label">Name</label>
+                        <label for="name-input" class="form-label">${i18n.tr('Name')}</label>
                         <input type="text" class="form-control" id="name-input" name="name"
-                               value="<c:out value="${classroom.name}"/>"
+                               value="<c:out value='${classroom.name}'/>"
                                required maxlength="100"
-                               placeholder="Name">
+                               placeholder="${i18n.tr('Name')}">
                         <div class="invalid-feedback">
-                            Please enter a valid name.
+                                ${i18n.tr('Please enter a valid name.')}
                         </div>
                         <div class="form-text">
-                            Maximum length: 100 characters.
+                                ${i18n.tr('Maximum length: 100 characters.')}
                         </div>
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-primary">Save changes</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Save changes')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -318,29 +320,31 @@
                 <input type="hidden" name="action" value="set-password"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Set password" id="set-password-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Set password')}" id="set-password-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
                         <div class="mb-2">
-                            <label for="password-input" class="form-label">Password</label>
+                            <label for="password-input" class="form-label">${i18n.tr('Password')}</label>
                             <input type="password" class="form-control" id="password-input" name="password"
-                                   placeholder="Password"
+                                   placeholder="${i18n.tr('Password')}"
                                    required maxlength="100">
                             <div class="invalid-feedback">
-                                Please enter a valid password.
+                                    ${i18n.tr('Please enter a valid password.')}
                             </div>
                         </div>
                         <div class="mb-3">
                             <input type="password" class="form-control" id="confirm-password-input"
-                                   name="confirm" placeholder="Confirm Password" required>
+                                   name="confirm" placeholder="${i18n.tr('Confirm Password')}" required
+                                   aria-label="${i18n.tr('Confirm Password')}">
                             <div class="invalid-feedback" id="confirm-password-feedback">
-                                Please confirm your password.
+                                    ${i18n.tr('Please confirm your password.')}
                             </div>
                             <div class="form-text">
-                                Maximum length: 100 characters.
+                                    ${i18n.tr('Maximum length: 100 characters.')}
                             </div>
                         </div>
                         <div>
-                            The password will be asked whenever someone joins the classroom.
+                                ${i18n.tr('The password will be asked whenever someone joins the classroom.')}
                         </div>
                         <script>
                             const passwordInput = document.getElementById('password-input');
@@ -349,14 +353,14 @@
 
                             const validateConfirmPassword = function () {
                                 if (confirmPasswordInput.validity.valueMissing) {
-                                    confirmPasswordFeedback.innerText = 'Please confirm your password.';
+                                    confirmPasswordFeedback.innerText = '${i18n.tr('Please confirm your password.')}';
                                 } else {
                                     if (passwordInput.value === confirmPasswordInput.value)  {
                                         confirmPasswordInput.setCustomValidity('');
                                         confirmPasswordFeedback.innerText = '';
                                     } else {
                                         confirmPasswordInput.setCustomValidity('password-mismatch');
-                                        confirmPasswordFeedback.innerText = "Passwords don't match.";
+                                        confirmPasswordFeedback.innerText = "${i18n.tr('Passwords don\'t match.')}";
                                     }
                                 }
                             };
@@ -366,7 +370,7 @@
                         </script>
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-primary">Set password</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Set password')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -379,12 +383,13 @@
                 <input type="hidden" name="action" value="remove-password"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Remove classroom password" id="remove-password-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Remove classroom password')}" id="remove-password-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        Are you sure you want to remove the password?
+                        ${i18n.tr('Are you sure you want to remove the password?')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-danger">Remove password</button>
+                        <button type="submit" class="btn btn-danger">${i18n.tr('Remove password')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -397,13 +402,13 @@
                 <input type="hidden" name="action" value="enable-joining"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Enable joining" id="enable-joining-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Enable joining')}" id="enable-joining-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        Are you sure you want to enable joining?
-                        Students will be able to join via invite link or from the public list (if the classroom is public).
+                        ${i18n.tr('Are you sure you want to enable joining? Students will be able to join via invite link or from the public list (if the classroom is public).')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-success">Enable joining</button>
+                        <button type="submit" class="btn btn-success">${i18n.tr('Enable joining')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -416,13 +421,13 @@
                 <input type="hidden" name="action" value="disable-joining"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Disable joining" id="disable-joining-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Disable joining')}" id="disable-joining-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        Are you sure you want to disable joining?
-                        Students won't be able to join the classroom via invite link or from the public list.
+                        ${i18n.tr('Are you sure you want to disable joining? Students won\'t be able to join the classroom via invite link or from the public list.')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-danger">Disable joining</button>
+                        <button type="submit" class="btn btn-danger">${i18n.tr('Disable joining')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -435,14 +440,13 @@
                 <input type="hidden" name="action" value="make-public"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Change visibility" id="make-public-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Change visibility')}" id="make-public-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    Are you sure you want to make the classroom publicly visible?
-                    The classroom will be shown in the public list.
-                    If the classroom is open, players will be able to join from there.
+                    ${i18n.tr('Are you sure you want to make the classroom publicly visible? The classroom will be shown in the public list. If the classroom is open, players will be able to join from there.')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-success">Make Public</button>
+                    <button type="submit" class="btn btn-success">${i18n.tr('Make Public')}</button>
                 </jsp:attribute>
                 </t:modal>
 
@@ -455,13 +459,13 @@
                 <input type="hidden" name="action" value="make-private"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Change visibility" id="make-private-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Change visibility')}" id="make-private-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    Are you sure you want to change the classroom's visibility to private?
-                    The classroom will no longer be shown in the public list and players won't be able to join from there.
+                    ${i18n.tr('Are you sure you want to change the classroom\'s visibility to private? The classroom will no longer be shown in the public list and players won\'t be able to join from there.')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-danger">Make Private</button>
+                    <button type="submit" class="btn btn-danger">${i18n.tr('Make Private')}</button>
                 </jsp:attribute>
                 </t:modal>
 
@@ -474,14 +478,13 @@
                 <input type="hidden" name="action" value="archive"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Archive classroom" id="archive-classroom-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Archive classroom')}" id="archive-classroom-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    Are you sure you want to archive the classroom?
-                    This will make the classroom read-only and prevent players from joining.
-                    You can undo this later by restoring the classroom.
+                    ${i18n.tr('Are you sure you want to archive the classroom? This will make the classroom read-only and prevent players from joining. You can undo this later by restoring the classroom.')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-danger">Archive</button>
+                    <button type="submit" class="btn btn-danger">${i18n.tr('Archive')}</button>
                 </jsp:attribute>
                 </t:modal>
 
@@ -494,12 +497,13 @@
                 <input type="hidden" name="action" value="restore"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Restore classroom" id="restore-classroom-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Restore classroom')}" id="restore-classroom-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    Are you sure you want to restore the classroom?
+                    ${i18n.tr('Are you sure you want to restore the classroom?')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-success">Restore</button>
+                    <button type="submit" class="btn btn-success">${i18n.tr('Restore')}</button>
                 </jsp:attribute>
                 </t:modal>
 
@@ -512,12 +516,12 @@
                 <input type="hidden" name="action" value="leave"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Leave classroom" id="leave-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Leave classroom')}" id="leave-modal" closeButtonText="${i18n.tr('Cancel')}">
                 <jsp:attribute name="content">
-                    Are you sure you want to leave the classroom?
+                    ${i18n.tr('Are you sure you want to leave the classroom?')}
                 </jsp:attribute>
                     <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-danger">Leave</button>
+                    <button type="submit" class="btn btn-danger">${i18n.tr('Leave')}</button>
                 </jsp:attribute>
                 </t:modal>
 
@@ -532,16 +536,13 @@
                 <input type="hidden" name="userId" value=""/>
                 <input type="hidden" name="role" value=""/>
 
-                <t:modal title="Change role" id="change-role-modal" closeButtonText="Cancel">
+                <t:modal title='${i18n.tr("Change role")}' id="change-role-modal"
+                         closeButtonText='${i18n.tr("Cancel")}'>
                     <jsp:attribute name="content">
-                        Are you sure you want to make
-                        <span data-fill="username" class="border rounded px-1"></span>
-                        a
-                        <span data-fill="role" class="border rounded px-1"></span>
-                        ?
+                        ${i18n.tr('Are you sure you want to make {0} a {1}?', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>', '<span data-fill=\'role\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-primary">Change role</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Change role')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -555,15 +556,13 @@
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
                 <input type="hidden" name="userId" value=""/>
 
-                <t:modal title="Change role" id="change-role-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Change role')}" id="change-role-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        Are you sure you want to make
-                        <span data-fill="username" class="border rounded px-1"></span>
-                        the owner of this classroom?
-                        This will change the current owner's role to Moderator.
+                        ${i18n.tr('Are you sure you want to make {0} the owner of this classroom? This will change the current owner\'s role to Moderator.', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-primary">Change owner</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Change owner')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -577,14 +576,13 @@
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
                 <input type="hidden" name="userId" value=""/>
 
-                <t:modal title="Kick member" id="kick-member-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Kick member')}" id="kick-member-modal"
+                         closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
-                        Are you sure you want kick
-                        <span data-fill="username" class="border rounded px-1"></span>
-                        from this classroom?
+                        ${i18n.tr('Are you sure you want kick {0} from this classroom?', '<span data-fill=\'username\' class=\'border rounded px-1\'></span>')}
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-danger">Kick</button>
+                        <button type="submit" class="btn btn-danger">${i18n.tr('Kick')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -597,22 +595,22 @@
                 <input type="hidden" name="action" value="join"/>
                 <input type="hidden" name="classroomId" value="${classroom.id}"/>
 
-                <t:modal title="Join Classroom" id="join-modal" closeButtonText="Cancel">
+                <t:modal title="${i18n.tr('Join Classroom')}" id="join-modal" closeButtonText="${i18n.tr('Cancel')}">
                     <jsp:attribute name="content">
                         <c:choose>
                             <c:when test="${classroom.password.isPresent()}">
-                                <p>A password is required to join this classroom:</p>
+                                <p>${i18n.tr('A password is required to join this classroom:')}</p>
                                 <input type="password" class="form-control" id="join-password-input"
-                                       name="password" placeholder="Password" required>
-                                <div class="invalid-feedback">Please enter the password.</div>
+                                       name="password" placeholder="${i18n.tr('Password')}" required>
+                                <div class="invalid-feedback">${i18n.tr('Please enter the password.')}</div>
                             </c:when>
                             <c:otherwise>
-                                Are you sure you want to join this classroom?
+                                ${i18n.tr('Are you sure you want to join this classroom?')}
                             </c:otherwise>
                         </c:choose>
                     </jsp:attribute>
                     <jsp:attribute name="footer">
-                        <button type="submit" class="btn btn-primary">Join</button>
+                        <button type="submit" class="btn btn-primary">${i18n.tr('Join')}</button>
                     </jsp:attribute>
                 </t:modal>
 
@@ -621,6 +619,7 @@
 
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
+            import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {Tooltip, Modal} from '${url.forPath("/js/bootstrap.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
@@ -748,26 +747,26 @@
                             <i class="fa fa-ellipsis-v"></i>
                         </span>
                         <div class="dropdown-menu">
-                            <li><h6 class="dropdown-header">Change Role to ...</h6></li>
+                            <li><h6 class="dropdown-header">${i18n.tr('Change Role to ...')}</h6></li>
                             <li>
                                 <a href="#" class="dropdown-item change-role" data-role="STUDENT">
                                     <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                    Student
+                                    ${i18n.tr('Student')}
                                 </a>
                                 <a href="#" class="dropdown-item change-role" data-role="MODERATOR">
                                     <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                    Moderator
+                                    ${i18n.tr('Moderator')}
                                 </a>
                                 <a href="#" class="dropdown-item change-role" data-role="OWNER">
                                     <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                    Owner
+                                    ${i18n.tr('Owner')}
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <a class="dropdown-item kick-member" href="#">
                                     <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
-                                    Kick
+                                    ${i18n.tr('Kick')}
                                 </a>
                             </li>
                         </div>
@@ -845,25 +844,25 @@
                     columns: [
                         {
                             data: 'user.id',
-                            title: 'User ID',
+                            title: "${i18n.tr('User ID')}",
                             type: 'number',
                             width: '5em',
                             visible: canChangeRoles || canChangeOwner || canKickStudents || canKickModerators
                         },
                         {
                             data: 'user.name',
-                            title: 'Name',
+                            title: "${i18n.tr('Name')}",
                             type: 'string'
                         },
                         {
                             data: 'role',
-                            title: 'Role',
+                            title: "${i18n.tr('Role')}",
                             type: 'string',
                             render: renderClassroomRole,
                         },
                         {
                             data: null,
-                            title: 'Actions',
+                            title: "${i18n.tr('Actions')}",
                             orderable: false,
                             searchable: false,
                             render: renderMemberActions,
@@ -877,10 +876,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
-                        emptyTable: 'This classroom has no members... yet.',
-                        zeroRecords: 'No members found.'
-                    }
+                    language: DataTablesUtils.language({
+                        emptyTable: '${i18n.tr('This classroom has no members... yet.')}',
+                        zeroRecords: '${i18n.tr('No members found.')}'
+                    })
                 });
                 LoadingAnimation.hideAnimation(membersTable.table().container());
 
@@ -903,11 +902,11 @@
             const renderGameMode = function(mode, type, row, meta) {
                 switch (mode) {
                     case GameMode.PARTY:
-                        return 'Battleground';
+                        return '${i18n.tr('Battleground')}';
                     case GameMode.MELEE:
-                        return 'Melee';
+                        return '${i18n.tr('Melee')}';
                     default:
-                        return 'unknown';
+                        return '${i18n.tr('unknown')}';
                 }
             };
 
@@ -926,13 +925,13 @@
                     case 'display':
                         switch (role) {
                             case Role.ATTACKER:
-                                return '<span class="badge bg-attacker" style="font-size: .85rem;">Attacker</span>';
+                                return '<span class="badge bg-attacker" style="font-size: .85rem;">${i18n.tr('Attacker')}</span>';
                             case Role.DEFENDER:
-                                return '<span class="badge bg-defender" style="font-size: .85rem;">Defender</span>';
+                                return '<span class="badge bg-defender" style="font-size: .85rem;">${i18n.tr('Defender')}</span>';
                             case Role.PLAYER:
-                                return '<span class="badge bg-player" style="font-size: .85rem;">Player</span>';
+                                return '<span class="badge bg-player" style="font-size: .85rem;">${i18n.tr('Player')}</span>';
                             case Role.OBSERVER:
-                                return '<span class="badge bg-warning text-dark" style="font-size: .85rem;">Observer</span>';
+                                return '<span class="badge bg-warning text-dark" style="font-size: .85rem;">${i18n.tr('Observer')}</span>';
                             case Role.NONE:
                                 return '';
                         }
@@ -951,9 +950,10 @@
                     case 'display':
                         const timeLeftStr = GameTime.formatTime(timeLeft);
                         const percentElapsed = GameTime.calculateElapsedPercentage(data.startTime, data.duration);
+                        const timeLeftLabel = "${i18n.tr('Running: {0} left')}".replace('{0}', timeLeftStr);
                         return `
                             <div style="margin-top: -5px;">
-                                <span class="small">Running: \${timeLeftStr} left</span>
+                                <span class="small">\${timeLeftLabel}</span>
                                 <div class="progress" style="max-width: 15rem; height: 4px;">
                                     <div class="progress-bar" style="width: \${percentElapsed * 100}%;"></div>
                                 </div>
@@ -972,14 +972,14 @@
                     case 'type':
                         return GameTime.formatDate(endDate);
                     case 'display':
-                        return 'Ended at ' + GameTime.formatDate(endDate);
+                        return '${i18n.tr('Ended at {0}')} '.replace('{0}', GameTime.formatDate(endDate));
                 }
             };
 
             const renderGameState = function(data, type, row, meta) {
                 switch (data.state) {
                     case GameState.CREATED:
-                        return 'Not Started';
+                        return "${i18n.tr('Not Started')}";
                     case GameState.ACTIVE:
                         return renderGameStateActive(data, type, row, meta);
                     case GameState.FINISHED:
@@ -1023,8 +1023,8 @@
                             <span class="text-nowrap">
                                 <button type="submit" id="join-observer-\${data.gameId}"
                                         class="btn btn-sm btn-info ms-1"
-                                        title="Join as Observer">
-                                    <i class="fa fa-external-link text-primary"></i> Observe
+                                        title="${i18n.tr('Join as Observer')}">
+                                    <i class="fa fa-external-link text-primary"></i> ${i18n.tr('Observe')}
                                 </button>
                             </span>
                         </form>
@@ -1101,10 +1101,10 @@
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',
-                    language: {
-                        emptyTable: 'This classroom has no games... yet.',
-                        zeroRecords: 'No games found.'
-                    }
+                    language: DataTablesUtils.language({
+                        emptyTable: '${i18n.tr('This classroom has no games... yet.')}',
+                        zeroRecords: '${i18n.tr('No games found.')}'
+                    })
                 });
                 LoadingAnimation.hideAnimation(gamesTable.table().container());
 
@@ -1125,7 +1125,7 @@
 
                         const tooltip = new Tooltip(this, {
                             trigger: 'manual',
-                            title: 'copied'
+                            title: '${i18n.tr('copied')}'
                         });
                         tooltip.show();
                         setTimeout(() => tooltip.hide(), 1000);

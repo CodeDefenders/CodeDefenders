@@ -28,7 +28,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 
@@ -39,9 +38,6 @@ public class LoginPage extends HttpServlet {
     CodeDefendersAuth login;
 
     @Inject
-    PageInfoBean pageInfo;
-
-    @Inject
     private URLUtils url;
 
     @Override
@@ -49,8 +45,6 @@ public class LoginPage extends HttpServlet {
         if (login.isLoggedIn()) {
             resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         } else {
-            pageInfo.setPageTitle("Login");
-
             req.getRequestDispatcher("/jsp/login_view.jsp").forward(req, resp);
         }
     }

@@ -68,7 +68,7 @@ public class RoleServiceTest {
     @Test
     public void testAdminSetupAddsRole() {
         when(userRepo.getUserByName("userA")).thenReturn(
-                Optional.of(new UserEntity(100, "userA", "", "")));
+                Optional.of(new UserEntity(100, "userA", "", "", null)));
 
         roleService.doInitialAdminSetup(List.of("userA"));
 
@@ -89,9 +89,9 @@ public class RoleServiceTest {
     @Test
     public void testAdminSetupAddsMultiple() {
         when(userRepo.getUserByName("userA")).thenReturn(
-                Optional.of(new UserEntity(100, "userA", "", "")));
+                Optional.of(new UserEntity(100, "userA", "", "", null)));
         when(userRepo.getUserByName("userB")).thenReturn(
-                Optional.of(new UserEntity(101, "userB", "", "")));
+                Optional.of(new UserEntity(101, "userB", "", "", null)));
         when(userRepo.getUserByName("userC")).thenReturn(
                 Optional.empty());
 

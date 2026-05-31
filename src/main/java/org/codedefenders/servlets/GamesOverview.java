@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -36,6 +37,7 @@ import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JspWorkaround;
@@ -66,6 +68,10 @@ public class GamesOverview extends HttpServlet {
     @Inject
     private MultiplayerGameRepository multiplayerGameRepo;
 
+    @Named
+    @Inject
+    private I18nService i18nService;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -91,7 +97,7 @@ public class GamesOverview extends HttpServlet {
         boolean gamesCreatable = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         request.setAttribute("gamesCreatable", gamesCreatable);
 
-
-        JspWorkaround.forwardInWrapper(request, response, "My Games", Constants.USER_GAMES_OVERVIEW_JSP);
+        var i18n = i18nService.getI18n(request);
+        JspWorkaround.forwardInWrapper(request, response, i18n.tr("My Games"), Constants.USER_GAMES_OVERVIEW_JSP);
     }
 }

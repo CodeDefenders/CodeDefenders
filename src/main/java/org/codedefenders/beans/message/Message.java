@@ -21,18 +21,20 @@ package org.codedefenders.beans.message;
 import java.io.Serializable;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.util.PreparedMessage;
 
 /**
  * Represents a message shown on to a user on page load. By default, the message is HTML-escaped and fades out after a
  * few seconds, this can be changed by using the builder-style setter methods.
  */
 public class Message implements Serializable {
-    private long id;
+    private final long id;
     private String text;
     private boolean alert;
     private boolean escape;
     private String title;
     private String secondary;
+    private Object[] args = new Object[0];
 
     /**
      * Constructs a new message with the given text. Use {@link MessagesBean#add(String)} instead of calling the
@@ -131,5 +133,21 @@ public class Message implements Serializable {
     public Message setSecondary(String secondary) {
         this.secondary = secondary;
         return this;
+    }
+
+    public Message setText(String text) {
+        this.text = text;
+        return this;
+    }
+
+    public Message setArgs(Object... args) {
+        this.args = args;
+        return this;
+    }
+
+    /* Utility methods. */
+
+    public PreparedMessage getPreparedText() {
+        return new PreparedMessage(text, args);
     }
 }

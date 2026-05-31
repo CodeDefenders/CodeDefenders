@@ -28,6 +28,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
@@ -48,7 +49,10 @@
     gameHighlighting.setEnableFlagging(false);
 %>
 
-<p:base_page title="Puzzle Preview">
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
+
+<p:base_page title="${i18n.tr('Puzzle Preview')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
     </jsp:attribute>
@@ -66,15 +70,15 @@
         <div class="d-flex flex-column gap-4 p-4">
             <div>
                 <div class="game-component-header">
-                    <h3>Description</h3>
+                    <h3>${i18n.tr('Description')}</h3>
                 </div>
                 <div>
                     <c:choose>
-                        <c:when test="${puzzle.description == null || puzzle.description.blank}">
-                            (no description)
+                        <c:when test="${puzzleDescription == null || puzzleDescription.blank}">
+                            (${i18n.tr('no description')})
                         </c:when>
                         <c:otherwise>
-                            ${puzzle.description}
+                            ${puzzleDescription}
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -83,79 +87,79 @@
             <t:mutant_accordion/>
 
             <div id="tests-div">
-                <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                <div class="game-component-header"><h3>${i18n.tr('JUnit Tests')}</h3></div>
                 <t:test_accordion/>
             </div>
 
             <div>
-                <div class="game-component-header"><h3>Class Under Test</h3></div>
+                <div class="game-component-header"><h3>${i18n.tr('Class Under Test')}</h3></div>
                 <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                 <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
             </div>
 
             <div>
                 <div class="game-component-header">
-                    <h3>Properties</h3>
+                    <h3>${i18n.tr('Properties')}</h3>
                 </div>
                 <table class="table table-bordered">
                     <tbody>
                         <tr>
-                            <td>Title</td>
-                            <td>${puzzle.title}</td>
+                            <td>${i18n.tr('Title')}</td>
+                            <td>${puzzleTitle}</td>
                         </tr>
                         <tr>
-                            <td>Description</td>
-                            <td>${puzzle.description}</td>
+                            <td>${i18n.tr('Description')}</td>
+                            <td>${puzzleDescription}</td>
                         </tr>
                         <tr>
-                            <td>Type</td>
+                            <td>${i18n.tr('Type')}</td>
                             <td>${puzzle.type}</td>
                         </tr>
                         <tr>
-                            <td class="pe-3">Mutant Equivalent</td>
+                            <td class="pe-3">${i18n.tr('Mutant Equivalent')}</td>
                             <c:choose>
                                 <c:when test="${puzzle.type == PuzzleType.EQUIVALENCE}">
-                                    <td>${puzzle.equivalent ? "yes" : "no"}</td>
+                                    <td>${puzzle.equivalent ? i18n.tr('yes') : i18n.tr('no')}</td>
                                 </c:when>
                                 <c:otherwise>
-                                    <td>N/A</td>
+                                    <td>${i18n.tr('N/A')}</td>
                                 </c:otherwise>
                             </c:choose>
                         </tr>
                         <tr>
-                            <td>Level</td>
-                            <td>${puzzle.level}</td>
+                            <td>${i18n.tr('Level')}</td>
+                            <td>${i18n.tr(puzzle.level.formattedString)}</td>
                         </tr>
                         <tr>
-                            <td>Editable lines start</td>
-                            <td>${puzzle.editableLinesStart != null ? puzzle.editableLinesStart : "N/A"}</td>
+                            <td>${i18n.tr('Editable lines start')}</td>
+                            <td>${puzzle.editableLinesStart != null ? puzzle.editableLinesStart : i18n.tr('N/A')}</td>
                         </tr>
                         <tr>
-                            <td>Editable lines end</td>
-                            <td>${puzzle.editableLinesEnd != null ? puzzle.editableLinesEnd : "N/A"}</td>
+                            <td>${i18n.tr('Editable lines end')}</td>
+                            <td>${puzzle.editableLinesEnd != null ? puzzle.editableLinesEnd : i18n.tr('N/A')}</td>
                         </tr>
                         <tr>
-                            <td>Max. assertions per test</td>
+                            <td>${i18n.tr('Max. assertions per test')}</td>
                             <td>${puzzle.maxAssertionsPerTest}</td>
                         </tr>
                         <tr>
-                            <td>Mutant validator level</td>
+                            <td>${i18n.tr('Mutant validator level')}</td>
                             <td>${puzzle.mutantValidatorLevel}</td>
                         </tr>
                         <tr>
-                            <td>Puzzle ID</td>
+                            <td>${i18n.tr('Puzzle ID')}</td>
                             <td>${puzzle.puzzleId}</td>
                         </tr>
                         <tr>
-                            <td>Class ID</td>
+                            <td>${i18n.tr('Class ID')}</td>
                             <td>${puzzle.classId}</td>
                         </tr>
                         <tr>
-                            <td>Chapter ID</td>
+                            <td>${i18n.tr('Chapter ID')}</td>
                             <td>${puzzle.chapterId}</td>
                         </tr>
                         <tr>
-                            <td>Position</td>
+                            <td>${i18n.tr('Position')}</td>
                             <td>${puzzle.position}</td>
                         </tr>
                     </tbody>
@@ -204,15 +208,15 @@
             if (startLine !== null && startLine >= 2) {
                 // one line before startLine (1-indexed)
                 editor.setGutterMarker(startLine - 2, 'CodeMirror-linenumbers',
-                        createMarker('fa-arrow-down', 'Editable lines start below'));
+                    createMarker('fa-arrow-down', "${i18n.tr('Editable lines start below')}"));
             }
             if (startLine !== null && endLine <= lineCount - 1) {
                 // one line after endLine (1-indexed)
                 const marker = createMarker();
                 marker.querySelector('.fa').classList.add('fa-arrow-down');
-                marker.title = 'Editable lines start below';
+                marker.title = "${i18n.tr('Editable lines start below')}";
                 editor.setGutterMarker(endLine, 'CodeMirror-linenumbers',
-                        createMarker('fa-arrow-up', 'Editable lines end above'));
+                    createMarker('fa-arrow-up', "${i18n.tr('Editable lines end above')}"));
             }
         </script>
     </jsp:body>

@@ -40,7 +40,7 @@ public class URLUtilsTest {
             public Optional<URL> getApplicationURL() {
                 return Optional.empty();
             }
-        }));
+        }), null);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class URLUtilsTest {
             public Optional<URL> getApplicationURL() {
                 return Optional.of(applicationURL);
             }
-        });
+        }, null);
 
         assertEquals(url, urlUtils.getAbsoluteURLForPath("/"));
     }

@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.game.GameClass" %>
@@ -35,6 +35,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
@@ -43,6 +44,7 @@
     Map<Integer, String> multiplayerGameCreatorNames = (Map<Integer, String>) request.getAttribute("multiplayerGameCreatorNames");
     Map<Integer, List<List<String>>> multiplayerPlayerInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("multiplayerPlayersInfoForGame");
     Map<Integer, Integer> multiplayerUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("multiplayerUserIdForPlayerIds");
+    I18n i18n = (I18n) request.getAttribute("i18n");
 %>
 
 <%!
@@ -63,7 +65,7 @@
     <form id="games" action="${url.forPath(Paths.ADMIN_MONITOR)}" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
 
-        <h3 class="mb-3">Multiplayer Games</h3>
+        <h3 class="mb-3">${i18n.tr('Multiplayer Games')}</h3>
         <table id="table-multiplayer" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -72,17 +74,17 @@
                             <input type="checkbox" class="form-check-input" id="selectAllGamesMultiplayer">
                         </div>
                     </th>
-                    <th>ID</th>
+                    <th>${i18n.tr('ID')}</th>
                     <th></th>
-                    <th>Class</th>
-                    <th>Creator</th>
-                    <th>Attackers</th>
-                    <th>Defenders</th>
-                    <th>Level</th>
+                    <th>${i18n.tr('Class')}</th>
+                    <th>${i18n.tr('Creator')}</th>
+                    <th>${i18n.tr('Attackers')}</th>
+                    <th>${i18n.tr('Defenders')}</th>
+                    <th>${i18n.tr('Level')}</th>
                     <th>
                         <input type="checkbox" id="togglePlayersActiveMultiplayer" class="btn-check" autocomplete="off">
                         <label for="togglePlayersActiveMultiplayer" class="btn btn-sm btn-outline-secondary"
-                               title="Show list of Players for each Game.">
+                               title="${i18n.tr('Show list of Players for each Game.')}">
                             <i class="fa fa-expand btn-check-inactive"></i>
                             <i class="fa fa-compress btn-check-active"></i>
                         </label>
@@ -94,7 +96,7 @@
                 <% if (multiplayerGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            You don't control any unfinished multiplayer games at the moment.
+                            ${i18n.tr("You don\'t control any unfinished multiplayer games at the moment.")}
                         </td>
                     </tr>
                 <% } %>
@@ -106,7 +108,7 @@
                         String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
                                 "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
                         String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
-                                "return confirm('Are you sure you want to stop this Game?');" : "";
+                                "return confirm('" + i18n.tr("Are you sure you want to stop this Game?") + "');" : "";
                         int gid = g.getId();
                 %>
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
@@ -120,14 +122,14 @@
                             <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
                                 <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
                                    href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gid%>">
-                                    Observe
+                                    ${i18n.tr('Observe')}
                                 </a>
                             <% } else { %>
                             <span class="text-nowrap">
                                     <button type="submit" form="joinGameForm_observer_<%=gid%>"
                                             class="btn btn-sm btn-info"
                                             value="Join as Observer">
-                                        Join as Observer
+                                        ${i18n.tr('Join as Observer')}
                                     </button>
                                 </span>
                             <% } %>
@@ -144,18 +146,18 @@
                         <td><%=multiplayerGameCreatorNames.get(gid)%></td>
                         <td><%=g.getAttackerPlayers().size()%></td>
                         <td><%=g.getDefenderPlayers().size()%></td>
-                        <td><%=g.getLevel()%></td>
+                        <td><%=i18n.tr(g.getLevel().getFormattedString())%></td>
                         <td>
                             <div class="d-flex gap-1">
                                 <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
                                         onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
-                                        title="Start/Stop Game">
+                                        title="${i18n.tr('Start/Stop Game')}">
                                     <i class="<%=startStopButtonIcon%>"></i>
                                 </button>
                                 <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
-                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        onclick="return confirm('${i18n.tr('Are you sure you want to create a rematch for this game?')}')"
                                         id="<%="rematch_"+g.getId()%>"
-                                        title="Rematch">
+                                        title="${i18n.tr('Rematch')}">
                                     <i class="fa fa-repeat"></i>
                                 </button>
                                 <button class="btn btn-sm btn-dark" data-bs-toggle="modal" type="button"
@@ -173,7 +175,8 @@
                                 userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
                         <tr class="players-table" hidden>
-                            <td colspan="100" class="text-center">There are no players active in this game.</td>
+                            <td colspan="100"
+                                class="text-center">${i18n.tr('There are no players active in this game.')}</td>
                         </tr>
                     <%
                         } else {
@@ -184,14 +187,14 @@
                                     <table class="table m-0">
                                         <thead>
                                             <tr>
-                                                <th>Game Score</th>
-                                                <th>Name</th>
-                                                <th>Submissions</th>
-                                                <th>Last Action</th>
-                                                <th>Points</th>
-                                                <th>Total Score</th>
-                                                <th>Switch Role</th>
-                                                <th>Remove Player</th>
+                                                <th>${i18n.tr('Game Score')}</th>
+                                                <th>${i18n.tr('Name')}</th>
+                                                <th>${i18n.tr('Submissions')}</th>
+                                                <th>${i18n.tr('Last Action')}</th>
+                                                <th>${i18n.tr('Points')}</th>
+                                                <th>${i18n.tr('Total Score')}</th>
+                                                <th>${i18n.tr('Switch Role')}</th>
+                                                <th>${i18n.tr('Remove Player')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -227,7 +230,7 @@
 
                                                     String lastSubmissionTS;
                                                     if (ts.equalsIgnoreCase("never")) {
-                                                        lastSubmissionTS = ts;
+                                                        lastSubmissionTS = i18n.tr("never");
                                                     } else {
                                                         Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
                                                         Instant now = Instant.now();
@@ -266,9 +269,8 @@
                                                     <td class="<%=color%>"><%=totalScore%></td>
                                                     <td class="<%=color%>">
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
-                                                                onclick="return confirm('Are you sure you want to change the role of this player? \n' +
-                                                                    'This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the game.');"
+                                                                onclick="return confirm('${i18n.tr('Are you sure you want to change the role of this player?')}\n' +
+                                                                        '${i18n.tr('This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the game.')}');"
                                                                 id="<%="switch_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserSwitchButton">
                                                             <i class="fa fa-exchange"></i>
@@ -276,12 +278,11 @@
                                                     </td>
                                                     <td class="<%=color%>">
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
+                                                                onclick="return confirm('${i18n.tr('Are you sure you want to permanently remove this player?')}\n' +
+                                                                        '${i18n.tr('This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game.')}');"
                                                                 id="<%="remove_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserRemoveButton">
-                                                            Remove
+                                                            ${i18n.tr('Remove')}
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -302,7 +303,7 @@
 
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
-        <h3 class="mb-3 mt-4">Melee Games</h3>
+        <h3 class="mb-3 mt-4">${i18n.tr('Melee Games')}</h3>
         <%
             List<MeleeGame> meleeGames = (List<MeleeGame>) request.getAttribute("meleeGames");
             Map<Integer, String> meleeGameCreatorNames = (Map<Integer, String>) request.getAttribute("meleeGameCreatorNames");
@@ -317,16 +318,16 @@
                             <input type="checkbox" class="form-check-input" id="selectAllGamesMelee">
                         </div>
                     </th>
-                    <th>ID</th>
+                    <th>${i18n.tr('ID')}</th>
                     <th></th>
-                    <th>Class</th>
-                    <th>Creator</th>
-                    <th>Players</th>
-                    <th>Level</th>
+                    <th>${i18n.tr('Class')}</th>
+                    <th>${i18n.tr('Creator')}</th>
+                    <th>${i18n.tr('Players')}</th>
+                    <th>${i18n.tr('Level')}</th>
                     <th>
                         <input type="checkbox" id="togglePlayersActiveMelee" class="btn-check" autocomplete="off">
                         <label for="togglePlayersActiveMelee" class="btn btn-sm btn-outline-secondary"
-                               title="Show list of Players for each Game.">
+                               title="${i18n.tr('Show list of Players for each Game.')}">
                             <i class="fa fa-expand btn-check-inactive"></i>
                             <i class="fa fa-compress btn-check-active"></i>
                         </label>
@@ -338,7 +339,7 @@
                 <% if (meleeGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            You don't control any unfinished melee games at the moment.
+                            ${i18n.tr("You don\'t control any unfinished melee games at the moment.")}
                         </td>
                     </tr>
                 <% } %>
@@ -350,7 +351,7 @@
                         String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
                                 "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
                         String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
-                                "return confirm('Are you sure you want to stop this Game?');" : "";
+                                "return confirm('" + i18n.tr("Are you sure you want to stop this Game?") + "');" : "";
                         int gid = g.getId();
                 %>
                     <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
@@ -364,14 +365,14 @@
                             <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
                                 <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
                                    href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gid%>">
-                                    Observe
+                                    ${i18n.tr('Observe')}
                                 </a>
                             <% } else { %>
                             <span class="text-nowrap">
                                     <button type="submit" form="joinGameForm_observer_<%=g.getId()%>"
                                             class="btn btn-info btn-sm"
                                             value="Join">
-                                        Join as Observer
+                                        ${i18n.tr('Join as Observer')}
                                     </button>
                                 </span>
                             <% } %>
@@ -387,18 +388,18 @@
                         </td>
                         <td><%=meleeGameCreatorNames.get(gid)%></td>
                         <td><%=g.getPlayers().size()%></td>
-                        <td><%=g.getLevel()%></td>
+                        <td><%=i18n.tr(g.getLevel().getFormattedString())%></td>
                         <td>
                             <div class="d-flex gap-1">
                                 <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
                                         onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>"
-                                        title="Start/Stop Game">
+                                        title="${i18n.tr('Start/Stop Game')}">
                                     <i class="<%=startStopButtonIcon%>"></i>
                                 </button>
                                 <button class="btn btn-sm btn-warning" type="submit" value="<%=gid%>" name="rematch_btn"
-                                        onclick="return confirm('Are you sure you want to create a rematch for this game?')"
+                                        onclick="return confirm('${i18n.tr('Are you sure you want to create a rematch for this game?')}')"
                                         id="<%="rematch_"+g.getId()%>"
-                                        title="Rematch">
+                                        title="${i18n.tr('Rematch')}">
                                     <i class="fa fa-repeat"></i>
                                 </button>
                                 <button class="btn btn-sm btn-dark" data-bs-toggle="modal" type="button"
@@ -427,13 +428,13 @@
                                     <table class="table m-0">
                                         <thead>
                                             <tr>
-                                                <th>Game Score</th>
-                                                <th>Name</th>
-                                                <th>Submissions</th>
-                                                <th>Last Action</th>
-                                                <th>Points</th>
-                                                <th>Total Score</th>
-                                                <th>Remove Player</th>
+                                                <th>${i18n.tr('Game Score')}</th>
+                                                <th>${i18n.tr('Name')}</th>
+                                                <th>${i18n.tr('Submissions')}</th>
+                                                <th>${i18n.tr('Last Action')}</th>
+                                                <th>${i18n.tr('Points')}</th>
+                                                <th>${i18n.tr('Total Score')}</th>
+                                                <th>${i18n.tr('Remove Player')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -465,7 +466,7 @@
 
                                                     String lastSubmissionTS;
                                                     if (ts.equalsIgnoreCase("never")) {
-                                                        lastSubmissionTS = ts;
+                                                        lastSubmissionTS = i18n.tr("never");
                                                     } else {
                                                         Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
                                                         Instant now = Instant.now();
@@ -497,12 +498,11 @@
                                                     <td><%=totalScore%></td>
                                                     <td>
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
+                                                                onclick="return confirm('${i18n.tr('Are you sure you want to permanently remove this player?')}\n' +
+                                                                        '${i18n.tr('This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game.')}');"
                                                                 id="<%="remove_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserRemoveButton">
-                                                            Remove
+                                                            ${i18n.tr('Remove')}
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -526,14 +526,14 @@
                 <div class="col-auto">
                     <button class="btn btn-md btn-primary" type="submit" name="games_btn" id="start_games_btn"
                             disabled value="Start Games">
-                        Start Games
+                        ${i18n.tr('Start Games')}
                     </button>
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-md btn-danger" type="submit" name="games_btn" id="stop_games_btn"
-                            onclick="return confirm('Are you sure you want to stop the selected Games?');"
+                            onclick="return confirm('${i18n.tr('Are you sure you want to stop the selected Games?')}');"
                             disabled value="Stop Games">
-                        Stop Games
+                        ${i18n.tr('Stop Games')}
                     </button>
                 </div>
             </div>

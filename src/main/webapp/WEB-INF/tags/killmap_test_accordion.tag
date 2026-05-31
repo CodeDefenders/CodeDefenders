@@ -20,6 +20,7 @@
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="killMapAccordion" type="org.codedefenders.beans.game.KillMapAccordionBean"--%>
 
@@ -28,36 +29,36 @@
 <div id="mutants-div">
 
     <div class="game-component-header">
-        <h2>Kill-maps by Tests</h2>
+        <h2>${i18n.tr('Kill-maps by Tests')}</h2>
         <div id="kta-filter">
             <input type="radio" class="btn-check" name="kta-filter" id="kt-all" value="ALL" checked>
             <label class="btn btn-xs btn-outline-secondary" for="kt-all">
-                <span class="align-middle">All</span>
+                <span class="align-middle">${i18n.tr('All')}</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-no-kill" value="NO_KILL">
             <label class="btn btn-xs btn-outline-secondary" for="kt-no-kill">
                 <span class="killMapImage killMapImageNoKill align-middle"></span>
-                <span class="align-middle">No Kill</span>
+                <span class="align-middle">${i18n.tr('No Kill')}</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-kill" value="KILL">
             <label class="btn btn-xs btn-outline-secondary" for="kt-kill">
                 <span class="killMapImage killMapImageKill align-middle"></span>
-                <span class="align-middle">Kill</span>
+                <span class="align-middle">${i18n.tr('Kill')}</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-error" value="ERROR">
             <label class="btn btn-xs btn-outline-secondary" for="kt-error">
                 <span class="killMapImage killMapImageError align-middle"></span>
-                <span class="align-middle">Error</span>
+                <span class="align-middle">${i18n.tr('Error')}</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-no-cov" value="NO_COVERAGE">
             <label class="btn btn-xs btn-outline-secondary" for="kt-no-cov">
                 <span class="killMapImage killMapImageNoCoverage align-middle"></span>
-                <span class="align-middle">No Coverage</span>
+                <span class="align-middle">${i18n.tr('No Coverage')}</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-unknown" value="UNKNOWN">
             <label class="btn btn-xs btn-outline-secondary" for="kt-unknown">
                 <span class="killMapImage killMapImageUnknown align-middle"></span>
-                <span class="align-middle">Unknown</span>
+                <span class="align-middle">${i18n.tr('Unknown')}</span>
             </label>
         </div>
     </div>
@@ -66,7 +67,7 @@
         <c:forEach items="${killMapAccordion.categoriesForTests}" var="category">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="kta-heading-${category.id}">
-                    <button class="${category.testIds.size() == 0 ? "" : 'kta-covered'} accordion-button collapsed"
+                    <button class="${category.testIds.size() == 0 ? '' : 'kta-covered'} accordion-button collapsed"
                             type="button" data-bs-toggle="collapse"
                             data-bs-target="#kta-collapse-${category.id}"
                             aria-controls="kta-collapse-${category.id}">
@@ -75,7 +76,7 @@
                               <c:if test="${category.testIds.size() == 0}">hidden</c:if>>
                                 ${category.testIds.size()}
                         </span>
-                            ${category.description}
+                            ${i18n.tr(category.description)}
                     </button>
                 </h2>
                 <div class="accordion-collapse collapse"
@@ -88,7 +89,7 @@
                             <c:if test="${category.testIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
-                                        <p class="text-center m-0 py-1">No tests in this category.</p>
+                                        <p class="text-center m-0 py-1">${i18n.tr('No tests in this category.')}</p>
                                     </div>
                                 </div>
                             </c:if>
@@ -96,33 +97,33 @@
                                 <div class="accordion-item">
                                     <h3 class="accordion-header"
                                         id="kta-heading-category-${category.id}-test-${test.id}">
-                                        <button class="${category.testIds.size() == 0 ? "" : 'kta-covered'}
+                                        <button class="${category.testIds.size() == 0 ? '' : 'kta-covered'}
                                                         accordion-button collapsed"
                                                 type="button" role="button"
                                                 aria-controls="kta-collapse-category-${category.id}-test-${test.id}">
                                             <span class="kta-button-content">
                                                 <span class="kta-test-link">
-                                                    Test ${test.id}
+                                                    ${i18n.tr('Test {0}', test.id)}
                                                 </span>
                                                 <span class="kta-col">
-                                                    <span class="kta-column-name mx-2">by</span>
+                                                    <span class="kta-column-name mx-2">${i18n.tr('by')}</span>
                                                     ${test.creator.name}
                                                 </span>
                                                 <span class="kta-col">
-                                                    <span class="kta-column-name mx-2">Covered:</span>
+                                                    <span class="kta-column-name mx-2">${i18n.tr('Covered:')}</span>
                                                     ${test.coveredMutantIds.size()}
                                                 </span>
                                                 <span class="kta-col">
-                                                    <span class="kta-column-name mx-2">Killed:</span>
+                                                    <span class="kta-column-name mx-2">${i18n.tr('Killed:')}</span>
                                                     ${test.killedMutantIds.size()}
                                                 </span>
                                                 <span class="kta-col">
-                                                    <span class="kta-column-name mx-2">Points:</span>
+                                                    <span class="kta-column-name mx-2">${i18n.tr('Points:')}</span>
                                                     ${test.points}
                                                 </span>
                                                 <span class="kta-col ms-auto me-3 text-end">
                                                     <span class="kta-view-test-button btn btn-xs btn-primary">
-                                                        View
+                                                        ${i18n.tr('View')}
                                                     </span>
                                                 </span>
                                             </span>

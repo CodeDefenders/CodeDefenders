@@ -49,15 +49,18 @@ class AchievementNotifications {
      * @param {String} profilePath
      */
     static showAchievementNotification(achievement, achievementPath, profilePath) {
-        const progressText = achievement.progressText
-                .replace('{0}', achievement.metricCurrent.toString())
-                .replace('{1}', achievement.metricForNextLevel.toString());
+        // translation has to happen on the server side, just use i18n to replace the placeholders here.
+        const progressText = i18n.tr(
+            achievement.progressText,
+            achievement.metricCurrent,
+            achievement.metricForNextLevel
+        );
 
         show_toasts.showToast({
             colorClass: "",
-            title: "New Achievement Unlocked:",
+            title: i18n.tr("New Achievement Unlocked:"),
             //secondary: "Level " + achievement.level,
-            bodyTitle: achievement.name + " (Level " + achievement.level + ")",
+            bodyTitle: i18n.tr(achievement.name, achievement.metricCurrent) + " (Level " + achievement.level + ")",
             body: progressText,
             icon:  achievementPath + "codedefenders_achievements_" + achievement.achievementId
                     + "_lvl_" + achievement.level + ".png",

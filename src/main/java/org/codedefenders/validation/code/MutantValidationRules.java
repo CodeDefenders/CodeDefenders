@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.difflib.patch.AbstractDelta;
 import com.github.javaparser.ast.CompilationUnit;
@@ -62,30 +63,30 @@ public class MutantValidationRules {
     /**
      * Categories of rules.
      */
-    private static final String IDENTICAL = "Mutants must change the code";
-    private static final String RENAMING = "Changes to names are restricted";
-    private static final String CONTROL = "Changes to control structures are restricted";
-    private static final String METHOD_CALLS = "Some classes and methods may not be called";
+    private static final String IDENTICAL = I18n.marktr("Mutants must change the code");
+    private static final String RENAMING = I18n.marktr("Changes to names are restricted");
+    private static final String CONTROL = I18n.marktr("Changes to control structures are restricted");
+    private static final String METHOD_CALLS = I18n.marktr("Some classes and methods may not be called");
     private static final String FORBIDDEN_EXPRESSIONS
-            = "Some statements and expressions may not be changed by a mutant";
+            = I18n.marktr("Some statements and expressions may not be changed by a mutant");
 
     public static MutantRule noCommentsEqual = new MutantRule.Builder(
             IDENTICAL,
-            "No mutants that only change comments",
+            I18n.marktr("No mutants that only change comments"),
             ValidationMessage.MUTANT_ONLY_COMMENT_CHANGES)
             .withCompilationPredicate(NoCommentEqualsVisitor::equals)
             .build();
 
     public static MutantRule packageDeclarations = new MutantRule.Builder(
             RENAMING,
-            "No changes to package signatures",
+            I18n.marktr("No changes to package signatures"),
             ValidationMessage.MUTANT_PACKAGE)
             .withCompilationPredicate((o, m) -> !o.getPackageDeclaration().equals(m.getPackageDeclaration()))
             .build();
 
     public static MutantRule classDeclarations = new MutantRule.Builder(
             RENAMING,
-            "No changes to class signatures",
+            I18n.marktr("No changes to class signatures"),
             ValidationMessage.MUTANT_CLASS)
             .withCompilation(MutantValidationRules::containsChangesToClassDeclarations)
             .withInsertionNode(n -> n instanceof ClassOrInterfaceDeclaration || n instanceof RecordDeclaration)
@@ -93,7 +94,7 @@ public class MutantValidationRules {
 
     public static MutantRule addOrRenameMethods = new MutantRule.Builder(
             RENAMING,
-            "No new or renamed methods",
+            I18n.marktr("No new or renamed methods"),
             ValidationMessage.MUTANT_ADDS_OR_RENAMES_METHOD)
             .withCompilation(MutantValidationRules::mutantAddsOrRenamesMethod)
             .withInsertionNode(n ->
@@ -104,42 +105,42 @@ public class MutantValidationRules {
 
     public static MutantRule addOrRenameFields = new MutantRule.Builder(
             RENAMING,
-            "No new or renamed fields",
+            I18n.marktr("No new or renamed fields"),
             ValidationMessage.MUTANT_ADDS_OR_RENAMES_FIELD)
             .withCompilation(MutantValidationRules::mutantAddsOrChangesFieldNames)
             .build();
 
     public static MutantRule changesMethodSignatures = new MutantRule.Builder(
             RENAMING,
-            "No changes to method signatures",
+            I18n.marktr("No changes to method signatures"),
             ValidationMessage.MUTANT_METHOD_SIGNATURE)
             .withCompilationPredicate(MutantValidationRules::mutantChangesMethodSignatures)
             .build();
 
     public static MutantRule changesImportStatements = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
-            "No changes to import statements",
+            I18n.marktr("No changes to import statements"),
             ValidationMessage.MUTANT_IMPORT_STATEMENT)
             .withCompilationPredicate(MutantValidationRules::mutantChangesImportStatements)
             .build();
 
     public static MutantRule instanceofChanges = new MutantRule.Builder(
             CONTROL,
-            "No changes to instanceof statements",
+            I18n.marktr("No changes to instanceof statements"),
             ValidationMessage.MUTANT_INSTANCEOF)
             .withCompilationPredicate(MutantValidationRules::containsInstanceOfChanges)
             .build();
 
     public static MutantRule astEqual = new MutantRule.Builder(
             IDENTICAL,
-            "No mutants that are identical to the Class under Test",
+            I18n.marktr("No mutants that are identical to the Class under Test"),
             ValidationMessage.MUTANT_IDENTICAL)
             .withCompilationPredicate(Node::equals)
             .build();
 
     public static MutantRule noChangesToComments = new MutantRule.Builder(
             IDENTICAL,
-            "No changes to comments",
+            I18n.marktr("No changes to comments"),
             ValidationMessage.MUTANT_COMMENT)
             .withCompilation(MutantValidationRules::containsModifiedComments)
             .withInsertion("//", "/*")
@@ -147,21 +148,21 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedModifier = new MutantRule.Builder(
             FORBIDDEN_EXPRESSIONS,
-            "No changes to modifiers like 'static' or 'public'",
+            I18n.marktr("No changes to modifiers like 'static' or 'public'"),
             ValidationMessage.MUTANT_MODIFIER)
             .withCode(MutantValidationRules::containsProhibitedModifierChanges)
             .build();
 
     public static MutantRule logicalOperator = new MutantRule.Builder(
             CONTROL,
-            "No new logical operators like '&&' or '||'",
+            I18n.marktr("No new logical operators like '&&' or '||'"),
             ValidationMessage.MUTANT_LOGIC)
             .withInsertion("&&", "||")
             .build();
 
     public static MutantRule prohibitedConditionals = new MutantRule.Builder(
             CONTROL,
-            "No new conditional statements like if, switch etc.",
+            I18n.marktr("No new conditional statements like if, switch etc."),
             ValidationMessage.MUTANT_CONDITIONALS)
             .withInsertion("if", "switch")
             .withLineDiff(MutantValidationRules::ternaryAdded)
@@ -174,7 +175,7 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedLoops = new MutantRule.Builder(
             CONTROL,
-            "No new loops.",
+            I18n.marktr("No new loops."),
             ValidationMessage.MUTANT_LOOPS)
             .withInsertion("while", "for")
             .withInsertionNode(n -> n instanceof ForEachStmt
@@ -186,7 +187,7 @@ public class MutantValidationRules {
 
     public static MutantRule noSystemCalls = new MutantRule.Builder(
             METHOD_CALLS,
-            "No calls to System.*",
+            I18n.marktr("No calls to System.*"),
             ValidationMessage.MUTANT_CALL_SYSTEM)
             .withInsertion("System.")
 
@@ -204,7 +205,7 @@ public class MutantValidationRules {
 
     public static MutantRule noRandom = new MutantRule.Builder(
             METHOD_CALLS,
-            "No use of random number generators",
+            I18n.marktr("No use of random number generators"),
             ValidationMessage.MUTANT_CALL_RANDOM)
             .withInsertion("Random.", "Random(", "random(", "randomUUID(")
             .withInsertionNode(n -> n instanceof NameExpr nameExpr
@@ -213,7 +214,7 @@ public class MutantValidationRules {
 
     public static MutantRule noDate = new MutantRule.Builder(
             METHOD_CALLS,
-            "No calls to Date classes",
+            I18n.marktr("No calls to Date classes"),
             ValidationMessage.MUTANT_CALL_DATE)
             .withInsertion("Date(")
             .withInsertionNode(n -> n instanceof NameExpr nameExpr
@@ -222,7 +223,7 @@ public class MutantValidationRules {
 
     public static MutantRule noThreading = new MutantRule.Builder(
             METHOD_CALLS,
-            "No calls to multithreading classes",
+            I18n.marktr("No calls to multithreading classes"),
             ValidationMessage.MUTANT_CALL_THREAD)
             .withInsertion("Thread.")
             .withInsertionNode(n -> n instanceof NameExpr nameExpr
@@ -231,7 +232,7 @@ public class MutantValidationRules {
 
     public static MutantRule noIO = new MutantRule.Builder(
             METHOD_CALLS,
-            "No new IO calls",
+            I18n.marktr("No new IO calls"),
             ValidationMessage.MUTANT_CALL_IO)
             .withInsertion("java.io", "java.nio", "java.net", "java.sql")
             .build();
@@ -239,7 +240,7 @@ public class MutantValidationRules {
 
     public static MutantRule prohibitedBitwiseOperators = new MutantRule.Builder(
             CONTROL,
-            "No new bitwise operators",
+            I18n.marktr("No new bitwise operators"),
             ValidationMessage.MUTANT_BITWISE)
             .withInsertion("<<", ">>", ">>>", "|", "&")
             .build();
@@ -248,7 +249,7 @@ public class MutantValidationRules {
      * Checks if the mutation introduces a change to a class declaration.
      */
     private static Optional<String> containsChangesToClassDeclarations(CompilationUnit originalCU,
-                                                                       CompilationUnit mutatedCU) {
+                                                                       CompilationUnit mutatedCU, I18n i18n) {
         Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
         for (TypeDeclaration<?> type : originalCU.getTypes()) {
             originalTypes.putAll(ValidationUtils.extractTypeDeclaration(type));
@@ -262,17 +263,19 @@ public class MutantValidationRules {
         if (originalTypes.equals(mutatedTypes)) {
             return Optional.empty();
         } else if (originalTypes.size() > mutatedTypes.size()) {
-            return Optional.of("You deleted a class declaration.");
+            return Optional.of(i18n.tr("You deleted a class declaration."));
         } else if (originalTypes.size() < mutatedTypes.size()) {
-            return Optional.of("You added a class declaration");
+            return Optional.of(i18n.tr("You added a class declaration"));
         } else {
             for (String k : originalTypes.keySet()) {
                 if (!originalTypes.get(k).equals(mutatedTypes.get(k))) {
-                    return Optional.of("You changed the class declaration for " + k
-                            + " from " + originalTypes.get(k) + " to " + mutatedTypes.get(k));
+                    return Optional.of(i18n.tr(
+                            "You changed the class declaration for {0} from {1} to {2}",
+                            k, originalTypes.get(k), mutatedTypes.get(k)
+                    ));
                 }
             }
-            return Optional.of("You changed a class name.");
+            return Optional.of(i18n.tr("You changed a class name."));
         }
     }
 
@@ -319,7 +322,8 @@ public class MutantValidationRules {
      * Checks compilation units for changes to comments. Returns an empty Optional, if no changes are found, or an
      * Optional with a String that explains the illegal change.
      */
-    private static Optional<String> containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+    private static Optional<String> containsModifiedComments(CompilationUnit originalCU,
+                                                             CompilationUnit mutatedCU, I18n i18n) {
         // We assume getAllContainedComments() preserves the order of comments
         List<Comment> originalComments = originalCU.getAllContainedComments();
         List<Comment> mutatedComments = mutatedCU.getAllContainedComments();
@@ -331,19 +335,19 @@ public class MutantValidationRules {
                 String cleanedMutated = mutatedComments.get(i).getContent().replaceAll("\\r", "");
 
                 if (!cleanedOriginal.equals(cleanedMutated)) {
-                    return Optional.of("Changed comment " + cleanedOriginal + " to " + cleanedMutated);
+                    return Optional.of(i18n.tr("Changed comment {0} to {1}", cleanedOriginal,cleanedMutated));
                 }
             }
             return Optional.empty();
         } else if (originalComments.size() > mutatedComments.size()) {
             originalComments.removeAll(mutatedComments);
-            return Optional.of("Removed comments: "
+            return Optional.of(i18n.tr("Removed comments:") + " "
                     + originalComments.stream()
                     .map(Comment::getContent)
                     .collect(Collectors.joining(", ")));
         } else {
             mutatedComments.removeAll(originalComments);
-            return Optional.of("Added comments: "
+            return Optional.of(i18n.tr("Added comments:") + " "
                     + mutatedComments.stream()
                     .map(Comment::getContent)
                     .collect(Collectors.joining(", ")));
@@ -383,7 +387,8 @@ public class MutantValidationRules {
         return !cutImportStatements.equals(mutantImportStatements);
     }
 
-    private static Optional<String> mutantAddsOrRenamesMethod(final CompilationUnit orig, final CompilationUnit muta) {
+    private static Optional<String> mutantAddsOrRenamesMethod(final CompilationUnit orig,
+                                                              final CompilationUnit muta, final I18n i18n) {
         Set<String> cutMethodSignatures = new HashSet<>();
         Set<String> mutantMethodSignatures = new HashSet<>();
 
@@ -404,7 +409,7 @@ public class MutantValidationRules {
     }
 
     private static Optional<String> mutantAddsOrChangesFieldNames(final CompilationUnit orig,
-                                                                  final CompilationUnit muta) {
+                                                                  final CompilationUnit muta, final I18n i18n) {
         // Parse original and extract method signatures -> Set of string
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();

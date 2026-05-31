@@ -20,26 +20,21 @@ package org.codedefenders.servlets;
 
 import java.io.IOException;
 
-import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.util.Paths;
 
 @WebServlet(Paths.CLASSROOMS_OVERVIEW)
 public class ClassroomsOverview extends HttpServlet {
 
-    @Inject
-    private PageInfoBean pageInfo;
 
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        pageInfo.setPageTitle("My Classrooms");
         request.getRequestDispatcher("/jsp/classrooms_overview.jsp").forward(request, response);
     }
 }

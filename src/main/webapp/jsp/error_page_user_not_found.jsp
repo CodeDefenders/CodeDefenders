@@ -25,17 +25,18 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <t:error_page
-        title="User not found (404)"
+        title="${i18n.tr('User not found (404)')}"
         statusCode="404"
-        shortDescription="The user with the name \"${fn:escapeXml(param.user)}\" does not exist.">
+        shortDescription="${i18n.tr('The user with the name \"{0}\" does not exist.', fn:escapeXml(param.user))}">
     <jsp:attribute name="message">
-        <p>Make sure the address and the username are correct and that the page hasn't moved.</p>
-        <p>Please contact your administrator if you think this is a mistake.</p>
+        <p>${i18n.tr("Make sure the address and the username are correct.")}</p>
+        <p>${i18n.tr("Please contact your administrator if you think this is a mistake.")}</p>
         <p>
-            Looking for your own profile?
-            <a href="${url.forPath(Paths.USER_PROFILE)}" title="your profile">Click here.</a>
+            ${i18n.tr("Looking for your own profile?")}
+            <a href="${url.forPath(Paths.USER_PROFILE)}" title="${i18n.tr('your profile')}">${i18n.tr("Click here.")}</a>
         </p>
     </jsp:attribute>
 </t:error_page>

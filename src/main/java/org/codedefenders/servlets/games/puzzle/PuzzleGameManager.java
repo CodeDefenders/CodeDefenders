@@ -20,7 +20,6 @@ package org.codedefenders.servlets.games.puzzle;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +68,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -82,6 +82,7 @@ import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
@@ -168,6 +169,9 @@ public class PuzzleGameManager extends HttpServlet {
     private TestRepository testRepo;
 
     @Inject
+    private I18nService i18nService;
+
+    @Inject
     private TestValidator testValidator;
 
     @Inject
@@ -224,8 +228,19 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
+        // Resolve localized texts for the puzzle and its chapter
+        var i18n = i18nService.getI18n(request);
+        var userLang = i18n.getLocale().getLanguage();
+        var defaultLang = i18nService.getDefaultLocale().getLanguage();
+        var puzzleText = puzzleRepo.getPuzzleTextWithFallback(game.getPuzzleId(), userLang, defaultLang);
+        request.setAttribute("puzzleTitle", puzzleText != null ? puzzleText.title() : "");
+        request.setAttribute("puzzleDescription", puzzleText != null ? puzzleText.description() : "");
+        var chapterText = puzzleRepo.getPuzzleChapterTextWithFallback(
+                game.getPuzzle().getChapterId(), userLang, defaultLang);
+        request.setAttribute("chapterTitle", chapterText != null ? chapterText.title() : "");
+
         if (game.getState() == GameState.SOLVED) {
-            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder()));
+            request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
         }
 
         switch (game.getType()) {
@@ -418,7 +433,7 @@ public class PuzzleGameManager extends HttpServlet {
                     gse.setGameId(gameId);
                     notificationService.post(gse);
                 } else {
-                    messages.add("No, this mutant is not equivalent to the class under test.");
+                    messages.add(I18n.marktr("No, this mutant is not equivalent to the class under test."));
                     game.incrementCurrentRound();
 
                     ServletUtils.getStringParameter(request, "test")
@@ -446,15 +461,17 @@ public class PuzzleGameManager extends HttpServlet {
                         testText, game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
                 boolean validationSuccess = validationMessage.isValid();
 
+                I18n i18n = i18nService.getI18n(request);
+
                 TestValidatedEvent tve = new TestValidatedEvent();
                 tve.setGameId(gameId);
                 tve.setUserId(login.getUserId());
                 tve.setSuccess(validationSuccess);
-                tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+                tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
-                    messages.add(validationMessage.toString()).alert();
+                    messages.add(validationMessage.getMessage(i18n)).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
                     return;
@@ -532,7 +549,7 @@ public class PuzzleGameManager extends HttpServlet {
                     gse.setGameId(gameId);
                     notificationService.post(gse);
                 } else { // ASSUMED_YES
-                    messages.add("Your test did not kill the mutant. Try again.");
+                    messages.add(I18n.marktr("Your test did not kill the mutant. Try again."));
                     previousSubmission.setTestCode(testText); // keep the non-killing test?
                     game.incrementCurrentRound();
                 }
@@ -632,15 +649,17 @@ public class PuzzleGameManager extends HttpServlet {
                 game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isValid();
 
+        I18n i18n = i18nService.getI18n(request);
+
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.add(validationMessage.toString()).alert();
+            messages.add(validationMessage.getMessage(i18n)).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -657,7 +676,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
         if (newTest == null) {
-            messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+            messages.addFormatted(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest());
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -707,7 +726,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         if (!solver.solve(game, newTest)) {
-            messages.add("Your test did not solve the puzzle. Try another one...");
+            messages.add(I18n.marktr("Your test did not solve the puzzle. Try another one..."));
             game.incrementCurrentRound();
         } else {
             messages.clear();
@@ -792,21 +811,22 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(mse);
 
         final MutantValidationRuleSet mutantValidatorLevel = game.getMutantValidatorLevel();
+        final I18n i18n = i18nService.getI18n(request);
 
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel, i18n);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
         mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationResult.toString());
+        mve.setValidationMessage(validationSuccess ? null : validationResult.getMessage(i18n));
         notificationService.post(mve);
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validationResult.toString()).alert();
+            messages.add(validationResult.getMessage(i18n)).alert();
             Redirect.redirectBack(request, response);
             return;
         }
@@ -906,7 +926,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         if (!solver.solve(game, newMutant)) {
-            messages.add("Your mutant did not solve the puzzle. Try another one...");
+            messages.add(I18n.marktr("Your mutant did not solve the puzzle. Try another one..."));
             game.incrementCurrentRound();
         } else {
             messages.clear();
@@ -931,7 +951,7 @@ public class PuzzleGameManager extends HttpServlet {
      */
     private Optional<Puzzle> getNextPuzzleForUser(int userId) {
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
-            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+            for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 PuzzleGame playedGame = puzzleRepo.getLatestPuzzleGameForPuzzleAndUser(
                         puzzle.getPuzzleId(),
@@ -949,7 +969,7 @@ public class PuzzleGameManager extends HttpServlet {
         return Optional.empty();
     }
 
-    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message) {
+    private String generateNextPuzzleMessage(PuzzleGame game, StringBuilder message, I18n i18n) {
         int currentChapter = game.getPuzzle().getChapterId();
         int currentPositionInChapter = game.getPuzzle().getPosition();
 
@@ -961,13 +981,13 @@ public class PuzzleGameManager extends HttpServlet {
          */
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
             // Check in current and next chapters
-            if (puzzleChapter.getChapterId() >= currentChapter) {
+            if (puzzleChapter.getId() >= currentChapter) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
-                 * and empty, not-null list if there's not puzzles
+                 * an empty, not-null list if there are no puzzles
                  */
-                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
-                    if (puzzleChapter.getChapterId() == currentChapter
+                for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    if (puzzleChapter.getId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
                         continue;
@@ -980,25 +1000,29 @@ public class PuzzleGameManager extends HttpServlet {
                     if (playedGame == null // Not yet played this puzzle
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
-                        if (puzzleChapter.getChapterId() > currentChapter) {
-                            message.append(MessageFormat.format("""
-                                                <br>
-                                                You solved all the puzzles of the current chapter!
-                                                Start with the
-                                                <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
-                                                of the next chapter "{2}", or go back to the
-                                                <a href="{0}">Puzzle Overview</a>.
-                                            """.stripIndent(),
+                        if (puzzleChapter.getId() > currentChapter) {
+                            var chapterText = puzzleRepo.getPuzzleChapterText(
+                                    puzzleChapter.getId(),
+                                    i18n.getLocale().getLanguage()
+                            );
+                            message.append(i18n.tr("""
+                                            <br>
+                                            You solved all the puzzles of the current chapter!
+                                            Start with the
+                                            <a href="{0}?puzzleId={1,number,#}">first puzzle</a>
+                                            of the next chapter "{2}", or go back to the
+                                            <a href="{0}">Puzzle Overview</a>.
+                                            """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId(),
-                                    puzzleChapter.getTitle()
+                                    chapterText.title()
                             ));
                         } else {
-                            message.append(MessageFormat.format("""
-                                                Try to solve the
-                                                <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
-                                                or go back to the
-                                                <a href="{0}">Puzzle Overview</a>.
+                            message.append(i18n.tr("""
+                                            Try to solve the
+                                            <a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,
+                                            or go back to the
+                                            <a href="{0}">Puzzle Overview</a>.
                                             """,
                                     url.forPath(Paths.PUZZLE_GAME),
                                     puzzle.getPuzzleId()
@@ -1013,10 +1037,12 @@ public class PuzzleGameManager extends HttpServlet {
         /*
          * If we got here, the user has solved all the puzzles in a chapter
          */
-        message.append(" ")
-                .append("You solved all the puzzles of the current chapter, go back to the <a href=")
-                .append(url.forPath(Paths.PUZZLE_GAME))
-                .append(">Puzzle Overview</a>.");
+        message.append(" ").append(
+                i18n.tr(
+                        "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>.",
+                        url.forPath(Paths.PUZZLE_GAME)
+                )
+        );
         return message.toString();
     }
 }

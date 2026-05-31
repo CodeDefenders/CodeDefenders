@@ -275,7 +275,7 @@
 				<configuration>
 					<webResources>
 						<resource>
-							<directory>target/rollup</directory>
+							<directory>target/rolldown</directory>
 						</resource>
 					</webResources>
 					<archive>
@@ -378,6 +378,29 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>versions-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>compile-i18n-po</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target name="compile-i18n-po">
+								<exec executable="sh" failonerror="true" dir="${project.basedir}">
+									<arg value="-c"/>
+									<arg value="./i18n.sh compile"/>
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 
@@ -553,7 +576,7 @@
 					<artifactId>frontend-maven-plugin</artifactId>
 					<version>1.12.1</version>
 					<configuration>
-						<nodeVersion>v16.17.1</nodeVersion>
+						<nodeVersion>v24.14.0</nodeVersion>
 					</configuration>
 				</plugin>
 
@@ -1088,6 +1111,11 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
 			<version>4.4.16</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.gettext-commons</groupId>
+			<artifactId>gettext-commons</artifactId>
+			<version>0.9.8</version>
 		</dependency>
 		<!-- End Commons Libraries -->
 

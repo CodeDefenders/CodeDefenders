@@ -18,9 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
@@ -30,29 +33,26 @@
     <div id="keymap-dropdown" class="btn-group" role="group">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle text-nowrap" type="button" id="editor-mode-menu" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-cog"></i>
-            Editor Mode:
-            <span id="current-keymap">${login.user.keyMap.CMName}</span>
+            ${i18n.tr("Editor Mode:")}
+            <span id="current-keymap">${i18n.tr(login.user.keyMap.CMName)}</span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="editor-mode-menu">
-            <li><span class="dropdown-item">${login.user.keyMap.CMName}</span></li>
+            <li><span class="dropdown-item">${i18n.tr(login.user.keyMap.CMName)}</span></li>
             <li class="dropdown-divider"></li>
-            <%
-                for (KeyMap km : KeyMap.values()) {
-                    if (km != login.getUser().getKeyMap()) {
-            %>
+            <c:forEach var="km" items="${KeyMap.values()}">
+                <%--@elvariable id="km" type="org.codedefenders.model.KeyMap"--%>
+                <c:if test="${km != login.user.keyMap}">
                     <li>
                         <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post">
                             <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
-                            <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
+                            <input type="hidden" class="form-control" name="editorKeyMap" value="${km.name()}">
                             <button class="dropdown-item" type="submit">
-                                <%=km.getCMName()%>
+                                ${i18n.tr(km.CMName)}
                             </button>
                         </form>
                     </li>
-            <%
-                    }
-                }
-            %>
+                </c:if>
+            </c:forEach>
         </ul>
     </div>
     <button type="button" data-bs-toggle="modal" data-bs-target="#editor-help-modal" class="btn btn-sm btn-outline-secondary">

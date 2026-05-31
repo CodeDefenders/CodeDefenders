@@ -22,7 +22,9 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
-<p:main_page title="Create Games">
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
+<p:main_page title="${i18n.tr('Create Games')}">
     <div class="container">
         <t:admin_navigation activePage="adminCreateGames"/>
 

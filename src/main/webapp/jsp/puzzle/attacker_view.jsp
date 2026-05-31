@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -31,6 +32,7 @@
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -45,9 +47,10 @@
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
+    final I18n i18n = (I18n) request.getAttribute("i18n");
 
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
-    String title = "Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle();
+    String title = i18n.tr("Puzzle: ") + request.getAttribute("chapterTitle") + " - " + request.getAttribute("puzzleTitle");
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("cut", cut);
@@ -90,6 +93,8 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -98,9 +103,9 @@
 
     <jsp:body>
         <div id="game-container" class="container-fluid">
-            <h4><b>${title}</b></h4>
+            <h4><b>${i18n.tr('Puzzle: {0}', title)}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h4 class="m-0">${puzzle.description}</h4>
+                <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
@@ -112,8 +117,8 @@
             <c:if test="${game.state == GameState.SOLVED}">
                 <div class="alert alert-success" role="alert">
                     <p class="m-0">
-                        <strong class="alert-heading">Congratulations!</strong>
-                        Your mutant solved the puzzle. ${requestScope.nextPuzzleMessage}
+                        <strong class="alert-heading">${i18n.tr('Congratulations!')}</strong>
+                            ${i18n.tr('Your mutant solved the puzzle. {0}', requestScope.nextPuzzleMessage)}
                     </p>
                 </div>
             </c:if>
@@ -121,11 +126,11 @@
             <div class="row">
                 <div class="col-xl-6 col-12">
                     <c:if test="${game.state == GameState.SOLVED}">
-                        <div class="game-component-header"><h3>Solving mutant</h3></div>
+                        <div class="game-component-header"><h3>${i18n.tr('Solving mutant')}</h3></div>
                         <div class="card mb-3">
                             <div class="card-body p-0 codemirror-expand">
                                 <!-- solved attacker games have exactly one alive mutant = the solving mutant -->
-                                <pre class="m-0"><textarea id="solving-mutant-code" title="solving-mutant"
+                                <pre class="m-0"><textarea id="solving-mutant-code" title="${i18n.tr('solving mutant')}"
                                 >${game.aliveMutants[0].HTMLEscapedPatchString}</textarea></pre>
                             </div>
                         </div>
@@ -148,7 +153,7 @@
 
                     <c:if test="${showTestAccordion}">
                         <div id="tests-div">
-                            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                            <div class="game-component-header"><h3>${i18n.tr('JUnit Tests')}</h3></div>
                             <t:test_accordion/>
                         </div>
                     </c:if>
@@ -160,10 +165,10 @@
                     <div class="game-component-header">
                         <c:choose>
                             <c:when test="${game.state == GameState.SOLVED}">
-                                <h3>Class under test</h3>
+                                <h3>${i18n.tr('Class under test')}</h3>
                             </c:when>
                             <c:otherwise>
-                                <h3>Create a mutant here</h3>
+                                <h3>${i18n.tr('Create a mutant here')}</h3>
                             </c:otherwise>
                         </c:choose>
                         <div>
@@ -172,7 +177,7 @@
                                 <input type="hidden" name="formType" value="reset">
                                 <input type="hidden" name="gameId" value="${game.id}">
                                 <button class="btn btn-warning" id="btnReset">
-                                    Reset
+                                        ${i18n.tr('Reset')}
                                 </button>
                             </form>
 

@@ -34,6 +34,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -44,6 +45,7 @@ import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
@@ -60,6 +62,9 @@ public class UserSettingsManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private I18nService i18nService;
 
     @Inject
     private UserService userService;
@@ -103,10 +108,10 @@ public class UserSettingsManager extends HttpServlet {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
                 if (updateUserKeyMap(user, editorKeyMap)) {
-                    messages.add("Successfully updated editor preference.");
+                    messages.add(I18n.marktr("Successfully updated editor preference."));
                 } else {
                     logger.info("Failed to update editor preference for user {}.", login.getUserId());
-                    messages.add("Failed to update editor preference.");
+                    messages.add(I18n.marktr("Failed to update editor preference."));
                 }
                 Redirect.redirectBack(request, response);
             }
@@ -116,10 +121,10 @@ public class UserSettingsManager extends HttpServlet {
                         .orElse(false);
                 user.setKeepPreviousTest(keepPreviousTest);
                 if (userRepo.update(user)) {
-                    messages.add("Successfully updated keep previous test preference.");
+                    messages.add(I18n.marktr("Successfully updated keep previous test preference."));
                 } else {
                     logger.info("Failed to update keep previous test preference for user {}.", login.getUserId());
-                    messages.add("Failed to update keep previous test preference.");
+                    messages.add(I18n.marktr("Failed to update keep previous test preference."));
                 }
                 Redirect.redirectBack(request, response);
             }
@@ -128,10 +133,21 @@ public class UserSettingsManager extends HttpServlet {
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
                 final boolean success = updateUserInformation(user, email, allowContact);
                 if (success) {
-                    messages.add("Successfully updated profile information.");
+                    messages.add(I18n.marktr("Successfully updated profile information."));
                 } else {
                     logger.info("Failed to update profile information for user {}.", login.getUserId());
-                    messages.add("Failed to update profile information. Please contact the page administrator.");
+                    messages.add(I18n.marktr("Failed to update profile information. Please contact the page administrator."));
+                }
+                response.sendRedirect(responsePath);
+            }
+            case "updateLanguage" -> {
+                final Optional<String> language = ServletUtils.getStringParameter(request, "updatedLanguage");
+                final boolean success = updateLanguage(user, language);
+                if (success) {
+                    messages.add(I18n.marktr("Successfully updated language."));
+                } else {
+                    logger.info("Failed to update language for user {}.", login.getUserId());
+                    messages.add(I18n.marktr("Failed to update language. Please contact the page administrator"));
                 }
                 response.sendRedirect(responsePath);
             }
@@ -141,14 +157,14 @@ public class UserSettingsManager extends HttpServlet {
                 if (isPasswordValid(password)) {
                     final boolean success = changeUserPassword(user, password.get());
                     if (success) {
-                        messages.add("Successfully changed password.");
+                        messages.add(I18n.marktr("Successfully changed password."));
                     } else {
                         logger.info("Failed to change password for user {}.", login.getUserId());
-                        messages.add("Failed to change password. Please contact the page administrator.");
+                        messages.add(I18n.marktr("Failed to change password. Please contact the page administrator."));
                     }
                 } else {
                     // Additional validation if frontend check is bypassed
-                    messages.add("No or invalid password provided.");
+                    messages.add(I18n.marktr("No or invalid password provided."));
                 }
                 response.sendRedirect(responsePath);
             }
@@ -167,7 +183,7 @@ public class UserSettingsManager extends HttpServlet {
                     response.sendRedirect(url.forPath(Paths.LOGOUT));
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
-                    messages.add("Failed to set your account as inactive. Please contact the page administrator.");
+                    messages.add(I18n.marktr("Failed to set your account as inactive. Please contact the page administrator."));
                     response.sendRedirect(responsePath);
                 }
             }
@@ -194,6 +210,14 @@ public class UserSettingsManager extends HttpServlet {
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
+        return userRepo.update(user);
+    }
+
+    private boolean updateLanguage(UserEntity user, Optional<String> language) {
+        var locale = language
+                .map(i18nService::toSupportedLocale)
+                .orElseGet(i18nService::getDefaultLocale);
+        user.setLocale(locale);
         return userRepo.update(user);
     }
 

@@ -18,12 +18,16 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <link href="${url.forPath("/css/specific/research.css")}" rel="stylesheet">
 
 <div id="research" class="paper-list">
     <ul class="papercite_bibliography">
         <li>
-            <a href="https://study.code-defenders.org/papers/Mutation2025.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/Mutation2025.pdf" title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Philipp Straubinger, Alexander Degenhart and Gordon Fraser.
@@ -44,7 +48,7 @@
 
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
@@ -60,11 +64,13 @@
     publisher = {ACM},
     year = {2019}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="${i18n.tr('Download PDF')}"
+               class="pdf_link">
                 <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
@@ -81,11 +87,13 @@
     publisher = {ACM},
     year = {2018}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/ICSE17_Education.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ICSE17_Education.pdf" title="${i18n.tr('Download PDF')}"
+               class="pdf_link">
                 <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
@@ -102,11 +110,13 @@
     publisher = {IEEE Press},
     year = {2017}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf"
+               title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
@@ -122,11 +132,13 @@
     publisher = {IEEE},
     year = {2017}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf"
+               title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -140,11 +152,13 @@
     booktitle = {Psychology of Programming Interest Group 2016 (PPIG)},
     year = {2016}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf"
+               title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -160,11 +174,13 @@
     publisher = {Shaker Publishing},
     note = {To appear}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
         <li>
-            <a href="https://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf"
+               title="${i18n.tr('Download PDF')}" class="pdf_link">
                 <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -180,7 +196,8 @@
     publisher = {IEEE},
     pages = {162--167}
 }</code></pre>
-                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy"
+                        onclick="copyBibtex(this);">${i18n.tr('Copy')}</button>
             </div>
         </li>
     </ul>
@@ -193,9 +210,9 @@
         navigator.clipboard.writeText(texEl.textContent);
 
         if (buttonEl.textTimeout === undefined) {
-            buttonEl.innerText = 'Copied.';
+            buttonEl.innerText = '${i18n.tr('Copied.')}';
             buttonEl.textTimeout = setTimeout(() => {
-                buttonEl.innerText = 'Copy';
+                buttonEl.innerText = '${i18n.tr('Copy')}';
                 delete buttonEl.textTimeout;
             }, 1000);
         }

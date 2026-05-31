@@ -23,6 +23,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
@@ -30,6 +31,7 @@
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <%--
     Puzzle game view for a defender. Retrieves the given puzzle game
@@ -41,19 +43,19 @@
 
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
+    I18n i18n = (I18n) request.getAttribute("i18n");
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    String title = "Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle();
+    String title = i18n.tr("Puzzle") + ": "
+            + request.getAttribute("chapterTitle") + " - "
+            + request.getAttribute("puzzleTitle");
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
     pageContext.setAttribute("title", title);
 %>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
@@ -87,6 +89,8 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
 
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
@@ -100,7 +104,7 @@
 
             <h4><b>${title}</b></h4>
             <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-                <h4 class="m-0">${puzzle.description}</h4>
+                <h4 class="m-0">${puzzleDescription}</h4>
                 <div class="align-items-center d-flex gap-4">
                     <t:round_counter game="${game}"/>
                     <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
@@ -112,15 +116,15 @@
             <c:if test="${game.state == GameState.SOLVED}">
                 <div class="alert alert-success" role="alert">
                     <p class="m-0">
-                        <strong class="alert-heading">Congratulations!</strong>
-                        Your test solved the puzzle. ${requestScope.nextPuzzleMessage}
+                        <strong class="alert-heading">${i18n.tr('Congratulations!')}</strong>
+                            ${i18n.tr('Your test solved the puzzle. {0}', requestScope.nextPuzzleMessage)}
                     </p>
                 </div>
             </c:if>
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="cut-div">
-                    <div class="game-component-header"><h3>Class Under Test</h3></div>
+                    <div class="game-component-header"><h3>${i18n.tr('Class Under Test')}</h3></div>
                         <%-- <t:defender_intention_collection_note/>
                              for defender intetion collection, not needed here --%>
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
@@ -133,16 +137,16 @@
                     <div class="game-component-header">
                         <c:choose>
                             <c:when test="${game.state == GameState.SOLVED}">
-                                <h3>Solving JUnit Test</h3>
+                                <h3>${i18n.tr('Solving JUnit Test')}</h3>
                             </c:when>
                             <c:otherwise>
-                                <h3>Write a new JUnit test here</h3>
+                                <h3>${i18n.tr('Write a new JUnit test here')}</h3>
                             </c:otherwise>
                         </c:choose>
                         <div>
                             <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
                                 ${game.state == GameState.SOLVED ? 'disabled' : ''}>
-                                Defend
+                                    ${i18n.tr('Defend')}
                             </button>
                             <c:if test="${game.state == GameState.ACTIVE}">
                                 <script type="module">
@@ -181,7 +185,7 @@
                 </div>
 
                 <div class="col-xl-6 col-12">
-                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                    <div class="game-component-header"><h3>${i18n.tr('JUnit Tests')}</h3></div>
                     <t:test_accordion/>
                 </div>
             </div>

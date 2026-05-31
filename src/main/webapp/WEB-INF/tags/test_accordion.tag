@@ -22,6 +22,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="testAccordion" type="org.codedefenders.beans.game.TestAccordionBean"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%--
     Displays an accordion of tables of tests, grouped by which of the CUT's methods they cover.
@@ -45,7 +46,7 @@
                     <c:if test="${!(category.testIds.size() == 0)}">
                         <span class="badge bg-defender me-2 ta-count">${category.testIds.size()}</span>
                     </c:if>
-                    ${category.description}
+                    ${i18n.tr(category.description)}
                 </button>
             </h2>
             <div class="accordion-collapse collapse"

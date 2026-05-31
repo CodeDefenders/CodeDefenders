@@ -1,0 +1,2 @@
+ALTER TABLE users
+    ADD Language VARCHAR(3) DEFAULT NULL;

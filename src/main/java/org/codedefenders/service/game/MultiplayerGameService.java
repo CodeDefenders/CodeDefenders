@@ -62,6 +62,7 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
@@ -166,7 +167,7 @@ public class MultiplayerGameService extends AbstractGameService {
         if (!canCreateGames) {
             logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
                     login.getUserId());
-            messages.add("Creating games is currently not enabled.");
+            messages.add(I18n.marktr("Creating games is currently not enabled."));
             return false;
         }
 
@@ -219,7 +220,7 @@ public class MultiplayerGameService extends AbstractGameService {
         if (!canCreateGames) {
             logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
                     login.getUserId());
-            messages.add("Creating games is currently not enabled.");
+            messages.add(I18n.marktr("Creating games is currently not enabled."));
             return Optional.empty();
         }
 

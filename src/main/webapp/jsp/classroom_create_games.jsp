@@ -25,16 +25,17 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <c:set var="classroom" value="${requestScope.classroom}"/>
 
-<p:main_page title="Create Games">
+<p:main_page title="${i18n.tr('Create Games')}">
     <div class="container">
         <div class="d-flex align-items-center mb-4 gap-3">
             <h2 class="m-0"><c:out value="${classroom.name}"/></h2>
             <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}"
                class="btn btn-sm rounded-pill btn-outline-secondary flex-shrink-0">
-                Back to Classroom
+                    ${i18n.tr("Back to Classroom")}
                 <i class="fa fa-external-link ms-1"></i>
             </a>
         </div>

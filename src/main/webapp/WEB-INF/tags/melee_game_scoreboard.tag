@@ -20,19 +20,20 @@
 --%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="meleeScoreboard" type="org.codedefenders.beans.game.MeleeScoreboardBean"--%>
 
 <table class="table">
     <thead>
     <tr>
-        <th>User</th>
-        <th>Mutants</th>
-        <th>Tests</th>
-        <th>Attack</th>
-        <th>Defense</th>
-        <th>Duels</th>
-        <th>Total Points</th>
+        <th>${i18n.tr('User')}</th>
+        <th>${i18n.tr('Mutants')}</th>
+        <th>${i18n.tr('Tests')}</th>
+        <th>${i18n.tr('Attack')}</th>
+        <th>${i18n.tr('Defense')}</th>
+        <th>${i18n.tr('Duels')}</th>
+        <th>${i18n.tr('Total Points')}</th>
     </tr>
     </thead>
     <tbody>

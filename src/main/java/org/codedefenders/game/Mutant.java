@@ -38,6 +38,7 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
@@ -135,7 +136,6 @@ public class Mutant implements Serializable {
 
     // Computed on the fly if not read in the db
     private List<Integer> lines = null;
-    private transient List<String> description = null;
     private transient Patch<String> difference = null;
 
     private String killMessage;
@@ -427,14 +427,14 @@ public class Mutant implements Serializable {
     // Does this every get called if mutant is not stored to DB ?
     public List<Integer> getLines() {
         if (lines == null) {
-            computeLinesAndDescription();
+            computeLines();
         }
         return lines;
     }
 
     public String getSummaryString() {
         if (summaryString == null) {
-            computeLinesAndDescription();
+            computeLines();
         }
         return summaryString;
     }
@@ -445,23 +445,16 @@ public class Mutant implements Serializable {
      *
      * <p>An insertion only modifies the line it was inserted in
      */
-    private void computeLinesAndDescription() {
+    private void computeLines() {
         // This workflow is not really nice...
         List<Integer> mutatedLines = new ArrayList<>();
-        description = new ArrayList<>();
+        List<String> fragmentSummary = new ArrayList<>();
 
-        List<String> fragementSummary = new ArrayList<>();
-
-        Patch<String> p = getDifferences();
-        String modified = null;
-        String deleted = null;
-        String added = null;
-        for (AbstractDelta<String> d : p.getDeltas()) {
+        for (AbstractDelta<String> d : getDifferences().getDeltas()) {
             Chunk<String> chunk = d.getSource();
             // position starts at 0 but code readout starts at 1
             int firstLine = chunk.getPosition() + 1;
-            String desc = "line " + firstLine;
-            fragementSummary.add(String.format("%d", firstLine));
+            fragmentSummary.add(String.format("%d", firstLine));
             // was it one single line or several?
             mutatedLines.add(firstLine);
             int endLine = firstLine + chunk.getLines().size() - 1;
@@ -472,46 +465,60 @@ public class Mutant implements Serializable {
                 for (int l = firstLine + 1; l <= endLine; l++) {
                     mutatedLines.add(l);
                 }
-                desc = String.format("lines %d-%d", firstLine, endLine);
-                fragementSummary.remove(fragementSummary.size() - 1);
-                fragementSummary.add(String.format("%d-%d", firstLine, endLine));
+                fragmentSummary.remove(fragmentSummary.size() - 1);
+                fragmentSummary.add(String.format("%d-%d", firstLine, endLine));
             }
-            // update mutant description
-            switch (d.getType()) {
-                case CHANGE:
-                    modified = modified == null ? "Modified " + desc : modified + ", " + desc;
-                    break;
-                case DELETE:
-                    deleted = deleted == null ? "Removed " + desc : deleted + ", " + desc;
-                    break;
-                case INSERT:
-                    added = added == null ? "Added " + desc : added + ", " + desc;
-                    break;
-                default:
-                    throw new IllegalStateException("Found unknown delta type " + d.getType());
-            }
-        }
-        if (modified != null) {
-            description.add(StringEscapeUtils.escapeHtml4(modified + "\n"));
-        }
-        if (deleted != null) {
-            description.add(StringEscapeUtils.escapeHtml4(deleted + "\n"));
-        }
-        if (added != null) {
-            description.add(StringEscapeUtils.escapeHtml4(added + "\n"));
         }
 
         setLines(mutatedLines);
 
         // Generate the summaryString
-        summaryString = String.join(",", fragementSummary);
+        summaryString = String.join(",", fragmentSummary);
     }
 
-    public synchronized List<String> getHTMLReadout() {
-        if (description == null) {
-            computeLinesAndDescription();
+    public String getDescription(I18n i18n) {
+        List<String> modifiedLines = new ArrayList<>();
+        List<String> deletedLines = new ArrayList<>();
+        List<String> addedLines = new ArrayList<>();
+
+        for (AbstractDelta<String> d : getDifferences().getDeltas()) {
+            Chunk<String> chunk = d.getSource();
+            // position starts at 0 but code readout starts at 1
+            int firstLine = chunk.getPosition() + 1;
+            String desc = i18n.tr("line {0}", firstLine);
+            int endLine = firstLine + chunk.getLines().size() - 1;
+            if (endLine > firstLine) {
+                desc = i18n.tr("lines {0}-{0}", firstLine, endLine);
+            }
+
+            (switch (d.getType()) {
+                case CHANGE -> modifiedLines;
+                case DELETE -> deletedLines;
+                case INSERT -> addedLines;
+                default -> throw new IllegalStateException("Found unknown delta type " + d.getType());
+            }).add(desc);
         }
-        return description;
+
+        List<String> description = new ArrayList<>();
+        if (!modifiedLines.isEmpty()) {
+            String modified = String.join(", ", modifiedLines);
+            modified = i18n.tr("Modified {0}", modified);
+            description.add(StringEscapeUtils.escapeHtml4(modified + "\n"));
+        }
+        if (!deletedLines.isEmpty()) {
+            String deleted = String.join(", ", deletedLines);
+            deleted = i18n.tr("Deleted {0}", deleted);
+            description.add(StringEscapeUtils.escapeHtml4(deleted + "\n"));
+        }
+        if (!addedLines.isEmpty()) {
+            String added = String.join(", ", addedLines);
+            added = i18n.tr("Added {0}", added);
+            description.add(StringEscapeUtils.escapeHtml4(added + "\n"));
+        }
+
+        return description.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("<br>"));
     }
 
     @Override

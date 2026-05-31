@@ -23,6 +23,7 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ attribute name="gameActive" required="true" %>
@@ -33,7 +34,7 @@
         <button type="submit" form="atk"
                 id="submitMutant" class="btn btn-attacker btn-highlight"
                 <c:if test="${!gameActive}">disabled</c:if>>
-            Attack
+            ${i18n.tr('Attack')}
         </button>
 
         <script type="module">
@@ -54,22 +55,22 @@
             <button type="button" class="btn btn-attacker btn-highlight dropdown-toggle"
                     data-bs-toggle="dropdown" id="submitMutant" aria-expanded="false"
                     <c:if test="${!gameActive}">disabled</c:if>>
-                Attack
+                ${i18n.tr('Attack')}
             </button>
             <ul class="dropdown-menu" aria-labelledby="submitMutant" style="">
                 <li>
                     <a class="dropdown-item cursor-pointer" data-intention="KILLABLE">
-                        My mutant is killable
+                        ${i18n.tr('My mutant is killable')}
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item cursor-pointer" data-intention="EQUIVALENT">
-                        My mutant is equivalent
+                        ${i18n.tr('My mutant is equivalent')}
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item cursor-pointer" data-intention="DONTKNOW">
-                        I don't know if my mutant is killable
+                        ${i18n.tr("I don\'t know if my mutant is killable")}
                     </a>
                 </li>
             </ul>

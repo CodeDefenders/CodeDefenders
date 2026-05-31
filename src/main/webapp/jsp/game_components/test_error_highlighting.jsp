@@ -18,13 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-
 <%--
     Adds highlighting of error (red) lines to a CodeMirror editor.
 
     The CSS is located in error_highlighting.css.
 --%>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 

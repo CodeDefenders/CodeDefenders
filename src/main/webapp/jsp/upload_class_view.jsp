@@ -22,6 +22,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="gameClassRepo" type="org.codedefenders.persistence.database.GameClassRepository"--%>
 
@@ -47,9 +48,9 @@
     pageContext.setAttribute("avgTestDifficulties", avgTestDifficulties);
 %>
 
-<c:set var="title" value="Upload Class"/>
+<c:set var="title" value="${i18n.tr('Upload Class')}"/>
 
-<p:main_page title="Upload Class">
+<p:main_page title="${title}">
     <div class="container">
 
         <h2 class="mb-3">${title}</h2>
@@ -61,26 +62,27 @@
 
             <div class="row mb-3 g-3">
                 <div class="col-12">
-                    <label class="form-label" for="classAlias">Class Alias</label>
-                    <input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Class Alias"
+                    <label class="form-label" for="classAlias">${i18n.tr('Class Alias')}</label>
+                    <input id="classAlias" name="classAlias" type="text" class="form-control"
+                           placeholder="${i18n.tr('Class Alias')}"
                            pattern="[a-zA-Z0-9]*">
-                    <div class="invalid-feedback">Please provide a valid alias (or leave empty).</div>
+                    <div class="invalid-feedback">${i18n.tr('Please provide a valid alias (or leave empty).')}</div>
                     <div class="form-text">
-                        Optional class alias.
-                        Name with no whitespaces or special characters.
-                        If empty, the name of the class will be used.
+                            ${i18n.tr('Optional class alias.')}<br/>
+                            ${i18n.tr('Name with no whitespaces or special characters.')}<br/>
+                            ${i18n.tr('If empty, the name of the class will be used.')}
                     </div>
                 </div>
 
                 <div class="col-12">
-                    <label class="form-label" for="fileUploadCUT">Java File</label>
+                    <label class="form-label" for="fileUploadCUT">${i18n.tr('Java File')}</label>
                     <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="form-control" accept=".java" required>
-                    <div class="invalid-feedback">Please provide a <code>.java</code> file.</div>
-                    <div class="form-text">The .java file of the class.</div>
+                    <div class="invalid-feedback">${i18n.tr('Please provide a {0} file.', '<code>.java</code>')}</div>
+                    <div class="form-text">${i18n.tr('The .java file of the class.')}</div>
                 </div>
 
                 <div class="col-md-6 col-12">
-                    <label for="testingFramework" class="form-label">Testing Framework</label>
+                    <label for="testingFramework" class="form-label">${i18n.tr('Testing Framework')}</label>
                     <select id="testingFramework" name="testingFramework" class="form-select" required>
                         <c:forEach var="framework" items="${TestingFramework.values()}">
                             <%--@elvariable id="framework" type="org.codedefenders.game.TestingFramework"--%>
@@ -89,11 +91,11 @@
                             </option>
                         </c:forEach>
                     </select>
-                    <div class="form-text">The testing framework that will be used in games with the class.</div>
+                    <div class="form-text">${i18n.tr('The testing framework that will be used in games with the class.')}</div>
                 </div>
 
                 <div class="col-md-6 col-12">
-                    <label for="assertionLibrary" class="form-label">Assertion Library</label>
+                    <label for="assertionLibrary" class="form-label">${i18n.tr('Assertion Library')}</label>
                     <select id="assertionLibrary" name="assertionLibrary" class="form-select" required>
                         <c:forEach var="library" items="${AssertionLibrary.values()}">
                             <%--@elvariable id="library" type="org.codedefenders.game.AssertionLibrary"--%>
@@ -102,32 +104,33 @@
                             </option>
                         </c:forEach>
                     </select>
-                    <div class="form-text">The assertion library used to write tests for this class.</div>
+                    <div class="form-text">${i18n.tr('The assertion library used to write tests for this class.')}</div>
                 </div>
             </div>
 
             <details>
                 <summary>
-                    Advanced Upload Options
+                        ${i18n.tr('Advanced Upload Options')}
                 </summary>
                 <div class="mt-3">
                     <div class="form-check">
                         <input class="form-check-input" id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking">
-                        <label class="form-check-label" for="mockingEnabled">Enable Mocking for this class</label>
+                        <label class="form-check-label"
+                               for="mockingEnabled">${i18n.tr('Enable Mocking for this class')}</label>
                     </div>
 
-                    <h4 class="mt-4 mb-3">Upload Dependencies (optional)</h4>
+                    <h4 class="mt-4 mb-3">${i18n.tr('Upload Dependencies (optional)')}</h4>
                     <div class="row g-3 mb-3">
                         <div class="col-12">
                             <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="form-control" accept=".zip">
                         </div>
                         <div class="col-12">
-                            <p>If the class under test has dependencies, you can upload them here.</p>
+                            <p>${i18n.tr('If the class under test has dependencies, you can upload them here.')}</p>
                             <ul>
-                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                <li>Dependencies may contain packages.</li>
+                                <li>${i18n.tr('The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant.', '<code>zip</code>')}</li>
+                                <li>${i18n.tr('Dependencies may contain packages.')}</li>
                             </ul>
-                            <p>Example:</p>
+                            <p>${i18n.tr('Example:')}</p>
                             <pre class="mb-0 p-3 bg-light">deps
 &#x251c;&#x2500; Event.java
 &#x2514;&#x2500; events
@@ -136,18 +139,18 @@
                         </div>
                     </div>
 
-                    <h4 class="mt-4 mb-3">Upload Mutants (optional)</h4>
+                    <h4 class="mt-4 mb-3">${i18n.tr('Upload Mutants (optional)')}</h4>
                     <div class="row g-3 mb-3">
                         <div class="col-12">
                             <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="form-control" accept=".zip">
                         </div>
                         <div class="col-12">
-                            <p>Mutants uploaded with a class under test can be used to initialize games with existing mutants.</p>
+                            <p>${i18n.tr('Mutants uploaded with a class under test can be used to initialize games with existing mutants.')}</p>
                             <ul>
-                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                <li>All mutants must have the same class name as the class under test.</li>
+                                <li>${i18n.tr('The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant.', '<code>zip</code>')}</li>
+                                <li>${i18n.tr('All mutants must have the same class name as the class under test.')}</li>
                             </ul>
-                            <p>Example:</p>
+                            <p>${i18n.tr('Example:')}</p>
                             <pre class="mb-0 p-3 bg-light">mutants
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; EventBus.java
@@ -156,18 +159,18 @@
                         </div>
                     </div>
 
-                    <h4 class="mt-4 mb-3">Upload Tests (optional)</h4>
+                    <h4 class="mt-4 mb-3">${i18n.tr('Upload Tests (optional)')}</h4>
                     <div class="row g-3">
                         <div class="col-12">
                             <input id="fileUploadTest" name="fileUploadTest" type="file" class="form-control" accept=".zip">
                         </div>
                         <div class="col-12">
-                            <p>Tests uploaded with a class under test can be used to initialize games with existing tests.</p>
+                            <p>${i18n.tr('Tests uploaded with a class under test can be used to initialize games with existing tests.')}</p>
                             <ul>
-                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                <li>Multiple tests can have the same name, but they don't have to.</li>
+                                <li>${i18n.tr('The dependencies are uploaded inside of a {0} file, the folder structure of which is irrelevant.', '<code>zip</code>')}</li>
+                                <li>${i18n.tr('Multiple tests can have the same name, but they don\'t have to.')}</li>
                             </ul>
-                            <p>Example:</p>
+                            <p>${i18n.tr('Example:')}</p>
                             <pre class="mb-0 p-3 bg-light">tests
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; TestEventBus.java
@@ -183,7 +186,7 @@
                     <c:when test="${empty param.origin}">
                         <div class="col-auto">
                             <button id="upload" type="submit" class="btn btn-primary">
-                                Upload
+                                    ${i18n.tr('Upload')}
                             </button>
                             <%-- TODO Where do we cancel to in this case? --%>
                         </div>
@@ -193,30 +196,31 @@
                         <div class="col-auto">
                             <div class="btn-group">
                                 <button id="upload" type="submit" class="btn btn-primary">
-                                    Upload
+                                        ${i18n.tr('Upload')}
                                 </button>
                                 <button id="upload-and-stay" type="submit" class="btn btn-outline-primary" name="disableAutomaticRedirect" value="disabled">
-                                    Upload and stay on this page
+                                        ${i18n.tr('Upload and stay on this page')}
                                 </button>
                             </div>
-                            <a href="${url.forPath(param.origin)}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                            <a href="${url.forPath(param.origin)}" id="cancel"
+                               class="btn btn-outline-primary">${i18n.tr('Cancel')}</a>
                         </div>
                     </c:otherwise>
                 </c:choose>
             </div>
         </form>
 
-        <h2 class="mt-4">Uploaded Classes</h2>
+        <h2 class="mt-4">${i18n.tr('Uploaded Classes')}</h2>
         <table class="table table-striped" id="tableUploadedClasses">
             <thead>
             <tr>
-                <th>ID</th>
-                <th>Class name (alias)</th>
-                <th>Available dependencies/tests/mutants</th>
-                <th>Mutation Difficulty</th>
-                <th>Testing Difficulty</th>
-                <th>Testing Framework</th>
-                <th>Assertion Library</th>
+                <th>${i18n.tr('ID')}</th>
+                <th>${i18n.tr('Class name (alias)')}</th>
+                <th>${i18n.tr('Available dependencies/tests/mutants')}</th>
+                <th>${i18n.tr('Mutation Difficulty')}</th>
+                <th>${i18n.tr('Testing Difficulty')}</th>
+                <th>${i18n.tr('Testing Framework')}</th>
+                <th>${i18n.tr('Assertion Library')}</th>
             </tr>
             </thead>
             <tbody>
@@ -254,6 +258,7 @@
 
     <script type="module">
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
@@ -263,10 +268,10 @@
                 order: [[0, 'desc']],
                 scrollY: '600px',
                 scrollCollapse: true,
-                language: {
-                    info: 'Showing _TOTAL_ entries',
-                    emptyTable: 'No classes uploaded.'
-                }
+                language: DataTablesUtils.language({
+                    info: `${i18n.tr('Showing _TOTAL_ entries')}`,
+                    emptyTable: `${i18n.tr('No classes uploaded.')}`
+                })
             });
         });
     </script>

@@ -22,6 +22,8 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ attribute name="id" required="false" %>
 <%@ attribute name="title" required="true" %>
 <%@ attribute name="content" fragment="true" required="true" %>
@@ -33,7 +35,7 @@
 <%@ attribute name="modalFooterClasses" required="false" description="Additional class(es) for the .modal-footer div." %>
 
 <%@ attribute name="closeButtonText" required="false" %>
-<c:set var="closeButtonText" value="${(empty closeButtonText) ? 'Close' : closeButtonText}" />
+<c:set var="closeButtonText" value="${(empty closeButtonText) ? i18n.tr('Close') : closeButtonText}" />
 
 <div class="modal fade" tabindex="-1" aria-hidden="true" role="dialog" <c:if test="${not empty id}">id="${id}"</c:if>>
     <div class="modal-dialog ${modalDialogClasses}">

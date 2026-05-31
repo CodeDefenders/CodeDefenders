@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
 
@@ -26,14 +27,15 @@
     <div class="modal-dialog" style="max-width: 60rem;">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Scoreboard</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">${i18n.tr("Scoreboard")}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                        aria-label="${i18n.tr("Close")}"></button>
             </div>
             <div class="modal-body">
                 <t:battleground_game_scoreboard/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.tr("Close")}</button>
             </div>
         </div>
     </div>

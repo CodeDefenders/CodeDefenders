@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codedefenders.game.Role;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This class contains static constants for feedback and the {@link Type feedback type}.
@@ -33,13 +34,34 @@ public class Feedback {
     public static final int MIN_RATING = -1;
 
     public enum Type {
-        CUT_MUTATION_DIFFICULTY("Mutation Difficulty", "The class under test is difficult to mutate"),
-        CUT_TEST_DIFFICULTY("Test Difficulty", "The class under test is difficult to test"),
-        ATTACKER_COMPETENCE("Attacker Competence", "The attacking team is competent"),
-        DEFENDER_COMPETENCE("Defender Competence", "The defending team is competent"),
-        ATTACKER_FAIRNESS("Attacker Fairness", "The attacking team is playing fair"),
-        DEFENDER_FAIRNESS("Defender Fairness", "The defending team is playing fair"),
-        GAME_ENGAGING("Game Engaging", "The game is engaging");
+        CUT_MUTATION_DIFFICULTY(
+                I18n.marktr("Mutation Difficulty"),
+                I18n.marktr("The class under test is difficult to mutate")
+        ),
+        CUT_TEST_DIFFICULTY(
+                I18n.marktr("Test Difficulty"),
+                I18n.marktr("The class under test is difficult to test")
+        ),
+        ATTACKER_COMPETENCE(
+                I18n.marktr("Attacker Competence"),
+                I18n.marktr("The attacking team is competent")
+        ),
+        DEFENDER_COMPETENCE(
+                I18n.marktr("Defender Competence"),
+                I18n.marktr("The defending team is competent")
+        ),
+        ATTACKER_FAIRNESS(
+                I18n.marktr("Attacker Fairness"),
+                I18n.marktr("The attacking team is playing fair")
+        ),
+        DEFENDER_FAIRNESS(
+                I18n.marktr("Defender Fairness"),
+                I18n.marktr("The defending team is playing fair")
+        ),
+        GAME_ENGAGING(
+                I18n.marktr("Game Engaging"),
+                I18n.marktr("The game is engaging")
+        );
 
         public static final List<Type> TYPES = List.of(values());
 
@@ -80,20 +102,14 @@ public class Feedback {
         }
 
         public static List<Type> getFeedbackTypesForRole(Role role) {
-            switch (role) {
-                case ATTACKER:
-                    return ATTACKER_TYPES;
-                case DEFENDER:
-                    return DEFENDER_TYPES;
-                case PLAYER:
-                    return PLAYER_TYPES;
-                case OBSERVER:
-                    return TYPES;
-                case NONE:
-                    return Collections.emptyList();
-                default:
-                    throw new IllegalArgumentException("Unknown role: " + role);
-            }
+            return switch (role) {
+                case ATTACKER -> ATTACKER_TYPES;
+                case DEFENDER -> DEFENDER_TYPES;
+                case PLAYER -> PLAYER_TYPES;
+                case OBSERVER -> TYPES;
+                case NONE -> Collections.emptyList();
+                default -> throw new IllegalArgumentException("Unknown role: " + role);
+            };
         }
     }
 

@@ -28,6 +28,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%
     List<MultiplayerGame> openMultiplayerGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
@@ -38,7 +39,7 @@
     pageContext.setAttribute("gameCreatorNames", gameCreatorNames);
 %>
 
-<p:main_page title="Welcome to Code Defenders">
+<p:main_page title="${i18n.tr('Welcome to Code Defenders')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/landing_page.css")}" rel="stylesheet">
     </jsp:attribute>
@@ -47,19 +48,19 @@
         <%-- Vertically align content if enough space is available. --%>
         <div class="container py-5 page">
             <div class="d-flex flex-column align-items-center gap-3 mb-3">
-                <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
+                <img src="${url.forPath("/images/logo.png")}" alt="${i18n.tr('Code Defenders Logo')}" width="58">
                     <%-- Make the header break nicely on smaller screens. --%>
                 <h1 class="d-flex flex-column">
-                    <span class="title">Code Defenders</span>
-                    <span class="subtitle">A Mutation Testing Game</span>
+                    <span class="title">${i18n.tr('Code Defenders')}</span>
+                    <span class="subtitle">${i18n.tr('A Mutation Testing Game')}</span>
                 </h1>
             </div>
 
             <div class="d-flex justify-content-center">
                 <a href="${url.forPath(Paths.LOGIN)}"
-                   class="btn btn-lg btn-primary btn-highlight"
-                   style="margin-bottom: 5rem;">
-                    Log in or Sign up
+           class="btn btn-lg btn-primary btn-highlight"
+           style="margin-bottom: 5rem;">
+                ${i18n.tr('Log in or Sign up')}
                 </a>
             </div>
 
@@ -101,30 +102,27 @@
                 </div>
             </div>
 
-            <div id="prompt" class="hidden">Can you kill the mutant?</div>
+            <div id="prompt" class="hidden">${i18n.tr('Can you kill the mutant?')}</div>
 
             <div class="intro">
-                <p>CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple,
-                    competitive challenge between two roles: defenders and attackers.</p>
-                <p>Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change
-                    the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all
-                    tests still pass, the mutant survives and scores for the attacker.</p>
+                <p>${i18n.tr('CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple, competitive challenge between two roles: defenders and attackers.')}</p>
+                <p>${i18n.tr('Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all tests still pass, the mutant survives and scores for the attacker.')}</p>
             </div>
         </div>
 
         <div class="page container bg-light rounded-6-md mb-5">
             <div class="row">
                 <div class="p-5 col-xxl-6 col-12">
-                    <h2 class="mb-3">Active Battleground Games</h2>
+                    <h2 class="mb-3">${i18n.tr('Active Battleground Games')}</h2>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
                             <tr>
-                                <th>Creator</th>
-                                <th>Class</th>
-                                <th>Attackers</th>
-                                <th>Defenders</th>
-                                <th>Level</th>
+                                <th>${i18n.tr('Creator')}</th>
+                                <th>${i18n.tr('Class')}</th>
+                                <th>${i18n.tr('Attackers')}</th>
+                                <th>${i18n.tr('Defenders')}</th>
+                                <th>${i18n.tr('Level')}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -132,7 +130,7 @@
                                 <c:when test="${empty openMultiplayerGames}">
                                     <tr>
                                         <td colspan="100" class="text-center">
-                                            There are currently no open games.
+                                                ${i18n.tr('There are currently no open games.')}
                                         </td>
                                     </tr>
                                 </c:when>
@@ -143,7 +141,7 @@
                                             <td><span>${game.CUT.alias}</span></td>
                                             <td>${game.attackerPlayers.size()}</td>
                                             <td>${game.defenderPlayers.size()}</td>
-                                            <td>${game.level.formattedString}</td>
+                                            <td>${i18n.tr(game.level.formattedString)}</td>
                                         </tr>
                                     </c:forEach>
                                 </c:otherwise>
@@ -153,23 +151,23 @@
                     </div>
                 </div>
                 <div class="p-5 col-xxl-6 col-12">
-                        <h2 class="mb-3">Active Melee Games</h2>
+                        <h2 class="mb-3">${i18n.tr('Active Melee Games')}</h2>
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th>Creator</th>
-                                    <th>Class</th>
-                                    <th>Players</th>
-                                    <th>Level</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <c:choose>
-                                    <c:when test="${empty openMeleeGames}">
-                                        <tr>
-                                            <td colspan="100" class="text-center">
-                                                There are currently no open games.
+                                    <th>${i18n.tr('Creator')}</th>
+                                    <th>${i18n.tr('Class')}</th>
+                                    <th>${i18n.tr('Players')}</th>
+                                    <th>${i18n.tr('Level')}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:choose>
+                                <c:when test="${empty openMeleeGames}">
+                                    <tr>
+                                        <td colspan="100" class="text-center">
+                                                ${i18n.tr('There are currently no open games.')}
                                             </td>
                                         </tr>
                                     </c:when>
@@ -179,7 +177,7 @@
                                                 <td>${gameCreatorNames[game.id]}</td>
                                                 <td><span>${game.CUT.alias}</span></td>
                                                 <td>${game.players.size()}</td>
-                                                <td>${game.level.formattedString}</td>
+                                                <td>${i18n.tr(game.level.formattedString)}</td>
                                             </tr>
                                         </c:forEach>
                                     </c:otherwise>
@@ -193,7 +191,7 @@
 
         <div class="page container bg-light rounded-6-md mb-5">
             <div class="p-5">
-                <h2 class="mb-3">Research</h2>
+                <h2 class="mb-3">${i18n.tr('Research')}</h2>
                 <div class="two-cols-xxl">
                     <%@ include file="/jsp/research.jsp" %>
                 </div>
@@ -203,24 +201,19 @@
 
         <div class="page container py-5">
             <div class="usage">
-                <h2 class="mb-3">Use CodeDefenders for your lessons</h2>
+                <h2 class="mb-3">${i18n.tr('Use CodeDefenders for your lessons')}</h2>
                 <p>
-                    CodeDefenders is an open source software developed and maintained at the Chair of Software
-                    Engineering&nbspII at the University of Passau.
-                    The source code is available along with install instructions on
-                    <a href="https://github.com/CodeDefenders/CodeDefenders/" rel="noopener" target="_blank"
-                       title="CodeDefenders repo on GitHub">GitHub</a>.<br>
-                    We also provide docker containers for all major releases.
-                    You can find links to these containers and more information in our
-                    <a href="https://github.com/CodeDefenders/CodeDefenders/blob/master/docker/README.md"
-                       rel="noopener" target="_blank" title="CodeDefenders Docker README">docker documentation</a>.
+                    ${i18n.tr('CodeDefenders is an open source software developed and maintained at the Chair of Software Engineering&nbsp;II at the University of Passau.')}
+                    ${i18n.tr('The source code is available along with install instructions on <a href="{0}" rel="noopener" target="_blank" title="CodeDefenders repo on GitHub">GitHub</a>.',
+                        'https://github.com/CodeDefenders/CodeDefenders/')}
+                    <br>
+                    ${i18n.tr('We also provide docker containers for all major releases.')}
+                    ${i18n.tr('You can find links to these containers and more information in our <a href="{0}" rel="noopener" target="_blank" title="CodeDefenders Docker README">docker documentation</a>.',
+                        'https://github.com/CodeDefenders/CodeDefenders/blob/master/docker/README.md')}
                 </p>
                 <p>
-                    While the public instance at
-                    <a href="https://code-defenders.org/" title="Public CodeDefenders instance">code-defenders.org</a>
-                    is available for everyone to try out CodeDefenders, we strongly recommend setting up a private
-                    instance
-                    for use in the classroom to ensure a consistent performance.
+                    ${i18n.tr('While the public instance at <a href="{0}" title="Public CodeDefenders instance">code-defenders.org</a> is available for everyone to try out CodeDefenders, we strongly recommend setting up a private instance for use in the classroom to ensure a consistent performance.',
+                        'https://code-defenders.org/')}
                 </p>
             </div>
         </div>

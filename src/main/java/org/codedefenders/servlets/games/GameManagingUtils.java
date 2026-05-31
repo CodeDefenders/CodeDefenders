@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -86,6 +87,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.service.llm.LlmManagerService;
@@ -95,6 +97,7 @@ import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
+import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
 import org.codedefenders.validation.code.MutantRule;
@@ -104,6 +107,7 @@ import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
@@ -205,6 +209,10 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private MutantValidator mutantValidator;
 
+    @Named
+    @Inject
+    private I18nService i18nService;
+
     /**
      * {@inheritDoc}
      */
@@ -298,7 +306,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             boolean isSuccess,
             // on success
             Optional<Mutant> mutant,
-            Optional<String> mutationTesterMessage,
+            Optional<PreparedMessage> mutationTesterMessage,
             // on failure
             Optional<FailureReason> failureReason,
             Optional<String> validationErrorMessage,
@@ -310,7 +318,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             COMPILATION_FAILED,
         }
 
-        public static CreateBattlegroundMutantResult success(Mutant mutant, String mutationTesterMessage) {
+        public static CreateBattlegroundMutantResult success(Mutant mutant, PreparedMessage mutationTesterMessage) {
             return new CreateBattlegroundMutantResult(
                     true,
                     Optional.of(mutant),
@@ -352,6 +360,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+        I18n i18n = i18nService.getI18n(userId);
 
         MutantRule[] ignoredRules = new MutantRule[0];
         if (userId <= 10) {
@@ -360,7 +369,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
 
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, ignoredRules);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, i18n, ignoredRules);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -371,7 +380,10 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         if (!validationSuccess) {
             return CreateBattlegroundMutantResult.failure(
-                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
+                    CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED,
+                    validationResult.getMessage(i18n),
+                    null
+            );
         }
 
         Mutant existingMutant = existingMutant(game.getId(), code);
@@ -433,7 +445,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        String mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
+        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }
@@ -454,6 +466,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         mse.setUserId(userId);
         notificationService.post(mse);
 
+        I18n i18n = i18nService.getI18n(userId);
+
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
 
@@ -462,7 +476,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             ignoredRules = new MutantRule[]{MutantValidationRules.noChangesToComments};
         }
         CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
-                mutantText, codeValidatorLevel, ignoredRules);
+                mutantText, codeValidatorLevel, i18n, ignoredRules);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -541,7 +555,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        String mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }
@@ -638,7 +652,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             boolean isSuccess,
             // on success
             Optional<Test> test,
-            Optional<String> mutationTesterMessage,
+            Optional<PreparedMessage> mutationTesterMessage,
             // on failure
             Optional<FailureReason> failureReason,
             Optional<String> validationErrorMessages,
@@ -651,7 +665,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             TEST_DID_NOT_PASS_ON_CUT,
         }
 
-        public static CreateBattlegroundTestResult success(Test test, String mutationTesterMessage) {
+        public static CreateBattlegroundTestResult success(Test test, PreparedMessage mutationTesterMessage) {
             return new CreateBattlegroundTestResult(
                     true,
                     Optional.of(test),
@@ -683,6 +697,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         tse.setUserId(userId);
         notificationService.post(tse);
 
+        I18n i18n = i18nService.getI18n(userId);
+
         // Do the validation even before creating the mutant
         CodeValidationResult validationMessage = testValidator.validateTestCode(
                 code,
@@ -694,13 +710,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return CreateBattlegroundTestResult.failure(
                     null, CreateBattlegroundTestResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.toString(), null, null);
+                    validationMessage.getMessage(i18n), null, null);
         }
 
         // From this point on we assume that test is valid according to the rules (but it might still not compile)
@@ -732,7 +748,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
 
-        String mutationTesterMessage;
+        PreparedMessage mutationTesterMessage;// = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
         if (game instanceof MultiplayerGame multiplayerGame) {
             mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
         } else if (game instanceof MeleeGame meleeGame) {
@@ -821,7 +837,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                     " However, the mutant was killable! You can view an example for a killing test in the mutant accordion.";
         }
 
-        // At this point we where not able to kill the mutant will all the covering
+        // At this point, we were not able to kill the mutant will all the covering
         // tests on the same class from different games
         mutantRepo.killMutant(equivMutant, Mutant.Equivalence.DECLARED_YES);
 
@@ -912,6 +928,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             AbstractGame game, int userId, Mutant equivMutant, String code) throws IOException {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
+        I18n i18n = i18nService.getI18n(userId);
 
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(game.getId());
@@ -928,13 +945,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         tve.setGameId(game.getId());
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : validationMessage.toString());
+        tve.setValidationMessage(validationSuccess ? null : validationMessage.getMessage(i18n));
         notificationService.post(tve);
 
         if (!validationSuccess) {
             return RejectBattlegroundEquivalenceResult.testInvalid(
                     null, RejectBattlegroundEquivalenceResult.FailureReason.VALIDATION_FAILED,
-                    validationMessage.toString(), null, null);
+                    validationMessage.getMessage(i18n), null, null);
         }
 
         Test newTest = createTest(game.getId(), game.getClassId(), code, userId, MODE_BATTLEGROUND_DIR);
@@ -1065,16 +1082,14 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public record ClaimEquivalentResult(
             List<Mutant> claimedMutants,
-            List<String> messages
-    ) {
-    }
-
+            List<PreparedMessage> messages
+    ){}
     public ClaimEquivalentResult claimBattlegroundEquivalence(AbstractGame game, int userId, List<Integer> mutantLines) {
         var user = userService.getSimpleUserById(userId).orElseThrow();
         int playerId = playerRepo.getPlayerIdForUserAndGame(userId, game.getId());
 
         List<Mutant> mutantsAlive = game.getAliveMutants();
-        List<String> messages = new ArrayList<>();
+        List<PreparedMessage> messages = new ArrayList<>();
 
         List<Integer> coveredLines = new ArrayList<>();
         for (Integer line : mutantLines) {
@@ -1084,7 +1099,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         if (coveredLines.isEmpty()) {
-            messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
+            messages.add(new PreparedMessage(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE));
             return new ClaimEquivalentResult(List.of(), messages);
         }
 
@@ -1110,7 +1125,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                     .forEach(claimedMutants::add);
         }
 
-        if (claimedMutants.size() > 0) {
+        if (!claimedMutants.isEmpty()) {
             String flaggingChatMessage = user.getName() + " flagged "
                     + claimedMutants.size() + " mutant" + (claimedMutants.size() == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, game.getId(), userId, flaggingChatMessage,
@@ -1119,11 +1134,12 @@ public class GameManagingUtils implements IGameManagingUtils {
             eventDAO.insert(event);
         }
 
-        String flaggingMessage = claimedMutants.size() == 0
-                ? "Mutant has already been claimed as equivalent or killed!"
-                : String.format("Flagged %d mutant%s as equivalent", claimedMutants.size(),
-                (claimedMutants.size() == 1 ? "" : 's'));
-        messages.add(flaggingMessage);
+        messages.add(switch (claimedMutants.size()) {
+            case 0  -> new PreparedMessage(I18n.marktr("Mutant has already been claimed as equivalent or killed!"));
+            case 1  -> new PreparedMessage(I18n.marktr("Flagged 1 mutant as equivalent!"));
+            default -> new PreparedMessage(I18n.marktr("Flagged {0} mutants as equivalent!"), claimedMutants.size());
+        });
+
         return new ClaimEquivalentResult(claimedMutants, messages);
     }
 
@@ -1311,17 +1327,23 @@ public class GameManagingUtils implements IGameManagingUtils {
         return decorated.toString();
     }
 
-    public Optional<String> getTestSmellsMessage(Test test) {
+    public Optional<PreparedMessage> getTestSmellsMessage(Test test) {
         List<String> detectedTestSmells = testSmellRepo.getDetectedTestSmellsForTest(test.getId());
-        if (!detectedTestSmells.isEmpty()) {
-            if (detectedTestSmells.size() == 1) {
-                return Optional.of("Your test has the following smell: " + detectedTestSmells.get(0));
-            } else {
-                String join = String.join(", ", detectedTestSmells);
-                return Optional.of("Your test has the following smells: " + join);
-            }
+        if (detectedTestSmells.isEmpty()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        if (detectedTestSmells.size() == 1) {
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Your test has the following smell: {0}"),
+                    detectedTestSmells.get(0)
+            ));
+        } else {
+            String smells = String.join(", ", detectedTestSmells);
+            return Optional.of(new PreparedMessage(
+                    I18n.marktr("Your test has the following smells: {0}"),
+                    smells
+            ));
+        }
     }
 
 

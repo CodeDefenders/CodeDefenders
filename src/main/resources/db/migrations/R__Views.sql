@@ -26,14 +26,14 @@ FROM `puzzles`
 WHERE Active = 1;
 
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT games.*, UNIX_TIMESTAMP(games.Start_Time) AS `Timestamp_Start`, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
+SELECT games.*, UNIX_TIMESTAMP(games.Start_Time) AS `Timestamp_Start`, UNIX_TIMESTAMP(games.Finish_Time) AS `Timestamp_Finish`, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'PARTY'
   AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_melee_games` AS
-SELECT games.*, UNIX_TIMESTAMP(games.Start_Time) AS `Timestamp_Start`, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
+SELECT games.*, UNIX_TIMESTAMP(games.Start_Time) AS `Timestamp_Start`, UNIX_TIMESTAMP(games.Finish_Time) AS `Timestamp_Finish`, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'MELEE'
@@ -83,7 +83,8 @@ SELECT p.*,
        u.Active           AS usersActive,
        u.AllowContact     AS usersAllowContact,
        u.KeyMap           AS usersKeyMap,
-       u.KeepPreviousTest AS usersKeepPreviousTest
+       u.KeepPreviousTest AS usersKeepPreviousTest,
+       u.Language         AS usersLanguage
 FROM players AS p,
      view_valid_users AS u
 WHERE p.User_ID = u.User_ID;

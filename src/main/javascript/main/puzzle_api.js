@@ -46,16 +46,16 @@ class PuzzleAPI {
         return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles`, 'GET');
     }
 
-    static async updatePuzzle(puzzleId, puzzleData) {
-        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/puzzle?id=${puzzleId}`, 'PUT', puzzleData);
+    static async updatePuzzle(puzzleId, puzzleData, language) {
+        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/puzzle?id=${puzzleId}&language=${language}`, 'PUT', puzzleData);
     }
 
-    static async updatePuzzleChapter(chapterId, chapterData) {
-        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?id=${chapterId}`, 'PUT', chapterData);
+    static async updatePuzzleChapter(chapterId, chapterData, language) {
+        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?id=${chapterId}&language=${language}`, 'PUT', chapterData);
     }
 
-    static async createPuzzleChapter(chapterData) {
-        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?create`, 'PUT', chapterData);
+    static async createPuzzleChapter(chapterData, language) {
+        return await PuzzleAPI.requestJSON(`${contextPath}admin/api/puzzles/chapter?create&language=${language}`, 'PUT', chapterData);
     }
 
     static async deletePuzzle(puzzleId) {

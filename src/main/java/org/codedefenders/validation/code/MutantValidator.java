@@ -25,6 +25,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.util.JavaParserUtils;
+import org.xnap.commons.i18n.I18n;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
@@ -42,7 +43,7 @@ public class MutantValidator {
      * @return A {@link CodeValidationResult} containing information on all rules this mutant violated
      */
     public CodeValidationResult validateMutant(String originalCode, String mutatedCode,
-                                                      MutantValidationRuleSet ruleSet, MutantRule... ignoredRules) {
+                                                      MutantValidationRuleSet ruleSet, I18n i18n, MutantRule... ignoredRules) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
         MutantValidationRuleSet tmpRuleSet = new MutantValidationRuleSet("tmp", ruleSet);
@@ -50,7 +51,7 @@ public class MutantValidator {
             tmpRuleSet.removeRule(r);
         }
 
-        result.add(checkCompilationRules(originalCode, mutatedCode, tmpRuleSet));
+        result.add(checkCompilationRules(originalCode, mutatedCode, tmpRuleSet, i18n));
 
         // if only string literals were changed
         if (ValidationUtils.onlyLiteralsChanged(originalCode, mutatedCode)) {
@@ -65,7 +66,7 @@ public class MutantValidator {
     }
 
     private CodeValidationResult checkCompilationRules(String originalCode, String mutatedCode,
-                                                              MutantValidationRuleSet ruleSet) {
+                                                       MutantValidationRuleSet ruleSet, I18n i18n) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
@@ -80,7 +81,7 @@ public class MutantValidator {
         CompilationUnit mutatedCU = mutatedParseResult.get();
 
         for (MutantRule rule : ruleSet.getRules()) {
-            result.add(rule.fails(originalCU, mutatedCU));
+            result.add(rule.fails(originalCU, mutatedCU, i18n));
         }
 
         return result;

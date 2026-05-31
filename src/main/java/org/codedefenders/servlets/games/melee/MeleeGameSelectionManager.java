@@ -67,6 +67,7 @@ import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.game.GameState.ACTIVE;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
@@ -302,7 +303,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null || !game.hasUserJoined(login.getUserId())) {
-            messages.add("You cannot leave a game you are not part of.");
+            messages.add(I18n.marktr("You cannot leave a game you are not part of."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -311,12 +312,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
-            messages.add("An error occurred while leaving game " + gameId);
+            messages.addFormatted(I18n.marktr("An error occurred while leaving game {0}"), gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
-        messages.add("You left game " + gameId);
+        messages.addFormatted(I18n.marktr("You left game {0}"), gameId);
         eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
@@ -345,7 +346,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame game = gameProducer.getMeleeGame();
 
         if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
-            messages.add("Only the game's creator or an observer can start the game.");
+            messages.add(I18n.marktr("Only the game's creator or an observer can start the game."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -371,7 +372,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame game = gameProducer.getMeleeGame();
 
         if (game.getCreatorId() != login.getUserId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
-            messages.add("Only the game's creator or an observer can end the game.");
+            messages.add(I18n.marktr("Only the game's creator or an observer can end the game."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -392,13 +393,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame oldGame = gameProducer.getMeleeGame();
 
         if (login.getUser().getId() != oldGame.getCreatorId() && oldGame.getRole(login.getUserId()) != Role.OBSERVER) {
-            messages.add("Only the creator of this game can call a rematch.");
+            messages.add(I18n.marktr("Only the creator of this game can call a rematch."));
             Redirect.redirectBack(request, response);
             return;
         }
 
         Optional<MeleeGame> newGame = gameService.rematch(oldGame);
-        if (!newGame.isPresent()) {
+        if (newGame.isEmpty()) {
             Redirect.redirectBack(request, response);
             return;
         }
@@ -410,13 +411,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null || game.getState() == GameState.FINISHED) {
-            messages.add("The game is already over. You cannot change its duration.");
+            messages.add(I18n.marktr("The game is already over. You cannot change its duration."));
             Redirect.redirectBack(request, response);
             return;
         }
 
         if (login.getUser().getId() != game.getCreatorId() && game.getRole(login.getUserId()) != Role.OBSERVER) {
-            messages.add("Only the creator or an observer of this game can change its duration.");
+            messages.add(I18n.marktr("Only the creator or an observer of this game can change its duration."));
             Redirect.redirectBack(request, response);
             return;
         }
@@ -434,13 +435,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int remainingMinutes = newDuration.get();
 
         if (remainingMinutes < minDuration) {
-            messages.add("The remaining time cannot be below " + minDuration + " minutes.");
+            messages.addFormatted(I18n.marktr("The remaining time cannot be below {0} minutes."), minDuration);
             Redirect.redirectBack(request, response);
             return;
         }
 
         if (remainingMinutes > maxDuration) {
-            messages.add("The new remaining duration must be at most " + maxDuration + " minutes.");
+            messages.addFormatted(I18n.marktr("The new remaining duration must be at most {0} minutes."), maxDuration);
             Redirect.redirectBack(request, response);
             return;
         }

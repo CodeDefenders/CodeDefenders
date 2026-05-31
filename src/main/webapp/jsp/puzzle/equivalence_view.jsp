@@ -22,6 +22,7 @@
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
@@ -52,8 +53,8 @@
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
-    pageContext.setAttribute("title", puzzle.getTitle());
-    pageContext.setAttribute("description", puzzle.getDescription());
+    pageContext.setAttribute("title", request.getAttribute("puzzleTitle"));
+    pageContext.setAttribute("description", request.getAttribute("puzzleDescription"));
     pageContext.setAttribute("equivMutant", equivMutant);
     pageContext.setAttribute("mutantClaimedMessage", mutantClaimedMessage);
     pageContext.setAttribute("showTestAccordion", showTestAccordion);
@@ -96,6 +97,9 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
+<%--@elvariable id="puzzleTitle" type="String"--%>
+<%--@elvariable id="puzzleDescription" type="String"--%>
+
 <p:main_page title="${title}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
@@ -117,13 +121,13 @@
             <c:if test="${game.state == GameState.SOLVED}">
                 <div class="alert alert-success" role="alert">
                     <p class="m-0">
-                        <strong class="alert-heading">Congratulations!</strong>
+                        <strong class="alert-heading">${i18n.tr("Congratulations!")}</strong>
                         <c:choose>
                             <c:when test="${puzzle.equivalent}">
-                                This mutant is equivalent to the class under test.
+                                ${i18n.tr("This mutant is equivalent to the class under test.")}
                             </c:when>
                             <c:otherwise>
-                                Your test killed the mutant flagged as equivalent.
+                                ${i18n.tr("Your test killed the mutant flagged as equivalent.")}
                             </c:otherwise>
                         </c:choose>
                             ${requestScope.nextPuzzleMessage}
@@ -133,12 +137,13 @@
 
             <div class="row">
                 <div class="col-xl-6 col-12" id="equivmut-div">
-                    <div class="game-component-header"><h3>${mutantClaimedMessage}
+                    <div class="game-component-header">
+                        <h3>${i18n.tr("Mutant {0} automatically claimed equivalent", equivMutant.id)}
                     </h3></div>
 
                     <div class="equivalence-container">
 
-                        <h3>Diff</h3>
+                        <h3>${i18n.tr("Diff")}</h3>
                         <div class="card">
                             <div class="card-body p-0 loading loading-height-200">
                                 <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff"
@@ -166,17 +171,17 @@
 
                         <c:choose>
                             <c:when test="${game.state == GameState.SOLVED and puzzle.equivalent}">
-                                <h3 class="mt-3">The mutant is equivalent!</h3>
-                                <p>The mutant was accepted as equivalent</p>
+                                <h3 class="mt-3">${i18n.tr("The mutant is equivalent!")}</h3>
+                                <p>${i18n.tr("The mutant was accepted as equivalent")}</p>
                             </c:when>
                             <c:when test="${game.state == GameState.SOLVED and not puzzle.equivalent}">
-                                <h3 class="mt-3">Not equivalent! Your killing test:</h3>
+                                <h3 class="mt-3">${i18n.tr("Not equivalent! Your killing test:")}</h3>
                                 <form id="equivalenceForm">
                                     <jsp:include page="/jsp/game_components/test_editor.jsp"/>
                                 </form>
                             </c:when>
                             <c:when test="${game.state == GameState.ACTIVE}">
-                                <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
+                                <h3 class="mt-3">${i18n.tr("Not equivalent? Write a killing test here:")}</h3>
                                 <form id="equivalenceForm" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
                                     <input type="hidden" name="formType" value="resolveEquivalence">
                                     <input type="hidden" name="gameId" value="${game.id}">
@@ -188,10 +193,10 @@
 
                                     <div class="d-flex justify-content-between mt-2 mb-2">
                                         <button class="btn btn-danger" id="accept-equivalent-button" type="button"
-                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Accept As Equivalent
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>${i18n.tr("Accept As Equivalent")}
                                         </button>
                                         <button class="btn btn-primary" id="reject-equivalent-button" type="button"
-                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>Submit Killing Test
+                                            ${game.state != GameState.ACTIVE ? 'disabled' : ''}>${i18n.tr("Submit Killing Test")}
                                         </button>
 
                                         <script type="module">
@@ -200,7 +205,7 @@
                                             const testProgressBar = await objects.await('testProgressBar');
 
                                             document.getElementById("accept-equivalent-button").addEventListener('click', function () {
-                                                if (confirm('Are you sure that this mutant is equivalent and cannot be killed?')) {
+                                                if (confirm('${i18n.tr("Are you sure that this mutant is equivalent and cannot be killed?")}')) {
                                                     this.form['resolveAction'].value = 'accept';
                                                     this.form.submit();
                                                     this.disabled = true;
@@ -221,7 +226,7 @@
                 </div>
 
                 <div class="col-xl-6 col-12" id="cut-div">
-                    <div class="game-component-header"><h3>Class Under Test</h3></div>
+                    <div class="game-component-header"><h3>${i18n.tr("Class Under Test")}</h3></div>
                     <t:defender_intention_collection_note/>
                     <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
                     <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -239,7 +244,7 @@
                 <div class="row">
                     <div class="col-xl-6 col-12">
                         <div id="tests-div">
-                            <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                            <div class="game-component-header"><h3>${i18n.tr("JUnit Tests")}</h3></div>
                             <t:test_accordion/>
                         </div>
                     </div>

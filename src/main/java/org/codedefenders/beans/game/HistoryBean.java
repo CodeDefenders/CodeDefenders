@@ -36,6 +36,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * <p>Provides data for the history game component.</p>
@@ -64,86 +65,87 @@ public class HistoryBean {
         this.login = login;
     }
 
-    public List<HistoryBeanEventDTO> getEvents() {
+    public List<HistoryBeanEventDTO> getEvents(I18n i18n) {
         if (events == null) {
             events = eventDAO.getEventsForGame(gameId).stream()
-                    .map(this::createHistoryBeanEvent).filter(Objects::nonNull)
+                    .map(e -> createHistoryBeanEvent(e, i18n))
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
         return events;
     }
 
-    private HistoryBeanEventDTO createHistoryBeanEvent(Event e) {
+    private HistoryBeanEventDTO createHistoryBeanEvent(Event e, I18n i18n) {
         if (e.getUserId() < 100) {
             return null;
         }
         String userName = userService.getSimpleUserById(e.getUserId())
                 .map(SimpleUser::getName)
-                .orElse("Unknown user");
+                .orElse(i18n.tr("Unknown user"));
         String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {
             case GAME_CREATED:
-                userMessage += "created game";
+                userMessage += i18n.tr("created game");
                 break;
             case GAME_STARTED:
-                userMessage += "started game";
+                userMessage += i18n.tr("started game");
                 break;
             case GAME_FINISHED:
-                userMessage += "finished game";
+                userMessage += i18n.tr("finished game");
                 break;
             case PLAYER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "joined";
+                userMessage += i18n.tr("joined");
                 colour = "blue";
                 break;
             case ATTACKER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "joined as attacker";
+                userMessage += i18n.tr("joined as attacker");
                 colour = "blue";
                 break;
             case DEFENDER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "joined as defender";
+                userMessage += i18n.tr("joined as defender");
                 colour = "blue";
                 break;
             case GAME_PLAYER_LEFT:
-                userMessage += "left the game";
+                userMessage += i18n.tr("left the game");
                 break;
             case PLAYER_TEST_ERROR:
             case DEFENDER_TEST_READY:
-                userMessage += "created a test that errored";
+                userMessage += i18n.tr("created a test that errored");
                 colour = "red";
                 break;
             case PLAYER_TEST_READY:
             case DEFENDER_TEST_ERROR:
-                userMessage = "Test by " + userMessage + "is ready";
+                userMessage = i18n.tr("Test by {0} is ready", userMessage);
                 colour = "green";
                 break;
             case PLAYER_MUTANT_ERROR:
             case ATTACKER_MUTANT_ERROR:
-                userMessage += "created a mutant that errored";
+                userMessage += i18n.tr("created a mutant that errored");
                 colour = "red";
                 break;
             case PLAYER_TEST_CREATED:
             case DEFENDER_TEST_CREATED:
-                userMessage += "created a test";
+                userMessage += i18n.tr("created a test");
                 colour = "green";
                 break;
             case PLAYER_KILLED_MUTANT:
             case DEFENDER_KILLED_MUTANT:
-                userMessage += "killed a mutant";
+                userMessage += i18n.tr("killed a mutant");
                 colour = "red";
                 break;
             case PLAYER_MUTANT_CREATED:
             case ATTACKER_MUTANT_CREATED:
-                userMessage += "created a mutant";
+                userMessage += i18n.tr("created a mutant");
                 colour = "green";
                 break;
                 /*
@@ -160,27 +162,27 @@ public class HistoryBean {
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "caught an equivalence";
+                userMessage += i18n.tr("caught an equivalence");
                 colour = "yellow";
                 break;
             case PLAYER_WON_EQUIVALENT_DUEL:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
-                userMessage += "won an equivalence duel";
+                userMessage += i18n.tr("won an equivalence duel");
                 colour = "green";
                 break;
             case PLAYER_LOST_EQUIVALENT_DUEL:
-                userMessage += "lost an equivalence duel";
+                userMessage += i18n.tr("lost an equivalence duel");
                 colour = "red";
                 break;
             case PLAYER_MUTANT_CLAIMED_EQUIVALENT:
             case DEFENDER_MUTANT_CLAIMED_EQUIVALENT:
-                userMessage += "claimed a mutant equivalent";
+                userMessage += i18n.tr("claimed a mutant equivalent");
                 colour = "yellow";
                 break;
             case ATTACKER_MUTANT_KILLED_EQUIVALENT:
-                userMessage += "proved a mutant non-equivalent";
+                userMessage += i18n.tr("proved a mutant non-equivalent");
                 colour = "yellow";
                 break;
             case GAME_MESSAGE:
@@ -273,9 +275,9 @@ public class HistoryBean {
 
         public String getDate() {
             if (time.isAfter(today)) {
-                return "Today";
+                return I18n.marktr("Today");
             } else if (time.isAfter(today.minusDays(1))) {
-                return "Yesterday";
+                return I18n.marktr("Yesterday");
             } else {
                 return time.getDayOfMonth() + "." + time.getMonth().ordinal() + "." + time.getYear();
             }

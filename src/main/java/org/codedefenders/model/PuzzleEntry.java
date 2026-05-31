@@ -53,6 +53,9 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
     private boolean locked;
     private boolean solved;
     private int rounds;
+    private String title;
+    private String description;
+    private String chapterTitle;
 
     /**
      * Constructs a new puzzle entry for a given puzzle and locked status.
@@ -71,6 +74,14 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
         this.game = null;
     }
 
+    public PuzzleEntry(Puzzle puzzle, boolean locked, boolean solved, int rounds,
+                       String title, String description, String chapterTitle) {
+        this(puzzle, locked, solved, rounds);
+        this.title = title;
+        this.description = description;
+        this.chapterTitle = chapterTitle;
+    }
+
     /**
      * Constructs a new puzzle entry for a given puzzle game.
      *
@@ -84,6 +95,13 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
 
         this.type = Type.GAME;
         this.puzzle = null;
+    }
+
+    public PuzzleEntry(PuzzleGame game, boolean solved, String title, String description, String chapterTitle) {
+        this(game, solved);
+        this.title = title;
+        this.description = description;
+        this.chapterTitle = chapterTitle;
     }
 
     public Type getType() {
@@ -116,6 +134,26 @@ public class PuzzleEntry implements Comparable<PuzzleEntry> {
 
     public int getRounds() {
         return rounds;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getChapterTitle() {
+        return chapterTitle;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void lock() {

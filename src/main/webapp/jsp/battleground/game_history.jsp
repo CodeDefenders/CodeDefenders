@@ -20,20 +20,22 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
 
 <div id="history" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 900px">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">History</h5>
+                <h5 class="modal-title">${i18n.tr("History")}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background: #eee; overflow-y: auto; max-height: 55vh">
                 <t:game_timeline/>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${i18n.tr("Close")}</button>
             </div>
         </div>
     </div>
