@@ -53,6 +53,7 @@
 <%@ attribute name="strategy" required="false" type="org.codedefenders.model.llm.LlmStrategy" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%
     Map<String, String> namesToContent = new HashMap<>();
@@ -73,12 +74,12 @@
     <t:modal title="Edit strategy" id="${htmlId}">
     <jsp:attribute name="content">
         <div class="d-flex flex-row border-bottom border-2 border-secondary p-2 mb-2">
-            <label class="form-label flex-fill" for="${htmlId}-new-custom-name">Strategy name:</label>
+            <label class="form-label flex-fill" for="${htmlId}-new-custom-name">${i18n.tr('Strategy name:')}</label>
             <input class="form-control" id="${htmlId}-new-custom-name" type="text" name="newCustomName"
                    value="${strategy.name}${strategy.readOnly ? "_clone" : ""}"  required pattern="[a-zA-Z0-9_\-]+">
         </div>
         <button class="btn btn-primary" id="${htmlId}-add-prompt" type="button">
-            Add custom prompt
+                ${i18n.tr('Add custom prompt')}
         </button>
         <div id="${htmlId}-content-pane">
             <!--Populated by JS with clones of the template-->
@@ -87,12 +88,12 @@
         <jsp:attribute name="footer">
             <c:if test="${!strategy.readOnly}">
                 <button id="${htmlId}-remove-strat-btn" class="btn btn-danger" type="button">
-                    Delete this strategy
+                    ${i18n.tr('Delete this strategy')}
                 </button>
                 <div class="flex-fill"></div>
             </c:if>
             <button class="btn btn-primary" type="submit">
-                Save custom strategy
+                ${i18n.tr('Save custom strategy')}
             </button>
         </jsp:attribute>
 
@@ -117,7 +118,7 @@
             </c:forEach>
         </select>
         <div class="pt-2">
-            <label class="form-label" for="${htmlId}-area">Prompt content:</label>
+            <label class="form-label" for="${htmlId}-area">${i18n.tr('Prompt content:')}</label>
             <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form"></textarea>
         </div>
 
@@ -211,7 +212,7 @@
         if (chosenName !== "${strategy.name}") {
         <c:forEach items="${allStrategies}" var="n">
             if (chosenName === "${n.name}") {
-                alert("The strategy already exists.")
+                alert("${i18n.tr('The strategy already exists.')}")
                 event.preventDefault();
                 return;
             }
@@ -223,7 +224,7 @@
         for (let i = 0; i < selects.length; i++) {
             const v = selects[i].value;
             if (names.includes(v)) {
-                alert("You defined the same prompt twice.")
+                alert("${i18n.tr('You defined the same prompt twice.')}")
                 event.preventDefault();
                 break;
             }

@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
@@ -32,9 +35,9 @@
         <table id="attack-strategies" class="table table-v-align-middle table-striped">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Based on</th>
-                <th>Edit</th>
+                <th>${i18n.tr('Name')}</th>
+                <th>${i18n.tr('Based on')}</th>
+                <th>${i18n.tr('Edit')}</th>
             </tr>
             </thead>
             <c:forEach items="${strategies}" var="strat">
@@ -46,12 +49,12 @@
                     <c:when test="${strat.readOnly}">
                     <button class="btn btn-primary" data-bs-toggle="modal"
                             data-bs-target="#${htmlId}-${strat.name}-modal">
-                        Create custom variant
+                        ${i18n.tr('Create custom variant')}
                     </button>
                     </c:when>
                     <c:otherwise>
                     <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
-                                Edit
+                        ${i18n.tr('Edit')}
                             </button>
                         </c:otherwise>
                         </c:choose>

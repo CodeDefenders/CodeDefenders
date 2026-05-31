@@ -27,6 +27,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="settingsRepository" type="org.codedefenders.persistence.database.SettingsRepository"--%>
 
@@ -52,14 +53,14 @@
 
         <div class="card m-2">
             <div class="card-body">
-                <h4 class="card-title">Available Large Language Models:</h4>
+                <h4 class="card-title">${i18n.tr('Available Large Language Models:')}</h4>
                 <table id="models" class="table table-v-align-middle table-striped">
                     <thead>
                     <tr>
-                        <th>Provider</th>
-                        <th>Name</th>
-                        <th>Active</th>
-                        <th>Remove</th>
+                        <th>${i18n.tr('Provider')}</th>
+                        <th>${i18n.tr('Name')}</th>
+                        <th>${i18n.tr('Active')}</th>
+                        <th>${i18n.tr('Remove')}</th>
                     </tr>
                     </thead>
                     <tbody id="modelBody">
@@ -105,17 +106,17 @@
                             </c:forEach>
                         </select>
 
-                        <label for="create-model-name-input" >Model name:</label>
+                        <label for="create-model-name-input" >${i18n.tr('Model name:')}</label>
                         <input id="create-model-name-input" type="text" name="llmName" class="form-control" style="width: auto;">
-                        <button class="btn-primary btn" type="submit">Create new model</button>
+                        <button class="btn-primary btn" type="submit">${i18n.tr('Create new model')}</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <t:admin_llm_strat_table strategies="${attackStrategies}" title="Attack strategies" htmlId="attackTable"/>
-        <t:admin_llm_strat_table strategies="${defendStrategies}" title="Defend strategies" htmlId="defendTable"/>
-        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="Equivalence strategies"
+        <t:admin_llm_strat_table strategies="${attackStrategies}" title="${i18n.tr('Attack strategies')}" htmlId="attackTable"/>
+        <t:admin_llm_strat_table strategies="${defendStrategies}" title="${i18n.tr('Defend strategies')}" htmlId="defendTable"/>
+        <t:admin_llm_strat_table strategies="${equivalenceStrategies}" title="${i18n.tr('Equivalence strategies')}"
                                  htmlId="equivTable"/>
 
         <script type="module">

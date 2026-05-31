@@ -5315,6 +5315,46 @@ msgstr "Are you sure you want to delete the selected killmaps?"
 msgid "Are you sure you want to delete the selected killmaps?"
 msgstr "Are you sure you want to delete the selected killmaps?"
 
+#: src/main/webapp/jsp/admin_llm_config.jsp:56
+msgid "Available Large Language Models:"
+msgstr "Available Large Language Models:"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:60
+msgid "Provider"
+msgstr "Provider"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:61
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:62
+msgid "Active"
+msgstr "Active"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:63
+msgid "Remove"
+msgstr "Remove"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:109
+msgid "Model name:"
+msgstr "Model name:"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:111
+msgid "Create new model"
+msgstr "Create new model"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:117
+msgid "Attack strategies"
+msgstr "Attack strategies"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:118
+msgid "Defend strategies"
+msgstr "Defend strategies"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:119
+msgid "Equivalence strategies"
+msgstr "Equivalence strategies"
+
 #: src/main/webapp/jsp/admin_monitor_games.jsp:68
 msgid "Multiplayer Games"
 msgstr "Multiplayer Games"
@@ -9998,6 +10038,54 @@ msgstr "{0} (Level {1})"
 #: src/main/webapp/WEB-INF/tags/achievement_badge.tag:39
 msgid "Level {0}"
 msgstr "Level {0}"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:77
+msgid "Strategy name:"
+msgstr "Strategy name:"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:82
+msgid "Add custom prompt"
+msgstr "Add custom prompt"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:91
+msgid "Delete this strategy"
+msgstr "Delete this strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:96
+msgid "Save custom strategy"
+msgstr "Save custom strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:121
+msgid "Prompt content:"
+msgstr "Prompt content:"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:215
+msgid "The strategy already exists."
+msgstr "The strategy already exists."
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:227
+msgid "You defined the same prompt twice."
+msgstr "You defined the same prompt twice."
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:38
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:39
+msgid "Based on"
+msgstr "Based on"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:40
+msgid "Edit"
+msgstr "Edit"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:52
+msgid "Create custom variant"
+msgstr "Create custom variant"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:57
+msgid "Edit"
+msgstr "Edit"
 
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
 msgid "Create Games"
