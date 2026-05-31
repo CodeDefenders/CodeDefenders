@@ -5235,6 +5235,7 @@ msgid "Available Large Language Models:"
 msgstr "Verfügbare Sprachmodelle:"
 
 #: src/main/webapp/jsp/admin_llm_config.jsp:60
+#: src/main/webapp/jsp/admin_llm_config.jsp:100
 msgid "Provider"
 msgstr "Anbieter"
 
@@ -8696,13 +8697,17 @@ msgstr "{0} (Level {1})"
 msgid "Level {0}"
 msgstr "Level {0}"
 
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:74
+msgid "Edit strategy"
+msgstr "Strategie bearbeiten"
+
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:77
 msgid "Strategy name:"
 msgstr "Strategiename:"
 
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:82
 msgid "Add custom prompt"
-msgstr "Benutzerdefinierten prompt hinzufügen"
+msgstr "Benutzerdefinierten Prompt hinzufügen"
 
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:91
 msgid "Delete this strategy"
@@ -8711,6 +8716,10 @@ msgstr "Diese Strategie löschen"
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:96
 msgid "Save custom strategy"
 msgstr "Benutzerdefinierte Strategie speichern"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:108
+msgid "Prompt type"
+msgstr "Prompttyp"
 
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:121
 msgid "Prompt content:"

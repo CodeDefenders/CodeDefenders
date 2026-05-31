@@ -5335,6 +5335,10 @@ msgstr "Active"
 msgid "Remove"
 msgstr "Remove"
 
+#: src/main/webapp/jsp/admin_llm_config.jsp:100
+msgid "Provider"
+msgstr "Provider"
+
 #: src/main/webapp/jsp/admin_llm_config.jsp:109
 msgid "Model name:"
 msgstr "Model name:"
@@ -10039,6 +10043,10 @@ msgstr "{0} (Level {1})"
 msgid "Level {0}"
 msgstr "Level {0}"
 
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:74
+msgid "Edit strategy"
+msgstr "Edit strategy"
+
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:77
 msgid "Strategy name:"
 msgstr "Strategy name:"
@@ -10054,6 +10062,10 @@ msgstr "Delete this strategy"
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:96
 msgid "Save custom strategy"
 msgstr "Save custom strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:108
+msgid "Prompt type"
+msgstr "Prompt type"
 
 #: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:121
 msgid "Prompt content:"

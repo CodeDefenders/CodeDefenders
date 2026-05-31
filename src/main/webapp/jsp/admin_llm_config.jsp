@@ -97,7 +97,7 @@
                 <form method="post" action="${url.forPath(Paths.API_LLM)}">
                     <div class="d-flex align-items-center gap-2">
                         <input type="hidden" name="formType" value="createModel">
-                        <label for="create-model-provider-select">Provider:</label>
+                        <label for="create-model-provider-select">${i18n.tr('Provider')}:</label>
                         <select id="create-model-provider-select" name="llmType" class="form-select" style="width:auto">
                             <c:forEach items="${providers}" var="provider">
                                 <option value="${provider}">

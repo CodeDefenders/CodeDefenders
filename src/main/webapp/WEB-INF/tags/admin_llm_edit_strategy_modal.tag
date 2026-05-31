@@ -71,7 +71,7 @@
     <input type="hidden" name="baseStrategy" value="${strategy.base.name()}">
     <input type="hidden" name="oldCustomName" value="${strategy.name}">
 
-    <t:modal title="Edit strategy" id="${htmlId}">
+    <t:modal title="${i18n.tr('Edit strategy')}" id="${htmlId}">
     <jsp:attribute name="content">
         <div class="d-flex flex-row border-bottom border-2 border-secondary p-2 mb-2">
             <label class="form-label flex-fill" for="${htmlId}-new-custom-name">${i18n.tr('Strategy name:')}</label>
@@ -105,7 +105,7 @@
 <div id="${htmlId}-template" style="display: none">
     <div class="border rounded bg-light mt-2 mb-2 p-2">
         <div class="pb-2 d-flex justify-content-between align-items-center">
-            <label class="form-label" for="${htmlId}-select">Prompt type:</label>
+            <label class="form-label" for="${htmlId}-select">${i18n.tr('Prompt type')}:</label>
             <button id="${htmlId}-remove-prompt-btn" class="btn btn-danger">
                 <i class="fa fa-trash"></i>
             </button>

@@ -255,7 +255,7 @@ public class LlmRepository {
         @Language("SQL")
         String sql = """
                 SELECT * FROM llm_custom_strategies
-                    left join codedefenders.llm_custom_prompts prompts
+                    left join llm_custom_prompts prompts
                         on llm_custom_strategies.Strategy_ID = prompts.Strategy_ID
                 WHERE Strategy_Name = ?
                 """;
