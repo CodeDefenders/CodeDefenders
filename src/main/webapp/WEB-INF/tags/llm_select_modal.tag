@@ -28,6 +28,7 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
 <%--@elvariable id="LlmStrategy" type="org.codedefenders.model.llm.LlmStrategy--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ attribute name="gameType" required="true" %>
 <%@ attribute name="gameId" required="true" %>
@@ -41,24 +42,21 @@
 
 <div>
 
-    <t:modal title="Manage LLM players" id="${htmlId}" modalDialogClasses="modal-lg">
+    <t:modal title="${i18n.tr('Manage LLM players')}" id="${htmlId}" modalDialogClasses="modal-lg">
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3 container">
 
                             <div class="row mb-4 p-2 border">
                                 <div class="col-6">
-                                    <label for="${htmlId}-defenderSelect" class="form-label">Choose defender
-                                        model</label>
+                                    <label for="${htmlId}-defenderSelect" class="form-label">${i18n.tr('Choose defender model')}</label>
                                     <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
-                                        <option id="${htmlId}-no-defender" value="NONE">Don't use an LLM defender
-                                        </option>
+                                        <option id="${htmlId}-no-defender" value="NONE">${i18n.tr('Don\'t use an LLM defender')}</option>
                                     </select>
                                 </div>
 
                                 <div class="col-5">
-                                    <label class="form-label" for="${htmlId}-defenderStrategySelect">Choose defend
-                                        strategy</label>
+                                    <label class="form-label" for="${htmlId}-defenderStrategySelect">${i18n.tr('Choose defend strategy')}</label>
                                     <select class="form-select" id="${htmlId}-defenderStrategySelect"
                                             name="defenderStrat">
                                     <c:forEach items="${defendStrategies}" var="strat">
@@ -77,16 +75,13 @@
 
                             <div class="row p-2 border">
                                 <div class="col-6">
-                                    <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker
-                                        model</label>
+                                    <label for="${htmlId}-attackerSelect" class="form-label">${i18n.tr('Choose attacker model')}</label>
                                     <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
-                                        <option id="${htmlId}-no-attacker" value="NONE">Don't use an LLM attacker
-                                        </option>
+                                        <option id="${htmlId}-no-attacker" value="NONE">${i18n.tr('Don\'t use an LLM attacker')}</option>
                                     </select>
                                 </div>
                                 <div class="col-5">
-                                    <label class="form-label" for="${htmlId}-attackerStrategySelect">Choose attack
-                                        strategy</label>
+                                    <label class="form-label" for="${htmlId}-attackerStrategySelect">${i18n.tr('Choose attack strategy')}</label>
                                     <select class="form-select" id="${htmlId}-attackerStrategySelect"
                                             name="defenderStrat">
                                     <c:forEach items="${attackStrategies}" var="strat">
@@ -107,14 +102,12 @@
         <jsp:attribute name="footer">
             <button type="button" id="${htmlId}-open-conversation-modal-button" class="btn btn-outline-dark"
                     data-bs-toggle="modal" data-bs-target="#${htmlId}-conversation-modal">
-                <i class="fa fa-comments"></i>See
-                conversations
-            </button>
-                    <button type="button" id="${htmlId}-submit-button" class="btn btn-primary">Confirm</button>
+                <i class="fa fa-comments"></i>${i18n.tr('See conversations')}</button>
+                    <button type="button" id="${htmlId}-submit-button" class="btn btn-primary">${i18n.tr('Confirm')}</button>
 
         </jsp:attribute>
     </t:modal>
-    <t:modal title="LLM conversations" id="${htmlId}-conversation-modal">
+    <t:modal title="${i18n.tr('LLM conversations')}" id="${htmlId}-conversation-modal">
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-cons-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3" id="${htmlId}-conversation-panel">

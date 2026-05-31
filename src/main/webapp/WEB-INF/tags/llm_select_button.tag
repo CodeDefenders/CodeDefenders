@@ -25,6 +25,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="classViewer" type="org.codedefenders.beans.game.ClassViewerBean"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <%@ attribute name="htmlId" required="true" %>
 
@@ -39,18 +40,16 @@ TODO Further generalize for use in llm_select_modal.tag
 --%>
 <div>
     <div class="mb-3">
-        <label for="${htmlId}-defenderSelect" class="form-label">Choose defender model</label>
+        <label for="${htmlId}-defenderSelect" class="form-label">${i18n.tr('Choose defender model')}</label>
         <div class="d-flex gap-2 align-items-center">
             <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
-                <option id="${htmlId}-no-defender" value="NONE" selected>Don't use an LLM defender
-                </option>
+                <option id="${htmlId}-no-defender" value="NONE" selected>${i18n.tr('Don\'t use an LLM defender')}</option>
             </select>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label" for="${htmlId}-defenderStrategySelect">Choose defend
-            strategy</label>
+        <label class="form-label" for="${htmlId}-defenderStrategySelect">${i18n.tr('Choose defend strategy')}</label>
         <select class="form-select" id="${htmlId}-defenderStrategySelect"
                 name="defenderStrategy">
             <c:forEach items="${defendStrategies}" var="strat">
@@ -62,18 +61,16 @@ TODO Further generalize for use in llm_select_modal.tag
     </div>
 
     <div class="mb-3">
-        <label for="${htmlId}-attackerSelect" class="form-label">Choose attacker model</label>
+        <label for="${htmlId}-attackerSelect" class="form-label">${i18n.tr('Choose attacker model')}</label>
         <div class="d-flex gap-2 align-items-center">
             <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
-                <option id="${htmlId}-no-attacker" value="NONE" selected>Don't use an LLM attacker
-                </option>
+                <option id="${htmlId}-no-attacker" value="NONE" selected>${i18n.tr('Don\'t use an LLM attacker')}</option>
             </select>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label" for="${htmlId}-attackerStrategySelect">Choose attack
-            strategy</label>
+        <label class="form-label" for="${htmlId}-attackerStrategySelect">${i18n.tr('Choose attack strategy')}</label>
         <select class="form-select" id="${htmlId}-attackerStrategySelect"
                 name="attackerStrategy">
             <c:forEach items="${attackStrategies}" var="strat">

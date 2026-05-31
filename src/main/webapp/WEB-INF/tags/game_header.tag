@@ -171,7 +171,7 @@
         <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
                 data-bs-toggle="modal" data-bs-target="#llm-modal">
             <i class="fa fa-industry"></i>
-            Manage LLM players
+            ${i18n.tr('Manage LLM players')}
         </button>
         <t:llm_select_modal htmlId="llm-modal" gameId="${gameId}" gameType="${gameType}">
 

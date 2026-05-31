@@ -5419,6 +5419,10 @@ msgstr "Are you sure you want to create a rematch for this game?"
 msgid "Rematch"
 msgstr "Rematch"
 
+#: src/main/webapp/jsp/admin_monitor_games.jsp:164
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
 #: src/main/webapp/jsp/admin_monitor_games.jsp:179
 msgid "There are no players active in this game."
 msgstr "There are no players active in this game."
@@ -5534,6 +5538,10 @@ msgstr "Are you sure you want to create a rematch for this game?"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:402
 msgid "Rematch"
 msgstr "Rematch"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:406
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:431
 msgid "Game Score"
@@ -11079,6 +11087,10 @@ msgstr "Are you sure you want to end the game?"
 msgid "Confirm"
 msgstr "Confirm"
 
+#: src/main/webapp/WEB-INF/tags/game_header.tag:174
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
 #: src/main/webapp/WEB-INF/tags/game_header.tag:190
 msgid "Start Game"
 msgstr "Start Game"
@@ -11506,6 +11518,70 @@ msgstr "Teams are <b>not</b> allowed to view the other team's submissions."
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:39
 msgid "But: Defenders can still view mutants after they are killed or accepted as equivalent."
 msgstr "But: Defenders can still view mutants after they are killed or accepted as equivalent."
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:43
+msgid "Choose defender model"
+msgstr "Choose defender model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:46
+msgid "Don't use an LLM defender"
+msgstr "Don't use an LLM defender"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:52
+msgid "Choose defend strategy"
+msgstr "Choose defend strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:64
+msgid "Choose attacker model"
+msgstr "Choose attacker model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:67
+msgid "Don't use an LLM attacker"
+msgstr "Don't use an LLM attacker"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:73
+msgid "Choose attack strategy"
+msgstr "Choose attack strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:45
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:52
+msgid "Choose defender model"
+msgstr "Choose defender model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:54
+msgid "Don't use an LLM defender"
+msgstr "Don't use an LLM defender"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:59
+msgid "Choose defend strategy"
+msgstr "Choose defend strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:78
+msgid "Choose attacker model"
+msgstr "Choose attacker model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:80
+msgid "Don't use an LLM attacker"
+msgstr "Don't use an LLM attacker"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:84
+msgid "Choose attack strategy"
+msgstr "Choose attack strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:105
+msgid "See conversations"
+msgstr "See conversations"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:106
+msgid "Confirm"
+msgstr "Confirm"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:110
+msgid "LLM conversations"
+msgstr "LLM conversations"
 
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:30
 msgid "User"
