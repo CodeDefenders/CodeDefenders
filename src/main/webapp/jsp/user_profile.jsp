@@ -19,13 +19,14 @@
 
 --%>
 <%@ page import="org.codedefenders.game.GameType" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 <%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
-<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="profile" type="org.codedefenders.beans.user.UserProfileBean"--%>
 
@@ -270,11 +271,11 @@
                 <section class="mt-5" aria-labelledby="account-information">
                     <h2 class="mb-3" id="account-information">${i18n.tr('Account Information')}</h2>
                     <p>
-                            ${i18n.tr('Your current email:')}
+                        ${i18n.tr('Your current email:')}
                         <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
                     </p>
                     <p>
-                            ${i18n.tr('Change your account information, password or delete your account in the')}
+                        ${i18n.tr('Change your account information, password or delete your account in the')}
                         <a href="${url.forPath(Paths.USER_SETTINGS)}"
                            title="${i18n.tr('Edit or delete your CodeDefenders account.')}">${i18n.tr('account settings')}</a>.
                     </p>
