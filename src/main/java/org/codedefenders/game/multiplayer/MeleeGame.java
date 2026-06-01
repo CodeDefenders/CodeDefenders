@@ -19,16 +19,12 @@
 package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -38,13 +34,10 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.validation.code.DefaultRuleSets;
-import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 public class MeleeGame extends AbstractMultiplayerGame {
 
@@ -70,136 +63,14 @@ public class MeleeGame extends AbstractMultiplayerGame {
      * protected Integer classroomId;
      */
 
-    public static class Builder {
-        // mandatory values
-        private final int classId;
-        private final int creatorId;
-        private final int maxAssertionsPerTest;
-
-        // optional values with default values
-        private GameClass cut = null;
-
-        private int id = -1;
-        private boolean requiresValidation = false;
-        private boolean capturePlayersIntention = false;
-        private boolean chatEnabled = false;
-        private float lineCoverage = 1f;
-        private float mutantCoverage = 1f;
-        private float prize = 1f;
-        private GameState state = GameState.CREATED;
-        private GameLevel level = GameLevel.HARD;
-        private MutantValidationRuleSet mutantValidatorLevel = DefaultRuleSets.STRICT;
-
-        private int gameDurationMinutes;
-        private long startTimeUnixSeconds;
-        private long finishTimeUnixSeconds;
-
-        private int automaticMutantEquivalenceThreshold = 0;
-
-        private Integer classroomId = null;
-
-        private boolean inviteOnly = false;
-        private Integer inviteId = null;
-        private Set<WhitelistElement> whitelist = new HashSet<>();
+    public static class Builder extends AbstractMultiplayerGame.Builder<Builder, MeleeGame> {
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
-            this.classId = classId;
-            this.creatorId = creatorId;
-            this.maxAssertionsPerTest = maxAssertionsPerTest;
+            super(classId, creatorId, maxAssertionsPerTest);
         }
 
-        public Builder cut(GameClass cut) {
-            this.cut = cut;
-            return this;
-        }
-
-        public Builder id(int id) {
-            this.id = id;
-            return this;
-        }
-
-        public Builder requiresValidation(boolean requiresValidation) {
-            this.requiresValidation = requiresValidation;
-            return this;
-        }
-
-        public Builder capturePlayersIntention(boolean capturePlayersIntention) {
-            this.capturePlayersIntention = capturePlayersIntention;
-            return this;
-        }
-
-        public Builder chatEnabled(boolean chatEnabled) {
-            this.chatEnabled = chatEnabled;
-            return this;
-        }
-
-        public Builder prize(float prize) {
-            this.prize = prize;
-            return this;
-        }
-
-        public Builder lineCoverage(float lineCoverage) {
-            this.lineCoverage = lineCoverage;
-            return this;
-        }
-
-        public Builder mutantCoverage(float mutantCoverage) {
-            this.mutantCoverage = mutantCoverage;
-            return this;
-        }
-
-        public Builder state(GameState state) {
-            this.state = state;
-            return this;
-        }
-
-        public Builder level(GameLevel level) {
-            this.level = level;
-            return this;
-        }
-
-        public Builder mutantValidatorLevel(MutantValidationRuleSet mutantValidatorLevel) {
-            this.mutantValidatorLevel = mutantValidatorLevel;
-            return this;
-        }
-
-        public Builder gameDurationMinutes(int gameDurationMinutes) {
-            this.gameDurationMinutes = gameDurationMinutes;
-            return this;
-        }
-
-        public Builder startTimeUnixSeconds(long startTimeUnixSeconds) {
-            this.startTimeUnixSeconds = startTimeUnixSeconds;
-            return this;
-        }
-
-        public Builder finishTimeUnixSeconds(long finishTimeUnixSeconds) {
-            this.finishTimeUnixSeconds = finishTimeUnixSeconds;
-            return this;
-        }
-
-        public Builder automaticMutantEquivalenceThreshold(int threshold) {
-            this.automaticMutantEquivalenceThreshold = threshold;
-            return this;
-        }
-
-        public Builder classroomId(Integer classroomId) {
-            this.classroomId = classroomId;
-            return this;
-        }
-
-        public Builder inviteOnly(boolean inviteOnly) {
-            this.inviteOnly = inviteOnly;
-            return this;
-        }
-
-        public Builder inviteId(Integer inviteId) {
-            this.inviteId = inviteId;
-            return this;
-        }
-
-        public Builder whitelist(Set<WhitelistElement> whitelist) {
-            this.whitelist = whitelist;
+        @Override
+        protected Builder self() {
             return this;
         }
 
@@ -209,32 +80,9 @@ public class MeleeGame extends AbstractMultiplayerGame {
     }
 
     protected MeleeGame(Builder builder) {
+        super(builder);
+
         this.mode = GameMode.MELEE;
-
-        this.cut = builder.cut;
-        this.id = builder.id;
-        this.classId = builder.classId;
-        this.creatorId = builder.creatorId;
-        this.state = builder.state;
-        this.level = builder.level;
-        this.lineCoverage = builder.lineCoverage;
-        this.mutantCoverage = builder.mutantCoverage;
-        this.prize = builder.prize;
-        this.requiresValidation = builder.requiresValidation;
-        this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
-        this.chatEnabled = builder.chatEnabled;
-        this.mutantValidatorLevel = builder.mutantValidatorLevel;
-        this.capturePlayersIntention = builder.capturePlayersIntention;
-        this.gameDurationMinutes = builder.gameDurationMinutes;
-        this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
-        this.finishTimeUnixSeconds = builder.finishTimeUnixSeconds;
-
-        this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
-        this.classroomId = builder.classroomId;
-
-        this.inviteOnly = builder.inviteOnly;
-        this.inviteId = builder.inviteId;
-        this.whitelist = builder.whitelist;
     }
 
     public int getAutomaticMutantEquivalenceThreshold() {
