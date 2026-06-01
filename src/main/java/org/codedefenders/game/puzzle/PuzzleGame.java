@@ -66,12 +66,12 @@ public class PuzzleGame extends AbstractGame {
     /**
      * The type of the puzzle.
      */
-    private PuzzleType type;
+    private final PuzzleType type;
 
     /**
      * The ID of the {@link Puzzle} this is an instance of.
      */
-    private int puzzleId;
+    private final int puzzleId;
 
     /**
      * The {@link Puzzle} this is an instance of.

@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -57,7 +56,7 @@ import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
 import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
-public class MultiplayerGame extends AbstractGame {
+public class MultiplayerGame extends AbstractMultiplayerGame {
 
     /*
      * Inherited from AbstractGame
@@ -66,26 +65,25 @@ public class MultiplayerGame extends AbstractGame {
      * int creatorId; protected GameState state; protected GameLevel level;
      * protected GameMode mode; protected ArrayList<Event> events; protected
      * List<Mutant> mutants; protected List<Test> tests;
+     *
+     *
+     * Inherited from AbstractMultiplayerGame
+     *
+     * protected float lineCoverage;
+     * protected float mutantCoverage;
+     * protected float prize;
+     * protected boolean chatEnabled;
+     * protected int gameDurationMinutes;
+     * protected long startTimeUnixSeconds;
+     * protected long finishTimeUnixSeconds;
+     * protected int automaticMutantEquivalenceThreshold = 0;
+     * protected Integer classroomId;
      */
+
     private List<Player> attackers;
     private List<Player> defenders;
     private int defenderValue;
     private int attackerValue;
-    private float lineCoverage;
-    private float mutantCoverage;
-    private float prize;
-
-    private boolean chatEnabled;
-
-    private int gameDurationMinutes;
-
-    private long startTimeUnixSeconds;
-    private long finishTimeUnixSeconds;
-
-    // 0 means disabled
-    private int automaticMutantEquivalenceThreshold = 0;
-
-    private Integer classroomId;
 
     private boolean mayChooseRoles = true;
 
@@ -287,49 +285,12 @@ public class MultiplayerGame extends AbstractGame {
         this.whitelist = builder.whitelist;
     }
 
-    public int getGameDurationMinutes() {
-        return gameDurationMinutes;
-    }
-
-    public void setGameDurationMinutes(int gameDurationMinutes) {
-        this.gameDurationMinutes = gameDurationMinutes;
-    }
-
-    public long getStartTimeUnixSeconds() {
-        return startTimeUnixSeconds;
-    }
-
-    public long getFinishTimeUnixSeconds() {
-        return finishTimeUnixSeconds;
-    }
-
     public int getDefenderValue() {
         return defenderValue;
     }
 
     public int getAttackerValue() {
         return attackerValue;
-    }
-
-    public float getLineCoverage() {
-        return lineCoverage;
-    }
-
-    public float getMutantCoverage() {
-        return mutantCoverage;
-    }
-
-    public float getPrize() {
-        return prize;
-    }
-
-    public void setPrize(float prize) {
-        this.prize = prize;
-    }
-
-    @Override
-    public boolean isChatEnabled() {
-        return chatEnabled;
     }
 
     public int getAutomaticMutantEquivalenceThreshold() {
@@ -433,15 +394,6 @@ public class MultiplayerGame extends AbstractGame {
         return true;
     }
 
-    public boolean removePlayer(int userId) {
-        GameRepository gameRepo = CDIUtil.getBeanFromCDI(GameRepository.class);
-
-        if (state == GameState.CREATED) {
-            return gameRepo.removeUserFromGame(id, userId);
-        }
-        return false;
-    }
-
     @Override
     public boolean insert() {
         var multiplayerGameRepo = CDIUtil.getBeanFromCDI(MultiplayerGameRepository.class);
@@ -482,14 +434,12 @@ public class MultiplayerGame extends AbstractGame {
         allMutants.addAll(getMutantsMarkedEquivalent());
         allMutants.addAll(getMutantsMarkedEquivalentPending());
 
-        if (!mutantScores.containsKey(-1)) {
-            mutantScores.put(-1, new PlayerScore(-1));
-            mutantsAlive.put(-1, 0);
-            mutantsEquiv.put(-1, 0);
-            mutantsChallenged.put(-1, 0);
-            mutantsKilled.put(-1, 0);
-            duelsWon.put(-1, 0);
-        }
+        mutantScores.put(-1, new PlayerScore(-1));
+        mutantsAlive.put(-1, 0);
+        mutantsEquiv.put(-1, 0);
+        mutantsChallenged.put(-1, 0);
+        mutantsKilled.put(-1, 0);
+        duelsWon.put(-1, 0);
 
         for (Mutant mm : allMutants) {
 
@@ -592,14 +542,12 @@ public class MultiplayerGame extends AbstractGame {
             ps.increaseQuantity();
             ps.increaseTotalScore(test.getScore());
 
-            int teamKey = defendersTeamId;
-
-            PlayerScore ts = testScores.get(teamKey);
+            PlayerScore ts = testScores.get(defendersTeamId);
             ts.increaseQuantity();
             ts.increaseTotalScore(test.getScore());
 
             mutantsKilled.put(test.getPlayerId(), mutantsKilled.get(test.getPlayerId()) + test.getMutantsKilled());
-            mutantsKilled.put(teamKey, mutantsKilled.get(teamKey) + test.getMutantsKilled());
+            mutantsKilled.put(defendersTeamId, mutantsKilled.get(defendersTeamId) + test.getMutantsKilled());
 
         }
 
@@ -607,13 +555,12 @@ public class MultiplayerGame extends AbstractGame {
             if (playerId < 0 || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
             }
-            int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
             int playerScore = playerRepo.getPlayerPoints(playerId);
             ps.increaseTotalScore(playerScore);
 
-            PlayerScore ts = testScores.get(teamKey);
+            PlayerScore ts = testScores.get(defendersTeamId);
             ts.increaseTotalScore(playerScore);
         }
 
@@ -657,106 +604,9 @@ public class MultiplayerGame extends AbstractGame {
         return testScores;
     }
 
-    public boolean isLineCovered(int lineNumber) {
-        for (Test test : getTests(true)) {
-            if (test.getLineCoverage().getLinesCovered().contains(lineNumber)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public WhitelistType getWhitelistTypeOfUser(int userId) {
         WhitelistRepository whitelistRepo = CDIUtil.getBeanFromCDI(WhitelistRepository.class);
         return whitelistRepo.getWhitelistType(id, userId);
-    }
-
-    public void notifyPlayers() {
-        List<Event> events = getEvents();
-
-        switch (state) {
-            case ACTIVE:
-                if (!listContainsEvent(events, EventType.GAME_STARTED)) {
-                    EventType et = EventType.GAME_STARTED;
-                    notifyAttackers("Game has started. Attack now!", et);
-                    notifyDefenders("Game has started. Defend now!", et);
-                    notifyCreator("Your game as started!", et);
-                    notifyGame("The game has started!", et);
-                }
-                break;
-            case GRACE_ONE:
-                if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
-                    EventType et = EventType.GAME_GRACE_ONE;
-                    notifyAttackers("A game has entered Grace One.", et);
-                    notifyDefenders("A game has entered Grace One.", et);
-                    notifyCreator("Your game has entered Grace One", et);
-                    notifyGame("The game as entered Grace Period One", et);
-                }
-                break;
-            case GRACE_TWO:
-                if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
-                    EventType et = EventType.GAME_GRACE_TWO;
-                    notifyAttackers("A game has entered Grace Two.", et);
-                    notifyDefenders("A game has entered Grace Two.", et);
-                    notifyCreator("Your game has entered Grace Two", et);
-                    notifyGame("The game as entered Grace Period Two", et);
-                }
-                break;
-            case FINISHED:
-                if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
-                    EventType et = EventType.GAME_FINISHED;
-                    notifyAttackers("A game has finished.", et);
-                    notifyDefenders("A game has finished.", et);
-                    notifyCreator("Your game has finished.", et);
-                    notifyGame("The game has ended.", et);
-                }
-                break;
-            default:
-                // ignored
-        }
-    }
-
-    private boolean listContainsEvent(List<Event> events, EventType et) {
-        for (Event e : events) {
-            if (e.getEventType().equals(et)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void notifyAttackers(String message, EventType et) {
-        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
-        for (Player player : getAttackerPlayers()) {
-            Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
-            eventDAO.insert(notif);
-        }
-    }
-
-    private void notifyDefenders(String message, EventType et) {
-        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
-        for (Player player : getDefenderPlayers()) {
-            Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
-            eventDAO.insert(notif);
-        }
-    }
-
-    private void notifyCreator(String message, EventType et) {
-        // Event for game log: started
-        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
-        Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
-                new Timestamp(System.currentTimeMillis()));
-        eventDAO.insert(notif);
-    }
-
-    private void notifyGame(String message, EventType et) {
-        // Event for game log: started
-        EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
-        Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
-                new Timestamp(System.currentTimeMillis()));
-        eventDAO.insert(notif);
     }
 
 }
