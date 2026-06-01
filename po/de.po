@@ -4585,7 +4585,7 @@ msgstr "Nützliche Tests"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:54
 msgid "What are useful actions?"
-msgstr "Was sind nützliche Maßnahmen?"
+msgstr "Was sind nützliche Aktionen?"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:76
 msgid "Useful Actions Explanation"
@@ -5492,7 +5492,7 @@ msgstr "Hochladen…"
 #: src/main/webapp/jsp/upload_class_view.jsp:189
 #: src/main/webapp/jsp/upload_class_view.jsp:199
 msgid "Upload"
-msgstr "Upload"
+msgstr "Hochladen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:186
 msgid "Upload Chapters"
@@ -8348,7 +8348,7 @@ msgstr "Offene Melee-Spiele"
 
 #: src/main/webapp/jsp/user_games_view.jsp:667
 msgid "There are currently no open melee games."
-msgstr "Derzeit sind keine Melee-Spiele verfügbar."
+msgstr "Derzeit gibt es keine offenen Melee-Spiele."
 
 #: src/main/webapp/jsp/user_profile.jsp:32
 msgid "My Profile"
@@ -8427,7 +8427,7 @@ msgstr "Durch die Erzeugung von Mutanten:"
 
 #: src/main/webapp/jsp/user_profile.jsp:107
 msgid "Games played"
-msgstr "Gespielte Spiele"
+msgstr "Spiele gespielt"
 
 #: src/main/webapp/jsp/user_profile.jsp:110
 msgid "As defender:"
@@ -8477,11 +8477,11 @@ msgstr "Duelle als Angreifer"
 
 #: src/main/webapp/jsp/user_profile.jsp:185
 msgid "Rejected equivalence claim:"
-msgstr "Zurückgewiesene Äquivalenz-Behauptung:"
+msgstr "Nicht-Äquivalenz bewiesen:"
 
 #: src/main/webapp/jsp/user_profile.jsp:186
 msgid "Failed to reject claim:"
-msgstr "Behauptung konnte nicht zurückgewiesen werden:"
+msgstr "Äquivalenz nicht zurückgewiesen:"
 
 #: src/main/webapp/jsp/user_profile.jsp:191
 msgid "Duels as defender"
@@ -8489,7 +8489,7 @@ msgstr "Duelle als Verteidiger"
 
 #: src/main/webapp/jsp/user_profile.jsp:194
 msgid "Successfully claimed as equivalent:"
-msgstr "Erfolgreich als equivalent anerkannt:"
+msgstr "Erfolgreich als äquivalent markiert:"
 
 #: src/main/webapp/jsp/user_profile.jsp:195
 msgid "Incorrectly claimed mutants:"
@@ -8574,11 +8574,11 @@ msgstr "Erlaube uns die Kontaktaufnahme per E-Mail."
 
 #: src/main/webapp/jsp/user_settings.jsp:108
 msgid "Update Email Preferences"
-msgstr "Aktualisiere E-Mail Einstellungen"
+msgstr "E-Mail Einstellungen aktualisieren"
 
 #: src/main/webapp/jsp/user_settings.jsp:115
 msgid "Update Password"
-msgstr "Aktualisiere Passwort"
+msgstr "Passwort ändern"
 
 #: src/main/webapp/jsp/user_settings.jsp:124
 msgid "New password"
