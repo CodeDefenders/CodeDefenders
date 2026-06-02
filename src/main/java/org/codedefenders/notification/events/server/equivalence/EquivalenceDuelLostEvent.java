@@ -19,8 +19,8 @@
 package org.codedefenders.notification.events.server.equivalence;
 
 /**
- * Equivalence duel won event.
+ * Equivalence duel lost event.
  */
-public class EquivalenceDuelWonEvent extends EquivalenceDuelEvent {
+public class EquivalenceDuelLostEvent extends EquivalenceDuelEvent {
 
 }

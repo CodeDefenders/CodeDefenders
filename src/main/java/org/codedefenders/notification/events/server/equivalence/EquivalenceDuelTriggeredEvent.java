@@ -19,8 +19,8 @@
 package org.codedefenders.notification.events.server.equivalence;
 
 /**
- * Equivalence duel won event.
+ * Equivalence duel triggered event (mutant was flagged).
  */
-public class EquivalenceDuelWonEvent extends EquivalenceDuelEvent {
+public class EquivalenceDuelTriggeredEvent extends EquivalenceDuelEvent {
 
 }

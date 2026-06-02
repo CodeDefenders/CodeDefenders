@@ -538,7 +538,7 @@ public class PuzzleGameManager extends HttpServlet {
 
                     EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
                     edwe.setGameId(gameId);
-                    edwe.setUserId(login.getUserId());
+                    edwe.setAttackerId(login.getUserId());
                     edwe.setMutantId(mutant.getId());
                     notificationService.post(edwe);
 

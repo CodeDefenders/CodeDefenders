@@ -19,8 +19,9 @@
 package org.codedefenders.notification.events.server.equivalence;
 
 /**
- * Equivalence duel won event.
+ * Event that is fired when an attacker loses an equivalence duel by accepting that their mutant is equivalent or
+ * failing to provide a test that proofs otherwise.
  */
-public class EquivalenceDuelWonEvent extends EquivalenceDuelEvent {
+public class EquivalenceDuelAttackerLostEvent extends EquivalenceDuelLostEvent {
 
 }

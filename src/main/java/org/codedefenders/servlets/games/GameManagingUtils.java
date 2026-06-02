@@ -60,9 +60,11 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerLostEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderLostEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -689,17 +691,24 @@ public class GameManagingUtils implements IGameManagingUtils {
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notifEquiv);
 
-        EquivalenceDuelWonEvent edwe = new EquivalenceDuelDefenderWonEvent();
+        var defenderUserId = userRepo.getUserIdForPlayerId(playerIdDefender);
+
+        EquivalenceDuelEvent edwe = new EquivalenceDuelDefenderWonEvent();
         edwe.setGameId(game.getId());
-        userService.getSimpleUserByPlayerId(playerIdDefender).map(SimpleUser::getId)
-                .ifPresent(edwe::setUserId);
+        edwe.setAttackerId(userId);
+        defenderUserId.ifPresent(edwe::setDefenderId);
         edwe.setMutantId(equivMutant.getId());
         notificationService.post(edwe);
 
+        EquivalenceDuelEvent eale = new EquivalenceDuelAttackerLostEvent();
+        eale.setGameId(game.getId());
+        eale.setAttackerId(userId);
+        defenderUserId.ifPresent(eale::setDefenderId);
+        eale.setMutantId(equivMutant.getId());
+        notificationService.post(eale);
+
         // Notify the defender which triggered the duel about it!
         if (isMutantKillable) {
-            int defenderId = mutantRepo.getEquivalentDefenderId(equivMutant);
-            Optional<Integer> defenderUserId = userRepo.getUserIdForPlayerId(defenderId);
             notification = user.getName() + " accepts that the mutant " + equivMutant.getId()
                     + "that you claimed equivalent is equivalent, but that mutant was killable.";
             Event notifDefenderEquiv = new Event(-1, game.getId(), defenderUserId.orElse(0), notification,
@@ -836,11 +845,22 @@ public class GameManagingUtils implements IGameManagingUtils {
                 );
                 eventDAO.insert(notif);
 
-                EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
-                edwe.setGameId(game.getId());
-                edwe.setUserId(userId);
-                edwe.setMutantId(mutPending.getId());
-                notificationService.post(edwe);
+                var defenderPlayerId = mutantRepo.getEquivalentDefenderId(mutPending);
+                var defenderUserId = userRepo.getUserIdForPlayerId(defenderPlayerId);
+
+                EquivalenceDuelEvent eawe = new EquivalenceDuelAttackerWonEvent();
+                eawe.setGameId(game.getId());
+                eawe.setAttackerId(userId);
+                defenderUserId.ifPresent(eawe::setDefenderId);
+                eawe.setMutantId(mutPending.getId());
+                notificationService.post(eawe);
+
+                EquivalenceDuelEvent edle = new EquivalenceDuelDefenderLostEvent();
+                edle.setGameId(game.getId());
+                edle.setAttackerId(userId);
+                defenderUserId.ifPresent(edle::setDefenderId);
+                edle.setMutantId(mutPending.getId());
+                notificationService.post(edle);
 
                 if (mutPending.getId() == equivMutant.getId()) {
                     killedClaimed = true; // won equivalence duel of their own, claimed mutant

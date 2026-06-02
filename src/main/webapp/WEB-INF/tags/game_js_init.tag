@@ -39,6 +39,8 @@
         /** @type {PushSocket} */
         const socket = await objects.await('pushSocket');
 
+        // lifecycle events
+
         socket.subscribe('registration.GameLifecycleRegistrationEvent', {
             gameId: ${gameProducer.game.id},
             userId: ${login.userId}
@@ -59,11 +61,28 @@
             window.location.reload();
         });
 
-        socket.subscribe('registration.AchievementRegistrationEvent', {
+
+        // equivalence duel events
+
+        socket.subscribe('registration.EquivalenceDuelRegistrationEvent', {
+            gameId: ${gameProducer.game.id},
             userId: ${login.userId}
         });
 
+        socket.register('equivalence.EquivalenceDuelDefenderWonEvent', event => {
+            console.log('Defender won equivalence duel // ', event);
+        });
 
+        socket.register('equivalence.EquivalenceDuelDefenderLostEvent', event => {
+            console.log('Defender lost equivalence duel // ', event);
+        });
+
+
+        // achievements
+
+        socket.subscribe('registration.AchievementRegistrationEvent', {
+            userId: ${login.userId}
+        });
 
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);
