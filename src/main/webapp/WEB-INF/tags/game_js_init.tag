@@ -71,6 +71,19 @@
         });
 
         socket.register('equivalence.EquivalenceDuelResultEvent', event => {
+            if (event.defenderId === ${login.userId}) {
+                if (!event.attackerWon) {
+                    ShowToasts.showToast({
+                        title: '${i18n.tr("Equivalence duel won!")}',
+                        body: '${i18n.tr("Mutant {0} that you claimed was declared equivalent. The attacker lost all their points for the mutant and you gained an additional point.")}'.replaceAll('{0}', event.mutantId)
+                    });
+                } else {
+                    ShowToasts.showToast({
+                        title: '${i18n.tr("Equivalence duel lost!")}',
+                        body: '${i18n.tr("Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point.")}'.replaceAll('{0}', event.mutantId)
+                    });
+                }
+            }
         });
 
 

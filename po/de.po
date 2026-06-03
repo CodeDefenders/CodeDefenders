@@ -1343,11 +1343,11 @@ msgstr "Das Spiel macht Spaß"
 msgid "default"
 msgstr "Standard"
 
-#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:131
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:132
 msgid "/{0} is not a valid chat command."
 msgstr "/{0} ist kein gültiger Chat-Befehl."
 
-#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:137
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:138
 msgid "Your message cannot be empty."
 msgstr "Deine Nachricht darf nicht leer sein."
 
@@ -2709,7 +2709,7 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:469
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:566
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:679
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:771
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:769
 msgid "User is not a player in the game."
 msgstr "Der Benutzer ist kein Spieler in diesem Spiel."
 
@@ -2726,7 +2726,7 @@ msgid "Can only submit mutants if you are an Attacker."
 msgstr "Du kannst nur Mutanten einreichen, wenn du ein Angreifer bist."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:507
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:679
 msgid ""
 "Error submitting the mutant: data too long. Maybe you made too many changes?"
 msgstr ""
@@ -2734,7 +2734,7 @@ msgstr ""
 "Änderungen vorgenommen?"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:509
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:683
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
 msgid "Database error while saving the mutant."
 msgstr "Datenbankfehler beim Speichern des Mutanten."
 
@@ -2743,17 +2743,17 @@ msgid "Can only resolve equivalence duels if you are an Attacker!"
 msgstr "Du kannst Äquivalenzduelle nur lösen, wenn du der Angreifer bist!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:576
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:781
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:779
 msgid "Game {0} has finished."
 msgstr "Spiel {0} ist beendet."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:581
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:786
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:784
 msgid "Mutant does not exist."
 msgstr "Mutant existiert nicht."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:595
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:802
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:800
 msgid ""
 "Too late. The mutant was already killed and therefore proven to be not "
 "equivalent."
@@ -2766,7 +2766,7 @@ msgid "Can only claim mutant as equivalent if you are a Defender!"
 msgstr "Nur als Verteidiger kannst du einen Mutanten als äquivalent markieren!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:692
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1068
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr ""
 "In diesem Spiel kannst du Mutanten nicht mehr als äquivalent einstufen."
@@ -2818,58 +2818,58 @@ msgstr "Die verbleibende Zeit darf nicht unter {0} Minuten liegen."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "Die neue verbleibende Dauer darf höchstens {0} Minuten betragen."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:969
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1137
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:970
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:972
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "1 Mutant als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:973
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "{0} Mutanten als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1168
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1170
 msgid "Your test has the following smell: {0}"
 msgstr "Dein Test weist folgenden Test-Smell auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1174
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1176
 msgid "Your test has the following smells: {0}"
 msgstr "Dein Test weist folgende Test-Smells auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:776
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:774
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Du kannst Äquivalenz-Duelle nur lösen, wenn du ein Spieler bist!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1029
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1033
 msgid "...and it also killed another claimed mutant!"
 msgstr ""
 "...und er hat auch noch einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1031
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1035
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr ""
 "...und er hat auch noch {0} weitere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1036
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1040
 msgid "...however, your test did kill another claimed mutant!"
 msgstr ""
 "...aber dein Test hat immerhin einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1038
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1042
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr ""
 "...dein Test hat jedoch {0} andere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1139
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1143
 msgid "Flagged 1 mutant as equivalent"
 msgstr "1 Mutant als äquivalent markiert"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1145
 msgid "Flagged {0} mutants as equivalent"
 msgstr "{0} Mutanten wurden als äquivalent markiert"
 
@@ -2881,7 +2881,7 @@ msgstr "Du kannst kein Spiel verlassen, an dem du gar nicht teilnimmst."
 msgid "Only the creator of this game can call a rematch."
 msgstr "Nur der Ersteller dieses Spiels kann eine Revanche erstellen."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:436
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:435
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "Nein, dieser Mutant ist nicht äquivalent mit der zu testenden Klasse."
 
@@ -6337,7 +6337,7 @@ msgstr "Die Spieldauer"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:175
 #: src/main/webapp/jsp/melee/details_view.jsp:208
-#: src/main/webapp/WEB-INF/tags/game_time.tag:78
+#: src/main/webapp/WEB-INF/tags/game_time.tag:76
 msgid "Total Duration"
 msgstr "Gesamtdauer"
 
@@ -9199,6 +9199,35 @@ msgstr "Einladungen"
 #: src/main/webapp/WEB-INF/tags/game_time.tag:43
 msgid "Change the game duration."
 msgstr "Ändere die Spieldauer."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:77
+msgid "Equivalence duel won!"
+msgstr "Äquivalenzduell gewonnen!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:78
+msgid ""
+"Mutant {0} that you claimed was declared equivalent. The attacker lost all "
+"their points for the mutant and you gained an additional point."
+msgstr ""
+"Der Ersteller von Mutant {0} konnte nicht beweisen, dass dieser nicht "
+"äquivalent ist und hat alle Punkte des Mutanten verloren. Du hast einen "
+"zusätzlichen Punkt erhalten."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:82
+msgid "Equivalence duel lost!"
+msgstr "Äquivalenzduell verloren!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:83
+msgid ""
+"Mutant {0} that you claimed was proven to be not equivalent. The attacker "
+"gained an additional point."
+msgstr ""
+"Der Ersteller von Mutant {0} hat bewiesen, dass dieser nicht äquivalent ist "
+"und dafür einen zusätzlichen Punkt erhalten."
+
+#: src/main/webapp/WEB-INF/tags/game_time.tag:42
+msgid "Change"
+msgstr "Ändern"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:44
 msgid "View the game duration."
