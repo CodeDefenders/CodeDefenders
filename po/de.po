@@ -318,10 +318,10 @@ msgstr "Fügte {0} hinzu"
 #: src/main/java/org/codedefenders/game/Role.java:30
 #: src/main/javascript/game/game_chat.js:192
 #: src/main/webapp/jsp/classroom_page.jsp:928
-#: src/main/webapp/jsp/games_history.jsp:131
+#: src/main/webapp/jsp/games_history.jsp:134
 #: src/main/webapp/jsp/user_games_view.jsp:238
 #: src/main/webapp/jsp/user_games_view.jsp:566
-#: src/main/webapp/jsp/user_profile.jsp:237
+#: src/main/webapp/jsp/user_profile.jsp:238
 #: src/main/webapp/WEB-INF/tags/create_games.tag:261
 #: src/main/webapp/WEB-INF/tags/create_games.tag:654
 #: src/main/webapp/WEB-INF/tags/js_init.tag:74
@@ -332,10 +332,10 @@ msgstr "Angreifer"
 #: src/main/java/org/codedefenders/game/Role.java:31
 #: src/main/javascript/game/game_chat.js:195
 #: src/main/webapp/jsp/classroom_page.jsp:930
-#: src/main/webapp/jsp/games_history.jsp:164
+#: src/main/webapp/jsp/games_history.jsp:167
 #: src/main/webapp/jsp/user_games_view.jsp:274
 #: src/main/webapp/jsp/user_games_view.jsp:602
-#: src/main/webapp/jsp/user_profile.jsp:237
+#: src/main/webapp/jsp/user_profile.jsp:238
 #: src/main/webapp/WEB-INF/tags/create_games.tag:262
 #: src/main/webapp/WEB-INF/tags/create_games.tag:655
 #: src/main/webapp/WEB-INF/tags/js_init.tag:64
@@ -354,7 +354,7 @@ msgstr "Beobachter"
 #: src/main/java/org/codedefenders/game/Role.java:33
 #: src/main/javascript/game/game_chat.js:198
 #: src/main/webapp/jsp/classroom_page.jsp:932
-#: src/main/webapp/jsp/games_history.jsp:272
+#: src/main/webapp/jsp/games_history.jsp:275
 #: src/main/webapp/jsp/player_feedback.jsp:134
 #: src/main/webapp/jsp/user_games_view.jsp:400
 #: src/main/webapp/jsp/user_games_view.jsp:735
@@ -2724,7 +2724,7 @@ msgstr ""
 "nochmal!"
 
 #: src/main/java/org/codedefenders/servlets/GameHistoryOverview.java:70
-#: src/main/webapp/jsp/games_history.jsp:58
+#: src/main/webapp/jsp/games_history.jsp:61
 msgid "Game History"
 msgstr "Spielhistorie"
 
@@ -3734,7 +3734,7 @@ msgstr "Dein Mutant ruft eine IO-Klasse auf"
 msgid "Defend"
 msgstr "Verteidige"
 
-#: src/main/javascript/game/dynamic_class_viewer.js:103
+#: src/main/javascript/game/dynamic_class_viewer.js:102
 #: src/main/javascript/main/info_api.js:57
 msgid ""
 "Could not fetch class.\n"
@@ -3771,7 +3771,7 @@ msgid "Team"
 msgstr "Team"
 
 #: src/main/javascript/game/game_highlighting.js:127
-#: src/main/webapp/jsp/games_history.jsp:133
+#: src/main/webapp/jsp/games_history.jsp:136
 #: src/main/webapp/jsp/user_games_view.jsp:241
 #: src/main/webapp/jsp/user_games_view.jsp:570
 msgid "Alive Mutants"
@@ -3903,9 +3903,9 @@ msgstr ""
 #: src/main/javascript/game/test_accordion.js:225
 #: src/main/webapp/jsp/admin_monitor_games.jsp:188
 #: src/main/webapp/jsp/admin_monitor_games.jsp:423
-#: src/main/webapp/jsp/games_history.jsp:134
-#: src/main/webapp/jsp/games_history.jsp:167
-#: src/main/webapp/jsp/games_history.jsp:273
+#: src/main/webapp/jsp/games_history.jsp:137
+#: src/main/webapp/jsp/games_history.jsp:170
+#: src/main/webapp/jsp/games_history.jsp:276
 #: src/main/webapp/jsp/user_games_view.jsp:242
 #: src/main/webapp/jsp/user_games_view.jsp:278
 #: src/main/webapp/jsp/user_games_view.jsp:401
@@ -3946,7 +3946,6 @@ msgstr "Getötet"
 #: src/main/javascript/game/killmap_test_accordion.js:196
 #: src/main/javascript/game/mutant_accordion.js:328
 #: src/main/javascript/game/test_accordion.js:241
-#: src/main/webapp/WEB-INF/tags/game_time.tag:42
 #: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:138
 #: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:126
 msgid "View"
@@ -4411,8 +4410,8 @@ msgstr "Klassen-Analyse"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:77
 #: src/main/webapp/jsp/admin_monitor_games.jsp:315
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:192
-#: src/main/webapp/jsp/games_history.jsp:65
-#: src/main/webapp/jsp/games_history.jsp:212
+#: src/main/webapp/jsp/games_history.jsp:68
+#: src/main/webapp/jsp/games_history.jsp:215
 #: src/main/webapp/jsp/upload_class_view.jsp:217
 #: src/main/webapp/jsp/user_games_view.jsp:87
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1251
@@ -4510,7 +4509,7 @@ msgstr "Das Spiel ist fesselnd:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:558
 #: src/main/webapp/jsp/admin_killmap_management.jsp:610
 #: src/main/webapp/jsp/admin_killmap_management.jsp:659
-#: src/main/webapp/jsp/games_history.jsp:132 src/main/webapp/jsp/help.jsp:191
+#: src/main/webapp/jsp/games_history.jsp:135 src/main/webapp/jsp/help.jsp:191
 #: src/main/webapp/jsp/leaderboards.jsp:40
 #: src/main/webapp/jsp/user_games_view.jsp:239
 #: src/main/webapp/jsp/user_games_view.jsp:568
@@ -4585,7 +4584,7 @@ msgstr "Nützliche Tests"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:54
 msgid "What are useful actions?"
-msgstr "Was sind nützliche Maßnahmen?"
+msgstr "Was sind nützliche Aktionen?"
 
 #: src/main/webapp/jsp/admin_analytics_killmaps.jsp:76
 msgid "Useful Actions Explanation"
@@ -4692,7 +4691,7 @@ msgstr "Äquivalente Mutanten:"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:563
 #: src/main/webapp/jsp/admin_killmap_management.jsp:615
 #: src/main/webapp/jsp/admin_killmap_management.jsp:664
-#: src/main/webapp/jsp/games_history.jsp:165 src/main/webapp/jsp/help.jsp:195
+#: src/main/webapp/jsp/games_history.jsp:168 src/main/webapp/jsp/help.jsp:195
 #: src/main/webapp/jsp/leaderboards.jsp:42
 #: src/main/webapp/jsp/user_games_view.jsp:275
 #: src/main/webapp/jsp/user_games_view.jsp:604
@@ -4974,8 +4973,8 @@ msgstr "Killmap-Status"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:547
 #: src/main/webapp/jsp/admin_monitor_games.jsp:79
 #: src/main/webapp/jsp/admin_monitor_games.jsp:317
-#: src/main/webapp/jsp/games_history.jsp:67
-#: src/main/webapp/jsp/games_history.jsp:214 src/main/webapp/jsp/index.jsp:122
+#: src/main/webapp/jsp/games_history.jsp:70
+#: src/main/webapp/jsp/games_history.jsp:217 src/main/webapp/jsp/index.jsp:122
 #: src/main/webapp/jsp/index.jsp:160 src/main/webapp/jsp/user_games_view.jsp:89
 #: src/main/webapp/jsp/user_games_view.jsp:453
 #: src/main/webapp/jsp/user_games_view.jsp:653
@@ -5194,7 +5193,7 @@ msgid "Multiplayer Games"
 msgstr "Mehrspieler-Spiele"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:81
-#: src/main/webapp/jsp/games_history.jsp:68 src/main/webapp/jsp/help.jsp:102
+#: src/main/webapp/jsp/games_history.jsp:71 src/main/webapp/jsp/help.jsp:102
 #: src/main/webapp/jsp/index.jsp:123 src/main/webapp/jsp/scoring_system.jsp:25
 #: src/main/webapp/jsp/user_games_view.jsp:130
 #: src/main/webapp/jsp/user_games_view.jsp:454
@@ -5204,7 +5203,7 @@ msgid "Attackers"
 msgstr "Angreifer"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:82
-#: src/main/webapp/jsp/games_history.jsp:69 src/main/webapp/jsp/help.jsp:48
+#: src/main/webapp/jsp/games_history.jsp:72 src/main/webapp/jsp/help.jsp:48
 #: src/main/webapp/jsp/index.jsp:124 src/main/webapp/jsp/scoring_system.jsp:26
 #: src/main/webapp/jsp/user_games_view.jsp:131
 #: src/main/webapp/jsp/user_games_view.jsp:455
@@ -5216,8 +5215,8 @@ msgstr "Verteidiger"
 #: src/main/webapp/jsp/admin_monitor_games.jsp:83
 #: src/main/webapp/jsp/admin_monitor_games.jsp:320
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:130
-#: src/main/webapp/jsp/games_history.jsp:70
-#: src/main/webapp/jsp/games_history.jsp:216 src/main/webapp/jsp/index.jsp:125
+#: src/main/webapp/jsp/games_history.jsp:73
+#: src/main/webapp/jsp/games_history.jsp:219 src/main/webapp/jsp/index.jsp:125
 #: src/main/webapp/jsp/index.jsp:162 src/main/webapp/jsp/user_games_view.jsp:91
 #: src/main/webapp/jsp/user_games_view.jsp:459
 #: src/main/webapp/jsp/user_games_view.jsp:658
@@ -5345,7 +5344,7 @@ msgid "Melee Games"
 msgstr "Melee-Spiele"
 
 #: src/main/webapp/jsp/admin_monitor_games.jsp:319
-#: src/main/webapp/jsp/games_history.jsp:215 src/main/webapp/jsp/index.jsp:161
+#: src/main/webapp/jsp/games_history.jsp:218 src/main/webapp/jsp/index.jsp:161
 #: src/main/webapp/jsp/user_games_view.jsp:90
 #: src/main/webapp/jsp/user_games_view.jsp:329
 #: src/main/webapp/jsp/user_games_view.jsp:654
@@ -5492,7 +5491,7 @@ msgstr "Hochladen…"
 #: src/main/webapp/jsp/upload_class_view.jsp:189
 #: src/main/webapp/jsp/upload_class_view.jsp:199
 msgid "Upload"
-msgstr "Upload"
+msgstr "Hochladen"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:186
 msgid "Upload Chapters"
@@ -5667,7 +5666,7 @@ msgid "Please select a level."
 msgstr "Bitte wähle ein Level aus."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:915
-#: src/main/webapp/jsp/user_profile.jsp:236
+#: src/main/webapp/jsp/user_profile.jsp:237
 msgid "Equivalence"
 msgstr "Äquivalenz"
 
@@ -6243,27 +6242,27 @@ msgstr "Leg die Spieldauer fest:"
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:305
 #: src/main/webapp/jsp/melee/create_game_view.jsp:284
 #: src/main/webapp/WEB-INF/tags/create_games.tag:303
-#: src/main/webapp/WEB-INF/tags/game_time.tag:109
+#: src/main/webapp/WEB-INF/tags/game_time.tag:111
 msgid "days"
 msgstr "Tage"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:307
 #: src/main/webapp/jsp/melee/create_game_view.jsp:286
 #: src/main/webapp/WEB-INF/tags/create_games.tag:305
-#: src/main/webapp/WEB-INF/tags/game_time.tag:111
+#: src/main/webapp/WEB-INF/tags/game_time.tag:113
 msgid "hours"
 msgstr "Stunden"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:309
 #: src/main/webapp/jsp/melee/create_game_view.jsp:288
 #: src/main/webapp/WEB-INF/tags/create_games.tag:307
-#: src/main/webapp/WEB-INF/tags/game_time.tag:113
+#: src/main/webapp/WEB-INF/tags/game_time.tag:115
 msgid "minutes"
 msgstr "Minuten"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:311
 #: src/main/webapp/jsp/melee/create_game_view.jsp:290
-#: src/main/webapp/WEB-INF/tags/game_time.tag:115
+#: src/main/webapp/WEB-INF/tags/game_time.tag:117
 msgid "Please input a valid duration."
 msgstr "Bitte gib eine gültige Dauer ein."
 
@@ -6368,25 +6367,25 @@ msgstr "Punktesystem"
 msgid "The game's duration"
 msgstr "Die Spieldauer"
 
-#: src/main/webapp/jsp/battleground/details_view.jsp:174
-#: src/main/webapp/jsp/melee/details_view.jsp:207
-#: src/main/webapp/WEB-INF/tags/game_time.tag:76
+#: src/main/webapp/jsp/battleground/details_view.jsp:175
+#: src/main/webapp/jsp/melee/details_view.jsp:208
+#: src/main/webapp/WEB-INF/tags/game_time.tag:78
 msgid "Total Duration"
 msgstr "Gesamtdauer"
 
-#: src/main/webapp/jsp/battleground/details_view.jsp:183
-#: src/main/webapp/jsp/melee/details_view.jsp:216
+#: src/main/webapp/jsp/battleground/details_view.jsp:184
+#: src/main/webapp/jsp/melee/details_view.jsp:217
 msgid "End date of the game"
 msgstr "Enddatum des Spiels"
 
-#: src/main/webapp/jsp/battleground/details_view.jsp:201
-#: src/main/webapp/jsp/melee/details_view.jsp:235
+#: src/main/webapp/jsp/battleground/details_view.jsp:202
+#: src/main/webapp/jsp/melee/details_view.jsp:236
 #: src/main/webapp/jsp/puzzle/attacker_view.jsp:168
 msgid "Class under test"
 msgstr "Zu testende Klasse"
 
-#: src/main/webapp/jsp/battleground/details_view.jsp:207
-#: src/main/webapp/jsp/melee/details_view.jsp:281
+#: src/main/webapp/jsp/battleground/details_view.jsp:208
+#: src/main/webapp/jsp/melee/details_view.jsp:282
 #: src/main/webapp/WEB-INF/tags/game_header.tag:240
 msgid "Timeline"
 msgstr "Zeitachse"
@@ -6777,14 +6776,14 @@ msgid "Moderator"
 msgstr "Moderator"
 
 #: src/main/webapp/jsp/classroom_page.jsp:762
-#: src/main/webapp/jsp/games_history.jsp:66
-#: src/main/webapp/jsp/games_history.jsp:213
+#: src/main/webapp/jsp/games_history.jsp:69
+#: src/main/webapp/jsp/games_history.jsp:216
 msgid "Owner"
 msgstr "Eigentümer"
 
 #: src/main/webapp/jsp/classroom_page.jsp:865
-#: src/main/webapp/jsp/games_history.jsp:71
-#: src/main/webapp/jsp/games_history.jsp:217
+#: src/main/webapp/jsp/games_history.jsp:74
+#: src/main/webapp/jsp/games_history.jsp:220
 msgid "Actions"
 msgstr "Aktionen"
 
@@ -7201,25 +7200,25 @@ msgstr "Für weitere Informationen hier klicken"
 msgid "Assertion Library: {0}"
 msgstr "Assertion-Library: {0}"
 
-#: src/main/webapp/jsp/games_history.jsp:60
+#: src/main/webapp/jsp/games_history.jsp:63
 msgid "Battlegrounds"
 msgstr "Battlegrounds"
 
-#: src/main/webapp/jsp/games_history.jsp:82
+#: src/main/webapp/jsp/games_history.jsp:85
 msgid "Your battleground game history is empty."
 msgstr "Deine Battleground-Spielhistorie ist leer."
 
-#: src/main/webapp/jsp/games_history.jsp:120
-#: src/main/webapp/jsp/games_history.jsp:261
+#: src/main/webapp/jsp/games_history.jsp:123
+#: src/main/webapp/jsp/games_history.jsp:264
 msgid "View Results"
 msgstr "Ergebnisse anzeigen"
 
-#: src/main/webapp/jsp/games_history.jsp:143
+#: src/main/webapp/jsp/games_history.jsp:146
 #: src/main/webapp/jsp/user_games_view.jsp:251
 msgid "There are no Attackers."
 msgstr "Es gibt keine Angreifer."
 
-#: src/main/webapp/jsp/games_history.jsp:166
+#: src/main/webapp/jsp/games_history.jsp:169
 #: src/main/webapp/jsp/leaderboards.jsp:44
 #: src/main/webapp/jsp/user_games_view.jsp:277
 #: src/main/webapp/jsp/user_games_view.jsp:606
@@ -7227,20 +7226,20 @@ msgstr "Es gibt keine Angreifer."
 msgid "Mutants Killed"
 msgstr "Getötete Mutanten"
 
-#: src/main/webapp/jsp/games_history.jsp:176
+#: src/main/webapp/jsp/games_history.jsp:179
 #: src/main/webapp/jsp/user_games_view.jsp:287
 msgid "There are no Defenders."
 msgstr "Es gibt keine Verteidiger."
 
-#: src/main/webapp/jsp/games_history.jsp:207
+#: src/main/webapp/jsp/games_history.jsp:210
 msgid "Melee games"
 msgstr "Melee-Spiele"
 
-#: src/main/webapp/jsp/games_history.jsp:228
+#: src/main/webapp/jsp/games_history.jsp:231
 msgid "Your melee game history is empty."
 msgstr "Deine Melee-Spielhistorie ist leer."
 
-#: src/main/webapp/jsp/games_history.jsp:282
+#: src/main/webapp/jsp/games_history.jsp:285
 msgid "There are no Players."
 msgstr "Es gibt keine Spieler."
 
@@ -7825,26 +7824,26 @@ msgstr "Ermöglicht es den Spielern, miteinander zu chatten."
 
 #: src/main/webapp/jsp/melee/create_game_view.jsp:291
 #: src/main/webapp/WEB-INF/tags/create_games.tag:310
-#: src/main/webapp/WEB-INF/tags/game_time.tag:116
+#: src/main/webapp/WEB-INF/tags/game_time.tag:118
 msgid "Maximum duration:"
 msgstr "Maximale Dauer:"
 
-#: src/main/webapp/jsp/melee/details_view.jsp:239
+#: src/main/webapp/jsp/melee/details_view.jsp:240
 msgid "You are an observer in this game."
 msgstr "Du bist ein Beobachter in diesem Spiel."
 
-#: src/main/webapp/jsp/melee/details_view.jsp:239
+#: src/main/webapp/jsp/melee/details_view.jsp:240
 msgid "The coverage of all player tests is shown."
 msgstr "Die Coverage aller Spielertests wird angezeigt."
 
-#: src/main/webapp/jsp/melee/details_view.jsp:246
+#: src/main/webapp/jsp/melee/details_view.jsp:247
 msgid ""
 "Switch between showing coverage of your tests (off) and enemy tests (on)."
 msgstr ""
 "Wechsle zwischen der Anzeige von Coverage deiner Tests (aus) und der Tests "
 "des Gegners (ein)."
 
-#: src/main/webapp/jsp/melee/details_view.jsp:250
+#: src/main/webapp/jsp/melee/details_view.jsp:251
 #: src/main/webapp/jsp/melee/player_view.jsp:253
 msgid "Enemy Coverage"
 msgstr "Gegnerische Coverage"
@@ -8025,13 +8024,13 @@ msgid "This puzzle is locked."
 msgstr "Dieses Rätsel ist gesperrt."
 
 #: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
-#: src/main/webapp/jsp/user_profile.jsp:231
+#: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
 msgid "Puzzle solved in {0} attempt."
 msgstr "Rätsel in {0} Versuch gelöst."
 
 #: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
-#: src/main/webapp/jsp/user_profile.jsp:231
+#: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
 msgid "Puzzle solved in {0} attempts."
 msgstr "Rätsel in {0} Versuchen gelöst."
@@ -8348,203 +8347,203 @@ msgstr "Offene Melee-Spiele"
 
 #: src/main/webapp/jsp/user_games_view.jsp:667
 msgid "There are currently no open melee games."
-msgstr "Derzeit sind keine Melee-Spiele verfügbar."
+msgstr "Derzeit gibt es keine offenen Melee-Spiele."
 
-#: src/main/webapp/jsp/user_profile.jsp:32
+#: src/main/webapp/jsp/user_profile.jsp:33
 msgid "My Profile"
 msgstr "Mein Profil"
 
-#: src/main/webapp/jsp/user_profile.jsp:32
+#: src/main/webapp/jsp/user_profile.jsp:33
 msgid "Profile of {0}"
 msgstr "Profil von {0}"
 
-#: src/main/webapp/jsp/user_profile.jsp:44
+#: src/main/webapp/jsp/user_profile.jsp:45
 msgid "Achievements"
 msgstr "Errungenschaften"
 
-#: src/main/webapp/jsp/user_profile.jsp:48
+#: src/main/webapp/jsp/user_profile.jsp:49
 msgid "No achievement unlocked yet."
 msgstr "Noch keine Errungenschaften freigeschaltet."
 
-#: src/main/webapp/jsp/user_profile.jsp:56
-#: src/main/webapp/jsp/user_profile.jsp:62
-#: src/main/webapp/jsp/user_profile.jsp:64
+#: src/main/webapp/jsp/user_profile.jsp:57
+#: src/main/webapp/jsp/user_profile.jsp:63
+#: src/main/webapp/jsp/user_profile.jsp:65
 msgid "Show all achievements"
 msgstr "Alle Erfolge anzeigen"
 
-#: src/main/webapp/jsp/user_profile.jsp:63
+#: src/main/webapp/jsp/user_profile.jsp:64
 msgid "Hide locked achievements"
 msgstr "Noch nicht freigeschaltene Erfolge ausblenden"
 
-#: src/main/webapp/jsp/user_profile.jsp:76
+#: src/main/webapp/jsp/user_profile.jsp:77
 msgid "Statistics for Multiplayer Games"
 msgstr "Statistiken für Multiplayer-Spiele"
 
-#: src/main/webapp/jsp/user_profile.jsp:83
-#: src/main/webapp/jsp/user_profile.jsp:131
+#: src/main/webapp/jsp/user_profile.jsp:84
+#: src/main/webapp/jsp/user_profile.jsp:132
 msgid "Mutants created"
 msgstr "Mutanten erstellt"
 
-#: src/main/webapp/jsp/user_profile.jsp:86
-#: src/main/webapp/jsp/user_profile.jsp:134
+#: src/main/webapp/jsp/user_profile.jsp:87
+#: src/main/webapp/jsp/user_profile.jsp:135
 msgid "Mutants still alive:"
 msgstr "Noch lebende Mutanten:"
 
-#: src/main/webapp/jsp/user_profile.jsp:87
-#: src/main/webapp/jsp/user_profile.jsp:135
+#: src/main/webapp/jsp/user_profile.jsp:88
+#: src/main/webapp/jsp/user_profile.jsp:136
 msgid "Killed mutants:"
 msgstr "Getötete Mutanten:"
 
-#: src/main/webapp/jsp/user_profile.jsp:91
-#: src/main/webapp/jsp/user_profile.jsp:139
+#: src/main/webapp/jsp/user_profile.jsp:92
+#: src/main/webapp/jsp/user_profile.jsp:140
 msgid "Tests written"
 msgstr "Tests geschrieben"
 
-#: src/main/webapp/jsp/user_profile.jsp:94
-#: src/main/webapp/jsp/user_profile.jsp:142
+#: src/main/webapp/jsp/user_profile.jsp:95
+#: src/main/webapp/jsp/user_profile.jsp:143
 msgid "Tests that killed mutants:"
 msgstr "Tests, die Mutanten töteten:"
 
-#: src/main/webapp/jsp/user_profile.jsp:95
-#: src/main/webapp/jsp/user_profile.jsp:143
+#: src/main/webapp/jsp/user_profile.jsp:96
+#: src/main/webapp/jsp/user_profile.jsp:144
 msgid "Non-killing tests:"
 msgstr "Tests ohne Kills:"
 
-#: src/main/webapp/jsp/user_profile.jsp:99
-#: src/main/webapp/jsp/user_profile.jsp:147
+#: src/main/webapp/jsp/user_profile.jsp:100
+#: src/main/webapp/jsp/user_profile.jsp:148
 msgid "Points earned"
 msgstr "Punkte verdient"
 
-#: src/main/webapp/jsp/user_profile.jsp:102
-#: src/main/webapp/jsp/user_profile.jsp:150
+#: src/main/webapp/jsp/user_profile.jsp:103
+#: src/main/webapp/jsp/user_profile.jsp:151
 msgid "By writing tests:"
 msgstr "Durch das Schreiben von Tests:"
 
-#: src/main/webapp/jsp/user_profile.jsp:103
-#: src/main/webapp/jsp/user_profile.jsp:151
+#: src/main/webapp/jsp/user_profile.jsp:104
+#: src/main/webapp/jsp/user_profile.jsp:152
 msgid "By creating mutants:"
 msgstr "Durch die Erzeugung von Mutanten:"
 
-#: src/main/webapp/jsp/user_profile.jsp:107
+#: src/main/webapp/jsp/user_profile.jsp:108
 msgid "Games played"
-msgstr "Gespielte Spiele"
+msgstr "Spiele gespielt"
 
-#: src/main/webapp/jsp/user_profile.jsp:110
+#: src/main/webapp/jsp/user_profile.jsp:111
 msgid "As defender:"
 msgstr "Als Verteidiger:"
 
-#: src/main/webapp/jsp/user_profile.jsp:111
+#: src/main/webapp/jsp/user_profile.jsp:112
 msgid "As attacker:"
 msgstr "Als Angreifer:"
 
-#: src/main/webapp/jsp/user_profile.jsp:116
-#: src/main/webapp/jsp/user_profile.jsp:159
+#: src/main/webapp/jsp/user_profile.jsp:117
+#: src/main/webapp/jsp/user_profile.jsp:160
 msgid "Average points per tests:"
 msgstr "Durchschnittliche Punktzahl pro Test:"
 
-#: src/main/webapp/jsp/user_profile.jsp:119
-#: src/main/webapp/jsp/user_profile.jsp:162
+#: src/main/webapp/jsp/user_profile.jsp:120
+#: src/main/webapp/jsp/user_profile.jsp:163
 msgid "Average points per mutant:"
 msgstr "Durchschnittliche Punkte pro Mutant:"
 
-#: src/main/webapp/jsp/user_profile.jsp:125
+#: src/main/webapp/jsp/user_profile.jsp:126
 msgid "Statistics for Melee Games"
 msgstr "Statistiken für Melee-Spiele"
 
-#: src/main/webapp/jsp/user_profile.jsp:156
+#: src/main/webapp/jsp/user_profile.jsp:157
 msgid "Total melee games played:"
 msgstr "Gesamtzahl der gespielten Nahkampfspiele:"
 
-#: src/main/webapp/jsp/user_profile.jsp:168
+#: src/main/webapp/jsp/user_profile.jsp:169
 msgid "Statistics for Equivalence Duels"
 msgstr "Statistiken für Äquivalenzduelle"
 
-#: src/main/webapp/jsp/user_profile.jsp:173
+#: src/main/webapp/jsp/user_profile.jsp:174
 msgid "All duels"
 msgstr "Alle Duelle"
 
-#: src/main/webapp/jsp/user_profile.jsp:176
+#: src/main/webapp/jsp/user_profile.jsp:177
 msgid "Equivalence duels won:"
 msgstr "Gewonnene Äquivalenzduelle:"
 
-#: src/main/webapp/jsp/user_profile.jsp:177
+#: src/main/webapp/jsp/user_profile.jsp:178
 msgid "Equivalence duels lost:"
 msgstr "Verlorene Äquivalenzduelle:"
 
-#: src/main/webapp/jsp/user_profile.jsp:182
+#: src/main/webapp/jsp/user_profile.jsp:183
 msgid "Duels as attacker"
 msgstr "Duelle als Angreifer"
 
-#: src/main/webapp/jsp/user_profile.jsp:185
-msgid "Rejected equivalence claim:"
-msgstr "Zurückgewiesene Äquivalenz-Behauptung:"
-
 #: src/main/webapp/jsp/user_profile.jsp:186
-msgid "Failed to reject claim:"
-msgstr "Behauptung konnte nicht zurückgewiesen werden:"
+msgid "Rejected equivalence claim:"
+msgstr "Nicht-Äquivalenz bewiesen:"
 
-#: src/main/webapp/jsp/user_profile.jsp:191
+#: src/main/webapp/jsp/user_profile.jsp:187
+msgid "Failed to reject claim:"
+msgstr "Äquivalenz nicht zurückgewiesen:"
+
+#: src/main/webapp/jsp/user_profile.jsp:192
 msgid "Duels as defender"
 msgstr "Duelle als Verteidiger"
 
-#: src/main/webapp/jsp/user_profile.jsp:194
-msgid "Successfully claimed as equivalent:"
-msgstr "Erfolgreich als equivalent anerkannt:"
-
 #: src/main/webapp/jsp/user_profile.jsp:195
+msgid "Successfully claimed as equivalent:"
+msgstr "Erfolgreich als äquivalent markiert:"
+
+#: src/main/webapp/jsp/user_profile.jsp:196
 msgid "Incorrectly claimed mutants:"
 msgstr "Falsch markierte Mutanten:"
 
-#: src/main/webapp/jsp/user_profile.jsp:201
+#: src/main/webapp/jsp/user_profile.jsp:202
 msgid "Statistics for Puzzle Games"
 msgstr "Statistiken für Rätselspiele"
 
-#: src/main/webapp/jsp/user_profile.jsp:205
+#: src/main/webapp/jsp/user_profile.jsp:206
 msgid "Chapter {0} - {1}"
 msgstr "Kapitel {0} – {1}"
 
-#: src/main/webapp/jsp/user_profile.jsp:238
+#: src/main/webapp/jsp/user_profile.jsp:239
 msgid "puzzle"
 msgstr "Rätsel"
 
-#: src/main/webapp/jsp/user_profile.jsp:251
+#: src/main/webapp/jsp/user_profile.jsp:252
 msgid "{0} puzzle unsolved"
 msgstr "{0} Rätsel ungelöst"
 
-#: src/main/webapp/jsp/user_profile.jsp:251
+#: src/main/webapp/jsp/user_profile.jsp:252
 msgid "{0} puzzles unsolved"
 msgstr "{0} ungelöste Rätsel"
 
-#: src/main/webapp/jsp/user_profile.jsp:263
+#: src/main/webapp/jsp/user_profile.jsp:264
 msgid "Played games"
 msgstr "Gespielte Spiele"
 
-#: src/main/webapp/jsp/user_profile.jsp:265
+#: src/main/webapp/jsp/user_profile.jsp:266
 msgid "You can find a list of your past games in the"
 msgstr "Eine Liste deiner bisherigen Spiele findest du in der"
 
-#: src/main/webapp/jsp/user_profile.jsp:266
+#: src/main/webapp/jsp/user_profile.jsp:267
 msgid "games history"
 msgstr "Spielhistorie"
 
-#: src/main/webapp/jsp/user_profile.jsp:271
+#: src/main/webapp/jsp/user_profile.jsp:272
 msgid "Account Information"
 msgstr "Kontoinformationen"
 
-#: src/main/webapp/jsp/user_profile.jsp:273
+#: src/main/webapp/jsp/user_profile.jsp:274
 msgid "Your current email:"
 msgstr "Deine aktuelle E-Mail-Adresse:"
 
-#: src/main/webapp/jsp/user_profile.jsp:277
+#: src/main/webapp/jsp/user_profile.jsp:278
 msgid "Change your account information, password or delete your account in the"
 msgstr ""
 "Ändere deine Kontoinformationen, dein Passwort oder lösche dein Konto in den"
 
-#: src/main/webapp/jsp/user_profile.jsp:279
+#: src/main/webapp/jsp/user_profile.jsp:280
 msgid "Edit or delete your CodeDefenders account."
 msgstr "Bearbeite oder lösche dein CodeDefenders-Konto."
 
-#: src/main/webapp/jsp/user_profile.jsp:279
+#: src/main/webapp/jsp/user_profile.jsp:280
 msgid "account settings"
 msgstr "Kontoeinstellungen"
 
@@ -8574,11 +8573,11 @@ msgstr "Erlaube uns die Kontaktaufnahme per E-Mail."
 
 #: src/main/webapp/jsp/user_settings.jsp:108
 msgid "Update Email Preferences"
-msgstr "Aktualisiere E-Mail Einstellungen"
+msgstr "E-Mail Einstellungen aktualisieren"
 
 #: src/main/webapp/jsp/user_settings.jsp:115
 msgid "Update Password"
-msgstr "Aktualisiere Passwort"
+msgstr "Passwort ändern"
 
 #: src/main/webapp/jsp/user_settings.jsp:124
 msgid "New password"
@@ -9098,8 +9097,8 @@ msgid "Start Game"
 msgstr "Spiel starten"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:1216
-#: src/main/webapp/WEB-INF/tags/game_time.tag:53
-#: src/main/webapp/WEB-INF/tags/game_time.tag:58
+#: src/main/webapp/WEB-INF/tags/game_time.tag:55
+#: src/main/webapp/WEB-INF/tags/game_time.tag:60
 msgid "Game Duration"
 msgstr "Spieldauer"
 
@@ -9229,31 +9228,31 @@ msgstr "Möchten Sie das Spiel wirklich beenden?"
 msgid "Invitations"
 msgstr "Einladungen"
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:42
-msgid "Change"
-msgstr "Ändern"
+#: src/main/webapp/WEB-INF/tags/game_time.tag:43
+msgid "Change the game duration."
+msgstr "Ändere die Spieldauer."
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:42
-msgid "the game duration."
-msgstr "die Spieldauer."
+#: src/main/webapp/WEB-INF/tags/game_time.tag:44
+msgid "View the game duration."
+msgstr "Die Spieldauer anzeigen."
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:84
+#: src/main/webapp/WEB-INF/tags/game_time.tag:86
 msgid "Remaining Duration"
 msgstr "Verbleibende Dauer"
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:93
+#: src/main/webapp/WEB-INF/tags/game_time.tag:95
 msgid "This game would end at"
 msgstr "Dieses Spiel würde enden um"
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:93
+#: src/main/webapp/WEB-INF/tags/game_time.tag:95
 msgid "This game will end at"
 msgstr "Dieses Spiel endet um"
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:106
+#: src/main/webapp/WEB-INF/tags/game_time.tag:108
 msgid "Set the game's new remaining duration:"
 msgstr "Stell die neue verbleibende Spieldauer ein:"
 
-#: src/main/webapp/WEB-INF/tags/game_time.tag:131
+#: src/main/webapp/WEB-INF/tags/game_time.tag:133
 msgid "Change Game Duration"
 msgstr "Spieldauer ändern"
 
@@ -9647,497 +9646,3 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
-
-#~ msgid ""
-#~ "Make sure the address and the username are correct and that the page "
-#~ "hasn't moved."
-#~ msgstr "Vergewissere dich, dass die URL und der Benutzername korrekt sind."
-
-#~ msgid "Are you sure you want to set class '${gameClass.name}' to inactive?"
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse '${gameClass.name}' auf inaktiv setzen "
-#~ "möchtest?"
-
-#~ msgid "Are you sure you want to set class '${gameClass.name}' to active?"
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse „${gameClass.name}“ als aktiv "
-#~ "festlegen möchten?"
-
-#~ msgid ""
-#~ "Are you sure you want to delete class '${gameClass.name}' forever? This "
-#~ "cannot be undone."
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
-#~ "willst? Das kann nicht rückgängig gemacht werden."
-
-#~ msgid ""
-#~ "You have been invited to join a game. \n"
-#~ " Join as: "
-#~ msgstr ""
-#~ "Du wurdest zu einem Spiel eingeladen. \n"
-#~ " Teilnehmen als: "
-
-#~ msgid ""
-#~ "Set class as inactive. This class won\\'t be available for games "
-#~ "afterwards."
-#~ msgstr ""
-#~ "Klasse als inaktiv markieren. Diese Klasse steht danach nicht mehr für "
-#~ "Spiele zur Verfügung."
-
-#~ msgid ""
-#~ "Are you sure you want to set class \\'${gameClass.name}\\' to inactive?"
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” auf inaktiv setzen "
-#~ "willst?"
-
-#~ msgid ""
-#~ "Are you sure you want to set class \\'${gameClass.name}\\' to active?"
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” als aktiv setzen "
-#~ "willst?"
-
-#~ msgid ""
-#~ "Delete class from the system. This class won\\'t be available for games "
-#~ "afterwards."
-#~ msgstr ""
-#~ "Lösch die Klasse aus dem System. Diese Klasse steht danach nicht mehr für "
-#~ "Spiele zur Verfügung."
-
-#~ msgid ""
-#~ "Are you sure you want to delete class \\'${gameClass.name}\\' forever? "
-#~ "This cannot be undone."
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Klasse „${gameClass.name}” endgültig löschen "
-#~ "willst? Das kann nicht rückgängig gemacht werden."
-
-#~ msgid "Class can\\'t be deleted, since games were already played on it."
-#~ msgstr ""
-#~ "Die Klasse kann nicht gelöscht werden, weil damit schon Spiele gespielt "
-#~ "wurden."
-
-#~ msgid "There aren\\'t any classrooms... yet."
-#~ msgstr "Es gibt noch keine Klassenzimmer... noch nicht."
-
-#~ msgid "You don\\'t control any unfinished multiplayer games at the moment."
-#~ msgstr ""
-#~ "Du hast im Moment keine Kontrolle über noch nicht beendete Multiplayer-"
-#~ "Spiele."
-
-#~ msgid "You don\\'t control any unfinished melee games at the moment."
-#~ msgstr "Du hast im Moment keine laufenden Melee-Spiele unter Kontrolle."
-
-#~ msgid "Are you sure you want to set {0}\\'s account to inactive?"
-#~ msgstr "Bist du sicher, dass du das Konto von {0} inaktiv setzen willst?"
-
-#~ msgid ""
-#~ "Please consider that you can\\'t reuse a username from an inactive user."
-#~ msgstr ""
-#~ "Bitte denk dran, dass du den Benutzernamen eines inaktiven Nutzers nicht "
-#~ "wiederverwenden kannst."
-
-#~ msgid "Enable Capturing Players\\' Intentions"
-#~ msgstr "Spieler-Intentionen erfassen"
-
-#~ msgid "Set the game\\'s duration:"
-#~ msgstr "Leg die Spieldauer fest:"
-
-#~ msgid "Passwords don\\'t match."
-#~ msgstr "Die Passwörter passen nicht zusammen."
-
-#~ msgid ""
-#~ "Are you sure you want to disable joining? Students won\\'t be able to "
-#~ "join the classroom via invite link or from the public list."
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Teilnahme deaktivieren willst? Die Schüler "
-#~ "können dann nicht mehr über den Einladungslink oder die öffentliche Liste "
-#~ "dem Raum beitreten."
-
-#~ msgid ""
-#~ "Are you sure you want to change the classroom\\'s visibility to private? "
-#~ "The classroom will no longer be shown in the public list and players "
-#~ "won\\'t be able to join from there."
-#~ msgstr ""
-#~ "Bist du sicher, dass du die Sichtbarkeit des Raumes auf „privat” ändern "
-#~ "willst? Der Raum wird dann nicht mehr in der öffentlichen Liste angezeigt "
-#~ "und Spieler können von dort aus nicht mehr beitreten."
-
-#~ msgid ""
-#~ "Are you sure you want to make {0} the owner of this classroom? This will "
-#~ "change the current owner\\'s role to Moderator."
-#~ msgstr ""
-#~ "Bist du sicher, dass du {0} zum Besitzer diesen Raumes machen willst? "
-#~ "Dadurch wird der aktuelle Besitzer zum Moderator."
-
-#~ msgid "You\\'re not part of any classrooms."
-#~ msgstr "Du bist in keinem Raum."
-
-#~ msgid ""
-#~ "A teacher account lets you create classrooms for your students, so you "
-#~ "can manage games more easily. If you\\'re interested in turning your "
-#~ "account into a teacher account, please use the template below to email "
-#~ "us. You can also use this <a href='{0}'>mailto link</a> to automatically "
-#~ "create an email with the template."
-#~ msgstr ""
-#~ "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um "
-#~ "Spiele einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto "
-#~ "umwandeln möchtest, schick uns bitte eine E-Mail mit der unten stehenden "
-#~ "Vorlage. Du kannst auch diesen <a href=\"{0}\">Mailto-Link</a> verwenden, "
-#~ "um automatisch eine E-Mail mit der Vorlage zu erstellen."
-
-#~ msgid "You don\\'t have permission to perform this request (403)"
-#~ msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen (403)."
-
-#~ msgid "You don\\'t have permission to perform this request."
-#~ msgstr "Du hast keine Berechtigung, diese Anfrage auszuführen."
-
-#~ msgid "The page you\\'re looking for could not be found (404)"
-#~ msgstr "Die Seite, die du suchst, wurde nicht gefunden (404)"
-
-#~ msgid ""
-#~ "The page could not be found, or you don\\'t have permission to view it."
-#~ msgstr ""
-#~ "Die Seite wurde nicht gefunden oder du hast keine Berechtigung, sie "
-#~ "anzuzeigen."
-
-#~ msgid ""
-#~ "The resource that you are attempting to access does not exist, or you "
-#~ "don\\'t have the necessary permissions to view it."
-#~ msgstr ""
-#~ "Die Ressource, auf die du zugreifen willst, ist nicht da oder du hast "
-#~ "nicht die nötigen Rechte, um sie anzusehen."
-
-#~ msgid "Make sure the address is correct and that the page hasn\\'t moved."
-#~ msgstr ""
-#~ "Schau mal, ob die Adresse stimmt und die Seite nicht verschoben wurde."
-
-#~ msgid "The game\\'s duration"
-#~ msgstr "Die Spieldauer"
-
-#~ msgid "Keep the mutant\\'s points and get an extra point"
-#~ msgstr "Behalte die Punkte des Mutanten und hol dir einen Extrapunkt"
-
-#~ msgid "Lose the mutant\\'s points"
-#~ msgstr "Verlier die Punkte des Mutanten"
-
-#~ msgid "Multiple tests can have the same name, but they don\\'t have to."
-#~ msgstr "Mehrere Tests können denselben Namen haben, müssen es aber nicht."
-
-#~ msgid "Set the game\\'s new remaining duration:"
-#~ msgstr "Stell die neue verbleibende Spieldauer ein:"
-
-#~ msgid "Players are allowed to view other players\\' submissions."
-#~ msgstr "Die Spieler dürfen die Beiträge der anderen Spieler anschauen."
-
-#~ msgid "Players are not allowed to view other players\\' submissions."
-#~ msgstr ""
-#~ "Die Spieler dürfen die Beiträge der anderen Spieler nicht anschauen."
-
-#~ msgid ""
-#~ "But: Players can still view others\\' mutants after they have been killed "
-#~ "or accepted as equivalent."
-#~ msgstr ""
-#~ "Aber: Du kannst immer noch die Mutanten von anderen Spielern sehen, auch "
-#~ "wenn sie schon tot sind oder als äquivalenz akzeptiert wurden."
-
-#~ msgid "I don\\'t know if my mutant is killable"
-#~ msgstr "Ich weiß nicht, ob mein Mutant getötet werden kann"
-
-#~ msgid ""
-#~ "Your test is not valid. Remember the rules: Only one non-empty test, at "
-#~ "most %d assertions per test, no conditionals and no loops!"
-#~ msgstr ""
-#~ "Dein Test ist nicht gültig. Denk an die Regeln: Nur ein nicht leerer "
-#~ "Test, höchstens %d Assertions pro Test, keine Bedingungen und keine "
-#~ "Schleifen!"
-
-#~ msgid "Awesome! Your test killed %d mutants!"
-#~ msgstr "Super! Dein Test hat %d Mutanten erledigt!"
-
-#~ msgid "Test %d killed your mutant. Better luck with the next one!"
-#~ msgstr "Test %d hat deinen Mutanten erledigt. Viel Glück beim nächsten Mal!"
-
-#~ msgid "Awesome, your mutant survived %d tests!"
-#~ msgstr "Super, dein Mutant hat %d Tests überstanden!"
-
-#~ msgid ""
-#~ "As we can see above, there is a living mutant in the getCurrentFloor() "
-#~ "method, and there is no test yet to cover it."
-#~ msgstr ""
-#~ "Wie wir oben sehen können, gibt es in der Methode getCurrentFloor() einen "
-#~ "lebenden Mutanten, und es gibt noch keinen Test, der diesen covered."
-
-#~ msgid ""
-#~ "Greetings,\n"
-#~ "I would like to request a teacher account for {0} on {1}.\n"
-#~ "Regards,\n"
-#~ "{0}\n"
-#~ msgstr ""
-#~ "Sehr geehrte Damen und Herren,\n"
-#~ "ich möchte ein Lehrerkonto für {0} auf {1} beantragen.\n"
-#~ "Mit freundlichen Grüßen,\n"
-#~ "{0}\n"
-
-#~ msgid ""
-#~ "Welcome to Code Defenders!\n"
-#~ "An account has been created for you with Username {0} and Password {1}.\n"
-#~ "You can log in at {2}.\n"
-#~ "Happy coding!"
-#~ msgstr ""
-#~ "Willkommen bei Code Defenders!\n"
-#~ "Es wurde ein Konto für dich mit dem Benutzernamen {0} und dem Passwort "
-#~ "{1} erstellt.\n"
-#~ "Du kannst dich unter {2} anmelden.\n"
-#~ "Viel Spaß beim Programmieren!"
-
-#~ msgid ""
-#~ "Hello {0}!\n"
-#~ "Change your password here: {1}\n"
-#~ "This link is only valid for {2} hours.\n"
-#~ "Greetings, your Code Defenders team"
-#~ msgstr ""
-#~ "Guten Tag {0}!\n"
-#~ "\n"
-#~ "Hier kannst Du Dein Passwort ändern: {1}\n"
-#~ "Dieser Link ist nur {2} Stunden lang gültig.\n"
-#~ "\n"
-#~ "Viele Grüße\vCode Defenders-Team"
-
-#~ msgid ""
-#~ "A teacher account lets you create classrooms for your students, so you "
-#~ "can manage games more easily. If you\\'re interested in turning your "
-#~ "account into a teacher account, please use the template below to email "
-#~ "us. You can also use this <a href=\\'{0}\\'>mailto link</a> to "
-#~ "automatically create an email with the template."
-#~ msgstr ""
-#~ "Mit einem Lehrerkonto kannst du Räume für deine Schüler erstellen, um "
-#~ "Spiele einfacher zu verwalten. Wenn du dein Konto in ein Lehrerkonto "
-#~ "umwandeln möchtest, schick uns bitte eine E-Mail mit der unten stehenden "
-#~ "Vorlage. Du kannst auch diesen <a href=\\'{0}\\'>Mailto-Link</a> "
-#~ "verwenden, um automatisch eine E-Mail mit der Vorlage zu erstellen."
-
-#~ msgid ""
-#~ "Greetings,\n"
-#~ "I would like to request a teacher account for %s on %s.\n"
-#~ "Regards,\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "Sehr geehrte Damen und Herren,\n"
-#~ "ich möchte ein Lehrerkonto für %s auf %s beantragen.\n"
-#~ "Mit freundlichen Grüßen,\n"
-#~ "%s \n"
-
-#~ msgid ""
-#~ "The game you were invited to no longer exists, or it has not been created "
-#~ "yet."
-#~ msgstr ""
-#~ "Das Spiel, zu dem du eingeladen wurdest, gibt's nicht mehr oder wurde "
-#~ "noch nicht erstellt."
-
-#~ msgid "Mutation rules"
-#~ msgstr "Mutationsregeln"
-
-#~ msgid "No calls to {0},{1}"
-#~ msgstr "Keine Aufrufe von {0}, {1}"
-
-#~ msgid "No renaming of methods or fields, no additional methods or fields"
-#~ msgstr ""
-#~ "Keine Umbenennung von Methoden oder Feldern, keine zusätzlichen Methoden "
-#~ "oder Felder"
-
-#~ msgid "No additional logical operators ({0}, {1})"
-#~ msgstr "Keine zusätzlichen logischen Operatoren ({0}, {1})"
-
-#~ msgid "No new control structures ({0}, {1}, {2}, ...)"
-#~ msgstr "Keine neuen Kontrollstrukturen ({0}, {1}, {2}, ...)"
-
-#~ msgid "No new methods or conditionals"
-#~ msgstr "Keine neuen Methoden oder Bedingungen"
-
-#~ msgid "Failed to set class as {0}."
-#~ msgstr "Die Klasse konnte nicht als {0} festgelegt werden."
-
-#, fuzzy
-#~ msgid "Successfully set class as {0}!"
-#~ msgstr "Klasse wurde erfolgreich auf {0} gesetzt!"
-
-#, fuzzy
-#~ msgid "Failed to set class as {0}!"
-#~ msgstr "Die Klasse konnte nicht als {0} festgelegt werden."
-
-#~ msgid "ERROR: Cannot add user {0} to staged game {1}. "
-#~ msgstr ""
-#~ "FEHLER: Kann den Benutzer {0} nicht zum Spielentwurf {1} hinzufügen. "
-
-#~ msgid "Password is"
-#~ msgstr "Passwort lautet"
-
-#~ msgid "not set"
-#~ msgstr "nicht gesetzt"
-
-#~ msgid "set"
-#~ msgstr "Satz"
-
-#, fuzzy
-#~ msgid "Puzzle: {0} - {1}\", request.getAttribute(\"chapterTitle"
-#~ msgstr "Rätsel: {0} – {1}\", request.getAttribute(\"chapterTitle"
-
-#~ msgid "Puzzle: {0} - {1}"
-#~ msgstr "Rätsel: {0} – {1}"
-
-#~ msgid "Are you sure you want to permanently delete puzzle"
-#~ msgstr "Möchtest du das Rätsel wirklich dauerhaft löschen"
-
-#~ msgid "Are you sure you want to delete chapter"
-#~ msgstr "Bist du sicher, dass du das Kapitel löschen möchtest?"
-
-#~ msgid "Any puzzles left in the chapter will be moved to"
-#~ msgstr "Alle im Kapitel verbliebenen Rätsel werden verschoben nach"
-
-#~ msgid "Unassigned"
-#~ msgstr "Nicht zugeordnet"
-
-#~ msgid "Chair of Software Engineering&nbspII"
-#~ msgstr "Lehrstuhl für Software Engineering&nbspII"
-
-#~ msgid "Test"
-#~ msgstr "Test"
-
-#~ msgid "Show all achievements on the profile page"
-#~ msgstr "Zeige alle Errungenschaften auf der Profilseite"
-
-#~ msgid "New Achievement Unlocked"
-#~ msgstr "Neue Errungenschaft freigeschalten"
-
-#~ msgid "Chair of Software Engineering II"
-#~ msgstr "Lehrstuhl für Software Engineering II"
-
-#~ msgid "at the University of Passau and the"
-#~ msgstr "an der Universität Passau und der"
-
-#~ msgid "University of Leicester"
-#~ msgstr "Universität Leicester"
-
-#~ msgid "Imprint"
-#~ msgstr "Impressum"
-
-#~ msgid "Code Defenders:"
-#~ msgstr "CodeDefenders:"
-
-#~ msgid ""
-#~ "<p>Switch between showing coverage of your tests (off) and enemy tests "
-#~ "(on).</p><p class=\"mb-0\"><i>Note: If you add/remove lines while "
-#~ "creating a mutant the coverage highlighting may be misaligned until you "
-#~ "submit the mutant.</i></p>"
-#~ msgstr ""
-#~ "<p>Wechseln Sie zwischen der Anzeige der Abdeckung Ihrer Tests (aus) und "
-#~ "der Tests des Gegners (ein).</p><p class=\"mb-0\"><i>Hinweis: Wenn Sie "
-#~ "beim Erstellen eines Mutanten Zeilen hinzufügen/entfernen, kann es zu "
-#~ "einer Fehlausrichtung der Coverage-Kennzeichnung kommen, bis Sie den "
-#~ "Mutanten übermitteln.</i></p>"
-
-#~ msgid "[PDF]"
-#~ msgstr "[PDF]"
-
-#~ msgid "[Bibtex]"
-#~ msgstr "[Bibtex]"
-
-#~ msgid ""
-#~ "Password requirements: {0}-20 alphanumeric characters, no whitespace or "
-#~ "special characters."
-#~ msgstr ""
-#~ "Passwortanforderungen: {0}-20 alphanumerische Zeichen, keine Leerzeichen "
-#~ "oder Sonderzeichen."
-
-#~ msgid "Change \"Keep previous test in editor\" setting"
-#~ msgstr "Ändern Sie die Einstellung „Vorherigen Test im Editor behalten“"
-
-#~ msgid "Puzzle solved in {0} {1}."
-#~ msgstr "Rätsel gelöst in {0} {1}."
-
-#~ msgid "attempt"
-#~ msgstr "Versuch"
-
-#~ msgid "attempts"
-#~ msgstr "Versuche"
-
-#~ msgid "{0} {1} unsolved"
-#~ msgstr "{0} {1} ungelöst"
-
-#~ msgid "puzzles"
-#~ msgstr "Rätsel"
-
-#~ msgid "ERROR: Cannot remove user {0} from staged game {1}. "
-#~ msgstr ""
-#~ "FEHLER: Benutzer {0} kann nicht aus dem vorbereiteten Spiel {1} entfernt "
-#~ "werden. "
-
-#~ msgid "ERROR: Cannot move user {0} from staged game {1}. "
-#~ msgstr ""
-#~ "FEHLER: Benutzer {0} kann nicht aus dem vorbereiteten Spiel {1} "
-#~ "verschoben werden. "
-
-#~ msgid "The"
-#~ msgstr "Das"
-
-#~ msgid ""
-#~ "users selected in the table, will be assigned to created staged games."
-#~ msgstr ""
-#~ "die in der Tabelle ausgewählten Benutzer werden den erstellten Staged-"
-#~ "Spielen zugewiesen."
-
-#, fuzzy
-#~ msgid "<span data-fill='username' class='border rounded px-1'></span>"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie {0} zum Eigentümer des Raums machen möchten? "
-#~ "Dadurch wird die Rolle des aktuellen Eigentümers in „Moderator” geändert."
-#~ "<span data-fill='username' class='border rounded px-1'></span>"
-
-#~ msgid ""
-#~ "Are you sure you want to make {0} a {1}?', '<span data-fill='username' "
-#~ "class='border rounded px-1'></span>', '<span data-fill='role' "
-#~ "class='border rounded px-1'></span>"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie {0} zu {1} machen möchten?', '<span data-"
-#~ "fill='username' class='border rounded px-1'></span>', '<span data-"
-#~ "fill='role' class='border rounded px-1'></span>"
-
-#~ msgid ""
-#~ "At the top of the page, there are two panels. On the left is the original "
-#~ "Class Under Test (CUT), and on the right there is a panel to write a new "
-#~ "test, along with a \"Defend!\" button which submits the test."
-#~ msgstr ""
-#~ "Oben auf der Seite gibt es zwei Felder. Auf der linken Seite befindet "
-#~ "sich die ursprüngliche zu testende Klasse (Class Under Test, CUT), und "
-#~ "auf der rechten Seite gibt es ein Feld, um einen neuen Test zu schreiben, "
-#~ "zusammen mit einer Schaltfläche \"Verteidigen\", die den Test absendet."
-
-#~ msgid ""
-#~ "Below these panels are two more panels, which show existing mutants and "
-#~ "tests. In the mutants panel, mutants can be claimed as being equivalent "
-#~ "(which is covered at the end of this page). Existing mutants can also be "
-#~ "seen by the icon present in the margin of the CUT panel."
-#~ msgstr ""
-#~ "Unterhalb dieser Tafeln befinden sich zwei weitere Tafeln, die bestehende "
-#~ "Mutanten und Tests zeigen. Im Mutanten-Panel könnten Mutanten als "
-#~ "gleichwertig deklariert werden (dies wird am Ende der Seite behandelt). "
-#~ "Vorhandene Mutanten sind auch an dem Symbol am Rand des CUT-Panels zu "
-#~ "erkennen."
-
-#~ msgid ""
-#~ "We're going to submit a test to kill an alive mutant. Tests don't "
-#~ "necessarily have to target alive mutants, and can simply be made to kill "
-#~ "possible future mutants."
-#~ msgstr ""
-#~ "Wir werden einen Test einreichen, um einen lebenden Mutanten zu töten. "
-#~ "Tests müssen nicht unbedingt auf lebende Mutanten abzielen, sondern "
-#~ "können auch einfach dazu dienen, mögliche zukünftige Mutanten zu töten."
-
-#~ msgid ""
-#~ "If an error is made in your test and it does not compile, a full compiler "
-#~ "error is shown at the top of the screen. In this case, I did not add the "
-#~ "brackets at the end of a function call."
-#~ msgstr ""
-#~ "Wenn in Ihrem Test ein Fehler auftritt und er nicht kompiliert werden "
-#~ "kann, wird oben auf dem Bildschirm ein vollständiger Compiler-Fehler "
-#~ "angezeigt. In diesem Fall habe ich die Klammern am Ende eines "
-#~ "Funktionsaufrufs nicht hinzugefügt."
