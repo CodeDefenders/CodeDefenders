@@ -53,8 +53,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.achievement.AchievementUnlockedEvent;
 import org.codedefenders.notification.events.server.achievement.ServerAchievementNotificationShownEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
@@ -442,29 +441,21 @@ public class AchievementService {
         }
 
         /**
-         * The {@link EquivalenceDuelAttackerWonEvent} is fired when an attacker has won an equivalence duel.
-         * It is used to count the number of won equivalence duels as attacker.
+         * The {@link EquivalenceDuelResultEvent} is fired when an equivalence duel is won/lost.
+         * It is used to count the number of won equivalence duels as attacker, defender and in total.
          *
          * @param event the event
          */
         @Subscribe
         @SuppressWarnings("unused")
-        public void handleEquivalenceDuelAttackerWonEvent(EquivalenceDuelAttackerWonEvent event) {
-            equivalenceDuelAttackerWon(event.getAttackerId());
-            equivalenceDuelWon(event.getAttackerId());
-        }
+        public void handleEquivalenceDuelResultEvent(EquivalenceDuelResultEvent event) {
+            equivalenceDuelWon(event.getWinnerId());
 
-        /**
-         * The {@link EquivalenceDuelDefenderWonEvent} is fired when a defender has won an equivalence duel.
-         * It is used to count the number of won equivalence duels as defender.
-         *
-         * @param event the event
-         */
-        @Subscribe
-        @SuppressWarnings("unused")
-        public void handleEquivalenceDuelDefenderWonEvent(EquivalenceDuelDefenderWonEvent event) {
-            equivalenceDuelDefenderWon(event.getDefenderId());
-            equivalenceDuelWon(event.getDefenderId());
+            if (event.hasAttackerWon()) {
+                equivalenceDuelAttackerWon(event.getAttackerId());
+            } else {
+                equivalenceDuelDefenderWon(event.getDefenderId());
+            }
         }
 
         /**

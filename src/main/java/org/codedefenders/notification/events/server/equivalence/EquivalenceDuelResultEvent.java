@@ -18,9 +18,44 @@
  */
 package org.codedefenders.notification.events.server.equivalence;
 
+import com.google.gson.annotations.Expose;
+
 /**
- * Event that is fired when an attacker wins an equivalence duel by proving that their mutant is not equivalent.
+ * Equivalence duel result event.
  */
-public class EquivalenceDuelAttackerWonEvent extends EquivalenceDuelWonEvent {
+public class EquivalenceDuelResultEvent extends EquivalenceDuelEvent {
+
+    @Expose
+    private boolean attackerWon;
+
+    public boolean hasAttackerWon() {
+        return attackerWon;
+    }
+
+    public void setAttackerWon() {
+        this.attackerWon = true;
+    }
+
+    public boolean hasDefenderWon() {
+        return !attackerWon;
+    }
+
+    public void setDefenderWon() {
+        this.attackerWon = false;
+    }
+
+    /**
+     * @return the winner's user ID
+     */
+    public int getWinnerId() {
+        return attackerWon ? getAttackerId() : getDefenderId();
+    }
+
+    /**
+     * @return the loser's user ID
+     */
+    public int getLoserId() {
+        return attackerWon ? getDefenderId() : getAttackerId();
+    }
 
 }

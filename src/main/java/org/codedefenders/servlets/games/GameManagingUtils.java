@@ -60,11 +60,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerLostEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderLostEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelDefenderWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -692,20 +688,13 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notifEquiv);
 
         var defenderUserId = userRepo.getUserIdForPlayerId(playerIdDefender);
-
-        EquivalenceDuelEvent edwe = new EquivalenceDuelDefenderWonEvent();
-        edwe.setGameId(game.getId());
-        edwe.setAttackerId(userId);
-        defenderUserId.ifPresent(edwe::setDefenderId);
-        edwe.setMutantId(equivMutant.getId());
-        notificationService.post(edwe);
-
-        EquivalenceDuelEvent eale = new EquivalenceDuelAttackerLostEvent();
-        eale.setGameId(game.getId());
-        eale.setAttackerId(userId);
-        defenderUserId.ifPresent(eale::setDefenderId);
-        eale.setMutantId(equivMutant.getId());
-        notificationService.post(eale);
+        var ede = new EquivalenceDuelResultEvent();
+        ede.setGameId(game.getId());
+        ede.setAttackerId(userId);
+        defenderUserId.ifPresent(ede::setDefenderId);
+        ede.setMutantId(equivMutant.getId());
+        ede.setDefenderWon();
+        notificationService.post(ede);
 
         // Notify the defender which triggered the duel about it!
         if (isMutantKillable) {
@@ -847,20 +836,13 @@ public class GameManagingUtils implements IGameManagingUtils {
 
                 var defenderPlayerId = mutantRepo.getEquivalentDefenderId(mutPending);
                 var defenderUserId = userRepo.getUserIdForPlayerId(defenderPlayerId);
-
-                EquivalenceDuelEvent eawe = new EquivalenceDuelAttackerWonEvent();
-                eawe.setGameId(game.getId());
-                eawe.setAttackerId(userId);
-                defenderUserId.ifPresent(eawe::setDefenderId);
-                eawe.setMutantId(mutPending.getId());
-                notificationService.post(eawe);
-
-                EquivalenceDuelEvent edle = new EquivalenceDuelDefenderLostEvent();
-                edle.setGameId(game.getId());
-                edle.setAttackerId(userId);
-                defenderUserId.ifPresent(edle::setDefenderId);
-                edle.setMutantId(mutPending.getId());
-                notificationService.post(edle);
+                var ede = new EquivalenceDuelResultEvent();
+                ede.setGameId(game.getId());
+                ede.setAttackerId(userId);
+                defenderUserId.ifPresent(ede::setDefenderId);
+                ede.setMutantId(mutPending.getId());
+                ede.setAttackerWon();
+                notificationService.post(ede);
 
                 if (mutPending.getId() == equivMutant.getId()) {
                     killedClaimed = true; // won equivalence duel of their own, claimed mutant

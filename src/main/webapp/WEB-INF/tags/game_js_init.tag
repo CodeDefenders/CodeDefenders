@@ -24,6 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%--
@@ -33,7 +34,7 @@
 
 <%-- Recieve events from the server --%>
 <script type="module">
-    import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {objects, AchievementNotifications, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */
@@ -69,12 +70,7 @@
             userId: ${login.userId}
         });
 
-        socket.register('equivalence.EquivalenceDuelDefenderWonEvent', event => {
-            console.log('Defender won equivalence duel // ', event);
-        });
-
-        socket.register('equivalence.EquivalenceDuelDefenderLostEvent', event => {
-            console.log('Defender lost equivalence duel // ', event);
+        socket.register('equivalence.EquivalenceDuelResultEvent', event => {
         });
 
 
