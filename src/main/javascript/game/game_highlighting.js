@@ -468,7 +468,7 @@ class GameHighlighting {
      * @property {number} gameId The id of the game the mutant was added in.
      */
 
-    /**]
+    /**
      * @typedef {Object} TestAddedEvent
      * @property {GHTestDTO} test The added test.
      * @property {number[]} coveredLines The lines covered by the added test.

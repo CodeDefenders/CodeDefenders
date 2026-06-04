@@ -153,6 +153,7 @@ public class ParallelMutationTester extends MutationTester {
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
                 int score = Scorer.score(game, mutant, missedTests);
+                mutant.setScore(score);
                 mutantRepo.incrementMutantScore(mutant, score);
             }
         }
@@ -276,6 +277,7 @@ public class ParallelMutationTester extends MutationTester {
             // missedTests));
             // mutant.update();
             int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            mutant.setScore(score);
             mutantRepo.incrementMutantScore(mutant, score);
         }
 

@@ -528,8 +528,7 @@ public class MultiplayerGameManager extends HttpServlet {
         GameManagingUtils.CreateBattlegroundMutantResult result;
         //noinspection DuplicatedCode
         try {
-            result = gameManagingUtils.createBattlegroundMutant(
-                    game, login.getUserId(), mutantText.get());
+            result = gameManagingUtils.createBattlegroundMutant(game, login.getUserId(), mutantText.get());
         } catch (GameManagingUtils.MutantCreationException e) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
