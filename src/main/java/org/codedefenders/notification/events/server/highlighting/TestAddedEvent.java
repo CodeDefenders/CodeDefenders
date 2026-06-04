@@ -22,7 +22,10 @@ import org.codedefenders.game.highlighting.GHTestDTO;
 
 import com.google.gson.annotations.Expose;
 
-
+/**
+ * Event sent when a test is added to the game in order to update the game highlighting.
+ * Contains the test information and the covered lines of the test.
+ */
 public class TestAddedEvent extends GameHighlightingEvent {
 
     @Expose
@@ -45,10 +48,5 @@ public class TestAddedEvent extends GameHighlightingEvent {
 
     public void setCoveredLines(Integer[] coveredLines) {
         this.coveredLines = coveredLines;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + ", test=" + test.id;
     }
 }

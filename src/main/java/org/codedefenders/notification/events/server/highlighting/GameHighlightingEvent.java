@@ -22,7 +22,11 @@ import org.codedefenders.notification.events.server.ServerEvent;
 
 import com.google.gson.annotations.Expose;
 
-public class GameHighlightingEvent extends ServerEvent {
+/**
+ * Event sent to trigger a change of the game highlighting (mutant/tests/coverage).
+ * Contains the game id of the game for which the highlighting should be refreshed.
+ */
+public abstract class GameHighlightingEvent extends ServerEvent {
 
     @Expose
     private int gameId;
@@ -33,10 +37,5 @@ public class GameHighlightingEvent extends ServerEvent {
 
     public void setGameId(int gameId) {
         this.gameId = gameId;
-    }
-
-    @Override
-    public String toString() {
-        return "gameId=" + gameId;
     }
 }

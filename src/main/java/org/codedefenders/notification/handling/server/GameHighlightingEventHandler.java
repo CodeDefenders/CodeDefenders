@@ -50,18 +50,10 @@ public class GameHighlightingEventHandler implements ServerEventHandler {
 
     @Subscribe
     public void sendGameHighlightingEvent(GameHighlightingEvent event) {
-        if (event.getGameId() != this.gameId) {
-            logger.info("ignore event for gameId={}, expected={}", event.getGameId(), this.gameId);
-            return;
-        }
-        if (event instanceof MutantAddedEvent mae) {
-            if (mae.getUserId() != this.userId) {
-                logger.info("ignore mutant added event for userId={}, expected={}", mae.getUserId(), this.userId);
-                return;
-            }
-        }
+        if (event.getGameId() != this.gameId) return;
+        // The mutant added event has a user id as it contains the user specific GHMutantDTO#canClaim info
+        if (event instanceof MutantAddedEvent mae && mae.getUserId() != this.userId) return;
 
-        logger.info("send gameHighlightingEvent: {}", event);
         socket.sendEvent(event);
     }
 

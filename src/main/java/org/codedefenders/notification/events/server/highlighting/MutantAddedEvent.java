@@ -22,7 +22,10 @@ import org.codedefenders.game.highlighting.GHMutantDTO;
 
 import com.google.gson.annotations.Expose;
 
-
+/**
+ * Event sent when a mutant is added to the game highlighting.
+ * Contains the mutant information and the user id of the player for which the canClaim info is relevant.
+ */
 public class MutantAddedEvent extends GameHighlightingEvent {
 
     @Expose
@@ -45,10 +48,5 @@ public class MutantAddedEvent extends GameHighlightingEvent {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + ", mutant=[id:" + mutant.id + ", changes:" + mutant.lines + "]";
     }
 }
