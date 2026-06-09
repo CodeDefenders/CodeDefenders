@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
@@ -44,7 +45,9 @@ public class LoggingConfig {
 
     public void reconfigure() {
         var context = LoggerContext.getContext(false);
-        context.getRootLogger().setLevel(getLogLevel());
+        var config = context.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+        config.setLevel(getLogLevel());
+        context.updateLoggers();
     }
 
     private Level getLogLevel() {
