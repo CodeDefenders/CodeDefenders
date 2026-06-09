@@ -1375,38 +1375,6 @@ msgstr "FEHLER: Systemspieler konnten nicht zum Spiel hinzugefügt werden {0}."
 msgid "Creating games is currently not enabled."
 msgstr "Das Erstellen von Spielen ist im Moment nicht möglich."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:151
-msgid ""
-"You configured auth.admin.users to promote the following users to admin: "
-"'%s'. Please remember to disable this setting in the config after you finish "
-"setting up Code Defenders."
-msgstr ""
-"Du hast auth.admin.users so eingestellt, dass die folgenden Nutzer zu Admins "
-"werden: '%s'. Vergiss nicht, diese Einstellung in der Konfiguration zu "
-"deaktivieren, wenn du mit der Einrichtung von Code Defenders fertig bist."
-
-#: src/main/java/org/codedefenders/service/RoleService.java:157
-#: src/main/java/org/codedefenders/service/RoleService.java:197
-msgid ""
-"Some users were not found. If you want to add these users as administrators, "
-"please create the accounts and restart the application."
-msgstr ""
-"Einige Benutzer wurden nicht gefunden. Wenn du diese Benutzer als "
-"Administratoren hinzufügen möchtest, erstelle bitte die Konten und starte "
-"die Anwendung neu."
-
-#: src/main/java/org/codedefenders/service/RoleService.java:188
-msgid ""
-"Your configuration still contains the deprecated auth.admin.role setting. "
-"Code Defenders will now migrate your existing admin users from the Tomcat "
-"user database to our new system. You can safely remove auth.admin.role after "
-"this is done."
-msgstr ""
-"Deine Konfiguration hat noch die veraltete Einstellung „auth.admin.role“. "
-"Code Defenders wird jetzt deine bestehenden Admin-Benutzer von der Tomcat-"
-"Benutzerdatenbank in unser neues System migrieren. Danach kannst du "
-"„auth.admin.role“ einfach löschen."
-
 #: src/main/java/org/codedefenders/service/UserService.java:185
 msgid "Could not create user. Invalid username."
 msgstr "Der Benutzer konnte nicht erstellt werden. Ungültiger Benutzername."
