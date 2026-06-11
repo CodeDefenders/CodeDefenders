@@ -59,11 +59,13 @@ public class Paths {
     public static final String BATTLEGROUND_HISTORY = "/multiplayer/history";
     public static final String BATTLEGROUND_SELECTION = "/multiplayer/games";
     public static final String BATTLEGROUND_CREATE = "/multiplayer/create";
+    public static final String BATTLEGROUND_GAME_SCOREBOARD = "/multiplayer/scoreboard";
 
     public static final String MELEE_GAME = "/meleegame";
     public static final String MELEE_HISTORY = "/meleegame/history";
     public static final String MELEE_SELECTION = "/melee/games";
     public static final String MELEE_CREATE = "/melee/create";
+    public static final String MELEE_GAME_SCOREBOARD = "/melee/scoreboard";
 
     public static final String PUZZLE_OVERVIEW = "/puzzles";
     public static final String PUZZLE_GAME = "/puzzlegame";

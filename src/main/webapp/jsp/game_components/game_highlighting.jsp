@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
 
     Copyright (C) 2016-2025 Code Defenders contributors
@@ -19,6 +20,8 @@
 
 --%>
 <%--@elvariable id="gameHighlighting" type="org.codedefenders.beans.game.GameHighlightingBean"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -34,23 +37,43 @@
     The CSS is located in codemirror_customize.css.
 --%>
 
+<c:set var="scoreboardBaseUrl" value="${
+    gameHighlighting.gameMode == 'MELEE' ? Paths.MELEE_GAME_SCOREBOARD :
+    gameHighlighting.gameMode == 'PARTY' ? Paths.BATTLEGROUND_GAME_SCOREBOARD :
+    ''}" />
+
 <script type="module">
     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
     import {GameHighlighting} from '${url.forPath("/js/codedefenders_game.mjs")}';
-
 
     const data = JSON.parse('${gameHighlighting.JSON}');
     const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
     const gameId = Number(${gameHighlighting.gameId});
 
-    const gameHighlighting = await new GameHighlighting(
-            data,
-            enableFlagging,
-            gameId).initAsync();
+    const gameHighlighting = await new GameHighlighting(data, enableFlagging, gameId)
+        .initAsync();
 
     gameHighlighting.highlightCoverage();
     gameHighlighting.highlightMutants();
 
+    <c:if test="${not empty scoreboardBaseUrl}">
+    function updateScoreboard() {
+        fetch("${url.forPath(scoreboardBaseUrl)}?gameId=${gameHighlighting.gameId}")
+            .then(r => {
+                if (r.ok) {
+                    r.text().then(text =>
+                        document.querySelector('#scoreboard .modal-body').innerHTML = text.trim()
+                    );
+                } else {
+                    console.error("Failed to update scoreboard: " + r.status);
+                }
+            });
+    }
+
+    const pushSocket = await objects.await('pushSocket');
+    pushSocket.register('highlighting.MutantAddedEvent', updateScoreboard);
+    pushSocket.register('highlighting.TestAddedEvent', updateScoreboard);
+    </c:if>
 
     objects.register('gameHighlighting', gameHighlighting);
 </script>
