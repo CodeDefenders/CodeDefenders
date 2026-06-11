@@ -602,6 +602,8 @@ public class MeleeGameManager extends HttpServlet {
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
+        gameManagingUtils.notifyPlayersOnTestAdded(newTest, game.getId());
+
         // Clean up the session
         previousSubmission.clear();
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
