@@ -1871,219 +1871,227 @@ msgstr "Execution Error: {0}"
 msgid "Successfully uploaded chapter(s). As of now, please check the logs for errors."
 msgstr "Successfully uploaded chapter(s). As of now, please check the logs for errors."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:54
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:70
 msgid "Show Player Feedback"
 msgstr "Show Player Feedback"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:55
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:71
 msgid "Show other player's feedback to all players in the game."
 msgstr "Show other player's feedback to all players in the game."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:58
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:74
 msgid "Registration"
 msgstr "Registration"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:59
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:75
 msgid "Show or hide the link for user registration."
 msgstr "Show or hide the link for user registration."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:62
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:78
 msgid "Class Upload"
 msgstr "Class Upload"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:63
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:79
 msgid "Show or hide the link for CUT upload."
 msgstr "Show or hide the link for CUT upload."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:66
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:82
 msgid "Game Creation"
 msgstr "Game Creation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:67
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:83
 msgid "Show or hide the link for Game Creation."
 msgstr "Show or hide the link for Game Creation."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:70
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:86
 msgid "Game Joining"
 msgstr "Game Joining"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:71
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:87
 msgid "Show or hide links to join/leave games."
 msgstr "Show or hide links to join/leave games."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:74
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:90
 msgid "Require Mail Validation"
 msgstr "Require Mail Validation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:75
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:91
 msgid "Require a validated email address for login."
 msgstr "Require a validated email address for login."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:78
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:94
 msgid "Min Password Length"
 msgstr "Min Password Length"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:79
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:95
 msgid "Minimum password length, also length of generated passwords. Recommended: >7"
 msgstr "Minimum password length, also length of generated passwords. Recommended: >7"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:82
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:98
 msgid "Connection Pool Connections"
 msgstr "Connection Pool Connections"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:84
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:100
 msgid "NOT USED, SET THIS VIA THE CONFIGURATION.\nNumber of permanently open connections. Recommended: >20\nLowering this number closes the delta in connections!\n"
 msgstr "NOT USED, SET THIS VIA THE CONFIGURATION.\nNumber of permanently open connections. Recommended: >20\nLowering this number closes the delta in connections!\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:92
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:108
 msgid "Connection Waiting Time"
 msgstr "Connection Waiting Time"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:94
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:110
 msgid "NOT USED, SET THIS VIA THE CONFIGURATION.\nAmount of time in ms a thread waits to be notified of newly available connections.\nRecommended: ~5000ms\n"
 msgstr "NOT USED, SET THIS VIA THE CONFIGURATION.\nAmount of time in ms a thread waits to be notified of newly available connections.\nRecommended: ~5000ms\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:102
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:118
 msgid "Supported Languages"
 msgstr "Supported Languages"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:104
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
 msgid "Comma separated list of supported locales where full translations exist.\nThe first locale in the list will be used by default.\nLanguage codes like en, de, fr are sufficient.\n"
 msgstr "Comma separated list of supported locales where full translations exist.\nThe first locale in the list will be used by default.\nLanguage codes like en, de, fr are sufficient.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:112
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
 msgid "Email Smtp Host"
 msgstr "Email Smtp Host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:113
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:129
 msgid "SMTP host"
 msgstr "SMTP host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:116
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:132
 msgid "Email Smtp Port"
 msgstr "Email Smtp Port"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:117
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:133
 msgid "SMTP port"
 msgstr "SMTP port"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:136
 msgid "Email Address"
 msgstr "Email Address"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:121
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
 msgid "System mail account"
 msgstr "System mail account"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:124
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:140
 msgid "Email Password"
 msgstr "Email Password"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:125
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:141
 msgid "Password for the system mail account"
 msgstr "Password for the system mail account"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:144
 msgid "Email Username"
 msgstr "Email Username"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:130
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:146
 msgid "Username for the system mail account.\nShould usually be the same as the address. If left blank, will default to the address.\n"
 msgstr "Username for the system mail account.\nShould usually be the same as the address. If left blank, will default to the address.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:153
 msgid "Emails Enabled"
 msgstr "Emails Enabled"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:139
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:155
 msgid "Send emails from the specified account for verification,\nresetting passwords and when the admin changes user info\n"
 msgstr "Send emails from the specified account for verification,\nresetting passwords and when the admin changes user info\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:146
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
 msgid "Password Reset Secret Lifespan"
 msgstr "Password Reset Secret Lifespan"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:147
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
 msgid "How long (in hours) a password reset secret is valid"
 msgstr "How long (in hours) a password reset secret is valid"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:150
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
 msgid "Debug Mode"
 msgstr "Debug Mode"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:151
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
 msgid "Turn on certain debugging features such as detailed debug prints for javax.mail"
 msgstr "Turn on certain debugging features such as detailed debug prints for javax.mail"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:154
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
 msgid "Automatic Killmap Computation"
 msgstr "Automatic Killmap Computation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:155
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
 msgid "Turn on the automatic killmaps computation"
 msgstr "Turn on the automatic killmaps computation"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:158
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
 msgid "Public User Profile"
 msgstr "Public User Profile"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:159
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
 msgid "Let users visit the profile pages of others."
 msgstr "Let users visit the profile pages of others."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
 msgid "Allow Puzzle Section"
 msgstr "Allow Puzzle Section"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:179
 msgid "Let users play the puzzles in the puzzle section."
 msgstr "Let users play the puzzles in the puzzle section."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:182
 msgid "Failed Duel Validation Threshold"
 msgstr "Failed Duel Validation Threshold"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:183
 msgid "The maximum number of tests that will run to validate a lost equivalence duel."
 msgstr "The maximum number of tests that will run to validate a lost equivalence duel."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:186
 msgid "Game Duration Minutes Max"
 msgstr "Game Duration Minutes Max"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
 msgid "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 msgstr "The maximum duration that can be set for multiplayer/melee games (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:190
 msgid "Game Duration Minutes Default"
 msgstr "Game Duration Minutes Default"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
 msgid "The default duration a multiplayer/melee game is open (in minutes)."
 msgstr "The default duration a multiplayer/melee game is open (in minutes)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:194
 msgid "Teacher Applications Enabled"
 msgstr "Teacher Applications Enabled"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:180
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
 msgid "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 msgstr "Enable teacher account applications using email on the 'Contact Us' page.\nConfiguring a valid email address is required.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
 msgid "Teacher Applications Email"
 msgstr "Teacher Applications Email"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:188
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
 msgid "The email address to use for teacher account applications."
 msgstr "The email address to use for teacher account applications."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:319
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:207
+msgid "Log Level"
+msgstr "Log Level"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:208
+msgid "Controls the granularity of log messages."
+msgstr "Controls the granularity of log messages."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:348
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:320
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:349
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
@@ -6099,31 +6107,31 @@ msgstr "Editable lines start below"
 msgid "Editable lines end above"
 msgstr "Editable lines end above"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:50
+#: src/main/webapp/jsp/admin_system_settings.jsp:52
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:85
+#: src/main/webapp/jsp/admin_system_settings.jsp:108
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:86
+#: src/main/webapp/jsp/admin_system_settings.jsp:109
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:114
+#: src/main/webapp/jsp/admin_system_settings.jsp:139
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:115
+#: src/main/webapp/jsp/admin_system_settings.jsp:140
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:128
+#: src/main/webapp/jsp/admin_system_settings.jsp:153
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:132
+#: src/main/webapp/jsp/admin_system_settings.jsp:157
 msgid "Cancel"
 msgstr "Cancel"
 
