@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringJoiner;
-import java.util.function.Consumer;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -41,7 +39,6 @@ import org.codedefenders.persistence.database.RoleRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xnap.commons.i18n.I18n;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -146,18 +143,12 @@ public class RoleService {
             return;
         }
 
-        StringJoiner messages = new StringJoiner("\n");
-        messages.add(I18n.marktr(
-                "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
-                ).formatted(String.join(", ", userNames)));
+        logger.warn("You configured auth.admin.users to promote the following users to admin: '{}'.", String.join(", ", userNames));
 
-        boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
-
+        boolean missingUser = promoteUsersToAdmin(userNames);
         if (missingUser) {
-            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."));
+            logger.warn("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application.");
         }
-
-        logger.warn(messages.toString());
     }
 
     /**
@@ -178,44 +169,38 @@ public class RoleService {
 
         if (userNames.isEmpty()) {
             logger.warn("""
-                        Your configuration still contains the deprecated auth.admin.role setting, but no users \
+                        Your configuration contains the deprecated auth.admin.role setting, but no users \
                         matching the role were found in your Tomcat user database. You can safely remove \
-                        auth.admin.role from your config.""");
+                        auth.admin.role from your config.""".stripIndent());
             return;
         }
 
-        StringJoiner messages = new StringJoiner("\n");
-        messages.add(I18n.marktr("""
-                     Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now \
+        logger.warn("""
+                     Your configuration contains the deprecated auth.admin.role setting. Code Defenders will now \
                      migrate your existing admin users from the Tomcat user database to our new system. You can safely \
-                     remove auth.admin.role after this is done.""")
-                .stripIndent());
+                     remove auth.admin.role after this is done.""".stripIndent());
 
-        boolean missingUser = promoteUsersToAdmin(userNames, messages::add);
-
+        boolean missingUser = promoteUsersToAdmin(userNames);
         if (missingUser) {
-            messages.add(I18n.marktr("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."));
+            logger.warn("Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application.");
         }
-
-        logger.warn(messages.toString());
     }
 
     /**
      * Promotes the given users to admin.
      * @param userNames User names to promote.
-     * @param logMessage A callback for log messages.
      * @return {@code true} if any of the given users wasn't found.
      */
-    private boolean promoteUsersToAdmin(List<String> userNames, Consumer<String> logMessage) {
+    private boolean promoteUsersToAdmin(List<String> userNames) {
         boolean missingUser = false;
         for (String userName : userNames) {
             var user = userRepo.getUserByName(userName);
             if (user.isPresent()) {
                 addRoleForUser(user.get().getId(), new AdminRole());
-                logMessage.accept("Promoted user to admin: '%s'".formatted(userName));
+                logger.warn("Promoted user to admin: '{}'", userName);
             } else {
                 missingUser = true;
-                logMessage.accept("Could not promote user to admin: '%s'. User not found.".formatted(userName));
+                logger.warn("Could not promote user to admin: '{}'. User not found.", userName);
             }
         }
         return missingUser;

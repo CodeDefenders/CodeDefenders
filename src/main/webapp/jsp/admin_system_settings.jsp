@@ -29,6 +29,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
 <%
     // Get the enum constants here, since EL doesn't seem to work with inner-class enums.
@@ -45,6 +46,7 @@
     pageContext.setAttribute("EMAIL_SMTP_PORT", SETTING_NAME.EMAIL_SMTP_PORT);
     pageContext.setAttribute("TEACHER_APPLICATIONS_ENABLED", SETTING_NAME.TEACHER_APPLICATIONS_ENABLED);
     pageContext.setAttribute("TEACHER_APPLICATIONS_EMAIL", SETTING_NAME.TEACHER_APPLICATIONS_EMAIL);
+    pageContext.setAttribute("LOG_LEVEL", SETTING_NAME.LOG_LEVEL);
 %>
 
 <p:main_page title="${i18n.tr('System Settings')}">
@@ -74,19 +76,42 @@
                         </label>
                         <c:choose>
                             <c:when test="${setting.type == STRING_VALUE}">
-                                <div class="col-8">
-                                    <input type="${settingId.contains('PASSWORD') ? 'password' : 'text'}"
-                                           class="form-control"
-                                           name="${settingId}"
-                                           id="${settingId}"
-                                           value="${setting.stringValue}">
-                                    <c:if test="${settingId.startsWith('EMAIL')}">
-                                        <div class="invalid-feedback">
-                                                ${i18n.tr('This setting is required for sending emails.')}
-                                                ${i18n.tr('Please provide a valid value, or disable emails.')}
+                                <c:choose>
+                                    <c:when test="${setting.name == SITE_NOTICE || setting.name == PRIVACY_NOTICE || setting.name == CONTACT_NOTICE}">
+                                        <div class="col-8">
+                                            <textarea class="form-control" rows="3"
+                                                      name="${settingId}"
+                                                      id="${settingId}">${setting.stringValue}</textarea>
                                         </div>
-                                    </c:if>
-                                </div>
+                                    </c:when>
+                                    <c:when test="${setting.name == LOG_LEVEL}">
+                                        <div class="col-8">
+                                            <select id="${settingId}" name="${settingId}" class="form-select" required>
+                                                <c:forEach var="level" items="${AdminSystemSettings.sortedLogLevels}">
+                                                    <%--@elvariable id="level" type="org.apache.logging.log4j.Level"--%>
+                                                    <option value="${level.name()}" ${level.name() == setting.stringValue ? 'selected' : ''}>
+                                                        ${level.name()}
+                                                    </option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <div class="col-8">
+                                            <input type="${settingId.contains("PASSWORD") ? 'password' : 'text'}"
+                                                   class="form-control"
+                                                   name="${settingId}"
+                                                   id="${settingId}"
+                                                   value="${setting.stringValue}">
+                                            <c:if test="${settingId.startsWith('EMAIL')}">
+                                                <div class="invalid-feedback">
+                                                    ${i18n.tr('This setting is required for sending emails.')}
+                                                    ${i18n.tr('Please provide a valid value, or disable emails.')}
+                                                </div>
+                                            </c:if>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:when>
                             <c:when test="${setting.type == BOOL_VALUE}">
                                 <div class="col-8 d-flex align-items-center">

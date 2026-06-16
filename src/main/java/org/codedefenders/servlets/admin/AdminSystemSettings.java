@@ -19,6 +19,9 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import jakarta.inject.Inject;
@@ -28,9 +31,12 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.Level;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.logging.LoggingConfig;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,9 +44,9 @@ import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.util.Paths.ADMIN_SETTINGS;
 
-@WebServlet(ADMIN_SETTINGS)
+// TODO Does this enable CDI using @Property@Inject ?
+@WebServlet(Paths.ADMIN_SETTINGS)
 public class AdminSystemSettings extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(AdminSystemSettings.class);
 
     @Inject
@@ -48,6 +54,16 @@ public class AdminSystemSettings extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private LoggingConfig loggingConfig;
+
+    public static List<Level> sortedLogLevels = new ArrayList<>();
+    static {
+        Arrays.stream(Level.values())
+                .sorted(Comparator.comparing(Level::intLevel))
+                .forEach(sortedLogLevels::add);
+    }
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK(
@@ -186,6 +202,10 @@ public class AdminSystemSettings extends HttpServlet {
         TEACHER_APPLICATIONS_EMAIL(
                 I18n.marktr("Teacher Applications Email"),
                 I18n.marktr("The email address to use for teacher account applications.")
+        ),
+        LOG_LEVEL(
+                I18n.marktr("Log Level"),
+                I18n.marktr("Controls the granularity of log messages.")
         );
 
         private final String readableName;
@@ -302,6 +322,15 @@ public class AdminSystemSettings extends HttpServlet {
                 switch (setting.getType()) {
                     case STRING_VALUE:
                         setting.setStringValue(valueString);
+                        if (setting.getName().equals(SETTING_NAME.LOG_LEVEL)) {
+                            try {
+                                Level.valueOf(setting.getStringValue());
+                            } catch (IllegalArgumentException e) {
+                                logger.warn("Invalid log level: '{}'. Falling back to INFO.");
+                                setting.setStringValue(Level.INFO.name());
+                            }
+                            // connectionFactory.updateSize(Integer.parseInt(valueString));
+                        }
                         break;
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
@@ -319,6 +348,9 @@ public class AdminSystemSettings extends HttpServlet {
                 ? I18n.marktr("Updated Settings.")
                 : I18n.marktr("There was a problem. Please consult the logs")
         );
+
+        loggingConfig.reconfigure();
+        messages.add(success ? "Updated Settings." : "There was a problem. Please consult the logs");
     }
 
 }

@@ -226,13 +226,6 @@ tomcat-standalone:
     if test -z "${CATALINA_OPTS:-}"; then
         CATALINA_OPTS="-agentlib:jdwp=transport=dt_socket,address=${debug_port},server=y,suspend=n"
     fi
-    # Set log level and some basic config if JAVA_OPTS is unset
-    if test -z "${JAVA_OPTS:-}"; then
-        JAVA_OPTS="-Dorg.slf4j.simpleLogger.defaultLogLevel=${log_level}"
-        JAVA_OPTS="$JAVA_OPTS -Dorg.slf4j.simpleLogger.showDateTime=true"
-        JAVA_OPTS="$JAVA_OPTS -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss"
-        JAVA_OPTS="$JAVA_OPTS -Dorg.slf4j.simpleLogger.showShortLogName=true"
-    fi
 
     rm -rf target/tomcat
     mkdir -p target/tomcat/conf/Catalina/localhost

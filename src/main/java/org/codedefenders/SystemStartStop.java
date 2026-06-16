@@ -37,6 +37,7 @@ import org.codedefenders.dependencies.DependencyProvider;
 import org.codedefenders.dependencies.MavenDependencyResolver;
 import org.codedefenders.game.GameStoppedEventHandlerContainer;
 import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.logging.LoggingConfig;
 import org.codedefenders.service.AchievementService;
 import org.codedefenders.service.RoleService;
 import org.codedefenders.util.FileUtils;
@@ -75,6 +76,8 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private DependencyProvider dependencyProvider;
 
+    @Inject
+    private LoggingConfig loggingConfig;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -83,6 +86,8 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        loggingConfig.reconfigure();
+
         try {
             config.validate();
         } catch (ConfigurationValidationException e) {

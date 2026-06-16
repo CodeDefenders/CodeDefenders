@@ -1567,22 +1567,6 @@ msgstr "Creating games is currently not enabled."
 msgid "Creating games is currently not enabled."
 msgstr "Creating games is currently not enabled."
 
-#: src/main/java/org/codedefenders/service/RoleService.java:151
-msgid "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
-msgstr "You configured auth.admin.users to promote the following users to admin: '%s'. Please remember to disable this setting in the config after you finish setting up Code Defenders."
-
-#: src/main/java/org/codedefenders/service/RoleService.java:157
-msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
-msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
-
-#: src/main/java/org/codedefenders/service/RoleService.java:188
-msgid "Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now migrate your existing admin users from the Tomcat user database to our new system. You can safely remove auth.admin.role after this is done."
-msgstr "Your configuration still contains the deprecated auth.admin.role setting. Code Defenders will now migrate your existing admin users from the Tomcat user database to our new system. You can safely remove auth.admin.role after this is done."
-
-#: src/main/java/org/codedefenders/service/RoleService.java:197
-msgid "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
-msgstr "Some users were not found. If you want to add these users as administrators, please create the accounts and restart the application."
-
 #: src/main/java/org/codedefenders/service/UserService.java:185
 msgid "Could not create user. Invalid username."
 msgstr "Could not create user. Invalid username."

@@ -16,39 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration.configfileresolver;
+package org.codedefenders.logging;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-
-import jakarta.inject.Singleton;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * The ClassPathConfigFileResolver searches the named config file with a classpath search.
- *
- * @author degenhart
- */
-@Singleton
-public class ClasspathConfigFileResolver extends ConfigFileResolver {
-    private static final Logger logger = LoggerFactory.getLogger(ClasspathConfigFileResolver.class);
+public final class ExceptionLoggingFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionLoggingFilter.class);
 
     @Override
-    public Reader getConfigFile(String file) {
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
-
-        if (inputStream == null) {
-            return null;
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) {
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Throwable e) {
+            logger.error("Unhandled exception", e);
+            throw new RuntimeException(e);
         }
-
-        return new InputStreamReader(inputStream);
-    }
-
-    @Override
-    public int getPriority() {
-        return 10;
     }
 }
