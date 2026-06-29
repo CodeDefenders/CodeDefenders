@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-public class TestStrategyFullSuite extends LlmTestService {
+public class TestStrategyFullSuite extends AbstractTestStrategy {
 
     private static final String GENERATE_FULL_SUITE = "GENERATE_FULL_SUITE";
     private static final String CORRECTION = "CORRECTION";

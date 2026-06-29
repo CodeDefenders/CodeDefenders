@@ -34,6 +34,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.LlmOrganizer;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
@@ -42,7 +43,6 @@ import org.codedefenders.persistence.database.MeleeGameRepository;
 import org.codedefenders.persistence.database.MultiplayerGameRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
-import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.xnap.commons.i18n.I18n;
 
@@ -84,7 +84,7 @@ public class CreateGamesService {
     private GameClassRepository gameClassRepo;
 
     @Inject
-    private LlmManagerService llmManagerService;
+    private LlmOrganizer llmOrganizer;
 
     /**
      * Maps user ID to their admin staged games list.
@@ -232,7 +232,7 @@ public class CreateGamesService {
         if (gameSettings.getGameType() == MELEE) {
             if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null
                     || gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
-                llmManagerService.setPlayerModel(game, Role.PLAYER,
+                llmOrganizer.setPlayerModel(game, Role.PLAYER,
                         gameSettings.getLlmDefenderModel(),
                         gameSettings.getLlmAttackerModel(),
                         gameSettings.getLlmDefenderStrategy(),
@@ -240,14 +240,14 @@ public class CreateGamesService {
             }
         } else if (gameSettings.getGameType() == MULTIPLAYER) {
             if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null) {
-                llmManagerService.setPlayerModel(game, Role.DEFENDER,
+                llmOrganizer.setPlayerModel(game, Role.DEFENDER,
                         gameSettings.getLlmDefenderModel(),
                         null,
                         gameSettings.getLlmDefenderStrategy(),
                         null);
             }
             if (gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
-                llmManagerService.setPlayerModel(game, Role.ATTACKER,
+                llmOrganizer.setPlayerModel(game, Role.ATTACKER,
                         null,
                         gameSettings.getLlmAttackerModel(),
                         null,

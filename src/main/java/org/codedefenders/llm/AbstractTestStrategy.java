@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  * Superclass of all TestStrategies. It is not to be instantiated itself. Provides some commonly used structures
  * and utility methods.
  */
-abstract class LlmTestService extends LlmSubActionService {
-    private static final Logger logger = LoggerFactory.getLogger(LlmTestService.class);
+abstract class AbstractTestStrategy extends AbstractStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractTestStrategy.class);
 
     //TODO Make this adjustable
     private static final String OUTSIDE_OF_METHOD_DESCRIPTION = "(The code outside of methods)";
@@ -103,7 +103,7 @@ abstract class LlmTestService extends LlmSubActionService {
      * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
      * living mutant that hasn't been created by the user.
      * If one method contains several living mutants, it occurs several times in the list.
-     * If a mutant exists outside a method, the String is {@link LlmTestService#OUTSIDE_OF_METHOD_DESCRIPTION}.
+     * If a mutant exists outside a method, the String is {@link AbstractTestStrategy#OUTSIDE_OF_METHOD_DESCRIPTION}.
      */
     private List<String> getMethodsWithLivingMutants() {
         List<MutantDTO> mutants = gameService.getMutants(user, game);

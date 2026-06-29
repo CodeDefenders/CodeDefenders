@@ -21,7 +21,6 @@ package org.codedefenders.servlets.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,16 +36,16 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
+import org.codedefenders.llm.LlmOrganizer;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
-import org.codedefenders.model.llm.LlmDefaultStrategy;
+import org.codedefenders.model.llm.LlmDefaultStrategies;
 import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmRepository;
-import org.codedefenders.service.llm.LlmInspectionService;
-import org.codedefenders.service.llm.LlmManagerService;
+import org.codedefenders.service.LlmInspectionService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -78,7 +77,7 @@ public class LlmApi extends HttpServlet {
     URLUtils url;
 
     @Inject
-    private LlmManagerService llmService;
+    private LlmOrganizer llmService;
 
     /**
      * Send back information about LLMs or LLM players. Supported actions:
@@ -270,9 +269,9 @@ public class LlmApi extends HttpServlet {
                     resp.sendRedirect(url.forPath(Paths.ADMIN_LLM_CONFIG));
                     return;
                 }
-                Optional<LlmDefaultStrategy> baseStrategy = ServletUtils.getEnumParameter(
+                Optional<LlmDefaultStrategies> baseStrategy = ServletUtils.getEnumParameter(
                         req,
-                        LlmDefaultStrategy.class,
+                        LlmDefaultStrategies.class,
                         "baseStrategy");
                 Map<LlmPromptType, String> customPrompts = new HashMap<>();
                 Iterator<String> otherParams = req.getParameterNames().asIterator();

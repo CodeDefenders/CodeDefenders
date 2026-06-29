@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.service;
 
 import java.sql.Timestamp;
 import java.time.Instant;

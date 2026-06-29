@@ -29,11 +29,11 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.LlmOrganizer;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmDefaultStrategy;
+import org.codedefenders.model.llm.LlmDefaultStrategies;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
-import org.codedefenders.service.llm.LlmManagerService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
 
@@ -47,7 +47,7 @@ public class SetLlmAPI extends APIServlet {
     GameProducer gameProducer;
 
     @Inject
-    LlmManagerService llmService;
+    LlmOrganizer llmService;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -58,7 +58,7 @@ public class SetLlmAPI extends APIServlet {
                 .map(String::toUpperCase)
                 .map(Role::valueOrNull);
         final Optional<Action> action = ServletUtils.getEnumParameter(request, Action.class, "action");
-        final LlmStrategy strategy = ServletUtils.getEnumParameter(request, LlmDefaultStrategy.class, "strategy")
+        final LlmStrategy strategy = ServletUtils.getEnumParameter(request, LlmDefaultStrategies.class, "strategy")
                         .map(LlmStrategy::of).orElse(null);//TODO unschön
         if (gameId.isEmpty() || modelName.isEmpty() || modelType.isEmpty() || action.isEmpty() || role.isEmpty()
                 || strategy == null) {

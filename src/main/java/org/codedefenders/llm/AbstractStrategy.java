@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +33,7 @@ import org.codedefenders.model.llm.LlmConversationBatch;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
+import org.codedefenders.service.LlmPromptService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.slf4j.Logger;
@@ -41,8 +42,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This class provides fields and methods common to its subclasses, but is not to be instantiated itself.
  */
-public abstract class LlmSubActionService {
-    private static final Logger logger = LoggerFactory.getLogger(LlmSubActionService.class);
+public abstract class AbstractStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractStrategy.class);
 
     //TODO Make this customizable
     private static final int EQUIVALENT_POINT_RESTRICTION = 10;
@@ -85,7 +86,7 @@ public abstract class LlmSubActionService {
             }
 
         } else {
-            logger.warn("Running a disabled LlmSubActionService. This is probably not intended.");
+            logger.warn("Running a disabled AbstractStrategy. This is probably not intended.");
         }
     }
 
@@ -172,7 +173,7 @@ public abstract class LlmSubActionService {
 
     /**
      * Return one random mutant from the set of all mutants that can be marked as equivalent by the user
-     * and have acquired at least {@link LlmSubActionService#EQUIVALENT_POINT_RESTRICTION} points.
+     * and have acquired at least {@link AbstractStrategy#EQUIVALENT_POINT_RESTRICTION} points.
      * Returns an empty Optional if there is no mutant that can be marked as equivalent.
      */
     private Optional<MutantDTO> getRandomPossiblyEquivalentMutant(AbstractGame game, SimpleUser user, Random random) {

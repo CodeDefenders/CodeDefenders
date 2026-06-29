@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-public class TestStrategyDefault extends LlmTestService {
+public class TestStrategyDefault extends AbstractTestStrategy {
 
     @Override
     public Optional<String> generate(LlmStrategy strategy) {

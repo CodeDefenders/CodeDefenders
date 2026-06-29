@@ -16,10 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.UncheckedSQLException;
@@ -32,8 +31,8 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class LlmMutantService extends LlmSubActionService {
-    private static final Logger logger = LoggerFactory.getLogger(LlmMutantService.class);
+abstract class AbstractMutantStrategy extends AbstractStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractMutantStrategy.class);
 
     protected abstract void onSubmitSuccess();
 

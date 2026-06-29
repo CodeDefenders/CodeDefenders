@@ -16,39 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import jakarta.enterprise.inject.Vetoed;
 
-import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.codedefenders.util.LlmUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
-public class MutantStrategyRandomSingleMethod extends LlmMutantService {
-    private static final Logger logger = LoggerFactory.getLogger(MutantStrategyRandomSingleMethod.class);
+public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy {
+
+    private static final String ASK_FOR_METHOD = "ASK_FOR_METHOD";
+    private static final String FOLLOW_UP = "FOLLOW_UP";
 
     @Override
     protected void onSubmitSuccess() {
         finishConversation(true);
-        baggage().callableDeclaration = null;
-        baggage().originalMethodCode = null;
+        baggage().methodDeclaration = null;
     }
 
     @Override
@@ -58,25 +53,47 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
 
     @Override
     protected Optional<String> generate(LlmStrategy strategy) {
-        setConversationType(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM.displayName());
-        resetConversationAfterTooManyTries();
-
-        if (conversation.isEmpty()) {
-            List<MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
-            MethodDescription chosenDescription = methodDescriptions.get(random.nextInt(methodDescriptions.size()));
-
-            //TODO Not very efficient
-            baggage().callableDeclaration = baggage().getMethodDeclaration(chosenDescription.getDescription());
-            baggage().originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
-
-
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM), model);
-            conversation.addUserMessage(baggage().originalMethodCode, model);
+        if (baggage().methodDeclaration == null) {
+            setConversationType(ASK_FOR_METHOD);
+        } else {
+            setConversationType(FOLLOW_UP);
         }
+        resetConversationAfterTooManyTries();
+        if (conversation.getType().equals(ASK_FOR_METHOD)) {
+            if (conversation.isEmpty()) {
+                conversation.addSystemMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_INITIAL_SYSTEM), model);
+                conversation.addUserMessage(
+                        LlmUtils.annotatedMethodDescriptions(game, baggage().compilationUnit), model);
+            }
+            String reply = promptService.getResponse(model, conversation);
+            CallableDeclaration<?> declaration = baggage().getCallableDeclaration(reply);
+            if (declaration == null) {
+                conversation.addUserMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_NO_SUCH_METHOD_SYSTEM), model);
+            } else {
+                baggage().methodDeclaration = declaration;
+                finishConversation(true);
+                setConversationType(FOLLOW_UP); //TODO verstehe den flow hier nicht ganz. Warum hier auf follow_up, und oben wird auch nochmal überprüft`?
+            }
+            return Optional.empty();
+            //baggage().methodSignature = reply;
 
-        String reply = promptService.getResponse(model, conversation);
-        reply = LlmUtils.extractMutantFromReply(reply, null);
-        return Optional.of(game.getCUT().getSourceCode().replace(baggage().originalMethodCode, reply));
+        } else if (conversation.getType().equals(FOLLOW_UP)) {
+            String originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
+
+            if (conversation.isEmpty()) {
+                conversation.addSystemMessage(
+                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_FOLLOWUP_SYSTEM), model);
+                conversation.addUserMessage(originalMethodCode, model);
+            }
+
+            String reply = promptService.getResponse(model, conversation);
+            reply = LlmUtils.extractMutantFromReply(reply, null);
+            return Optional.of(game.getCUT().getSourceCode().replace(originalMethodCode, reply));
+        } else {
+            throw new RuntimeException("No support for this conversation type: " + conversation.getType());
+        }
     }
 
     private SingleMethodBaggage baggage() {
@@ -84,13 +101,11 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
                 || !(conversationBatch.getBaggage() instanceof SingleMethodBaggage)) {
             conversationBatch.setBaggage(new SingleMethodBaggage(game));
         }
-        return (SingleMethodBaggage) conversationBatch.getBaggage();
+        return (SingleMethodBaggage)conversationBatch.getBaggage();
     }
 
-    //TODO Generalize
     private static class SingleMethodBaggage {
-        private CallableDeclaration<?> callableDeclaration;
-        private String originalMethodCode;
+        private CallableDeclaration<?> methodDeclaration;
         private final CompilationUnit compilationUnit;
 
         private SingleMethodBaggage(AbstractGame game) {
@@ -98,29 +113,22 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
                     .orElseThrow(IllegalStateException::new);
         }
 
-        private CallableDeclaration<?> getMethodDeclaration(String signature) {
+        private CallableDeclaration<?> getCallableDeclaration(String signature) {
             return compilationUnit.accept(new MethodNameVisitor(), signature);
         }
 
         private String getMethodContent(String source) {
-            Range range = callableDeclaration.getRange().orElseThrow();
-            int begin = range.begin.line - 1;
-            int end = range.end.line;
-            String[] lines = source.split("\n");
-            String[] methodLines = Arrays.copyOfRange(lines, begin, end);
-            String methodString = String.join("\n", methodLines);
-            logger.info("Original method String: {}", methodString);
-            return methodString;
+            return LlmUtils.getMethodContent(source, methodDeclaration);
         }
     }
 
+    //TODO Generalize with other Single-Method-Mutants
     @Vetoed
-    private static class MethodNameVisitor
-            extends GenericVisitorAdapter<CallableDeclaration<? extends CallableDeclaration<?>>, String> {
+    private static class MethodNameVisitor extends GenericVisitorAdapter<CallableDeclaration<?>, String> {
         @Override
         public MethodDeclaration visit(MethodDeclaration methodDeclaration, String searchedFor) {
             //super.visit(methodDeclaration, searchedFor);
-            String stringRepresentation = methodDeclaration.getDeclarationAsString(false, false, false);
+            String stringRepresentation = methodDeclaration.getDeclarationAsString();
             if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
                 return methodDeclaration;
             } else {
@@ -130,7 +138,8 @@ public class MutantStrategyRandomSingleMethod extends LlmMutantService {
 
         @Override
         public ConstructorDeclaration visit(ConstructorDeclaration constructorDeclaration, String searchedFor) {
-            String stringRepresentation = constructorDeclaration.getDeclarationAsString(false, false, false);
+            //super.visit(methodDeclaration, searchedFor);
+            String stringRepresentation = constructorDeclaration.getDeclarationAsString();
             if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
                 return constructorDeclaration;
             } else {

@@ -22,7 +22,7 @@
 <%@ tag import="org.codedefenders.model.llm.LlmPromptType" %>
 <%@ tag import="java.util.Arrays" %>
 <%@ tag import="java.util.HashMap" %>
-<%@ tag import="org.codedefenders.model.llm.LlmDefaultStrategy" %>
+<%@ tag import="org.codedefenders.model.llm.LlmDefaultStrategies" %>
 <%@ tag import="org.codedefenders.model.llm.LlmStrategy" %>
 <%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
 <%@ tag import="org.codedefenders.util.CDIUtil" %><%--
@@ -60,7 +60,7 @@
     for (LlmPromptType promptType : LlmPromptType.values()) {
         namesToContent.put(promptType.name(), promptType.getDefaultPrompt());
     }
-    request.setAttribute("defaultStrategyNames", LlmDefaultStrategy.values());
+    request.setAttribute("defaultStrategyNames", LlmDefaultStrategies.values());
     LlmRepository llmRepository = CDIUtil.getBeanFromCDI(LlmRepository.class);
     request.setAttribute("allStrategies", llmRepository.getAllStrategies());
     //pageContext.setAttribute("namesToContent", namesToContent);

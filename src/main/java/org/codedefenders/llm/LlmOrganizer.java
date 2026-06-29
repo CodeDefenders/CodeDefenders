@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -36,18 +36,16 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversationBatch;
-import org.codedefenders.model.llm.LlmDefaultStrategy;
+import org.codedefenders.model.llm.LlmDefaultStrategies;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -62,9 +60,7 @@ import org.slf4j.LoggerFactory;
 
 import dev.langchain4j.exception.TimeoutException;
 
-import static org.codedefenders.model.llm.LlmDefaultStrategy.EQUIVALENCE_DEFAULT;
-import static org.codedefenders.model.llm.LlmDefaultStrategy.MUTANT_ANNOTATED_SINGLE_METHOD;
-import static org.codedefenders.model.llm.LlmDefaultStrategy.TEST_FULL_SUITE_PLUS_DEFAULT;
+import static org.codedefenders.model.llm.LlmDefaultStrategies.TEST_FULL_SUITE_PLUS_DEFAULT;
 
 /**
  * This class manages actions of llm players. All information about which llm players are activated in which games
@@ -72,13 +68,13 @@ import static org.codedefenders.model.llm.LlmDefaultStrategy.TEST_FULL_SUITE_PLU
  * potentially costly llm players are not unknowingly reawakened after restarting the server.
  *
  * <p>
- * The detailed proceedings of an LLM action are managed by {@link LlmSubActionService} and its subclasses. This
+ * The detailed proceedings of an LLM action are managed by {@link AbstractStrategy} and its subclasses. This
  * class only establishes the general structure of an LLM action and handles their scheduling, activation, error
  * handling and deactivation.
  */
 @ApplicationScoped
-public class LlmManagerService {
-    private static final Logger logger = LoggerFactory.getLogger(LlmManagerService.class);
+public class LlmOrganizer {
+    private static final Logger logger = LoggerFactory.getLogger(LlmOrganizer.class);
 
     private final ExecutorService llmExecutor;
     private final ScheduledExecutorService organizerExecutor;
@@ -119,7 +115,7 @@ public class LlmManagerService {
     private GameService gameService;
 
     @Inject
-    public LlmManagerService() {
+    public LlmOrganizer() {
         organizerExecutor = Executors.newSingleThreadScheduledExecutor();
         llmExecutor = Executors.newCachedThreadPool();
     }
@@ -288,7 +284,7 @@ public class LlmManagerService {
     }
 
     /**
-     * This is supposed to run in a separate thread created by {@link LlmManagerService#llmExecutor}.
+     * This is supposed to run in a separate thread created by {@link LlmOrganizer#llmExecutor}.
      * It only runs for a single action, i.e. one mutant or one test, and then schedules another execution of itself
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
@@ -302,7 +298,7 @@ public class LlmManagerService {
         logger.info("Running llmAction for game {} with role {}", game.getId(), role);
         final int gameId = game.getId();
 
-        LlmStrategy equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategy.EQUIVALENCE_DEFAULT);
+        LlmStrategy equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategies.EQUIVALENCE_DEFAULT);
         LlmStrategy testStrategy = activeLlmDefenders.getStrategy(gameId);
         LlmStrategy mutantStrategy = activeLlmAttackers.getStrategy(gameId);
 
@@ -385,10 +381,10 @@ public class LlmManagerService {
             testStrategy = LlmStrategy.of(TEST_FULL_SUITE_PLUS_DEFAULT); //TODO Define default strategies elsewhere
         }
         if (mutantStrategy == null) {
-            mutantStrategy = LlmStrategy.of(LlmDefaultStrategy.MUTANT_DEFAULT);
+            mutantStrategy = LlmStrategy.of(LlmDefaultStrategies.MUTANT_DEFAULT);
         }
         if (equivalenceStrategy == null) {
-            equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategy.EQUIVALENCE_DEFAULT);
+            equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategies.EQUIVALENCE_DEFAULT);
         }
 
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
@@ -398,13 +394,13 @@ public class LlmManagerService {
             //int normalNumberOfTries = strategy.getNormalNumberOfTries();
             //int equivalenceNumberOfTries = strategy.getEquivalenceNumberOfTries();
 
-            LlmEquivalenceService equivalenceService;
-            LlmMutantService mutantService;
-            LlmTestService testService;
+            EquivalenceStrategy equivalenceService;
+            AbstractMutantStrategy mutantService;
+            AbstractTestStrategy testService;
 
-            equivalenceService = (LlmEquivalenceService) CDIUtil.getBeanFromCDI(equivalenceStrategy.getService());
-            mutantService = (LlmMutantService) CDIUtil.getBeanFromCDI(mutantStrategy.getService());
-            testService = (LlmTestService) CDIUtil.getBeanFromCDI(testStrategy.getService());
+            equivalenceService = (EquivalenceStrategy) CDIUtil.getBeanFromCDI(equivalenceStrategy.getService());
+            mutantService = (AbstractMutantStrategy) CDIUtil.getBeanFromCDI(mutantStrategy.getService());
+            testService = (AbstractTestStrategy) CDIUtil.getBeanFromCDI(testStrategy.getService());
 
             Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
             Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);

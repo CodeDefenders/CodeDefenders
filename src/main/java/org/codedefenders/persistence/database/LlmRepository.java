@@ -33,17 +33,15 @@ import java.util.stream.Stream;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmDefaultStrategy;
+import org.codedefenders.model.llm.LlmDefaultStrategies;
 import org.codedefenders.model.llm.LlmPromptType;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.persistence.database.util.QueryUtils;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
-import org.codedefenders.service.llm.NoSuchModelException;
 import org.intellij.lang.annotations.Language;
 
 @ApplicationScoped
@@ -85,7 +83,7 @@ public class LlmRepository {
      * Update the values of an existing {@link LlModel}. It is identified by type and name, all other values are filled
      * up from DB.
      *
-     * @throws org.codedefenders.service.llm.NoSuchModelException If there is no model with this type and name
+     * @throws NoSuchModelException If there is no model with this type and name
      *                                                            in the database.
      */
     public void loadModel(LlModel model) throws NoSuchModelException {
@@ -132,7 +130,7 @@ public class LlmRepository {
      * no such strategy exists. Can return both Default strategies and custom strategies.
      */
     public Optional<LlmStrategy> getStrategyByName(String name) {
-        for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
+        for (LlmDefaultStrategies s : LlmDefaultStrategies.values()) {
             if (s.name().equals(name)) {
                 return Optional.of(LlmStrategy.of(s));
             }
@@ -145,7 +143,7 @@ public class LlmRepository {
      */
     public List<LlmStrategy> getAllStrategies() {
         List<LlmStrategy> result = new ArrayList<>();
-        for (LlmDefaultStrategy s : LlmDefaultStrategy.values()) {
+        for (LlmDefaultStrategies s : LlmDefaultStrategies.values()) {
             result.add(LlmStrategy.of(s));
         }
         @Language("SQL")
@@ -163,7 +161,7 @@ public class LlmRepository {
                     Map<String, LlmStrategy> strats = new HashMap<>();
                     while (rs.next()) {
                         String name = rs.getString("Strategy_Name");
-                        LlmDefaultStrategy base = LlmDefaultStrategy.valueOf(rs.getString("Base_name"));
+                        LlmDefaultStrategies base = LlmDefaultStrategies.valueOf(rs.getString("Base_name"));
                         if (!strats.containsKey(name)) {
                             LlmStrategy s = new LlmStrategy(name, base);
                             s.setTimeModifier(rs.getDouble("Time_modifier"));
@@ -238,7 +236,7 @@ public class LlmRepository {
         while (rs.next()) {
             if (result == null) {
                 String name = rs.getString("Strategy_Name");
-                LlmDefaultStrategy base = LlmDefaultStrategy.valueOf(rs.getString("Base_name"));
+                LlmDefaultStrategies base = LlmDefaultStrategies.valueOf(rs.getString("Base_name"));
                 result = new LlmStrategy(name, base);
             }
             String promptTypeName = rs.getString("Prompt_type");
@@ -285,7 +283,7 @@ public class LlmRepository {
         }
 
 
-        if (Arrays.stream(LlmDefaultStrategy.values())
+        if (Arrays.stream(LlmDefaultStrategies.values())
                 .anyMatch(strat -> strat.name().equals(customStrategy.getName()))) {
             // This should normally be caught at the UI level
             throw new IllegalArgumentException("You tried to name a custom strategy "

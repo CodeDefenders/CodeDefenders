@@ -21,7 +21,6 @@ package org.codedefenders.persistence.database;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -30,15 +29,14 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.llm.ChatMessageDTO;
 import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.service.UserService;
-import org.codedefenders.service.llm.NoSuchModelException;
 import org.intellij.lang.annotations.Language;
 
 import dev.langchain4j.data.message.AiMessage;

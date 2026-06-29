@@ -22,8 +22,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.service.llm.LlmSubActionService;
+import org.codedefenders.llm.AbstractStrategy;
 
 import com.google.gson.annotations.Expose;
 
@@ -42,13 +41,13 @@ public class LlmStrategy implements Serializable {
 
     Map<LlmPromptType, String> customPrompts;
 
-    final transient Class<? extends LlmSubActionService> service;
+    final transient Class<? extends AbstractStrategy> service;
 
-    private final LlmDefaultStrategy base;
+    private final LlmDefaultStrategies base;
 
     private LlmStrategy(String name, Map<LlmPromptType, String> customPrompts,
-                        Class<? extends LlmSubActionService> service,
-                        double timeModifier, LlmDefaultStrategy base) {
+                        Class<? extends AbstractStrategy> service,
+                        double timeModifier, LlmDefaultStrategies base) {
         this.name = name;
         this.customPrompts = customPrompts;
         this.service = service;
@@ -56,11 +55,11 @@ public class LlmStrategy implements Serializable {
         this.base = base;
     }
 
-    public LlmStrategy(String name, LlmDefaultStrategy base) {
+    public LlmStrategy(String name, LlmDefaultStrategies base) {
         this(name, new HashMap<>(), base.service, base.timeModifier, base);
     }
 
-    public static LlmStrategy of(LlmDefaultStrategy base) {
+    public static LlmStrategy of(LlmDefaultStrategies base) {
         return new LlmStrategy(base.name(), base);
     }
 
@@ -115,7 +114,7 @@ public class LlmStrategy implements Serializable {
         return customPrompts;
     }
 
-    public Class<? extends LlmSubActionService> getService() {
+    public Class<? extends AbstractStrategy> getService() {
         return service;
     }
 
@@ -139,7 +138,7 @@ public class LlmStrategy implements Serializable {
         return base.name().equals(name);
     }
 
-    public LlmDefaultStrategy getBase() {
+    public LlmDefaultStrategies getBase() {
         return base;
     }
 }

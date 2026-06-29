@@ -27,14 +27,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.codedefenders.service.llm.LlmManagerService;
+import org.codedefenders.llm.LlmOrganizer;
 import org.codedefenders.servlets.util.ServletUtils;
 
 @WebServlet("/llm-api/battleground/final-equivalence")
 public class FinalEquivalenceAPI extends APIServlet {
 
     @Inject
-    LlmManagerService llmService;
+    LlmOrganizer llmService;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

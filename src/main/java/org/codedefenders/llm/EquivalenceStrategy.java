@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -38,12 +38,12 @@ import org.slf4j.LoggerFactory;
  * For attackers and melee llm players, this service creates and submits the tests to resolve equivalence duels for
  * all flagged mutants. In order to not bog the LLM player down too much, this is the only place where many prompt
  * can be sent to the LLM without waiting for the normal cooldown. The LLM always tries to resolve the duel. If the
- * test does not validate or compile, there will be {@link LlmEquivalenceService#numberOfRepairAttempts} attempts
+ * test does not validate or compile, there will be {@link EquivalenceStrategy#numberOfRepairAttempts} attempts
  * to get a better result from the LLM, after that the mutant is accepted as equivalent.
  */
 @RequestScoped//TODO nötig??
-public class LlmEquivalenceService extends LlmSubActionService {
-    Logger logger = LoggerFactory.getLogger(LlmEquivalenceService.class);
+public class EquivalenceStrategy extends AbstractStrategy {
+    Logger logger = LoggerFactory.getLogger(EquivalenceStrategy.class);
 
     @Inject
     MutantRepository mutantRepository;

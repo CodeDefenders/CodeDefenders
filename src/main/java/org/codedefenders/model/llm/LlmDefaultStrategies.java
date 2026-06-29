@@ -21,18 +21,18 @@ package org.codedefenders.model.llm;
 import java.util.List;
 
 import org.codedefenders.game.Role;
-import org.codedefenders.service.llm.LlmEquivalenceService;
-import org.codedefenders.service.llm.LlmSubActionService;
-import org.codedefenders.service.llm.MutantStrategyAnnotatedFullClass;
-import org.codedefenders.service.llm.MutantStrategyAnnotatedSingleMethod;
-import org.codedefenders.service.llm.MutantStrategyDefault;
-import org.codedefenders.service.llm.MutantStrategyDefaultWithoutExisting;
-import org.codedefenders.service.llm.MutantStrategyRandomSingleMethod;
-import org.codedefenders.service.llm.TestStrategyAnnotatedSingleTest;
-import org.codedefenders.service.llm.TestStrategyDefault;
-import org.codedefenders.service.llm.TestStrategyFullSuite;
-import org.codedefenders.service.llm.TestStrategyFullSuitePlusAnnotated;
-import org.codedefenders.service.llm.TestStrategyFullSuitePlusDefault;
+import org.codedefenders.llm.AbstractStrategy;
+import org.codedefenders.llm.EquivalenceStrategy;
+import org.codedefenders.llm.MutantStrategyAnnotatedFullClass;
+import org.codedefenders.llm.MutantStrategyAnnotatedSingleMethod;
+import org.codedefenders.llm.MutantStrategyDefault;
+import org.codedefenders.llm.MutantStrategyDefaultWithoutExisting;
+import org.codedefenders.llm.MutantStrategyRandomSingleMethod;
+import org.codedefenders.llm.TestStrategyAnnotatedSingleTest;
+import org.codedefenders.llm.TestStrategyDefault;
+import org.codedefenders.llm.TestStrategyFullSuite;
+import org.codedefenders.llm.TestStrategyFullSuitePlusAnnotated;
+import org.codedefenders.llm.TestStrategyFullSuitePlusDefault;
 
 import static org.codedefenders.game.Role.ATTACKER;
 import static org.codedefenders.game.Role.DEFENDER;
@@ -46,7 +46,7 @@ import static org.codedefenders.model.llm.LlmPromptType.*;
  * Every enum value contains the {@link Class} of the strategy and a list of all prompt types that can
  * be customized for this strategy.
  */
-public enum LlmDefaultStrategy {
+public enum LlmDefaultStrategies {
     TEST_DEFAULT(TestStrategyDefault.class,
             DEFENDER,
             TEST_DEFAULT_DEFAULT_SYSTEM,
@@ -102,25 +102,25 @@ public enum LlmDefaultStrategy {
     MUTANT_DEFAULT_WITHOUT_EXISTING(MutantStrategyDefaultWithoutExisting.class,
             ATTACKER,
             MUTANT_DEFAULT_WITHOUT_EXISTING_DEFAULT_SYSTEM),
-    EQUIVALENCE_DEFAULT(LlmEquivalenceService.class,
+    EQUIVALENCE_DEFAULT(EquivalenceStrategy.class,
             ATTACKER,
             EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM);
 
 
-    final transient Class<? extends LlmSubActionService> service;
+    final transient Class<? extends AbstractStrategy> service;
     final Role role;
     final double timeModifier;
     final List<LlmPromptType> promptTypes;
 
-    LlmDefaultStrategy(Class<? extends LlmSubActionService> service, Role role, double timeModifier,
-                       LlmPromptType... promptTypes) {
+    LlmDefaultStrategies(Class<? extends AbstractStrategy> service, Role role, double timeModifier,
+                         LlmPromptType... promptTypes) {
         this.service = service;
         this.role = role;
         this.timeModifier = timeModifier;
         this.promptTypes = List.of(promptTypes);
     }
 
-    LlmDefaultStrategy(Class<? extends LlmSubActionService> service, Role role, LlmPromptType... promptTypes) {
+    LlmDefaultStrategies(Class<? extends AbstractStrategy> service, Role role, LlmPromptType... promptTypes) {
         this(service, role, 1, promptTypes);
     }
 

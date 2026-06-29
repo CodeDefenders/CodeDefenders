@@ -58,6 +58,8 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.LlmOrganizer;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -90,8 +92,6 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
-import org.codedefenders.service.llm.LlmManagerService;
-import org.codedefenders.service.llm.NoSuchModelException;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
@@ -201,7 +201,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private LlmRepository llmRepo;
 
     @Inject
-    private LlmManagerService llmService;
+    private LlmOrganizer llmService;
 
     @Inject
     private TestValidator testValidator;

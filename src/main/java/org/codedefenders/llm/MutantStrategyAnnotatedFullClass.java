@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.service.llm;
+package org.codedefenders.llm;
 
 import java.util.Optional;
 
@@ -25,29 +25,29 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
-public class TestStrategyAnnotatedSingleTest extends LlmTestService {
+
+public class MutantStrategyAnnotatedFullClass extends AbstractMutantStrategy {
 
     @Override
-    protected void onSubmitSuccess(LlmStrategy strategy) {
+    protected void onSubmitSuccess() {
         finishConversation(true);
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
-                                   String testSrc,
-                                   LlmStrategy strategy) {
-        standardSubmitFailure(result, testSrc);
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundMutantResult result, String testSrc) {
+
     }
 
     @Override
     protected Optional<String> generate(LlmStrategy strategy) {
-        setConversationType(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM.displayName());
+        setConversationType(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
-        if (!conversation.lastMessageWasError()) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM), model);
+        if (conversation.isEmpty()) {
+            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM),
+                    model);
             conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
         }
-        String reply = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
+        String result = promptService.getResponse(model, conversation);
+        return Optional.of(LlmUtils.extractMutantFromReply(result, true, game));
     }
 }
