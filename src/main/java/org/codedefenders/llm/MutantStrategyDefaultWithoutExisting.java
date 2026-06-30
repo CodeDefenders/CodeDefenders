@@ -21,7 +21,6 @@ package org.codedefenders.llm;
 import java.util.Optional;
 
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
@@ -31,21 +30,21 @@ public class MutantStrategyDefaultWithoutExisting extends AbstractMutantStrategy
     Logger logger = LoggerFactory.getLogger(MutantStrategyDefaultWithoutExisting.class);
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         //TODO Dependencies
         LlmPromptType promptType = LlmPromptType.MUTANT_DEFAULT_WITHOUT_EXISTING_DEFAULT_SYSTEM;
         setConversationType(promptType.displayName());
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
             {
-                conversation.addSystemMessage(strategy.getPrompt(promptType), model);
+                conversation.addSystemMessage(context.strategy().getPrompt(promptType), context.model());
                 String userMessage = getSourceCodeForUserMessage(false);
-                conversation.addUserMessage(userMessage, model);
+                conversation.addUserMessage(userMessage, context.model());
             }
         }
 
-        String result = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.extractMutantFromReply(result, true, game));
+        String result = promptService.getResponse(context.model(), conversation);
+        return Optional.of(LlmUtils.extractMutantFromReply(result, true, context.game()));
     }
 
     @Override

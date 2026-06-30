@@ -28,39 +28,39 @@ import org.codedefenders.util.LlmUtils;
 public class TestStrategyDefault extends AbstractTestStrategy {
 
     @Override
-    public Optional<String> generate(LlmStrategy strategy) {
+    public Optional<String> generate() {
         LlmPromptType promptType = getCorrectDefendPromptType();
         setConversationType(promptType.displayName());
         resetConversationAfterTooManyTries();
         if (!conversation.lastMessageWasError()) {
             {
-                String systemMessage = strategy.getPrompt(promptType);
+                String systemMessage = context.strategy().getPrompt(promptType);
                 if (promptType == LlmPromptType.TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM) {
                     Optional<String> methodName = getRandomMethodWithLivingMutant();
                     if (methodName.isPresent()) {
                         systemMessage = systemMessage.replace("${focused_method}", methodName.get());
                     }
                 }
-                conversation.addSystemMessage(systemMessage, model);
+                conversation.addSystemMessage(systemMessage, context.model());
 
                 conversation.addUserMessage(
-                        getSourceCodeForUserMessage(false), model);//TODO dependencies
+                        getSourceCodeForUserMessage(false), context.model());//TODO dependencies
             }
-            String reply = promptService.getResponse(model, conversation);
-            return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
+            String reply = promptService.getResponse(context.model(), conversation);
+            return Optional.of(LlmUtils.testTemplateFromReply(reply, context.game()));
         } else {
-            String response = promptService.getResponse(model, conversation);
-            return Optional.of(LlmUtils.testTemplateFromReply(response, game));
+            String response = promptService.getResponse(context.model(), conversation);
+            return Optional.of(LlmUtils.testTemplateFromReply(response, context.game()));
         }
     }
 
     @Override
-    protected void onSubmitSuccess(LlmStrategy strategy) {
+    protected void onSubmitSuccess() {
         finishConversation(true);
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc, LlmStrategy strategy) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
         standardSubmitFailure(result, testSrc);
     }
 
@@ -68,7 +68,7 @@ public class TestStrategyDefault extends AbstractTestStrategy {
         if (hasLivingMutants()) {
             return LlmPromptType.TEST_TEMPLATE_DEFAULT_FOCUS_SYSTEM;
         }
-        if (!game.getCUT().getDependencyNames().isEmpty()) {
+        if (!context.game().getCUT().getDependencyNames().isEmpty()) {
             return LlmPromptType.TEST_DEFAULT_DEPENDENCY_SYSTEM;
         }
         return LlmPromptType.TEST_DEFAULT_DEFAULT_SYSTEM;

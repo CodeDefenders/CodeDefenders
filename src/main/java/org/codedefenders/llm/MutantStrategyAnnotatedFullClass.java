@@ -21,7 +21,6 @@ package org.codedefenders.llm;
 import java.util.Optional;
 
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 
@@ -39,15 +38,17 @@ public class MutantStrategyAnnotatedFullClass extends AbstractMutantStrategy {
     }
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         setConversationType(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM),
-                    model);
-            conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
+            conversation.addSystemMessage(
+                    context.strategy().getPrompt(LlmPromptType.MUTANT_ANNOTATED_FULL_CLASS_DEFAULT_SYSTEM),
+                    context.model()
+            );
+            conversation.addUserMessage(LlmUtils.annotatedCut(context.game()), context.model());
         }
-        String result = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.extractMutantFromReply(result, true, game));
+        String result = promptService.getResponse(context.model(), conversation);
+        return Optional.of(LlmUtils.extractMutantFromReply(result, true, context.game()));
     }
 }

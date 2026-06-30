@@ -28,26 +28,26 @@ import org.codedefenders.util.LlmUtils;
 public class TestStrategyAnnotatedSingleTest extends AbstractTestStrategy {
 
     @Override
-    protected void onSubmitSuccess(LlmStrategy strategy) {
+    protected void onSubmitSuccess() {
         finishConversation(true);
     }
 
     @Override
     protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
-                                   String testSrc,
-                                   LlmStrategy strategy) {
+                                   String testSrc) {
         standardSubmitFailure(result, testSrc);
     }
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         setConversationType(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
         if (!conversation.lastMessageWasError()) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM), model);
-            conversation.addUserMessage(LlmUtils.annotatedCut(game), model);
+            conversation.addSystemMessage(context.strategy().getPrompt(LlmPromptType.TEST_ANNOTATED_DEFAULT_SYSTEM),
+                    context.model());
+            conversation.addUserMessage(LlmUtils.annotatedCut(context.game()), context.model());
         }
-        String reply = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
+        String reply = promptService.getResponse(context.model(), conversation);
+        return Optional.of(LlmUtils.testTemplateFromReply(reply, context.game()));
     }
 }

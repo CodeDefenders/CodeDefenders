@@ -20,7 +20,6 @@ package org.codedefenders.llm;
 
 import java.util.Optional;
 
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.CDIUtil;
 
@@ -29,29 +28,23 @@ public class TestStrategyFullSuitePlusDefault extends AbstractTestStrategy {
     private TestStrategyDefault fallback;
 
     @Override
-    protected void run(LlmStrategy strategy) {
-        if (conversationBatch.getBaggage() == null) { //initial
-            fullSuite().run(strategy);
+    protected void run(LlmContext context) {
+        this.context = context;
+        if (baggage() == null || !baggage().isEmpty()) { //initial
+            fullSuite().run(context);
         } else {
-            if (conversationBatch.getBaggage() instanceof TestStrategyFullSuite.FullSuiteBaggage baggage) {
-                if (!baggage.isEmpty()) {
-                    fullSuite().run(strategy);
-                } else {
-                    fallback().run(strategy);
-                }
-            }
+            fallback().run(context);
         }
     }
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         throw new IllegalStateException("Must not be called");
     }
 
     private TestStrategyFullSuite fullSuite() {
         if (fullSuite == null) {
             fullSuite = CDIUtil.getBeanFromCDI(TestStrategyFullSuite.class);
-            fullSuite.init(game, user, Optional.of(model), conversationBatch, random);
         }
         return fullSuite;
     }
@@ -59,19 +52,22 @@ public class TestStrategyFullSuitePlusDefault extends AbstractTestStrategy {
     private TestStrategyDefault fallback() {
         if (fallback == null) {
             fallback = CDIUtil.getBeanFromCDI(TestStrategyDefault.class);
-            fallback.init(game, user, Optional.of(model), conversationBatch, random);
         }
         return fallback;
     }
 
 
     @Override
-    protected void onSubmitSuccess(LlmStrategy strategy) {
+    protected void onSubmitSuccess() {
         throw new IllegalStateException("Must not be called");
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc, LlmStrategy strategy) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
         throw new IllegalStateException("Must not be called");
+    }
+
+    private TestStrategyFullSuite.FullSuiteBaggage baggage() {
+        return (TestStrategyFullSuite.FullSuiteBaggage) context.getBaggages().get(TestStrategyFullSuite.BAGGAGE_KEY);
     }
 }

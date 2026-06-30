@@ -25,13 +25,12 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractMutantStrategy extends AbstractStrategy {
+public abstract class AbstractMutantStrategy extends AbstractStrategy {
     private static final Logger logger = LoggerFactory.getLogger(AbstractMutantStrategy.class);
 
     protected abstract void onSubmitSuccess();
@@ -39,13 +38,13 @@ abstract class AbstractMutantStrategy extends AbstractStrategy {
     protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundMutantResult result, String testSrc);
 
     @Override
-    protected void submit(String mutantSrc, LlmStrategy strategy) {
+    protected void submit(String mutantSrc) {
         try {
             GameManagingUtils.CreateBattlegroundMutantResult result;
-            if (game instanceof MultiplayerGame multiplayerGame) {
+            if (context.game() instanceof MultiplayerGame multiplayerGame) {
                 result = gameManagingUtils.createBattlegroundMutant(multiplayerGame,
                         Constants.AI_ATTACKER_USER_ID, mutantSrc);
-            } else if (game instanceof MeleeGame meleeGame) {
+            } else if (context.game() instanceof MeleeGame meleeGame) {
                 result = gameManagingUtils.createMeleeMutant(meleeGame, Constants.AI_PLAYER_USER_ID, mutantSrc);
             } else {
                 throw new RuntimeException("No LLMs in Puzzles allowed!");
@@ -61,12 +60,12 @@ abstract class AbstractMutantStrategy extends AbstractStrategy {
                             case DUPLICATE_MUTANT_FOUND -> "Your mutant already exists. Create another one.";
                             case COMPILATION_FAILED -> "Your mutant failed to compile. Compilation error: "
                                     + result.compilationError().orElseThrow();
-                        } + "\n Fix this.", model);
+                        } + "\n Fix this.", context.model());
             }
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
                 conversation.addSystemMessage(
-                        "Your mutant changed to many lines. Stick closer to the original code", model);
+                        "Your mutant changed to many lines. Stick closer to the original code", context.model());
             }
         } catch (IOException | GameManagingUtils.MutantCreationException e) {
             throw new RuntimeException(e);
@@ -75,6 +74,8 @@ abstract class AbstractMutantStrategy extends AbstractStrategy {
 
     protected String getExistingMutantDiffsMessage() {
         return String.join("\n####\n",
-                gameService.getMutants(user, game).stream().map(MutantDTO::getPatchString).collect(Collectors.toSet()));
+                gameService.getMutants(context.user(), context.game()).stream()
+                        .map(MutantDTO::getPatchString)
+                        .collect(Collectors.toSet()));
     }
 }

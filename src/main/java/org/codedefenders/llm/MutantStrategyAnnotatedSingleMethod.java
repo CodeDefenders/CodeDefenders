@@ -24,7 +24,6 @@ import jakarta.enterprise.inject.Vetoed;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.codedefenders.util.LlmUtils;
@@ -40,6 +39,8 @@ public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy 
     private static final String ASK_FOR_METHOD = "ASK_FOR_METHOD";
     private static final String FOLLOW_UP = "FOLLOW_UP";
 
+    public static final String BAGGAGE_KEY = "MUTANT_ANNOTATED_METHOD";
+
     @Override
     protected void onSubmitSuccess() {
         finishConversation(true);
@@ -52,7 +53,7 @@ public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy 
     }
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         if (baggage().methodDeclaration == null) {
             setConversationType(ASK_FOR_METHOD);
         } else {
@@ -62,46 +63,51 @@ public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy 
         if (conversation.getType().equals(ASK_FOR_METHOD)) {
             if (conversation.isEmpty()) {
                 conversation.addSystemMessage(
-                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_INITIAL_SYSTEM), model);
+                        context.strategy().getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_INITIAL_SYSTEM),
+                        context.model());
                 conversation.addUserMessage(
-                        LlmUtils.annotatedMethodDescriptions(game, baggage().compilationUnit), model);
+                        LlmUtils.annotatedMethodDescriptions(context.game(), baggage().compilationUnit),
+                        context.model());
             }
-            String reply = promptService.getResponse(model, conversation);
+            String reply = promptService.getResponse(context.model(), conversation);
             CallableDeclaration<?> declaration = baggage().getCallableDeclaration(reply);
             if (declaration == null) {
                 conversation.addUserMessage(
-                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_NO_SUCH_METHOD_SYSTEM), model);
+                        context.strategy().getPrompt(
+                                LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_NO_SUCH_METHOD_SYSTEM),
+                        context.model()
+                );
             } else {
                 baggage().methodDeclaration = declaration;
                 finishConversation(true);
-                setConversationType(FOLLOW_UP); //TODO verstehe den flow hier nicht ganz. Warum hier auf follow_up, und oben wird auch nochmal überprüft`?
+                setConversationType(FOLLOW_UP);
             }
             return Optional.empty();
             //baggage().methodSignature = reply;
 
         } else if (conversation.getType().equals(FOLLOW_UP)) {
-            String originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
+            String originalMethodCode = baggage().getMethodContent(context.game().getCUT().getSourceCode());
 
             if (conversation.isEmpty()) {
                 conversation.addSystemMessage(
-                        strategy.getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_FOLLOWUP_SYSTEM), model);
-                conversation.addUserMessage(originalMethodCode, model);
+                        context.strategy().getPrompt(LlmPromptType.MUTANT_ANNOTATED_SINGLE_METHOD_FOLLOWUP_SYSTEM),
+                        context.model());
+                conversation.addUserMessage(originalMethodCode, context.model());
             }
 
-            String reply = promptService.getResponse(model, conversation);
+            String reply = promptService.getResponse(context.model(), conversation);
             reply = LlmUtils.extractMutantFromReply(reply, null);
-            return Optional.of(game.getCUT().getSourceCode().replace(originalMethodCode, reply));
+            return Optional.of(context.game().getCUT().getSourceCode().replace(originalMethodCode, reply));
         } else {
             throw new RuntimeException("No support for this conversation type: " + conversation.getType());
         }
     }
 
     private SingleMethodBaggage baggage() {
-        if (conversationBatch.getBaggage() == null
-                || !(conversationBatch.getBaggage() instanceof SingleMethodBaggage)) {
-            conversationBatch.setBaggage(new SingleMethodBaggage(game));
+        if (!context.getBaggages().containsKey(BAGGAGE_KEY)) {
+            context.getBaggages().put(BAGGAGE_KEY, new SingleMethodBaggage(context.game()));
         }
-        return (SingleMethodBaggage)conversationBatch.getBaggage();
+        return (SingleMethodBaggage) context.getBaggages().get(BAGGAGE_KEY);
     }
 
     private static class SingleMethodBaggage {
@@ -127,7 +133,6 @@ public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy 
     private static class MethodNameVisitor extends GenericVisitorAdapter<CallableDeclaration<?>, String> {
         @Override
         public MethodDeclaration visit(MethodDeclaration methodDeclaration, String searchedFor) {
-            //super.visit(methodDeclaration, searchedFor);
             String stringRepresentation = methodDeclaration.getDeclarationAsString();
             if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
                 return methodDeclaration;
@@ -138,7 +143,6 @@ public class MutantStrategyAnnotatedSingleMethod extends AbstractMutantStrategy 
 
         @Override
         public ConstructorDeclaration visit(ConstructorDeclaration constructorDeclaration, String searchedFor) {
-            //super.visit(methodDeclaration, searchedFor);
             String stringRepresentation = constructorDeclaration.getDeclarationAsString();
             if (stringRepresentation.contains(searchedFor) || searchedFor.contains(stringRepresentation)) {
                 return constructorDeclaration;

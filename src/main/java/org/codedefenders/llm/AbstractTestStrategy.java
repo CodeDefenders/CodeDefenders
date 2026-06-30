@@ -32,7 +32,6 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -62,25 +61,24 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
      * after the test code has been generated and the game has been refreshed.
      *
      * @param testSrc  The formatted test code. All formatting heuristics should have already been performed.
-     * @param strategy The strategy to follow. This will supply the service with custom prompts.
      */
     @Override
-    protected void submit(String testSrc, LlmStrategy strategy) {
+    protected void submit(String testSrc) {
         try {
             GameManagingUtils.CreateBattlegroundTestResult result;
-            if (game instanceof MultiplayerGame multiplayerGame) {
+            if (context.game() instanceof MultiplayerGame multiplayerGame) {
                 result = gameManagingUtils.createBattlegroundTest(multiplayerGame,
                         Constants.AI_DEFENDER_USER_ID,
                         testSrc);
             } else {
-                result = gameManagingUtils.createBattlegroundTest(game, Constants.AI_PLAYER_USER_ID, testSrc);
+                result = gameManagingUtils.createBattlegroundTest(context.game(), Constants.AI_PLAYER_USER_ID, testSrc);
             }
             if (result.isSuccess()) {
                 logger.info("LLM successfully submitted test.");
                 conversation.setTestId(result.test().orElseThrow().getId());
-                onSubmitSuccess(strategy);
+                onSubmitSuccess();
             } else {
-                onSubmitFailure(result, testSrc, strategy);
+                onSubmitFailure(result, testSrc);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -90,14 +88,13 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
     /**
      * Defines what to do when submission was successful.
      */
-    protected abstract void onSubmitSuccess(LlmStrategy strategy);
+    protected abstract void onSubmitSuccess();
 
     /**
      * Defines what to do when submission fails.
      */
     protected abstract void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result,
-                                            String testSrc,
-                                            LlmStrategy strategy);
+                                            String testSrc);
 
     /**
      * Returns a list of all methods descriptions (as in {@link MethodDescription#getDescription()}) that contain a
@@ -106,22 +103,22 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
      * If a mutant exists outside a method, the String is {@link AbstractTestStrategy#OUTSIDE_OF_METHOD_DESCRIPTION}.
      */
     private List<String> getMethodsWithLivingMutants() {
-        List<MutantDTO> mutants = gameService.getMutants(user, game);
-        List<MethodDescription> methods = game.getCUT().getMethodDescriptions();
+        List<MutantDTO> mutants = gameService.getMutants(context.user(), context.game());
+        List<MethodDescription> methods = context.game().getCUT().getMethodDescriptions();
         GameAccordionMapping mapping = GameAccordionMapping.computeForMutants(methods, mutants);
         HashMap<MethodDescription, SortedSet<Integer>> map = mapping.elementsPerMethod;
         List<String> listOfPossibilities = new ArrayList<>();
         for (MethodDescription m : map.keySet()) {
             for (Integer mutantId : map.get(m)) {
                 Mutant mutant = mutantRepository.getMutantById(mutantId);
-                if (mutant.isAlive() && mutant.getCreatorId() != user.getId()) {
+                if (mutant.isAlive() && mutant.getCreatorId() != context.user().getId()) {
                     listOfPossibilities.add(m.getDescription());
                 }
             }
         }
         mapping.elementsOutsideMethods.stream()
                 .map(mutantId -> mutantRepository.getMutantById(mutantId))
-                .filter(mutant -> mutant.isAlive() && mutant.getCreatorId() != user.getId())
+                .filter(mutant -> mutant.isAlive() && mutant.getCreatorId() != context.user().getId())
                 .forEach(mutant -> listOfPossibilities.add(OUTSIDE_OF_METHOD_DESCRIPTION));
         return listOfPossibilities;
     }
@@ -130,7 +127,7 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
      * Returns if the game has living mutants that are not created by the user.
      */
     protected boolean hasLivingMutants() {
-        return gameService.getMutants(user, game).stream().anyMatch(
+        return gameService.getMutants(context.user(), context.game()).stream().anyMatch(
                 mutantDTO -> mutantDTO.getState() == Mutant.State.ALIVE);
     }
 
@@ -141,7 +138,7 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
     protected Optional<String> getRandomMethodWithLivingMutant() {
         List<String> methods = getMethodsWithLivingMutants();
         if (!methods.isEmpty()) {
-            return Optional.of(methods.get(random.nextInt(methods.size())));
+            return Optional.of(methods.get(context.random().nextInt(methods.size())));
         } else {
             return Optional.empty();
         }
@@ -168,6 +165,6 @@ abstract class AbstractTestStrategy extends AbstractStrategy {
             default -> throw new RuntimeException("Checkstyle");
         }
         correction.append("\nFix these problems.");
-        conversation.addSystemMessage(correction.toString(), model);
+        conversation.addSystemMessage(correction.toString(), context.model());
     }
 }

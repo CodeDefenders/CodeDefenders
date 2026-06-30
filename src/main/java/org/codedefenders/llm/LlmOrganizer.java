@@ -18,14 +18,12 @@
  */
 package org.codedefenders.llm;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,7 +34,6 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.control.RequestContextController;
 import jakarta.inject.Inject;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -44,12 +41,9 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.llm.LlModel;
-import org.codedefenders.model.llm.LlmConversationBatch;
-import org.codedefenders.model.llm.LlmDefaultStrategies;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
-import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.CDIUtil;
@@ -59,8 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import dev.langchain4j.exception.TimeoutException;
-
-import static org.codedefenders.model.llm.LlmDefaultStrategies.TEST_FULL_SUITE_PLUS_DEFAULT;
 
 /**
  * This class manages actions of llm players. All information about which llm players are activated in which games
@@ -80,10 +72,7 @@ public class LlmOrganizer {
     private final ScheduledExecutorService organizerExecutor;
 
     /*
-    Maps game ids to the models that should be used by their LLM players.
-    If the key is present but the value is null, a thread is still running, but will finish after the current
-        iteration (and remove the key-value pair)
-    If the key is not present, no thread is running at all.
+    Maps game ids to the context information that should be used by their LLM players.
 
     For melee games, attacking and defending can be done using different models, or one side can be disabled.
     The melee player is considered active as long as not both these maps map the game id to null.
@@ -92,13 +81,7 @@ public class LlmOrganizer {
     private final GameLlmState activeLlmAttackers = new GameLlmState();
 
     /*
-     * Maps game ids to the last error message of failed llm actions.
-     */
-    private final Map<Integer, String> defenderErrorMessages = new HashMap<>();
-    private final Map<Integer, String> attackerErrorMessages = new HashMap<>();
-
-    /*
-        Only for the thesis. Lists all gameIds that are in equivalent-only-mode
+        Only for experiments. Lists all gameIds that are in equivalent-only-mode
      */
     private final List<Integer> equivalentOnlyGames = new ArrayList<>();
 
@@ -107,9 +90,6 @@ public class LlmOrganizer {
 
     @Inject
     private MutantRepository mutantRepo;
-
-    @Inject
-    private UserService userService;
 
     @Inject
     private GameService gameService;
@@ -130,17 +110,28 @@ public class LlmOrganizer {
     }
 
     public Optional<LlModel> getModelForGame(int gameId, Role role) {
-        return Optional.ofNullable(getCorrectMap(role).getModel(gameId));
+        LlmContext context = getContext(gameId, role);
+        if (context == null) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(context.model());
+        }
     }
 
     public Optional<LlmStrategy> getStrategyForGame(int gameId, Role role) {
-        return Optional.ofNullable(getCorrectMap(role).getStrategy(gameId));
+        LlmContext context = getContext(gameId, role);
+        if (context == null) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(context.strategy());
+        }
     }
 
     /**
      * Used for llm-vs-llm experiments. When this happens, the LLM defender is deactivated, and all living
      * mutants are marked
      * as equivalent, giving the attacker the chance to defend itself.
+     *
      * @param gameId The ID of the game to be set to equivalent-only.
      */
     public void setEquivalentOnly(int gameId) {
@@ -161,11 +152,11 @@ public class LlmOrganizer {
         };
     }
 
-    private Map<Integer, String> getCorrectErrorMap(Role r) {
-        return switch (r) {
-            case ATTACKER, PLAYER -> attackerErrorMessages;
-            case DEFENDER -> defenderErrorMessages;
-            default -> throw new IllegalArgumentException("Illegal role: " + r);
+    private LlmContext getContext(int gameId, Role role) {
+        return switch (role) {
+            case ATTACKER -> activeLlmAttackers.getContext(gameId);
+            case DEFENDER -> activeLlmDefenders.getContext(gameId);
+            default -> throw new IllegalArgumentException("Illegal role: " + role);
         };
     }
 
@@ -186,58 +177,36 @@ public class LlmOrganizer {
                 .getIntValue());
     }
 
-    /**
-     * Checks if an LLM player with this role is active in this game.
-     */
-    private boolean isLlmPlayerActive(AbstractGame game, Role role) {
-        if (!gameRepository.isGameActive(game.getId())) {
-            return false;
-        }
-        if (role == Role.PLAYER) {
-            return getModelForGame(game, Role.DEFENDER).isPresent() || getModelForGame(game, Role.ATTACKER).isPresent();
-        } else {
-            return getModelForGame(game, role).isPresent();
-        }
-    }
-
-    /**
-     * This only checks if values for this game and role have been added, they might be zero.
-     * This way it can be avoided to add multiple threads for melee players.
-     */
-    public boolean isLlmPlayerPresent(AbstractGame game, Role role) {
-        if (game instanceof MultiplayerGame) {
-            return getCorrectMap(role).getState(game.getId()) != ThreadState.INACTIVE;
-        } else {
-            return activeLlmDefenders.getState(game.getId()) != ThreadState.INACTIVE
-                    || activeLlmAttackers.getState(game.getId()) != ThreadState.INACTIVE;
-        }
-    }
-
     public void setPlayerModel(AbstractGame game, Role role,
                                LlModel defendModel,
                                LlModel attackModel,
                                LlmStrategy defendStrategy,
                                LlmStrategy attackStrategy) {
-        boolean alreadyPresent = isLlmPlayerPresent(game, role);
 
-        if ((role == Role.DEFENDER || role == Role.PLAYER)
-                && (defendModel != null || activeLlmDefenders.getState(game.getId()) != ThreadState.INACTIVE)) { //Never put a new 'null' value, it wouldn't be deleted
-            activeLlmDefenders.put(game.getId(), defendModel, defendStrategy);
+        final boolean attackerAlreadyPresent = activeLlmAttackers.getState(game.getId()) == ThreadState.ACTIVE;
+        final boolean defenderAlreadyPresent = activeLlmDefenders.getState(game.getId()) == ThreadState.ACTIVE;
+
+        if (role == Role.DEFENDER || role == Role.PLAYER) {
+            activeLlmDefenders.put(game, defendModel, defendStrategy);
         }
-        if ((role == Role.ATTACKER || role == Role.PLAYER)
-                && (attackModel != null || activeLlmAttackers.getState(game.getId()) != ThreadState.INACTIVE)) { //Never put a new 'null' value, it wouldn't be deleted
-            activeLlmAttackers.put(game.getId(), attackModel, attackStrategy);
+        if (role == Role.ATTACKER || role == Role.PLAYER) {
+            activeLlmAttackers.put(game, attackModel, attackStrategy);
         }
 
-        if ((attackModel != null || defendModel != null) && !alreadyPresent) {
-            int userId = getCorrectUserId(role);
-            SimpleUser user = userService.getSimpleUserById(userId).orElseThrow();
+        int userId = getCorrectUserId(role);
+
+
+        if (attackModel != null && !attackerAlreadyPresent) {
             game.addPlayer(userId, role);
-
-            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(game, role,
-                    new LlmConversationBatch(game, user, defendStrategy),
-                    new LlmConversationBatch(game, user, attackStrategy),
-                    new Random())));
+            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(
+                    game.getId(), Role.ATTACKER)
+            ));
+        }
+        if (defendModel != null && !defenderAlreadyPresent) {
+            game.addPlayer(userId, role);
+            organizerExecutor.execute(() -> llmExecutor.execute(() -> runLlmAction(
+                    game.getId(), Role.DEFENDER)
+            ));
         }
     }
 
@@ -262,21 +231,9 @@ public class LlmOrganizer {
         activeLlmDefenders.closeModel(model);
     }
 
-    /**
-     * Add an error message. This message will be portrayed in the UI and should only be used for unexpected
-     * errors, like bugs, connection or authentication issues.
-     * @param game The game in which the error occurred.
-     * @param role The role in which's thread the error occurred.
-     * @param e The exception.
-     */
-    private void addErrorMessage(AbstractGame game, Role role, Exception e) {
-        logger.error("LLM thread had an error: ", e);
-        String timestamp = LocalDateTime.now().toString();
-        getCorrectErrorMap(role).put(game.getId(), timestamp + ": " + e.toString());
-    }
 
     public Optional<String> getErrorMessage(int gameId, Role role) {
-        return Optional.ofNullable(getCorrectErrorMap(role).get(gameId));
+        return Optional.ofNullable(getCorrectMap(role).getContext(gameId)).map(LlmContext::getErrorMessage);
     }
 
     public Optional<String> getErrorMessage(AbstractGame game, Role role) {
@@ -289,23 +246,25 @@ public class LlmOrganizer {
      * in the future. If the conditions for running are no longer met, because the game doesn't exist anymore or
      * the model has been deactivated, it terminates itself.
      *
-     * @param role May be {@link Role#ATTACKER}, {@link Role#DEFENDER} or {@link Role#PLAYER}
+     * <p>
+     *
+     * @param role may be {@link Role#ATTACKER} or {@link Role#DEFENDER}
      */
-    private void runLlmAction(AbstractGame game, final Role role,
-                              final LlmConversationBatch defendConversation,
-                              final LlmConversationBatch attackConversation,
-                              final Random random) {
-        logger.info("Running llmAction for game {} with role {}", game.getId(), role);
-        final int gameId = game.getId();
+    private void runLlmAction(int gameId, Role role) {
+        LlmContext context = getContext(gameId, role);
 
-        LlmStrategy equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategies.EQUIVALENCE_DEFAULT);
-        LlmStrategy testStrategy = activeLlmDefenders.getStrategy(gameId);
-        LlmStrategy mutantStrategy = activeLlmAttackers.getStrategy(gameId);
 
-        LlmStrategy timeModStrategy = role == Role.DEFENDER ? testStrategy : mutantStrategy;
-        double timeModifier = timeModStrategy != null ? timeModStrategy.getTimeModifier() : 1;
+        context.updateGame();
 
-        //TODO For melee games, put this after attack/defend has been decided
+
+        final AbstractGame game = context.game();
+        final LlmStrategy strategy = context.strategy();
+
+
+        logger.info("Running llmAction for game {} with role {}", gameId, role);
+
+        double timeModifier = strategy.getTimeModifier();
+
         long timeToStartNextThread = (int) (getLlmActionInterval() * timeModifier) * 1000L + System.currentTimeMillis();
 
         if (equivalentOnlyGames.contains(game.getId())) {
@@ -318,18 +277,9 @@ public class LlmOrganizer {
                     });
         }
 
-        int userId = switch (role) {
-            case ATTACKER -> Constants.AI_ATTACKER_USER_ID;
-            case DEFENDER -> Constants.AI_DEFENDER_USER_ID;
-            case PLAYER -> Constants.AI_PLAYER_USER_ID;
-            default -> throw new IllegalArgumentException("No such role allowed for LLM: " + role);
-        };
-        final SimpleUser user = new SimpleUser(userId, "PLACEHOLDER");
-
-        if (isLlmPlayerActive(game, role)) {
+        if (gameRepository.isGameActive(gameId) && context.threadState() == ThreadState.ACTIVE) {
             try {
-                singleLlmAction(game, user, role, defendConversation, attackConversation,
-                        testStrategy, mutantStrategy, equivalenceStrategy, random);
+                singleLlmAction(context);
                 long timeToWait;
                 if (equivalentOnlyGames.contains(game.getId())) {
                     timeToWait = 0;
@@ -338,17 +288,15 @@ public class LlmOrganizer {
                 }
 
                 organizerExecutor.schedule(() -> llmExecutor.execute(
-                                () -> runLlmAction(
-                                        gameRepository.getGame(game.getId()), role, defendConversation,
-                                        attackConversation, random)),
+                                () -> runLlmAction(gameId, role)),
                         timeToWait, TimeUnit.MILLISECONDS);
             } catch (TimeoutException e) {
                 logger.error("AiPlayerThread for game {} with role {} timed out.",
                         game.getId(), role);
-                addErrorMessage(game, role, e);
+                context.setErrorMessage(e);
             } catch (NoSuchModelException e) {
                 logger.error("The model is no longer active, llm player thread will be aborted.");
-                addErrorMessage(game, role, e);
+                context.setErrorMessage(e);
                 finishPlayer(game.getId(), role);
             } catch (Exception e) {
                 logger.error("""
@@ -356,88 +304,56 @@ public class LlmOrganizer {
                                 {}
                                 The thread will be terminated.""",
                         game.getId(), role, e.toString());
-                addErrorMessage(game, role, e);
+                context.setErrorMessage(e);
                 finishPlayer(game.getId(), role);
             }
         } else if (gameRepository.isGameCreated(game.getId())) {
             long timeToWait = Math.max(0, timeToStartNextThread - System.currentTimeMillis());
             organizerExecutor.schedule(() -> llmExecutor.execute(
-                            () -> runLlmAction(
-                                    gameRepository.getGame(game.getId()), role, defendConversation,
-                                    attackConversation, random)),
-                    //testStrategy, mutantStrategy, equivalenceStrategy, random)),
+                            () -> runLlmAction(gameId, role)),
                     timeToWait, TimeUnit.MILLISECONDS);
         } else {
             finishPlayer(game.getId(), role);
         }
     }
 
-    private void singleLlmAction(AbstractGame game, final SimpleUser user, final Role role,
-                                 final LlmConversationBatch defendConversation,
-                                 final LlmConversationBatch attackConversation,
-                                 LlmStrategy testStrategy, LlmStrategy mutantStrategy, LlmStrategy equivalenceStrategy,
-                                 final Random random) throws NoSuchModelException {
-        if (testStrategy == null) {
-            testStrategy = LlmStrategy.of(TEST_FULL_SUITE_PLUS_DEFAULT); //TODO Define default strategies elsewhere
-        }
-        if (mutantStrategy == null) {
-            mutantStrategy = LlmStrategy.of(LlmDefaultStrategies.MUTANT_DEFAULT);
-        }
-        if (equivalenceStrategy == null) {
-            equivalenceStrategy = LlmStrategy.of(LlmDefaultStrategies.EQUIVALENCE_DEFAULT);
+    private void singleLlmAction(LlmContext context) throws NoSuchModelException {
+
+
+        AbstractGame game = context.game();
+        Role role = context.role();
+        LlmStrategy strategy = context.strategy();
+        SimpleUser user = context.user();
+
+        if (strategy == null) {
+            throw new RuntimeException("Strategies may not be null!");
         }
 
         RequestContextController requestContextController = CDIUtil.getBeanFromCDI(RequestContextController.class);
         requestContextController.activate();
 
         try {
-            //int normalNumberOfTries = strategy.getNormalNumberOfTries();
-            //int equivalenceNumberOfTries = strategy.getEquivalenceNumberOfTries();
 
-            EquivalenceStrategy equivalenceService;
-            AbstractMutantStrategy mutantService;
-            AbstractTestStrategy testService;
+            AbstractStrategy strategyClass = CDIUtil.getBeanFromCDI(strategy.getService());
 
-            equivalenceService = (EquivalenceStrategy) CDIUtil.getBeanFromCDI(equivalenceStrategy.getService());
-            mutantService = (AbstractMutantStrategy) CDIUtil.getBeanFromCDI(mutantStrategy.getService());
-            testService = (AbstractTestStrategy) CDIUtil.getBeanFromCDI(testStrategy.getService());
-
-            Optional<LlModel> attackModel = getModelForGame(game, Role.ATTACKER);
-            Optional<LlModel> defendModel = getModelForGame(game, Role.DEFENDER);
-
-            equivalenceService.init(game, user, attackModel, attackConversation, random);
-            mutantService.init(game, user, attackModel, attackConversation, random);
-            testService.init(game, user, defendModel, defendConversation, random);
-
-            if (role == Role.DEFENDER) {
-                testService.claimEquivalent();
-                testService.run(testStrategy);
+            if (context.role() == Role.DEFENDER) {
+                strategyClass.claimEquivalent(context);
+                strategyClass.run(context);
             } else {
-                equivalenceService.run(equivalenceStrategy);
-                if (equivalentOnlyGames.contains(game.getId()) && gameService.getFlaggedMutants(user, game).isEmpty()) {
+                CDIUtil.getBeanFromCDI(EquivalenceStrategy.class).run(context);
+                if (equivalentOnlyGames.contains(game.getId())
+                        && gameService.getFlaggedMutants(user, game).isEmpty()) {
                     equivalentOnlyGames.remove((Integer) game.getId());
                     finishPlayer(game.getId(), role);
                     return;
                 }
                 if (role == Role.ATTACKER) {
                     if (!equivalentOnlyGames.contains(game.getId())) {
-                        mutantService.run(mutantStrategy);
+                        strategyClass.run(context);
                     }
                 } else {
-                    boolean attackAvailable = activeLlmAttackers.getState(game.getId()) == ThreadState.ACTIVE;
-                    boolean defendAvailable = activeLlmDefenders.getState(game.getId()) == ThreadState.ACTIVE;
-                    if (!attackAvailable && !defendAvailable) {
-                        finishPlayer(game.getId(), role);
-                        return;
-                    }
-                    boolean attack = attackAvailable && !defendAvailable || attackAvailable && random.nextBoolean();
-
-                    mutantService.claimEquivalent();
-                    if (attack) {
-                        mutantService.run(mutantStrategy);
-                    } else {
-                        testService.run(testStrategy);
-                    }
+                    throw new RuntimeException("Unsupported role: " + role
+                            + ". Use two different threads for melee games.");
                 }
             }
         } finally {
@@ -445,47 +361,52 @@ public class LlmOrganizer {
         }
     }
 
+    public enum ThreadState {
+        ACTIVE,
+        FINISHING,
+        INACTIVE
+    }
+
     private static class GameLlmState {
-        private final Map<Integer, ImmutablePair<LlModel, LlmStrategy>> map = new HashMap<>();
+        private final Map<Integer, LlmContext> map = new HashMap<>();
 
-        private void put(int gameId, LlModel model, LlmStrategy strategy) {
-            map.put(gameId, ImmutablePair.of(model, strategy));
+
+        /**
+         * Sets the model and strategy for this game. Conversations, baggages etc. are reset if they exist.
+         */
+        private void put(AbstractGame game, LlModel model, LlmStrategy strategy) {
+            if (model == null || strategy == null) {
+                if (map.containsKey(game.getId())) {
+                    map.put(game.getId(), LlmContext.finishingModel(model, strategy, game));
+                }
+            } else {
+                map.put(game.getId(), new LlmContext(model, strategy, game));
+            }
+
         }
 
-        private LlModel getModel(int gameId) {
-            if (map.get(gameId) == null) {
-                return null;
-            }
-            return map.get(gameId).left;
-        }
-
-        private LlmStrategy getStrategy(int gameId) {
-            if (map.get(gameId) == null) {
-                return null;
-            }
-            return map.get(gameId).right;
+        private LlmContext getContext(int gameId) {
+            return map.get(gameId);
         }
 
         private ThreadState getState(int gameId) {
             if (map.containsKey(gameId)) {
-                if (map.get(gameId) != null) {
-                    return ThreadState.ACTIVE;
-                } else {
-                    return ThreadState.FINISHING;
-                }
+                return map.get(gameId).threadState();
             } else {
                 return ThreadState.INACTIVE;
             }
         }
 
         private void completeFinish(int gameId) {
-            map.remove(gameId);
+            if (map.containsKey(gameId)) {
+                map.get(gameId).setThreadState(ThreadState.INACTIVE);
+            }
         }
 
         private void closeModel(LlModel model) {
             Set<Integer> toRemove = new HashSet<>();
             for (var x : map.entrySet()) {
-                if (x.getValue().left.equals(model)) {
+                if (x.getValue().model().equals(model)) {
                     toRemove.add(x.getKey());
                 }
             }
@@ -495,7 +416,5 @@ public class LlmOrganizer {
         }
     }
 
-    private enum ThreadState {
-        ACTIVE, FINISHING, INACTIVE
-    }
+
 }

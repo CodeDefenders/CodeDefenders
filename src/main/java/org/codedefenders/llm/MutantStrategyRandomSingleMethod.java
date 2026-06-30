@@ -27,7 +27,6 @@ import jakarta.enterprise.inject.Vetoed;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JavaParserUtils;
 import org.codedefenders.util.LlmUtils;
@@ -44,6 +43,8 @@ import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 public class MutantStrategyRandomSingleMethod extends AbstractMutantStrategy {
     private static final Logger logger = LoggerFactory.getLogger(MutantStrategyRandomSingleMethod.class);
 
+    public static final String BAGGAGE_KEY = "mutant_random_single_method";
+
     @Override
     protected void onSubmitSuccess() {
         finishConversation(true);
@@ -57,34 +58,36 @@ public class MutantStrategyRandomSingleMethod extends AbstractMutantStrategy {
     }
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         setConversationType(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM.displayName());
         resetConversationAfterTooManyTries();
 
         if (conversation.isEmpty()) {
-            List<MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
-            MethodDescription chosenDescription = methodDescriptions.get(random.nextInt(methodDescriptions.size()));
+            List<MethodDescription> methodDescriptions = context.game().getCUT().getMethodDescriptions();
+            MethodDescription chosenDescription = methodDescriptions.get(
+                    context.random().nextInt(methodDescriptions.size())
+            );
 
             //TODO Not very efficient
             baggage().callableDeclaration = baggage().getMethodDeclaration(chosenDescription.getDescription());
-            baggage().originalMethodCode = baggage().getMethodContent(game.getCUT().getSourceCode());
+            baggage().originalMethodCode = baggage().getMethodContent(context.game().getCUT().getSourceCode());
 
 
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM), model);
-            conversation.addUserMessage(baggage().originalMethodCode, model);
+            conversation.addSystemMessage(context.strategy().getPrompt(LlmPromptType.MUTANT_RANDOM_DEFAULT_SYSTEM),
+                    context.model());
+            conversation.addUserMessage(baggage().originalMethodCode, context.model());
         }
 
-        String reply = promptService.getResponse(model, conversation);
+        String reply = promptService.getResponse(context.model(), conversation);
         reply = LlmUtils.extractMutantFromReply(reply, null);
-        return Optional.of(game.getCUT().getSourceCode().replace(baggage().originalMethodCode, reply));
+        return Optional.of(context.game().getCUT().getSourceCode().replace(baggage().originalMethodCode, reply));
     }
 
     private SingleMethodBaggage baggage() {
-        if (conversationBatch.getBaggage() == null
-                || !(conversationBatch.getBaggage() instanceof SingleMethodBaggage)) {
-            conversationBatch.setBaggage(new SingleMethodBaggage(game));
+        if (!context.getBaggages().containsKey(BAGGAGE_KEY)) {
+            context.getBaggages().put(BAGGAGE_KEY, new SingleMethodBaggage(context.game()));
         }
-        return (SingleMethodBaggage) conversationBatch.getBaggage();
+        return (SingleMethodBaggage) context.getBaggages().get(BAGGAGE_KEY);
     }
 
     //TODO Generalize

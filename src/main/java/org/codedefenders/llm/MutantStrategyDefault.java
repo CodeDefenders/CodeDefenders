@@ -22,7 +22,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
 import org.slf4j.Logger;
@@ -32,28 +31,29 @@ public class MutantStrategyDefault extends AbstractMutantStrategy {
     Logger logger = LoggerFactory.getLogger(MutantStrategyDefault.class);
 
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         //TODO Dependencies with game.getCUT().getDependencyNames().isEmpty()
         LlmPromptType promptType = LlmPromptType.MUTANT_DEFAULT_DEFAULT_SYSTEM;
         setConversationType(promptType.displayName());
         resetConversationAfterTooManyTries();
         if (conversation.isEmpty()) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.MUTANT_DEFAULT_DEFAULT_SYSTEM), model);
+            conversation.addSystemMessage(context.strategy().getPrompt(LlmPromptType.MUTANT_DEFAULT_DEFAULT_SYSTEM),
+                    context.model());
             String userMessage;
-            if (random.nextBoolean()) {
-                String userTemplate = strategy.getPrompt(LlmPromptType.MUTANT_TEMPLATE_DEFAULT_DIFFS_USER);
+            if (context.random().nextBoolean()) {
+                String userTemplate = context.strategy().getPrompt(LlmPromptType.MUTANT_TEMPLATE_DEFAULT_DIFFS_USER);
                 userMessage = StringUtils.replaceEach(userTemplate,
                         new String[]{"${cut_source}", "${mutant_diffs}"},
                         new String[]{getSourceCodeForUserMessage(false), getExistingMutantDiffsMessage()});
             } else {
                 userMessage = getSourceCodeForUserMessage(false);
             }
-            conversation.addUserMessage(userMessage, model);
+            conversation.addUserMessage(userMessage, context.model());
 
         }
 
-        String result = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.extractMutantFromReply(result, true, game));
+        String result = promptService.getResponse(context.model(), conversation);
+        return Optional.of(LlmUtils.extractMutantFromReply(result, true, context.game()));
     }
 
     @Override

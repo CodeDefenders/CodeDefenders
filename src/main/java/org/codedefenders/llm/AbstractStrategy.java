@@ -27,11 +27,7 @@ import jakarta.inject.Inject;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmConversation;
-import org.codedefenders.model.llm.LlmConversationBatch;
-import org.codedefenders.model.llm.LlmStrategy;
-import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.LlmConversationRepository;
 import org.codedefenders.service.LlmPromptService;
 import org.codedefenders.service.game.GameService;
@@ -55,73 +51,44 @@ public abstract class AbstractStrategy {
     protected GameManagingUtils gameManagingUtils;
 
     @Inject
-    private GameRepository gameRepository;
-
-    @Inject
     protected GameService gameService;
 
     @Inject
     protected LlmConversationRepository conversationRepository;
 
-    protected LlModel model;
-    protected AbstractGame game;
-    protected LlmConversationBatch conversationBatch;
+    protected LlmContext context;
     protected LlmConversation conversation = null;
-    protected SimpleUser user;
-    protected Random random;
     protected int numberOfRepairAttempts = 3;
 
-    protected boolean disabled = false;
-
-    protected void run(LlmStrategy strategy) {
-        if (!disabled) {
-            Optional<String> reply = generate(strategy);
-            if (reply.isPresent()) {
-                updateGame();
-                submit(reply.get(), strategy);
-            }
-
-            if (conversation != null) {
-                conversationRepository.saveConversation(conversation);
-            }
-
-        } else {
-            logger.warn("Running a disabled AbstractStrategy. This is probably not intended.");
+    protected void run(LlmContext context) {
+        this.context = context;
+        Optional<String> reply = generate();
+        if (reply.isPresent()) {
+            this.context.updateGame();
+            submit(reply.get());
         }
+
+        if (conversation != null) {
+            conversationRepository.saveConversation(conversation);
+        }
+
     }
 
     /**
      * Generate a test/mutant to submit. This is responsible for creating the prompt, getting the response
      * from the LLM and formatting the response.
-     * @param strategy The strategy to use
+     *
      * @return The code of the generated test/mutant
      */
-    protected abstract Optional<String> generate(LlmStrategy strategy);
+    protected abstract Optional<String> generate();
 
     /**
      * Submit the generated test/mutant.
+     *
      * @param reply The code of the generated test/mutant.
-     * @param strategy The strategy to use.
      */
-    protected abstract void submit(String reply, LlmStrategy strategy);
+    protected abstract void submit(String reply);
 
-    protected void init(AbstractGame game, SimpleUser user, Optional<LlModel> model, LlmConversationBatch conversation,
-                        Random random) {
-        if (model.isPresent()) {
-            this.model = model.get();
-        } else {
-            disabled = true;
-            return;
-        }
-        this.user = user;
-        this.game = game;
-        this.conversationBatch = conversation;
-        this.random = random;
-    }
-
-    protected void updateGame() {
-        game = gameRepository.getGame(game.getId());
-    }
 
     /**
      * Utility method to reset conversations. If the maximum number of failed generation attempts has been reached,
@@ -132,17 +99,17 @@ public abstract class AbstractStrategy {
         String tmp = conversation.getType();
         if (conversation.numberOfTries() > numberOfRepairAttempts) {
             finishConversation(false);
-            conversation = conversationBatch.getConversation(tmp);
+            conversation = context.conversationBatch().getConversation(tmp);
         }
     }
 
     protected void setConversationType(String type) {
-        conversation = conversationBatch.getConversation(type);
+        conversation = context.conversationBatch().getConversation(type);
     }
 
     protected void finishConversation(boolean success) {
         conversation.finish(success);
-        conversationBatch.remove(conversation);
+        context.conversationBatch().remove(conversation);
         conversation = null;
     }
 
@@ -152,21 +119,22 @@ public abstract class AbstractStrategy {
      */
     protected String getSourceCodeForUserMessage(boolean withDependencies) {
         if (withDependencies) {
-            return game.getCUT().getSourceCode() + "\n####\n"
-                    + String.join("\n####\n", game.getCUT().getDependencyCode());
+            return context.game().getCUT().getSourceCode() + "\n####\n"
+                    + String.join("\n####\n", context.game().getCUT().getDependencyCode());
         } else {
-            return game.getCUT().getSourceCode();
+            return context.game().getCUT().getSourceCode();
         }
     }
 
     /**
      * Try to claim a random potentially equivalent mutant as equivalent, or do nothing if no such mutant is available.
      */
-    protected void claimEquivalent() {
-        Optional<MutantDTO> potentialEquivalent = getRandomPossiblyEquivalentMutant(game, user, random);
+    protected void claimEquivalent(LlmContext context) {
+        Optional<MutantDTO> potentialEquivalent = getRandomPossiblyEquivalentMutant(
+                context.game(), context.user(), context.random());
         if (potentialEquivalent.isPresent()) {
             logger.info("Claiming equivalence on mutant {}", potentialEquivalent.get());
-            gameManagingUtils.claimBattlegroundEquivalence(game, user.getId(),
+            gameManagingUtils.claimBattlegroundEquivalence(context.game(), context.user().getId(),
                     potentialEquivalent.get().getLines());
         }
     }

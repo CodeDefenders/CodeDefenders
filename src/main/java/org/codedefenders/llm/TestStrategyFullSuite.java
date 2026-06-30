@@ -35,12 +35,14 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
     private static final String CORRECTION = "CORRECTION";
     private static final String ONE_FROM_MANY = "ONE_FROM_MANY";
 
+    public static final String BAGGAGE_KEY = "testsuite";
+
     private FullSuiteBaggage baggage() {
-        if (conversationBatch.getBaggage() == null
-                || !(conversationBatch.getBaggage() instanceof FullSuiteBaggage)) {
-            conversationBatch.setBaggage(new FullSuiteBaggage());
+        Object baggage = context.getBaggages().get(BAGGAGE_KEY);
+        if (baggage == null) {
+            context.getBaggages().put(BAGGAGE_KEY, new FullSuiteBaggage());
         }
-        return (FullSuiteBaggage) conversationBatch.getBaggage();
+        return (FullSuiteBaggage) context.getBaggages().get(BAGGAGE_KEY);
     }
 
     public String getOneTest() {
@@ -60,9 +62,9 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
 
     private String getCorrectionUserMessage(AbstractGame game,
                                             String testCode,
-                                            GameManagingUtils.CreateBattlegroundTestResult result,
-                                            LlmStrategy strategy) {
+                                            GameManagingUtils.CreateBattlegroundTestResult result) {
 
+        LlmStrategy strategy = context.strategy();
         String userTemplate = strategy.getPrompt(LlmPromptType.TEST_TEMPLATE_FULL_SUITE_USER);
 
         String issueString = switch (result.failureReason().orElseThrow()) {
@@ -81,7 +83,7 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
     }
 
     @Override
-    public Optional<String> generate(LlmStrategy strategy) {
+    public Optional<String> generate() {
         if (isEmpty()) {
             setConversationType(GENERATE_FULL_SUITE);
         } else {
@@ -89,13 +91,14 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
         }
         if (conversation.numberOfTries() > numberOfRepairAttempts) {
             finishConversation(false);
-            conversation = conversationBatch.getConversation(GENERATE_FULL_SUITE); //TODO Dependencies
+            conversation = context.conversationBatch().getConversation(GENERATE_FULL_SUITE); //TODO Dependencies
         }
         if (conversation.getType().equals(GENERATE_FULL_SUITE)) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_FULL_SUITE_SYSTEM), model);
-            conversation.addUserMessage(getSourceCodeForUserMessage(false), model); //TODO customize??
-            String reply = promptService.getResponse(model, conversation);
-            LlmUtils.suiteOfTestTemplatesFromReply(reply, game).forEach(this::addTest);
+            conversation.addSystemMessage(context.strategy().getPrompt(LlmPromptType.TEST_FULL_SUITE_SYSTEM),
+                    context.model());
+            conversation.addUserMessage(getSourceCodeForUserMessage(false), context.model()); //TODO customize??
+            String reply = promptService.getResponse(context.model(), conversation);
+            LlmUtils.suiteOfTestTemplatesFromReply(reply, context.game()).forEach(this::addTest);
             if (isEmpty()) {
                 //Not a single valid test was generated
                 finishConversation(false);
@@ -107,8 +110,8 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
         }
         if (!conversation.isEmpty()) {
             //There was an error on the last submission
-            String reply = promptService.getResponse(model, conversation);
-            return Optional.of(LlmUtils.testTemplateFromReply(reply, game));
+            String reply = promptService.getResponse(context.model(), conversation);
+            return Optional.of(LlmUtils.testTemplateFromReply(reply, context.game()));
         } else {
             finishConversation(true);
             setConversationType(ONE_FROM_MANY);
@@ -117,21 +120,23 @@ public class TestStrategyFullSuite extends AbstractTestStrategy {
     }
 
     @Override
-    protected void onSubmitSuccess(LlmStrategy strategy) {
+    protected void onSubmitSuccess() {
         if (isEmpty() || !conversation.isEmpty()) {
             finishConversation(true);
         }
     }
 
     @Override
-    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc,
-                                   LlmStrategy strategy) {
+    protected void onSubmitFailure(GameManagingUtils.CreateBattlegroundTestResult result, String testSrc) {
         if (!conversation.hasSystemMessage()) {
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.TEST_FULL_SUITE_CORRECTION_SYSTEM), model);
+            conversation.addSystemMessage(context.strategy().getPrompt(
+                    LlmPromptType.TEST_FULL_SUITE_CORRECTION_SYSTEM),
+                    context.model()
+            );
         }
         String testContent = LlmUtils.extractTestContentFromReply(testSrc);
-        String userMessage = getCorrectionUserMessage(game, testContent, result, strategy);
-        conversation.addUserMessage(userMessage, model);
+        String userMessage = getCorrectionUserMessage(context.game(), testContent, result);
+        conversation.addUserMessage(userMessage, context.model());
     }
 
     static class FullSuiteBaggage {

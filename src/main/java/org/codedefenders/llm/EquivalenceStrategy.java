@@ -27,7 +27,6 @@ import jakarta.inject.Inject;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.model.llm.LlmPromptType;
-import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.LlmUtils;
@@ -41,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * test does not validate or compile, there will be {@link EquivalenceStrategy#numberOfRepairAttempts} attempts
  * to get a better result from the LLM, after that the mutant is accepted as equivalent.
  */
-@RequestScoped//TODO nötig??
+@RequestScoped
 public class EquivalenceStrategy extends AbstractStrategy {
     Logger logger = LoggerFactory.getLogger(EquivalenceStrategy.class);
 
@@ -53,14 +52,15 @@ public class EquivalenceStrategy extends AbstractStrategy {
     private static final String EQUIVALENCE = "EQUIVALENCE";
 
     @Override
-    protected void run(LlmStrategy strategy) {
-        for (MutantDTO flagged : gameService.getFlaggedMutants(user, game)) {
+    protected void run(LlmContext context) {
+        this.context = context;
+        for (MutantDTO flagged : gameService.getFlaggedMutants(this.context.user(), this.context.game())) {
             this.flagged = flagged;
             do {
                 if (conversation == null) {
                     setConversationType(EQUIVALENCE);
                 }
-                super.run(strategy);
+                super.run(context);
                 if (conversation == null) {
                     setConversationType(EQUIVALENCE);
                 }
@@ -75,19 +75,22 @@ public class EquivalenceStrategy extends AbstractStrategy {
      * llm is complete.
      */
     @Override
-    protected Optional<String> generate(LlmStrategy strategy) {
+    protected Optional<String> generate() {
         if (conversation.isEmpty()) {
             //conversation.addSystemMessage(getSystemPrompt(model, PromptType.ATTACK_EQUIVALENCE), model);
-            conversation.addSystemMessage(strategy.getPrompt(LlmPromptType.EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM), model);
-            conversation.addUserMessage(game.getCUT().getSourceCode()//TODO customize
-                    + "\n###\n" + flagged.getPatchString(), model);
+            conversation.addSystemMessage(context.equivalenceStrategy().getPrompt(
+                    LlmPromptType.EQUIVALENCE_DEFAULT_DEFAULT_SYSTEM),
+                    context.model()
+            );
+            conversation.addUserMessage(context.game().getCUT().getSourceCode()//TODO customize
+                    + "\n###\n" + flagged.getPatchString(), context.model());
         }
-        String response = promptService.getResponse(model, conversation);
-        return Optional.of(LlmUtils.testTemplateFromReply(response, game));
+        String response = promptService.getResponse(context.model(), conversation);
+        return Optional.of(LlmUtils.testTemplateFromReply(response, context.game()));
     }
 
     @Override
-    protected void submit(String testSource, LlmStrategy strategy) {
+    protected void submit(String testSource) {
         if (!conversation.getType().equals(EQUIVALENCE)) {
             logger.error("Conversation may not be of type {} in submitEquivalenceTest", conversation.getType());
             throw new RuntimeException("Conversation may not be of type " + conversation.getType()
@@ -97,7 +100,8 @@ public class EquivalenceStrategy extends AbstractStrategy {
         Mutant equivalentMutant = mutantRepository.getMutantById(flagged.getId());
         try {
             GameManagingUtils.RejectBattlegroundEquivalenceResult result =
-                    gameManagingUtils.rejectBattlegroundEquivalence(game, user.getId(), equivalentMutant, testSource);
+                    gameManagingUtils.rejectBattlegroundEquivalence(context.game(), context.user().getId(),
+                            equivalentMutant, testSource);
             //TODO Duplicate code can be removed after refactoring Results and FailureReasons to common types
             if (result.testValid()) {
                 finishConversation(true);
@@ -115,11 +119,13 @@ public class EquivalenceStrategy extends AbstractStrategy {
                         case TEST_DID_NOT_PASS_ON_CUT -> correction.append(
                                         "Your test did not pass on the original code for the following reason: ")
                                 .append(result.testCutError().orElseThrow());
+                        default -> throw new RuntimeException();
                     }
                     correction.append("\nFix these problems.");
-                    conversation.addSystemMessage(correction.toString(), model);
+                    conversation.addSystemMessage(correction.toString(), context.model());
                 } else {
-                    gameManagingUtils.acceptBattlegroundEquivalence(game, user.getId(), equivalentMutant);
+                    gameManagingUtils.acceptBattlegroundEquivalence(context.game(), context.user().getId(),
+                            equivalentMutant);
                     finishConversation(false);
                 }
             }

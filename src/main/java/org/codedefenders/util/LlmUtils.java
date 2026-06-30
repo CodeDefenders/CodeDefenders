@@ -26,10 +26,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.llm.AbstractMutantStrategy;
+import org.codedefenders.model.llm.LlmStrategy;
 
 import com.github.javaparser.Range;
 import com.github.javaparser.ast.CompilationUnit;
@@ -284,11 +288,23 @@ public class LlmUtils {
     }
 
     public static String getMethodContent(String source, CallableDeclaration<?> methodDeclaration) {
-        Range range =  methodDeclaration.getRange().orElseThrow();
+        Range range = methodDeclaration.getRange().orElseThrow();
         int begin = range.begin.line - 1;
         int end = range.end.line;
         String[] lines = source.split("\n");
-        String [] methodLines = Arrays.copyOfRange(lines, begin, end);
+        String[] methodLines = Arrays.copyOfRange(lines, begin, end);
         return String.join("\n", methodLines);
+    }
+
+    public static SimpleUser getUserFromStrategy(LlmStrategy strategy) {
+        return strategy.getService().getSuperclass() == AbstractMutantStrategy.class
+                ? new SimpleUser(Constants.AI_ATTACKER_USER_ID, "AI_ATTACKER")
+                : new SimpleUser(Constants.AI_DEFENDER_USER_ID, "AI_DEFENDER");
+    }
+
+    public static Role getRoleFromStrategy(LlmStrategy strategy) {
+        return strategy.getService().getSuperclass() == AbstractMutantStrategy.class
+                ? Role.ATTACKER
+                : Role.DEFENDER;
     }
 }

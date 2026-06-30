@@ -75,12 +75,4 @@ public class LlmConversationBatch {
         }
         return messageLists.get(type);
     }
-
-    public Object getBaggage() {
-        return baggage;
-    }
-
-    public void setBaggage(Object baggage) {
-        this.baggage = baggage;
-    }
 }
