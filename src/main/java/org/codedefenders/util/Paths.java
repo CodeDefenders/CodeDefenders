@@ -101,6 +101,7 @@ public class Paths {
     public static final String API_CLASS = "/api/class";
     public static final String API_TEST = "/api/test";
     public static final String API_MUTANT = "/api/mutant";
+    public static final String API_MUTANT_ACCORDION = "/api/mutant-accordion";
     public static final String API_GAME_CHAT = "/api/game-chat";
     public static final String API_CLASSROOM = "/api/classroom";
     public static final String API_MESSAGES = "/api/messages";
