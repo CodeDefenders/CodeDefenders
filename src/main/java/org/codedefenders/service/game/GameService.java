@@ -146,7 +146,6 @@ public class GameService implements IGameService {
 
     public List<MutantDTO> getFlaggedMutants(SimpleUser user, AbstractGame game) {
         List<MutantDTO> results = new ArrayList<>();
-        List<MutantDTO> allMutants = getMutants(user, game);
         for (MutantDTO m : getMutants(user, game)) {
             if (m.getState() == Mutant.State.FLAGGED && m.getCreator().equals(user)) {
                 results.add(m);
