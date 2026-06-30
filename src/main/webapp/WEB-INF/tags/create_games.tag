@@ -297,7 +297,7 @@
 
                         <div class="col-12"
                              title="Select the LLM defender for the games">
-                            <t:llm_select_button htmlId="llm_buttons"/>
+                            <t:llm_player_configuration htmlId="llm_buttons"/>
 
                         </div>
 

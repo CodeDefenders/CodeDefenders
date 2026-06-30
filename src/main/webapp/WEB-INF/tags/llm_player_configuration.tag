@@ -36,49 +36,45 @@
 %>
 
 <%--
-TODO Further generalize for use in llm_select_modal.tag
+    This tag is only used in /admin/games, but TODO it could be generalized to be used in LLM modals
 --%>
 <div>
     <div class="mb-3">
-        <label for="${htmlId}-defenderSelect" class="form-label">${i18n.tr('Choose defender model')}</label>
-        <div class="d-flex gap-2 align-items-center">
+        <label for="${htmlId}-defenderSelect" class="form-label">${i18n.tr('Configure LLM Defender')}</label>
+        <div class="input-group">
+            <span class="input-group-text">Model:</span>
             <select class="form-select" id="${htmlId}-defenderSelect" name="defenderModel">
                 <option id="${htmlId}-no-defender" value="NONE" selected>${i18n.tr('Don\'t use an LLM defender')}</option>
             </select>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label" for="${htmlId}-defenderStrategySelect">${i18n.tr('Choose defend strategy')}</label>
-        <select class="form-select" id="${htmlId}-defenderStrategySelect"
-                name="defenderStrategy">
-            <c:forEach items="${defendStrategies}" var="strat">
-                <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
-                        ${strat.toString()}
-                </option>
-            </c:forEach>
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label for="${htmlId}-attackerSelect" class="form-label">${i18n.tr('Choose attacker model')}</label>
-        <div class="d-flex gap-2 align-items-center">
-            <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
-                <option id="${htmlId}-no-attacker" value="NONE" selected>${i18n.tr('Don\'t use an LLM attacker')}</option>
+            <span class="input-group-text">Strategy:</span>
+            <select class="form-select" id="${htmlId}-defenderStrategySelect"
+                    name="defenderStrategy">
+                <c:forEach items="${defendStrategies}" var="strat">
+                    <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
+                            ${strat.toString()}
+                    </option>
+                </c:forEach>
             </select>
         </div>
     </div>
 
     <div class="mb-3">
-        <label class="form-label" for="${htmlId}-attackerStrategySelect">${i18n.tr('Choose attack strategy')}</label>
-        <select class="form-select" id="${htmlId}-attackerStrategySelect"
-                name="attackerStrategy">
-            <c:forEach items="${attackStrategies}" var="strat">
-                <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
-                        ${strat.toString()}
-                </option>
-            </c:forEach>
-        </select>
+        <label for="${htmlId}-attackerSelect" class="form-label">${i18n.tr('Configure LLM Attacker')}</label>
+        <div class="input-group">
+            <span class="input-group-text">Model:</span>
+            <select class="form-select" id="${htmlId}-attackerSelect" name="attackerModel">
+                <option id="${htmlId}-no-attacker" value="NONE" selected>${i18n.tr('Don\'t use an LLM attacker')}</option>
+            </select>
+            <span class="input-group-text">Strategy:</span>
+            <select class="form-select" id="${htmlId}-attackerStrategySelect"
+                    name="attackerStrategy">
+                <c:forEach items="${attackStrategies}" var="strat">
+                    <option id="${htmlId}-def-${strat}-option" value="${strat.name}">
+                            ${strat.toString()}
+                    </option>
+                </c:forEach>
+            </select>
+        </div>
     </div>
 
     <script>
