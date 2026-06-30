@@ -272,7 +272,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 try {
                     if (checkForPrivileges(game, request, response)) {
                         gameManagingUtils.setLlmPlayer(game, request);
-                        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME + "?gameId=" + game.getId()));
+                        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
                     }
                     return;
                 } catch (IllegalArgumentException e) {
