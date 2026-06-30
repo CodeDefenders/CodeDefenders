@@ -119,7 +119,7 @@
         </select>
         <div class="pt-2">
             <label class="form-label" for="${htmlId}-area">${i18n.tr('Prompt content:')}</label>
-            <textarea class="form-control" id="${htmlId}-area" form="${htmlId}-form"></textarea>
+            <textarea class="form-control" rows="15" id="${htmlId}-area" form="${htmlId}-form"></textarea>
         </div>
 
     </div>
