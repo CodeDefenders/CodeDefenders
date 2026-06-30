@@ -37,6 +37,9 @@ import org.codedefenders.util.Paths;
 
 /**
  * This {@link HttpServlet} offers an API for the mutant accordion game component.
+ * It returns the data for categories and mutants needed to render the mutant accordion.
+ * If a {@code mutantId} is provided as a request parameter,
+ * it returns only the data of that specific mutant and its categories.
  *
  * <p>Serves on path: {@code /api/mutant-accordion}.
  */
@@ -71,13 +74,23 @@ public class MutantAccordionAPI extends HttpServlet {
             return;
         }
 
-        PrintWriter out = response.getWriter();
-        String json = "{\"categories\":" + mutantAccordionBean.jsonFromCategories() + "," +
-                "\"mutants\":" + mutantAccordionBean.jsonMutants() + "}";
+        var mutantId = ServletUtils.getIntParameter(request, "mutantId");
+        var json = mutantId.map(this::getJsonForNewMutant).orElseGet(this::getCompleteJson);
 
+        PrintWriter out = response.getWriter();
         response.setContentType("application/json");
         out.print(json);
         out.flush();
+    }
+
+    private String getCompleteJson() {
+        return "{\"categories\":" + mutantAccordionBean.jsonFromCategories() + "," +
+                "\"mutants\":" + mutantAccordionBean.jsonMutants() + "}";
+    }
+
+    private String getJsonForNewMutant(int mutantId) {
+        return "{\"categories\":" + mutantAccordionBean.jsonCategoriesContainingMutant(mutantId) + "," +
+                "\"mutant\":" + mutantAccordionBean.jsonMutant(mutantId) + "}";
     }
 
 }

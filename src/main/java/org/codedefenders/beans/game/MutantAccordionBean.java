@@ -156,6 +156,16 @@ public class MutantAccordionBean {
         return gson.toJson(categories);
     }
 
+    public String jsonCategoriesContainingMutant(int mutantId) {
+        List<MutantAccordionCategory> categoriesContainingMutant = categories.stream()
+                .filter(category -> category.getMutantIds().contains(mutantId))
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(categoriesContainingMutant);
+    }
+
     public String jsonMutants() {
         Map<Integer, MutantDTO> mutants = this.mutantList.stream()
                 .collect(Collectors.toMap(MutantDTO::getId, Function.identity()));
@@ -167,6 +177,17 @@ public class MutantAccordionBean {
                 .create();
 
         return gson.toJson(mutants);
+    }
+
+    public String jsonMutant(int mutantId) {
+        MutantDTO mutant = this.mutantList.stream()
+                .filter(m -> m.getId() == mutantId)
+                .findFirst()
+                .orElse(null);
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(mutant);
     }
 
     public static class MutantAccordionCategory {

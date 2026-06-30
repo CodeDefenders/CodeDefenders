@@ -411,27 +411,27 @@ class MutantAccordion {
      * @param {MutantDTO} mutant The mutant to add.
      */
     async addMutant (mutant) {
-        const data = await fetch(`${contextPath}api/mutant-accordion?gameId=${this._gameId}`)
+        const data = await fetch(`${contextPath}api/mutant-accordion?gameId=${this._gameId}&mutantId=${mutant.id}`)
             .then(response => response.json())
             .catch(error => console.error(error));
 
-        if (data === undefined || !data.categories || !data.mutants) {
+        if (data === undefined || !data.categories || !data.mutant) {
             console.error('Failed to fetch mutant accordion data.');
             return;
         }
 
-        this._categories = data.categories;
-        this._mutants = new Map(data.mutants);
+        this._mutants.set(mutant.id, data.mutant);
 
-        for (const category of this._categories) {
+        for (const category of data.categories) {
             if (this._dataTablesByCategory.has(category.id)) {
                 /* Update the existing DataTable. */
                 const dataTable = this._dataTablesByCategory.get(category.id);
-                dataTable.row.add(this._mutants.get(mutant.id)).draw(false);
+                dataTable.row.add(data.mutant).draw(false);
                 /* Update the count badge. */
                 const countElement = document.getElementById('ma-count-' + category.id);
                 countElement.innerText = category.mutantIds.length;
             } else {
+                this._categories.push(category);
                 /* Create a new accordion and DataTable for the new category. */
                 mutantAccordionElement.insertAdjacentHTML('beforeend', this._renderCategoryAccordion(category));
                 const dataTable = this._renderMutantTable(category);
