@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<%@ taglib prefix="fn" uri="org.codedefenders.functions" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
@@ -64,8 +65,8 @@
         import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import {MutantAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
-        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
-        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+        const categories = JSON.parse('${fn:escapeJS(mutantAccordion.jsonFromCategories())}');
+        const mutants = new Map(JSON.parse('${fn:escapeJS(mutantAccordion.jsonMutants())}'));
         const gameId = ${mutantAccordion.gameId};
 
         const mutantAccordion = new MutantAccordion(categories, mutants, gameId);

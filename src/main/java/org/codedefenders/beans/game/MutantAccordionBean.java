@@ -31,7 +31,6 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
@@ -166,9 +165,8 @@ public class MutantAccordionBean {
                 .excludeFieldsWithoutExposeAnnotation()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
-        // We need to do the JavaScript escaping in the end, since otherwise {@code '} character don't get escaped
-        // properly
-        return StringEscapeUtils.escapeEcmaScript(gson.toJson(mutants));
+
+        return gson.toJson(mutants);
     }
 
     public static class MutantAccordionCategory {
