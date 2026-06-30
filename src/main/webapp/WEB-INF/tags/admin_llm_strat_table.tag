@@ -47,13 +47,13 @@
                 <td>
                     <c:choose>
                     <c:when test="${strat.readOnly}">
-                    <button class="btn btn-primary" data-bs-toggle="modal"
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                             data-bs-target="#${htmlId}-${strat.name}-modal">
                         ${i18n.tr('Create custom variant')}
                     </button>
                     </c:when>
                     <c:otherwise>
-                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
+                    <button class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#${htmlId}-${strat.name}-modal">
                         ${i18n.tr('Edit')}
                             </button>
                         </c:otherwise>
