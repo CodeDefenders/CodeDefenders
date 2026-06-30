@@ -164,18 +164,47 @@ class MutantAccordion {
         LoadingAnimation.hideAnimation(modal.body);
     };
 
+    _renderCategoryAccordion (category) {
+        return `
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="ma-heading-${category.id}">
+                    <button class="${category.mutantIds.length === 0 ? "" : 'ma-covered'} accordion-button collapsed"
+                            type="button" data-bs-toggle="collapse"
+                            data-bs-target="#ma-collapse-${category.id}"
+                            aria-controls="ma-collapse-${category.id}">
+                        <span class="badge bg-attacker me-2 ma-count"
+                              id="ma-count-${category.id}"
+                              ${category.mutantIds.length === 0 ? 'hidden' : ''}">
+                            ${category.mutantIds.length}
+                        </span>
+                        ${category.description}
+                    </button>
+                </h2>
+                <div class="accordion-collapse collapse"
+                     id="ma-collapse-${category.id}"
+                     data-bs-parent="#mutants-accordion"
+                     aria-expanded="false" aria-labelledby="ma-heading-${category.id}">
+                    <div class="accordion-body p-0">
+                        <table id="ma-table-${category.id}" class="table table-sm"></table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     /** @private */
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
+        const mutantAccordionElement = document.getElementById('mutants-accordion');
 
-        /* Loop through the categories and create a mutant table for each one. */
+        /* Loop through the categories and create an accordion with a mutant table for each one. */
         for (const category of this._categories) {
-            const rows = category.mutantIds
-                    .sort()
-                    .map(this._mutants.get, this._mutants);
+            /* Create accordion */
+            mutantAccordionElement.insertAdjacentHTML('beforeend', this._renderCategoryAccordion(category));
 
             /* Create the DataTable. */
+            const rows = category.mutantIds.sort().map(this._mutants.get, this._mutants);
             const tableElement = document.getElementById(`ma-table-${category.id}`);
             const dataTable = new DataTable(tableElement, {
                 data: rows,
