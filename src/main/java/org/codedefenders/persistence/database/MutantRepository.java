@@ -423,6 +423,10 @@ public class MutantRepository {
         queryRunner.batch(query2, params);
     }
 
+    /**
+     * Returns the player ID of the defender that claimed equivalence for the given mutant,
+     * or -1 if no defender claimed equivalence for the mutant.
+     */
     public int getEquivalentDefenderId(Mutant m) {
         @Language("SQL") String query = "SELECT * FROM equivalences WHERE Mutant_ID = ?;";
 

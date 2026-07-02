@@ -23,11 +23,15 @@ import org.codedefenders.notification.events.server.ServerEvent;
 import com.google.gson.annotations.Expose;
 
 /**
- * Equivalence duel won event.
+ * Equivalence duel triggered or result event.
  */
-public class EquivalenceDuelWonEvent extends ServerEvent {
+public class EquivalenceDuelEvent extends ServerEvent {
+
     @Expose
-    private int userId;
+    private int defenderId;
+
+    @Expose
+    private int attackerId;
 
     @Expose
     private int gameId;
@@ -35,23 +39,6 @@ public class EquivalenceDuelWonEvent extends ServerEvent {
     @Expose
     private int mutantId;
 
-    /**
-     * Returns the user id of the winner.
-     *
-     * @return the user id of the winner
-     */
-    public int getUserId() {
-        return userId;
-    }
-
-    /**
-     * Sets the user id of the winner.
-     *
-     * @param userId the user id of the winner
-     */
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
 
     public int getMutantId() {
         return mutantId;
@@ -67,5 +54,21 @@ public class EquivalenceDuelWonEvent extends ServerEvent {
 
     public void setGameId(int gameId) {
         this.gameId = gameId;
+    }
+
+    public int getDefenderId() {
+        return defenderId;
+    }
+
+    public void setDefenderId(int defenderId) {
+        this.defenderId = defenderId;
+    }
+
+    public int getAttackerId() {
+        return attackerId;
+    }
+
+    public void setAttackerId(int attackerId) {
+        this.attackerId = attackerId;
     }
 }

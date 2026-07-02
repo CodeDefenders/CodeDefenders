@@ -7,7 +7,8 @@
 
 		<powermock.version>2.0.9</powermock.version>
 		<tomcat.version>10.1.23</tomcat.version>
-		<slf4j.version>1.7.36</slf4j.version>
+		<slf4j.version>2.0.17</slf4j.version>
+		<log4j2.version>2.25.4</log4j2.version>
 		<junit5.version>5.10.0</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
 		<prometheus-client.version>0.16.0</prometheus-client.version>
@@ -831,11 +832,24 @@
 			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-			<scope>runtime</scope>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
+			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j2-impl</artifactId>
+			<version>${log4j2.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- Also requires 'commons-compress' -->
 
 		<!-- Metrics -->
 		<dependency>

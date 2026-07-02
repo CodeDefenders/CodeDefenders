@@ -25,6 +25,7 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.registration.AchievementRegistrationEvent;
+import org.codedefenders.notification.events.client.registration.EquivalenceDuelRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.InviteRegistrationEvent;
@@ -32,6 +33,7 @@ import org.codedefenders.notification.events.client.registration.MutantProgressB
 import org.codedefenders.notification.events.client.registration.RegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
 import org.codedefenders.notification.handling.server.AchievementEventHandler;
+import org.codedefenders.notification.handling.server.EquivalenceDuelEventHandler;
 import org.codedefenders.notification.handling.server.GameChatEventHandler;
 import org.codedefenders.notification.handling.server.GameLifecycleEventHandler;
 import org.codedefenders.notification.handling.server.InviteEventHandler;
@@ -181,6 +183,22 @@ public class ServerEventHandlerContainer {
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
             removeHandler(new InviteEventHandler(socket, user.getId()));
+        }
+    }
+
+    public void handleRegistrationEvent(EquivalenceDuelRegistrationEvent event) {
+        Role role = playerRepo.getRole(user.getId(), event.getGameId());
+        if (role == null) {
+            logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
+                    user.getId(), EquivalenceDuelEventHandler.class.getSimpleName(), event.getGameId());
+            return;
+        }
+
+        if (event.getAction() == RegistrationEvent.Action.REGISTER) {
+            addHandler(new EquivalenceDuelEventHandler(socket, event.getGameId(), user.getId()));
+
+        } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
+            removeHandler(new EquivalenceDuelEventHandler(socket, event.getGameId(), user.getId()));
         }
     }
 }

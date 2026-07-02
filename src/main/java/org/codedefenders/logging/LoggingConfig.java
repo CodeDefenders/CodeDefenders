@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2016-2025 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.codedefenders.logging;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Re-configures the log level at runtime.
+ */
+@Singleton
+public class LoggingConfig {
+    private static final Logger logger = LoggerFactory.getLogger(LoggingConfig.class);
+    private final Configuration config;
+
+    @Inject
+    public LoggingConfig(Configuration config) {
+        this.config = config;
+    }
+
+    public void reconfigure() {
+        var context = LoggerContext.getContext(false);
+        var config = context.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME);
+        config.setLevel(getLogLevel());
+        context.updateLoggers();
+    }
+
+    private Level getLogLevel() {
+        String logLevelStr = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.LOG_LEVEL).getStringValue();
+        try {
+            return Level.valueOf(logLevelStr);
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid setting value for log level: '{}'. Falling back to INFO.", logLevelStr);
+            return Level.INFO;
+        }
+    }
+}

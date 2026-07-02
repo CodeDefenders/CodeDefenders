@@ -16,11 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.notification.events.server.equivalence;
+package org.codedefenders.logging;
 
-/**
- * Event that is fired when a defender wins an equivalence duel against an attacker.
- */
-public class EquivalenceDuelDefenderWonEvent extends EquivalenceDuelWonEvent {
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public final class ExceptionLoggingFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(ExceptionLoggingFilter.class);
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) {
+        try {
+            filterChain.doFilter(request, response);
+        } catch (Throwable e) {
+            logger.error("Unhandled exception", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

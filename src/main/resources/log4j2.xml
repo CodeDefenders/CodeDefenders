@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is the default config for log4j2. -->
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd"
+               packages="org.codedefenders.logging.ConfigLookup">
+    <Appenders>
+        <RollingFile name="APPENDER_DATA_DIR"
+                     fileName="${cfg:dataDir}/logs/codedefenders.log"
+                     filePattern="${cfg:dataDir}/logs/codedefenders-%d{yyyy-MM-dd}-%i.log.xz">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy fileIndex="nomax"/>
+        </RollingFile>
+        <Console name="APPENDER_CONSOLE">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="APPENDER_DATA_DIR"/>
+            <AppenderRef ref="APPENDER_CONSOLE"/>
+        </Root>
+    </Loggers>
+</Configuration>

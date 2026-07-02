@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-class ContextConfigFileResolver extends ConfigFileResolver {
+public class ContextConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ContextConfigFileResolver.class);
 
     @Override

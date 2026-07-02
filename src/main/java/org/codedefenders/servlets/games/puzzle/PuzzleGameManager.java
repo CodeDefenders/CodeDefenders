@@ -53,8 +53,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelAttackerWonEvent;
-import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelWonEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.game.GameSolvedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -536,11 +535,12 @@ public class PuzzleGameManager extends HttpServlet {
                     );
                     eventDAO.insert(notif);
 
-                    EquivalenceDuelWonEvent edwe = new EquivalenceDuelAttackerWonEvent();
-                    edwe.setGameId(gameId);
-                    edwe.setUserId(login.getUserId());
-                    edwe.setMutantId(mutant.getId());
-                    notificationService.post(edwe);
+                    var ede = new EquivalenceDuelResultEvent();
+                    ede.setGameId(game.getId());
+                    ede.setAttackerId(login.getUserId());
+                    ede.setMutantId(mutant.getId());
+                    ede.setAttackerWon();
+                    notificationService.post(ede);
 
                     game.setState(GameState.SOLVED);
                     messages.clear();

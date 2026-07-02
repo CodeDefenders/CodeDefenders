@@ -10,9 +10,17 @@ So you can also refer to this document when refactoring or replacing other parts
 
 ### Logging
 
-We use _SLF4J_.  
-`Logger` should be listed as first line in a class as `private static final` variable.
+We use the _SLF4J_ logging API with _Log4j2_ as the backend.
+The `Logger` should be listed as first line in a class as `private static final` variable like so:
 
+```java
+private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+```
+
+Configuration:
+- `src/main/resources/log4j2.xml` configures the logging backend for deployments.
+- `src/test/resources/log4j2-test.xml` configures the logging backend for tests.
+- The config can be overriden via the Java option `-Dlog4j2.configurationFile=/path/to/log4j2.xml`.
 
 ### Metrics
 
