@@ -24,6 +24,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%--
@@ -33,11 +34,13 @@
 
 <%-- Recieve events from the server --%>
 <script type="module">
-    import {objects, AchievementNotifications} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {objects, AchievementNotifications, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */
         const socket = await objects.await('pushSocket');
+
+        // lifecycle events
 
         socket.subscribe('registration.GameLifecycleRegistrationEvent', {
             gameId: ${gameProducer.game.id},
@@ -59,11 +62,36 @@
             window.location.reload();
         });
 
-        socket.subscribe('registration.AchievementRegistrationEvent', {
+
+        // equivalence duel events
+
+        socket.subscribe('registration.EquivalenceDuelRegistrationEvent', {
+            gameId: ${gameProducer.game.id},
             userId: ${login.userId}
         });
 
+        socket.register('equivalence.EquivalenceDuelResultEvent', event => {
+            if (event.defenderId === ${login.userId}) {
+                if (!event.attackerWon) {
+                    ShowToasts.showToast({
+                        title: '${i18n.tr("Equivalence duel won!")}',
+                        body: '${i18n.tr("Mutant {0} that you claimed was declared equivalent. The attacker lost all their points for the mutant and you gained an additional point.")}'.replaceAll('{0}', event.mutantId)
+                    });
+                } else {
+                    ShowToasts.showToast({
+                        title: '${i18n.tr("Equivalence duel lost!")}',
+                        body: '${i18n.tr("Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point.")}'.replaceAll('{0}', event.mutantId)
+                    });
+                }
+            }
+        });
 
+
+        // achievements
+
+        socket.subscribe('registration.AchievementRegistrationEvent', {
+            userId: ${login.userId}
+        });
 
         socket.register('achievement.AchievementUnlockedEvent', event => {
             console.log('Achievement unlocked.', event);

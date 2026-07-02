@@ -1343,11 +1343,11 @@ msgstr "Das Spiel macht Spaß"
 msgid "default"
 msgstr "Standard"
 
-#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:131
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:132
 msgid "/{0} is not a valid chat command."
 msgstr "/{0} ist kein gültiger Chat-Befehl."
 
-#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:137
+#: src/main/java/org/codedefenders/notification/handling/ClientEventHandler.java:138
 msgid "Your message cannot be empty."
 msgstr "Deine Nachricht darf nicht leer sein."
 
@@ -1708,70 +1708,70 @@ msgstr ""
 "Kapitel erfolgreich hochgeladen. Bitte überprüfe ab sofort die Protokolle "
 "auf Fehler."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:54
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:70
 msgid "Show Player Feedback"
 msgstr "Spieler-Feedback anzeigen"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:55
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:71
 msgid "Show other player's feedback to all players in the game."
 msgstr "Zeige das Feedback anderer Spieler allen Spielern im Spiel an."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:58
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:74
 msgid "Registration"
 msgstr "Registrierung"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:59
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:75
 msgid "Show or hide the link for user registration."
 msgstr "Den Link zur Benutzerregistrierung anzeigen oder ausblenden."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:62
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:78
 msgid "Class Upload"
 msgstr "Datei hochladen"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:63
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:79
 msgid "Show or hide the link for CUT upload."
 msgstr "Den Link für den CUT-Upload anzeigen oder ausblenden."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:66
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:82
 msgid "Game Creation"
 msgstr "Spielerstellung"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:67
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:83
 msgid "Show or hide the link for Game Creation."
 msgstr "Den Link zur Spielerstellung anzeigen oder ausblenden."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:70
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:86
 msgid "Game Joining"
 msgstr "Spielbeitritt"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:71
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:87
 msgid "Show or hide links to join/leave games."
 msgstr "Links zum Beitreten/Verlassen von Spielen anzeigen oder ausblenden."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:74
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:90
 msgid "Require Mail Validation"
 msgstr "E-Mail-Überprüfung erforderlich"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:75
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:91
 msgid "Require a validated email address for login."
 msgstr "Für die Anmeldung ist eine bestätigte E-Mail-Adresse erforderlich."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:78
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:94
 msgid "Min Password Length"
 msgstr "Mindestlänge des Passworts"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:79
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:95
 msgid ""
 "Minimum password length, also length of generated passwords. Recommended: >7"
 msgstr ""
 "Mindestlänge für Passwörter, gilt auch für generierte Passwörter. Empfohlen: "
 ">7"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:82
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:98
 msgid "Connection Pool Connections"
 msgstr "Verbindungen im Verbindungspool"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:84
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:100
 msgid ""
 "NOT USED, SET THIS VIA THE CONFIGURATION.\n"
 "Number of permanently open connections. Recommended: >20\n"
@@ -1782,11 +1782,11 @@ msgstr ""
 "Wenn du diesen Wert verringerst, wird die Lücke bei den Verbindungen "
 "geschlossen!\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:92
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:108
 msgid "Connection Waiting Time"
 msgstr "Wartezeit für die Verbindung"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:94
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:110
 msgid ""
 "NOT USED, SET THIS VIA THE CONFIGURATION.\n"
 "Amount of time in ms a thread waits to be notified of newly available "
@@ -1798,11 +1798,11 @@ msgstr ""
 "Verbindungen benachrichtigt wird.\n"
 "Empfohlen: ~5000 ms\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:102
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:118
 msgid "Supported Languages"
 msgstr "Unterstützte Sprachen"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:104
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
 msgid ""
 "Comma separated list of supported locales where full translations exist.\n"
 "The first locale in the list will be used by default.\n"
@@ -1813,43 +1813,43 @@ msgstr ""
 "Standardmäßig wird die erste Sprache in der Liste verwendet.\n"
 "Sprachcodes wie en, de, fr reichen aus.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:112
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
 msgid "Email Smtp Host"
 msgstr "E-Mail-SMTP-Host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:113
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:129
 msgid "SMTP host"
 msgstr "SMTP-Host"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:116
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:132
 msgid "Email Smtp Port"
 msgstr "SMTP-Port für E-Mails"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:117
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:133
 msgid "SMTP port"
 msgstr "SMTP-Port"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:120
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:136
 msgid "Email Address"
 msgstr "E-Mail Adresse"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:121
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
 msgid "System mail account"
 msgstr "System-E-Mail-Konto"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:124
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:140
 msgid "Email Password"
 msgstr "E-Mail Passwort"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:125
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:141
 msgid "Password for the system mail account"
 msgstr "Passwort für das System-E-Mail-Konto"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:128
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:144
 msgid "Email Username"
 msgstr "E-Mail-User Login-Name"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:130
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:146
 msgid ""
 "Username for the system mail account.\n"
 "Should usually be the same as the address. If left blank, will default to "
@@ -1859,11 +1859,11 @@ msgstr ""
 "Sollte normalerweise mit der E-Mail-Adresse übereinstimmen. Wenn das Feld "
 "leer gelassen wird, wird standardmäßig die E-Mail-Adresse verwendet.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:137
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:153
 msgid "Emails Enabled"
 msgstr "E-Mails aktiviert"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:139
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:155
 msgid ""
 "Send emails from the specified account for verification,\n"
 "resetting passwords and when the admin changes user info\n"
@@ -1872,19 +1872,19 @@ msgstr ""
 "zum Zurücksetzen von Passwörtern und wenn der Administrator Benutzerdaten "
 "ändert\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:146
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
 msgid "Password Reset Secret Lifespan"
 msgstr "Gültigkeitsdauer des Passwort-Zurücksetzungscodes"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:147
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
 msgid "How long (in hours) a password reset secret is valid"
 msgstr "Wie lange (in Stunden) ein Passwort-Zurücksetzungscode gültig ist"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:150
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
 msgid "Debug Mode"
 msgstr "Debug Modus"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:151
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
 msgid ""
 "Turn on certain debugging features such as detailed debug prints for "
 "javax.mail"
@@ -1892,35 +1892,35 @@ msgstr ""
 "Aktiviere bestimmte Debugging-Funktionen wie detaillierte Debug-Ausgaben für "
 "javax.mail"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:154
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
 msgid "Automatic Killmap Computation"
 msgstr "Automatische Berechnung der Killmap"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:155
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
 msgid "Turn on the automatic killmaps computation"
 msgstr "Aktiviere die automatische Berechnung der Killmaps"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:158
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
 msgid "Public User Profile"
 msgstr "Öffentliches Benutzerprofil"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:159
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
 msgid "Let users visit the profile pages of others."
 msgstr "Erlaube den Nutzern, die Profilseiten anderer zu besuchen."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:162
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
 msgid "Allow Puzzle Section"
 msgstr "Rätsel-Bereich aktivieren"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:163
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:179
 msgid "Let users play the puzzles in the puzzle section."
 msgstr "Lass die Nutzer die Rätsel im Rätselbereich lösen."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:166
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:182
 msgid "Failed Duel Validation Threshold"
 msgstr "Schwellenwert für fehlgeschlagene Duell-Validierung"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:167
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:183
 msgid ""
 "The maximum number of tests that will run to validate a lost equivalence "
 "duel."
@@ -1928,11 +1928,11 @@ msgstr ""
 "Die maximale Anzahl an Tests, die zur Überprüfung eines verlorenen "
 "Äquivalenzduells ausgeführt werden."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:170
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:186
 msgid "Game Duration Minutes Max"
 msgstr "Spieldauer in Minuten (max.)"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:171
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
 msgid ""
 "The maximum duration that can be set for multiplayer/melee games (in "
 "minutes)."
@@ -1940,21 +1940,21 @@ msgstr ""
 "Die maximale Dauer, die für Multiplayer-/Nahkampfspiele eingestellt werden "
 "kann (in Minuten)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:174
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:190
 msgid "Game Duration Minutes Default"
 msgstr "Spieldauer in Minuten (Standard)"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:175
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
 msgid "The default duration a multiplayer/melee game is open (in minutes)."
 msgstr ""
 "Die Standarddauer, für die ein Multiplayer-/Nahkampfspiel geöffnet ist (in "
 "Minuten)."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:178
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:194
 msgid "Teacher Applications Enabled"
 msgstr "Bewerbungen von Lehrer-Accounts sind möglich"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:180
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
 msgid ""
 "Enable teacher account applications using email on the 'Contact Us' page.\n"
 "Configuring a valid email address is required.\n"
@@ -1963,21 +1963,29 @@ msgstr ""
 "„Kontakt“.\n"
 "Die Angabe einer gültigen E-Mail-Adresse ist erforderlich.\n"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:187
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
 msgid "Teacher Applications Email"
 msgstr "E-Mail für Bewerbungen als Lehrer"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:188
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
 msgid "The email address to use for teacher account applications."
 msgstr ""
 "Die E-Mail-Adresse, die du für die Beantragung eines Lehrerkontos verwenden "
 "musst."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:319
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:207
+msgid "Log Level"
+msgstr "Protokollierungsstufe"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:208
+msgid "Controls the granularity of log messages."
+msgstr "Steuert die Detailgenauigkeit der Protokollmeldungen."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:348
 msgid "Updated Settings."
 msgstr "Einstellungen aktualisiert."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:320
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:349
 msgid "There was a problem. Please consult the logs"
 msgstr "Es ist ein Problem aufgetreten. Schau mal in den Protokollen nach."
 
@@ -2709,7 +2717,7 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:469
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:566
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:679
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:771
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:769
 msgid "User is not a player in the game."
 msgstr "Der Benutzer ist kein Spieler in diesem Spiel."
 
@@ -2726,7 +2734,7 @@ msgid "Can only submit mutants if you are an Attacker."
 msgstr "Du kannst nur Mutanten einreichen, wenn du ein Angreifer bist."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:507
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:679
 msgid ""
 "Error submitting the mutant: data too long. Maybe you made too many changes?"
 msgstr ""
@@ -2734,7 +2742,7 @@ msgstr ""
 "Änderungen vorgenommen?"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:509
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:683
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
 msgid "Database error while saving the mutant."
 msgstr "Datenbankfehler beim Speichern des Mutanten."
 
@@ -2743,17 +2751,17 @@ msgid "Can only resolve equivalence duels if you are an Attacker!"
 msgstr "Du kannst Äquivalenzduelle nur lösen, wenn du der Angreifer bist!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:576
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:781
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:779
 msgid "Game {0} has finished."
 msgstr "Spiel {0} ist beendet."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:581
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:786
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:784
 msgid "Mutant does not exist."
 msgstr "Mutant existiert nicht."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:595
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:802
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:800
 msgid ""
 "Too late. The mutant was already killed and therefore proven to be not "
 "equivalent."
@@ -2766,7 +2774,7 @@ msgid "Can only claim mutant as equivalent if you are a Defender!"
 msgstr "Nur als Verteidiger kannst du einen Mutanten als äquivalent markieren!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:692
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1068
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr ""
 "In diesem Spiel kannst du Mutanten nicht mehr als äquivalent einstufen."
@@ -2818,58 +2826,58 @@ msgstr "Die verbleibende Zeit darf nicht unter {0} Minuten liegen."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "Die neue verbleibende Dauer darf höchstens {0} Minuten betragen."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:969
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1137
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:970
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:972
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "1 Mutant als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:973
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "{0} Mutanten als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1168
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1170
 msgid "Your test has the following smell: {0}"
 msgstr "Dein Test weist folgenden Test-Smell auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1174
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1176
 msgid "Your test has the following smells: {0}"
 msgstr "Dein Test weist folgende Test-Smells auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:776
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:774
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Du kannst Äquivalenz-Duelle nur lösen, wenn du ein Spieler bist!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1029
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1033
 msgid "...and it also killed another claimed mutant!"
 msgstr ""
 "...und er hat auch noch einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1031
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1035
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr ""
 "...und er hat auch noch {0} weitere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1036
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1040
 msgid "...however, your test did kill another claimed mutant!"
 msgstr ""
 "...aber dein Test hat immerhin einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1038
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1042
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr ""
 "...dein Test hat jedoch {0} andere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1139
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1143
 msgid "Flagged 1 mutant as equivalent"
 msgstr "1 Mutant als äquivalent markiert"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1145
 msgid "Flagged {0} mutants as equivalent"
 msgstr "{0} Mutanten wurden als äquivalent markiert"
 
@@ -2881,7 +2889,7 @@ msgstr "Du kannst kein Spiel verlassen, an dem du gar nicht teilnimmst."
 msgid "Only the creator of this game can call a rematch."
 msgstr "Nur der Ersteller dieses Spiels kann eine Revanche erstellen."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:436
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:435
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "Nein, dieser Mutant ist nicht äquivalent mit der zu testenden Klasse."
 
@@ -4824,7 +4832,7 @@ msgstr "Raum erstellen"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1017
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1066
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
-#: src/main/webapp/jsp/admin_system_settings.jsp:132
+#: src/main/webapp/jsp/admin_system_settings.jsp:157
 #: src/main/webapp/jsp/admin_text_settings.jsp:101
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:345
@@ -5370,7 +5378,7 @@ msgstr "Sprache"
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:100
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1123
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:1289
-#: src/main/webapp/jsp/admin_system_settings.jsp:128
+#: src/main/webapp/jsp/admin_system_settings.jsp:153
 #: src/main/webapp/jsp/admin_text_settings.jsp:97
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:156
 msgid "Save"
@@ -5791,18 +5799,18 @@ msgstr "Bearbeitbare Zeilen beginnen unter"
 msgid "Editable lines end above"
 msgstr "Bearbeitbare Zeilen enden oberhalb"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:50
+#: src/main/webapp/jsp/admin_system_settings.jsp:52
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
 msgid "System Settings"
 msgstr "Systemeinstellungen"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:85
-#: src/main/webapp/jsp/admin_system_settings.jsp:114
+#: src/main/webapp/jsp/admin_system_settings.jsp:108
+#: src/main/webapp/jsp/admin_system_settings.jsp:139
 msgid "This setting is required for sending emails."
 msgstr "Diese Einstellung ist für den Versand von E-Mails erforderlich."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:86
-#: src/main/webapp/jsp/admin_system_settings.jsp:115
+#: src/main/webapp/jsp/admin_system_settings.jsp:109
+#: src/main/webapp/jsp/admin_system_settings.jsp:140
 msgid "Please provide a valid value, or disable emails."
 msgstr "Bitte gib einen gültigen Wert ein oder deaktiviere E-Mails."
 
@@ -9196,6 +9204,31 @@ msgstr "Möchten Sie das Spiel wirklich beenden?"
 msgid "Invitations"
 msgstr "Einladungen"
 
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:77
+msgid "Equivalence duel won!"
+msgstr "Äquivalenzduell gewonnen!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:78
+msgid ""
+"Mutant {0} that you claimed was declared equivalent. The attacker lost all "
+"their points for the mutant and you gained an additional point."
+msgstr ""
+"Der Ersteller von Mutant {0} konnte nicht beweisen, dass dieser nicht "
+"äquivalent ist und hat alle Punkte des Mutanten verloren. Du hast einen "
+"zusätzlichen Punkt erhalten."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:82
+msgid "Equivalence duel lost!"
+msgstr "Äquivalenzduell verloren!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:83
+msgid ""
+"Mutant {0} that you claimed was proven to be not equivalent. The attacker "
+"gained an additional point."
+msgstr ""
+"Der Ersteller von Mutant {0} hat bewiesen, dass dieser nicht äquivalent ist "
+"und dafür einen zusätzlichen Punkt erhalten."
+
 #: src/main/webapp/WEB-INF/tags/game_time.tag:43
 msgid "Change the game duration."
 msgstr "Ändere die Spieldauer."
@@ -9614,3 +9647,6 @@ msgstr "Kopieren fehlgeschlagen"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
+
+#~ msgid "Change"
+#~ msgstr "Ändern"
