@@ -213,6 +213,7 @@
                     messageCard.appendChild(messageHeader);
 
                     const messageBody = document.createElement("div");
+                    messageBody.setAttribute("style", "white-space: pre-wrap");
                     messageBody.innerHTML = dto.message.replaceAll("\n", "<br>");
                     messageCard.appendChild(messageBody);
 
