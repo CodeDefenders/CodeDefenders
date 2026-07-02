@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.llm.AbstractStrategy;
 
 import com.google.gson.annotations.Expose;
@@ -107,7 +108,8 @@ public class LlmStrategy implements Serializable {
      * Same as {@link LlmStrategy#getPrompt(LlmPromptType)}, but the result is escaped for HTML use.
      */
     public String getHtmlPrompt(LlmPromptType promptType) {
-        return getPrompt(promptType).replace("\r\n", "\n").replace("\n", "\\n");
+        return StringEscapeUtils.escapeJson(StringEscapeUtils.escapeEcmaScript(getPrompt(promptType)));//TODO Noch Fehler bei manchen Prompts
+//        return getPrompt(promptType).replace("\r\n", "\n").replace("\n", "\\n");
     }
 
     public Map<LlmPromptType, String> getCustomPrompts() {
