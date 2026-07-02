@@ -39,7 +39,9 @@
 
     <%-- Button with remaining duration. --%>
 
-    <div data-bs-toggle="tooltip" title="${canSetDuration ? i18n.tr('Change') : i18n.tr('View')} ${i18n.tr('the game duration.')}">
+    <div data-bs-toggle="tooltip" title="${canSetDuration
+            ? i18n.tr('Change the game duration.')
+            : i18n.tr('View the game duration.')}">
         <button type="button"
                 class="btn btn-sm btn-outline-${canSetDuration ? 'danger' : 'secondary'}"
                 form="durationModalForm"

@@ -31,6 +31,7 @@
 <%@ page import="org.codedefenders.model.UserMeleeGameInfo" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.xnap.commons.i18n.I18n" %>
 
 <%
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
@@ -39,6 +40,8 @@
     PlayerScore zeroDummyScore = new PlayerScore(-1);
     zeroDummyScore.setMutantKillInformation("0 / 0 / 0");
     zeroDummyScore.setDuelInformation("0 / 0 / 0");
+
+    I18n i18n = (I18n) request.getAttribute("i18n");
 %>
 
 <%!
@@ -112,7 +115,7 @@
                     </td>
                     <td><%=defenders.size()%>
                     </td>
-                    <td><%=g.gameLevel().getFormattedString()%>
+                    <td><%=i18n.tr(g.gameLevel().getFormattedString())%>
                     </td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
@@ -253,7 +256,7 @@
                     </td>
                     <td><%=players.size()%>
                     </td>
-                    <td><%=g.gameLevel().getFormattedString()%>
+                    <td><%=i18n.tr(g.gameLevel().getFormattedString())%>
                     </td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
