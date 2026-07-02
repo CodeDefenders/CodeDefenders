@@ -27,8 +27,6 @@ import java.util.List;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
-import org.codedefenders.persistence.database.LlmConversationRepository;
-import org.codedefenders.util.CDIUtil;
 
 import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
@@ -128,7 +126,6 @@ public class LlmConversation {
     public void finish(boolean success) {
         this.success = success;
         active = false;
-        CDIUtil.getBeanFromCDI(LlmConversationRepository.class).saveConversation(this);
     }
 
     public boolean lastMessageWasError() {

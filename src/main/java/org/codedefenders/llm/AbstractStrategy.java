@@ -109,6 +109,7 @@ public abstract class AbstractStrategy {
 
     protected void finishConversation(boolean success) {
         conversation.finish(success);
+        conversationRepository.saveConversation(conversation);
         context.conversationBatch().remove(conversation);
         conversation = null;
     }
