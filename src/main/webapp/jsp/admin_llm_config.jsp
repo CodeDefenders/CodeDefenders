@@ -120,7 +120,6 @@
                                  htmlId="equivTable"/>
 
         <script type="module">
-            console.log("MODELS: ${models}");
             const rows = document.querySelectorAll("[id^='model-row-']");
             rows.forEach(r => {
                 const name = r.querySelector("[id^='model-name']").textContent.trim();
