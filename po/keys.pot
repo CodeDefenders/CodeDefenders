@@ -2935,55 +2935,55 @@ msgstr "Your test has the following smell: {0}"
 msgid "Your test has the following smells: {0}"
 msgstr "Your test has the following smells: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:800
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:799
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:805
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:804
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Can only resolve equivalence duels if you are a Player!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:810
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:809
 msgid "Game {0} has finished."
 msgstr "Game {0} has finished."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:815
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:814
 msgid "Mutant does not exist."
 msgstr "Mutant does not exist."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:831
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:830
 msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
 msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1058
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1057
 msgid "...and it also killed another claimed mutant!"
 msgstr "...and it also killed another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1060
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1059
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr "...and it also killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1065
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
 msgid "...however, your test did kill another claimed mutant!"
 msgstr "...however, your test did kill another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1067
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1066
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr "...however, your test killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1096
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1095
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr "You cannot claim mutants as equivalent in this game anymore."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1169
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1168
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1171
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1170
 msgid "Flagged 1 mutant as equivalent"
 msgstr "Flagged 1 mutant as equivalent"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1173
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1172
 msgid "Flagged {0} mutants as equivalent"
 msgstr "Flagged {0} mutants as equivalent"
 
@@ -10051,39 +10051,39 @@ msgstr "{0} (Level {1})"
 msgid "Level {0}"
 msgstr "Level {0}"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:74
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:58
 msgid "Edit strategy"
 msgstr "Edit strategy"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:77
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:61
 msgid "Strategy name:"
 msgstr "Strategy name:"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:82
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:66
 msgid "Add custom prompt"
 msgstr "Add custom prompt"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:91
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:75
 msgid "Delete this strategy"
 msgstr "Delete this strategy"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:96
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:80
 msgid "Save custom strategy"
 msgstr "Save custom strategy"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:108
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:92
 msgid "Prompt type"
 msgstr "Prompt type"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:121
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:105
 msgid "Prompt content:"
 msgstr "Prompt content:"
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:215
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:198
 msgid "The strategy already exists."
 msgstr "The strategy already exists."
 
-#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:227
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:211
 msgid "You defined the same prompt twice."
 msgstr "You defined the same prompt twice."
 
@@ -10150,6 +10150,10 @@ msgstr "Classes"
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:54
 msgid "KillMaps"
 msgstr "KillMaps"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
+msgid "LLM Settings"
+msgstr "LLM Settings"
 
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
 msgid "System Settings"
@@ -10470,6 +10474,10 @@ msgstr "Automatically start games once they are created."
 #: src/main/webapp/WEB-INF/tags/create_games.tag:294
 msgid "Start Games"
 msgstr "Start Games"
+
+#: src/main/webapp/WEB-INF/tags/create_games.tag:299
+msgid "Select the LLM players for the games"
+msgstr "Select the LLM players for the games"
 
 #: src/main/webapp/WEB-INF/tags/create_games.tag:304
 msgid "The duration for how long the games will be open."
@@ -11515,29 +11523,21 @@ msgstr "Teams are <b>not</b> allowed to view the other team's submissions."
 msgid "But: Defenders can still view mutants after they are killed or accepted as equivalent."
 msgstr "But: Defenders can still view mutants after they are killed or accepted as equivalent."
 
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:43
-msgid "Choose defender model"
-msgstr "Choose defender model"
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:43
+msgid "Configure LLM Defender"
+msgstr "Configure LLM Defender"
 
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:46
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:47
 msgid "Don't use an LLM defender"
 msgstr "Don't use an LLM defender"
 
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:52
-msgid "Choose defend strategy"
-msgstr "Choose defend strategy"
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:62
+msgid "Configure LLM Attacker"
+msgstr "Configure LLM Attacker"
 
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:64
-msgid "Choose attacker model"
-msgstr "Choose attacker model"
-
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:67
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:66
 msgid "Don't use an LLM attacker"
 msgstr "Don't use an LLM attacker"
-
-#: src/main/webapp/WEB-INF/tags/llm_select_button.tag:73
-msgid "Choose attack strategy"
-msgstr "Choose attack strategy"
 
 #: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:45
 msgid "Manage LLM players"

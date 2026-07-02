@@ -296,7 +296,7 @@
                         </div>
 
                         <div class="col-12"
-                             title="Select the LLM defender for the games">
+                             title="${i18n.tr('Select the LLM players for the games')}">
                             <t:llm_player_configuration htmlId="llm_buttons"/>
 
                         </div>
