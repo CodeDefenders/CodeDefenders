@@ -107,7 +107,7 @@
 
         </jsp:attribute>
     </t:modal>
-    <t:modal title="${i18n.tr('LLM conversations')}" id="${htmlId}-conversation-modal">
+    <t:modal title="${i18n.tr('LLM conversations')}" id="${htmlId}-conversation-modal" modalDialogClasses="modal-restricted-height">
                 <jsp:attribute name="content">
                     <div id="${htmlId}-loading-cons-div" class="loading loading-bg-gray loading-height-200">
                         <div class="mb-3" id="${htmlId}-conversation-panel">
