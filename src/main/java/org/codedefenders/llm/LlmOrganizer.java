@@ -398,7 +398,7 @@ public class LlmOrganizer {
         }
 
         private void completeFinish(int gameId) {
-            if (map.containsKey(gameId)) {
+            if (map.containsKey(gameId) && map.get(gameId) != null) {
                 map.get(gameId).setThreadState(ThreadState.INACTIVE);
             }
         }
@@ -406,7 +406,7 @@ public class LlmOrganizer {
         private void closeModel(LlModel model) {
             Set<Integer> toRemove = new HashSet<>();
             for (var x : map.entrySet()) {
-                if (x.getValue().model().equals(model)) {
+                if (x.getValue().model() != null && x.getValue().model().equals(model)) {
                     toRemove.add(x.getKey());
                 }
             }
