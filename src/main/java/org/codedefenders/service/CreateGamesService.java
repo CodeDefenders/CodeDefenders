@@ -34,6 +34,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.LlmOrganizer;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
@@ -82,6 +83,9 @@ public class CreateGamesService {
     @Inject
     private GameClassRepository gameClassRepo;
 
+    @Inject
+    private LlmOrganizer llmOrganizer;
+
     /**
      * Maps user ID to their admin staged games list.
      */
@@ -91,7 +95,9 @@ public class CreateGamesService {
      * Maps user ID and classroom ID to its staged games list.
      */
     private final Map<UserIdClassroomId, StagedGameList> classroomStagedGames;
-    private record UserIdClassroomId(int userId, int classroomId){}
+
+    private record UserIdClassroomId(int userId, int classroomId) {
+    }
 
     public CreateGamesService() {
         adminStagedGames = new HashMap<>();
@@ -121,6 +127,7 @@ public class CreateGamesService {
 
     /**
      * Creates a stages game as a real game and adds its assigned users to it.
+     *
      * @param stagedGame The staged game to create.
      * @return {@code true} if the game was successfully created, {@code false} if not.
      */
@@ -218,6 +225,33 @@ public class CreateGamesService {
             game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
             for (int userId : stagedGame.getPlayers()) {
                 game.addPlayer(userId, Role.PLAYER);
+            }
+        }
+
+        //Add LLM players if configured to
+        if (gameSettings.getGameType() == MELEE) {
+            if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null
+                    || gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
+                llmOrganizer.setPlayerModel(game, Role.PLAYER,
+                        gameSettings.getLlmDefenderModel(),
+                        gameSettings.getLlmAttackerModel(),
+                        gameSettings.getLlmDefenderStrategy(),
+                        gameSettings.getLlmAttackerStrategy());
+            }
+        } else if (gameSettings.getGameType() == MULTIPLAYER) {
+            if (gameSettings.getLlmDefenderModel() != null && gameSettings.getLlmDefenderStrategy() != null) {
+                llmOrganizer.setPlayerModel(game, Role.DEFENDER,
+                        gameSettings.getLlmDefenderModel(),
+                        null,
+                        gameSettings.getLlmDefenderStrategy(),
+                        null);
+            }
+            if (gameSettings.getLlmAttackerModel() != null && gameSettings.getLlmAttackerStrategy() != null) {
+                llmOrganizer.setPlayerModel(game, Role.ATTACKER,
+                        null,
+                        gameSettings.getLlmAttackerModel(),
+                        null,
+                        gameSettings.getLlmAttackerStrategy());
             }
         }
 

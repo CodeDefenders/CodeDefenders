@@ -84,6 +84,7 @@ public class Paths {
     public static final String ADMIN_TEXT_SETTINGS = "/admin/text";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";
     public static final String ADMIN_CLASSROOMS = "/admin/classrooms";
+    public static final String ADMIN_LLM_CONFIG = "/admin/llm-config";
 
     public static final String ADMIN_PUZZLE_OVERVIEW = "/admin/puzzles";
     public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
@@ -101,6 +102,7 @@ public class Paths {
     public static final String API_GAME_CHAT = "/api/game-chat";
     public static final String API_CLASSROOM = "/api/classroom";
     public static final String API_MESSAGES = "/api/messages";
+    public static final String API_LLM = "/api/llm";
 
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";

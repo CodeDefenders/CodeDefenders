@@ -69,6 +69,11 @@ SELECT * FROM `users`
 WHERE `User_ID` >= 5
   AND Active = 1;
 
+CREATE OR REPLACE VIEW `view_real_users` AS
+    SELECT * FROM `users`
+    WHERE `User_ID` >= 100
+        AND Active = 1;
+
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
        u.Password         AS usersPassword,

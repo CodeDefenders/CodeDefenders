@@ -20,6 +20,7 @@
 --%>
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
@@ -35,6 +36,10 @@
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.xnap.commons.i18n.I18n" %>
+<%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
+<%@ tag import="org.codedefenders.model.llm.LlModel" %>
+<%@ tag import="java.util.List" %>
+<%@ tag import="org.codedefenders.game.puzzle.PuzzleGame" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
@@ -49,7 +54,15 @@
 
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
+    request.setAttribute("gameType", game instanceof PuzzleGame ? "puzzle"
+            : game instanceof MultiplayerGame ? "multiplayer" : "melee");
     int gameId = game.getId();
+    request.setAttribute("gameId", gameId);
+
+
+    LlmRepository llmRepo = CDIUtil.getBeanFromCDI(LlmRepository.class);
+    List<LlModel> models = llmRepo.getAllModels(true);
+
 
     Role role = null;
     boolean mayChooseRole = true;
@@ -152,7 +165,20 @@
                 </t:modal>
             </form>
         </div>
+
+        <% if (!models.isEmpty()) {
+        %>
+        <button type="button" class="btn btn-sm btn-dark" id="llmModalButton"
+                data-bs-toggle="modal" data-bs-target="#llm-modal">
+            <i class="fa fa-industry"></i>
+            ${i18n.tr('Manage LLM players')}
+        </button>
+        <t:llm_select_modal htmlId="llm-modal" gameId="${gameId}" gameType="${gameType}">
+
+        </t:llm_select_modal>
+
         <%
+                }
             }
 
             if (game.getState() == GameState.CREATED) {

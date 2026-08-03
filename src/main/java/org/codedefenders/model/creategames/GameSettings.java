@@ -24,29 +24,54 @@ import java.util.Optional;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 
 import com.google.gson.annotations.Expose;
 
 public class GameSettings implements Serializable {
-    @Expose private final GameType gameType;
+    @Expose
+    private final GameType gameType;
 
-    @Expose private final int classId;
-    @Expose private final boolean withMutants;
-    @Expose private final boolean withTests;
+    @Expose
+    private final int classId;
+    @Expose
+    private final boolean withMutants;
+    @Expose
+    private final boolean withTests;
 
-    @Expose private final int maxAssertionsPerTest;
-    @Expose private final MutantValidationRuleSet mutantValidatorLevel;
-    @Expose private final boolean chatEnabled;
-    @Expose private final boolean captureIntentions;
-    @Expose private final int equivalenceThreshold;
-    @Expose private final GameLevel level;
-    @Expose private final Role creatorRole;
-    @Expose private final int gameDurationMinutes;
+    @Expose
+    private final int maxAssertionsPerTest;
+    @Expose
+    private final MutantValidationRuleSet mutantValidatorLevel;
+    @Expose
+    private final boolean chatEnabled;
+    @Expose
+    private final boolean captureIntentions;
+    @Expose
+    private final int equivalenceThreshold;
+    @Expose
+    private final GameLevel level;
+    @Expose
+    private final Role creatorRole;
+    @Expose
+    private final int gameDurationMinutes;
 
-    @Expose private final boolean startGame;
+    @Expose
+    private final boolean startGame;
 
-    @Expose private final Integer classroomId;
+    @Expose
+    private final Integer classroomId;
+
+    @Expose
+    private final LlModel llmDefenderModel;
+    @Expose
+    private final LlModel llmAttackerModel;
+    @Expose
+    private final LlmStrategy llmDefenderStrategy;
+    @Expose
+    private final LlmStrategy llmAttackerStrategy;
 
     public GameSettings(
             GameType gameType,
@@ -62,7 +87,11 @@ public class GameSettings implements Serializable {
             Role creatorRole,
             int gameDurationMinutes,
             boolean startGame,
-            Integer classroomId) {
+            Integer classroomId,
+            LlModel llmDefenderModel,
+            LlModel llmAttackerModel,
+            LlmStrategy llmDefenderStrategy,
+            LlmStrategy llmAttackerStrategy) {
         this.gameType = gameType;
         this.classId = classId;
         this.withMutants = withMutants;
@@ -77,6 +106,10 @@ public class GameSettings implements Serializable {
         this.gameDurationMinutes = gameDurationMinutes;
         this.startGame = startGame;
         this.classroomId = classroomId;
+        this.llmDefenderModel = llmDefenderModel;
+        this.llmAttackerModel = llmAttackerModel;
+        this.llmDefenderStrategy = llmDefenderStrategy;
+        this.llmAttackerStrategy = llmAttackerStrategy;
     }
 
     /**
@@ -85,20 +118,24 @@ public class GameSettings implements Serializable {
      */
     public static Builder from(GameSettings other) {
         return new Builder(
-            other.gameType,
-            other.classId,
-            other.withMutants,
-            other.withTests,
-            other.maxAssertionsPerTest,
-            other.mutantValidatorLevel,
-            other.chatEnabled,
-            other.captureIntentions,
-            other.equivalenceThreshold,
-            other.level,
-            other.creatorRole,
-            other.gameDurationMinutes,
-            other.startGame,
-            other.classroomId
+                other.gameType,
+                other.classId,
+                other.withMutants,
+                other.withTests,
+                other.maxAssertionsPerTest,
+                other.mutantValidatorLevel,
+                other.chatEnabled,
+                other.captureIntentions,
+                other.equivalenceThreshold,
+                other.level,
+                other.creatorRole,
+                other.gameDurationMinutes,
+                other.startGame,
+                other.classroomId,
+                other.llmDefenderModel,
+                other.llmAttackerModel,
+                other.llmDefenderStrategy,
+                other.llmAttackerStrategy
         );
     }
 
@@ -158,6 +195,22 @@ public class GameSettings implements Serializable {
         return Optional.ofNullable(classroomId);
     }
 
+    public LlModel getLlmDefenderModel() {
+        return llmDefenderModel;
+    }
+
+    public LlModel getLlmAttackerModel() {
+        return llmAttackerModel;
+    }
+
+    public LlmStrategy getLlmDefenderStrategy() {
+        return llmDefenderStrategy;
+    }
+
+    public LlmStrategy getLlmAttackerStrategy() {
+        return llmAttackerStrategy;
+    }
+
     public static class Builder {
         private GameType gameType;
         private int classId;
@@ -173,6 +226,10 @@ public class GameSettings implements Serializable {
         private int gameDurationMinutes;
         private boolean startGame;
         private Integer classroomId;
+        private LlModel llmDefender;
+        private LlModel llmAttacker;
+        private LlmStrategy llmDefenderStrategy;
+        private LlmStrategy llmAttackerStrategy;
 
         private Builder(
                 GameType gameType,
@@ -188,7 +245,11 @@ public class GameSettings implements Serializable {
                 Role creatorRole,
                 int gameDurationMinutes,
                 boolean startGame,
-                Integer classroomId) {
+                Integer classroomId,
+                LlModel llmDefender,
+                LlModel llmAttacker,
+                LlmStrategy llmDefenderStrategy,
+                LlmStrategy llmAttackerStrategy) {
             this.gameType = gameType;
             this.classId = classId;
             this.withMutants = withMutants;
@@ -203,6 +264,10 @@ public class GameSettings implements Serializable {
             this.gameDurationMinutes = gameDurationMinutes;
             this.startGame = startGame;
             this.classroomId = classroomId;
+            this.llmDefender = llmDefender;
+            this.llmAttacker = llmAttacker;
+            this.llmDefenderStrategy = llmDefenderStrategy;
+            this.llmAttackerStrategy = llmAttackerStrategy;
         }
 
         public Builder setGameType(GameType gameType) {
@@ -275,6 +340,26 @@ public class GameSettings implements Serializable {
             return this;
         }
 
+        public Builder setLlmDefender(LlModel llmDefender) {
+            this.llmDefender = llmDefender;
+            return this;
+        }
+
+        public Builder setLlmAttacker(LlModel llmAttacker) {
+            this.llmAttacker = llmAttacker;
+            return this;
+        }
+
+        public Builder setLlmDefenderStrategy(LlmStrategy llmDefenderStrategy) {
+            this.llmDefenderStrategy = llmDefenderStrategy;
+            return this;
+        }
+
+        public Builder setLlmAttackerStrategy(LlmStrategy llmAttackerStrategy) {
+            this.llmAttackerStrategy = llmAttackerStrategy;
+            return this;
+        }
+
         public GameSettings build() {
             return new GameSettings(
                     gameType,
@@ -290,7 +375,11 @@ public class GameSettings implements Serializable {
                     creatorRole,
                     gameDurationMinutes,
                     startGame,
-                    classroomId
+                    classroomId,
+                    llmDefender,
+                    llmAttacker,
+                    llmDefenderStrategy,
+                    llmAttackerStrategy
             );
         }
     }

@@ -238,6 +238,7 @@ public class Configuration extends BaseConfiguration {
                 }
             }
 
+
             if (JavaVersionUtils.getJavaMajorVersion() < 17) {
                 validationErrors.add("Unsupported java version! CodeDefenders needs at least Java 17.");
             }

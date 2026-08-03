@@ -97,31 +97,31 @@ public class AdminSystemSettings extends HttpServlet {
         CONNECTION_POOL_CONNECTIONS(
                 I18n.marktr("Connection Pool Connections"),
                 I18n.marktr(
-                    """
-                    NOT USED, SET THIS VIA THE CONFIGURATION.
-                    Number of permanently open connections. Recommended: >20
-                    Lowering this number closes the delta in connections!
-                    """
+                        """
+                                NOT USED, SET THIS VIA THE CONFIGURATION.
+                                Number of permanently open connections. Recommended: >20
+                                Lowering this number closes the delta in connections!
+                                """
                 )
         ),
         CONNECTION_WAITING_TIME(
                 I18n.marktr("Connection Waiting Time"),
                 I18n.marktr(
-                    """
-                    NOT USED, SET THIS VIA THE CONFIGURATION.
-                    Amount of time in ms a thread waits to be notified of newly available connections.
-                    Recommended: ~5000ms
-                    """
+                        """
+                                NOT USED, SET THIS VIA THE CONFIGURATION.
+                                Amount of time in ms a thread waits to be notified of newly available connections.
+                                Recommended: ~5000ms
+                                """
                 )
         ),
         SUPPORTED_LANGUAGES(
                 I18n.marktr("Supported Languages"),
                 I18n.marktr(
-                    """
-                    Comma separated list of supported locales where full translations exist.
-                    The first locale in the list will be used by default.
-                    Language codes like en, de, fr are sufficient.
-                    """
+                        """
+                                Comma separated list of supported locales where full translations exist.
+                                The first locale in the list will be used by default.
+                                Language codes like en, de, fr are sufficient.
+                                """
                 )
         ),
         EMAIL_SMTP_HOST(
@@ -143,19 +143,19 @@ public class AdminSystemSettings extends HttpServlet {
         EMAIL_USERNAME(
                 I18n.marktr("Email Username"),
                 I18n.marktr(
-                    """
-                    Username for the system mail account.
-                    Should usually be the same as the address. If left blank, will default to the address.
-                    """
+                        """
+                                Username for the system mail account.
+                                Should usually be the same as the address. If left blank, will default to the address.
+                                """
                 )
         ),
         EMAILS_ENABLED(
                 I18n.marktr("Emails Enabled"),
                 I18n.marktr(
-                """
-                    Send emails from the specified account for verification,
-                    resetting passwords and when the admin changes user info
-                    """
+                        """
+                                Send emails from the specified account for verification,
+                                resetting passwords and when the admin changes user info
+                                """
                 )
         ),
         PASSWORD_RESET_SECRET_LIFESPAN(
@@ -193,10 +193,10 @@ public class AdminSystemSettings extends HttpServlet {
         TEACHER_APPLICATIONS_ENABLED(
                 I18n.marktr("Teacher Applications Enabled"),
                 I18n.marktr(
-                    """
-                    Enable teacher account applications using email on the 'Contact Us' page.
-                    Configuring a valid email address is required.
-                    """
+                        """
+                                Enable teacher account applications using email on the 'Contact Us' page.
+                                Configuring a valid email address is required.
+                                """
                 )
         ),
         TEACHER_APPLICATIONS_EMAIL(
@@ -206,6 +206,22 @@ public class AdminSystemSettings extends HttpServlet {
         LOG_LEVEL(
                 I18n.marktr("Log Level"),
                 I18n.marktr("Controls the granularity of log messages.")
+        ),
+        LLM_INTERVAL_SECONDS(
+                I18n.marktr("LLM action interval"),
+                I18n.marktr("The default number of seconds between actions of an AI player.")
+        ),
+        LLM_NORMAL_PROMPT_NUMBER_OF_TRIES(
+                I18n.marktr("LLM normal prompt number of tries"),
+                I18n.marktr("The number of attempts the LLM player will make to fix an invalid mutant or test it created.")
+        ),
+        LLM_EQUIVALENCE_DUEL_NUMBER_OF_TRIES(
+                I18n.marktr("LLM equivalence duel number of tries"),
+                I18n.marktr("The number of attempts the LLM player will make to fix an invalid equivalence duel test.")
+        ),
+        OPENAI_KEY(
+                I18n.marktr("OpenAI key"),
+                I18n.marktr("The API key for OpenAI to be used by LLM players")
         );
 
         private final String readableName;

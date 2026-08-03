@@ -21,6 +21,7 @@ package org.codedefenders.game;
 import java.util.List;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.util.Constants;
 
 public class TestTemplate {
     private String code;
@@ -274,7 +275,7 @@ public class TestTemplate {
                             + testingFramework.name() + ".");
             }
 
-            appendLines("        // test here!\n");
+            appendLines("        " + Constants.TEST_TEMPLATE_PLACEHOLDER + "\n");
             testCodeLine = lastLineNr;
             appendLines("    }\n");
             appendLines("}");

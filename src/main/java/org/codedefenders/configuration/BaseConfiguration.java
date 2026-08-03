@@ -60,6 +60,9 @@ public abstract class BaseConfiguration {
     protected Integer parallelizeKillmapCount; // TODO(kreismar): is this needed?
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
+    //protected String llmOpenaiModels;
+    protected String llmOllamaServer;
+    //protected String llmOllamaModels;
 
     @Deprecated
     protected String authAdminRole;
@@ -161,6 +164,10 @@ public abstract class BaseConfiguration {
 
     public boolean isMutantCoverage() {
         return mutantCoverage;
+    }
+
+    public String getLlmLocalServer() {
+        return llmOllamaServer;
     }
 
     public int getNumberOfKillmapThreads() {

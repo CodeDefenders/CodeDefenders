@@ -47,6 +47,7 @@
     pageContext.setAttribute("TEACHER_APPLICATIONS_ENABLED", SETTING_NAME.TEACHER_APPLICATIONS_ENABLED);
     pageContext.setAttribute("TEACHER_APPLICATIONS_EMAIL", SETTING_NAME.TEACHER_APPLICATIONS_EMAIL);
     pageContext.setAttribute("LOG_LEVEL", SETTING_NAME.LOG_LEVEL);
+    pageContext.setAttribute("LLM_INTERVAL_SECONDS", SETTING_NAME.LLM_INTERVAL_SECONDS);
 %>
 
 <p:main_page title="${i18n.tr('System Settings')}">

@@ -159,7 +159,8 @@
                             <div class="input-group mb-2">
                                 <select id="class-select" name="cut" class="form-control form-select">
                                     <% for (GameClass clazz : gameClassRepo.getAllPlayableClasses()) { %>
-                                    <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
+                                    <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%>
+                                    </option>
                                     <% } %>
                                 </select>
                                 <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
@@ -175,7 +176,8 @@
 
                             <div class="form-check form-switch"
                                  title="${i18n.tr('Include mutants uploaded together with the class.')}">
-                                <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
+                                <input class="form-check-input" type="checkbox" id="predefined-mutants-switch"
+                                       name="withMutants">
                                 <label class="form-check-label" for="predefined-mutants-switch">${i18n.tr('Include predefined mutants (if available)')}</label>
                             </div>
 
@@ -221,7 +223,8 @@
                                 <% for (MutantValidationRuleSet level : DefaultRuleSets.getValues()) { %>
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio"
-                                           id="mutant-validator-radio-<%=level.getName().toLowerCase()%>" name="mutantValidatorLevel"
+                                           id="mutant-validator-radio-<%=level.getName().toLowerCase()%>"
+                                           name="mutantValidatorLevel"
                                            value="<%=level.getName()%>"
                                         <%=level == DefaultRuleSets.MODERATE ? "checked" : ""%>>
                                     <label class="form-check-label" for="mutant-validator-radio-<%=level.getName().toLowerCase()%>">
@@ -237,7 +240,8 @@
                             <label class="form-label" id="max-assertions-label" for="max-assertions-input">
                                 ${i18n.tr('Max. Assertions Per Test')}
                             </label>
-                            <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
+                            <input type="number" class="form-control" id="max-assertions-input"
+                                   name="maxAssertionsPerTest"
                                    value="<%=Constants.DEFAULT_NB_ASSERTIONS%>" min="1" required>
                         </div>
 
@@ -249,7 +253,8 @@
                                     <i class="fa fa-question-circle ms-1"></i>
                                 </a>
                             </label>
-                            <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
+                            <input class="form-control" type="number" id="equiv-threshold-input"
+                                   name="automaticEquivalenceTrigger"
                                    value="0" min="0" required>
                         </div>
 
@@ -290,6 +295,12 @@
                             </div>
                         </div>
 
+                        <div class="col-12"
+                             title="${i18n.tr('Select the LLM players for the games')}">
+                            <t:llm_player_configuration htmlId="llm_buttons"/>
+
+                        </div>
+
                         <div class="col-12" title="${i18n.tr('The duration for how long the games will be open.')}">
                             <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
                             <%
@@ -312,7 +323,10 @@
                             </small>
 
                             <script type="module">
-                                import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                                import {
+                                    GameTimeValidator,
+                                    GameTime
+                                } from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                 const gameTimeValidator = new GameTimeValidator(
                                         Number(${maximumDuration}),
@@ -339,7 +353,8 @@
                 </div>
             </div>
 
-        </div> <%-- column --%>
+        </div>
+        <%-- column --%>
         <div class="col-md-6 col-12">
 
             <div class="card mb-4">
@@ -473,8 +488,10 @@
                 </div>
             </div>
 
-        </div> <%-- column --%>
-    </div> <%-- row --%>
+        </div>
+        <%-- column --%>
+    </div>
+    <%-- row --%>
 </form>
 
 <t:modal id="levelExplanation" title="${i18n.tr('Level Explanation')}">
@@ -679,34 +696,42 @@
 
     /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
     DataTable.ext.order['select-extension'] = function (settings, col) {
-        return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
             const tr = td.closest('tr');
             return tr.classList.contains('selected') ? '0' : '1';
         });
     };
 
     /* Search function added to DataTables to filter the users table. */
-    const searchFunction = function(settings, renderedData, index, data, counter) {
-        /* Let this search function only affect the users table. */
-        if (settings.nTable.id !== 'table-users') {
-            return true;
-        }
+    const searchFunction = function (settings, renderedData, index, data, counter) {
+                /* Let this search function only affect the users table. */
+                if (settings.nTable.id !== 'table-users') {
+                    return true;
+                }
 
-        /* Filter out logged-in user. */
-        if (data.id === loggedInUserId) {
-            return false;
-        }
+                /* Filter out logged-in user. */
+                if (data.id === loggedInUserId) {
+                    return false;
+                }
 
-        if (showAssignedUsers) {
-            return true;
-        }
+                // Filter out LLM users
+                if (data.id === ${Constants.AI_ATTACKER_USER_ID}
+                        || data.id === ${Constants.AI_DEFENDER_USER_ID}
+                        || data.id === ${Constants.AI_PLAYER_USER_ID}) {
+                    return false;
+                }
 
-        /* Filter out assigned users. */
-        return !assignedUserIds.has(data.id);
-    };
+                if (showAssignedUsers) {
+                    return true;
+                }
+
+                /* Filter out assigned users. */
+                return !assignedUserIds.has(data.id);
+            }
+    ;
     DataTable.ext.search.push(searchFunction);
 
-    const renderClassroomRole = function(role, type, row, meta) {
+    const renderClassroomRole = function (role, type, row, meta) {
         switch (type) {
             case 'type':
                 return role;
@@ -1216,6 +1241,26 @@
         tr.insertCell().textContent = '${i18n.tr("Game Duration")}';
         tr.insertCell().textContent = GameTime.formatTime(gameSettings.gameDurationMinutes);
 
+        if (gameSettings.llmDefenderModel !== null && gameSettings.llmDefenderStrategy !== null) {
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Defender Model';
+            tr.insertCell().textContent = gameSettings.llmDefenderModel.type + ':' + gameSettings.llmDefenderModel.name;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Defender Strategy';
+            tr.insertCell().textContent = gameSettings.llmDefenderStrategy.name;
+        }
+
+        if (gameSettings.llmAttackerModel !== null && gameSettings.llmAttackerStrategy !== null) {
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Attacker Model';
+            tr.insertCell().textContent = gameSettings.llmAttackerModel.type + ':' + gameSettings.llmAttackerModel.name;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'LLM Attacker Strategy';
+            tr.insertCell().textContent = gameSettings.llmAttackerStrategy.name;
+        }
+
         return table;
     };
 
@@ -1537,8 +1582,8 @@
             }
         },
         order: kind === 'CLASSROOM'
-            ? [[3, 'asc']]
-            : [[5, 'asc']],
+                ? [[3, 'asc']]
+                : [[5, 'asc']],
         scrollY: '600px',
         scrollCollapse: true,
         paging: false,
@@ -1690,7 +1735,7 @@
     /* Create new empty staged games. */
     document.getElementById('stage-games-empty-button').addEventListener('click', function (event) {
         const userNames = document.getElementById('userNames').value;
-
+        console.log("Empty button clicked")
         if (getSelected(usersTable).length > 0) {
             if (!confirm("${i18n.tr('You have users selected. Are you sure you want to stage empty games?')}")) {
                 return;

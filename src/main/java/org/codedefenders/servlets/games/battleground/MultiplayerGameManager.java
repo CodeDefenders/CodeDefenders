@@ -41,11 +41,13 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
@@ -266,11 +268,43 @@ public class MultiplayerGameManager extends HttpServlet {
                 claimEquivalent(request, response, gameId, game);
                 return;
             }
+            case "setLlmPlayer": {
+                try {
+                    if (checkForPrivileges(game, request, response)) {
+                        gameManagingUtils.setLlmPlayer(game, request);
+                        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+                    }
+                    return;
+                } catch (IllegalArgumentException e) {
+                    messages.add("Something went wrong, sorry!");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                    return;
+                } catch (NoSuchModelException e) {
+                    messages.add("The selected model is no longer active.");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+            }
+
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
         }
     }
+
+    private boolean checkForPrivileges(AbstractGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (login.isAdmin() || login.getUserId() == game.getCreatorId()) {
+            return true;
+        } else {
+            logger.warn("User {} tried to do something he's not allowed to do with game {}.",
+                    login.getUserId(), game.getId());
+            Redirect.redirectBack(req, resp);
+            return false;
+        }
+    }
+
 
     void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();

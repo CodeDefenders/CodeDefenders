@@ -104,11 +104,11 @@ public class PlayerRepository {
      */
     public int getPlayerIdForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
-                SELECT players.ID
-                FROM players
-                WHERE User_ID = ?
-                  AND Game_ID = ?
-        """;
+                        SELECT players.ID
+                        FROM players
+                        WHERE User_ID = ?
+                          AND Game_ID = ?
+                """;
 
         // TODO: Return optional here
         var playerId = queryRunner.query(query,
@@ -124,10 +124,10 @@ public class PlayerRepository {
      */
     public Player getPlayer(int playerId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE ID = ?;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE ID = ?;
+                """;
 
         var player = queryRunner.query(query,
                 oneFromRS(PlayerRepository::playerWithUserFromRS),
@@ -141,12 +141,12 @@ public class PlayerRepository {
      */
     public Player getPlayerForUserAndGame(int userId, int gameId) {
         @Language("SQL") String query = """
-                SELECT *
-                FROM view_players_with_userdata
-                WHERE Game_ID = ?
-                  AND User_ID = ?
-                  AND Active = TRUE;
-        """;
+                        SELECT *
+                        FROM view_players_with_userdata
+                        WHERE Game_ID = ?
+                          AND User_ID = ?
+                          AND Active = TRUE;
+                """;
 
         var player = queryRunner.query(query,
                 oneFromRS(PlayerRepository::playerWithUserFromRS),
@@ -192,12 +192,12 @@ public class PlayerRepository {
         QueryRunner queryRunner = CDIUtil.getBeanFromCDI(QueryRunner.class);
 
         @Language("SQL") String query = """
-                SELECT *
-                FROM players
-                WHERE players.Active = TRUE
-                  AND players.User_ID = ?
-                  AND players.Game_ID = ?
-        """;
+                        SELECT *
+                        FROM players
+                        WHERE players.Active = TRUE
+                          AND players.User_ID = ?
+                          AND players.Game_ID = ?
+                """;
 
         return queryRunner.query(query,
                 oneFromRS(rs -> Role.valueOrNull(rs.getString("Role"))),

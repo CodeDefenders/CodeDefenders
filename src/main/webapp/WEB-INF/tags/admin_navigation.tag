@@ -55,6 +55,9 @@
         </ul>
     </li>
     <li class="nav-item">
+        <a class="nav-link ${activePage.equals("adminLlmConfig") ? 'active' : ''}" id="adminLlm" href="${url.forPath(Paths.ADMIN_LLM_CONFIG)}">${i18n.tr('LLM Settings')}</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link ${activePage.equals('adminSystemSettings') ? 'active' : ''}" id="adminSystemSettings" href="${url.forPath(Paths.ADMIN_SETTINGS)}">${i18n.tr('System Settings')}</a>
     </li>
     <li class="nav-item">

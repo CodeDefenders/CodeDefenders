@@ -37,10 +37,13 @@ import java.util.regex.Pattern;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -55,10 +58,15 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.llm.LlmOrganizer;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
+import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
@@ -73,6 +81,7 @@ import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
@@ -81,6 +90,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -88,7 +98,9 @@ import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.PreparedMessage;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
+import org.codedefenders.validation.code.MutantRule;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
+import org.codedefenders.validation.code.MutantValidationRules;
 import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
@@ -182,6 +194,12 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private LlmRepository llmRepo;
+
+    @Inject
+    private LlmOrganizer llmService;
 
     @Inject
     private TestValidator testValidator;
@@ -316,6 +334,19 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public static class MutantCreationException extends Exception {
+        private String detailedReason;
+
+        public MutantCreationException() {
+            super();
+        }
+
+        public MutantCreationException(String detailedReason) {
+            this.detailedReason = detailedReason;
+        }
+
+        public Optional<String> getDetailedReason() {
+            return Optional.ofNullable(detailedReason);
+        }
     }
 
     public CreateBattlegroundMutantResult createBattlegroundMutant(MultiplayerGame game, int userId, String code)
@@ -328,8 +359,15 @@ public class GameManagingUtils implements IGameManagingUtils {
         // Do the validation even before creating the mutant
         MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
         I18n i18n = i18nService.getI18n(userId);
+
+        MutantRule[] ignoredRules = new MutantRule[0];
+        if (userId <= 10) {
+            ignoredRules = new MutantRule[]{MutantValidationRules.noChangesToComments};
+        }
+
+
         CodeValidationResult validationResult =
-                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, i18n);
+                mutantValidator.validateMutant(game.getCUT().getSourceCode(), code, codeValidatorLevel, i18n, ignoredRules);
         boolean validationSuccess = validationResult.isValid();
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -406,6 +444,119 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
         PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
+        game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(game.getId());
+        mte.setUserId(userId);
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
+
+        return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
+    }
+
+    public CreateBattlegroundMutantResult createMeleeMutant(MeleeGame game, int userId, String mutantText) throws MutantCreationException, IOException {
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(game.getId());
+        mse.setUserId(userId);
+        notificationService.post(mse);
+
+        I18n i18n = i18nService.getI18n(userId);
+
+        // Do the validation even before creating the mutant
+        MutantValidationRuleSet codeValidatorLevel = game.getMutantValidatorLevel();
+
+        MutantRule[] ignoredRules = new MutantRule[0];
+        if (userId <= 10) {
+            ignoredRules = new MutantRule[]{MutantValidationRules.noChangesToComments};
+        }
+        CodeValidationResult validationResult = mutantValidator.validateMutant(game.getCUT().getSourceCode(),
+                mutantText, codeValidatorLevel, i18n, ignoredRules);
+        boolean validationSuccess = validationResult.isValid();
+
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(game.getId());
+        mve.setUserId(userId);
+        mve.setSuccess(validationSuccess);
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
+            // Mutant is either the same as the CUT or it contains invalid code
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
+        }
+
+        Mutant existingMutant = existingMutant(game.getId(), mutantText);
+        boolean duplicateCheckSuccess = existingMutant == null; // || existingMutant.getPlayerId() != playerId;
+        // TODO: Why allow duplicate mutants from different creators?
+        // Currently not possible because of database constraint
+        // See also: Issue #675
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(game.getId());
+        mdce.setUserId(userId);
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
+            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
+                    TargetExecution.Target.COMPILE_MUTANT);
+            String compilationError = null;
+            if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
+                    && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
+                compilationError = existingMutantTarget.message;
+            }
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.DUPLICATE_MUTANT_FOUND, null, compilationError);
+        }
+
+        // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
+        // then we get the PLAYER_ID when we get id of the mutants' creator?
+
+        Mutant newMutant;
+        //noinspection DuplicatedCode
+        try {
+            newMutant = createMutant(game.getId(), game.getClassId(), mutantText, userId,
+                    // TODO Should we use a different directory structure for MELEE GAMES?
+                    MODE_BATTLEGROUND_DIR);
+            if (newMutant == null) {
+                throw new MutantCreationException();
+            }
+        } catch (UncheckedSQLException e) {
+            if (e.isDataTooLong()) {
+                throw new MutantCreationException("Error submitting the mutant: data too long. " +
+                        "Maybe you made too many changes?");
+            } else {
+                logger.error("Database error while saving the mutant: {}", e.getMessage());
+                throw new MutantCreationException("Database error while saving the mutant.");
+            }
+
+
+        }
+        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
+                TargetExecution.Target.COMPILE_MUTANT);
+        String errorMessage = (compileMutantTarget != null
+                && compileMutantTarget.message != null
+                && !compileMutantTarget.message.isEmpty())
+                ? compileMutantTarget.message : null;
+        if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.COMPILATION_FAILED, null, errorMessage);
+        }
+
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
+        final String notificationMsg = user.map(SimpleUser::getName)
+                .orElse("User with the id " + userId) + " created a mutant.";
+        // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
+        Event notif = new Event(-1, game.getId(), userId, notificationMsg, EventType.PLAYER_MUTANT_CREATED,
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
+        eventDAO.insert(notif);
+
+        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -537,7 +688,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
     }
 
-    public CreateBattlegroundTestResult createBattlegroundTest(MultiplayerGame game, int userId, String code)
+    public CreateBattlegroundTestResult createBattlegroundTest(AbstractGame game, int userId, String code)
             throws IOException {
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(game.getId());
@@ -595,7 +746,17 @@ public class GameManagingUtils implements IGameManagingUtils {
         eventDAO.insert(notif);
 
 
-        PreparedMessage mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
+        PreparedMessage mutationTesterMessage;// = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
+        if (game instanceof MultiplayerGame multiplayerGame) {
+            mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
+        } else if (game instanceof MeleeGame meleeGame) {
+            mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
+        } else {
+            throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
+        }
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -650,14 +811,16 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     public record AcceptBattlegroundEquivalenceResult(
             boolean mutantKillable
-    ){}
+    ) {
+    }
+
     public enum ResolveBattlegroundEquivalenceAction {
         ACCEPT,
         REJECT
     }
 
     public AcceptBattlegroundEquivalenceResult acceptBattlegroundEquivalence(
-            MultiplayerGame game, int userId, Mutant equivMutant) {
+            AbstractGame game, int userId, Mutant equivMutant) {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
 
@@ -730,7 +893,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         public static RejectBattlegroundEquivalenceResult testValid(Test test,
-                boolean killedPendingMutant, int numOtherPendingMutantsKilled, Boolean isMutantKillable) {
+                                                                    boolean killedPendingMutant, int numOtherPendingMutantsKilled, Boolean isMutantKillable) {
             return new RejectBattlegroundEquivalenceResult(
                     true,
                     Optional.of(test),
@@ -760,7 +923,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     public RejectBattlegroundEquivalenceResult rejectBattlegroundEquivalence(
-            MultiplayerGame game, int userId, Mutant equivMutant, String code) throws IOException {
+            AbstractGame game, int userId, Mutant equivMutant, String code) throws IOException {
         SimpleUser user = userService.getSimpleUserById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User must exist."));
         I18n i18n = i18nService.getI18n(userId);
@@ -882,12 +1045,15 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(ttme);
 
         testRepo.updateTest(newTest);
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
         return RejectBattlegroundEquivalenceResult.testValid(
                 newTest,
                 killedClaimed,
                 killedOthers,
-            isMutantKillable
+                isMutantKillable
         );
     }
 
@@ -920,24 +1086,27 @@ public class GameManagingUtils implements IGameManagingUtils {
             List<Mutant> claimedMutants,
             List<PreparedMessage> messages
     ){}
-    public ClaimEquivalentResult claimBattlegroundEquivalence(MultiplayerGame game, int userId, List<Integer> mutantLines) {
+    public ClaimEquivalentResult claimBattlegroundEquivalence(AbstractGame game, int userId, List<Integer> mutantLines) {
         var user = userService.getSimpleUserById(userId).orElseThrow();
         int playerId = playerRepo.getPlayerIdForUserAndGame(userId, game.getId());
 
         List<Mutant> mutantsAlive = game.getAliveMutants();
         List<PreparedMessage> messages = new ArrayList<>();
 
-        mutantLines = mutantLines.stream()
-                .filter(game::isLineCovered)
-                .toList();
+        List<Integer> coveredLines = new ArrayList<>();
+        for (Integer line : mutantLines) {
+            if (gameService.isLineCovered(game, user, line)) {
+                coveredLines.add(line);
+            }
+        }
 
-        if (mutantLines.isEmpty()) {
+        if (coveredLines.isEmpty()) {
             messages.add(new PreparedMessage(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE));
             return new ClaimEquivalentResult(List.of(), messages);
         }
 
         List<Mutant> claimedMutants = new ArrayList<>();
-        for (int line : mutantLines) {
+        for (int line : coveredLines) {
             mutantsAlive.stream()
                     .filter(m -> m.getLines().contains(line))
                     .filter(m -> m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
@@ -1177,5 +1346,57 @@ public class GameManagingUtils implements IGameManagingUtils {
                     smells
             ));
         }
+    }
+
+
+    /**
+     * Returns a model that includes type and name from a single String in the format of 'TYPE|name',
+     * for example {@code OPENAI|gpt-4.0}. The model has to exist and be active.
+     *
+     * @throws IllegalArgumentException Thrown if the String doesn't follow this format, if there is no such type
+     *                                  defined
+     * @throws NoSuchModelException     If there is no such active model in the database.
+     */
+    public LlModel getLLModelFromSingleValue(String s) throws IllegalArgumentException, NoSuchModelException {
+        if (s.equals("NONE")) {
+            return null;
+        } else {
+            String[] split = s.split("\\|");
+            if (split.length != 2) {
+                logger.error("Malformed defender form value: {}", s);
+                throw new IllegalArgumentException("Malformed defender form value: " + s);
+            }
+            LlmType type = LlmType.valueOf(split[0]);
+            String name = split[1];
+            return llmRepo.getModelFromName(name, type, true).orElseThrow(
+                    () -> new NoSuchModelException(type, name));
+        }
+    }
+
+    public void setLlmPlayer(AbstractGame game, HttpServletRequest request) throws NoSuchModelException {
+        var defenderModelParam = ServletUtils.getStringParameter(request, "defenderModel");
+        var attackerModelParam = ServletUtils.getStringParameter(request, "attackerModel");
+        Optional<LlmStrategy> defenderStrategy = ServletUtils.getStringParameter(
+                request, "defenderStrategy").flatMap(llmRepo::getStrategyByName);
+        Optional<LlmStrategy> attackerStrategy = ServletUtils.getStringParameter(
+                request, "attackerStrategy").flatMap(llmRepo::getStrategyByName);
+
+        LlModel defenderModel = defenderModelParam.isPresent()
+                ? getLLModelFromSingleValue(defenderModelParam.get())
+                : null;
+        LlModel attackerModel = attackerModelParam.isPresent()
+                ? getLLModelFromSingleValue(attackerModelParam.get())
+                : null;
+
+        if (game instanceof MultiplayerGame) {
+            llmService.setPlayerModel(game, Role.DEFENDER, defenderModel, null,
+                    defenderStrategy.orElse(null), null);
+            llmService.setPlayerModel(game, Role.ATTACKER, null, attackerModel,
+                    null, attackerStrategy.orElse(null));
+        } else {
+            llmService.setPlayerModel(game, Role.PLAYER, defenderModel, attackerModel,
+                    defenderStrategy.orElse(null), attackerStrategy.orElse(null));
+        }
+
     }
 }

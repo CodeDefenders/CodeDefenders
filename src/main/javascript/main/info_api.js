@@ -108,6 +108,18 @@ class InfoApi {
     static async getUserNamesForGame(gameId) {
         return await InfoApi.fetchJSON(`${contextPath}api/user?forGame=true&gameId=` + gameId);
     }
+
+    static async getLlmForGame(gameId, role) {
+        return await InfoApi.fetchJSON(`${contextPath}api/llm?action=getLlmForGame&gameId=` + gameId + "&role=" + role);
+    }
+
+    static async getActiveLlms() {
+        return await InfoApi.fetchJSON(`${contextPath}api/llm?action=getall&mustBeActive=true`);
+    }
+
+    static async getLlmConversations(gameId) {
+        return await InfoApi.fetchJSON(`${contextPath}api/llm?action=getConversations&gameId=` + gameId);
+    }
 }
 
 

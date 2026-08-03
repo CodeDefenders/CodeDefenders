@@ -36,6 +36,9 @@ public class Constants {
     public static final int DUMMY_CREATOR_USER_ID = -1;
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
+    public static final int AI_ATTACKER_USER_ID = 5;
+    public static final int AI_DEFENDER_USER_ID = 6;
+    public static final int AI_PLAYER_USER_ID = 7;
 
     // classes, dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_MUTANTS_DIR = "mutants";
@@ -94,6 +97,7 @@ public class Constants {
     public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
     public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
     public static final String ADMIN_ANALYTICS_KILLMAPS_JSP = "/jsp/admin_analytics_killmaps.jsp";
+    public static final String ADMIN_LLM_CONFIG_JSP = "/jsp/admin_llm_config.jsp";
 
     // Messages
     public static final String WINNER_MESSAGE = I18n.marktr("You won!");
@@ -142,6 +146,9 @@ public class Constants {
     public static final String ATTACKER_HAS_PENDING_DUELS = I18n.marktr("Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.");
 
     public static final String DEFAULT_KILL_MESSAGE = I18n.marktr("Sorry, no kill message available for this mutant");
+
+    //Template components
+    public static final String TEST_TEMPLATE_PLACEHOLDER = "// test here!";
 
     public static final String ILLEGAL_ACTION_MESSAGE = I18n.marktr("Hey! You're not allowed to do that!");
     //Default configurations: number of max. allowed assertions for battleground games

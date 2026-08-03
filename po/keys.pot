@@ -1535,19 +1535,19 @@ msgstr "/{0} is not a valid chat command."
 msgid "Your message cannot be empty."
 msgstr "Your message cannot be empty."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:166
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:173
 msgid "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 msgstr "ERROR: Cannot create staged game {0}. Invalid game type: {1}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:176
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:183
 msgid "ERROR: Could not create game for staged game {0}."
 msgstr "ERROR: Could not create game for staged game {0}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:187
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:194
 msgid "ERROR: Could not add system players to game {0}."
 msgstr "ERROR: Could not add system players to game {0}."
 
-#: src/main/java/org/codedefenders/service/CreateGamesService.java:196
+#: src/main/java/org/codedefenders/service/CreateGamesService.java:203
 msgid "ERROR: Could not add system players to game {0}."
 msgstr "ERROR: Could not add system players to game {0}."
 
@@ -2087,11 +2087,43 @@ msgstr "Log Level"
 msgid "Controls the granularity of log messages."
 msgstr "Controls the granularity of log messages."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:348
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
+msgid "LLM action interval"
+msgstr "LLM action interval"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:192
+msgid "The default number of seconds between actions of an AI player."
+msgstr "The default number of seconds between actions of an AI player."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:195
+msgid "LLM normal prompt number of tries"
+msgstr "LLM normal prompt number of tries"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
+msgid "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
+msgstr "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:199
+msgid "LLM equivalence duel number of tries"
+msgstr "LLM equivalence duel number of tries"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:200
+msgid "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
+msgstr "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
+msgid "OpenAI key"
+msgstr "OpenAI key"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
+msgid "The API key for OpenAI to be used by LLM players"
+msgstr "The API key for OpenAI to be used by LLM players"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:335
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:349
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:336
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
@@ -2663,95 +2695,95 @@ msgstr "You don't have access to this page."
 msgid "This classroom is archived. You cannot create games for it."
 msgstr "This classroom is archived. You cannot create games for it."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:126
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:135
 msgid "ERROR: Missing parameter"
 msgstr "ERROR: Missing parameter"
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:128
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:137
 msgid "ERROR: Invalid parameter"
 msgstr "ERROR: Invalid parameter"
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:202
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:243
 msgid "INFO: The max. allowed duration is {0} minutes."
 msgstr "INFO: The max. allowed duration is {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:205
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:246
 msgid "INFO: The min. allowed duration is {0} minutes."
 msgstr "INFO: The min. allowed duration is {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:277
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:319
 msgid "ERROR: Cannot create staged games with user {0}. User is already assigned to a staged game."
 msgstr "ERROR: Cannot create staged games with user {0}. User is already assigned to a staged game."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:287
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:329
 msgid "Invalid team sizes. Players per game: {0}."
 msgstr "Invalid team sizes. Players per game: {0}."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:293
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:335
 msgid "Invalid team sizes. Attackers per game: {0}, defenders per game: {1}."
 msgstr "Invalid team sizes. Attackers per game: {0}, defenders per game: {1}."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:317
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:360
 msgid "ERROR: Won't create more than 100 staged games."
 msgstr "ERROR: Won't create more than 100 staged games."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:344
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:388
 msgid "ERROR: Cannot delete staged games. Not all selected staged games exist."
 msgstr "ERROR: Cannot delete staged games. Not all selected staged games exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:375
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:420
 msgid "ERROR: Cannot create staged games. Not all selected staged games exist."
 msgstr "ERROR: Cannot create staged games. Not all selected staged games exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:399
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:445
 msgid "ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist."
 msgstr "ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:421
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:468
 msgid "ERROR: Cannot remove you from staged game {0}. Staged game does not exist."
 msgstr "ERROR: Cannot remove you from staged game {0}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:441
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:489
 msgid "ERROR: Cannot switch role of user {0}. Invalid user."
 msgstr "ERROR: Cannot switch role of user {0}. Invalid user."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:448
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:496
 msgid "ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist."
 msgstr "ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:469
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:518
 msgid "ERROR: Cannot switch creator role in staged game {0}. Staged game does not exist."
 msgstr "ERROR: Cannot switch creator role in staged game {0}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:494
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:544
 msgid "ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist."
 msgstr "ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:503
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:553
 msgid "ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist."
 msgstr "ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:512
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:562
 msgid "ERROR: Cannot move user {0}. User does not exist."
 msgstr "ERROR: Cannot move user {0}. User does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:547
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:598
 msgid "ERROR: Cannot add user {0} to staged game {1}. User does not exist."
 msgstr "ERROR: Cannot add user {0} to staged game {1}. User does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:552
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:603
 msgid "ERROR: Cannot add user {0} to existing game {1}. User does not exist."
 msgstr "ERROR: Cannot add user {0} to existing game {1}. User does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:563
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:614
 msgid "ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist."
 msgstr "ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:573
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:624
 msgid "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action."
 msgstr "ERROR: Cannot add user {0} to existing game {1}. Game is not available for this action."
 
-#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:582
+#: src/main/java/org/codedefenders/servlets/creategames/CreateGamesServlet.java:633
 msgid "ERROR: Cannot add user {0} to existing game {1}. Game does not exist."
 msgstr "ERROR: Cannot add user {0} to existing game {1}. Game does not exist."
 
@@ -2763,79 +2795,79 @@ msgstr "Could not save your feedback. Please try again later!"
 msgid "Game History"
 msgstr "Game History"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:348
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:382
 msgid "Parameter 'test' is missing."
 msgstr "Parameter 'test' is missing."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:358
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:392
 msgid "You cannot submit a test without specifying a line to cover."
 msgstr "You cannot submit a test without specifying a line to cover."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:365
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:399
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:371
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:405
 msgid "Can only submit tests if you are an Defender!"
 msgstr "Can only submit tests if you are an Defender!"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:453
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:487
 msgid "Parameter 'mutant' is missing."
 msgstr "Parameter 'mutant' is missing."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:469
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:503
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:475
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:509
 msgid "Can only submit mutants if you are an Attacker."
 msgstr "Can only submit mutants if you are an Attacker."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:507
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:541
 msgid "Error submitting the mutant: data too long. Maybe you made too many changes?"
 msgstr "Error submitting the mutant: data too long. Maybe you made too many changes?"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:509
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:543
 msgid "Database error while saving the mutant."
 msgstr "Database error while saving the mutant."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:566
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:600
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:571
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:605
 msgid "Can only resolve equivalence duels if you are an Attacker!"
 msgstr "Can only resolve equivalence duels if you are an Attacker!"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:576
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:610
 msgid "Game {0} has finished."
 msgstr "Game {0} has finished."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:581
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:615
 msgid "Mutant does not exist."
 msgstr "Mutant does not exist."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:595
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:629
 msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
 msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:643
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:677
 msgid "Additionally, your test did kill another claimed mutant!"
 msgstr "Additionally, your test did kill another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:646
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:680
 msgid "Additionally, your test killed other {0} claimed mutants!"
 msgstr "Additionally, your test killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:679
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:713
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:686
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:720
 msgid "Can only claim mutant as equivalent if you are a Defender!"
 msgstr "Can only claim mutant as equivalent if you are a Defender!"
 
-#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:692
+#: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:726
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr "You cannot claim mutants as equivalent in this game anymore."
 
@@ -2875,23 +2907,23 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:971
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1138
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:972
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1139
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "Flagged 1 mutant as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:973
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1140
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "Flagged {0} mutants as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1170
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1337
 msgid "Your test has the following smell: {0}"
 msgstr "Your test has the following smell: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1176
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1343
 msgid "Your test has the following smells: {0}"
 msgstr "Your test has the following smells: {0}"
 
@@ -2903,55 +2935,55 @@ msgstr "Error submitting the mutant: data too long. Maybe you made too many chan
 msgid "Database error while saving the mutant."
 msgstr "Database error while saving the mutant."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:769
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:799
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:774
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:804
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Can only resolve equivalence duels if you are a Player!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:779
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:809
 msgid "Game {0} has finished."
 msgstr "Game {0} has finished."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:784
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:814
 msgid "Mutant does not exist."
 msgstr "Mutant does not exist."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:800
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:830
 msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
 msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1033
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1057
 msgid "...and it also killed another claimed mutant!"
 msgstr "...and it also killed another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1035
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1059
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr "...and it also killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1040
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
 msgid "...however, your test did kill another claimed mutant!"
 msgstr "...however, your test did kill another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1042
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1066
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr "...however, your test killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1068
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1095
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr "You cannot claim mutants as equivalent in this game anymore."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1141
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1168
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1143
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1170
 msgid "Flagged 1 mutant as equivalent"
 msgstr "Flagged 1 mutant as equivalent"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1145
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1172
 msgid "Flagged {0} mutants as equivalent"
 msgstr "Flagged {0} mutants as equivalent"
 
@@ -3167,155 +3199,155 @@ msgstr "No or invalid password provided."
 msgid "Failed to set your account as inactive. Please contact the page administrator."
 msgstr "Failed to set your account as inactive. Please contact the page administrator."
 
-#: src/main/java/org/codedefenders/util/Constants.java:55
+#: src/main/java/org/codedefenders/util/Constants.java:58
 msgid "Game is now in grace period."
 msgstr "Game is now in grace period."
 
-#: src/main/java/org/codedefenders/util/Constants.java:99
+#: src/main/java/org/codedefenders/util/Constants.java:103
 msgid "You won!"
 msgstr "You won!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:100
+#: src/main/java/org/codedefenders/util/Constants.java:104
 msgid "You lost!"
 msgstr "You lost!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:101
+#: src/main/java/org/codedefenders/util/Constants.java:105
 msgid "It was a draw!"
 msgstr "It was a draw!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:103
+#: src/main/java/org/codedefenders/util/Constants.java:107
 msgid "Sorry! An error on the server prevented the compilation of your test."
 msgstr "Sorry! An error on the server prevented the compilation of your test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:104
+#: src/main/java/org/codedefenders/util/Constants.java:108
 msgid "Your test did not compile. Try again, but with compilable code."
 msgstr "Your test did not compile. Try again, but with compilable code."
 
-#: src/main/java/org/codedefenders/util/Constants.java:105
+#: src/main/java/org/codedefenders/util/Constants.java:109
 msgid "Your test is not valid. Remember the rules: Only one non-empty test, at most {0} assertions per test, no conditionals and no loops!"
 msgstr "Your test is not valid. Remember the rules: Only one non-empty test, at most {0} assertions per test, no conditionals and no loops!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:106
+#: src/main/java/org/codedefenders/util/Constants.java:110
 msgid "Great! Your test compiled and passed on the original class under test."
 msgstr "Great! Your test compiled and passed on the original class under test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:107
+#: src/main/java/org/codedefenders/util/Constants.java:111
 msgid "Your test did not pass on the original class under test. Try again."
 msgstr "Your test did not pass on the original class under test. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:108
+#: src/main/java/org/codedefenders/util/Constants.java:112
 msgid "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 msgstr "Yay, your test killed the allegedly equivalent mutant. You won the duel!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:109
+#: src/main/java/org/codedefenders/util/Constants.java:113
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel."
 
-#: src/main/java/org/codedefenders/util/Constants.java:110
+#: src/main/java/org/codedefenders/util/Constants.java:114
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. However, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:111
+#: src/main/java/org/codedefenders/util/Constants.java:115
 msgid "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
 msgstr "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel. Unfortunately, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:112
+#: src/main/java/org/codedefenders/util/Constants.java:116
 msgid "Test submitted and ready to kill mutants!"
 msgstr "Test submitted and ready to kill mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:113
+#: src/main/java/org/codedefenders/util/Constants.java:117
 msgid "Your test has not killed any mutants, just yet."
 msgstr "Your test has not killed any mutants, just yet."
 
-#: src/main/java/org/codedefenders/util/Constants.java:114
+#: src/main/java/org/codedefenders/util/Constants.java:118
 msgid "Great, your test killed the last mutant!"
 msgstr "Great, your test killed the last mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:115
+#: src/main/java/org/codedefenders/util/Constants.java:119
 msgid "Great, your test killed a mutant!"
 msgstr "Great, your test killed a mutant!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:116
+#: src/main/java/org/codedefenders/util/Constants.java:120
 msgid "Awesome! Your test killed {0} mutants!"
 msgstr "Awesome! Your test killed {0} mutants!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:118
+#: src/main/java/org/codedefenders/util/Constants.java:122
 msgid "Your mutant was compiled successfully."
 msgstr "Your mutant was compiled successfully."
 
-#: src/main/java/org/codedefenders/util/Constants.java:119
+#: src/main/java/org/codedefenders/util/Constants.java:123
 msgid "The mutant was accepted as equivalent."
 msgstr "The mutant was accepted as equivalent."
 
-#: src/main/java/org/codedefenders/util/Constants.java:120
+#: src/main/java/org/codedefenders/util/Constants.java:124
 msgid "The mutant was accepted as equivalent. However, the mutant was killable!"
 msgstr "The mutant was accepted as equivalent. However, the mutant was killable!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:121
+#: src/main/java/org/codedefenders/util/Constants.java:125
 msgid "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
 msgstr "The mutant was accepted as equivalent. However, the mutant was killable! You can view an example for a killing test in the mutant accordion."
 
-#: src/main/java/org/codedefenders/util/Constants.java:122
+#: src/main/java/org/codedefenders/util/Constants.java:126
 msgid "Your mutant failed to compile. Try again."
 msgstr "Your mutant failed to compile. Try again."
 
-#: src/main/java/org/codedefenders/util/Constants.java:123
+#: src/main/java/org/codedefenders/util/Constants.java:127
 msgid "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 msgstr "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)"
 
-#: src/main/java/org/codedefenders/util/Constants.java:124
+#: src/main/java/org/codedefenders/util/Constants.java:128
 msgid "Oops! Something went wrong and the mutant was not created."
 msgstr "Oops! Something went wrong and the mutant was not created."
 
-#: src/main/java/org/codedefenders/util/Constants.java:125
+#: src/main/java/org/codedefenders/util/Constants.java:129
 msgid "Sorry, your mutant already exists in this game!"
 msgstr "Sorry, your mutant already exists in this game!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:126
+#: src/main/java/org/codedefenders/util/Constants.java:130
 msgid "Mutant claimed as equivalent, waiting for attacker to respond."
 msgstr "Mutant claimed as equivalent, waiting for attacker to respond."
 
-#: src/main/java/org/codedefenders/util/Constants.java:127
+#: src/main/java/org/codedefenders/util/Constants.java:131
 msgid "Something went wrong claiming an equivalent mutant"
 msgstr "Something went wrong claiming an equivalent mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:128
+#: src/main/java/org/codedefenders/util/Constants.java:132
 msgid "Cheeky! You cannot claim equivalence on untested lines!"
 msgstr "Cheeky! You cannot claim equivalence on untested lines!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:129
+#: src/main/java/org/codedefenders/util/Constants.java:133
 msgid "Test {0} killed your mutant. Better luck with the next one!"
 msgstr "Test {0} killed your mutant. Better luck with the next one!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:130
+#: src/main/java/org/codedefenders/util/Constants.java:134
 msgid "Mutant submitted, may the force be with it."
 msgstr "Mutant submitted, may the force be with it."
 
-#: src/main/java/org/codedefenders/util/Constants.java:131
+#: src/main/java/org/codedefenders/util/Constants.java:135
 msgid "Cool, your mutant survived its first test."
 msgstr "Cool, your mutant survived its first test."
 
-#: src/main/java/org/codedefenders/util/Constants.java:132
+#: src/main/java/org/codedefenders/util/Constants.java:136
 msgid "Awesome, your mutant survived {0} tests!"
 msgstr "Awesome, your mutant survived {0} tests!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:134
+#: src/main/java/org/codedefenders/util/Constants.java:138
 msgid "You must declare your intention."
 msgstr "You must declare your intention."
 
-#: src/main/java/org/codedefenders/util/Constants.java:137
+#: src/main/java/org/codedefenders/util/Constants.java:141
 msgid "Success!"
 msgstr "Success!"
 
-#: src/main/java/org/codedefenders/util/Constants.java:142
+#: src/main/java/org/codedefenders/util/Constants.java:146
 msgid "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 msgstr "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels."
 
-#: src/main/java/org/codedefenders/util/Constants.java:144
+#: src/main/java/org/codedefenders/util/Constants.java:148
 msgid "Sorry, no kill message available for this mutant"
 msgstr "Sorry, no kill message available for this mutant"
 
-#: src/main/java/org/codedefenders/util/Constants.java:146
+#: src/main/java/org/codedefenders/util/Constants.java:153
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
@@ -5283,6 +5315,50 @@ msgstr "Are you sure you want to delete the selected killmaps?"
 msgid "Are you sure you want to delete the selected killmaps?"
 msgstr "Are you sure you want to delete the selected killmaps?"
 
+#: src/main/webapp/jsp/admin_llm_config.jsp:56
+msgid "Available Large Language Models:"
+msgstr "Available Large Language Models:"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:60
+msgid "Provider"
+msgstr "Provider"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:61
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:62
+msgid "Active"
+msgstr "Active"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:63
+msgid "Remove"
+msgstr "Remove"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:100
+msgid "Provider"
+msgstr "Provider"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:109
+msgid "Model name:"
+msgstr "Model name:"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:111
+msgid "Create new model"
+msgstr "Create new model"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:117
+msgid "Attack strategies"
+msgstr "Attack strategies"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:118
+msgid "Defend strategies"
+msgstr "Defend strategies"
+
+#: src/main/webapp/jsp/admin_llm_config.jsp:119
+msgid "Equivalence strategies"
+msgstr "Equivalence strategies"
+
 #: src/main/webapp/jsp/admin_monitor_games.jsp:68
 msgid "Multiplayer Games"
 msgstr "Multiplayer Games"
@@ -5343,175 +5419,183 @@ msgstr "Are you sure you want to create a rematch for this game?"
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:173
+#: src/main/webapp/jsp/admin_monitor_games.jsp:164
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:179
 msgid "There are no players active in this game."
 msgstr "There are no players active in this game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:184
+#: src/main/webapp/jsp/admin_monitor_games.jsp:190
 msgid "Game Score"
 msgstr "Game Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:185
+#: src/main/webapp/jsp/admin_monitor_games.jsp:191
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:186
+#: src/main/webapp/jsp/admin_monitor_games.jsp:192
 msgid "Submissions"
 msgstr "Submissions"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:187
+#: src/main/webapp/jsp/admin_monitor_games.jsp:193
 msgid "Last Action"
 msgstr "Last Action"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:188
+#: src/main/webapp/jsp/admin_monitor_games.jsp:194
 msgid "Points"
 msgstr "Points"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:189
+#: src/main/webapp/jsp/admin_monitor_games.jsp:195
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:190
+#: src/main/webapp/jsp/admin_monitor_games.jsp:196
 msgid "Switch Role"
 msgstr "Switch Role"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:191
+#: src/main/webapp/jsp/admin_monitor_games.jsp:197
 msgid "Remove Player"
 msgstr "Remove Player"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:227
+#: src/main/webapp/jsp/admin_monitor_games.jsp:233
 msgid "never"
 msgstr "never"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:266
+#: src/main/webapp/jsp/admin_monitor_games.jsp:272
 msgid "Are you sure you want to change the role of this player?"
 msgstr "Are you sure you want to change the role of this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:267
+#: src/main/webapp/jsp/admin_monitor_games.jsp:273
 msgid "This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the game."
 msgstr "This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:275
+#: src/main/webapp/jsp/admin_monitor_games.jsp:281
 msgid "Are you sure you want to permanently remove this player?"
 msgstr "Are you sure you want to permanently remove this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:276
+#: src/main/webapp/jsp/admin_monitor_games.jsp:282
 msgid "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 msgstr "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:279
+#: src/main/webapp/jsp/admin_monitor_games.jsp:285
 msgid "Remove"
 msgstr "Remove"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:300
+#: src/main/webapp/jsp/admin_monitor_games.jsp:306
 msgid "Melee Games"
 msgstr "Melee Games"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:315
+#: src/main/webapp/jsp/admin_monitor_games.jsp:321
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:317
+#: src/main/webapp/jsp/admin_monitor_games.jsp:323
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:318
+#: src/main/webapp/jsp/admin_monitor_games.jsp:324
 msgid "Creator"
 msgstr "Creator"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:319
+#: src/main/webapp/jsp/admin_monitor_games.jsp:325
 msgid "Players"
 msgstr "Players"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:320
+#: src/main/webapp/jsp/admin_monitor_games.jsp:326
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:324
+#: src/main/webapp/jsp/admin_monitor_games.jsp:330
 msgid "Show list of Players for each Game."
 msgstr "Show list of Players for each Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:336
+#: src/main/webapp/jsp/admin_monitor_games.jsp:342
 msgid "You don\'t control any unfinished melee games at the moment."
 msgstr "You don\'t control any unfinished melee games at the moment."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:348
+#: src/main/webapp/jsp/admin_monitor_games.jsp:354
 msgid "Are you sure you want to stop this Game?"
 msgstr "Are you sure you want to stop this Game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:362
+#: src/main/webapp/jsp/admin_monitor_games.jsp:368
 msgid "Observe"
 msgstr "Observe"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:369
+#: src/main/webapp/jsp/admin_monitor_games.jsp:375
 msgid "Join as Observer"
 msgstr "Join as Observer"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:390
+#: src/main/webapp/jsp/admin_monitor_games.jsp:396
 msgid "Start/Stop Game"
 msgstr "Start/Stop Game"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:394
+#: src/main/webapp/jsp/admin_monitor_games.jsp:400
 msgid "Are you sure you want to create a rematch for this game?"
 msgstr "Are you sure you want to create a rematch for this game?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:396
+#: src/main/webapp/jsp/admin_monitor_games.jsp:402
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:419
+#: src/main/webapp/jsp/admin_monitor_games.jsp:406
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
+#: src/main/webapp/jsp/admin_monitor_games.jsp:431
 msgid "Game Score"
 msgstr "Game Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:420
+#: src/main/webapp/jsp/admin_monitor_games.jsp:432
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:421
+#: src/main/webapp/jsp/admin_monitor_games.jsp:433
 msgid "Submissions"
 msgstr "Submissions"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:422
+#: src/main/webapp/jsp/admin_monitor_games.jsp:434
 msgid "Last Action"
 msgstr "Last Action"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:423
+#: src/main/webapp/jsp/admin_monitor_games.jsp:435
 msgid "Points"
 msgstr "Points"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:424
+#: src/main/webapp/jsp/admin_monitor_games.jsp:436
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:425
+#: src/main/webapp/jsp/admin_monitor_games.jsp:437
 msgid "Remove Player"
 msgstr "Remove Player"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:457
+#: src/main/webapp/jsp/admin_monitor_games.jsp:469
 msgid "never"
 msgstr "never"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:489
+#: src/main/webapp/jsp/admin_monitor_games.jsp:501
 msgid "Are you sure you want to permanently remove this player?"
 msgstr "Are you sure you want to permanently remove this player?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:490
+#: src/main/webapp/jsp/admin_monitor_games.jsp:502
 msgid "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 msgstr "This will also delete ALL of his tests, mutants and claimed equivalences and might create inconsistencies in the Game."
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:493
+#: src/main/webapp/jsp/admin_monitor_games.jsp:505
 msgid "Remove"
 msgstr "Remove"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:517
+#: src/main/webapp/jsp/admin_monitor_games.jsp:529
 msgid "Start Games"
 msgstr "Start Games"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:522
+#: src/main/webapp/jsp/admin_monitor_games.jsp:534
 msgid "Are you sure you want to stop the selected Games?"
 msgstr "Are you sure you want to stop the selected Games?"
 
-#: src/main/webapp/jsp/admin_monitor_games.jsp:524
+#: src/main/webapp/jsp/admin_monitor_games.jsp:536
 msgid "Stop Games"
 msgstr "Stop Games"
 
@@ -6107,31 +6191,31 @@ msgstr "Editable lines start below"
 msgid "Editable lines end above"
 msgstr "Editable lines end above"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:52
+#: src/main/webapp/jsp/admin_system_settings.jsp:51
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:108
+#: src/main/webapp/jsp/admin_system_settings.jsp:86
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:109
+#: src/main/webapp/jsp/admin_system_settings.jsp:87
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:139
+#: src/main/webapp/jsp/admin_system_settings.jsp:115
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:140
+#: src/main/webapp/jsp/admin_system_settings.jsp:116
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:153
+#: src/main/webapp/jsp/admin_system_settings.jsp:129
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:157
+#: src/main/webapp/jsp/admin_system_settings.jsp:133
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -9967,6 +10051,62 @@ msgstr "{0} (Level {1})"
 msgid "Level {0}"
 msgstr "Level {0}"
 
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:58
+msgid "Edit strategy"
+msgstr "Edit strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:61
+msgid "Strategy name:"
+msgstr "Strategy name:"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:66
+msgid "Add custom prompt"
+msgstr "Add custom prompt"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:75
+msgid "Delete this strategy"
+msgstr "Delete this strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:80
+msgid "Save custom strategy"
+msgstr "Save custom strategy"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:92
+msgid "Prompt type"
+msgstr "Prompt type"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:105
+msgid "Prompt content:"
+msgstr "Prompt content:"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:198
+msgid "The strategy already exists."
+msgstr "The strategy already exists."
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_edit_strategy_modal.tag:211
+msgid "You defined the same prompt twice."
+msgstr "You defined the same prompt twice."
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:38
+msgid "Name"
+msgstr "Name"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:39
+msgid "Based on"
+msgstr "Based on"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:40
+msgid "Edit"
+msgstr "Edit"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:52
+msgid "Create custom variant"
+msgstr "Create custom variant"
+
+#: src/main/webapp/WEB-INF/tags/admin_llm_strat_table.tag:57
+msgid "Edit"
+msgstr "Edit"
+
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:29
 msgid "Create Games"
 msgstr "Create Games"
@@ -10012,10 +10152,14 @@ msgid "KillMaps"
 msgstr "KillMaps"
 
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:58
+msgid "LLM Settings"
+msgstr "LLM Settings"
+
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
+#: src/main/webapp/WEB-INF/tags/admin_navigation.tag:64
 msgid "Text Settings"
 msgstr "Text Settings"
 
@@ -10243,583 +10387,587 @@ msgstr "Melee"
 msgid "Class Under Test"
 msgstr "Class Under Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:167
+#: src/main/webapp/WEB-INF/tags/create_games.tag:168
 msgid "Upload a class."
 msgstr "Upload a class."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:177
+#: src/main/webapp/WEB-INF/tags/create_games.tag:178
 msgid "Include mutants uploaded together with the class."
 msgstr "Include mutants uploaded together with the class."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:179
+#: src/main/webapp/WEB-INF/tags/create_games.tag:181
 msgid "Include predefined mutants (if available)"
 msgstr "Include predefined mutants (if available)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:184
+#: src/main/webapp/WEB-INF/tags/create_games.tag:186
 msgid "Include predefined tests (if available)"
 msgstr "Include predefined tests (if available)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:192
+#: src/main/webapp/WEB-INF/tags/create_games.tag:194
 msgid "Game Level"
 msgstr "Game Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:201
+#: src/main/webapp/WEB-INF/tags/create_games.tag:203
 msgid "Hard"
 msgstr "Hard"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:206
+#: src/main/webapp/WEB-INF/tags/create_games.tag:208
 msgid "Easy"
 msgstr "Easy"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:215
+#: src/main/webapp/WEB-INF/tags/create_games.tag:217
 msgid "Mutant Validator Level"
 msgstr "Mutant Validator Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:236
+#: src/main/webapp/WEB-INF/tags/create_games.tag:239
 msgid "Maximum number of assertions per test. Increase this for difficult to test classes."
 msgstr "Maximum number of assertions per test. Increase this for difficult to test classes."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:238
+#: src/main/webapp/WEB-INF/tags/create_games.tag:241
 msgid "Max. Assertions Per Test"
 msgstr "Max. Assertions Per Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:248
+#: src/main/webapp/WEB-INF/tags/create_games.tag:252
 msgid "Auto Equiv. Threshold"
 msgstr "Auto Equiv. Threshold"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:257
+#: src/main/webapp/WEB-INF/tags/create_games.tag:262
 msgid "Select the role you will have in the game."
 msgstr "Select the role you will have in the game."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:258
+#: src/main/webapp/WEB-INF/tags/create_games.tag:263
 msgid "Your Role"
 msgstr "Your Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:260
+#: src/main/webapp/WEB-INF/tags/create_games.tag:265
 msgid "Observer"
 msgstr "Observer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:261
+#: src/main/webapp/WEB-INF/tags/create_games.tag:266
 msgid "Attacker"
 msgstr "Attacker"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:262
+#: src/main/webapp/WEB-INF/tags/create_games.tag:267
 msgid "Defender"
 msgstr "Defender"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:270
+#: src/main/webapp/WEB-INF/tags/create_games.tag:275
 msgid "Forces players to specify the intentions of their mutants/tests before they can submit them."
 msgstr "Forces players to specify the intentions of their mutants/tests before they can submit them."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:273
+#: src/main/webapp/WEB-INF/tags/create_games.tag:278
 msgid "Enable Capture Players' Intentions"
 msgstr "Enable Capture Players' Intentions"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:278
+#: src/main/webapp/WEB-INF/tags/create_games.tag:283
 msgid "Allows players to chat within their team and with the enemy team."
 msgstr "Allows players to chat within their team and with the enemy team."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:281
+#: src/main/webapp/WEB-INF/tags/create_games.tag:286
 msgid "Game Chat"
 msgstr "Game Chat"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:286
+#: src/main/webapp/WEB-INF/tags/create_games.tag:291
 msgid "Automatically start games once they are created."
 msgstr "Automatically start games once they are created."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:289
+#: src/main/webapp/WEB-INF/tags/create_games.tag:294
 msgid "Start Games"
 msgstr "Start Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:293
+#: src/main/webapp/WEB-INF/tags/create_games.tag:299
+msgid "Select the LLM players for the games"
+msgstr "Select the LLM players for the games"
+
+#: src/main/webapp/WEB-INF/tags/create_games.tag:304
 msgid "The duration for how long the games will be open."
 msgstr "The duration for how long the games will be open."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:300
+#: src/main/webapp/WEB-INF/tags/create_games.tag:311
 msgid "Set the game's duration:"
 msgstr "Set the game's duration:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:303
+#: src/main/webapp/WEB-INF/tags/create_games.tag:314
 msgid "days"
 msgstr "days"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:305
+#: src/main/webapp/WEB-INF/tags/create_games.tag:316
 msgid "hours"
 msgstr "hours"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:307
+#: src/main/webapp/WEB-INF/tags/create_games.tag:318
 msgid "minutes"
 msgstr "minutes"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:310
+#: src/main/webapp/WEB-INF/tags/create_games.tag:321
 msgid "Maximum duration:"
 msgstr "Maximum duration:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:311
+#: src/main/webapp/WEB-INF/tags/create_games.tag:322
 msgid "If the value is greater, it will be limited to this maximum."
 msgstr "If the value is greater, it will be limited to this maximum."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:349
+#: src/main/webapp/WEB-INF/tags/create_games.tag:364
 msgid "Create Staged Games With Users"
 msgstr "Create Staged Games With Users"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:360
+#: src/main/webapp/WEB-INF/tags/create_games.tag:375
 msgid "User Names"
 msgstr "User Names"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:368
+#: src/main/webapp/WEB-INF/tags/create_games.tag:383
 msgid "Method of assigning roles to players."
 msgstr "Method of assigning roles to players."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:372
+#: src/main/webapp/WEB-INF/tags/create_games.tag:387
 msgid "Role Assignment"
 msgstr "Role Assignment"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:382
+#: src/main/webapp/WEB-INF/tags/create_games.tag:397
 msgid "Random"
 msgstr "Random"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:388
+#: src/main/webapp/WEB-INF/tags/create_games.tag:403
 msgid "Opposite Role"
 msgstr "Opposite Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:394
+#: src/main/webapp/WEB-INF/tags/create_games.tag:409
 msgid "Method of assigning players to teams. Click the question mark for more information."
 msgstr "Method of assigning players to teams. Click the question mark for more information."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:398
+#: src/main/webapp/WEB-INF/tags/create_games.tag:413
 msgid "Game Assignment"
 msgstr "Game Assignment"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:408
+#: src/main/webapp/WEB-INF/tags/create_games.tag:423
 msgid "Random"
 msgstr "Random"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:414
+#: src/main/webapp/WEB-INF/tags/create_games.tag:429
 msgid "Score Descending"
 msgstr "Score Descending"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:420
+#: src/main/webapp/WEB-INF/tags/create_games.tag:435
 msgid "Number of attackers per game."
 msgstr "Number of attackers per game."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:421
+#: src/main/webapp/WEB-INF/tags/create_games.tag:436
 msgid "Attackers per Game"
 msgstr "Attackers per Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:426
+#: src/main/webapp/WEB-INF/tags/create_games.tag:441
 msgid "Number of defenders per game."
 msgstr "Number of defenders per game."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:427
+#: src/main/webapp/WEB-INF/tags/create_games.tag:442
 msgid "Defenders per Game"
 msgstr "Defenders per Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:432
+#: src/main/webapp/WEB-INF/tags/create_games.tag:447
 msgid "Players per game."
 msgstr "Players per game."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:433
+#: src/main/webapp/WEB-INF/tags/create_games.tag:448
 msgid "Players per Game"
 msgstr "Players per Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:440
+#: src/main/webapp/WEB-INF/tags/create_games.tag:455
 msgid "Stage Games"
 msgstr "Stage Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:452
+#: src/main/webapp/WEB-INF/tags/create_games.tag:467
 msgid "Create Empty Staged Games"
 msgstr "Create Empty Staged Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:460
+#: src/main/webapp/WEB-INF/tags/create_games.tag:475
 msgid "Number of staged games to create."
 msgstr "Number of staged games to create."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:461
+#: src/main/webapp/WEB-INF/tags/create_games.tag:476
 msgid "Number of Games"
 msgstr "Number of Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:468
+#: src/main/webapp/WEB-INF/tags/create_games.tag:483
 msgid "Stage Games"
 msgstr "Stage Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:480
+#: src/main/webapp/WEB-INF/tags/create_games.tag:497
 msgid "Level Explanation"
 msgstr "Level Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:482
+#: src/main/webapp/WEB-INF/tags/create_games.tag:499
 msgid "Battleground Games"
 msgstr "Battleground Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:484
+#: src/main/webapp/WEB-INF/tags/create_games.tag:501
 msgid "Melee Games"
 msgstr "Melee Games"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:489
+#: src/main/webapp/WEB-INF/tags/create_games.tag:506
 msgid "Validator Explanation"
 msgstr "Validator Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:497
+#: src/main/webapp/WEB-INF/tags/create_games.tag:514
 msgid "Auto Equivalence Duel Threshold Explanation"
 msgstr "Auto Equivalence Duel Threshold Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:503
+#: src/main/webapp/WEB-INF/tags/create_games.tag:520
 msgid "Role Assignment Explanation"
 msgstr "Role Assignment Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:505
+#: src/main/webapp/WEB-INF/tags/create_games.tag:522
 msgid "Specifies how roles are assigned to players:"
 msgstr "Specifies how roles are assigned to players:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:508
+#: src/main/webapp/WEB-INF/tags/create_games.tag:525
 msgid "Random:"
 msgstr "Random:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:509
+#: src/main/webapp/WEB-INF/tags/create_games.tag:526
 msgid "Players are assigned roles randomly."
 msgstr "Players are assigned roles randomly."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:512
+#: src/main/webapp/WEB-INF/tags/create_games.tag:529
 msgid "Opposite:"
 msgstr "Opposite:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:513
+#: src/main/webapp/WEB-INF/tags/create_games.tag:530
 msgid "Players are assigned the opposite of their last played role, if possible."
 msgstr "Players are assigned the opposite of their last played role, if possible."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:519
+#: src/main/webapp/WEB-INF/tags/create_games.tag:536
 msgid "Game Assignment Explanation"
 msgstr "Game Assignment Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:521
+#: src/main/webapp/WEB-INF/tags/create_games.tag:538
 msgid "Specifies how players are assigned to games:"
 msgstr "Specifies how players are assigned to games:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:524
+#: src/main/webapp/WEB-INF/tags/create_games.tag:541
 msgid "Random:"
 msgstr "Random:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:525
+#: src/main/webapp/WEB-INF/tags/create_games.tag:542
 msgid "Players are assigned to games randomly."
 msgstr "Players are assigned to games randomly."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:528
+#: src/main/webapp/WEB-INF/tags/create_games.tag:545
 msgid "Scores Descending:"
 msgstr "Scores Descending:"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:529
+#: src/main/webapp/WEB-INF/tags/create_games.tag:546
 msgid "Players are assigned to games based on their total score in past games."
 msgstr "Players are assigned to games based on their total score in past games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:530
+#: src/main/webapp/WEB-INF/tags/create_games.tag:547
 msgid "The players with the highest scores are assigned to the first games,"
 msgstr "The players with the highest scores are assigned to the first games,"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:531
+#: src/main/webapp/WEB-INF/tags/create_games.tag:548
 msgid "the players with the lowest scores are assigned to the last games."
 msgstr "the players with the lowest scores are assigned to the last games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:537
+#: src/main/webapp/WEB-INF/tags/create_games.tag:554
 msgid "User Names Explanation"
 msgstr "User Names Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:539
+#: src/main/webapp/WEB-INF/tags/create_games.tag:556
 msgid "Newline-separated list of usernames or emails. The users with these names/emails, as well as the users selected in the table, will be assigned to created staged games."
 msgstr "Newline-separated list of usernames or emails. The users with these names/emails, as well as the users selected in the table, will be assigned to created staged games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:543
+#: src/main/webapp/WEB-INF/tags/create_games.tag:560
 msgid "Stage Games With Users Explanation"
 msgstr "Stage Games With Users Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:546
+#: src/main/webapp/WEB-INF/tags/create_games.tag:563
 msgid "Selected users from the table, as well as users entered in the text area, will be assigned to new staged games."
 msgstr "Selected users from the table, as well as users entered in the text area, will be assigned to new staged games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:547
+#: src/main/webapp/WEB-INF/tags/create_games.tag:564
 msgid "The number of games is decided by the number of users and the selected method of distributing the users to teams."
 msgstr "The number of games is decided by the number of users and the selected method of distributing the users to teams."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:550
+#: src/main/webapp/WEB-INF/tags/create_games.tag:567
 msgid "The settings for the staged games are specified in the left card."
 msgstr "The settings for the staged games are specified in the left card."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:555
+#: src/main/webapp/WEB-INF/tags/create_games.tag:572
 msgid "Stage Empty Games Explanation"
 msgstr "Stage Empty Games Explanation"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:557
+#: src/main/webapp/WEB-INF/tags/create_games.tag:574
 msgid "Create a number staged games without users assigned to them."
 msgstr "Create a number staged games without users assigned to them."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:558
+#: src/main/webapp/WEB-INF/tags/create_games.tag:575
 msgid "The settings for the staged games are specified in the left card."
 msgstr "The settings for the staged games are specified in the left card."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:640
+#: src/main/webapp/WEB-INF/tags/create_games.tag:657
 msgid "Battleground"
 msgstr "Battleground"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:641
+#: src/main/webapp/WEB-INF/tags/create_games.tag:658
 msgid "Melee"
 msgstr "Melee"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:644
+#: src/main/webapp/WEB-INF/tags/create_games.tag:661
 msgid "Relaxed"
 msgstr "Relaxed"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:645
+#: src/main/webapp/WEB-INF/tags/create_games.tag:662
 msgid "Moderate"
 msgstr "Moderate"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:646
+#: src/main/webapp/WEB-INF/tags/create_games.tag:663
 msgid "Strict"
 msgstr "Strict"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:649
+#: src/main/webapp/WEB-INF/tags/create_games.tag:666
 msgid "Hard"
 msgstr "Hard"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:650
+#: src/main/webapp/WEB-INF/tags/create_games.tag:667
 msgid "Medium"
 msgstr "Medium"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:651
+#: src/main/webapp/WEB-INF/tags/create_games.tag:668
 msgid "Easy"
 msgstr "Easy"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:654
+#: src/main/webapp/WEB-INF/tags/create_games.tag:671
 msgid "Attacker"
 msgstr "Attacker"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:655
+#: src/main/webapp/WEB-INF/tags/create_games.tag:672
 msgid "Defender"
 msgstr "Defender"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:656
+#: src/main/webapp/WEB-INF/tags/create_games.tag:673
 msgid "Observer"
 msgstr "Observer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:657
+#: src/main/webapp/WEB-INF/tags/create_games.tag:674
 msgid "Player"
 msgstr "Player"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:658
+#: src/main/webapp/WEB-INF/tags/create_games.tag:675
 msgid "None"
 msgstr "None"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:739
+#: src/main/webapp/WEB-INF/tags/create_games.tag:764
 msgid "none"
 msgstr "none"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:761
+#: src/main/webapp/WEB-INF/tags/create_games.tag:786
 msgid "never"
 msgstr "never"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:763
+#: src/main/webapp/WEB-INF/tags/create_games.tag:788
 msgid "Dates are converted to you local timezone: {0}"
 msgstr "Dates are converted to you local timezone: {0}"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:781
+#: src/main/webapp/WEB-INF/tags/create_games.tag:806
 msgid "Game"
 msgstr "Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:810
+#: src/main/webapp/WEB-INF/tags/create_games.tag:835
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:816
+#: src/main/webapp/WEB-INF/tags/create_games.tag:841
 msgid "Add player to selected game"
 msgstr "Add player to selected game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:837
+#: src/main/webapp/WEB-INF/tags/create_games.tag:862
 msgid "unknown"
 msgstr "unknown"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:837
+#: src/main/webapp/WEB-INF/tags/create_games.tag:862
 msgid "unknown"
 msgstr "unknown"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:843
+#: src/main/webapp/WEB-INF/tags/create_games.tag:868
 msgid "alias"
 msgstr "alias"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:865
+#: src/main/webapp/WEB-INF/tags/create_games.tag:890
 msgid "hidden"
 msgstr "hidden"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:961
+#: src/main/webapp/WEB-INF/tags/create_games.tag:986
 msgid "Switch your role"
 msgstr "Switch your role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:973
+#: src/main/webapp/WEB-INF/tags/create_games.tag:998
 msgid "Change to Observer"
 msgstr "Change to Observer"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1023
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1048
 msgid "Switch role of player"
 msgstr "Switch role of player"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1035
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1060
 msgid "Remove player from game"
 msgstr "Remove player from game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1047
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1072
 msgid "Game"
 msgstr "Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1070
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1095
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1076
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1101
 msgid "Move player to selected game"
 msgstr "Move player to selected game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1108
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1133
 msgid "Role"
 msgstr "Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1168
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1193
 msgid "Game Type"
 msgstr "Game Type"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1172
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1197
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1176
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1201
 msgid "Level"
 msgstr "Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1180
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1205
 msgid "Include Predefined Mutants"
 msgstr "Include Predefined Mutants"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1184
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1209
 msgid "Include Predefined Tests"
 msgstr "Include Predefined Tests"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1188
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1213
 msgid "Max Assertions Per Test"
 msgstr "Max Assertions Per Test"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1192
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1217
 msgid "Mutant Validator Level"
 msgstr "Mutant Validator Level"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1196
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1221
 msgid "Creator Role"
 msgstr "Creator Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1200
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1225
 msgid "Chat Enabled"
 msgstr "Chat Enabled"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1204
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1229
 msgid "Capture Player Intentions"
 msgstr "Capture Player Intentions"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1208
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1233
 msgid "Equivalence Threshold"
 msgstr "Equivalence Threshold"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1212
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1237
 msgid "Start Game"
 msgstr "Start Game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1216
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1241
 msgid "Game Duration"
 msgstr "Game Duration"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1241
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1286
 msgid "Select"
 msgstr "Select"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1251
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1296
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1257
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1302
 msgid "Class"
 msgstr "Class"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1263
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1308
 msgid "Game Type"
 msgstr "Game Type"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1268
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1313
 msgid "Show"
 msgstr "Show"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1270
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1315
 msgid "Settings"
 msgstr "Settings"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1278
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1323
 msgid "Players (Username, Classroom Role, Last Game Role, Total Score)"
 msgstr "Players (Username, Classroom Role, Last Game Role, Total Score)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1279
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1324
 msgid "Players (Username, Last Game Role, Total Score)"
 msgstr "Players (Username, Last Game Role, Total Score)"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1301
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1346
 msgid "Game Settings"
 msgstr "Game Settings"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1317
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1362
 msgid "There are currently no staged games."
 msgstr "There are currently no staged games."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1318
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1363
 msgid "No matching staged games found."
 msgstr "No matching staged games found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1478
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1523
 msgid "Select"
 msgstr "Select"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1487
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1532
 msgid "ID"
 msgstr "ID"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1492
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1537
 msgid "Name"
 msgstr "Name"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1498
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1543
 msgid "Classroom Role"
 msgstr "Classroom Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1505
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1550
 msgid "Last Game Role"
 msgstr "Last Game Role"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1510
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1555
 msgid "Total Score"
 msgstr "Total Score"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1516
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1561
 msgid "Last Login"
 msgstr "Last Login"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1523
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1568
 msgid "Add to existing game"
 msgstr "Add to existing game"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1547
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1592
 msgid "No users found."
 msgstr "No users found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1548
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1593
 msgid "No matching users found."
 msgstr "No matching users found."
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1695
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1740
 msgid "You have users selected. Are you sure you want to stage empty games?"
 msgstr "You have users selected. Are you sure you want to stage empty games?"
 
-#: src/main/webapp/WEB-INF/tags/create_games.tag:1699
+#: src/main/webapp/WEB-INF/tags/create_games.tag:1744
 msgid "You entered user names/emails. Are you sure you want to stage empty games?"
 msgstr "You entered user names/emails. Are you sure you want to stage empty games?"
 
@@ -10907,99 +11055,103 @@ msgstr "Chat"
 msgid "Chat"
 msgstr "Chat"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:88
+#: src/main/webapp/WEB-INF/tags/game_header.tag:101
 msgid "Battleground"
 msgstr "Battleground"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:92
+#: src/main/webapp/WEB-INF/tags/game_header.tag:105
 msgid "Melee"
 msgstr "Melee"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:118
+#: src/main/webapp/WEB-INF/tags/game_header.tag:131
 msgid "Game"
 msgstr "Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:121
+#: src/main/webapp/WEB-INF/tags/game_header.tag:134
 msgid "Game Mode: {0}"
 msgstr "Game Mode: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:125
+#: src/main/webapp/WEB-INF/tags/game_header.tag:138
 msgid "Your Role: {0}"
 msgstr "Your Role: {0}"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:140
+#: src/main/webapp/WEB-INF/tags/game_header.tag:153
 msgid "End Game"
 msgstr "End Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:145
+#: src/main/webapp/WEB-INF/tags/game_header.tag:158
 msgid "Confirm End Game"
 msgstr "Confirm End Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:145
+#: src/main/webapp/WEB-INF/tags/game_header.tag:158
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:147
+#: src/main/webapp/WEB-INF/tags/game_header.tag:160
 msgid "Are you sure you want to end the game?"
 msgstr "Are you sure you want to end the game?"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:150
+#: src/main/webapp/WEB-INF/tags/game_header.tag:163
 msgid "Confirm"
 msgstr "Confirm"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:164
+#: src/main/webapp/WEB-INF/tags/game_header.tag:174
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
+#: src/main/webapp/WEB-INF/tags/game_header.tag:190
 msgid "Start Game"
 msgstr "Start Game"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:174
+#: src/main/webapp/WEB-INF/tags/game_header.tag:200
 msgid "Start a new game with the same settings and opposite roles."
 msgstr "Start a new game with the same settings and opposite roles."
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:177
+#: src/main/webapp/WEB-INF/tags/game_header.tag:203
 msgid "Rematch"
 msgstr "Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:183
+#: src/main/webapp/WEB-INF/tags/game_header.tag:209
 msgid "Confirm Rematch"
 msgstr "Confirm Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:183
+#: src/main/webapp/WEB-INF/tags/game_header.tag:209
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:185
+#: src/main/webapp/WEB-INF/tags/game_header.tag:211
 msgid "Are you sure you want to create a new game with opposite roles?"
 msgstr "Are you sure you want to create a new game with opposite roles?"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:188
+#: src/main/webapp/WEB-INF/tags/game_header.tag:214
 msgid "Confirm Rematch"
 msgstr "Confirm Rematch"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:224
+#: src/main/webapp/WEB-INF/tags/game_header.tag:250
 msgid "Scoreboard"
 msgstr "Scoreboard"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:231
+#: src/main/webapp/WEB-INF/tags/game_header.tag:257
 msgid "Scoring System"
 msgstr "Scoring System"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:240
+#: src/main/webapp/WEB-INF/tags/game_header.tag:266
 msgid "Timeline"
 msgstr "Timeline"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:245
+#: src/main/webapp/WEB-INF/tags/game_header.tag:271
 msgid "Export as a Gradle project to import into an IDE."
 msgstr "Export as a Gradle project to import into an IDE."
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:247
+#: src/main/webapp/WEB-INF/tags/game_header.tag:273
 msgid "Gradle Export"
 msgstr "Gradle Export"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:253
+#: src/main/webapp/WEB-INF/tags/game_header.tag:279
 msgid "Feedback"
 msgstr "Feedback"
 
-#: src/main/webapp/WEB-INF/tags/game_header.tag:267
+#: src/main/webapp/WEB-INF/tags/game_header.tag:293
 msgid "Invitations"
 msgstr "Invitations"
 
@@ -11386,6 +11538,62 @@ msgstr "Teams are <b>not</b> allowed to view the other team's submissions."
 #: src/main/webapp/WEB-INF/tags/level_explanation_multiplayer.tag:39
 msgid "But: Defenders can still view mutants after they are killed or accepted as equivalent."
 msgstr "But: Defenders can still view mutants after they are killed or accepted as equivalent."
+
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:43
+msgid "Configure LLM Defender"
+msgstr "Configure LLM Defender"
+
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:47
+msgid "Don't use an LLM defender"
+msgstr "Don't use an LLM defender"
+
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:62
+msgid "Configure LLM Attacker"
+msgstr "Configure LLM Attacker"
+
+#: src/main/webapp/WEB-INF/tags/llm_player_configuration.tag:66
+msgid "Don't use an LLM attacker"
+msgstr "Don't use an LLM attacker"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:45
+msgid "Manage LLM players"
+msgstr "Manage LLM players"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:52
+msgid "Choose defender model"
+msgstr "Choose defender model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:54
+msgid "Don't use an LLM defender"
+msgstr "Don't use an LLM defender"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:59
+msgid "Choose defend strategy"
+msgstr "Choose defend strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:78
+msgid "Choose attacker model"
+msgstr "Choose attacker model"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:80
+msgid "Don't use an LLM attacker"
+msgstr "Don't use an LLM attacker"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:84
+msgid "Choose attack strategy"
+msgstr "Choose attack strategy"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:105
+msgid "See conversations"
+msgstr "See conversations"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:106
+msgid "Confirm"
+msgstr "Confirm"
+
+#: src/main/webapp/WEB-INF/tags/llm_select_modal.tag:110
+msgid "LLM conversations"
+msgstr "LLM conversations"
 
 #: src/main/webapp/WEB-INF/tags/melee_game_scoreboard.tag:30
 msgid "User"

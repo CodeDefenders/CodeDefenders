@@ -44,15 +44,16 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
@@ -86,7 +87,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
-import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.codedefenders.validation.code.MutantValidator;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
@@ -110,6 +110,7 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TITLE_SUCCESS;
 
 
 // TODO Alessio 18/02/2020: Differentiate between errorLines in the mutants and errorLines in the tests in the UI.
@@ -217,29 +218,18 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        final int gameId = game.getId();
-        final int userId = login.getUserId();
-        final boolean isGameClosed = game.getState() == GameState.FINISHED
-                || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
+        int gameId = game.getId();
+        int userId = login.getUserId();
 
-        if (!game.hasUserJoined(userId)) {
-            if (login.isAdmin() && isGameClosed) {
-                logger.info("User {} is not part of closed game {}, but is an admin. Adding as observer.",
-                        login.getUserId(), gameId);
-                if (!game.addPlayer(login.getUserId(), Role.OBSERVER)) {
-                    logger.error("Failed to add user {} as observer for game {}.", login.getUserId(), gameId);
-                    response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-                    return;
-                }
-            } else {
-                logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
-                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
-                return;
-            }
+        if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
+            logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            return;
         }
 
         final int playerId = playerRepo.getPlayerIdForUserAndGame(userId, gameId);
-        if (playerId == -1) {
+
+        if (game.getCreatorId() != userId && playerId == -1) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", userId, gameId);
             response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
@@ -280,6 +270,8 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
 
+        final boolean isGameClosed = game.getState() == GameState.FINISHED
+                || game.getState() == GameState.ACTIVE && gameRepo.isGameExpired(gameId);
         final boolean hasOpenEquivDuels = !game.getMutantsMarkedEquivalentPending().isEmpty();
         final String jspPath = isGameClosed
                 ? (hasOpenEquivDuels ? Constants.CLOSING_VIEW_JSP : Constants.MELEE_DETAILS_VIEW_JSP)
@@ -309,23 +301,28 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         int gameId = game.getId();
+        final String action = ServletUtils.formType(request);
 
         if (!game.hasUserJoined(login.getUserId())) {
-            logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
-            Redirect.redirectBack(request, response);
-            return;
+            if (!login.isAdmin()) {
+                logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
+                Redirect.redirectBack(request, response);
+                return;
+            }
         }
 
-        final String action = ServletUtils.formType(request);
+
         final Optional<SimpleUser> user = userService.getSimpleUserById(login.getUserId());
 
         final int playerId = playerRepo.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 || user.isEmpty()) {
-            // Something odd with the registration - TODO
-            logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
-            Redirect.redirectBack(request, response);
-            return;
+            if (!action.equals("setLlmPlayer") || !login.isAdmin()) {
+                // Something odd with the registration - TODO
+                logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
+                Redirect.redirectBack(request, response);
+                return;
+            }
         }
 
         switch (action) {
@@ -354,9 +351,40 @@ public class MeleeGameManager extends HttpServlet {
                 resolveEquivalence(request, response, gameId, game, playerId);
                 return;
             }
+            case "setLlmPlayer": {
+                try {
+
+                    if (checkForPrivileges(game, request, response)) {
+                        gameManagingUtils.setLlmPlayer(game, request);
+                        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+                        return;
+                    }
+                } catch (IllegalArgumentException e) {
+                    messages.add("Something went wrong, sorry!");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                    return;
+                } catch (NoSuchModelException e) {
+                    messages.add("The selected model is no longer active.");
+                    logger.error(e.getMessage());
+                    Redirect.redirectBack(request, response);
+                }
+            }
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
+        }
+
+    }
+
+    private boolean checkForPrivileges(AbstractGame game, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        if (login.isAdmin() || login.getUserId() == game.getCreatorId()) {
+            return true;
+        } else {
+            logger.warn("User {} tried to do something he's not allowed to do with game {}.",
+                    login.getUserId(), game.getId());
+            Redirect.redirectBack(req, resp);
+            return false;
         }
     }
 
@@ -557,6 +585,9 @@ public class MeleeGameManager extends HttpServlet {
         eventDAO.insert(notif);
 
         messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
+        if (!gameRepo.isGameActive(game.getId())) {
+            game.setState(GameState.FINISHED);
+        }
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -605,7 +636,8 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        /*
+                MutantSubmittedEvent mse = new MutantSubmittedEvent();
         mse.setGameId(game.getId());
         mse.setUserId(login.getUserId());
         notificationService.post(mse);
@@ -661,62 +693,59 @@ public class MeleeGameManager extends HttpServlet {
                 messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-            return;
-        }
+         */
 
-        // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
-        // then we get the PLAYER_ID when we get id of the mutants' creator?
-
-        Mutant newMutant;
-        //noinspection DuplicatedCode
+        GameManagingUtils.CreateBattlegroundMutantResult result;
         try {
-            newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
-                    // TODO Should we use a different directory structure for MELEE GAMES?
-                    MODE_BATTLEGROUND_DIR);
-        } catch (UncheckedSQLException e) {
-            if (e.isDataTooLong()) {
-                messages.add(I18n.marktr("Error submitting the mutant: data too long. Maybe you made too many changes?")).alert();
-            } else {
-                messages.add(I18n.marktr("Database error while saving the mutant."));
-                logger.error("Database error while saving the mutant: {}", e.getMessage());
-            }
-            response.sendRedirect(
-                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
-            return;
-        }
-        if (newMutant == null) {
-            messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            previousSubmission.setMutantCode(mutantText);
-            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", game.getId(),
-                    game.getClassId(), user.getId(), mutantText);
+            result = gameManagingUtils.createMeleeMutant(game, login.getUserId(), mutantText);
+        } catch (GameManagingUtils.MutantCreationException e) {
+            messages.add(MUTANT_CREATION_ERROR_MESSAGE + "\n" + e.getDetailedReason().orElse(""));
+            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}," +
+                            "detailedReason: {}",
+                    game.getId(), game.getClassId(), login.getUserId(), mutantText, e.getDetailedReason().orElse("None"));
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
-        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
-                TargetExecution.Target.COMPILE_MUTANT);
-        if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
-            // There's a ton of defensive programming here...
-            if (compileMutantTarget != null && compileMutantTarget.message != null
-                    && !compileMutantTarget.message.isEmpty()) {
-                // We escape the content of the message for new tests since user can embed there
-                // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml4(compileMutantTarget.message);
-                // Extract the line numbers of the errors
-                List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileMutantTarget.message);
-                // Store them in the session so they can be picked up later
-                previousSubmission.setErrorLines(errorLines);
-                // We introduce our decoration
-                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false).alert();
-
-            }
+        if (result.isSuccess()) {
+            // Clean the mutated code only if mutant is accepted
+            previousSubmission.clear();
+            messages.add(MUTANT_COMPILED_MESSAGE, TITLE_SUCCESS);
+            result.mutationTesterMessage().ifPresent(messages::add);
+            logger.info("Successfully created mutant {} ", result.mutant().orElseThrow().getId());
+        } else {
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
-            return;
+            switch (result.failureReason().orElseThrow()) {
+                case VALIDATION_FAILED -> {
+                    // Mutant is either the same as the CUT or it contains invalid code
+                    result.validationErrorMessage().ifPresent(error -> messages.add(error).alert());
+                }
+                case DUPLICATE_MUTANT_FOUND -> {
+                    messages.add(MUTANT_DUPLICATED_MESSAGE);
+                    result.compilationError().ifPresent(this::handleCompilationError);
+                }
+                case COMPILATION_FAILED -> {
+                    messages.add(MUTANT_UNCOMPILABLE_MESSAGE).alert();
+                    result.compilationError().ifPresent(this::handleCompilationError);
+                }
+            }
         }
 
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
+    }
+
+    private void handleCompilationError(String errorMessage) {
+        // We escape the content of the message for new tests since user can embed there anything
+        String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
+        // Extract the line numbers of the errors
+        List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
+        // Store them in the session so they can be picked up later
+        previousSubmission.setErrorLines(errorLines);
+        // We introduce our decoration
+        String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+
+        messages.add(decorate).escape(false).alert();
+    }
+/*
         messages.add(MUTANT_COMPILED_MESSAGE);
         final String notificationMsg = user.getName() + " created a mutant.";
         // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
@@ -749,6 +778,9 @@ public class MeleeGameManager extends HttpServlet {
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
+ */
+
+
 
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response,
@@ -1050,6 +1082,9 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(ttme);
 
             testRepo.updateTest(newTest);
+            if (!gameRepo.isGameActive(game.getId())) {
+                game.setState(GameState.FINISHED);
+            }
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());

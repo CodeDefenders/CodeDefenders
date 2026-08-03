@@ -1017,6 +1017,25 @@
 			<artifactId>TestSmellDetector</artifactId>
 			<version>2.2</version>
 		</dependency>
+
+		<!-- LLM API-->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-open-ai</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-ollama</artifactId>
+			<version>1.1.0-rc1</version>
+		</dependency>
 		<!-- End Misc Dependencies -->
 
 		<!-- Begin Java Source Code / Coverage Analysis -->
@@ -1231,23 +1250,24 @@
 		</dependency>
 		<!-- End Integration/System Test Dependencies -->
 
+		<!-- Also a dependency for Langchain4j-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>2.14.2</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-guava</artifactId>
 			<version>2.14.2</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.jakarta.rs</groupId>
 			<artifactId>jackson-jakarta-rs-json-provider</artifactId>
 			<version>2.13.5</version>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

@@ -42,14 +42,20 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
+import org.codedefenders.llm.NoSuchModelException;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.model.creategames.gameassignment.GameAssignmentStrategy;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentStrategy;
+import org.codedefenders.model.llm.LlModel;
+import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.persistence.database.GameRepository;
+import org.codedefenders.persistence.database.LlmRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
 import org.slf4j.Logger;
@@ -69,6 +75,9 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     @Inject
     private GameRepository gameRepo;
+
+    @Inject
+    private LlmRepository llmRepo;
 
     /**
      * Returns the CreateGamesBean representing the context for the create-games page.
@@ -133,6 +142,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Extract game settings from a request.
+     *
      * @param request The HTTP request.
      * @return The extracted game settings.
      */
@@ -170,6 +180,33 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 ? getIntParameter(request, "classroomId").get()
                 : null;
 
+        GameManagingUtils gameManagingUtils = CDIUtil.getBeanFromCDI(GameManagingUtils.class);
+        var llmDefenderPara = getStringParameter(request, "defenderModel");
+        var llmAttackerPara = getStringParameter(request, "attackerModel");
+        var llmDefenderStrategyName = getStringParameter(request, "defenderStrategy");
+        var llmAttackerStrategyName = getStringParameter(request, "attackerStrategy");
+        LlModel llmDefender = null;
+        LlModel llmAttacker = null;
+        LlmStrategy llmDefenderStrategy = null;
+        LlmStrategy llmAttackerStrategy = null;
+
+        try {
+            if (llmDefenderPara.isPresent()) {
+                llmDefender = gameManagingUtils.getLLModelFromSingleValue(llmDefenderPara.get());
+            }
+            if (llmAttackerPara.isPresent()) {
+                llmAttacker = gameManagingUtils.getLLModelFromSingleValue(llmAttackerPara.get());
+            }
+            if (llmDefenderStrategyName.isPresent()) {
+                llmDefenderStrategy = llmRepo.getStrategyByName(llmDefenderStrategyName.get()).orElseThrow();
+            }
+            if (llmAttackerStrategyName.isPresent()) {
+                llmAttackerStrategy = llmRepo.getStrategyByName(llmAttackerStrategyName.get()).orElseThrow();
+            }
+        } catch (NoSuchModelException ignored) {
+
+        }
+
         return new GameSettings(
                 gameType,
                 classId,
@@ -184,7 +221,11 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 creatorRole,
                 gameDurationMinutes,
                 startGame,
-                classroomId);
+                classroomId,
+                llmDefender,
+                llmAttacker,
+                llmDefenderStrategy,
+                llmAttackerStrategy);
     }
 
     /**
@@ -216,17 +257,17 @@ public abstract class CreateGamesServlet extends HttpServlet {
         /* Extract user IDs from the table. */
         String userIdsStr = Optional.ofNullable(request.getParameter("userIds")).get();
         Set<Integer> userIdsFromTable = Arrays.stream(userIdsStr.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .map(Integer::valueOf)
-                    .collect(Collectors.toSet());
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::valueOf)
+                .collect(Collectors.toSet());
 
         /* Extract usernames/emails from the text field. */
         String userNamesStr = Optional.ofNullable(request.getParameter("userNames")).get();
         Set<String> userNames = Arrays.stream(userNamesStr.split("\\R"))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toSet());
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
 
         Set<UserInfo> players = new HashSet<>();
 
@@ -250,6 +291,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#stageGamesWithUsers(Set,
      * GameSettings, RoleAssignmentStrategy.Type, GameAssignmentStrategy.Type, int, int)}.
+     *
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {
@@ -306,7 +348,8 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#stageEmptyGames(
-     * GameSettings, int) AdminCreateGamesBean#stageEmptyGames()}.
+     *GameSettings, int) AdminCreateGamesBean#stageEmptyGames()}.
+     *
      * @param request The HTTP request.
      */
     private void stageEmptyGames(HttpServletRequest request) {
@@ -324,6 +367,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#deleteStagedGames(List)
      * AdminCreateGamesBean#deleteStagedGames()}.
+     *
      * @param request The HTTP request.
      */
     private void deleteStagedGames(HttpServletRequest request) {
@@ -355,6 +399,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#createStagedGames(List)
      * AdminCreateGamesBean#createStagedGames()}.
+     *
      * @param request The HTTP request.
      */
     private void createStagedGames(HttpServletRequest request) {
@@ -385,7 +430,8 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link CreateGamesBean#removePlayerFromStagedGame(
-     * StagedGame, int) AdminCreateGamesBean#removePlayerFromStagedGame()}.
+     *StagedGame, int) AdminCreateGamesBean#removePlayerFromStagedGame()}.
+     *
      * @param request The HTTP request.
      */
     private void removePlayerFromStagedGame(HttpServletRequest request) {
@@ -409,6 +455,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
      * Extract and validate POST parameters and forward them to
      * {@link CreateGamesBean#removeCreatorFromStagedGame(StagedGame)}
      * AdminCreateGamesBean#removeCreatorFromStagedGame()}.
+     *
      * @param request The HTTP request.
      */
     private void removeCreatorFromStagedGame(HttpServletRequest request) {
@@ -429,6 +476,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
 
     /**
      * Extract and validate POST parameters for {@link CreateGamesBean#switchRole(StagedGame, int)}
+     *
      * @param request The HTTP request.
      */
     private void switchRole(HttpServletRequest request) {
@@ -457,6 +505,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters for {@link CreateGamesBean#switchCreatorRole(StagedGame)
      * AdminCreateGamesBean#switchCreatorRole()}.
+     *
      * @param request The HTTP request.
      */
     private void switchCreatorRole(HttpServletRequest request) {
@@ -478,6 +527,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters for {@link CreateGamesBean#movePlayerBetweenStagedGames(StagedGame,
      * StagedGame, int, Role)}
+     *
      * @param request The HTTP request.
      */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
@@ -521,6 +571,7 @@ public abstract class CreateGamesServlet extends HttpServlet {
     /**
      * Extract and validate POST parameters for {@link CreateGamesBean#addPlayerToStagedGame(StagedGame, int, Role)}
      * or {@link CreateGamesBean#addPlayerToExistingGame(AbstractGame, int, Role)}
+     *
      * @param request The HTTP request.
      */
     private void addPlayerToGame(HttpServletRequest request) {

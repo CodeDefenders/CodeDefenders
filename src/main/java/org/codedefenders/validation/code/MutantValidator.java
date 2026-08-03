@@ -39,22 +39,28 @@ public class MutantValidator {
      * @param originalCode The code of the original CuT
      * @param mutatedCode The mutated code
      * @param ruleSet The ruleset the mutant is validated against
+     * @param ignoredRules These rules are ignored for this validation.
      * @return A {@link CodeValidationResult} containing information on all rules this mutant violated
      */
     public CodeValidationResult validateMutant(String originalCode, String mutatedCode,
-                                                      MutantValidationRuleSet ruleSet, I18n i18n) {
+                                                      MutantValidationRuleSet ruleSet, I18n i18n, MutantRule... ignoredRules) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
-        result.add(checkCompilationRules(originalCode, mutatedCode, ruleSet, i18n));
+        MutantValidationRuleSet tmpRuleSet = new MutantValidationRuleSet("tmp", ruleSet);
+        for (MutantRule r : ignoredRules) {
+            tmpRuleSet.removeRule(r);
+        }
+
+        result.add(checkCompilationRules(originalCode, mutatedCode, tmpRuleSet, i18n));
 
         // if only string literals were changed
         if (ValidationUtils.onlyLiteralsChanged(originalCode, mutatedCode)) {
             return result;
         }
 
-        result.add(checkCodeRules(originalCode, mutatedCode, ruleSet));
-        result.add(checkLineDiffRules(originalCode, mutatedCode, ruleSet));
-        result.add(checkInsertionRules(originalCode, mutatedCode, ruleSet));
+        result.add(checkCodeRules(originalCode, mutatedCode, tmpRuleSet));
+        result.add(checkLineDiffRules(originalCode, mutatedCode, tmpRuleSet));
+        result.add(checkInsertionRules(originalCode, mutatedCode, tmpRuleSet));
 
         return result;
     }
