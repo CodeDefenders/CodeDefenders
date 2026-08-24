@@ -67,15 +67,23 @@ If any installation step fails, the installation process aborts and prints an er
 
 #### Set up Code Defenders admin users
 
-Code Defenders currently relies on the Tomcat authentication system for providing a `username`-`role` mapping that can be used to assign admin privileges.
+Admin privileges are granted through the `auth.admin.users` property in your `codedefenders.properties` file. 
+This property takes a comma-separated list of existing Code Defenders usernames and grants each of them admin rights on Tomcat startup.
 
-Assigning admin privileges to a Code Defenders users can be done by setting up a mapping between the username (`<CODEDEFENDERS_USERNAME>`) and the configured `auth.admin.role` (`codedefenders-admin` by default) in the `tomcat-users.xml` file.  
-This file is per default located in `${CATALINA_HOME}/conf`.
+This file is typically located at `${CATALINA_HOME}/conf/codedefenders.properties` (e.g. `/etc/tomcat10/codedefenders.properties`), 
+and is based on [`example_codedefenders.properties`](/example.codedefenders.properties).
 
-```xml
-  <role rolename="codedefenders-admin"/>
-  <user username="<CODEDEFENDERS_USERNAME>" roles="codedefenders-admin"/>
+```properties
+auth.admin.users=<CODEDEFENDERS_USERNAME>
 ```
+
+**Steps:**
+1. Register the user (`<CODEDEFENDERS_USERNAME>`) in Code Defenders as normal, if you haven't already.
+2. Add or update the `auth.admin.users` line in `codedefenders.properties` with that username.
+3. Restart Tomcat so the property is picked up.
+4. Log in as `<CODEDEFENDERS_USERNAME>`. The account now has admin privileges.
+
+> `auth.admin.users` is intended for initial setup only. Once you've logged in as the granted user, remove the line from `codedefenders.properties`.
 
 Care should be taken, so the chosen `CODEDEFENDERS_USERNAME` can not be simply registered by anyone.
 
