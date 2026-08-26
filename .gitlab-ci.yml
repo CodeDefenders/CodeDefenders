@@ -326,6 +326,7 @@ container-image-build-only:
   artifacts:
     paths:
       - codedefenders-image.tar
+  allow_failure: true # Otherwise pipelines will block on this job
   rules:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && $CI_COMMIT_TAG == null
       when: manual
