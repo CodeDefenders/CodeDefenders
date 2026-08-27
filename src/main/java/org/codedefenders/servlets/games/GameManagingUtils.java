@@ -490,7 +490,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         if (!validationSuccess) {
             validationRepository.saveRejectedSubmission(mutantText, userId, game.getId(), validationResult);
             // Mutant is either the same as the CUT or it contains invalid code
-            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
+            return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.getMessage(i18n), null);
         }
 
         Mutant existingMutant = existingMutant(game.getId(), mutantText);
