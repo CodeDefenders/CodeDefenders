@@ -570,6 +570,7 @@ public class MeleeGameManager extends HttpServlet {
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+            validationRepository.saveTestsThatFailOnCut(testText, user.getId(), game.getId());
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
             messages.add(testOriginalTarget.message).alert();
             previousSubmission.setTestCode(testText);
@@ -927,7 +928,7 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                validationRepository.saveRejectedSubmission(testText, playerId, validationMessages);
+                validationRepository.saveRejectedSubmission(testText, login.getUserId(), gameId, validationMessages);
                 messages.add(validationMessages.getMessage(i18n)).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());

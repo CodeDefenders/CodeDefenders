@@ -739,6 +739,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+            validationRepository.saveTestsThatFailOnCut(code, userId, game.getId());
             return CreateBattlegroundTestResult.failure(
                     newTest, CreateBattlegroundTestResult.FailureReason.TEST_DID_NOT_PASS_ON_CUT,
                     null, null, testOriginalTarget.message
