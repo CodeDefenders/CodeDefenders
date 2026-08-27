@@ -27,9 +27,12 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.database.util.ResultSetUtils;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidationResult;
 import org.intellij.lang.annotations.Language;
+
+import static org.codedefenders.validation.code.CodeValidationResult.Type.MUTANT;
 
 @ApplicationScoped
 public class ValidationRepository {
@@ -47,17 +50,7 @@ public class ValidationRepository {
         if (result.isValid()) {
             throw new IllegalArgumentException("Valid submissions must not be saved here.");
         }
-        int id = queryRunner.insert("insert into rejected_submissions(Player_ID, Submission_type) VALUE (?,?);",
-                ResultSetUtils.generatedKeyFromRS(),
-                playerId,
-                result.getType().toString()).orElseThrow();
-
-        try {
-            Path filepath = Files.createDirectories(FileUtils.getAbsoluteDataPath("rejects")).resolve(id + ".txt");
-            Files.writeString(filepath, code);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        int id = saveSubmission(playerId, result.getType(), code);
         for (CodeValidationResult.RuleViolation<?> rule : result.getRuleViolations()) {
             @Language("SQL")
             String sql = """
@@ -72,5 +65,26 @@ public class ValidationRepository {
                     rule.getReasonDescription());
         }
 
+    }
+
+    public void saveDuplicateMutant(String code, int userId, int gameId, int originalMutantId) {
+        int playerId = playerRepository.getPlayerIdForUserAndGame(userId, gameId);
+        int id = saveSubmission(playerId, MUTANT, code);
+        queryRunner.update("insert into rejection_reasons(Reject_ID, General_description, Detailed_description, Validation_message, Reason) VALUE (?, ?, ?, ?, ?);",
+                id, "NO DUPLICATE MUTANTS", "NO DUPLICATE MUTANTS", Constants.MUTANT_DUPLICATED_MESSAGE, "" + originalMutantId);
+    }
+
+    private int saveSubmission(int playerId, CodeValidationResult.Type submissionType, String code) {
+        int id = queryRunner.insert("insert into rejected_submissions(Player_ID, Submission_type) VALUE (?,?);",
+                ResultSetUtils.generatedKeyFromRS(),
+                playerId,
+                submissionType.toString()).orElseThrow();
+        try {
+            Path filepath = Files.createDirectories(FileUtils.getAbsoluteDataPath("rejects")).resolve(id + ".txt");
+            Files.writeString(filepath, code);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return id;
     }
 }

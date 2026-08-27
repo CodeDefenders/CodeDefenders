@@ -399,6 +399,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mdce);
 
         if (!duplicateCheckSuccess) {
+            validationRepository.saveDuplicateMutant(code, userId, game.getId(), existingMutant.getId());
             // Check if the duplicate mutant had a compilation error and reuse the error message if it has.
             String compilationError = null;
             TargetExecution existingMutantTarget =
@@ -507,6 +508,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mdce);
 
         if (!duplicateCheckSuccess) {
+            validationRepository.saveDuplicateMutant(mutantText, userId, game.getId(), existingMutant.getId());
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
                     TargetExecution.Target.COMPILE_MUTANT);
             String compilationError = null;

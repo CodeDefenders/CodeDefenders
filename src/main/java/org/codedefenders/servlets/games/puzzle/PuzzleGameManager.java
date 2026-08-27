@@ -848,6 +848,7 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(mdce);
 
         if (!duplicateCheckSuccess) {
+            validationRepository.saveDuplicateMutant(mutantText, login.getUserId(), game.getId(), existingMutant.getId());
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget =
                     TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
