@@ -67,6 +67,7 @@ import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.ValidationRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -175,6 +176,8 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private MutantValidator mutantValidator;
+    @Inject
+    private ValidationRepository validationRepository;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -470,6 +473,7 @@ public class PuzzleGameManager extends HttpServlet {
                 notificationService.post(tve);
 
                 if (!validationSuccess) {
+                    validationRepository.saveRejectedSubmission(testText, login.getUserId(), gameId, validationMessage);
                     messages.add(validationMessage.getMessage(i18n)).alert();
                     previousSubmission.setTestCode(testText);
                     Redirect.redirectBack(request, response);
@@ -659,6 +663,7 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(testText, login.getUserId(), gameId, validationMessage);
             messages.add(validationMessage.getMessage(i18n)).alert();
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
@@ -826,6 +831,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
+            validationRepository.saveRejectedSubmission(mutantText, login.getUserId(), game.getId(), validationResult);
             messages.add(validationResult.getMessage(i18n)).alert();
             Redirect.redirectBack(request, response);
             return;

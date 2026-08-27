@@ -87,6 +87,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.ValidationRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
@@ -210,6 +211,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Named
     @Inject
     private I18nService i18nService;
+    @Inject
+    private ValidationRepository validationRepository;
 
     /**
      * {@inheritDoc}
@@ -377,6 +380,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(code, userId, game.getId(), validationResult);
             return CreateBattlegroundMutantResult.failure(
                     CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED,
                     validationResult.getMessage(i18n),
@@ -484,6 +488,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(mve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(mutantText, userId, game.getId(), validationResult);
             // Mutant is either the same as the CUT or it contains invalid code
             return CreateBattlegroundMutantResult.failure(CreateBattlegroundMutantResult.FailureReason.VALIDATION_FAILED, validationResult.toString(), null);
         }
@@ -712,6 +717,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(code, userId, game.getId(), validationMessage);
             return CreateBattlegroundTestResult.failure(
                     null, CreateBattlegroundTestResult.FailureReason.VALIDATION_FAILED,
                     validationMessage.getMessage(i18n), null, null);
@@ -947,6 +953,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         notificationService.post(tve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(code, userId, game.getId(), validationMessage);
             return RejectBattlegroundEquivalenceResult.testInvalid(
                     null, RejectBattlegroundEquivalenceResult.FailureReason.VALIDATION_FAILED,
                     validationMessage.getMessage(i18n), null, null);
