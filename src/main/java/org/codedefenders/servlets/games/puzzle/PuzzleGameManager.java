@@ -242,6 +242,12 @@ public class PuzzleGameManager extends HttpServlet {
             request.setAttribute("nextPuzzleMessage", generateNextPuzzleMessage(game, new StringBuilder(), i18n));
         }
 
+        if (!game.getPuzzle().isVisible()) {
+            logger.error("Trying to enter a seasonal puzzle that is not yet unlocked");
+            response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
+            return;
+        }
+
         switch (game.getType()) {
             case ATTACKER:
                 request.getRequestDispatcher(PUZZLE_GAME_ATTACKER_VIEW_JSP).forward(request, response);
@@ -981,12 +987,18 @@ public class PuzzleGameManager extends HttpServlet {
          */
         for (PuzzleChapter puzzleChapter : puzzleRepo.getPuzzleChapters()) {
             // Check in current and next chapters
-            if (puzzleChapter.getId() >= currentChapter) {
+            if (puzzleChapter.getId() >= currentChapter && puzzleChapter.isVisible()) {
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * an empty, not-null list if there are no puzzles
                  */
                 for (Puzzle puzzle : puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())) {
+                    if (!puzzle.isVisible()) {
+                        //If this puzzle is an invisible seasonal puzzle, all other puzzles in this chapter
+                        //will be too.
+                        break;
+                    }
+
                     if (puzzleChapter.getId() == currentChapter
                             && puzzle.getPosition() <= currentPositionInChapter) {
                         // Skip past and current puzzles in the same chapter
