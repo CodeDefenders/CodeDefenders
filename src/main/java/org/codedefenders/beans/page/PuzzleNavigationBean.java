@@ -71,6 +71,7 @@ public class PuzzleNavigationBean {
 
         puzzleChapters = puzzleRepo.getPuzzleChapters()
                 .stream()
+                .filter(PuzzleChapter::isVisible)
                 .map(toPuzzleChapterEntry(
                         login.getUserId(), activePuzzles,
                         login.getUser().getLocale().getLanguage(),
@@ -147,6 +148,7 @@ public class PuzzleNavigationBean {
 
             final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())
                     .stream()
+                    .filter(Puzzle::isVisible)//TODO: Could be done more efficiently by checking for the dates here
                     .map(toPuzzleEntry(userId, activePuzzles, userLanguage, defaultLanguage, title))
                     .collect(Collectors.toSet());
 

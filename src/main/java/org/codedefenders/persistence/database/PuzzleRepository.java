@@ -18,8 +18,10 @@
  */
 package org.codedefenders.persistence.database;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -357,7 +359,7 @@ public class PuzzleRepository {
                 query, generatedKeyFromRS(), position
         ).orElseThrow(() -> new UncheckedSQLException("Couldn't store puzzle chapter."));
 
-        return new PuzzleChapter(id, position);
+        return new PuzzleChapter(id, position, null);
     }
 
     /**
@@ -873,7 +875,11 @@ public class PuzzleRepository {
             position = null;
         }
 
-        return new PuzzleChapter(chapterId, position);
+        Date sqlDate = rs.getDate("puzzle_chapters.Calendar_date");
+        LocalDate localDate = sqlDate == null ? null : sqlDate.toLocalDate();
+
+
+        return new PuzzleChapter(chapterId, position, localDate);
     }
 
     /**

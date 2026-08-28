@@ -18,6 +18,8 @@
  */
 package org.codedefenders.game.puzzle;
 
+import java.time.LocalDate;
+
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.util.CDIUtil;
@@ -247,5 +249,19 @@ public class Puzzle {
 
     public void setEquivalent(boolean equivalent) {
         this.isEquivalent = equivalent;
+    }
+
+    public boolean isVisible() {
+        PuzzleChapter chapter = getChapter();
+        if (chapter == null) {
+            return true;
+        } else if (chapter.getCalendarDate() == null) {
+            return true;
+        } else {
+            return chapter.getCalendarDate()
+                    .withYear(2000)
+                    .plusDays(position - 2)
+                    .isBefore(LocalDate.now().withYear(2000));
+        }
     }
 }
