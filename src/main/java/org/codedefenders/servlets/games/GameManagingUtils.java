@@ -74,6 +74,7 @@ import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
+import org.codedefenders.notification.events.server.highlighting.MutantUpdatedEvent;
 import org.codedefenders.notification.events.server.highlighting.TestAddedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -583,20 +584,21 @@ public class GameManagingUtils implements IGameManagingUtils {
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
 
-    public void notifyPlayersOnMutantAdded(Mutant mutant, MultiplayerGame game) {
+    public static List<Player> getAllPlayersInGame(AbstractGame game) {
         var allPlayers = new LinkedList<Player>();
-        allPlayers.addAll(game.getAttackerPlayers());
-        allPlayers.addAll(game.getDefenderPlayers());
-        allPlayers.addAll(game.getObserverPlayers());
-
-        notifyPlayersOnMutantAdded(mutant, allPlayers, game.getId());
+        if (game instanceof MultiplayerGame multiplayerGame) {
+            allPlayers.addAll(multiplayerGame.getAttackerPlayers());
+            allPlayers.addAll(multiplayerGame.getDefenderPlayers());
+            allPlayers.addAll(multiplayerGame.getObserverPlayers());
+        } else if (game instanceof MeleeGame meleeGame) {
+            allPlayers.addAll(meleeGame.getPlayers());
+            allPlayers.addAll(meleeGame.getObserverPlayers());
+        }
+        return allPlayers;
     }
-    public void notifyPlayersOnMutantAdded(Mutant mutant, MeleeGame game) {
-        var allPlayers = new LinkedList<Player>();
-        allPlayers.addAll(game.getPlayers());
-        allPlayers.addAll(game.getObserverPlayers());
 
-        notifyPlayersOnMutantAdded(mutant, allPlayers, game.getId());
+    public void notifyPlayersOnMutantAdded(Mutant mutant, AbstractGame game) {
+        notifyPlayersOnMutantAdded(mutant, getAllPlayersInGame(game), game.getId());
     }
     public void notifyPlayersOnMutantAdded(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
         var creatorId = mutant.getCreatorId();
@@ -608,6 +610,20 @@ public class GameManagingUtils implements IGameManagingUtils {
             mte.setGameId(gameId);
             mte.setMutant(new GHMutantDTO(mutant, uid));
             return mte;
+        }).forEach(notificationService::post);
+    }
+
+    public void notifyPlayersOnMutantUpdated(AbstractGame game, Mutant mutant) {
+        notifyPlayersOnMutantUpdated(mutant, getAllPlayersInGame(game), game.getId());
+    }
+    private void notifyPlayersOnMutantUpdated(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
+        gamePlayers.stream().map(player -> {
+            var uid = player.getUser().getId();
+            var mue = new MutantUpdatedEvent();
+            mue.setUserId(uid);
+            mue.setGameId(gameId);
+            mue.setMutant(new GHMutantDTO(mutant, uid));
+            return mue;
         }).forEach(notificationService::post);
     }
 
@@ -925,6 +941,8 @@ public class GameManagingUtils implements IGameManagingUtils {
             eventDAO.insert(notifDefenderEquiv);
         }
 
+        notifyPlayersOnMutantUpdated(game, equivMutant);
+
         return new AcceptBattlegroundEquivalenceResult(isMutantKillable);
     }
 
@@ -1089,6 +1107,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
+
+                    notifyPlayersOnMutantUpdated(game, mutPending);
                 }
                 logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                         newTest.getId(), mutPending.getId());
@@ -1178,6 +1198,8 @@ public class GameManagingUtils implements IGameManagingUtils {
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(event);
+
+                        notifyPlayersOnMutantUpdated(game, m);
 
                         mutantRepo.insertEquivalence(m, playerId);
                     })

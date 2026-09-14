@@ -366,6 +366,8 @@ public class MultiplayerGameManager extends HttpServlet {
                         EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
+
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
 

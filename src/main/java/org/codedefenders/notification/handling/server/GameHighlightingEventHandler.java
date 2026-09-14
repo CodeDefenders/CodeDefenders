@@ -22,6 +22,7 @@ import java.util.Objects;
 
 import org.codedefenders.notification.events.server.highlighting.GameHighlightingEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
+import org.codedefenders.notification.events.server.highlighting.MutantUpdatedEvent;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ public class GameHighlightingEventHandler implements ServerEventHandler {
         if (event.getGameId() != this.gameId) return;
         // The mutant added event has a user id as it contains the user specific GHMutantDTO#canClaim info
         if (event instanceof MutantAddedEvent mae && mae.getUserId() != this.userId) return;
+        if (event instanceof MutantUpdatedEvent mue && mue.getUserId() != this.userId) return;
 
         socket.sendEvent(event);
     }

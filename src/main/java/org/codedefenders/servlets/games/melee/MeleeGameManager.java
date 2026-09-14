@@ -438,6 +438,7 @@ public class MeleeGameManager extends HttpServlet {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
 
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
     }
@@ -890,6 +891,8 @@ public class MeleeGameManager extends HttpServlet {
             ede.setDefenderWon();
             notificationService.post(ede);
 
+            gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+
             // We need this to pass the mutation information along
             Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
                     // Here we care only about the mutantID.
@@ -1065,6 +1068,8 @@ public class MeleeGameManager extends HttpServlet {
                                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(scoreEvent);
 
+                        gameManagingUtils.notifyPlayersOnMutantUpdated(game, mPending);
+
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                             newTest.getId(), mPending.getId());
@@ -1159,6 +1164,8 @@ public class MeleeGameManager extends HttpServlet {
                                         EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT,
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
+
+                                gameManagingUtils.notifyPlayersOnMutantUpdated(game, m);
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence

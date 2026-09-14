@@ -48,6 +48,7 @@ import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +59,10 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
 @ApplicationScoped
 public class GameService implements IGameService {
 
-    protected TestRepository testRepo;
-    protected MutantRepository mutantRepo;
-    protected GameRepository gameRepo;
+    protected final TestRepository testRepo;
+    protected final MutantRepository mutantRepo;
+    protected final GameRepository gameRepo;
+    protected final GameManagingUtils gameManagingUtils;
 
     private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
@@ -85,12 +87,11 @@ public class GameService implements IGameService {
 
     private final Set<Integer> gamesCurrentlyClosing = Collections.synchronizedSet(new HashSet<>());
 
-
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
                        PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo,
                        GameRepository gameRepo, PlayerRepository playerRepo, NotificationService notificationService,
-                       ITestCaseSelector regressionTestCaseSelector, KillMapService killMapService) {
+                       ITestCaseSelector regressionTestCaseSelector, KillMapService killMapService, GameManagingUtils gameManagingUtils) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
@@ -101,6 +102,7 @@ public class GameService implements IGameService {
         this.regressionTestCaseSelector = regressionTestCaseSelector;
         this.killMapService = killMapService;
         this.notificationService = notificationService;
+        this.gameManagingUtils = gameManagingUtils;
     }
 
     @Override
@@ -400,6 +402,8 @@ public class GameService implements IGameService {
 
                 logger.info("Mutant {} was automatically resolved as {}.",
                         mutant.getId(), isKillable ? "not equivalent" : "equivalent");
+
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
 
                 // TODO: create events like the EquivalenceDuelAttackerWonEvent?
 
