@@ -40,3 +40,13 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const historyModal = document.getElementById('history');
+        historyModal.addEventListener('shown.bs.modal', () => {
+            const modalBody = historyModal.querySelector('.modal-body');
+            modalBody.scrollTop = modalBody.scrollHeight;
+        });
+    });
+</script>
