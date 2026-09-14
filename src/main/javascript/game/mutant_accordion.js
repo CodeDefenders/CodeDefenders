@@ -421,6 +421,7 @@ class MutantAccordion {
 
         if (data === undefined || !data.categories || !data.mutant) {
             console.error(`Failed to fetch mutant accordion data for mutant ${mutantId}.`);
+            return null;
         } else {
             return data;
         }
@@ -436,6 +437,9 @@ class MutantAccordion {
         this._mutants.set(mutant.id, data.mutant);
 
         for (const category of data.categories) {
+            // update category objects used for count badges when filtering
+            this._categories[this._categories.findIndex(c => c.id === category.id)] = category;
+            // update data tables
             if (this._dataTablesByCategory.has(category.id)) {
                 /* Update the existing DataTable. */
                 const dataTable = this._dataTablesByCategory.get(category.id);
@@ -472,6 +476,9 @@ class MutantAccordion {
         this._mutants.set(mutant.id, data.mutant);
 
         for (const category of data.categories) {
+            // update category objects used for count badges when filtering
+            this._categories[this._categories.findIndex(c => c.id === category.id)] = category;
+            // update data tables
             if (this._dataTablesByCategory.has(category.id)) {
                 const dataTable = this._dataTablesByCategory.get(category.id);
                 const row = dataTable.row((index, rowData) => rowData.id === mutant.id);
