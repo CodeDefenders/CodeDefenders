@@ -459,6 +459,7 @@ class GameHighlighting {
         this._pushSocket = await objects.await('pushSocket');
         this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
         this._pushSocket.register('highlighting.MutantAddedEvent', this._onMutantAdded.bind(this));
+        this._pushSocket.register('highlighting.MutantUpdatedEvent', this._onMutantUpdated.bind(this));
         this._pushSocket.register('highlighting.TestAddedEvent', this._onTestAdded.bind(this));
     }
 
@@ -536,6 +537,46 @@ class GameHighlighting {
         }
     }
 
+    /**
+     * @typedef {Object} MutantUpdatedEvent
+     * @property {GHMutantDTO} mutant The added mutant.
+     * @property {number} gameId The id of the game the mutant was added in.
+     */
+
+    /**
+     * Event handler for when a mutant is updated.
+     * This updates the mutant icon/counts of the highlighting and updates the popover if it is active.
+     *
+     * @param {MutantUpdatedEvent} event The WebSocket event.
+     * @private
+     */
+    _onMutantUpdated (event) {
+        const mutantId = event.mutant.id;
+        console.log("updated mutant: ", event.mutant);
+
+        this._mutants.set(mutantId, event.mutant);
+
+        for (const line of event.mutant.mutatedLines) {
+            /* Remove all current icons of this line */
+            this._mutantIconsPerLine.get(line)?.forEach(icon => icon.remove());
+            this._mutantIconsPerLine.get(line)?.clear();
+
+            /* create new icons */
+            const mutantsOnLine = this._mutantIdsPerLine.get(line).map(id => this._mutants.get(id));
+            const marker = this._createMutantIcons(line, mutantsOnLine);
+            this._addPopoverTriggerToMutantIcons(marker);
+            this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+
+            /* animate icon */
+            const icon = this._mutantIconsPerLine.get(line).get(event.mutant.status);
+            if (icon) {
+                icon.classList.add('mutant-update-animation');
+                icon.addEventListener('animationend', function () {
+                    icon.classList.remove('mutant-update-animation');
+                }, {once: true});
+            }
+        }
+    }
 }
 
 
