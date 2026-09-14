@@ -205,6 +205,8 @@ public class MutationTester implements IMutationTester {
                         test.getId() + ":" + mutant.getId(),
                         EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(scoreEvent);
+
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
             } else {
                 Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
                         test.getId() + ":" + mutant.getId(),
@@ -385,6 +387,8 @@ public class MutationTester implements IMutationTester {
         mutant.setKillMessage(executedTarget.message);
         mutantRepo.updateMutantKillMessageForMutant(mutant);
 
+        gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
+
         return true;
     }
 
@@ -414,6 +418,7 @@ public class MutationTester implements IMutationTester {
                 testRepo.incrementMutantsKilled(test);
                 mutant.setKillMessage(executedTarget.message);
                 mutantRepo.updateMutantKillMessageForMutant(mutant);
+                gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
             } else {
                 logger.info(
                         "Test {} would have killed Mutant {} and resolve equivalence,"

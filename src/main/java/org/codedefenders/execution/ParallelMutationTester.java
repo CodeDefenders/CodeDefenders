@@ -129,6 +129,7 @@ public class ParallelMutationTester extends MutationTester {
                 if (tasks.get(mutant).get()) {
                     killed++;
                     killedMutants.add(mutant);
+                    gameManagingUtils.notifyPlayersOnMutantUpdated(game.getId(), mutant);
                 }
             } catch (InterruptedException | ExecutionException | CancellationException e) {
                 logger.error("While waiting results for mutant " + mutant, e);

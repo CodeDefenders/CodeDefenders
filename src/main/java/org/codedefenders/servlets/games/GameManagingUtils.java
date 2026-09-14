@@ -616,6 +616,14 @@ public class GameManagingUtils implements IGameManagingUtils {
     public void notifyPlayersOnMutantUpdated(AbstractGame game, Mutant mutant) {
         notifyPlayersOnMutantUpdated(mutant, getAllPlayersInGame(game), game.getId());
     }
+
+    public void notifyPlayersOnMutantUpdated(int gameId, Mutant mutant) {
+        var game = gameRepo.getGame(gameId);
+        if (game != null) {
+            notifyPlayersOnMutantUpdated(game, mutant);
+        }
+    }
+
     private void notifyPlayersOnMutantUpdated(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
         gamePlayers.stream().map(player -> {
             var uid = player.getUser().getId();

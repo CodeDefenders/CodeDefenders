@@ -213,6 +213,7 @@ class MutantAccordion {
         this._pushSocket = await objects.await('pushSocket');
         this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
         this._pushSocket.register('highlighting.MutantAddedEvent', event => this.addMutant(event.mutant));
+        this._pushSocket.register('highlighting.MutantUpdatedEvent', event => this.updateMutant(event.mutant));
     }
 
     _renderMutantTable(category) {
@@ -280,12 +281,13 @@ class MutantAccordion {
     _initFilters () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
+        this._selectedCategory = 'ALL';
 
         /* Setup filter functionality for mutant-accordion. */
         document.getElementById('ma-filter')
                 .addEventListener('change', function(event) {
-                    const selectedCategory = event.target.value;
-                    self.filterMutants(selectedCategory);
+                    self._selectedCategory = event.target.value;
+                    self.filterMutants(self._selectedCategory);
                 });
     }
 
@@ -395,7 +397,7 @@ class MutantAccordion {
                     // In case of no killing test (-1) or the current user being a defender, the test isn't viewable.
                     return '';
                 } else {
-                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
+                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip"
                                     title="${i18n.tr("This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed.")}"
                             >${i18n.tr("View Example Killing Test")}</button>`;
                 }
@@ -407,19 +409,30 @@ class MutantAccordion {
     }
 
     /**
+     * Fetches the current mutant data relevant for rendering it in the mutant accordion.
+     *
+     * @param mutantId
+     * @returns {Promise<{categories : Array, mutant : MutantDTO} | null>}
+     */
+    async fetchMutantData(mutantId){
+        const data = await fetch(`${contextPath}api/mutant-accordion?gameId=${this._gameId}&mutantId=${mutantId}`)
+                .then(response => response.json())
+                .catch(error => console.error(error));
+
+        if (data === undefined || !data.categories || !data.mutant) {
+            console.error(`Failed to fetch mutant accordion data for mutant ${mutantId}.`);
+        } else {
+            return data;
+        }
+    }
+
+    /**
      * Adds a new mutant to the accordion.
      * @param {MutantDTO} mutant The mutant to add.
      */
     async addMutant (mutant) {
-        const data = await fetch(`${contextPath}api/mutant-accordion?gameId=${this._gameId}&mutantId=${mutant.id}`)
-            .then(response => response.json())
-            .catch(error => console.error(error));
-
-        if (data === undefined || !data.categories || !data.mutant) {
-            console.error('Failed to fetch mutant accordion data.');
-            return;
-        }
-
+        const data = await this.fetchMutantData(mutant.id);
+        if (!data) return;
         this._mutants.set(mutant.id, data.mutant);
 
         for (const category of data.categories) {
@@ -429,15 +442,52 @@ class MutantAccordion {
                 dataTable.row.add(data.mutant).draw(false);
                 /* Update the count badge. */
                 const countElement = document.getElementById('ma-count-' + category.id);
-                countElement.innerText = category.mutantIds.length;
+                countElement.innerText = category.mutantIds.length.toString();
             } else {
+                /* this case will most likely never happen,
+                 * as adding methods (and thus categories) is prohibited by the validation rules */
                 this._categories.push(category);
                 /* Create a new accordion and DataTable for the new category. */
+                const mutantAccordionElement = document.getElementById('mutants-accordion');
                 mutantAccordionElement.insertAdjacentHTML('beforeend', this._renderCategoryAccordion(category));
                 const dataTable = this._renderMutantTable(category);
                 this._dataTablesByCategory.set(category.id, dataTable);
             }
         }
+
+        this.filterMutants(this._selectedCategory);
+    }
+
+    /**
+     * Updates the status and data for a mutant (e.g. when marked as equivalent or killed) and redraws the corresponding
+     * rows in the mutant accordion.
+     *
+     * @param mutant The mutant to update.
+     */
+    async updateMutant (mutant) {
+        console.log(`Mutant updated:`, mutant)
+
+        const data = await this.fetchMutantData(mutant.id);
+        if (!data) return;
+        this._mutants.set(mutant.id, data.mutant);
+
+        for (const category of data.categories) {
+            if (this._dataTablesByCategory.has(category.id)) {
+                const dataTable = this._dataTablesByCategory.get(category.id);
+                const row = dataTable.row((index, rowData) => rowData.id === mutant.id);
+                if (row.any()) {
+                    // remove and add instead of row.data(...) to ensure createdRow is called and the event listeners are added
+                    row.remove();
+                    dataTable.row.add(data.mutant).draw(false);
+                } else {
+                    console.error(`Mutant ${mutant.id} not found in category ${category.id}.`);
+                }
+            } else {
+                console.error(`Category ${category.id} not found.`);
+            }
+        }
+
+        this.filterMutants(this._selectedCategory);
     }
 }
 
