@@ -493,12 +493,19 @@ class GameHighlighting {
             }
             this._mutantIdsPerLine.get(line).push(mutantId);
 
-            // add mutant icon if no previous mutants with the same status exist on the line or change count on icon
+            /* add mutant icon if no previous mutants with the same status exist on the line or change count on icon */
             const mutantsOnLine = this._mutantIdsPerLine.get(line).map(mId => this._mutants.get(mId));
             const other = mutantsOnLine.filter(m => m.id !== mutantId && m.status === event.mutant.status);
             if (other.length) {
+                /* change count of status-category */
                 this._mutantIconsPerLine.get(line).get(event.mutant.status).dataset.count = String(other.length + 1);
+
             } else {
+                /* Remove all current icons of this line */
+                this._mutantIconsPerLine.get(line)?.forEach(icon => icon.remove());
+                this._mutantIconsPerLine.get(line)?.clear();
+
+                /* create new icons */
                 const marker = this._createMutantIcons(line, mutantsOnLine);
                 this._addPopoverTriggerToMutantIcons(marker);
                 this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
