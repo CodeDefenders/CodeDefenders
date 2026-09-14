@@ -41,6 +41,10 @@
     gameHighlighting.gameMode == 'MELEE' ? Paths.MELEE_GAME_SCOREBOARD :
     gameHighlighting.gameMode == 'PARTY' ? Paths.BATTLEGROUND_GAME_SCOREBOARD :
     ''}" />
+<c:set var="scoreBaseUrl" value="${
+    gameHighlighting.gameMode == 'MELEE' ? Paths.MELEE_GAME_SCORE :
+    gameHighlighting.gameMode == 'PARTY' ? Paths.BATTLEGROUND_GAME_SCORE :
+    ''}" />
 
 <script type="module">
     import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
@@ -56,14 +60,20 @@
     gameHighlighting.highlightCoverage();
     gameHighlighting.highlightMutants();
 
-    <c:if test="${not empty scoreboardBaseUrl}">
-    function updateScoreboard() {
+    <c:if test="${not empty scoreboardBaseUrl}"> // not for puzzle games
+    function updateScoreAndScoreboard() {
+        fetch("${url.forPath(scoreBaseUrl)}?gameId=${gameHighlighting.gameId}")
+            .then(r => {
+                if (r.ok) {
+                    r.json().then(data => document.querySelector('.score-badge-group #score').innerHTML = data.score);
+                } else {
+                    console.error("Failed to update score: " + r.status);
+                }
+            });
         fetch("${url.forPath(scoreboardBaseUrl)}?gameId=${gameHighlighting.gameId}")
             .then(r => {
                 if (r.ok) {
-                    r.text().then(text =>
-                        document.querySelector('#scoreboard .modal-body').innerHTML = text.trim()
-                    );
+                    r.text().then(text => document.querySelector('#scoreboard .modal-body').innerHTML = text.trim());
                 } else {
                     console.error("Failed to update scoreboard: " + r.status);
                 }
@@ -71,8 +81,9 @@
     }
 
     const pushSocket = await objects.await('pushSocket');
-    pushSocket.register('highlighting.MutantAddedEvent', updateScoreboard);
-    pushSocket.register('highlighting.TestAddedEvent', updateScoreboard);
+    pushSocket.register('highlighting.MutantAddedEvent', updateScoreAndScoreboard);
+    pushSocket.register('highlighting.MutantUpdatedEvent', updateScoreAndScoreboard);
+    pushSocket.register('highlighting.TestAddedEvent', updateScoreAndScoreboard);
     </c:if>
 
     objects.register('gameHighlighting', gameHighlighting);

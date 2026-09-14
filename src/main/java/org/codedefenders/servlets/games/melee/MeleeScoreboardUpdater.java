@@ -28,7 +28,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.Paths;
@@ -42,7 +44,7 @@ import static org.codedefenders.util.Constants.MELEE_SCOREBOARD_JSP;
  *
  * @see Paths#MELEE_GAME_SCOREBOARD
  */
-@WebServlet({Paths.MELEE_GAME_SCOREBOARD})
+@WebServlet({Paths.MELEE_GAME_SCOREBOARD, Paths.MELEE_GAME_SCORE})
 public class MeleeScoreboardUpdater extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MeleeScoreboardUpdater.class);
 
@@ -54,6 +56,9 @@ public class MeleeScoreboardUpdater extends HttpServlet {
 
     @Inject
     private PlayerRepository playerRepo;
+
+    @Inject
+    private MeleeScoreboardBean scoreboardBean;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -73,7 +78,23 @@ public class MeleeScoreboardUpdater extends HttpServlet {
             return;
         }
 
+        if (request.getServletPath().equals(Paths.MELEE_GAME_SCORE)) {
+            int score = getScoreForUser(login.getUserId());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"score\":" + score + "}");
+            return;
+        }
+
         request.getRequestDispatcher(MELEE_SCOREBOARD_JSP).forward(request, response);
     }
 
+    private int getScoreForUser(int userId) {
+        return scoreboardBean.getScoreItems().stream()
+                .filter(item -> item.getUser().getId() == userId)
+                .findFirst()
+                .map(item -> item.getDuelScore().getTotalScore()
+                        + item.getAttackScore().getTotalScore()
+                        + item.getDefenseScore().getTotalScore())
+                .orElse(0);
+    }
 }

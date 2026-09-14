@@ -43,7 +43,7 @@ import static org.codedefenders.util.Constants.BATTLEGROUND_SCOREBOARD_JSP;
  *
  * @see Paths#BATTLEGROUND_GAME_SCOREBOARD
  */
-@WebServlet({Paths.BATTLEGROUND_GAME_SCOREBOARD})
+@WebServlet({Paths.BATTLEGROUND_GAME_SCOREBOARD, Paths.BATTLEGROUND_GAME_SCORE})
 public class MultiplayerScoreboardUpdater extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerScoreboardUpdater.class);
 
@@ -77,6 +77,13 @@ public class MultiplayerScoreboardUpdater extends HttpServlet {
             return;
         }
 
+        if (request.getServletPath().equals(Paths.BATTLEGROUND_GAME_SCORE)) {
+            String score = getScoreForGame(game);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"score\": \"" + score + "\"}");
+            return;
+        }
+
         scoreboard.setGameId(game.getId());
         scoreboard.setScores(game.getMutantScores(), game.getTestScores());
         scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
@@ -85,4 +92,11 @@ public class MultiplayerScoreboardUpdater extends HttpServlet {
         request.getRequestDispatcher(BATTLEGROUND_SCOREBOARD_JSP).forward(request, response);
     }
 
+    private String getScoreForGame(MultiplayerGame game) {
+        ScoreboardBean scoreboardBean = new ScoreboardBean();
+        scoreboardBean.setGameId(game.getId());
+        scoreboardBean.setScores(game.getMutantScores(), game.getTestScores());
+        scoreboardBean.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+        return scoreboardBean.getTotalAttackerScore() + " / " + scoreboardBean.getTotalDefenderScore();
+    }
 }
