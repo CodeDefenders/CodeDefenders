@@ -55,7 +55,7 @@
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
     pageContext.setAttribute("title", title);
-    pageContext.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
+    request.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>

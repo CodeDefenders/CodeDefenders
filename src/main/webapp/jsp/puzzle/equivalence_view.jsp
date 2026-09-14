@@ -59,7 +59,7 @@
     pageContext.setAttribute("mutantClaimedMessage", mutantClaimedMessage);
     pageContext.setAttribute("showTestAccordion", showTestAccordion);
     pageContext.setAttribute("mutantLine", mutantLine);
-    pageContext.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
+    request.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
 %>
 
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>

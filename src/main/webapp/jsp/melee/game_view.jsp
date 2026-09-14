@@ -37,6 +37,7 @@
 
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("role", role);
+    pageContext.setAttribute("season", "");
 %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>

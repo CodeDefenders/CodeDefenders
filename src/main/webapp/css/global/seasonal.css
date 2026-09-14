@@ -25,3 +25,11 @@
 button.christmas-season {
     background-color: #ff00ff;
 }
+
+.nav-pills.christmas-season {
+    background-color: #ff00ff;
+}
+
+.mutantImageAlive.christmas-season {
+    background-image: url('../../images/seasonal/christmasEquivalence.png');
+}
