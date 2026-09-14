@@ -36,6 +36,9 @@
 <%@ tag import="org.codedefenders.database.AdminDAO" %>
 <%@ tag import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ tag import="org.xnap.commons.i18n.I18n" %>
+<%@ tag import="org.codedefenders.beans.game.ScoreboardBean" %>
+<%@ tag import="org.codedefenders.beans.game.MeleeScoreboardBean" %>
+<%@ tag import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ tag import="org.codedefenders.persistence.database.LlmRepository" %>
 <%@ tag import="org.codedefenders.model.llm.LlModel" %>
 <%@ tag import="java.util.List" %>
@@ -64,30 +67,51 @@
     List<LlModel> models = llmRepo.getAllModels(true);
 
 
+    final int userId = login.getUserId();
     Role role = null;
     boolean mayChooseRole = true;
     String selectionManagerUrl = null;
     int duration = -1;
     long startTime = -1;
+    String score = "?";
     String type = game instanceof MeleeGame ? "melee" : "battleground";
     if (game instanceof MeleeGame) {
+        MeleeGame meleeGame = (MeleeGame) game;
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
-        role = ((MeleeGame) game).getRole(login.getUserId());
-        duration = ((MeleeGame) game).getGameDurationMinutes();
+        role = meleeGame.getRole(userId);
+        duration = meleeGame.getGameDurationMinutes();
+
+        MeleeScoreboardBean scoreboardBean = CDIUtil.getBeanFromCDI(MeleeScoreboardBean.class);
+        score = scoreboardBean.getScoreItems().stream()
+                .filter(item -> item.getUser().getId() == userId)
+                .findFirst()
+                .map(item -> item.getDuelScore().getTotalScore()
+                        + item.getAttackScore().getTotalScore()
+                        + item.getDefenseScore().getTotalScore())
+                .orElse(0)
+                .toString();
 
         if (game.getState() == GameState.ACTIVE) {
-            startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+            startTime = meleeGame.getStartTimeUnixSeconds();
         }
     } else if (game instanceof MultiplayerGame) {
+        MultiplayerGame multiplayerGame = (MultiplayerGame) game;
         selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.BATTLEGROUND_SELECTION);
-        role = ((MultiplayerGame) game).getRole(login.getUserId());
-        duration = ((MultiplayerGame) game).getGameDurationMinutes();
-        mayChooseRole = ((MultiplayerGame) game).isMayChooseRoles();
+        role = multiplayerGame.getRole(userId);
+        duration = multiplayerGame.getGameDurationMinutes();
+        mayChooseRole = multiplayerGame.isMayChooseRoles();
+
+        ScoreboardBean scoreboardBean = new ScoreboardBean();
+        scoreboardBean.setGameId(gameId);
+        scoreboardBean.setScores(multiplayerGame.getMutantScores(), multiplayerGame.getTestScores());
+        scoreboardBean.setPlayers(multiplayerGame.getAttackerPlayers(), multiplayerGame.getDefenderPlayers());
+        score = scoreboardBean.getTotalAttackerScore() + " / " + scoreboardBean.getTotalDefenderScore();
 
         if (game.getState() == GameState.ACTIVE) {
             startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
         }
     }
+    request.setAttribute("score", score);
 %>
 
 
@@ -96,14 +120,17 @@
         I18n i18n = (I18n) request.getAttribute("i18n");
         String modeText = "Unknown Mode";
         String modeBg = "bg-secondary";
+        String scoreIcon = "fa-trophy";
         switch (game.getMode()) {
             case PARTY:
                 modeText = i18n.tr("Battleground");
                 modeBg = "bg-battleground";
+                scoreIcon = "fa-trophy";
                 break;
             case MELEE:
                 modeText = i18n.tr("Melee");
                 modeBg = "bg-player";
+                scoreIcon = "fa-star";
                 break;
         }
 
@@ -125,6 +152,7 @@
         request.setAttribute("roleText", roleText);
         request.setAttribute("modeBg", modeBg);
         request.setAttribute("roleBg", roleBg);
+        request.setAttribute("scoreIcon", scoreIcon);
     %>
     <div class="d-flex gap-1 align-items-center">
         <h2 class="m-0 me-2 mt-1">
@@ -139,6 +167,17 @@
             <i class="fa fa-user-circle"></i>
             ${roleText}
         </span>
+        <div class="btn-group score-badge-group ${modeText}">
+            <button class="badge fs-5 border-0 text-nowrap ${modeBg}" id="btnScoreboard"
+                    data-bs-toggle="modal" data-bs-target="#scoreboard" title="${i18n.tr('Scoreboard')}">
+                <i class="fa ${scoreIcon}"></i>
+                <span id="score">${score}</span>
+            </button>
+            <button class="btn btn-sm" id="btnScoringModal"
+                    data-bs-toggle="modal" data-bs-target="#scoringModal" title="${i18n.tr('Scoring System')}">
+                <i class="fa fa-question-circle"></i>
+            </button>
+        </div>
     </div>
 
     <div class="d-flex flex-wrap align-items-center gap-2">
@@ -243,6 +282,7 @@
             }
         %>
 
+        <%--
         <div class="btn-group">
             <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
                     data-bs-toggle="modal" data-bs-target="#scoreboard">
@@ -250,10 +290,11 @@
                 ${i18n.tr('Scoreboard')}
             </button>
             <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
-                    data-bs-toggle="modal" data-bs-target="#scoringModal">
+                    data-bs-toggle="modal" data-bs-target="#scoringModal" title="${i18n.tr('Scoring System')}">
                 <i class="fa fa-question-circle"></i>
             </button>
         </div>
+        --%>
         <t:modal title="${i18n.tr('Scoring System')}" id="scoringModal" modalBodyClasses="bg-light">
             <jsp:attribute name="content">
                 <jsp:include page="/jsp/scoring_system.jsp"/>
