@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.xnap.commons.i18n.I18n;
 
@@ -31,9 +30,9 @@ import com.github.javaparser.ast.Node;
 public class CodeValidationResult {
     private final Type type;
 
-    private final List<ImmutablePair<ValidationRule, Node>> nodeErrors = new ArrayList<>();
-    private final List<ImmutablePair<ValidationRule, String>> stringErrors = new ArrayList<>();
-    private final List<ValidationRule> anonymousErrors = new ArrayList<>();
+    private final List<RuleViolation<Node>> nodeErrors = new ArrayList<>();
+    private final List<RuleViolation<String>> stringErrors = new ArrayList<>();
+    private final List<RuleViolation<String>> anonymousErrors = new ArrayList<>();
     private int maxNumberOfAssertions = 0;
 
     private boolean failedParsing = false;
@@ -43,26 +42,26 @@ public class CodeValidationResult {
     }
 
     void add(ValidationRule rule, Node origin) {
-        if (nodeErrors.stream().noneMatch(p -> p.left == rule)) {
-            nodeErrors.add(new ImmutablePair<>(rule, origin));
-            stringErrors.removeIf(p -> p.left == rule);
-            anonymousErrors.removeIf(r -> r == rule);
+        if (nodeErrors.stream().noneMatch(p -> p.rule() == rule)) {
+            nodeErrors.add(new RuleViolation<>(rule, origin));
+            stringErrors.removeIf(p -> p.rule() == rule);
+            anonymousErrors.removeIf(r -> r.rule() == rule);
         }
     }
 
     void add(ValidationRule rule, String origin) {
-        if (nodeErrors.stream().noneMatch(p -> p.left == rule)
-                && stringErrors.stream().noneMatch(p -> p.left == rule)) {
-            stringErrors.add(new ImmutablePair<>(rule, origin));
-            anonymousErrors.removeIf(r -> r == rule);
+        if (nodeErrors.stream().noneMatch(p -> p.rule() == rule)
+                && stringErrors.stream().noneMatch(p -> p.rule() == rule)) {
+            stringErrors.add(new RuleViolation<>(rule, origin));
+            anonymousErrors.removeIf(r -> r.rule == rule);
         }
     }
 
     void add(ValidationRule rule) {
-        if (nodeErrors.stream().noneMatch(p -> p.left == rule)
-                && stringErrors.stream().noneMatch(p -> p.left == rule)
-                && !anonymousErrors.contains(rule)) {
-            anonymousErrors.add(rule);
+        if (nodeErrors.stream().noneMatch(p -> p.rule() == rule)
+                && stringErrors.stream().noneMatch(p -> p.rule() == rule)
+                && anonymousErrors.stream().noneMatch(p -> p.rule() == rule)) {
+            anonymousErrors.add(new RuleViolation<>(rule));
         }
     }
 
@@ -72,13 +71,13 @@ public class CodeValidationResult {
         }
 
         for (var p : toAdd.nodeErrors) {
-            add(p.left, p.right);
+            add(p.rule(), p.reason());
         }
         for (var p : toAdd.stringErrors) {
-            add(p.left, p.right);
+            add(p.rule(), p.reason());
         }
         for (var r : toAdd.anonymousErrors) {
-            add(r);
+            add(r.rule());
         }
 
         failedParsing |= toAdd.failedParsing;
@@ -106,39 +105,26 @@ public class CodeValidationResult {
 
         StringBuilder sb = new StringBuilder();
         sb.append(type == Type.TEST
-            ? i18n.tr("Your test is not valid, sorry! It failed for the following reasons:")
-            : i18n.tr("Your mutant is not valid, sorry! It failed for the following reasons:")
+                ? i18n.tr("Your test is not valid, sorry! It failed for the following reasons:")
+                : i18n.tr("Your mutant is not valid, sorry! It failed for the following reasons:")
         ).append("\n\n");
 
         int counter = 1;
 
-        for (ImmutablePair<ValidationRule, Node> error : nodeErrors) {
+        List<RuleViolation<?>> commonList = new ArrayList<>(nodeErrors);
+        commonList.addAll(stringErrors);
+        commonList.addAll(anonymousErrors);
+        for (RuleViolation<?> error : commonList) {
             sb.append(counter++)
                     .append(":\t")
-                    .append(i18n.tr(error.left.getValidationMessage()))
-                    .append(" - ")
-                    .append(i18n.tr("Offending statement:"))
-                    .append("\n\t\t")
-                    .append(error.right.toString().replace("\n", "\n\t\t"))
-                    .append("\n\n");
-        }
-
-        for (ImmutablePair<ValidationRule, String> error : stringErrors) {
-            sb.append(counter++)
-                    .append(":\t")
-                    .append(i18n.tr(error.left.getValidationMessage()))
-                    .append(" - ")
-                    .append(i18n.tr("Offending statement:"))
-                    .append("\n\t\t")
-                    .append(error.right.replace("\n", "\n\t\t"))
-                    .append("\n\n");
-        }
-
-        for (ValidationRule error : anonymousErrors) {
-            sb.append(counter++)
-                    .append(":\t")
-                    .append(i18n.tr(error.getValidationMessage()))
-                    .append("\n\n");
+                    .append(i18n.tr(error.rule().getValidationMessage()));
+            if (!error.getReasonDescription().isEmpty()) {
+                sb.append(" - ")
+                        .append(i18n.tr("Offending statement:"))
+                        .append("\n\t\t")
+                        .append(error.getReasonDescription().replace("\n", "\n\t\t"));
+            }
+            sb.append("\n\n");
         }
         return StringUtils.removeEnd(
                 sb.toString().replace("[MAX_ASSERTIONS]", String.valueOf(maxNumberOfAssertions)),
@@ -155,22 +141,32 @@ public class CodeValidationResult {
         return nodeErrors.isEmpty() && stringErrors.isEmpty() && anonymousErrors.isEmpty();
     }
 
-    /**
-     * Currently not in use, but could be useful for API interaction or something similar.
-     */
-    public List<ValidationRule> getViolatingRules() {
-        List<ValidationRule> result = new ArrayList<>();
-        for (var x : nodeErrors) {
-            result.add(x.left);
-        }
-        for (var x : stringErrors) {
-            result.add(x.left);
-        }
+    public Type getType() {
+        return type;
+    }
+
+    public List<RuleViolation<?>> getRuleViolations() {
+        List<RuleViolation<?>> result = new ArrayList<>(nodeErrors);
+        result.addAll(stringErrors);
         result.addAll(anonymousErrors);
         return result;
     }
 
-    enum Type {
+    public record RuleViolation<T>(ValidationRule rule, T reason) {
+        RuleViolation(ValidationRule rule) {
+            this(rule, null);
+        }
+
+        public String getReasonDescription() {
+            if (reason == null) {
+                return "";
+            } else {
+                return reason.toString();
+            }
+        }
+    }
+
+    public enum Type {
         TEST, MUTANT
     }
 }

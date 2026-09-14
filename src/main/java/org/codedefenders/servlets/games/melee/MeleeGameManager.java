@@ -76,6 +76,7 @@ import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.ValidationRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.service.game.GameService;
@@ -205,6 +206,8 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private I18nService i18nService;
+    @Inject
+    private ValidationRepository validationRepository;
 
 
     @Override
@@ -479,6 +482,7 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
+            validationRepository.saveRejectedSubmission(testText, user.getId(), game.getId(), validationMessages);
             messages.add(validationMessages.getMessage(i18n)).alert();
             previousSubmission.setTestCode(testText);
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
@@ -566,6 +570,7 @@ public class MeleeGameManager extends HttpServlet {
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+            validationRepository.saveTestsThatFailOnCut(testText, user.getId(), game.getId());
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).alert();
             messages.add(testOriginalTarget.message).alert();
             previousSubmission.setTestCode(testText);
@@ -923,6 +928,7 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
+                validationRepository.saveRejectedSubmission(testText, login.getUserId(), gameId, validationMessages);
                 messages.add(validationMessages.getMessage(i18n)).alert();
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
