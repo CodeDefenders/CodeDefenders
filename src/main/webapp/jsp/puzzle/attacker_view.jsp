@@ -57,6 +57,7 @@
     pageContext.setAttribute("puzzle", puzzle);
     pageContext.setAttribute("showTestAccordion", showTestAccordion);
     pageContext.setAttribute("title", title);
+    pageContext.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
 %>
 
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>

@@ -55,6 +55,7 @@
     pageContext.setAttribute("game", game);
     pageContext.setAttribute("puzzle", puzzle);
     pageContext.setAttribute("title", title);
+    pageContext.setAttribute("season", puzzle.getChapter().getSeasonalStyle());
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -144,7 +145,7 @@
                             </c:otherwise>
                         </c:choose>
                         <div>
-                            <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
+                            <button type="submit" class="btn btn-defender btn-highlight ${season}" id="submitTest" form="def"
                                 ${game.state == GameState.SOLVED ? 'disabled' : ''}>
                                     ${i18n.tr('Defend')}
                             </button>

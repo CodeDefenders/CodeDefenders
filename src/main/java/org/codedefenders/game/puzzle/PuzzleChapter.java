@@ -91,4 +91,12 @@ public class PuzzleChapter {
                     && calendarDate.withYear(2000).plusDays(30).isAfter(LocalDate.now().withYear(2000));
         }
     }
+
+    public String getSeasonalStyle() {
+        if (calendarDate != null) {
+            return "christmas-season";
+        } else {
+            return "";//TODO Configurable for other seasons
+        }
+    }
 }

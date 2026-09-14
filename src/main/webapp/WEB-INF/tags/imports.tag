@@ -63,4 +63,6 @@
 <link href="${url.forPath("/css/global/common.css")}" rel="stylesheet">
 <link href="${url.forPath("/css/global/loading_animation.css")}" rel="stylesheet">
 
+<link href="${url.forPath("/css/global/seasonal.css")}" rel="stylesheet">
+
 <jsp:invoke fragment="additionalImports"/>

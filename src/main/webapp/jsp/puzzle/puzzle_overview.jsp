@@ -32,6 +32,7 @@ or are locked for the logged in user.
 --%>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="seasonStyle" type="org.codedefenders.service.SeasonalStylingService"--%>
 <%--@elvariable id="puzzleNavigation" type="org.codedefenders.beans.page.PuzzleNavigationBean"--%>
 
 <c:set var="title" value="${i18n.tr('Puzzles')}"/>
@@ -91,6 +92,7 @@ or are locked for the logged in user.
                     <div class="chapter__levels">
                         <c:forEach var="puzzleEntry" items="${ChapterEntry.puzzleEntries}">
                             <c:set var="puzzle" value="${puzzleEntry.puzzle}"/>
+                            <c:set var="season" value="${puzzle.chapter.seasonalStyle}"/>
                             <c:set var="status"
                                    value="${puzzleEntry.equals(nextPuzzleObj) ? 'next' : (puzzleEntry.solved ? 'solved' : 'locked')}"/>
                             <a class="chapter__level puzzle-${status}"
@@ -108,7 +110,7 @@ or are locked for the logged in user.
                                 <img class="chapter__level__watermark" alt="${puzzle.type}"
                                         <c:choose>
                                             <c:when test="${puzzle.type == 'EQUIVALENCE'}">
-                                                src="${url.forPath("/images/ingameicons/equivalence.png")}"
+                                                src="${seasonStyle.getPath("/images/ingameicons/equivalence.png", season)}"
                                             </c:when>
                                             <c:otherwise>
                                                 src="${url.forPath("/images/achievements/")}codedefenders_achievements_${puzzle.type == 'ATTACKER' ? 1 : 2}_lvl_0.png"
