@@ -269,7 +269,7 @@ msgstr ""
 "Überschrift angezeigt wird."
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:27
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:901
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:915
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:149
 #: src/main/webapp/jsp/melee/create_game_view.jsp:146
 #: src/main/webapp/WEB-INF/tags/create_games.tag:208
@@ -285,7 +285,7 @@ msgid "Medium"
 msgstr "Mittel"
 
 #: src/main/java/org/codedefenders/game/GameLevel.java:29
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:908
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:922
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:144
 #: src/main/webapp/jsp/melee/create_game_view.jsp:141
 #: src/main/webapp/WEB-INF/tags/create_games.tag:203
@@ -1648,9 +1648,9 @@ msgid "You're already the creator of this game."
 msgstr "Du bist bereits der Ersteller dieses Spiels."
 
 #: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:123
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:204
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:280
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:317
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:208
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:284
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:321
 msgid "Puzzle not found."
 msgstr "Rätsel nicht gefunden."
 
@@ -1981,20 +1981,20 @@ msgstr "Protokollierungsstufe"
 msgid "Controls the granularity of log messages."
 msgstr "Steuert die Detailgenauigkeit der Protokollmeldungen."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:211
 msgid "LLM action interval"
 msgstr "LLM Intervall"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:192
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:212
 msgid "The default number of seconds between actions of an AI player."
 msgstr ""
 "Die standardmäßige Anzahl von Sekunden zwischen Aktionen von KI-Spielern."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:195
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:215
 msgid "LLM normal prompt number of tries"
 msgstr "LLM Versuchsanzahl normaler Prompt"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:216
 msgid ""
 "The number of attempts the LLM player will make to fix an invalid mutant or "
 "test it created."
@@ -2002,11 +2002,11 @@ msgstr ""
 "Die maximale Anzahl an Versuchen, die ein LLM-Spieler unternehmen wird, um "
 "einen invaliden Test oder Mutanten zu reparieren."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:199
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:219
 msgid "LLM equivalence duel number of tries"
 msgstr "LLM Versuchsanzahl Äquivalenzduelle"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:200
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:220
 msgid ""
 "The number of attempts the LLM player will make to fix an invalid "
 "equivalence duel test."
@@ -2014,19 +2014,19 @@ msgstr ""
 "Die maximale Anzahl an Versuchen, die ein LLM-Spieler unternehmen wird, um "
 "ein Äquivalenzduell zu gewinnen."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:223
 msgid "OpenAI key"
 msgstr "OpenAI-Key"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:224
 msgid "The API key for OpenAI to be used by LLM players"
 msgstr "Der API-Key für OpenAI, der von LLM-Spielern genutzt wird"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:335
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:364
 msgid "Updated Settings."
 msgstr "Einstellungen aktualisiert."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:336
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:365
 msgid "There was a problem. Please consult the logs"
 msgstr "Es ist ein Problem aufgetreten. Schau mal in den Protokollen nach."
 
@@ -2135,113 +2135,117 @@ msgstr ""
 msgid "Your Code Defenders Account"
 msgstr "Dein Code Defenders-Konto"
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:123
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:149
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:127
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:153
 msgid "Missing puzzleId parameter."
 msgstr "Der Parameter „puzzleId“ fehlt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:131
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:191
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:135
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:195
 msgid "Missing puzzleChapterId parameter."
 msgstr "Der Parameter „puzzleChapterId“ fehlt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:162
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:166
 msgid "Missing puzzleChapterId or create parameter."
 msgstr "Der Parameter „puzzleChapterId“ oder „create“ fehlt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:171
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:197
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:175
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:201
 msgid "Requested URL not available."
 msgstr "Die angeforderte URL ist nicht verfügbar."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:183
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:187
 msgid "Missing parameter."
 msgstr "Fehlender Parameter."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:209
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:213
 msgid "Cannot delete puzzle {0} because games exist for that puzzle."
 msgstr ""
 "Das Rätsel {0} kann nicht gelöscht werden, da es bereits Spiele für dieses "
 "Puzzle gibt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:239
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:243
 msgid "Removed puzzle {0}."
 msgstr "Rätsel {0} entfernt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:241
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:245
 msgid "Couldn't update puzzle {0}"
 msgstr "Rätsel konnte nicht aktualisiert werden {0}"
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:250
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:295
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:426
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:254
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:299
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:430
 msgid "Puzzle chapter not found."
 msgstr "Das Kapitel wurde nicht gefunden."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:254
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:258
 msgid "Failed to remove puzzle chapter."
 msgstr "Das Kapitel konnte nicht entfernt werden."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:257
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:261
 msgid "Removed puzzle chapter."
 msgstr "Das Kapitel wurde entfernt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:323
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:388
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:432
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:473
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:327
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:392
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:436
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:490
 msgid "No valid request body provided"
 msgstr "Es wurde kein gültiger Request-Body angegeben"
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:333
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:398
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:442
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:337
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:402
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:446
 msgid "Invalid title."
 msgstr "Ungültiger Titel."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:338
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:403
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:447
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:342
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:407
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:464
 msgid "Invalid description."
 msgstr "Ungültige Beschreibung."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:343
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:347
 msgid "Invalid maxAssertionsPerTest."
 msgstr "Ungültiger Wert für „maxAssertionsPerTest“."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:348
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:352
 msgid "Invalid editableLinesStart."
 msgstr "Ungültiger Wert für „editableLinesStart“."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:353
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:357
 msgid "Invalid editableLinesEnd."
 msgstr "Ungültiges „editableLinesEnd“."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:357
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:361
 msgid "Invalid editable lines."
 msgstr "Ungültige bearbeitbare Zeilen."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:368
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:372
 msgid "Failed to update puzzle."
 msgstr "Das Rätsel konnte nicht aktualisiert werden."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:378
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:382
 msgid "Updated puzzle."
 msgstr "Rätsel aktualisiert."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:415
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:419
 msgid "Created puzzle chapter."
 msgstr "Kapitel erstellt."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:453
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:457
+msgid "Invalid date format."
+msgstr "Ungültiges Datums-Format."
+
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:470
 msgid "Failed to update puzzle chapter."
 msgstr "Das Kapitel konnte nicht aktualisiert werden."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:463
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:480
 msgid "Updated puzzle chapter."
 msgstr "Das Kapitel wurde aktualisiert."
 
-#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:484
+#: src/main/java/org/codedefenders/servlets/admin/api/AdminPuzzleAPI.java:501
 msgid "Updated puzzle and chapter positions."
 msgstr "Die Positionen der Rätsel und Kapitel wurden aktualisiert."
 
@@ -2758,7 +2762,7 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:503
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:600
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:713
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:799
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:806
 msgid "User is not a player in the game."
 msgstr "Der Benutzer ist kein Spieler in diesem Spiel."
 
@@ -2790,17 +2794,17 @@ msgid "Can only resolve equivalence duels if you are an Attacker!"
 msgstr "Du kannst Äquivalenzduelle nur lösen, wenn du der Angreifer bist!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:610
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:809
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:816
 msgid "Game {0} has finished."
 msgstr "Spiel {0} ist beendet."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:615
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:814
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:821
 msgid "Mutant does not exist."
 msgstr "Mutant existiert nicht."
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:629
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:830
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:837
 msgid ""
 "Too late. The mutant was already killed and therefore proven to be not "
 "equivalent."
@@ -2813,7 +2817,7 @@ msgid "Can only claim mutant as equivalent if you are a Defender!"
 msgstr "Nur als Verteidiger kannst du einen Mutanten als äquivalent markieren!"
 
 #: src/main/java/org/codedefenders/servlets/games/battleground/MultiplayerGameManager.java:726
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1095
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1109
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr ""
 "In diesem Spiel kannst du Mutanten nicht mehr als äquivalent einstufen."
@@ -2865,58 +2869,58 @@ msgstr "Die verbleibende Zeit darf nicht unter {0} Minuten liegen."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "Die neue verbleibende Dauer darf höchstens {0} Minuten betragen."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1138
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1168
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1150
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1182
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Der Mutant wurde bereits als äquivalent markiert oder getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1139
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1151
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "1 Mutant als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1140
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1152
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "{0} Mutanten als äquivalent markiert!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1337
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1349
 msgid "Your test has the following smell: {0}"
 msgstr "Dein Test weist folgenden Test-Smell auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1343
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1355
 msgid "Your test has the following smells: {0}"
 msgstr "Dein Test weist folgende Test-Smells auf: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:804
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:811
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Du kannst Äquivalenz-Duelle nur lösen, wenn du ein Spieler bist!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1057
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1071
 msgid "...and it also killed another claimed mutant!"
 msgstr ""
 "...und er hat auch noch einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1059
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1073
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr ""
 "...und er hat auch noch {0} weitere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1078
 msgid "...however, your test did kill another claimed mutant!"
 msgstr ""
 "...aber dein Test hat immerhin einen weiteren äquivalent markierten Mutanten "
 "getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1066
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1080
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr ""
 "...dein Test hat jedoch {0} andere äquivalent markierte Mutanten getötet!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1170
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1184
 msgid "Flagged 1 mutant as equivalent"
 msgstr "1 Mutant als äquivalent markiert"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1172
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1186
 msgid "Flagged {0} mutants as equivalent"
 msgstr "{0} Mutanten wurden als äquivalent markiert"
 
@@ -2928,24 +2932,24 @@ msgstr "Du kannst kein Spiel verlassen, an dem du gar nicht teilnimmst."
 msgid "Only the creator of this game can call a rematch."
 msgstr "Nur der Ersteller dieses Spiels kann eine Revanche erstellen."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:435
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:444
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "Nein, dieser Mutant ist nicht äquivalent mit der zu testenden Klasse."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:552
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:562
 msgid "Your test did not kill the mutant. Try again."
 msgstr "Dein Test hat den Mutanten nicht getötet. Versuch es noch einmal."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:729
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:740
 msgid "Your test did not solve the puzzle. Try another one..."
 msgstr "Dein Versuch hat das Rätsel nicht gelöst. Versuch es noch einmal..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:929
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:942
 msgid "Your mutant did not solve the puzzle. Try another one..."
 msgstr ""
 "Dein Mutant hat das Rätsel nicht gelöst. Versuch es mit einem anderen..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1008
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1027
 msgid ""
 "<br>\n"
 "You solved all the puzzles of the current chapter!\n"
@@ -2961,7 +2965,7 @@ msgstr ""
 "des nächsten Kapitels „{2}“ oder kehre zur\n"
 "<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1021
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1040
 msgid ""
 "Try to solve the\n"
 "<a href=\"{0}?puzzleId={1,number,#}\">next Puzzle</a>,\n"
@@ -2973,7 +2977,7 @@ msgstr ""
 "oder kehre zur\n"
 "<a href=\"{0}\">Rätselübersicht</a> zurück.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1042
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1061
 msgid ""
 "You solved all the puzzles of the current chapter, go back to the <a "
 "href=\"{0}\">Puzzle Overview</a>."
@@ -3363,18 +3367,17 @@ msgstr "Sorry, für diesen Mutanten gibt's keine Kill-Nachricht."
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! Das darfst du nicht machen!"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:109
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:108
 msgid "Your test is not valid, sorry! It failed for the following reasons:"
 msgstr ""
 "Dein Test ist leider ungültig! Er ist aus folgenden Gründen fehlgeschlagen:"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:110
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:109
 msgid "Your mutant is not valid, sorry! It failed for the following reasons:"
 msgstr ""
 "Dein Mutant ist leider ungültig! Er ist aus folgenden Gründen fehlgeschlagen:"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:120
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:131
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:123
 msgid "Offending statement:"
 msgstr "Verstoßende Statements:"
 
@@ -3745,7 +3748,7 @@ msgstr "Dein Mutant ruft eine IO-Klasse auf"
 #: src/main/javascript/game/defender_intention_collection.js:111
 #: src/main/webapp/jsp/battleground/defender_view.jsp:97
 #: src/main/webapp/jsp/melee/player_view.jsp:318
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:149
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:150
 msgid "Defend"
 msgstr "Verteidige"
 
@@ -3870,12 +3873,12 @@ msgstr "Keine Coverage"
 
 #: src/main/javascript/game/killmap_accordion.js:351
 #: src/main/javascript/game/killmap_accordion.js:367
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:833
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:989
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1038
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1083
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1147
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1282
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:847
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1003
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1052
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1097
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1161
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1296
 #: src/main/webapp/WEB-INF/tags/killmap_mutant_accordion.tag:51
 #: src/main/webapp/WEB-INF/tags/killmap_test_accordion.tag:51
 msgid "Error"
@@ -3952,7 +3955,7 @@ msgstr "Covered"
 
 #: src/main/javascript/game/killmap_mutant_accordion.js:195
 #: src/main/javascript/game/test_accordion.js:235
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:57
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:59
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:46
 msgid "Killed"
 msgstr "Getötet"
@@ -4868,12 +4871,12 @@ msgstr "Raum erstellen"
 
 #: src/main/webapp/jsp/admin_classrooms.jsp:58
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:94
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:803
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:926
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1017
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1066
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
-#: src/main/webapp/jsp/admin_system_settings.jsp:133
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:813
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:940
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1031
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1080
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1132
+#: src/main/webapp/jsp/admin_system_settings.jsp:158
 #: src/main/webapp/jsp/admin_text_settings.jsp:101
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:154
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:345
@@ -5077,7 +5080,7 @@ msgstr "Warteschlange"
 #: src/main/webapp/jsp/admin_killmap_management.jsp:204
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:405
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:514
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1074
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1088
 msgid "Delete"
 msgstr "Löschen"
 
@@ -5460,9 +5463,9 @@ msgstr "Sprache"
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:70
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:100
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1123
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1289
-#: src/main/webapp/jsp/admin_system_settings.jsp:129
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1137
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1303
+#: src/main/webapp/jsp/admin_system_settings.jsp:154
 #: src/main/webapp/jsp/admin_text_settings.jsp:97
 #: src/main/webapp/jsp/admin_user_mgmt.jsp:156
 msgid "Save"
@@ -5486,7 +5489,7 @@ msgstr "Du hast ungespeicherte Änderungen. Bitte speichere zuerst."
 
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:111
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:402
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1316
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1330
 msgid "Upload Puzzles"
 msgstr "Rätsel hochladen"
 
@@ -5666,85 +5669,95 @@ msgstr "Zum Kapitel scrollen:"
 msgid "Go"
 msgstr "Los"
 
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:785
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:872
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:874
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1116
+#: src/main/webapp/jsp/admin_puzzle_preview.jsp:107
+msgid "Title"
+msgstr "Titel"
+
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:789
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:862
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1104
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:876
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1118
 msgid "Please enter a title."
 msgstr "Bitte gib einen Titel ein."
 
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:795
 #: src/main/webapp/jsp/admin_puzzle_management.jsp:797
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:868
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:870
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1110
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1112
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:882
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:884
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1124
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1126
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:73
 #: src/main/webapp/jsp/admin_puzzle_preview.jsp:111
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:802
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:804
+msgid ""
+"Start date for seasonal chapters (MM-dd, keep empty to keep this chapter "
+"available all year)"
+msgstr ""
+"Startdatum für saisonale Kapitel (MM-dd, freilassen, um das Kapitel das "
+"ganze Jahr über verfügbar zu lassen)"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:812
 msgid "Edit Chapter"
 msgstr "Kapitel bearbeiten"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:831
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:987
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1036
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1081
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1145
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1280
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:845
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1001
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1050
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1095
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1159
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1294
 msgid "Success"
 msgstr "Erfolg"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:858
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:860
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1102
-#: src/main/webapp/jsp/admin_puzzle_preview.jsp:107
-msgid "Title"
-msgstr "Titel"
-
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:876
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:890
 msgid "Max. Assertions"
 msgstr "Max. Assertions"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:884
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:898
 msgid "First Editable Line"
 msgstr "Erste bearbeitbare Zeile"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:889
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:903
 msgid "Last Editable Line"
 msgstr "Letzte bearbeitbare Zeile"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:897
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:911
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:135
 #: src/main/webapp/jsp/melee/create_game_view.jsp:132
 #: src/main/webapp/WEB-INF/tags/create_games.tag:194
 msgid "Game Level"
 msgstr "Spiellevel"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:902
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:916
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:150
 #: src/main/webapp/jsp/melee/create_game_view.jsp:147
 msgid "Please select a level."
 msgstr "Bitte wähle ein Level aus."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:915
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:929
 #: src/main/webapp/jsp/user_profile.jsp:237
 msgid "Equivalence"
 msgstr "Äquivalenz"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:919
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:933
 msgid "Mutant equivalent"
 msgstr "Mutant äquivalent"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:925
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:939
 msgid "Edit Puzzle"
 msgstr "Rätsel bearbeiten"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1012
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1026
 msgid "Are you sure you want to delete chapter {0}?"
 msgstr "Möchtest du Kapitel {0} wirklich löschen?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1013
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1027
 msgid ""
 "Any puzzles left in the chapter will be moved to <span class=\"px-1 border "
 "rounded-1\">Unassigned</span>."
@@ -5752,23 +5765,23 @@ msgstr ""
 "Alle Rätsel, die noch in diesem Kapitel sind, werden in den Ordner <span "
 "class=\"px-1 border rounded-1\">„Nicht zugewiesen“</span> verschoben."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1016
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1030
 msgid "Delete Chapter"
 msgstr "Kapitel löschen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1061
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1075
 msgid "Are you sure you want to permanently delete puzzle {0}?"
 msgstr "Möchtest du das Puzzle {0} wirklich endgültig löschen?"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1065
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1079
 msgid "Delete Puzzle"
 msgstr "Rätsel löschen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1117
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1131
 msgid "Create New Chapter"
 msgstr "Neues Kapitel erstellen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1171
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1185
 #: src/main/webapp/jsp/battleground/game_history.jsp:38
 #: src/main/webapp/jsp/battleground/game_scoreboard.jsp:32
 #: src/main/webapp/jsp/battleground/game_scoreboard.jsp:38
@@ -5784,11 +5797,11 @@ msgstr "Neues Kapitel erstellen"
 msgid "Close"
 msgstr "Schließen"
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1275
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1289
 msgid "Saving..."
 msgstr "Speichern..."
 
-#: src/main/webapp/jsp/admin_puzzle_management.jsp:1283
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:1297
 msgid "Could not save changes."
 msgstr "Änderungen konnten nicht gespeichert werden."
 
@@ -5806,9 +5819,9 @@ msgstr "keine Beschreibung"
 #: src/main/webapp/jsp/battleground/defender_view.jsp:134
 #: src/main/webapp/jsp/melee/creator_view.jsp:58
 #: src/main/webapp/jsp/melee/player_view.jsp:358
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:156
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:188
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:247
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:157
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:189
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:248
 msgid "JUnit Tests"
 msgstr "JUnit-Tests"
 
@@ -5820,8 +5833,8 @@ msgstr "JUnit-Tests"
 #: src/main/webapp/jsp/melee/create_game_view.jsp:90
 #: src/main/webapp/jsp/melee/creator_view.jsp:64
 #: src/main/webapp/jsp/melee/player_view.jsp:223
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:127
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:229
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:128
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:230
 #: src/main/webapp/WEB-INF/tags/create_games.tag:158
 msgid "Class Under Test"
 msgstr "Zu testende Klasse"
@@ -5885,18 +5898,18 @@ msgstr "Bearbeitbare Zeilen beginnen unter"
 msgid "Editable lines end above"
 msgstr "Bearbeitbare Zeilen enden oberhalb"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:51
+#: src/main/webapp/jsp/admin_system_settings.jsp:53
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:61
 msgid "System Settings"
 msgstr "Systemeinstellungen"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:86
-#: src/main/webapp/jsp/admin_system_settings.jsp:115
+#: src/main/webapp/jsp/admin_system_settings.jsp:109
+#: src/main/webapp/jsp/admin_system_settings.jsp:140
 msgid "This setting is required for sending emails."
 msgstr "Diese Einstellung ist für den Versand von E-Mails erforderlich."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:87
-#: src/main/webapp/jsp/admin_system_settings.jsp:116
+#: src/main/webapp/jsp/admin_system_settings.jsp:110
+#: src/main/webapp/jsp/admin_system_settings.jsp:141
 msgid "Please provide a valid value, or disable emails."
 msgstr "Bitte gib einen gültigen Wert ein oder deaktiviere E-Mails."
 
@@ -6103,13 +6116,13 @@ msgstr "Beispiele für gültige Eingabeformate:"
 
 #: src/main/webapp/jsp/battleground/attacker_view.jsp:96
 #: src/main/webapp/jsp/melee/player_view.jsp:246
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:171
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:172
 msgid "Create a mutant here"
 msgstr "Erstelle hier einen Mutanten"
 
 #: src/main/webapp/jsp/battleground/attacker_view.jsp:101
 #: src/main/webapp/jsp/melee/player_view.jsp:279
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:180
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:181
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -6346,7 +6359,7 @@ msgid "Level Explanation"
 msgstr "Erklärung der Level"
 
 #: src/main/webapp/jsp/battleground/create_game_view.jsp:357
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:82
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:84
 #: src/main/webapp/jsp/melee/create_game_view.jsp:333
 #: src/main/webapp/WEB-INF/tags/create_games.tag:506
 msgid "Validator Explanation"
@@ -6360,7 +6373,7 @@ msgstr "Erklärung zum Schwellenwert für das Duell der automatischen Äquivalen
 
 #: src/main/webapp/jsp/battleground/defender_view.jsp:91
 #: src/main/webapp/jsp/melee/player_view.jsp:311
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:143
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:144
 msgid "Write a new JUnit test here"
 msgstr "Schreibe hier einen neuen JUnit-Test"
 
@@ -6442,7 +6455,7 @@ msgstr "Enddatum des Spiels"
 
 #: src/main/webapp/jsp/battleground/details_view.jsp:202
 #: src/main/webapp/jsp/melee/details_view.jsp:236
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:168
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:169
 msgid "Class under test"
 msgstr "Zu testende Klasse"
 
@@ -6454,25 +6467,25 @@ msgstr "Zeitachse"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:102
 #: src/main/webapp/jsp/melee/player_view.jsp:149
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:146
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:147
 msgid "Diff"
 msgstr "Diff"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:129
 #: src/main/webapp/jsp/melee/player_view.jsp:176
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:184
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:185
 msgid "Not equivalent? Write a killing test here:"
 msgstr "Nicht äquivalent? Schreibe hier einen Test, der den Mutanten tötet:"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:140
 #: src/main/webapp/jsp/melee/player_view.jsp:187
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:196
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:197
 msgid "Accept As Equivalent"
 msgstr "Als äquivalent akzeptieren"
 
 #: src/main/webapp/jsp/battleground/equivalence_view.jsp:143
 #: src/main/webapp/jsp/melee/player_view.jsp:190
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:199
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:200
 msgid "Submit Killing Test"
 msgstr "Tötenden Test einreichen"
 
@@ -7231,25 +7244,25 @@ msgstr "Editor-Modus:"
 msgid "mutant"
 msgstr "Mutant"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:53
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:55
 msgid "Live"
 msgstr "Live"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:61
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:63
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:51
 msgid "Claimed Equivalent"
 msgstr "Als äquivalent markiert"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:65
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:67
 #: src/main/webapp/WEB-INF/tags/mutant_accordion.tag:56
 msgid "Equivalent"
 msgstr "Äquivalent"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:70
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:72
 msgid "Mutant/Test restrictions:"
 msgstr "Mutanten-/Testbeschränkungen:"
 
-#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:72
+#: src/main/webapp/jsp/game_components/mutant_explanation.jsp:74
 msgid "Click for more information"
 msgstr "Für weitere Informationen hier klicken"
 
@@ -7906,7 +7919,7 @@ msgid "Enemy Coverage"
 msgstr "Gegnerische Coverage"
 
 #: src/main/webapp/jsp/melee/player_view.jsp:62
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:141
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:142
 msgid "Mutant {0} automatically claimed equivalent"
 msgstr "Mutant {0} automatisch als äquivalent markiert"
 
@@ -7996,25 +8009,25 @@ msgstr "Bisher hat noch kein Spieler Feedback zu diesem Spiel abgegeben."
 msgid "Puzzle: "
 msgstr "Rätsel: "
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:106
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:107
 msgid "Puzzle: {0}"
 msgstr "Rätsel: {0}"
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:120
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:119
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:124
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:121
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:120
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:125
 msgid "Congratulations!"
 msgstr "Glückwunsch!"
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:121
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:122
 msgid "Your mutant solved the puzzle. {0}"
 msgstr "Dein Mutant hat das Rätsel gelöst. {0}"
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:129
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:130
 msgid "Solving mutant"
 msgstr "Lösender Mutant"
 
-#: src/main/webapp/jsp/puzzle/attacker_view.jsp:133
+#: src/main/webapp/jsp/puzzle/attacker_view.jsp:134
 msgid "solving mutant"
 msgstr "Lösender Mutant"
 
@@ -8022,71 +8035,71 @@ msgstr "Lösender Mutant"
 msgid "Puzzle"
 msgstr "Rätsel"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:120
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:121
 msgid "Your test solved the puzzle. {0}"
 msgstr "Dein Test hat das Rätsel gelöst. {0}"
 
-#: src/main/webapp/jsp/puzzle/defender_view.jsp:140
+#: src/main/webapp/jsp/puzzle/defender_view.jsp:141
 msgid "Solving JUnit Test"
 msgstr "Lösender JUnit-Test"
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:127
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:128
 msgid "This mutant is equivalent to the class under test."
 msgstr "Dieser Mutant entspricht der zu testenden Klasse."
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:130
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:131
 msgid "Your test killed the mutant flagged as equivalent."
 msgstr "Dein Test hat den als äquivalent markierten Mutanten getötet."
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:174
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:175
 msgid "The mutant is equivalent!"
 msgstr "Der Mutant ist äquivalent!"
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:175
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:176
 msgid "The mutant was accepted as equivalent"
 msgstr "Der Mutant wurde als äquivalent akzeptiert"
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:178
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:179
 msgid "Not equivalent! Your killing test:"
 msgstr "Nicht äquivalent! Dein tötender Test:"
 
-#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:208
+#: src/main/webapp/jsp/puzzle/equivalence_view.jsp:209
 msgid "Are you sure that this mutant is equivalent and cannot be killed?"
 msgstr ""
 "Bist du sicher, dass dieser Mutant äquivalent ist und nicht getötet werden "
 "kann?"
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:37
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:38
 #: src/main/webapp/WEB-INF/tags/admin_navigation.tag:44
 #: src/main/webapp/WEB-INF/tags/puzzle_navigation.tag:42
 msgid "Puzzles"
 msgstr "Rätsel"
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:54
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:55
 msgid "Preview Image Puzzle Game"
 msgstr "Vorschau-Bild: Rätselspiel"
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:73
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:74
 msgid "Next puzzle:"
 msgstr "Nächstes Rätsel:"
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:82
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:83
 #: src/main/webapp/WEB-INF/tags/puzzle_navigation.tag:59
 msgid "There are currently no puzzles available."
 msgstr "Derzeit sind keine Rätsel verfügbar."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:104
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:106
 #: src/main/webapp/WEB-INF/tags/puzzle_navigation.tag:86
 msgid "This puzzle is locked."
 msgstr "Dieses Rätsel ist gesperrt."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 #: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
 msgid "Puzzle solved in {0} attempt."
 msgstr "Rätsel in {0} Versuch gelöst."
 
-#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:130
+#: src/main/webapp/jsp/puzzle/puzzle_overview.jsp:132
 #: src/main/webapp/jsp/user_profile.jsp:232
 #: src/main/webapp/WEB-INF/tags/round_counter.tag:32
 msgid "Puzzle solved in {0} attempts."

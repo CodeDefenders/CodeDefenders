@@ -443,12 +443,14 @@ public class PuzzleRepository {
     public boolean updatePuzzleChapter(PuzzleChapter chapter) {
         @Language("SQL") String query = """
                 UPDATE puzzle_chapters
-                SET Position = ?
+                SET Position = ?,
+                Calendar_date = ?
                 WHERE Chapter_ID = ?;
         """;
 
         int updatedRows = queryRunner.update(query,
                 chapter.getPosition(),
+                chapter.getCalendarDate() != null ? Date.valueOf(chapter.getCalendarDate()) : null,
                 chapter.getId()
         );
         return updatedRows > 0;

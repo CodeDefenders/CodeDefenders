@@ -21,6 +21,9 @@ package org.codedefenders.servlets.admin.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -46,6 +49,7 @@ import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.servlets.admin.api.AdminPuzzleAPI.GetPuzzlesData.PuzzleData;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.DateUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -442,6 +446,19 @@ public class AdminPuzzleAPI extends HttpServlet {
             writeJSONMessage(response, 400, i18n.tr("Invalid title."));
             return;
         }
+
+        String dateString = data.date != null ? data.date.strip() : "";
+        if (dateString.isBlank()) {
+            chapter.setCalendarDate(null);
+        } else {
+            try {
+                chapter.setCalendarDate(DateUtils.parseSeasonalDate(dateString));
+            } catch (DateTimeParseException e) {
+                writeJSONMessage(response, 400, i18n.tr("Invalid date format."));
+                return;
+            }
+        }
+
         String description = data.description.strip();
         if (description.length() > 1000) {
             writeJSONMessage(response, 400, i18n.tr("Invalid description."));
@@ -512,8 +529,8 @@ public class AdminPuzzleAPI extends HttpServlet {
      * Reads and returns the body content of a given request, iff it contains any AND the body is valid JSON.
      *
      * @param request the request which body is read and returned.
-     * @return  An {@link Optional} holding either the request body content as a
-     *          {@link JsonObject}, or an instance of {@link Optional#empty()}.
+     * @return An {@link Optional} holding either the request body content as a
+     * {@link JsonObject}, or an instance of {@link Optional#empty()}.
      * @throws IOException when reading the request body fails.
      */
     private static Optional<JsonObject> readJSONBody(@Nonnull HttpServletRequest request) throws IOException {
@@ -522,7 +539,7 @@ public class AdminPuzzleAPI extends HttpServlet {
         JsonObject obj;
         try {
             obj = JsonParser.parseString(json)
-                .getAsJsonObject();
+                    .getAsJsonObject();
         } catch (JsonSyntaxException e) {
             obj = null;
         }
@@ -591,7 +608,8 @@ public class AdminPuzzleAPI extends HttpServlet {
             }
             out.beginObject()
                     .name("id").value(chapter.getId())
-                    .name("position").value(chapter.getPosition());
+                    .name("position").value(chapter.getPosition())
+                    .name("date").value(DateUtils.toSeasonalDateString(chapter.getCalendarDate()));
 
             out.name("texts").beginObject();
             for (PuzzleChapterText text : puzzleRepo.getAllPuzzleChapterTexts(chapter.getId())) {
@@ -655,16 +673,24 @@ public class AdminPuzzleAPI extends HttpServlet {
     public record GetPuzzlesData(
             List<PuzzleData> puzzles,
             List<PuzzleChapter> chapters) {
-        public record PuzzleData(Puzzle puzzle, int gameCount, boolean active) {}
+        public record PuzzleData(Puzzle puzzle, int gameCount, boolean active) {
+        }
     }
+
     public record UpdatePuzzlePositionsData(
             List<Integer> unassignedPuzzles,
             List<Integer> archivedPuzzles,
             List<ChapterData> chapters) {
-        public record ChapterData(int id, List<Integer> puzzles) {}
+        public record ChapterData(int id, List<Integer> puzzles) {
+        }
     }
-    public record CreateChapterData(String title, String description) {}
-    public record UpdateChapterData(String title, String description) {}
+
+    public record CreateChapterData(String title, String description) {
+    }
+
+    public record UpdateChapterData(String title, String description, String date) {
+    }
+
     public record UpdatePuzzleData(
             String title,
             String description,
@@ -672,5 +698,6 @@ public class AdminPuzzleAPI extends HttpServlet {
             Integer editableLinesStart,
             Integer editableLinesEnd,
             GameLevel level,
-            boolean isEquivalent) {}
+            boolean isEquivalent) {
+    }
 }
