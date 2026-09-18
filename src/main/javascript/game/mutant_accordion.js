@@ -447,6 +447,7 @@ class MutantAccordion {
                 /* Update the count badge. */
                 const countElement = document.getElementById('ma-count-' + category.id);
                 countElement.innerText = category.mutantIds.length.toString();
+                countElement.hidden = false;
                 /* Add the ma-covered class */
                 const buttonElement = document.querySelector(`#ma-heading-${category.id} .accordion-button`);
                 buttonElement.classList.add('ma-covered');

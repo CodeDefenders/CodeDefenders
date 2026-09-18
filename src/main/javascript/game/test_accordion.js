@@ -360,6 +360,7 @@ class TestAccordion {
                 /* Update the count badge. */
                 const countElement = document.getElementById('ta-count-' + category.id);
                 countElement.innerText = category.testIds.length.toString();
+                countElement.hidden = false;
             } else {
                 console.error(`Category ${category.id} not found.`);
             }
