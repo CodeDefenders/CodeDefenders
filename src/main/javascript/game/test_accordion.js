@@ -361,6 +361,9 @@ class TestAccordion {
                 const countElement = document.getElementById('ta-count-' + category.id);
                 countElement.innerText = category.testIds.length.toString();
                 countElement.hidden = false;
+                /* Add the ma-covered class */
+                const buttonElement = document.querySelector(`#ta-heading-${category.id} .accordion-button`);
+                buttonElement.classList.add('ta-covered');
             } else {
                 console.error(`Category ${category.id} not found.`);
             }
