@@ -525,22 +525,38 @@ class GameHighlighting {
         console.log("added test: ", event.test);
         this.clearCoverage();
 
-        this._tests.set(testId, event.test);
-        for (const line of event.coveredLines) {
-            if (!this._testIdsPerLine.has(line)) {
-                this._testIdsPerLine.set(line, []);
-            }
-            this._testIdsPerLine.get(line).push(testId);
+        const showAltCov = document.querySelector('#highlighting-switch');
+        const isBattleground = !showAltCov;
+        let tipl = null;
+        if (isBattleground) { // battleground
+            this._tests.set(testId, event.test);
+            tipl = this._testIdsPerLine;
+        } else { // melee
+            this._alternativeTests.set(testId, event.test);
+            tipl = this._alternativeTestIdsPerLine;
         }
 
-        this.highlightCoverage();
-
-        // animate coverage update
         for (const line of event.coveredLines) {
-            this._editor.addLineClass(line - 1, 'background', 'coverage-update-animation');
-            setTimeout(() => {
-                this._editor.removeLineClass(line - 1, 'background', 'coverage-update-animation');
-            }, 400); // animation duration
+            if (!tipl.has(line)) {
+                tipl.set(line, []);
+            }
+            tipl.get(line).push(testId);
+        }
+
+        if (isBattleground || !showAltCov.checked) {
+            this.highlightCoverage();
+        } else {
+            this.highlightAlternativeCoverage();
+        }
+
+        // animate coverage update if the shown coverage is the one that was updated
+        if (isBattleground || showAltCov.checked) {
+            for (const line of event.coveredLines) {
+                this._editor.addLineClass(line - 1, 'background', 'coverage-update-animation');
+                setTimeout(() => {
+                    this._editor.removeLineClass(line - 1, 'background', 'coverage-update-animation');
+                }, 400); // animation duration
+            }
         }
     }
 
