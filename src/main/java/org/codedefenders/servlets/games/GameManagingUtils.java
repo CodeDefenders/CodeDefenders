@@ -467,6 +467,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
+        notifyPlayersOnMutantAdded(newMutant, game);
+
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
 
