@@ -173,7 +173,7 @@ class MutantAccordion {
                             aria-controls="ma-collapse-${category.id}">
                         <span class="badge bg-attacker me-2 ma-count"
                               id="ma-count-${category.id}"
-                              ${category.mutantIds.length === 0 ? 'hidden' : ''}">
+                              ${category.mutantIds.length === 0 ? 'hidden' : ''}>
                             ${category.mutantIds.length}
                         </span>
                         ${category.description}
@@ -447,6 +447,9 @@ class MutantAccordion {
                 /* Update the count badge. */
                 const countElement = document.getElementById('ma-count-' + category.id);
                 countElement.innerText = category.mutantIds.length.toString();
+                /* Add the ma-covered class */
+                const buttonElement = document.querySelector(`#ma-heading-${category.id} .accordion-button`);
+                buttonElement.classList.add('ma-covered');
             } else {
                 /* this case will most likely never happen,
                  * as adding methods (and thus categories) is prohibited by the validation rules */
