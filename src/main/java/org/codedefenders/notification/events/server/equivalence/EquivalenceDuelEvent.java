@@ -56,18 +56,22 @@ public class EquivalenceDuelEvent extends ServerEvent {
         this.gameId = gameId;
     }
 
+    /** @return defender user id */
     public int getDefenderId() {
         return defenderId;
     }
 
+    /** @param defenderId the defender user id */
     public void setDefenderId(int defenderId) {
         this.defenderId = defenderId;
     }
 
+    /** @return attacker user id */
     public int getAttackerId() {
         return attackerId;
     }
 
+    /** @param attackerId the attacker user id */
     public void setAttackerId(int attackerId) {
         this.attackerId = attackerId;
     }
