@@ -2087,43 +2087,43 @@ msgstr "Log Level"
 msgid "Controls the granularity of log messages."
 msgstr "Controls the granularity of log messages."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:191
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:211
 msgid "LLM action interval"
 msgstr "LLM action interval"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:192
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:212
 msgid "The default number of seconds between actions of an AI player."
 msgstr "The default number of seconds between actions of an AI player."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:195
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:215
 msgid "LLM normal prompt number of tries"
 msgstr "LLM normal prompt number of tries"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:196
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:216
 msgid "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
 msgstr "The number of attempts the LLM player will make to fix an invalid mutant or test it created."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:199
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:219
 msgid "LLM equivalence duel number of tries"
 msgstr "LLM equivalence duel number of tries"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:200
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:220
 msgid "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
 msgstr "The number of attempts the LLM player will make to fix an invalid equivalence duel test."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:203
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:223
 msgid "OpenAI key"
 msgstr "OpenAI key"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:204
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:224
 msgid "The API key for OpenAI to be used by LLM players"
 msgstr "The API key for OpenAI to be used by LLM players"
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:335
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:364
 msgid "Updated Settings."
 msgstr "Updated Settings."
 
-#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:336
+#: src/main/java/org/codedefenders/servlets/admin/AdminSystemSettings.java:365
 msgid "There was a problem. Please consult the logs"
 msgstr "There was a problem. Please consult the logs"
 
@@ -2907,83 +2907,75 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1138
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1158
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1139
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1159
 msgid "Flagged 1 mutant as equivalent!"
 msgstr "Flagged 1 mutant as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1140
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1160
 msgid "Flagged {0} mutants as equivalent!"
 msgstr "Flagged {0} mutants as equivalent!"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1337
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1357
 msgid "Your test has the following smell: {0}"
 msgstr "Your test has the following smell: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1343
+#: src/main/java/org/codedefenders/servlets/games/GameManagingUtils.java:1363
 msgid "Your test has the following smells: {0}"
 msgstr "Your test has the following smells: {0}"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:679
-msgid "Error submitting the mutant: data too long. Maybe you made too many changes?"
-msgstr "Error submitting the mutant: data too long. Maybe you made too many changes?"
-
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:681
-msgid "Database error while saving the mutant."
-msgstr "Database error while saving the mutant."
-
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:799
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:803
 msgid "User is not a player in the game."
 msgstr "User is not a player in the game."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:804
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:808
 msgid "Can only resolve equivalence duels if you are a Player!"
 msgstr "Can only resolve equivalence duels if you are a Player!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:809
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:813
 msgid "Game {0} has finished."
 msgstr "Game {0} has finished."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:814
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:818
 msgid "Mutant does not exist."
 msgstr "Mutant does not exist."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:830
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:834
 msgid "Too late. The mutant was already killed and therefore proven to be not equivalent."
 msgstr "Too late. The mutant was already killed and therefore proven to be not equivalent."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1057
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1068
 msgid "...and it also killed another claimed mutant!"
 msgstr "...and it also killed another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1059
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1070
 msgid "...and it also killed other {0} claimed mutants!"
 msgstr "...and it also killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1064
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1075
 msgid "...however, your test did kill another claimed mutant!"
 msgstr "...however, your test did kill another claimed mutant!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1066
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1077
 msgid "...however, your test killed other {0} claimed mutants!"
 msgstr "...however, your test killed other {0} claimed mutants!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1095
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1106
 msgid "You cannot claim mutants as equivalent in this game anymore."
 msgstr "You cannot claim mutants as equivalent in this game anymore."
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1168
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1185
 msgid "Mutant has already been claimed as equivalent or killed!"
 msgstr "Mutant has already been claimed as equivalent or killed!"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1170
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1187
 msgid "Flagged 1 mutant as equivalent"
 msgstr "Flagged 1 mutant as equivalent"
 
-#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1172
+#: src/main/java/org/codedefenders/servlets/games/melee/MeleeGameManager.java:1189
 msgid "Flagged {0} mutants as equivalent"
 msgstr "Flagged {0} mutants as equivalent"
 
@@ -3027,31 +3019,31 @@ msgstr "The remaining time cannot be below {0} minutes."
 msgid "The new remaining duration must be at most {0} minutes."
 msgstr "The new remaining duration must be at most {0} minutes."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:435
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:438
 msgid "No, this mutant is not equivalent to the class under test."
 msgstr "No, this mutant is not equivalent to the class under test."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:552
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:556
 msgid "Your test did not kill the mutant. Try again."
 msgstr "Your test did not kill the mutant. Try again."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:729
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:734
 msgid "Your test did not solve the puzzle. Try another one..."
 msgstr "Your test did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:929
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:936
 msgid "Your mutant did not solve the puzzle. Try another one..."
 msgstr "Your mutant did not solve the puzzle. Try another one..."
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1008
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1015
 msgid "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "<br>\nYou solved all the puzzles of the current chapter!\nStart with the\n<a href="{0}?puzzleId={1,number,#}">first puzzle</a>\nof the next chapter "{2}", or go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1021
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1028
 msgid "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 msgstr "Try to solve the\n<a href="{0}?puzzleId={1,number,#}">next Puzzle</a>,\nor go back to the\n<a href="{0}">Puzzle Overview</a>.\n"
 
-#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1042
+#: src/main/java/org/codedefenders/servlets/games/puzzle/PuzzleGameManager.java:1049
 msgid "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 msgstr "You solved all the puzzles of the current chapter, go back to the <a href=\"{0}\">Puzzle Overview</a>."
 
@@ -3351,19 +3343,15 @@ msgstr "Sorry, no kill message available for this mutant"
 msgid "Hey! You're not allowed to do that!"
 msgstr "Hey! You're not allowed to do that!"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:109
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:108
 msgid "Your test is not valid, sorry! It failed for the following reasons:"
 msgstr "Your test is not valid, sorry! It failed for the following reasons:"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:110
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:109
 msgid "Your mutant is not valid, sorry! It failed for the following reasons:"
 msgstr "Your mutant is not valid, sorry! It failed for the following reasons:"
 
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:120
-msgid "Offending statement:"
-msgstr "Offending statement:"
-
-#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:131
+#: src/main/java/org/codedefenders/validation/code/CodeValidationResult.java:123
 msgid "Offending statement:"
 msgstr "Offending statement:"
 
@@ -6191,31 +6179,31 @@ msgstr "Editable lines start below"
 msgid "Editable lines end above"
 msgstr "Editable lines end above"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:51
+#: src/main/webapp/jsp/admin_system_settings.jsp:53
 msgid "System Settings"
 msgstr "System Settings"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:86
+#: src/main/webapp/jsp/admin_system_settings.jsp:109
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:87
+#: src/main/webapp/jsp/admin_system_settings.jsp:110
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:115
+#: src/main/webapp/jsp/admin_system_settings.jsp:140
 msgid "This setting is required for sending emails."
 msgstr "This setting is required for sending emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:116
+#: src/main/webapp/jsp/admin_system_settings.jsp:141
 msgid "Please provide a valid value, or disable emails."
 msgstr "Please provide a valid value, or disable emails."
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:129
+#: src/main/webapp/jsp/admin_system_settings.jsp:154
 msgid "Save"
 msgstr "Save"
 
-#: src/main/webapp/jsp/admin_system_settings.jsp:133
+#: src/main/webapp/jsp/admin_system_settings.jsp:158
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -11170,6 +11158,18 @@ msgstr "Equivalence duel lost!"
 #: src/main/webapp/WEB-INF/tags/game_js_init.tag:83
 msgid "Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point."
 msgstr "Mutant {0} that you claimed was proven to be not equivalent. The attacker gained an additional point."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:94
+msgid "Equivalence duel triggered!"
+msgstr "Equivalence duel triggered!"
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:95
+msgid "Your mutant {0} was claimed as being equivalent to the CUT by another player. You have to defend your mutant before you can submit another one. After the duel you can continue creating your current mutant."
+msgstr "Your mutant {0} was claimed as being equivalent to the CUT by another player. You have to defend your mutant before you can submit another one. After the duel you can continue creating your current mutant."
+
+#: src/main/webapp/WEB-INF/tags/game_js_init.tag:99
+msgid "Go to the duel"
+msgstr "Go to the duel"
 
 #: src/main/webapp/WEB-INF/tags/game_time.tag:43
 msgid "Change the game duration."

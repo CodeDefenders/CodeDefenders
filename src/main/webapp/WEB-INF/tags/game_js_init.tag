@@ -86,6 +86,24 @@
             }
         });
 
+        socket.register('equivalence.EquivalenceDuelTriggeredEvent', event => {
+            if (event.attackerId === ${login.userId}) {
+                // Show popup with button to submit the mutant to see the duel result
+                ShowToasts.showToast({
+                    title: '${i18n.tr("Equivalence duel triggered!")}',
+                    body: '${i18n.tr("Your mutant {0} was claimed as being equivalent to the CUT by another player. You have to defend your mutant before you can submit another one. After the duel you can continue creating your current mutant.")}'.replaceAll('{0}', event.mutantId),
+                    extraElements: [ (() => {
+                        const reloadButton = document.createElement('a');
+                        reloadButton.classList.add('btn', 'btn-primary', 'mt-2');
+                        reloadButton.textContent = "${i18n.tr('Go to the duel')}";
+                        reloadButton.onclick =()=> void document.forms.atk.submit();
+                        return reloadButton;
+                    })() ],
+                    timeout: false
+                });
+            }
+        });
+
 
         // achievements
 
