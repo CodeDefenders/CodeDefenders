@@ -23,16 +23,22 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.codedefenders.arcade.mutle.model.MutleFixtureBundle;
 import org.codedefenders.arcade.mutle.model.MutleFixtureInstallation;
 import org.codedefenders.arcade.mutle.model.MutleGame;
+import org.codedefenders.arcade.mutle.model.MutlePublication;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.intellij.lang.annotations.Language;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
@@ -40,6 +46,8 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
 /** Database access for installed Mutle fixtures and player games. */
 @ApplicationScoped
 public class MutleRepository {
+    private static final Gson GSON = new Gson();
+    private static final java.lang.reflect.Type RESOURCE_MAP = new TypeToken<Map<String, String>>() { }.getType();
     private final QueryRunner queryRunner;
 
     @Inject
@@ -63,6 +71,103 @@ public class MutleRepository {
                 ORDER BY fixture_key;
         """;
         return queryRunner.query(query, listFromRS(MutleRepository::fixtureFromRS));
+    }
+
+    public Optional<MutleFixtureBundle> findBundle(String classKey) {
+        @Language("SQL") String query = """
+                SELECT * FROM mutle_fixture_bundle WHERE class_key = ?;
+        """;
+        return queryRunner.query(query, oneFromRS(MutleRepository::bundleFromRS), classKey);
+    }
+
+    public List<MutleFixtureBundle> findBundles() {
+        @Language("SQL") String query = """
+                SELECT * FROM mutle_fixture_bundle ORDER BY class_key;
+        """;
+        return queryRunner.query(query, listFromRS(MutleRepository::bundleFromRS));
+    }
+
+    public void insertBundle(MutleFixtureBundle bundle) {
+        @Language("SQL") String query = """
+                INSERT INTO mutle_fixture_bundle
+                    (class_key, class_json, resources_json, content_hash, installed_at)
+                VALUES (?, ?, ?, ?, ?);
+        """;
+        int inserted = queryRunner.update(query, bundle.classKey(), bundle.classJson(),
+                GSON.toJson(bundle.resources(), RESOURCE_MAP), bundle.contentHash(),
+                Timestamp.from(bundle.installedAt()));
+        if (inserted != 1) {
+            throw new UncheckedSQLException("Couldn't store Mutle fixture bundle.");
+        }
+    }
+
+    /** Installs a bundled fixture without failing on a concurrent duplicate insert. */
+    public void insertBundleIfAbsent(MutleFixtureBundle bundle) {
+        @Language("SQL") String query = """
+                INSERT INTO mutle_fixture_bundle
+                    (class_key, class_json, resources_json, content_hash, installed_at)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE class_key = class_key;
+        """;
+        queryRunner.update(query, bundle.classKey(), bundle.classJson(),
+                GSON.toJson(bundle.resources(), RESOURCE_MAP), bundle.contentHash(),
+                Timestamp.from(bundle.installedAt()));
+    }
+
+    public List<MutlePublication> findPublications() {
+        @Language("SQL") String query = """
+                SELECT series, fixture_key, release_at FROM mutle_publication ORDER BY series;
+        """;
+        return queryRunner.query(query, listFromRS(MutleRepository::publicationFromRS));
+    }
+
+    public Optional<MutlePublication> findPublication(long series) {
+        @Language("SQL") String query = """
+                SELECT series, fixture_key, release_at FROM mutle_publication WHERE series = ?;
+        """;
+        return queryRunner.query(query, oneFromRS(MutleRepository::publicationFromRS), series);
+    }
+
+    public Optional<MutlePublication> findCurrentPublication(Instant now) {
+        @Language("SQL") String query = """
+                SELECT series, fixture_key, release_at
+                FROM mutle_publication
+                WHERE release_at <= ?
+                ORDER BY release_at DESC, series DESC
+                LIMIT 1;
+        """;
+        return queryRunner.query(query, oneFromRS(MutleRepository::publicationFromRS), Timestamp.from(now));
+    }
+
+    public void insertPublication(MutlePublication publication) {
+        @Language("SQL") String query = """
+                INSERT INTO mutle_publication (series, fixture_key, release_at) VALUES (?, ?, ?);
+        """;
+        int inserted = queryRunner.update(query, publication.series(), publication.fixtureKey(),
+                Timestamp.from(publication.releaseAt()));
+        if (inserted != 1) {
+            throw new UncheckedSQLException("Couldn't store Mutle publication.");
+        }
+    }
+
+    public void updatePublication(MutlePublication publication) {
+        @Language("SQL") String query = """
+                UPDATE mutle_publication SET fixture_key = ?, release_at = ? WHERE series = ?;
+        """;
+        int updated = queryRunner.update(query, publication.fixtureKey(), Timestamp.from(publication.releaseAt()),
+                publication.series());
+        if (updated != 1) {
+            throw new UncheckedSQLException("Couldn't update Mutle publication.");
+        }
+    }
+
+    public boolean hasGames() {
+        @Language("SQL") String query = """
+                SELECT EXISTS(
+                    SELECT 1 FROM mutle_game WHERE rotation_period >= 0
+                ) AS has_games;
+        """;
+        return queryRunner.query(query, oneFromRS(rs -> rs.getBoolean("has_games"))).orElse(false);
     }
 
     public void insertFixture(MutleFixtureInstallation fixture) {
@@ -183,6 +288,17 @@ public class MutleRepository {
                 rs.getInt("hidden_puzzle_id"),
                 rs.getInt("template_mutant_id"),
                 rs.getTimestamp("installed_at").toInstant());
+    }
+
+    private static MutleFixtureBundle bundleFromRS(ResultSet rs) throws SQLException {
+        Map<String, String> resources = GSON.fromJson(rs.getString("resources_json"), RESOURCE_MAP);
+        return new MutleFixtureBundle(rs.getString("class_key"), rs.getString("class_json"), resources,
+                rs.getString("content_hash"), rs.getTimestamp("installed_at").toInstant());
+    }
+
+    private static MutlePublication publicationFromRS(ResultSet rs) throws SQLException {
+        return new MutlePublication(rs.getLong("series"), rs.getString("fixture_key"),
+                rs.getTimestamp("release_at").toInstant());
     }
 
     private static MutleGame gameFromRS(ResultSet rs) throws SQLException {

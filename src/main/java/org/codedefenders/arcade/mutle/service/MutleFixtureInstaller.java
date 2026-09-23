@@ -37,7 +37,6 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.arcade.mutle.fixture.MutleClass;
 import org.codedefenders.arcade.mutle.fixture.MutleEntry;
-import org.codedefenders.arcade.mutle.fixture.MutleFixtureLoader;
 import org.codedefenders.arcade.mutle.fixture.MutleMutant;
 import org.codedefenders.arcade.mutle.model.MutleFixtureInstallation;
 import org.codedefenders.arcade.mutle.persistence.MutleRepository;
@@ -65,7 +64,7 @@ import static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS;
 
 @ApplicationScoped
 public class MutleFixtureInstaller {
-    private final MutleFixtureLoader loader;
+    private final MutleCatalog catalog;
     private final MutleRepository mutleRepository;
     private final GameClassRepository classRepository;
     private final MutantRepository mutantRepository;
@@ -75,11 +74,11 @@ public class MutleFixtureInstaller {
     private final Set<String> installedKeys = ConcurrentHashMap.newKeySet();
 
     @Inject
-    public MutleFixtureInstaller(MutleFixtureLoader loader, MutleRepository mutleRepository,
+    public MutleFixtureInstaller(MutleCatalog catalog, MutleRepository mutleRepository,
                                  GameClassRepository classRepository, MutantRepository mutantRepository,
                                  PuzzleRepository puzzleRepository, Configuration configuration,
                                  TransactionManager transactionManager) {
-        this.loader = loader;
+        this.catalog = catalog;
         this.mutleRepository = mutleRepository;
         this.classRepository = classRepository;
         this.mutantRepository = mutantRepository;
@@ -117,11 +116,6 @@ public class MutleFixtureInstaller {
                 failure);
     }
 
-    /** Installs the whole validated pack before the Mutle entry point is exposed. */
-    public synchronized void ensurePackInstalled(List<MutleEntry> entries) {
-        entries.forEach(this::ensureInstalled);
-    }
-
     public static String contentHash(MutleClass fixtureClass, MutleMutant mutant, String cutSource,
                                      String mutantSource, String proofSource) {
         try {
@@ -156,15 +150,15 @@ public class MutleFixtureInstaller {
     }
 
     private void install(MutleEntry entry) {
-        MutleClass fixtureClass = loader.fixtureClass(entry.classKey());
-        String cutSource = loader.readClassResource(entry.classKey(), fixtureClass.sourcePath());
+        MutleClass fixtureClass = catalog.fixtureClass(entry.classKey());
+        String cutSource = catalog.readClassResource(entry.classKey(), fixtureClass.sourcePath());
         MutleMutant mutant = fixtureClass.mutants().stream().filter(value -> value.key().equals(entry.mutantKey()))
                 .findFirst().orElseThrow(() -> new IllegalStateException("Mutle entry has no mutant"));
-        String mutantSource = loader.readClassResource(entry.classKey(), mutant.sourcePath());
+        String mutantSource = catalog.readClassResource(entry.classKey(), mutant.sourcePath());
         String proofSource = fixtureClass.tests().stream()
                 .filter(test -> test.key().equals(mutant.proofTestKey()))
                 .findFirst()
-                .map(test -> loader.readClassResource(entry.classKey(), test.sourcePath()))
+                .map(test -> catalog.readClassResource(entry.classKey(), test.sourcePath()))
                 .orElseThrow(() -> new IllegalStateException("Mutle mutant proof test is missing"));
         String key = MutleService.fixtureKey(entry);
         String hash = contentHash(fixtureClass, mutant, cutSource, mutantSource, proofSource);
@@ -246,13 +240,14 @@ public class MutleFixtureInstaller {
     }
 
     static Path storeFixtureFile(Path directory, String fileName, String source) throws IOException {
+        Path filePath = directory.resolve(fileName);
         try {
+            Files.createDirectories(filePath.getParent());
             return FileUtils.storeFile(directory, fileName, source);
         } catch (FileAlreadyExistsException e) {
-            Path path = directory.resolve(fileName);
-            if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)
-                    && Files.readString(path, StandardCharsets.UTF_8).equals(source)) {
-                return path;
+            if (Files.isRegularFile(filePath, LinkOption.NOFOLLOW_LINKS)
+                    && Files.readString(filePath, StandardCharsets.UTF_8).equals(source)) {
+                return filePath;
             }
             throw e;
         }

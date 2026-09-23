@@ -9866,11 +9866,11 @@ msgstr "Benutzern erlauben, Mutle-Rätsel zu spielen."
 msgid "Mutle"
 msgstr "Mutle"
 
-msgid "Weekly mutation puzzle"
-msgstr "Wöchentliches Mutationsrätsel"
+msgid "Mutation puzzle"
+msgstr "Mutationsrätsel"
 
-msgid "You have six accepted tests to isolate this week’s hidden change."
-msgstr "Du hast sechs akzeptierte Tests, um die versteckte Änderung dieser Woche einzugrenzen."
+msgid "You have six accepted tests to isolate the hidden change."
+msgstr "Du hast sechs akzeptierte Tests, um die versteckte Änderung einzugrenzen."
 
 msgid "Current case"
 msgstr "Aktueller Fall"
@@ -10024,6 +10024,98 @@ msgstr "Der Test konnte nicht ausgewertet werden. Bitte versuche es erneut."
 
 msgid "Show details"
 msgstr "Details anzeigen"
+
+#: src/main/webapp/jsp/mutle/overview.jsp
+msgid "Check back when the semester begins."
+msgstr "Schau zum Semesterbeginn wieder vorbei."
+
+msgid "The first case has not been published yet."
+msgstr "Der erste Fall wurde noch nicht veröffentlicht."
+
+#: src/main/webapp/jsp/admin_mutle.jsp
+msgid "Mutle administration"
+msgstr "Mutle-Administration"
+
+msgid "Import fixture classes and publish one case for each lecture."
+msgstr "Importiere Fixture-Klassen und veröffentliche einen Fall pro Vorlesung."
+
+msgid "Fixture inventory"
+msgstr "Fixture-Bestand"
+
+msgid "Mutants remain hidden from players."
+msgstr "Mutanten bleiben für Spieler verborgen."
+
+msgid "No Mutle fixtures are installed."
+msgstr "Keine Mutle-Fixtures installiert."
+
+msgid "Scheduled"
+msgstr "Geplant"
+
+msgid "Available"
+msgstr "Verfügbar"
+
+msgid "Add fixture class"
+msgstr "Fixture-Klasse hinzufügen"
+
+msgid "Fixture ZIP"
+msgstr "Fixture-ZIP"
+
+msgid "Upload one class and its mutants as a Mutle fixture ZIP. Validate puzzle quality offline before upload."
+msgstr "Lade eine Klasse und ihre Mutanten als Mutle-Fixture-ZIP hoch. Prüfe die Rätselqualität vor dem Hochladen offline."
+
+msgid "The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder."
+msgstr "Die ZIP-Datei benötigt class.json, den Quelltext der Klasse, tests/ und mutants/ im Stammverzeichnis oder in einem Klassenordner."
+
+msgid "Upload fixture"
+msgstr "Fixture hochladen"
+
+msgid "Publication schedule"
+msgstr "Veröffentlichungsplan"
+
+msgid "Published cases stay locked; future dates and fixture assignments can be changed."
+msgstr "Veröffentlichte Fälle bleiben gesperrt; zukünftige Termine und Fixture-Zuordnungen können geändert werden."
+
+msgid "No future case is scheduled. The current case remains available until you add one."
+msgstr "Kein zukünftiger Fall ist geplant. Der aktuelle Fall bleibt verfügbar, bis du einen hinzufügst."
+
+msgid "No cases are scheduled yet."
+msgstr "Noch keine Fälle geplant."
+
+msgid "First release (UTC)"
+msgstr "Erste Veröffentlichung (UTC)"
+
+msgid "Interpreted as UTC. This schedules 15 weekly cases."
+msgstr "Wird als UTC interpretiert. Dadurch werden 15 wöchentliche Fälle geplant."
+
+msgid "Schedule 15 weekly cases"
+msgstr "15 wöchentliche Fälle planen"
+
+msgid "Add case"
+msgstr "Fall hinzufügen"
+
+msgid "Case"
+msgstr "Fall"
+
+msgid "Coming soon"
+msgstr "Demnächst"
+
+msgid "Future"
+msgstr "Zukünftig"
+
+msgid "Next case"
+msgstr "Nächster Fall"
+
+msgid "Published"
+msgstr "Veröffentlicht"
+
+msgid "Release (UTC)"
+msgstr "Veröffentlichung (UTC)"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Unscheduled"
+msgstr "Nicht geplant"
 
 #~ msgid "Change"
 #~ msgstr "Ändern"

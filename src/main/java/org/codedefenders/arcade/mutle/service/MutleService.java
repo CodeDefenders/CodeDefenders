@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,6 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.arcade.mutle.fixture.MutleClass;
 import org.codedefenders.arcade.mutle.fixture.MutleEntry;
-import org.codedefenders.arcade.mutle.fixture.MutleFixtureLoader;
 import org.codedefenders.arcade.mutle.fixture.MutleMutant;
 import org.codedefenders.arcade.mutle.fixture.MutleTest;
 import org.codedefenders.arcade.mutle.model.MutleFixtureInstallation;
@@ -65,6 +65,8 @@ import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.util.concurrent.Striped;
+
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
@@ -77,12 +79,12 @@ public class MutleService {
     private static final Logger logger = LoggerFactory.getLogger(MutleService.class);
     public static final int MAX_GUESSES = 6;
     private static final Duration SUBMISSION_TIMEOUT = Duration.ofMinutes(2);
+    private static final Striped<Lock> SUBMISSION_LOCKS = Striped.lock(256);
     private static final Pattern COMPILER_ERROR = Pattern.compile(
             "(?m)^\\[javac]\\s+.*\\.java:(\\d+): error: (.+)$");
 
     private final MutleRepository mutleRepository;
-    private final MutleFixtureLoader fixtureLoader;
-    private final MutleSettings settings;
+    private final MutleCatalog catalog;
     private final PuzzleRepository puzzleRepository;
     private final GameManagingUtils gameManagingUtils;
     private final GameService gameService;
@@ -95,24 +97,23 @@ public class MutleService {
     private final TransactionManager transactionManager;
 
     @Inject
-    public MutleService(MutleRepository mutleRepository, MutleFixtureLoader fixtureLoader, MutleSettings settings,
+    public MutleService(MutleRepository mutleRepository, MutleCatalog catalog,
                         PuzzleRepository puzzleRepository, GameManagingUtils gameManagingUtils, GameService gameService,
                         IMutationTester mutationTester, TestValidator testValidator, MutleFixtureInstaller installer,
                         AchievementService achievementService, I18nService i18nService,
                         TransactionManager transactionManager) {
-        this(mutleRepository, fixtureLoader, settings, puzzleRepository, gameManagingUtils, gameService,
+        this(mutleRepository, catalog, puzzleRepository, gameManagingUtils, gameService,
                 mutationTester, testValidator, installer, achievementService, i18nService, transactionManager,
                 Clock.systemUTC());
     }
 
-    MutleService(MutleRepository mutleRepository, MutleFixtureLoader fixtureLoader, MutleSettings settings,
+    MutleService(MutleRepository mutleRepository, MutleCatalog catalog,
                  PuzzleRepository puzzleRepository, GameManagingUtils gameManagingUtils, GameService gameService,
                  IMutationTester mutationTester, TestValidator testValidator, MutleFixtureInstaller installer,
                  AchievementService achievementService, I18nService i18nService, TransactionManager transactionManager,
                  Clock clock) {
         this.mutleRepository = mutleRepository;
-        this.fixtureLoader = fixtureLoader;
-        this.settings = settings;
+        this.catalog = catalog;
         this.puzzleRepository = puzzleRepository;
         this.gameManagingUtils = gameManagingUtils;
         this.gameService = gameService;
@@ -126,8 +127,8 @@ public class MutleService {
     }
 
     public synchronized MutleStateView start(int userId) {
-        long rotationPeriod = currentRotationPeriod();
         MutleEntry entry = currentEntry();
+        long rotationPeriod = entry.series() - 1L;
         installer.ensureInstalled(entry);
         String fixtureKey = fixtureKey(entry);
         Optional<MutleGame> existing = mutleRepository.findGame(userId, rotationPeriod);
@@ -150,7 +151,7 @@ public class MutleService {
     }
 
     public List<MutleFixtureView> fixtures() {
-        return fixtureLoader.pack().entries().stream()
+        return catalog.allEntries().stream()
                 .map(this::fixtureView)
                 .toList();
     }
@@ -159,18 +160,16 @@ public class MutleService {
      * Returns the fixture selected for the current rotation without creating a game.
      */
     public MutleFixtureView currentFixture() {
-        return fixtureView(currentEntry());
+        return catalog.currentEntry(clock.instant()).map(this::fixtureView).orElse(null);
     }
 
-    /** Validates and installs every shipped fixture before the Mutle entry point is exposed. */
+    /** Makes the fixture catalog available before the Mutle entry point is exposed. */
     public boolean isReady() {
         try {
-            List<MutleEntry> entries = fixtureLoader.pack().entries();
-            settings.rotation(clock).currentIndex(entries.size());
-            installer.ensurePackInstalled(entries);
+            catalog.ensureSeeded();
             return true;
         } catch (RuntimeException exception) {
-            logger.error("Mutle is unavailable because its shipped fixtures are not ready", exception);
+            logger.error("Mutle is unavailable because its fixture catalog is not ready", exception);
             return false;
         }
     }
@@ -180,8 +179,12 @@ public class MutleService {
      * Visiting the overview must not create a game as a side effect.
      */
     public Optional<MutleStateView> current(int userId) {
-        String fixtureKey = fixtureKey(currentEntry());
-        return mutleRepository.findGame(userId, currentRotationPeriod())
+        Optional<MutleEntry> currentEntry = catalog.currentEntry(clock.instant());
+        if (currentEntry.isEmpty()) {
+            return Optional.empty();
+        }
+        String fixtureKey = fixtureKey(currentEntry.get());
+        return mutleRepository.findGame(userId, currentEntry.get().series() - 1L)
                 .filter(game -> game.fixtureKey().equals(fixtureKey))
                 .map(game -> state(userId, game.gameId()));
     }
@@ -195,7 +198,7 @@ public class MutleService {
             throw new NotFoundException();
         }
         MutleEntry entry = entry(game.fixtureKey());
-        MutleClass fixtureClass = fixtureLoader.fixtureClass(entry.classKey());
+        MutleClass fixtureClass = catalog.fixtureClass(entry.classKey());
         MutleMutant metadata = mutant(entry);
         Mutant target = target(puzzleGame);
         boolean practice = game.rotationPeriod() == -game.gameId();
@@ -209,13 +212,24 @@ public class MutleService {
                         target.getPatchString(), metadata.revealExplanation(), proofSource(entry.classKey(), fixtureClass, metadata))
                 : null;
         return new MutleStateView(game.gameId(), entry.series(), fixtureClass.title(),
-                fixtureClass.specification(), fixtureLoader.readClassResource(entry.classKey(), fixtureClass.sourcePath()),
+                fixtureClass.specification(), catalog.readClassResource(entry.classKey(), fixtureClass.sourcePath()),
                 guesses.size(),
                 MAX_GUESSES - guesses.size(), expired, solved, failed, puzzleGame.getCUT().getTestTemplate(),
                 guesses, reveal);
     }
 
     public MutleStateView submit(int userId, int gameId, String source) throws IOException {
+        // Serialize live submissions for the same game; the database lease recovers abandoned ones.
+        Lock submissionLock = SUBMISSION_LOCKS.get(gameId);
+        submissionLock.lock();
+        try {
+            return submitLocked(userId, gameId, source);
+        } finally {
+            submissionLock.unlock();
+        }
+    }
+
+    private MutleStateView submitLocked(int userId, int gameId, String source) throws IOException {
         MutleGame game = ownedGame(userId, gameId);
         MutleStateView before = state(userId, gameId);
         if (before.expired() || before.solved() || before.failed()) {
@@ -263,7 +277,7 @@ public class MutleService {
     }
 
     public List<MutleStateView> history(int userId) {
-        return historyGames(mutleRepository.findGamesForUser(userId), fixtureLoader.pack().entries(),
+        return historyGames(mutleRepository.findGamesForUser(userId), catalog.allEntries(),
                 currentRotationPeriod()).stream()
                 .map(game -> state(userId, game.gameId()))
                 .filter(state -> state.acceptedGuesses() > 0).toList();
@@ -437,38 +451,31 @@ public class MutleService {
     }
 
     private MutleEntry currentEntry() {
-        List<MutleEntry> entries = fixtureLoader.pack().entries();
-        return entries.get(settings.rotation(clock).currentIndex(entries.size()));
+        return catalog.currentEntry(clock.instant()).orElseThrow(NotFoundException::new);
     }
 
     private long currentRotationPeriod() {
-        return settings.rotation(clock).currentPeriod();
+        return catalog.currentEntry(clock.instant()).map(entry -> entry.series() - 1L).orElse(-1L);
     }
 
     private MutleEntry entry(String fixtureKey) {
-        return findEntry(fixtureKey).orElseThrow(NotFoundException::new);
-    }
-
-    private Optional<MutleEntry> findEntry(String fixtureKey) {
-        return fixtureLoader.pack().entries().stream()
-                .filter(entry -> fixtureKey(entry).equals(fixtureKey))
-                .findFirst();
+        return catalog.findEntry(fixtureKey).orElseThrow(NotFoundException::new);
     }
 
     private MutleFixtureView fixtureView(MutleEntry entry) {
         return new MutleFixtureView(fixtureKey(entry), entry.series(),
-                fixtureLoader.fixtureClass(entry.classKey()).title());
+                catalog.fixtureClass(entry.classKey()).title());
     }
 
     private MutleMutant mutant(MutleEntry entry) {
-        MutleClass fixtureClass = fixtureLoader.fixtureClass(entry.classKey());
+        MutleClass fixtureClass = catalog.fixtureClass(entry.classKey());
         return fixtureClass.mutants().stream().filter(mutant -> mutant.key().equals(entry.mutantKey())).findFirst()
                 .orElseThrow(() -> new IllegalStateException("Mutle entry references no mutant"));
     }
 
     private String proofSource(String classKey, MutleClass fixtureClass, MutleMutant mutant) {
         return fixtureClass.tests().stream().filter(test -> test.key().equals(mutant.proofTestKey())).findFirst()
-                .map(MutleTest::sourcePath).map(path -> fixtureLoader.readClassResource(classKey, path))
+                .map(MutleTest::sourcePath).map(path -> catalog.readClassResource(classKey, path))
                 .orElseThrow(() -> new IllegalStateException("Mutle mutant proof test is missing"));
     }
 

@@ -26,19 +26,22 @@
     <link rel="stylesheet" href="${url.forPath('/css/mutle.css')}">
     <main class="container">
         <section class="mutle-hero p-4 p-md-5 mb-5">
-            <p class="text-uppercase fw-semibold mb-2">${i18n.tr('Weekly mutation puzzle')}</p>
-            <h1>${i18n.tr('Current case')}</h1>
+            <p class="text-uppercase fw-semibold mb-2">${i18n.tr('Mutation puzzle')}</p>
+            <h1>${empty currentFixture ? i18n.tr('Coming soon') : i18n.tr('Current case')}</h1>
             <p class="lead mb-2">
                 <c:choose>
                     <c:when test="${not empty currentCase}">
-                        ${i18n.tr('Series')} ${currentCase.series} · ${currentCase.title}
+                        ${i18n.tr('Series')} ${currentCase.series} · <c:out value="${currentCase.title}" />
                     </c:when>
-                    <c:otherwise>
-                        ${i18n.tr('Series')} ${currentFixture.series} · ${currentFixture.title}
-                    </c:otherwise>
+                    <c:when test="${not empty currentFixture}">
+                        ${i18n.tr('Series')} ${currentFixture.series} · <c:out value="${currentFixture.title}" />
+                    </c:when>
+                    <c:otherwise>${i18n.tr('The first case has not been published yet.')}</c:otherwise>
                 </c:choose>
             </p>
-            <p class="mb-4">${i18n.tr('You have six accepted tests to isolate this week’s hidden change.')}</p>
+            <p class="mb-4">${empty currentFixture
+                    ? i18n.tr('Check back when the semester begins.')
+                    : i18n.tr('You have six accepted tests to isolate the hidden change.')}</p>
             <c:if test="${not empty currentCase}">
                 <p class="mb-3">
                     <span class="badge bg-${currentCase.solved ? 'success' : (currentCase.failed ? 'danger' : (currentCase.expired ? 'secondary' : 'primary'))} text-white">
@@ -48,6 +51,7 @@
                 </p>
             </c:if>
             <c:choose>
+                <c:when test="${empty currentFixture}"></c:when>
                 <c:when test="${empty currentCase}">
                     <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}">${i18n.tr('Start current case')}</a>
                 </c:when>
@@ -70,9 +74,13 @@
                         <div class="col-md">
                             <label class="form-label" for="mutle-fixture">${i18n.tr('Fixture')}</label>
                             <select class="form-select" id="mutle-fixture" name="fixture">
-                                <c:forEach items="${fixtures}" var="fixture">
+                                <c:forEach items="${fixtures}" var="fixture" varStatus="entry">
                                     <option value="${fixture.fixtureKey}">
-                                        ${i18n.tr('Series')} ${fixture.series} · ${fixture.title}
+                                        <c:choose>
+                                            <c:when test="${fixture.series > 0}">${i18n.tr('Series')} ${fixture.series}</c:when>
+                                            <c:otherwise>${i18n.tr('Unscheduled')} #${entry.count}</c:otherwise>
+                                        </c:choose>
+                                        · <c:out value="${fixture.title}" />
                                     </option>
                                 </c:forEach>
                             </select>
@@ -97,7 +105,7 @@
                         <c:forEach items="${history}" var="game">
                             <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${game.gameId}">
-                                <span><strong>${i18n.tr('Series')} ${game.series}</strong> · ${game.title}
+                                <span><strong>${i18n.tr('Series')} ${game.series}</strong> · <c:out value="${game.title}" />
                                     <small class="text-muted d-block">${game.acceptedGuesses}/${game.acceptedGuesses + game.remainingGuesses} ${i18n.tr('accepted tests')}</small>
                                 </span>
                                 <span class="badge bg-${game.solved ? 'success' : (game.failed ? 'danger' : (game.expired ? 'secondary' : 'primary'))} text-white">

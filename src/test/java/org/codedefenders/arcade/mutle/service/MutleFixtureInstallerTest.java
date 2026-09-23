@@ -79,6 +79,15 @@ class MutleFixtureInstallerTest {
     }
 
     @Test
+    void storesNestedFixtureFile(@TempDir Path directory) throws Exception {
+        Path expected = directory.resolve("nested/ParcelLocker.java");
+
+        assertEquals(expected, MutleFixtureInstaller.storeFixtureFile(directory, "nested/ParcelLocker.java",
+                "class ParcelLocker {}"));
+        assertEquals("class ParcelLocker {}", Files.readString(expected, StandardCharsets.UTF_8));
+    }
+
+    @Test
     void storesFixtureSourcesInEstablishedClassAndMutantLayout(@TempDir Path sourcesDirectory) {
         String source = "package org.codedefenders.mutle; class AppointmentBook {}";
 

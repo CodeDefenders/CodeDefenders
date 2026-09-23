@@ -19,12 +19,16 @@
 package org.codedefenders.arcade.mutle.fixture;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +54,7 @@ class MutleFixtureLoaderTest {
                 "key":"full-locker",
                 "sourcePath":"mutants/full-locker.java",
                 "method":"deposit",
-                "mutatedLines":[12],
+                "mutatedLines":[2],
                 "operator":"RELATIONAL",
                 "proofTestKey":"fills-locker",
                 "revealExplanation":"A full locker must reject another parcel."
@@ -62,11 +66,12 @@ class MutleFixtureLoaderTest {
         Map<String, String> resources = new HashMap<>();
         resources.put(MutleFixtureLoader.packResource(), PACK);
         resources.put(MutleFixtureLoader.classResource("parcel-locker"), CLASS);
-        resources.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/ParcelLocker.java", "public class ParcelLocker {}\n");
+        resources.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/ParcelLocker.java",
+                "public class ParcelLocker {\n  public void deposit() {}\n}\n");
         resources.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/tests/fills-locker.java",
-                "public class TestParcelLocker {}\n");
+                "public class TestParcelLocker {\n  @org.junit.Test public void proves() {}\n}\n");
         resources.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/mutants/full-locker.java",
-                "public class ParcelLocker {}\n");
+                "public class ParcelLocker {\n  public void deposit() {}\n}\n");
         return resources;
     }
 
@@ -140,7 +145,7 @@ class MutleFixtureLoaderTest {
 
         Map<String, String> malformedLineResources = validResources();
         malformedLineResources.put(MutleFixtureLoader.classResource("parcel-locker"),
-                CLASS.replace("\"mutatedLines\":[12]", "\"mutatedLines\":[0]"));
+                CLASS.replace("\"mutatedLines\":[2]", "\"mutatedLines\":[0]"));
         exception = assertThrows(IllegalStateException.class,
                 () -> loader(malformedLineResources).fixtureClass("parcel-locker"));
         assertTrue(exception.getMessage().contains("positive integer"));
@@ -167,5 +172,105 @@ class MutleFixtureLoaderTest {
         exception = assertThrows(IllegalStateException.class,
                 () -> loader(duplicateTestResources).fixtureClass("parcel-locker"));
         assertTrue(exception.getMessage().contains("test key fills-locker is duplicated"));
+    }
+
+    @Test
+    void loadsArchiveWithAClassDirectoryPrefix() throws Exception {
+        ByteArrayOutputStream archive = new ByteArrayOutputStream();
+        try (ZipOutputStream zip = new ZipOutputStream(archive, StandardCharsets.UTF_8)) {
+            String classPrefix = MutleFixtureLoader.classDirectory("parcel-locker") + "/";
+            for (Map.Entry<String, String> resource : validResources().entrySet()) {
+                if (!resource.getKey().startsWith(classPrefix)) {
+                    continue;
+                }
+                String path = "parcel-locker/" + resource.getKey().substring(classPrefix.length());
+                zip.putNextEntry(new ZipEntry(path));
+                zip.write(resource.getValue().getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
+        }
+
+        var bundle = MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive.toByteArray()));
+        assertEquals("parcel-locker", bundle.classKey());
+        assertEquals(CLASS, bundle.classJson());
+        assertEquals("public class ParcelLocker {\n  public void deposit() {}\n}\n",
+                bundle.resources().get("ParcelLocker.java"));
+        assertEquals("public class ParcelLocker {\n  public void deposit() {}\n}\n",
+                bundle.resources().get("mutants/full-locker.java"));
+    }
+
+    @Test
+    void rejectsSourcesWithUnknownMethodOrOutOfMethodLine() {
+        Map<String, String> unknownMethod = validResources();
+        unknownMethod.put(MutleFixtureLoader.classResource("parcel-locker"),
+                CLASS.replace("\"method\":\"deposit\"", "\"method\":\"missing\""));
+        IOException exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(unknownMethod))));
+        assertTrue(exception.getMessage().contains("method missing is missing"));
+
+        Map<String, String> outOfMethod = validResources();
+        outOfMethod.put(MutleFixtureLoader.classResource("parcel-locker"),
+                CLASS.replace("\"mutatedLines\":[2]", "\"mutatedLines\":[3]"));
+        exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(outOfMethod))));
+        assertTrue(exception.getMessage().contains("must belong to exactly one"));
+    }
+
+    @Test
+    void rejectsUnparsableCutAndProofSources() {
+        Map<String, String> invalidCut = validResources();
+        invalidCut.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/ParcelLocker.java",
+                "public class ParcelLocker {\n");
+        IOException exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(invalidCut))));
+        assertTrue(exception.getMessage().contains("unparsable CUT"));
+
+        Map<String, String> uncompilableCut = validResources();
+        uncompilableCut.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/ParcelLocker.java",
+                "public class ParcelLocker {\n  public void deposit() { int value = \"bad\"; }\n}\n");
+        exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(uncompilableCut))));
+        assertTrue(exception.getMessage().contains("CUT ParcelLocker.java does not compile"));
+
+        Map<String, String> invalidProof = validResources();
+        invalidProof.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/tests/fills-locker.java",
+                "public class TestParcelLocker {\n");
+        exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(invalidProof))));
+        assertTrue(exception.getMessage().contains("unparsable proof test"));
+    }
+
+    @Test
+    void rejectsProofWithoutJUnitTestAndReusedSourcePath() throws IOException {
+        Map<String, String> missingTest = validResources();
+        missingTest.put(MutleFixtureLoader.classDirectory("parcel-locker") + "/tests/fills-locker.java",
+                "public class TestParcelLocker {\n  public void helper() {}\n}\n");
+        IOException exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(missingTest))));
+        assertTrue(exception.getMessage().contains("must declare a JUnit test method"));
+
+        Map<String, String> reusedPath = validResources();
+        reusedPath.put(MutleFixtureLoader.classResource("parcel-locker"),
+                CLASS.replace("\"sourcePath\":\"mutants/full-locker.java\"",
+                        "\"sourcePath\":\"ParcelLocker.java\""));
+        exception = assertThrows(IOException.class,
+                () -> MutleFixtureLoader.loadArchive(new ByteArrayInputStream(archive(reusedPath))));
+        assertTrue(exception.getMessage().contains("source path ParcelLocker.java is reused"));
+    }
+
+    private static byte[] archive(Map<String, String> resources) throws IOException {
+        ByteArrayOutputStream archive = new ByteArrayOutputStream();
+        try (ZipOutputStream zip = new ZipOutputStream(archive, StandardCharsets.UTF_8)) {
+            String classPrefix = MutleFixtureLoader.classDirectory("parcel-locker") + "/";
+            for (Map.Entry<String, String> resource : resources.entrySet()) {
+                if (!resource.getKey().startsWith(classPrefix)) {
+                    continue;
+                }
+                zip.putNextEntry(new ZipEntry("parcel-locker/" + resource.getKey().substring(classPrefix.length())));
+                zip.write(resource.getValue().getBytes(StandardCharsets.UTF_8));
+                zip.closeEntry();
+            }
+        }
+        return archive.toByteArray();
     }
 }

@@ -70,6 +70,10 @@ public class MutleServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        if (gameId == null && fixtureKey == null && mutleService.currentFixture() == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
         request.setAttribute("mutleGameId", gameId == null ? "" : gameId);
         request.setAttribute("mutleFixtureKey", fixtureKey == null ? "" : fixtureKey);
         request.getRequestDispatcher("/jsp/mutle/play.jsp").forward(request, response);

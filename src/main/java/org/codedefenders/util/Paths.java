@@ -92,6 +92,7 @@ public class Paths {
     public static final String ADMIN_PUZZLE_OVERVIEW = "/admin/puzzles";
     public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
     public static final String ADMIN_PUZZLE_UPLOAD = "/admin/puzzles/upload";
+    public static final String ADMIN_MUTLE = "/admin/mutle";
 
     public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";

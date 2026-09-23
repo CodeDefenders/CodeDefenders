@@ -67,7 +67,7 @@
                 </div>
                 <div class="mutle-case-state">
                     <p id="mutle-status" class="mb-1" aria-live="polite"></p>
-                    <p id="mutle-remaining" class="mb-0"></p>
+                    <p id="mutle-remaining" class="mb-0" role="status" aria-live="polite" aria-atomic="true"></p>
                 </div>
             </header>
             <div id="mutle-notice" class="alert d-none" role="status" aria-live="polite">

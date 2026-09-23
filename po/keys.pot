@@ -11900,11 +11900,11 @@ msgstr "Let users play Mutle puzzles."
 msgid "Mutle"
 msgstr "Mutle"
 
-msgid "Weekly mutation puzzle"
-msgstr "Weekly mutation puzzle"
+msgid "Mutation puzzle"
+msgstr "Mutation puzzle"
 
-msgid "You have six accepted tests to isolate this week’s hidden change."
-msgstr "You have six accepted tests to isolate this week’s hidden change."
+msgid "You have six accepted tests to isolate the hidden change."
+msgstr "You have six accepted tests to isolate the hidden change."
 
 msgid "Current case"
 msgstr "Current case"
@@ -12058,3 +12058,95 @@ msgstr "The test could not be evaluated. Please try again."
 
 msgid "Show details"
 msgstr "Show details"
+
+#: src/main/webapp/jsp/mutle/overview.jsp
+msgid "Check back when the semester begins."
+msgstr "Check back when the semester begins."
+
+msgid "The first case has not been published yet."
+msgstr "The first case has not been published yet."
+
+#: src/main/webapp/jsp/admin_mutle.jsp
+msgid "Mutle administration"
+msgstr "Mutle administration"
+
+msgid "Import fixture classes and publish one case for each lecture."
+msgstr "Import fixture classes and publish one case for each lecture."
+
+msgid "Fixture inventory"
+msgstr "Fixture inventory"
+
+msgid "Mutants remain hidden from players."
+msgstr "Mutants remain hidden from players."
+
+msgid "No Mutle fixtures are installed."
+msgstr "No Mutle fixtures are installed."
+
+msgid "Scheduled"
+msgstr "Scheduled"
+
+msgid "Available"
+msgstr "Available"
+
+msgid "Add fixture class"
+msgstr "Add fixture class"
+
+msgid "Fixture ZIP"
+msgstr "Fixture ZIP"
+
+msgid "Upload one class and its mutants as a Mutle fixture ZIP. Validate puzzle quality offline before upload."
+msgstr "Upload one class and its mutants as a Mutle fixture ZIP. Validate puzzle quality offline before upload."
+
+msgid "The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder."
+msgstr "The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder."
+
+msgid "Upload fixture"
+msgstr "Upload fixture"
+
+msgid "Publication schedule"
+msgstr "Publication schedule"
+
+msgid "Published cases stay locked; future dates and fixture assignments can be changed."
+msgstr "Published cases stay locked; future dates and fixture assignments can be changed."
+
+msgid "No future case is scheduled. The current case remains available until you add one."
+msgstr "No future case is scheduled. The current case remains available until you add one."
+
+msgid "No cases are scheduled yet."
+msgstr "No cases are scheduled yet."
+
+msgid "First release (UTC)"
+msgstr "First release (UTC)"
+
+msgid "Interpreted as UTC. This schedules 15 weekly cases."
+msgstr "Interpreted as UTC. This schedules 15 weekly cases."
+
+msgid "Schedule 15 weekly cases"
+msgstr "Schedule 15 weekly cases"
+
+msgid "Add case"
+msgstr "Add case"
+
+msgid "Case"
+msgstr "Case"
+
+msgid "Coming soon"
+msgstr "Coming soon"
+
+msgid "Future"
+msgstr "Future"
+
+msgid "Next case"
+msgstr "Next case"
+
+msgid "Published"
+msgstr "Published"
+
+msgid "Release (UTC)"
+msgstr "Release (UTC)"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Unscheduled"
+msgstr "Unscheduled"

@@ -18,41 +18,17 @@
  */
 package org.codedefenders.arcade.mutle.service;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
-
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
-/** Runtime configuration for Mutle availability and fixture rotation. */
+/** Runtime configuration for Mutle availability. */
 @Named("mutleSettings")
 @ApplicationScoped
 public class MutleSettings {
-    private final Configuration configuration;
-
-    @Inject
-    public MutleSettings(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
     public boolean enabled() {
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_MUTLE_SECTION).getBoolValue();
-    }
-
-    public MutleRotation rotation(Clock clock) {
-        try {
-            Instant start = Instant.parse(configuration.getMutleRotationStart());
-            Duration period = Duration.ofDays(configuration.getMutleRotationPeriodDays());
-            return new MutleRotation(start, period, clock);
-        } catch (DateTimeParseException | ArithmeticException e) {
-            throw new IllegalStateException("Invalid Mutle rotation configuration.", e);
-        }
     }
 }

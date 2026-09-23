@@ -163,6 +163,7 @@
 
 .mutle-notice {
     display: flex;
+    flex-wrap: wrap;
     gap: .65rem;
     align-items: center;
     margin-bottom: 1.5rem;
@@ -172,17 +173,20 @@
 
 .mutle-notice details {
     flex-basis: 100%;
+    min-width: 0;
     margin-top: .5rem;
+}
+
+#mutle-notice-message {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
 }
 
 .mutle-notice pre {
     overflow-x: auto;
     color: inherit;
     font: inherit;
-    white-space: pre-wrap;
-}
-
-#mutle-notice-message {
     white-space: pre-wrap;
 }
 
@@ -383,11 +387,6 @@
     border: 1px solid rgba(111, 66, 193, .28);
     border-radius: var(--bs-border-radius);
     background: #fff;
-}
-
-.mutle-reveal:empty,
-.mutle-history:empty {
-    display: none;
 }
 
 .mutle-reveal-intro {
