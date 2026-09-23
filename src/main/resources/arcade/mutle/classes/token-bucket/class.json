@@ -1,0 +1,20 @@
+{
+  "id": "token-bucket",
+  "title": "Token Bucket",
+  "specification": "A token bucket starts empty, caps replenishment at its capacity, and allows spending only available positive tokens.",
+  "concepts": ["state", "boundaries", "arithmetic"],
+  "sourcePath": "TokenBucket.java",
+  "tests": [
+    {"key":"capacity-range","title":"Capacity must be positive","sourcePath":"tests/TokenBucketCapacityRangeTest.java"},
+    {"key":"starts-empty","title":"A new bucket is empty","sourcePath":"tests/TokenBucketStartsEmptyTest.java"},
+    {"key":"refill","title":"Refill adds tokens","sourcePath":"tests/TokenBucketRefillTest.java"},
+    {"key":"exact-refill","title":"Refill can reach capacity exactly","sourcePath":"tests/TokenBucketExactRefillTest.java"},
+    {"key":"overflow-capped","title":"Overflow is capped","sourcePath":"tests/TokenBucketOverflowCappedTest.java"},
+    {"key":"spend","title":"Available tokens can be spent","sourcePath":"tests/TokenBucketSpendTest.java"},
+    {"key":"overspend","title":"Overspending is rejected","sourcePath":"tests/TokenBucketOverspendTest.java"},
+    {"key":"nonpositive","title":"Non-positive amounts are rejected","sourcePath":"tests/TokenBucketNonpositiveTest.java"}
+  ],
+  "mutants": [
+    {"key":"exact-refill-capped","sourcePath":"mutants/exact-refill-capped/TokenBucket.java","method":"refill","mutatedLines":[17],"operator":"ARITHMETIC_OPERATOR_INSERTION","proofTestKey":"exact-refill","revealExplanation":"The bucket cannot refill to its full capacity."}
+  ]
+}
