@@ -205,6 +205,13 @@ public class AchievementService {
         }
     }
 
+    public void addMutleSolved(int userId, int acceptedGuesses) {
+        updateAchievement(userId, AchievementType.MUTLE_FIRST_SOLVE, 1);
+        if (acceptedGuesses <= 2) {
+            updateAchievement(userId, AchievementType.MUTLE_SOLVE_IN_TWO, 1);
+        }
+    }
+
     private void addTestWritten(int userId) {
         updateAchievement(userId, AchievementType.WRITE_TESTS, 1);
     }

@@ -132,6 +132,17 @@ public class PuzzleRepository {
         return puzzle.orElse(null);
     }
 
+    public Puzzle getPuzzleForClassId(int classId) {
+        @Language("SQL") String query = """
+                SELECT *
+                FROM puzzles
+                WHERE Class_ID = ?
+                ORDER BY Puzzle_ID
+                LIMIT 1;
+        """;
+        return queryRunner.query(query, oneFromRS(PuzzleRepository::puzzleFromRS), classId).orElse(null);
+    }
+
     /**
      * Returns a {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
      *

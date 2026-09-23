@@ -29,7 +29,7 @@
 
 <div class="achievement-card achievement-level-${achievement.level}">
     <div class="pie animate" style="--percentage: ${achievement.progress.orElse(100)}">
-        <img src="${url.forPath("/images/achievements/")}codedefenders_achievements_${achievement.type.id}_lvl_${achievement.level}.png"
+        <img src="${url.forPath("/images/achievements/")}${achievement.imageFileName}"
              alt="${i18n.tr('{0} (Level {1})', achievement.getName(i18n), achievement.level)}">
     </div>
     <p>

@@ -11854,3 +11854,207 @@ msgstr "Failed to copy"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Error updating whitelist"
+
+#: src/main/java/org/codedefenders/model/AchievementType.java
+msgid "No Mutle cases solved"
+msgstr "No Mutle cases solved"
+
+msgid "Solve a Mutle case"
+msgstr "Solve a Mutle case"
+
+msgid "{0} of {1} Mutle cases solved"
+msgstr "{0} of {1} Mutle cases solved"
+
+msgid "Mutle Solver"
+msgstr "Mutle Solver"
+
+msgid "Solve your first Mutle case"
+msgstr "Solve your first Mutle case"
+
+msgid "Mutle case solved"
+msgstr "Mutle case solved"
+
+msgid "No Mutle case solved in two tests or fewer"
+msgstr "No Mutle case solved in two tests or fewer"
+
+msgid "Solve a Mutle case in two tests or fewer"
+msgstr "Solve a Mutle case in two tests or fewer"
+
+msgid "{0} of {1} Mutle cases solved in two tests or fewer"
+msgstr "{0} of {1} Mutle cases solved in two tests or fewer"
+
+msgid "Swift Mutle Solver"
+msgstr "Swift Mutle Solver"
+
+msgid "Mutle case solved in two tests or fewer"
+msgstr "Mutle case solved in two tests or fewer"
+
+#: src/main/java/org/codedefenders/configuration/implementation/ConfigurationBrowser.java
+msgid "Allow Mutle Section"
+msgstr "Allow Mutle Section"
+
+msgid "Let users play Mutle puzzles."
+msgstr "Let users play Mutle puzzles."
+
+#: src/main/webapp/jsp/mutle/overview.jsp src/main/webapp/jsp/mutle/play.jsp
+msgid "Mutle"
+msgstr "Mutle"
+
+msgid "Weekly mutation puzzle"
+msgstr "Weekly mutation puzzle"
+
+msgid "You have six accepted tests to isolate this week’s hidden change."
+msgstr "You have six accepted tests to isolate this week’s hidden change."
+
+msgid "Current case"
+msgstr "Current case"
+
+msgid "Start current case"
+msgstr "Start current case"
+
+msgid "Review current case"
+msgstr "Review current case"
+
+msgid "Continue current case"
+msgstr "Continue current case"
+
+msgid "Your attempts"
+msgstr "Your attempts"
+
+msgid "accepted tests"
+msgstr "accepted tests"
+
+msgid "In progress"
+msgstr "In progress"
+
+msgid "Case history"
+msgstr "Case history"
+
+msgid "Cases you attempt will appear here. Practice games are not included."
+msgstr "Cases you attempt will appear here. Practice games are not included."
+
+msgid "Fixture practice"
+msgstr "Fixture practice"
+
+msgid "Start a fresh, non-scoring game for any fixture. Practice games do not award achievements."
+msgstr "Start a fresh, non-scoring game for any fixture. Practice games do not award achievements."
+
+msgid "Fixture"
+msgstr "Fixture"
+
+msgid "Start fresh practice game"
+msgstr "Start fresh practice game"
+
+msgid "Series"
+msgstr "Series"
+
+msgid "Solved"
+msgstr "Solved"
+
+msgid "Failed in six"
+msgstr "Failed in six"
+
+msgid "Expired"
+msgstr "Expired"
+
+msgid "{0} guesses remaining"
+msgstr "{0} guesses remaining"
+
+msgid "Guess {0}: {1}"
+msgstr "Guess {0}: {1}"
+
+msgid "Guess {0}: empty"
+msgstr "Guess {0}: empty"
+
+msgid "Test {0}: {1}"
+msgstr "Test {0}: {1}"
+
+msgid "Reveal"
+msgstr "Reveal"
+
+msgid "Mutant source"
+msgstr "Mutant source"
+
+msgid "Mutant diff"
+msgstr "Mutant diff"
+
+msgid "Reference proof test"
+msgstr "Reference proof test"
+
+msgid "No relevant coverage"
+msgstr "No relevant coverage"
+
+msgid "Mutated method covered"
+msgstr "Mutated method covered"
+
+msgid "Mutated line covered"
+msgstr "Mutated line covered"
+
+msgid "Changed line covered, mutant survived"
+msgstr "Changed line covered, mutant survived"
+
+msgid "Mutant killed"
+msgstr "Mutant killed"
+
+msgid "Result copied"
+msgstr "Result copied"
+
+msgid "Could not copy result"
+msgstr "Could not copy result"
+
+msgid "This case is unavailable."
+msgstr "This case is unavailable."
+
+msgid "Unable to load the case."
+msgstr "Unable to load the case."
+
+msgid "Loading case…"
+msgstr "Loading case…"
+
+msgid "Original class"
+msgstr "Original class"
+
+msgid "Original class source"
+msgstr "Original class source"
+
+msgid "Your test"
+msgstr "Your test"
+
+msgid "Test source"
+msgstr "Test source"
+
+msgid "Submit test"
+msgstr "Submit test"
+
+msgid "Six result cells"
+msgstr "Six result cells"
+
+msgid "Copy result"
+msgstr "Copy result"
+
+msgid "What tests are allowed?"
+msgstr "What tests are allowed?"
+
+msgid "Select an attempt to show its coverage."
+msgstr "Select an attempt to show its coverage."
+
+msgid "Reuse test"
+msgstr "Reuse test"
+
+msgid "Test copied to the editor."
+msgstr "Test copied to the editor."
+
+msgid "Evaluating test…"
+msgstr "Evaluating test…"
+
+msgid "Test accepted: {0}"
+msgstr "Test accepted: {0}"
+
+msgid "A test is already being evaluated. Please wait."
+msgstr "A test is already being evaluated. Please wait."
+
+msgid "The test could not be evaluated. Please try again."
+msgstr "The test could not be evaluated. Please try again."
+
+msgid "Show details"
+msgstr "Show details"

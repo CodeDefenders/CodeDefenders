@@ -1,3 +1,4 @@
+<%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%--
 
@@ -19,7 +20,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ tag pageEncoding="UTF-8" %>
+<%@ tag import="org.codedefenders.util.Paths" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
@@ -42,7 +43,7 @@
 <!-- JS Init -->
 <script type="module">
     import '${url.forPath("/js/codedefenders_init.mjs")}';
-    import {objects, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {AchievementNotifications, objects, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     /** @type {PushSocket} */
     const socket = await objects.await('pushSocket');
@@ -53,6 +54,20 @@
         if (userId >= 0) {
             socket.subscribe('registration.InviteRegistrationEvent', {
                 userId: userId
+            });
+
+            socket.subscribe('registration.AchievementRegistrationEvent', {
+                userId: userId
+            });
+
+            socket.register('achievement.AchievementUnlockedEvent', event => {
+                console.log('Achievement unlocked.', event);
+                AchievementNotifications.showAchievementNotification(event.achievement,
+                        "${url.forPath("/images/achievements/")}",
+                        "${url.forPath(Paths.USER_PROFILE)}");
+                socket.send('achievement.ClientAchievementNotificationShownEvent', {
+                    achievementId: event.achievement.achievementId
+                });
             });
         }
 

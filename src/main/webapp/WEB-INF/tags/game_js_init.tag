@@ -20,8 +20,6 @@
 --%>
 <%@ tag pageEncoding="UTF-8" %>
 
-<%@ tag import="org.codedefenders.util.Paths" %>
-
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
@@ -34,7 +32,7 @@
 
 <%-- Recieve events from the server --%>
 <script type="module">
-    import {objects, AchievementNotifications, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {objects, ShowToasts} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */
@@ -84,23 +82,6 @@
                     });
                 }
             }
-        });
-
-
-        // achievements
-
-        socket.subscribe('registration.AchievementRegistrationEvent', {
-            userId: ${login.userId}
-        });
-
-        socket.register('achievement.AchievementUnlockedEvent', event => {
-            console.log('Achievement unlocked.', event);
-            AchievementNotifications.showAchievementNotification(event.achievement,
-                    "${url.forPath("/images/achievements/")}",
-                    "${url.forPath(Paths.USER_PROFILE)}");
-            socket.send('achievement.ClientAchievementNotificationShownEvent', {
-                achievementId: event.achievement.achievementId
-            });
         });
     })();
 </script>

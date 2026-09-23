@@ -20,6 +20,7 @@
  * @typedef {Object} Achievement
  * @property {Number} achievementId
  * @property {Number} level
+ * @property {String} imageFileName
  * @property {String} name
  * @property {String} description
  * @property {String} progressText
@@ -62,8 +63,7 @@ class AchievementNotifications {
             //secondary: "Level " + achievement.level,
             bodyTitle: i18n.tr(achievement.name, achievement.metricCurrent) + " (Level " + achievement.level + ")",
             body: progressText,
-            icon:  achievementPath + "codedefenders_achievements_" + achievement.achievementId
-                    + "_lvl_" + achievement.level + ".png",
+            icon: achievementPath + achievement.imageFileName,
             link: profilePath,
             longTimeout: true
         })

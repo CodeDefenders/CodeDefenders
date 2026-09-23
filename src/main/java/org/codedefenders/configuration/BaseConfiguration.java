@@ -70,6 +70,8 @@ public abstract class BaseConfiguration {
 
     protected Boolean metrics;
     protected Boolean javamelody;
+    protected String mutleRotationStart;
+    protected Integer mutleRotationPeriodDays;
 
 
     public File getDataDir() {
@@ -181,6 +183,14 @@ public abstract class BaseConfiguration {
 
     public boolean isJavaMelodyEnabled() {
         return javamelody != null ? javamelody : false;
+    }
+
+    public String getMutleRotationStart() {
+        return Objects.requireNonNullElse(mutleRotationStart, "2026-01-05T00:00:00Z");
+    }
+
+    public int getMutleRotationPeriodDays() {
+        return Objects.requireNonNullElse(mutleRotationPeriodDays, 7);
     }
 
     @Deprecated

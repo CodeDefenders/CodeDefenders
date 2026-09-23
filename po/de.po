@@ -9824,6 +9824,207 @@ msgstr "Kopieren fehlgeschlagen"
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
 
+msgid "No Mutle cases solved"
+msgstr "Keine Mutle-Fälle gelöst"
+
+msgid "Solve a Mutle case"
+msgstr "Einen Mutle-Fall lösen"
+
+msgid "{0} of {1} Mutle cases solved"
+msgstr "{0} von {1} Mutle-Fällen gelöst"
+
+msgid "Mutle Solver"
+msgstr "Mutle-Löser"
+
+msgid "Solve your first Mutle case"
+msgstr "Löse deinen ersten Mutle-Fall"
+
+msgid "Mutle case solved"
+msgstr "Mutle-Fall gelöst"
+
+msgid "No Mutle case solved in two tests or fewer"
+msgstr "Kein Mutle-Fall in zwei Tests oder weniger gelöst"
+
+msgid "Solve a Mutle case in two tests or fewer"
+msgstr "Einen Mutle-Fall in zwei Tests oder weniger lösen"
+
+msgid "{0} of {1} Mutle cases solved in two tests or fewer"
+msgstr "{0} von {1} Mutle-Fällen in zwei Tests oder weniger gelöst"
+
+msgid "Swift Mutle Solver"
+msgstr "Schneller Mutle-Löser"
+
+msgid "Mutle case solved in two tests or fewer"
+msgstr "Mutle-Fall in zwei Tests oder weniger gelöst"
+
+msgid "Allow Mutle Section"
+msgstr "Mutle-Bereich erlauben"
+
+msgid "Let users play Mutle puzzles."
+msgstr "Benutzern erlauben, Mutle-Rätsel zu spielen."
+
+msgid "Mutle"
+msgstr "Mutle"
+
+msgid "Weekly mutation puzzle"
+msgstr "Wöchentliches Mutationsrätsel"
+
+msgid "You have six accepted tests to isolate this week’s hidden change."
+msgstr "Du hast sechs akzeptierte Tests, um die versteckte Änderung dieser Woche einzugrenzen."
+
+msgid "Current case"
+msgstr "Aktueller Fall"
+
+msgid "Start current case"
+msgstr "Aktuellen Fall starten"
+
+msgid "Review current case"
+msgstr "Aktuellen Fall ansehen"
+
+msgid "Continue current case"
+msgstr "Aktuellen Fall fortsetzen"
+
+msgid "Your attempts"
+msgstr "Deine Versuche"
+
+msgid "accepted tests"
+msgstr "akzeptierte Tests"
+
+msgid "In progress"
+msgstr "In Bearbeitung"
+
+msgid "Case history"
+msgstr "Fallverlauf"
+
+msgid "Cases you attempt will appear here. Practice games are not included."
+msgstr "Hier erscheinen Fälle, die du versuchst. Übungsspiele sind nicht enthalten."
+
+msgid "Fixture practice"
+msgstr "Fixture-Übung"
+
+msgid "Start a fresh, non-scoring game for any fixture. Practice games do not award achievements."
+msgstr "Starte ein neues Spiel ohne Wertung für jedes Fixture. Übungsspiele bringen keine Erfolge."
+
+msgid "Fixture"
+msgstr "Fixture"
+
+msgid "Start fresh practice game"
+msgstr "Neue Übung starten"
+
+msgid "Series"
+msgstr "Serie"
+
+msgid "Solved"
+msgstr "Gelöst"
+
+msgid "Failed in six"
+msgstr "Nach sechs Versuchen gescheitert"
+
+msgid "Expired"
+msgstr "Abgelaufen"
+
+msgid "{0} guesses remaining"
+msgstr "Noch {0} Versuche"
+
+msgid "Guess {0}: {1}"
+msgstr "Versuch {0}: {1}"
+
+msgid "Guess {0}: empty"
+msgstr "Versuch {0}: leer"
+
+msgid "Test {0}: {1}"
+msgstr "Test {0}: {1}"
+
+msgid "Reveal"
+msgstr "Auflösung"
+
+msgid "Mutant source"
+msgstr "Quelltext des Mutanten"
+
+msgid "Mutant diff"
+msgstr "Änderung des Mutanten"
+
+msgid "Reference proof test"
+msgstr "Referenztest"
+
+msgid "No relevant coverage"
+msgstr "Keine relevante Abdeckung"
+
+msgid "Mutated method covered"
+msgstr "Mutierte Methode abgedeckt"
+
+msgid "Mutated line covered"
+msgstr "Mutierte Zeile abgedeckt"
+
+msgid "Changed line covered, mutant survived"
+msgstr "Geänderte Zeile abgedeckt, Mutant hat überlebt"
+
+msgid "Mutant killed"
+msgstr "Mutant getötet"
+
+msgid "Result copied"
+msgstr "Ergebnis kopiert"
+
+msgid "Could not copy result"
+msgstr "Ergebnis konnte nicht kopiert werden"
+
+msgid "This case is unavailable."
+msgstr "Dieser Fall ist nicht verfügbar."
+
+msgid "Unable to load the case."
+msgstr "Der Fall konnte nicht geladen werden."
+
+msgid "Loading case…"
+msgstr "Fall wird geladen…"
+
+msgid "Original class"
+msgstr "Originalklasse"
+
+msgid "Original class source"
+msgstr "Quelltext der Originalklasse"
+
+msgid "Your test"
+msgstr "Dein Test"
+
+msgid "Test source"
+msgstr "Testquelltext"
+
+msgid "Submit test"
+msgstr "Test einreichen"
+
+msgid "Six result cells"
+msgstr "Sechs Ergebnisfelder"
+
+msgid "Copy result"
+msgstr "Ergebnis kopieren"
+
+msgid "What tests are allowed?"
+msgstr "Welche Tests sind erlaubt?"
+
+msgid "Select an attempt to show its coverage."
+msgstr "Wähle einen Versuch aus, um seine Abdeckung anzuzeigen."
+
+msgid "Reuse test"
+msgstr "Test wiederverwenden"
+
+msgid "Test copied to the editor."
+msgstr "Test in den Editor kopiert."
+
+msgid "Evaluating test…"
+msgstr "Test wird ausgewertet …"
+
+msgid "Test accepted: {0}"
+msgstr "Test akzeptiert: {0}"
+
+msgid "A test is already being evaluated. Please wait."
+msgstr "Ein Test wird bereits ausgewertet. Bitte warten."
+
+msgid "The test could not be evaluated. Please try again."
+msgstr "Der Test konnte nicht ausgewertet werden. Bitte versuche es erneut."
+
+msgid "Show details"
+msgstr "Details anzeigen"
+
 #~ msgid "Change"
 #~ msgstr "Ändern"
 
