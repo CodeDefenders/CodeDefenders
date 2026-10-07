@@ -139,7 +139,8 @@
                                            class="form-label">${i18n.tr('Password')}</label>
                                     <input type="password" class="form-control" id="createacc-password-input"
                                            name="password" placeholder="${i18n.tr('Password')}"
-                                           required minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
+                                           required minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*"
+                                           autocomplete="new-password">
                                     <div class="invalid-feedback">
                                             ${i18n.tr('Please enter a valid password.')}
                                     </div>
@@ -278,7 +279,8 @@
                                                class="form-label">${i18n.tr('Password')}</label>
                                         <input type="password" class="form-control" id="changepw-password-input"
                                                name="inputPasswordChange" placeholder="${i18n.tr('Password')}"
-                                               required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*">
+                                               required minlength="${pwMinLength}" maxlength="20" pattern="[a-zA-Z0-9]*"
+                                               autocomplete="new-password">
                                         <div class="invalid-feedback">
                                                 ${i18n.tr('Please enter a valid password.')}
                                         </div>
