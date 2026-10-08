@@ -251,7 +251,7 @@ public class Puzzle {
         this.isEquivalent = equivalent;
     }
 
-    public boolean isVisible() {
+    public boolean isSeasonablyAvailable() {
         PuzzleChapter chapter = getChapter();
         if (chapter == null) {
             return true;

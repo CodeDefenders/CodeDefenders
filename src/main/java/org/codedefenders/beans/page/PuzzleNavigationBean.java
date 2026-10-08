@@ -86,10 +86,19 @@ public class PuzzleNavigationBean {
         nextPuzzle = unsolvedPuzzles.stream().findFirst();
 
         // lock puzzles if the user has not solved the previous puzzle
-        unsolvedPuzzles.stream()
-                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
-                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
-                .forEach(PuzzleEntry::lock);
+//        unsolvedPuzzles.stream()
+//                .filter(puzzleEntry -> puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE)
+//                .filter(puzzleEntry -> !nextPuzzle.map(puzzleEntry::equals).orElse(true))
+//                .forEach(PuzzleEntry::lock);
+
+        for (PuzzleEntry puzzleEntry : unsolvedPuzzles) {
+            if (puzzleEntry.getType() == PuzzleEntry.Type.PUZZLE) {
+                if (!puzzleEntry.getPuzzle().isSeasonablyAvailable()
+                        || !nextPuzzle.map(puzzleEntry::equals).orElse(true)) {
+                    puzzleEntry.lock();
+                }
+            }
+        }
     }
 
     /**
@@ -148,7 +157,7 @@ public class PuzzleNavigationBean {
 
             final Set<PuzzleEntry> puzzleEntries = puzzleRepo.getPuzzlesForChapterId(puzzleChapter.getId())
                     .stream()
-                    .filter(Puzzle::isVisible)//TODO: Could be done more efficiently by checking for the dates here
+                    //.filter(Puzzle::isSeasonablyAvailable)//TODO: Could be done more efficiently by checking for the dates here
                     .map(toPuzzleEntry(userId, activePuzzles, userLanguage, defaultLanguage, title))
                     .collect(Collectors.toSet());
 
