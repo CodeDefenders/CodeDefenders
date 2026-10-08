@@ -272,7 +272,7 @@ if (root) {
                 const reuseIcon = document.createElement('i');
                 const reuseLabel = document.createElement('span');
                 const reuseText = text.reuseTest;
-                actions.className = 'mutle-history-actions p-2 text-end';
+                actions.className = 'mutle-history-actions';
                 reuse.type = 'button';
                 reuse.className = 'btn btn-sm btn-outline-secondary mutle-reuse-button';
                 reuse.setAttribute('aria-label', reuseText);
@@ -353,7 +353,7 @@ if (root) {
     const renderReveal = reveal => {
         destroyEditors(revealEditors);
         revealSection.replaceChildren();
-        share.classList.toggle('d-none', !reveal);
+        share.parentElement.classList.toggle('d-none', !reveal);
         if (!reveal) return;
         const intro = document.createElement('div');
         const icon = document.createElement('i');

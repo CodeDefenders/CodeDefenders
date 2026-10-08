@@ -72,7 +72,7 @@
                             <select class="form-select" id="mutle-fixture" name="fixture">
                                 <c:forEach items="${fixtures}" var="fixture">
                                     <option value="${fixture.fixtureKey}">
-                                        ${i18n.tr('Series')} ${fixture.series} · ${fixture.title} · ${fixture.fixtureKey}
+                                        ${i18n.tr('Series')} ${fixture.series} · ${fixture.title}
                                     </option>
                                 </c:forEach>
                             </select>

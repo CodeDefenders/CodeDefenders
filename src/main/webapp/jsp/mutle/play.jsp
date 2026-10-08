@@ -97,6 +97,7 @@
                     <div class="card mutle-code-card h-100">
                         <div class="card-header">
                             <h2>${i18n.tr('Your test')}</h2>
+                            <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                         </div>
                         <div class="card-body p-0">
                             <textarea id="mutle-test" aria-label="${i18n.tr('Test source')}"></textarea>
@@ -138,6 +139,12 @@
                                 <span><i class="mutle-legend-swatch line" aria-hidden="true"></i>${i18n.tr('Changed line covered, mutant survived')}</span>
                                 <span><i class="mutle-legend-swatch killed" aria-hidden="true"></i>${i18n.tr('Mutant killed')}</span>
                             </div>
+                            <div class="text-end mt-3 d-none" id="mutle-share-container">
+                                <button id="mutle-share" class="btn btn-outline-primary">
+                                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                                    ${i18n.tr('Copy result')}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -146,10 +153,6 @@
                 </section>
             </div>
             <p id="mutle-copy-status" class="visually-hidden" aria-live="polite"></p>
-            <button id="mutle-share" class="btn btn-outline-primary d-none mt-3">
-                <i class="fa fa-clipboard" aria-hidden="true"></i>
-                ${i18n.tr('Copy result')}
-            </button>
         </div>
     </main>
     <script type="module" src="${url.forPath('/js/mutle.mjs')}"></script>

@@ -46,7 +46,6 @@
     background:
             linear-gradient(100deg, rgba(10, 17, 36, .98) 0%, rgba(20, 26, 51, .91) 52%, rgba(32, 19, 58, .58) 100%),
             url('../images/mutle/hero.jpg') center/cover;
-    box-shadow: 0 .75rem 2rem rgba(19, 25, 44, .18);
     color: #fff;
 }
 
@@ -106,8 +105,6 @@
 .mutle-feedback {
     overflow: hidden;
     border: 1px solid rgba(25, 32, 51, .14);
-    border-radius: .85rem;
-    box-shadow: 0 .35rem 1.25rem rgba(25, 32, 51, .08);
 }
 
 .mutle-code-card {
@@ -120,9 +117,14 @@
 }
 
 .mutle-code-card .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .5rem;
     padding: .85rem 1rem;
     border-bottom: 1px solid var(--bs-border-color);
-    background: linear-gradient(180deg, #fff, #f5f6fa);
+    background: var(--bs-card-cap-bg);
 }
 
 .mutle-code-card h2,
@@ -226,7 +228,6 @@
     font-size: 1.35rem;
     font-weight: 800;
     text-align: center;
-    box-shadow: inset 0 -3px rgba(23, 32, 51, .06);
     padding: 0;
 }
 
@@ -324,9 +325,8 @@
 .mutle-history {
     overflow: hidden;
     border: 1px solid var(--bs-border-color);
-    border-radius: .85rem;
+    border-radius: var(--bs-border-radius);
     background: #fff;
-    box-shadow: 0 .35rem 1.25rem rgba(25, 32, 51, .06);
 }
 
 .mutle-history .accordion-button {
@@ -360,7 +360,15 @@
 .mutle-history-mark.killed { background: var(--mutle-killed); }
 
 .mutle-readonly-code {
+    position: relative;
     border-top: 1px solid var(--bs-border-color);
+}
+
+.mutle-history-actions {
+    position: absolute;
+    z-index: 1;
+    top: .5rem;
+    right: 1.5rem;
 }
 
 .mutle-readonly-code .CodeMirror {
@@ -373,9 +381,8 @@
     overflow: hidden;
     padding: 0;
     border: 1px solid rgba(111, 66, 193, .28);
-    border-radius: .85rem;
+    border-radius: var(--bs-border-radius);
     background: #fff;
-    box-shadow: 0 .5rem 1.5rem rgba(25, 32, 51, .08);
 }
 
 .mutle-reveal:empty,
