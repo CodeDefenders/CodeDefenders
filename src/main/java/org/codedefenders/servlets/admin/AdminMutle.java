@@ -72,6 +72,8 @@ public class AdminMutle extends HttpServlet {
                 .toList());
         request.setAttribute("mutleNeedsFutureCase", !publications.isEmpty()
                 && !publications.get(publications.size() - 1).releaseAt().isAfter(now));
+        request.setAttribute("mutleHasFutureCases", !publications.isEmpty()
+                && publications.get(publications.size() - 1).releaseAt().isAfter(now));
         request.setAttribute("mutleNextSeries", publications.size() + 1L);
         if (!publications.isEmpty()) {
             Instant last = publications.get(publications.size() - 1).releaseAt();
@@ -97,6 +99,9 @@ public class AdminMutle extends HttpServlet {
                         Long.parseLong(request.getParameter("series")),
                         request.getParameter("fixtureKey"),
                         parseDate(request.getParameter("releaseAt")));
+                case "removeLastPublication" -> catalog.removeLastFuturePublication(
+                        Long.parseLong(request.getParameter("series")));
+                case "clearFuturePublications" -> catalog.clearFuturePublications();
                 default -> throw new IllegalArgumentException("Unknown Mutle action");
             }
             messages.add("Mutle changes saved.");

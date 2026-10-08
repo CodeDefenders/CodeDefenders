@@ -12106,9 +12106,6 @@ msgstr "Upload fixture"
 msgid "Publication schedule"
 msgstr "Publication schedule"
 
-msgid "Published cases stay locked; future dates and fixture assignments can be changed."
-msgstr "Published cases stay locked; future dates and fixture assignments can be changed."
-
 msgid "No future case is scheduled. The current case remains available until you add one."
 msgstr "No future case is scheduled. The current case remains available until you add one."
 
@@ -12123,6 +12120,24 @@ msgstr "Interpreted as UTC. This schedules 15 weekly cases."
 
 msgid "Schedule 15 weekly cases"
 msgstr "Schedule 15 weekly cases"
+
+msgid "In class.json, define id, title, specification, concepts, sourcePath, tests, and mutants. Each test needs a key and sourcePath; each mutant needs a key, sourcePath, method, mutatedLines, operator, proofTestKey, and revealExplanation. The proofTestKey must match a test key, and all source paths are relative to the class folder."
+msgstr "In class.json, define id, title, specification, concepts, sourcePath, tests, and mutants. Each test needs a key and sourcePath; each mutant needs a key, sourcePath, method, mutatedLines, operator, proofTestKey, and revealExplanation. The proofTestKey must match a test key, and all source paths are relative to the class folder."
+
+msgid "Remove last case"
+msgstr "Remove last case"
+
+msgid "Published cases stay locked; future dates and fixture assignments can be changed. Only the last unpublished case can be removed individually."
+msgstr "Published cases stay locked; future dates and fixture assignments can be changed. Only the last unpublished case can be removed individually."
+
+msgid "Clear unpublished cases"
+msgstr "Clear unpublished cases"
+
+msgid "This removes only unpublished cases. Published cases and player history remain unchanged."
+msgstr "This removes only unpublished cases. Published cases and player history remain unchanged."
+
+msgid "Clear future schedule"
+msgstr "Clear future schedule"
 
 msgid "Add case"
 msgstr "Add case"

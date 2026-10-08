@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -104,6 +105,37 @@ class MutleCatalogTest {
         assertThrows(IllegalStateException.class, fixtureSet.catalog::ensureSeeded);
     }
 
+    @Test
+    void removesOnlyTheLastUnpublishedCase() {
+        FixtureSet fixtureSet = fixtureSet(15);
+        fixtureSet.publications.add(new MutlePublication(1, "class-1/mutant-1",
+                Instant.parse("2020-01-05T09:00:00Z")));
+        fixtureSet.publications.add(new MutlePublication(2, "class-2/mutant-2", FIRST_RELEASE));
+        fixtureSet.publications.add(new MutlePublication(3, "class-3/mutant-3", FIRST_RELEASE.plusSeconds(604800)));
+
+        assertThrows(IllegalStateException.class, () -> fixtureSet.catalog().removeLastFuturePublication(2));
+        fixtureSet.catalog().removeLastFuturePublication(3);
+        assertThat(fixtureSet.publications).hasSize(2);
+        fixtureSet.catalog().removeLastFuturePublication(2);
+        assertThat(fixtureSet.publications).hasSize(1);
+        assertThrows(IllegalStateException.class, () -> fixtureSet.catalog().removeLastFuturePublication(1));
+    }
+
+    @Test
+    void clearingFutureSchedulePreservesPublishedCases() {
+        FixtureSet fixtureSet = fixtureSet(15);
+        fixtureSet.publications.add(new MutlePublication(1, "class-1/mutant-1",
+                Instant.parse("2020-01-05T09:00:00Z")));
+        fixtureSet.publications.add(new MutlePublication(2, "class-2/mutant-2", FIRST_RELEASE));
+        fixtureSet.publications.add(new MutlePublication(3, "class-3/mutant-3", FIRST_RELEASE.plusSeconds(604800)));
+
+        fixtureSet.catalog().clearFuturePublications();
+
+        assertThat(fixtureSet.publications).hasSize(1);
+        assertThat(fixtureSet.publications.get(0).series()).isEqualTo(1);
+        assertThrows(IllegalStateException.class, fixtureSet.catalog()::clearFuturePublications);
+    }
+
     private static FixtureSet fixtureSet(int classCount) {
         return fixtureSet(classCount, false);
     }
@@ -145,6 +177,18 @@ class MutleCatalogTest {
             publications.add(invocation.getArgument(0));
             return null;
         }).when(repository).insertPublication(any());
+        when(repository.deleteFuturePublication(anyLong(), any())).thenAnswer(invocation -> {
+            long series = invocation.getArgument(0);
+            Instant now = invocation.getArgument(1);
+            return publications.removeIf(publication -> publication.series() == series
+                    && publication.releaseAt().isAfter(now)) ? 1 : 0;
+        });
+        when(repository.deleteFuturePublications(any())).thenAnswer(invocation -> {
+            Instant now = invocation.getArgument(0);
+            int before = publications.size();
+            publications.removeIf(publication -> publication.releaseAt().isAfter(now));
+            return before - publications.size();
+        });
         when(configuration.getMutleRotationStart()).thenReturn("2099-01-05T00:00:00Z");
         when(configuration.getMutleRotationPeriodDays()).thenReturn(7);
         return new FixtureSet(new MutleCatalog(loader, repository, configuration), publications, configuration);

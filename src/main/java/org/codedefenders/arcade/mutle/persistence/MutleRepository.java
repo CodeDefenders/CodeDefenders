@@ -161,6 +161,20 @@ public class MutleRepository {
         }
     }
 
+    public int deleteFuturePublication(long series, Instant now) {
+        @Language("SQL") String query = """
+                DELETE FROM mutle_publication WHERE series = ? AND release_at > ?;
+        """;
+        return queryRunner.update(query, series, Timestamp.from(now));
+    }
+
+    public int deleteFuturePublications(Instant now) {
+        @Language("SQL") String query = """
+                DELETE FROM mutle_publication WHERE release_at > ?;
+        """;
+        return queryRunner.update(query, Timestamp.from(now));
+    }
+
     public boolean hasGames() {
         @Language("SQL") String query = """
                 SELECT EXISTS(

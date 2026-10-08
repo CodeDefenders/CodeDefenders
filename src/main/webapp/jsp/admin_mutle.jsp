@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
@@ -74,10 +75,10 @@
                                             <td>
                                                 <c:choose>
                                                     <c:when test="${fixture.publishedCount > 0}">
-                                                        <span class="badge text-bg-success">${i18n.tr('Scheduled')}</span>
+                                                        <span class="badge bg-success text-white">${i18n.tr('Scheduled')}</span>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <span class="badge text-bg-secondary">${i18n.tr('Available')}</span>
+                                                        <span class="badge bg-secondary text-white">${i18n.tr('Available')}</span>
                                                     </c:otherwise>
                                                 </c:choose>
                                             </td>
@@ -102,6 +103,9 @@
                     <p class="text-muted small">
                         ${i18n.tr('The ZIP needs class.json, the class source, tests/, and mutants/ at its root or inside one class folder.')}
                     </p>
+                    <p class="text-muted small">
+                        ${i18n.tr('In class.json, define id, title, specification, concepts, sourcePath, tests, and mutants. Each test needs a key and sourcePath; each mutant needs a key, sourcePath, method, mutatedLines, operator, proofTestKey, and revealExplanation. The proofTestKey must match a test key, and all source paths are relative to the class folder.')}
+                    </p>
                     <form action="${url.forPath(Paths.ADMIN_MUTLE)}" method="post"
                           enctype="multipart/form-data" class="row gy-2 align-items-end">
                         <input type="hidden" name="formType" value="uploadFixture">
@@ -125,7 +129,7 @@
                     <h2 class="h5 mb-0" id="mutle-schedule-heading">${i18n.tr('Publication schedule')}</h2>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">${i18n.tr('Published cases stay locked; future dates and fixture assignments can be changed.')}</p>
+                    <p class="text-muted">${i18n.tr('Published cases stay locked; future dates and fixture assignments can be changed. Only the last unpublished case can be removed individually.')}</p>
                     <c:if test="${mutleNeedsFutureCase}">
                         <div class="alert alert-warning" role="status">
                             ${i18n.tr('No future case is scheduled. The current case remains available until you add one.')}
@@ -164,7 +168,7 @@
                                     <tr><td colspan="5" class="text-muted">${i18n.tr('No cases are scheduled yet.')}</td></tr>
                                 </c:when>
                                 <c:otherwise>
-                                    <c:forEach var="publication" items="${mutlePublications}">
+                                    <c:forEach var="publication" items="${mutlePublications}" varStatus="row">
                                         <tr>
                                             <td class="text-nowrap">
                                                 <form id="mutle-publication-${publication.series}"
@@ -193,7 +197,8 @@
                                                         </c:when>
                                                         <c:otherwise>
                                                             <select class="form-select form-select-sm" name="fixtureKey"
-                                                                    form="mutle-publication-${publication.series}" required>
+                                                                    form="mutle-publication-${publication.series}"
+                                                                    aria-label="${i18n.tr('Fixture')} ${publication.series}" required>
                                                                 <c:forEach var="fixture" items="${mutleFixtureEntries}">
                                                                     <option value="${fixture.fixtureKey}"
                                                                             ${fixture.fixtureKey == publication.fixtureKey ? 'selected' : ''}>
@@ -207,10 +212,10 @@
                                                 <td>
                                                     <c:choose>
                                                         <c:when test="${publication.locked}">
-                                                            <span class="badge text-bg-success">${i18n.tr('Published')}</span>
+                                                            <span class="badge bg-success text-white">${i18n.tr('Published')}</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="badge text-bg-secondary">${i18n.tr('Future')}</span>
+                                                            <span class="badge bg-secondary text-white">${i18n.tr('Future')}</span>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>
@@ -219,6 +224,15 @@
                                                         <button class="btn btn-sm btn-outline-primary"
                                                                 form="mutle-publication-${publication.series}"
                                                                 type="submit">${i18n.tr('Save')}</button>
+                                                        <c:if test="${row.last}">
+                                                            <form action="${url.forPath(Paths.ADMIN_MUTLE)}" method="post" class="d-inline">
+                                                                <input type="hidden" name="formType" value="removeLastPublication">
+                                                                <input type="hidden" name="series" value="${publication.series}">
+                                                                <button class="btn btn-sm btn-outline-danger" type="submit">
+                                                                    ${i18n.tr('Remove last case')}
+                                                                </button>
+                                                            </form>
+                                                        </c:if>
                                                     </c:if>
                                                 </td>
                                         </tr>
@@ -228,6 +242,20 @@
                             </tbody>
                         </table>
                     </div>
+                    <c:if test="${mutleHasFutureCases}">
+                        <details class="mt-3">
+                            <summary>${i18n.tr('Clear unpublished cases')}</summary>
+                            <p class="text-muted small mb-2">
+                                ${i18n.tr('This removes only unpublished cases. Published cases and player history remain unchanged.')}
+                            </p>
+                            <form action="${url.forPath(Paths.ADMIN_MUTLE)}" method="post">
+                                <input type="hidden" name="formType" value="clearFuturePublications">
+                                <button class="btn btn-outline-danger btn-sm" type="submit">
+                                    ${i18n.tr('Clear future schedule')}
+                                </button>
+                            </form>
+                        </details>
+                    </c:if>
                     <c:if test="${not empty mutlePublications}">
                         <form action="${url.forPath(Paths.ADMIN_MUTLE)}" method="post"
                               class="row gy-2 gx-3 align-items-end mt-4">

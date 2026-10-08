@@ -260,6 +260,24 @@ public class MutleCatalog {
         }
     }
 
+    public synchronized void removeLastFuturePublication(long series) {
+        ensureSeeded();
+        List<MutlePublication> publications = repository.findPublications();
+        Instant now = Instant.now();
+        if (publications.isEmpty() || publications.get(publications.size() - 1).series() != series
+                || !publications.get(publications.size() - 1).releaseAt().isAfter(now)
+                || repository.deleteFuturePublication(series, now) != 1) {
+            throw new IllegalStateException("Only the last unpublished Mutle case can be removed");
+        }
+    }
+
+    public synchronized void clearFuturePublications() {
+        ensureSeeded();
+        if (repository.deleteFuturePublications(Instant.now()) == 0) {
+            throw new IllegalStateException("There are no unpublished Mutle cases to clear");
+        }
+    }
+
 
     private void insertPublicationsAtomically(List<MutlePublication> publications) {
         if (transactionManager == null) {
