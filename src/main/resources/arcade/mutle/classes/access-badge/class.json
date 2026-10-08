@@ -21,6 +21,6 @@
   ],
   "mutants": [
     {"key":"exact-clearance-only","sourcePath":"mutants/exact-clearance-only/AccessBadge.java","method":"permits","mutatedLines":[21],"operator":"RELATIONAL_OPERATOR_REPLACEMENT","proofTestKey":"changed-clearance-keeps-lower-access","revealExplanation":"A badge permits only a request at exactly its current clearance."},
-    {"key":"allowed-count","sourcePath":"mutants/allowed-count.java","method":"permits","mutatedLines":[22],"operator":"conditional-negation","proofTestKey":"allowed-count","revealExplanation":"Allowed checks are counted as denials."}
+    {"key":"allowed-count","sourcePath":"mutants/allowed-count/AccessBadge.java","method":"permits","mutatedLines":[22],"operator":"conditional-negation","proofTestKey":"allowed-count","revealExplanation":"Allowed checks are counted as denials."}
   ]
 }

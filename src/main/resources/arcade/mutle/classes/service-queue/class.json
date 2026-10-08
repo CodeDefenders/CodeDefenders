@@ -21,6 +21,6 @@
     {"key":"size","title":"Size tracks queue contents","sourcePath":"tests/ServiceQueueSizeTest.java"}
   ],
   "mutants":[
-    {"key":"serves-last","sourcePath":"mutants/serves-last.java","method":"serveNext","mutatedLines":[32],"operator":"argument-replacement","proofTestKey":"fifo","revealExplanation":"The newest request is served before the oldest."}
+    {"key":"serves-last","sourcePath":"mutants/serves-last/ServiceQueue.java","method":"serveNext","mutatedLines":[32],"operator":"argument-replacement","proofTestKey":"fifo","revealExplanation":"The newest request is served before the oldest."}
   ]
 }

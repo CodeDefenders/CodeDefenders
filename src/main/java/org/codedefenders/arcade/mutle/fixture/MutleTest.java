@@ -18,5 +18,6 @@
  */
 package org.codedefenders.arcade.mutle.fixture;
 
+/** Corpus test for offline mutant qualification; one test per mutant is selected for its reveal. */
 public record MutleTest(String key, String sourcePath) {
 }

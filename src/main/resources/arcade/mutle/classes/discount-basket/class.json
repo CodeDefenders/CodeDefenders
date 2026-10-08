@@ -19,7 +19,7 @@
     {"key":"price-range","title":"Negative price is invalid","sourcePath":"tests/DiscountBasketPriceRangeTest.java"}
   ],
   "mutants":[
-    {"key":"eighth-item","sourcePath":"mutants/eighth-item.java","method":"addItem","mutatedLines":[17],"operator":"constant-replacement","proofTestKey":"capacity","revealExplanation":"The eighth item is rejected."},
+    {"key":"eighth-item","sourcePath":"mutants/eighth-item/DiscountBasket.java","method":"addItem","mutatedLines":[17],"operator":"constant-replacement","proofTestKey":"capacity","revealExplanation":"The eighth item is rejected."},
     {"key":"duplicate-name-allowed","sourcePath":"mutants/duplicate-name-allowed/DiscountBasket.java","method":"addItem","mutatedLines":[17],"operator":"CONDITIONAL_OPERATOR_REPLACEMENT","proofTestKey":"duplicate","revealExplanation":"An item name can be added more than once."}
   ]
 }
