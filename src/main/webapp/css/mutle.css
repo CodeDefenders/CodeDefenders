@@ -26,10 +26,10 @@
 
 .mutle-play {
     --mutle-ink: #172033;
-    --mutle-none: #6c757d;
-    --mutle-method: #d59c0b;
-    --mutle-line: #117383;
-    --mutle-killed: #198754;
+    --mutle-none: #888c90;
+    --mutle-method: #eab833;
+    --mutle-line: #fe5c2c;
+    --mutle-killed: #47297c;
     --bs-card-cap-bg: #f8f9fb;
     padding-bottom: 4rem;
 }
@@ -233,7 +233,6 @@
     place-items: center;
     aspect-ratio: 1;
     max-height: 5.75rem;
-    border: 2px solid #d9dce3;
     border-radius: .7rem;
     background: #f5f6f8;
     color: #737988;
@@ -243,10 +242,10 @@
     padding: 0;
 }
 
-.mutle-cell.none { border-color: #59636e; background: var(--mutle-none); color: #fff; }
-.mutle-cell.method { border-color: #b07b00; background: var(--mutle-method); color: #1d1d1d; }
-.mutle-cell.line { border-color: #0b5661; background: var(--mutle-line); color: #fff; }
-.mutle-cell.killed { border-color: #146c43; background: var(--mutle-killed); color: #fff; }
+.mutle-cell.none { background: var(--mutle-none); color: #000; }
+.mutle-cell.method { background: var(--mutle-method); color: #000; }
+.mutle-cell.line { background: var(--mutle-line); color: #000; }
+.mutle-cell.killed { background: var(--mutle-killed); color: #fff; }
 
 .mutle-cell-button {
     display: grid;
@@ -269,12 +268,13 @@
 }
 
 .mutle-cell-button.selected {
-    box-shadow: 0 0 0 4px rgba(13, 110, 253, .4);
+    outline: 2px solid #000;
+    outline-offset: 2px;
 }
 
 .mutle-cell-button:focus-visible {
-    outline: 0;
-    box-shadow: 0 0 0 4px rgba(13, 110, 253, .55);
+    outline: 2px solid #888c90;
+    outline-offset: 2px;
 }
 
 .mutle-legend {
@@ -316,12 +316,12 @@
 }
 
 .mutle-covered-line {
-    background: rgba(22, 138, 154, .16);
+    background: rgba(254 92 44 / .16);
     box-shadow: inset 4px 0 var(--mutle-line);
 }
 
 .mutle-covered-killed {
-    background: rgba(25, 135, 84, .14);
+    background: rgb(71 41 124 / .14);
     box-shadow: inset 4px 0 var(--mutle-killed);
 }
 
@@ -336,7 +336,6 @@
 .mutle-history {
     overflow: hidden;
     border: 1px solid var(--bs-border-color);
-    border-radius: var(--bs-border-radius);
     background: #fff;
 }
 
@@ -360,15 +359,15 @@
     flex: 0 0 auto;
     place-items: center;
     border-radius: .4rem;
-    color: #fff;
+    color: #000;
     font-size: .82rem;
     font-weight: 800;
 }
 
 .mutle-history-mark.none { background: var(--mutle-none); }
-.mutle-history-mark.method { background: var(--mutle-method); color: #1d1d1d; }
+.mutle-history-mark.method { background: var(--mutle-method); }
 .mutle-history-mark.line { background: var(--mutle-line); }
-.mutle-history-mark.killed { background: var(--mutle-killed); }
+.mutle-history-mark.killed { background: var(--mutle-killed);  color: #fff; }
 
 .mutle-readonly-code {
     position: relative;
@@ -392,7 +391,6 @@
     overflow: hidden;
     padding: 0;
     border: 1px solid rgba(111, 66, 193, .28);
-    border-radius: var(--bs-border-radius);
     background: #fff;
 }
 
