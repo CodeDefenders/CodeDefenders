@@ -55,14 +55,14 @@
             </p>
             <p class="mb-4">${empty currentFixture
                     ? i18n.tr('Check back when the semester begins.')
-                    : i18n.tr('You have six accepted tests to isolate the hidden change.')}</p>
+                    : i18n.tr('You have six tests to isolate the hidden change.')}</p>
             <c:if test="${not empty currentCase}">
                 <p class="mb-3">
                     <span class="badge bg-${currentCase.solved ? 'success' : (currentCase.failed ? 'danger' : (currentCase.expired ? 'secondary' : 'primary'))} text-white">
-                        <i class="fa fa-${currentCase.solved ? 'check' : (currentCase.failed ? 'close' : (currentCase.expired ? i18n.tr('hourglass-end') : i18n.tr('cog')))}"></i>
+                        <i class="fa fa-${currentCase.solved ? 'check' : (currentCase.failed ? 'close' : (currentCase.expired ? 'hourglass-end' : 'cog'))}"></i>
                         ${currentCase.solved ? i18n.tr('Solved') : (currentCase.failed ? i18n.tr('Failed in six') : (currentCase.expired ? i18n.tr('Expired') : i18n.tr('In progress')))}
                     </span>
-                    <span class="ms-2">${currentCase.acceptedGuesses}/${currentCase.acceptedGuesses + currentCase.remainingGuesses} ${i18n.tr('accepted tests')}</span>
+                    <span class="ms-2">${currentCase.acceptedGuesses}/${currentCase.acceptedGuesses + currentCase.remainingGuesses} ${i18n.tr('guesses')}</span>
                 </p>
             </c:if>
             <c:choose>
@@ -131,7 +131,7 @@
                             <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                                href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${game.gameId}">
                                 <span><strong>${i18n.tr('Series')} ${game.series}</strong> · <c:out value="${game.title}" />
-                                    <small class="text-muted d-block">${game.acceptedGuesses}/${game.acceptedGuesses + game.remainingGuesses} ${i18n.tr('accepted tests')}</small>
+                                    <small class="text-muted d-block">${game.acceptedGuesses}/${game.acceptedGuesses + game.remainingGuesses} ${i18n.tr('guesses')}</small>
                                 </span>
                                 <span class="badge bg-${game.solved ? 'success' : (game.failed ? 'danger' : (game.expired ? 'secondary' : 'primary'))} text-white">
                                     ${game.solved ? i18n.tr('Solved') : (game.failed ? i18n.tr('Failed in six') : (game.expired ? i18n.tr('Expired') : i18n.tr('Active')))}
