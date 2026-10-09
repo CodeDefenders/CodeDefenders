@@ -21,7 +21,16 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+
 <%@ page import="org.codedefenders.util.Paths" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
+<%--@elvariable id="fixtures" type="java.util.List"--%>
+<%--@elvariable id="currentFixture" type="org.codedefenders.game.multiplayer.MutleFixture"--%>
+<%--@elvariable id="currentCase" type="org.codedefenders.game.multiplayer.MutleCase"--%>
+
 <p:main_page title="${i18n.tr('Mutle')}">
     <link rel="stylesheet" href="${url.forPath('/css/mutle.css')}">
     <main class="container">
