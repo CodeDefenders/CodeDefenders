@@ -206,7 +206,7 @@ public class AchievementService {
     }
 
     public void addMutleSolved(int userId, int acceptedGuesses) {
-        updateAchievement(userId, AchievementType.MUTLE_FIRST_SOLVE, 1);
+        updateAchievement(userId, AchievementType.SOLVE_MUTLES, 1);
         if (acceptedGuesses <= 2) {
             updateAchievement(userId, AchievementType.MUTLE_SOLVE_IN_TWO, 1);
         }

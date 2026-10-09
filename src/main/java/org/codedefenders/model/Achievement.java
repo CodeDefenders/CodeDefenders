@@ -37,8 +37,6 @@ public class Achievement implements Serializable {
     @Expose
     private final int index;
     @Expose
-    private final String imageFileName;
-    @Expose
     private String name;
     @Expose
     private String description;
@@ -66,7 +64,6 @@ public class Achievement implements Serializable {
         this.achievementType = type;
         this.level = level;
         this.index = type.getIndex();
-        this.imageFileName = type.getImageFileName(level);
         this.name = currentLevel.name();
         this.description = currentLevel.description();
         this.progressText = currentLevel.progressText();
@@ -77,10 +74,6 @@ public class Achievement implements Serializable {
 
     public AchievementType getType() {
         return achievementType;
-    }
-
-    public String getImageFileName() {
-        return imageFileName;
     }
 
     public int getLevel() {
