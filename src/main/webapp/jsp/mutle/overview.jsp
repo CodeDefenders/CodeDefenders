@@ -34,9 +34,14 @@
 <p:main_page title="${i18n.tr('Mutle')}">
     <link rel="stylesheet" href="${url.forPath('/css/mutle.css')}">
     <main class="container">
+        <section class="mb-5 mt-3" aria-labelledby="mutle-explanation-title">
+            <h1 id="mutle-explanation-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h1>
+            <p class="text-muted">${i18n.tr("This game mode is similar to the concept known from Wordle or Mastermind; just with finding mutants in Java code.")}</p>
+            <p>${i18n.tr("You have six attempts to write a test that detects/kills the mutant. The only problem: Initially you know nothing about the mutant. But after each test you write, you get feedback in form of a color that tells you if you covered the method or line where the mutation is located. Using this information you have to locate the mutated line and write a test that successfully detects it.")}</p>
+        </section>
+
         <section class="mutle-hero p-4 p-md-5 mb-5">
-            <p class="text-uppercase fw-semibold mb-2">${i18n.tr('Mutation puzzle')}</p>
-            <h1>${empty currentFixture ? i18n.tr('Coming soon') : i18n.tr('Current case')}</h1>
+            <h2>${empty currentFixture ? i18n.tr('Mutle coming soon') : i18n.tr('This week\'s mutle')}</h2>
             <p class="lead mb-2">
                 <c:choose>
                     <c:when test="${not empty currentCase}">
@@ -45,7 +50,7 @@
                     <c:when test="${not empty currentFixture}">
                         ${i18n.tr('Series')} ${currentFixture.series} · <c:out value="${currentFixture.title}" />
                     </c:when>
-                    <c:otherwise>${i18n.tr('The first case has not been published yet.')}</c:otherwise>
+                    <c:otherwise>${i18n.tr('The first mutle has not been published yet.')}</c:otherwise>
                 </c:choose>
             </p>
             <p class="mb-4">${empty currentFixture
@@ -60,18 +65,27 @@
                 </p>
             </c:if>
             <c:choose>
-                <c:when test="${empty currentFixture}"></c:when>
+                <c:when test="${empty currentFixture}">
+                    <!-- no button -->
+                </c:when>
                 <c:when test="${empty currentCase}">
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}">${i18n.tr('Start current case')}</a>
+                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}">
+                            ${i18n.tr('Solve current mutle')}
+                    </a>
                 </c:when>
                 <c:when test="${currentCase.solved || currentCase.failed || currentCase.expired}">
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">${i18n.tr('Review current case')}</a>
+                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
+                            ${i18n.tr('View current mutle')}
+                    </a>
                 </c:when>
                 <c:otherwise>
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">${i18n.tr('Continue current case')}</a>
+                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
+                            ${i18n.tr('Continue current mutle')}
+                    </a>
                 </c:otherwise>
             </c:choose>
         </section>
+
         <c:if test="${login.admin}">
             <section class="card mb-5" aria-labelledby="mutle-practice-title">
                 <div class="card-body">
@@ -103,6 +117,7 @@
                 </div>
             </section>
         </c:if>
+
         <section aria-labelledby="mutle-history-title">
             <h2 id="mutle-history-title">${i18n.tr('Case history')}</h2>
             <c:choose>

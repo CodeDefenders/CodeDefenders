@@ -77,7 +77,8 @@
     max-width: 58rem;
 }
 
-.mutle-case-header h1 {
+.mutle-case-header h1,
+.mutle-case-header h2 {
     margin-bottom: .75rem;
     font-size: clamp(2rem, 5vw, 3.75rem);
     font-weight: 800;
@@ -129,7 +130,6 @@
     flex-wrap: wrap;
     gap: .5rem;
     padding: .85rem 1rem;
-    border-bottom: 1px solid var(--bs-border-color);
     background: var(--bs-card-cap-bg);
 }
 
@@ -141,18 +141,20 @@
     font-weight: 750;
 }
 
+.mutle-code-card .CodeMirror-scrollbar-filler {
+    background: var(--bs-card-cap-bg);
+}
+
 .mutle-code-card .card-footer {
     display: flex;
     min-height: 4.75rem;
     align-items: center;
     padding: .8rem 1rem;
-    border-top: 1px solid var(--bs-border-color);
     background: var(--bs-card-cap-bg);
 }
 
 .mutle-code-hint {
     gap: .5rem;
-    color: var(--bs-secondary-color);
     font-size: .82rem;
     line-height: 1.35;
 }
@@ -281,7 +283,6 @@
     gap: .65rem 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--bs-border-color);
-    color: var(--bs-secondary-color);
     font-size: .88rem;
 }
 
