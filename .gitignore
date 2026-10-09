@@ -25,6 +25,9 @@ database.properties
 # Maven #
 target/
 
+# Packed puzzle chapters #
+installation/puzzles/**/*.zip
+
 # Vagrant
 .vagrant
 vagrant.yml
