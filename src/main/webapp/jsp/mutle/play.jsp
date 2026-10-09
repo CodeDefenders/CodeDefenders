@@ -97,7 +97,6 @@
                     <div class="card mutle-code-card h-100">
                         <div class="card-header">
                             <h2>${i18n.tr('Your test')}</h2>
-                            <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
                         </div>
                         <div class="card-body p-0">
                             <textarea id="mutle-test" aria-label="${i18n.tr('Test source')}"></textarea>
@@ -116,11 +115,14 @@
                 </section>
             </div>
             <section class="mutle-test-rules mt-3" id="mutle-test-rules-panel">
-                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#mutle-test-rules" aria-expanded="false" aria-controls="mutle-test-rules">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    ${i18n.tr('What tests are allowed?')}
-                </button>
+                <div class="d-flex flex-row gap-3 justify-content-end">
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#mutle-test-rules" aria-expanded="false" aria-controls="mutle-test-rules">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        ${i18n.tr('What tests are allowed?')}
+                    </button>
+                    <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                </div>
                 <div class="collapse mt-3" id="mutle-test-rules">
                     <div class="card card-body">
                         <t:validator_explanation_test maxAssertions="${MUTLE_MAX_ASSERTIONS}"/>

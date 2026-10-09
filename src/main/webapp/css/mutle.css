@@ -30,6 +30,7 @@
     --mutle-method: #d59c0b;
     --mutle-line: #117383;
     --mutle-killed: #198754;
+    --bs-card-cap-bg: #f8f9fb;
     padding-bottom: 4rem;
 }
 
@@ -42,7 +43,6 @@
     overflow: hidden;
     min-height: 15rem;
     padding: 2.5rem;
-    border-radius: 1rem;
     background:
             linear-gradient(100deg, rgba(10, 17, 36, .98) 0%, rgba(20, 26, 51, .91) 52%, rgba(32, 19, 58, .58) 100%),
             url('../images/mutle/hero.jpg') center/cover;
@@ -59,6 +59,12 @@
     border-radius: 50%;
     box-shadow: 0 0 0 2rem rgba(255, 255, 255, .04), 0 0 0 5rem rgba(255, 255, 255, .025);
     content: '';
+}
+
+.mutle-case-header,
+.mutle-play .card,
+.mutle-reveal {
+    border-radius: 1rem;
 }
 
 .mutle-case-copy,
@@ -141,7 +147,7 @@
     align-items: center;
     padding: .8rem 1rem;
     border-top: 1px solid var(--bs-border-color);
-    background: #f8f9fb;
+    background: var(--bs-card-cap-bg);
 }
 
 .mutle-code-hint {
@@ -271,8 +277,8 @@
 
 .mutle-legend {
     display: flex;
-    flex-wrap: wrap;
-    gap: .65rem 1.25rem;
+    flex-direction: column;
+    gap: .65rem 1rem;
     padding-top: 1rem;
     border-top: 1px solid var(--bs-border-color);
     color: var(--bs-secondary-color);
@@ -336,7 +342,7 @@
 .mutle-history .accordion-button {
     gap: .75rem;
     padding: .8rem 1rem;
-    background: #f8f9fb;
+    background: var(--bs-card-cap-bg);
     box-shadow: none;
     color: var(--mutle-ink);
     font-weight: 700;
@@ -435,7 +441,7 @@
 
 .mutle-reveal-accordion .accordion-button {
     padding: .85rem 1rem;
-    background: #f8f9fb;
+    background: var(--bs-card-cap-bg);
     box-shadow: none;
     color: var(--mutle-ink);
     font-weight: 700;
