@@ -59,6 +59,7 @@
             <c:if test="${not empty currentCase}">
                 <p class="mb-3">
                     <span class="badge bg-${currentCase.solved ? 'success' : (currentCase.failed ? 'danger' : (currentCase.expired ? 'secondary' : 'primary'))} text-white">
+                        <i class="fa fa-${currentCase.solved ? 'check' : (currentCase.failed ? 'close' : (currentCase.expired ? i18n.tr('hourglass-end') : i18n.tr('cog')))}"></i>
                         ${currentCase.solved ? i18n.tr('Solved') : (currentCase.failed ? i18n.tr('Failed in six') : (currentCase.expired ? i18n.tr('Expired') : i18n.tr('In progress')))}
                     </span>
                     <span class="ms-2">${currentCase.acceptedGuesses}/${currentCase.acceptedGuesses + currentCase.remainingGuesses} ${i18n.tr('accepted tests')}</span>
