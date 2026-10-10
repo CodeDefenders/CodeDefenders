@@ -956,7 +956,23 @@
                 for (const player of players) {
                     const tr = table.insertRow();
                     tr.insertCell().textContent = player.name;
-                    tr.insertCell().textContent = player.role[0] + player.role.substring(1, player.role.length).toLowerCase();
+                    switch (player.role) {
+                        case Role.ATTACKER:
+                            tr.insertCell().textContent = "${i18n.tr('Attacker')}";
+                            break;
+                        case Role.DEFENDER:
+                            tr.insertCell().textContent = "${i18n.tr('Defender')}";
+                            break;
+                        case Role.PLAYER:
+                            tr.insertCell().textContent = "${i18n.tr('Player')}";
+                            break;
+                        case Role.OBSERVER:
+                            tr.insertCell().textContent = "${i18n.tr('Observer')}";
+                            break;
+                        case Role.NONE:
+                            tr.insertCell().textContent = "";
+                            break;
+                    }
                     tr.classList.add("fg-" + player.role.toLowerCase());
                 }
 
