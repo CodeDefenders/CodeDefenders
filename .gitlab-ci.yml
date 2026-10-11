@@ -251,7 +251,7 @@ spotbugs-sast:
     MAVEN_REPO_PATH: '.m2/repository'
   before_script:
     # Remove unrelated project files
-    - rm {src/main/resources,target/classes,target/codedefenders/WEB-INF/classes}/data/build.xml {src/test/resources,target/test-classes}/itests/build.xml {src/main/webapp,target/codedefenders}/project-exporter/{build.gradle,gradlew}
+    - rm {src/main/resources,target/classes,target/codedefenders/WEB-INF/classes}/data/build.xml {src/main/webapp,target/codedefenders}/project-exporter/{build.gradle,gradlew}
   artifacts:
     reports:
       sast: gl-sast-report.json
