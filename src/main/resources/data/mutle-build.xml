@@ -22,7 +22,7 @@
                    tempdir="${basedir}/tmp">
                 <classpath refid="mutle.cp"/>
                 <classpath location="test"/>
-                <test name="${testClassname}" todir="${basedir}/tmp" outfile="guest-result"/>
+                <test name="${testClassname}" todir="${basedir}/tmp" outfile="mutle-result"/>
                 <formatter type="plain" usefile="false"/>
                 <formatter type="xml" usefile="true"/>
                 <jvmarg value="-XX:MaxMetaspaceSize=64m"/>

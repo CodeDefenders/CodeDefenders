@@ -156,7 +156,7 @@ public class AntProcessResult {
         return hasError;
     }
 
-    /** Guest execution takes the outcome from a protected report rather than guest-controlled stdout. */
+    /** Mutle execution takes the outcome from a protected report rather than submitted-code stdout. */
     void setTestOutcome(boolean failure, boolean error) {
         hasFailure = failure;
         hasError = error;

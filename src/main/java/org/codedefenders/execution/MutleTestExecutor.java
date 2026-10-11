@@ -84,9 +84,8 @@ public class MutleTestExecutor {
 
     AntProcessResult run(String target, String mutantDirectory, String testDirectory,
                          Path cutDirectory, String testClassName) {
-        Path workspace = null;
-        try {
-            workspace = Files.createTempDirectory("codedefenders-mutle-").toRealPath();
+        try (var temporaryWorkspace = new TemporaryWorkspace()) {
+            Path workspace = temporaryWorkspace.path();
             Path test = workspace.resolve("test");
             copyCode(Path.of(testDirectory), test);
             copyCode(cutDirectory, workspace.resolve("cut"));
@@ -100,7 +99,8 @@ public class MutleTestExecutor {
                 }
                 Files.copy(resource, workspace.resolve("build.xml"));
             }
-            // Mutle uses JUnit 4/Hamcrest. Do not expose bytecode injection/agent libraries to submitted code.
+            // Keep only JUnit 4/Hamcrest from the common dependencies. The separately added coverage
+            // agent remains on the classpath, with control access restricted by MutleSecurityManager.
             List<Path> common = classpath(dependencies.getCommonClasspath()).stream()
                     .filter(path -> path.getFileName().toString().matches("(?:junit-4\\..*|hamcrest-.*)\\.jar"))
                     .toList();
@@ -115,10 +115,10 @@ public class MutleTestExecutor {
             Files.writeString(workspace.resolve("mutle.policy"), policy(workspace, jars));
 
             String commonClasspath = String.join(File.pathSeparator, common.stream().map(Path::toString).toList());
-            List<String> command = new ArrayList<>(List.of(config.getAntHome().toPath().resolve("bin/ant").toString(),
+            List<String> command = List.of(config.getAntHome().toPath().resolve("bin/ant").toString(),
                     target, "-Dcommon.cp=" + commonClasspath,
                     "-Dmutle.workspace=" + workspace.toUri(),
-                    "-DtestClassname=" + (testClassName == null ? "" : testClassName)));
+                    "-DtestClassname=" + (testClassName == null ? "" : testClassName));
             ProcessBuilder process = new ProcessBuilder(command).directory(workspace.toFile()).redirectErrorStream(true);
             // Do not expose database, mail, API or deployment credentials to submitted code.
             process.environment().clear();
@@ -138,7 +138,7 @@ public class MutleTestExecutor {
                     logger.warn("Mutle runner failed on {}: {}", target, output);
                     throw new ExecutionLimitException();
                 }
-                readTestOutcome(workspace.resolve("tmp/guest-result.xml"), result);
+                readTestOutcome(workspace.resolve("tmp/mutle-result.xml"), result);
             }
             if ("compile-test".equals(target) && result.compiled()) {
                 copyCode(test, Path.of(testDirectory));
@@ -150,15 +150,18 @@ public class MutleTestExecutor {
             return result;
         } catch (IOException e) {
             throw new ExecutionLimitException(e);
-        } finally {
-            if (workspace != null) {
-                try {
-                    FileUtils.deleteDirectory(workspace.toFile());
-                } catch (IOException e) {
-                    // A failed cleanup must be visible rather than leaving execution artifacts unnoticed.
-                    throw new ExecutionLimitException(e);
-                }
-            }
+        }
+    }
+
+    /** Try-with-resources preserves execution failures and suppresses any additional cleanup failure. */
+    private record TemporaryWorkspace(Path path) implements AutoCloseable {
+        private TemporaryWorkspace() throws IOException {
+            this(Files.createTempDirectory("codedefenders-mutle-").toRealPath());
+        }
+
+        @Override
+        public void close() throws IOException {
+            FileUtils.deleteDirectory(path.toFile());
         }
     }
 
@@ -206,50 +209,51 @@ public class MutleTestExecutor {
                 };
                 """);
         List<Path> dependencies = jars.stream().distinct().toList();
+        Path securityManager = workspace.resolve("mutle-security.jar");
+        Path agent = workspace.resolve("agent.jar");
         for (Path jar : dependencies) {
             policy.append("grant codeBase \"").append(jar.toUri()).append("\" {\n");
-            if (jar.equals(workspace.resolve("mutle-security.jar"))) {
+            if (jar.equals(securityManager)) {
                 // This jar contains only the enforcement class. Its checkPermission frame must not
                 // restrict trusted JVM operations; permissions are still checked against every caller.
                 policy.append("permission java.security.AllPermission;\n};\n");
                 continue;
             }
-            policy.append("permission java.io.FilePermission \"").append(escape(workspace.toString()))
-                    .append("\", \"read\";\n")
-                    .append("permission java.io.FilePermission \"").append(escape(workspace + "/-"))
-                    .append("\", \"read\";\n")
-                    // Ant's VM watcher is updated through JUnit's test-listener callback stack.
-                    .append("permission java.io.FilePermission \"")
-                    .append(escape(workspace.resolve("tmp") + "/-"))
-                    .append("\", \"read,write,delete\";\n")
-                    .append("permission java.lang.RuntimePermission \"getClassLoader\";\n")
+            boolean isAgent = jar.equals(agent);
+            boolean isAnt = jar.getFileName().toString().startsWith("ant");
+            filePermission(policy, workspace.toString(), "read");
+            filePermission(policy, workspace + "/-", "read");
+            // Ant's VM watcher is updated through JUnit's test-listener callback stack.
+            filePermission(policy, workspace.resolve("tmp") + "/-", "read,write,delete");
+            policy.append("permission java.lang.RuntimePermission \"getClassLoader\";\n")
                     .append("permission java.lang.RuntimePermission \"accessDeclaredMembers\";\n")
                     .append("permission java.lang.RuntimePermission \"shutdownHooks\";\n")
                     .append("permission java.lang.reflect.ReflectPermission \"suppressAccessChecks\";\n");
-            if (jar.equals(workspace.resolve("agent.jar")) || jar.getFileName().toString().startsWith("ant")) {
+            if (isAgent || isAnt) {
                 policy.append("permission java.lang.RuntimePermission \"createClassLoader\";\n");
             }
-            if (jar.getFileName().toString().startsWith("ant")) {
+            if (isAnt) {
                 // Ant's forked JUnit launcher writes its VM watcher and redirects the test's output.
                 policy.append("permission java.lang.RuntimePermission \"setIO\";\n")
                         .append("permission java.lang.RuntimePermission \"exitVM\";\n")
                         .append("permission java.util.PropertyPermission \"*\", \"read,write\";\n");
             }
             for (Path dependency : dependencies) {
-                policy.append("permission java.io.FilePermission \"").append(escape(dependency.toString()))
-                        .append("\", \"read\";\n");
+                filePermission(policy, dependency.toString(), "read");
             }
-            if (jar.equals(workspace.resolve("agent.jar"))) {
-                policy.append("permission java.lang.RuntimePermission \"defineClass\";\n")
-                        .append("permission java.io.FilePermission \"")
-                        .append(escape(workspace.toString())).append("\", \"write\";\n")
-                        .append("permission java.io.FilePermission \"")
-                        .append(escape(workspace.resolve("jacoco.exec").toString()))
-                        .append("\", \"write\";\n");
+            if (isAgent) {
+                policy.append("permission java.lang.RuntimePermission \"defineClass\";\n");
+                filePermission(policy, workspace.toString(), "write");
+                filePermission(policy, workspace.resolve("jacoco.exec").toString(), "write");
             }
             policy.append("};\n");
         }
         return policy.toString();
+    }
+
+    private static void filePermission(StringBuilder policy, String path, String actions) {
+        policy.append("permission java.io.FilePermission \"").append(escape(path))
+                .append("\", \"").append(actions).append("\";\n");
     }
 
     static void securityManagerJar(Path destination) throws IOException {
@@ -294,37 +298,38 @@ public class MutleTestExecutor {
     /** Kills the whole process tree on timeout, excessive output, interruption or execution failure. */
     static String runProcess(ProcessBuilder builder, Duration timeout) throws IOException {
         Process process = builder.start();
-        FutureTask<String> output = new FutureTask<>(() -> {
-            try (var input = process.getInputStream(); var bytes = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[4_096];
-                int read;
-                while ((read = input.read(buffer)) != -1) {
-                    if (bytes.size() + read > MAX_OUTPUT_BYTES) {
-                        kill(process);
-                        throw new ExecutionLimitException();
+        try (var input = process.getInputStream()) {
+            FutureTask<String> output = new FutureTask<>(() -> {
+                try (var bytes = new ByteArrayOutputStream()) {
+                    byte[] buffer = new byte[4_096];
+                    int read;
+                    while ((read = input.read(buffer)) != -1) {
+                        if (bytes.size() + read > MAX_OUTPUT_BYTES) {
+                            kill(process);
+                            throw new ExecutionLimitException();
+                        }
+                        bytes.write(buffer, 0, read);
                     }
-                    bytes.write(buffer, 0, read);
+                    return bytes.toString(StandardCharsets.UTF_8);
                 }
-                return bytes.toString(StandardCharsets.UTF_8);
+            });
+            Thread reader = new Thread(output, "mutle-output");
+            reader.setDaemon(true);
+            reader.start();
+            try {
+                if (!process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
+                    throw new ExecutionLimitException();
+                }
+                return output.get(1, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new ExecutionLimitException(e);
+            } catch (ExecutionException | TimeoutException e) {
+                throw new ExecutionLimitException(e);
+            } finally {
+                kill(process);
+                output.cancel(true);
             }
-        });
-        Thread reader = new Thread(output, "mutle-guest-output");
-        reader.setDaemon(true);
-        reader.start();
-        try {
-            if (!process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
-                throw new ExecutionLimitException();
-            }
-            return output.get(1, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ExecutionLimitException(e);
-        } catch (ExecutionException | TimeoutException e) {
-            throw new ExecutionLimitException(e);
-        } finally {
-            kill(process);
-            process.getInputStream().close();
-            output.cancel(true);
         }
     }
 

@@ -18,16 +18,22 @@
  */
 package org.codedefenders.execution;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.stream.Stream;
 
 import javax.tools.ToolProvider;
 
+import org.apache.commons.io.FileUtils;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.dependencies.DependencyProvider;
 import org.junit.jupiter.api.Test;
@@ -35,9 +41,13 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 class MutleTestExecutorTest {
@@ -181,14 +191,14 @@ class MutleTestExecutorTest {
                 "-cp", classpath, "org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner", "SandboxJUnitProbe",
                 "formatter=org.apache.tools.ant.taskdefs.optional.junit.PlainJUnitResultFormatter",
                 "formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,"
-                        + temporary.resolve("guest-result.xml"),
+                        + temporary.resolve("mutle-result.xml"),
                 "crashfile=" + temporary.resolve("junitvmwatcher.properties")), Duration.ofSeconds(10));
         assertTrue(output.contains("Tests run: 1,"), output);
         assertEquals("terminated successfully", Files.readString(temporary.resolve("junitvmwatcher.properties")).trim());
         assertTrue(Files.size(workspace.resolve("jacoco.exec")) > 0);
         AntProcessResult result = new AntProcessResult();
         result.setInputStream(new java.io.BufferedReader(new java.io.StringReader(output)));
-        MutleTestExecutor.readTestOutcome(temporary.resolve("guest-result.xml"), result);
+        MutleTestExecutor.readTestOutcome(temporary.resolve("mutle-result.xml"), result);
         return result;
     }
 
@@ -200,6 +210,51 @@ class MutleTestExecutorTest {
         Files.writeString(report, "<testsuite tests=\"0\" failures=\"0\" errors=\"0\"/>");
         assertThrows(MutleTestExecutor.ExecutionLimitException.class,
                 () -> MutleTestExecutor.readTestOutcome(report, new AntProcessResult()));
+    }
+
+    @Test
+    void workspaceCleanupFailureDoesNotReplaceExecutionFailure() throws Exception {
+        Configuration config = mock(Configuration.class);
+        DependencyProvider dependencies = mock(DependencyProvider.class);
+        when(dependencies.getCommonClasspath()).thenReturn("");
+        RuntimeException failure = new IllegalStateException("runner setup failed");
+        IOException cleanupFailure = new IOException("workspace cleanup failed");
+        when(config.getAntHome()).thenThrow(failure);
+        Path test = Files.createDirectory(root.resolve("test"));
+        Path cut = Files.createDirectory(root.resolve("cut"));
+        try (var files = mockStatic(FileUtils.class, CALLS_REAL_METHODS)) {
+            files.when(() -> FileUtils.deleteDirectory(any(File.class))).thenAnswer(invocation -> {
+                invocation.callRealMethod();
+                throw cleanupFailure;
+            });
+            var thrown = assertThrows(IllegalStateException.class,
+                    () -> new MutleTestExecutor(config, dependencies)
+                            .run("compile-test", null, test.toString(), cut, "TestProbe"));
+            assertSame(failure, thrown);
+            assertEquals(1, thrown.getSuppressed().length);
+            assertSame(cleanupFailure, thrown.getSuppressed()[0]);
+        }
+    }
+
+    @Test
+    void streamCleanupFailureDoesNotReplaceTimeout() throws Exception {
+        IOException cleanupFailure = new IOException("output stream cleanup failed");
+        var input = new ByteArrayInputStream(new byte[0]) {
+            @Override
+            public void close() throws IOException {
+                throw cleanupFailure;
+            }
+        };
+        Process process = mock(Process.class);
+        ProcessBuilder builder = mock(ProcessBuilder.class);
+        when(builder.start()).thenReturn(process);
+        when(process.getInputStream()).thenReturn(input);
+        when(process.waitFor(1_000, TimeUnit.MILLISECONDS)).thenReturn(false);
+        when(process.descendants()).thenAnswer(invocation -> Stream.empty());
+        var thrown = assertThrows(MutleTestExecutor.ExecutionLimitException.class,
+                () -> MutleTestExecutor.runProcess(builder, Duration.ofSeconds(1)));
+        assertEquals(1, thrown.getSuppressed().length);
+        assertSame(cleanupFailure, thrown.getSuppressed()[0]);
     }
 
     @Test
