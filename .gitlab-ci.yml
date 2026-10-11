@@ -154,10 +154,10 @@ unit-tests:
       junit:
         - target/failsafe-reports/TEST-*.xml
 
-integration-tests_database_mariadb-10-5:
+integration-tests_database_mariadb-11-4:
   extends: .integration-tests_database
   services:
-    - name: mariadb:10.5.10
+    - name: mariadb:11.4.13
       alias: database
   after_script:
     - mvn $MAVEN_ARGS jacoco:report-integration
@@ -169,10 +169,10 @@ integration-tests_database_mariadb-10-5:
     - when: manual
   allow_failure: true
 
-integration-tests_database_mariadb-10-3:
+integration-tests_database_mariadb-10-11:
   extends: .integration-tests_database
   services:
-    - name: mariadb:10.3.31
+    - name: mariadb:10.11.19
       alias: database
   rules:
     # Exclude job for Draft merge requests
@@ -256,7 +256,7 @@ merged-test-coverage:
   needs:
     - build
     - unit-tests
-    # - integration-tests_database_mariadb-10-5
+    # - integration-tests_database_mariadb-11-4
   script:
     - mvn $MAVEN_ARGS -Djacoco.destFile='${project.build.directory}/jacoco-merged.exec' -Djacoco.dataFile='${project.build.directory}/jacoco-merged.exec' jacoco:merge jacoco:report
   artifacts:
