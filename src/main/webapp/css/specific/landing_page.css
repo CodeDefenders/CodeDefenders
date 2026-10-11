@@ -22,6 +22,22 @@
     --color-error: #dc2626;
 }
 
+body {
+    background: #f5f7fa;
+}
+
+.landing-panel {
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid #dce3eb;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(23, 32, 51, .035);
+}
+
+.landing-details {
+    padding: 0;
+}
+
 .title {
     font-size: 48px;
     font-weight: 500;
@@ -47,12 +63,64 @@
     font-size: 1rem;
     text-align: left;
     letter-spacing: 0;
+    color: #64748b;
 }
 
 .landing-summary {
     max-width: 38rem;
+    font-size: 1.05rem;
     color: #64748b;
     line-height: 1.7;
+}
+
+.landing-mutle {
+    padding-top: 1.5rem;
+    border-top: 1px solid #dce3eb;
+}
+
+.landing-mutle h2 {
+    margin-bottom: .75rem;
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+}
+
+.landing-case {
+    display: table;
+    padding: .35rem .75rem;
+    border-radius: .5rem;
+    background: #eef5fc;
+    color: #24496d;
+    font-size: .9rem;
+}
+
+.landing-note {
+    color: #64748b;
+    font-size: .9rem;
+    line-height: 1.6;
+}
+
+.landing-demo .status {
+    min-height: 3.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.landing-demo .anim .row {
+    max-width: none;
+    margin-inline: 0;
+}
+
+.landing-demo .intro {
+    max-width: 60rem;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.landing-demo .browser-window {
+    box-shadow: none;
+}
+
+.landing-demo .browser-titlebar {
+    background: #f1f5f9;
 }
 
 .intro, .usage {
@@ -367,6 +435,15 @@
 
     .rounded-6-md {
         border-radius: .6rem !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .landing-mutle {
+        padding-top: 0;
+        padding-left: 2rem;
+        border-top: 0;
+        border-left: 1px solid #dce3eb;
     }
 }
 
