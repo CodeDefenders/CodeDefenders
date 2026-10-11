@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
 import org.codedefenders.arcade.mutle.persistence.MutleRepository;
 import org.codedefenders.arcade.mutle.service.MutleGuestLimits;
 import org.codedefenders.configuration.Configuration;
@@ -78,6 +79,6 @@ public class MutleGuestCleanupJob extends FixedDelayCronJob {
         if (gameId < 1) {
             throw new IllegalArgumentException("Invalid guest game ID");
         }
-        org.apache.commons.io.FileUtils.deleteDirectory(testsRoot.resolve("mutle").resolve(String.valueOf(gameId)).toFile());
+        FileUtils.deleteDirectory(testsRoot.resolve("mutle").resolve(String.valueOf(gameId)).toFile());
     }
 }

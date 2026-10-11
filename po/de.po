@@ -10388,8 +10388,8 @@ msgid "Too many requests. Please try again later."
 msgstr "Zu viele Anfragen. Bitte versuche es später erneut."
 
 #: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
-msgid "Your test could not run within the guest limits. Please simplify it or try again later."
-msgstr "Dein Test konnte innerhalb der Gastlimits nicht ausgeführt werden. Bitte vereinfache ihn oder versuche es später erneut."
+msgid "Your test could not run within the execution limits. Please simplify it or try again later."
+msgstr "Dein Test konnte innerhalb der Ausführungsgrenzen nicht ausgeführt werden. Bitte vereinfache ihn oder versuche es später erneut."
 
 #~ msgid "Mutle case solved"
 #~ msgstr "Mutle-Fall gelöst"

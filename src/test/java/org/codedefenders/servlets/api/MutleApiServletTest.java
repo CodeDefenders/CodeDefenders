@@ -36,6 +36,7 @@ import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.service.I18nService;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,6 +70,8 @@ class MutleApiServletTest {
         inject(servlet, "settings", settings);
         inject(servlet, "mutleService", service);
         inject(servlet, "login", mock(CodeDefendersAuth.class));
+        I18nService i18nService = mock(I18nService.class);
+        inject(servlet, "i18nService", i18nService);
         HttpServletRequest request = mock(HttpServletRequest.class);
         when(request.getHeader("X-Requested-With")).thenReturn("XMLHttpRequest");
         when(request.getPathInfo()).thenReturn("/start");
@@ -107,6 +110,7 @@ class MutleApiServletTest {
             release.countDown();
             pending.get(5, TimeUnit.SECONDS);
             verify(guest).start("127.0.0.1");
+            verify(i18nService).getI18n(request);
         } finally {
             release.countDown();
             executor.shutdownNow();

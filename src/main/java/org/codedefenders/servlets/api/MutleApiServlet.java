@@ -32,7 +32,7 @@ import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.execution.GuestTestExecutor;
+import org.codedefenders.execution.MutleTestExecutor;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Paths;
 
@@ -80,6 +80,7 @@ public class MutleApiServlet extends HttpServlet {
             return;
         }
         boolean anonymous = !login.isLoggedIn();
+        var i18n = i18nService.getI18n(request);
         try {
             if (anonymous) {
                 guestLimits.request(request.getRemoteAddr());
@@ -97,9 +98,9 @@ public class MutleApiServlet extends HttpServlet {
                         return;
                     }
                     try (var permit = anonymous ? guestLimits.acquire() : null) {
-                        write(response, anonymous ? guest.start(request.getRemoteAddr()) : fixtureKey == null
+                        write(response, anonymous ? guest.start(request.getRemoteAddr()) : (fixtureKey == null
                                 ? mutleService.start(login.getUserId())
-                                : mutleService.startPractice(login.getUserId(), fixtureKey));
+                                : mutleService.startPractice(login.getUserId(), fixtureKey)));
                     }
                 }
                 case "/state" -> write(response, login.isLoggedIn()
@@ -110,32 +111,28 @@ public class MutleApiServlet extends HttpServlet {
                     String source = string(body, "source");
                     try (var permit = anonymous ? guestLimits.acquire() : null) {
                         write(response, anonymous ? guest.submit(gameId, source,
-                                i18nService.getI18n(request), request.getRemoteAddr())
+                                i18n, request.getRemoteAddr())
                                 : mutleService.submit(login.getUserId(), gameId, source));
                     }
                 }
                 default -> response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (MutleGuestLimits.RequestTooLargeException e) {
-            var i18n = i18nService.getI18n(request);
             response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
             write(response, new ErrorView("too-large", i18n.tr("Please shorten your test and try again.")));
         } catch (MutleGuestLimits.GameSubmissionLimitException e) {
-            var i18n = i18nService.getI18n(request);
             response.setStatus(429);
             write(response, new ErrorView("game-limit",
                     i18n.tr("This guest game has reached its submission limit. Log in to keep playing.")));
         } catch (MutleGuestLimits.RateLimitException e) {
-            var i18n = i18nService.getI18n(request);
             response.setHeader("Retry-After", "3600");
             response.setStatus(429);
             write(response, new ErrorView("rate-limit", i18n.tr("Too many requests. Please try again later.")));
-        } catch (MutleGuestLimits.BusyException | GuestTestExecutor.ExecutionLimitException e) {
-            var i18n = i18nService.getI18n(request);
+        } catch (MutleGuestLimits.BusyException | MutleTestExecutor.ExecutionLimitException e) {
             response.setHeader("Retry-After", "30");
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             write(response, new ErrorView("busy",
-                    i18n.tr("Your test could not run within the guest limits. Please simplify it or try again later.")));
+                    i18n.tr("Your test could not run within the execution limits. Please simplify it or try again later.")));
         } catch (MutleService.NotFoundException e) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (MutleService.SubmissionInProgressException e) {

@@ -39,16 +39,11 @@ public class MutleGuestSession implements Serializable {
     // Lock the actual session state, not a synchronized method copied onto Weld's shared client proxy.
     private final Map<String, GuestGame> games = new LinkedHashMap<>();
 
-    @Inject
-    private MutleService service;
+    private final MutleService service;
+    private final MutleGuestLimits limits;
 
     @Inject
-    private MutleGuestLimits limits;
-
-    public MutleGuestSession() {
-    }
-
-    MutleGuestSession(MutleService service, MutleGuestLimits limits) {
+    public MutleGuestSession(MutleService service, MutleGuestLimits limits) {
         this.service = service;
         this.limits = limits;
     }

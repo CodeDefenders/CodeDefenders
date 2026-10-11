@@ -45,29 +45,29 @@ import jakarta.inject.Inject;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.dependencies.DependencyProvider;
-import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-/** Executes anonymous tests with a separate workspace, policy, environment and resource budget. */
+/** Executes all Mutle tests with the same restricted workspace, policy, environment and resource budget. */
 @ApplicationScoped
-public class GuestTestExecutor {
-    private static final Logger logger = LoggerFactory.getLogger(GuestTestExecutor.class);
+public class MutleTestExecutor {
+    private static final Logger logger = LoggerFactory.getLogger(MutleTestExecutor.class);
     static final Duration PROCESS_TIMEOUT = Duration.ofSeconds(30);
     static final int MAX_OUTPUT_BYTES = 65_536;
     private final Configuration config;
     private final DependencyProvider dependencies;
 
     @Inject
-    public GuestTestExecutor(Configuration config, DependencyProvider dependencies) {
+    public MutleTestExecutor(Configuration config, DependencyProvider dependencies) {
         this.config = config;
         this.dependencies = dependencies;
     }
 
-    boolean isGuest(String directory) {
+    boolean isMutle(String directory) {
         if (directory == null) {
             return false;
         }
@@ -78,7 +78,7 @@ public class GuestTestExecutor {
         }
         Path relative = root.relativize(path);
         return relative.getNameCount() >= 4 && relative.getName(0).toString().matches("[1-9][0-9]*")
-                && relative.getName(1).toString().equals(String.valueOf(Constants.MUTLE_GUEST_USER_ID))
+                && relative.getName(1).toString().matches("[1-9][0-9]*")
                 && relative.getName(2).toString().equals("original");
     }
 
@@ -94,13 +94,13 @@ public class GuestTestExecutor {
                 copyCode(Path.of(mutantDirectory), workspace.resolve("mutant"));
             }
             Files.createDirectory(workspace.resolve("tmp"));
-            try (var resource = GuestTestExecutor.class.getResourceAsStream("/data/guest-build.xml")) {
+            try (var resource = MutleTestExecutor.class.getResourceAsStream("/data/mutle-build.xml")) {
                 if (resource == null) {
-                    throw new IOException("Guest build resource is missing");
+                    throw new IOException("Mutle build resource is missing");
                 }
                 Files.copy(resource, workspace.resolve("build.xml"));
             }
-            // Mutle uses JUnit 4/Hamcrest. Do not expose bytecode injection/agent libraries to guest code.
+            // Mutle uses JUnit 4/Hamcrest. Do not expose bytecode injection/agent libraries to submitted code.
             List<Path> common = classpath(dependencies.getCommonClasspath()).stream()
                     .filter(path -> path.getFileName().toString().matches("(?:junit-4\\..*|hamcrest-.*)\\.jar"))
                     .toList();
@@ -110,14 +110,14 @@ public class GuestTestExecutor {
             }
             extractAgent(classpath(dependencies.getJacocoClasspath()), workspace.resolve("agent.jar"));
             jars.add(workspace.resolve("agent.jar"));
-            securityManagerJar(workspace.resolve("guest-security.jar"));
-            jars.add(workspace.resolve("guest-security.jar"));
-            Files.writeString(workspace.resolve("guest.policy"), policy(workspace, jars));
+            securityManagerJar(workspace.resolve("mutle-security.jar"));
+            jars.add(workspace.resolve("mutle-security.jar"));
+            Files.writeString(workspace.resolve("mutle.policy"), policy(workspace, jars));
 
             String commonClasspath = String.join(File.pathSeparator, common.stream().map(Path::toString).toList());
             List<String> command = new ArrayList<>(List.of(config.getAntHome().toPath().resolve("bin/ant").toString(),
                     target, "-Dcommon.cp=" + commonClasspath,
-                    "-Dguest.workspace=" + workspace.toUri(),
+                    "-Dmutle.workspace=" + workspace.toUri(),
                     "-DtestClassname=" + (testClassName == null ? "" : testClassName)));
             ProcessBuilder process = new ProcessBuilder(command).directory(workspace.toFile()).redirectErrorStream(true);
             // Do not expose database, mail, API or deployment credentials to submitted code.
@@ -135,7 +135,7 @@ public class GuestTestExecutor {
             result.setInputStream(new BufferedReader(new StringReader(output)));
             if (!"compile-test".equals(target)) {
                 if (!result.compiled()) {
-                    logger.warn("Guest runner failed on {}: {}", target, output);
+                    logger.warn("Mutle runner failed on {}: {}", target, output);
                     throw new ExecutionLimitException();
                 }
                 readTestOutcome(workspace.resolve("tmp/guest-result.xml"), result);
@@ -153,9 +153,9 @@ public class GuestTestExecutor {
         } finally {
             if (workspace != null) {
                 try {
-                    org.apache.commons.io.FileUtils.deleteDirectory(workspace.toFile());
+                    FileUtils.deleteDirectory(workspace.toFile());
                 } catch (IOException e) {
-                    // A failed cleanup must be visible rather than leaving anonymous artifacts unnoticed.
+                    // A failed cleanup must be visible rather than leaving execution artifacts unnoticed.
                     throw new ExecutionLimitException(e);
                 }
             }
@@ -195,12 +195,19 @@ public class GuestTestExecutor {
                 }
             }
         }
-        throw new IOException("Guest coverage agent is missing");
+        throw new IOException("Mutle coverage agent is missing");
     }
 
     /** Neither submitted classes nor libraries receive access to application files, sockets or environment variables. */
     static String policy(Path workspace, List<Path> jars) {
-        StringBuilder policy = new StringBuilder("grant { permission java.util.PropertyPermission \"*\", \"read\"; };\n");
+        // Reading class origin metadata lets the manager inspect the full caller stack without doPrivileged.
+        // It does not grant submitted code the permissions of the inspected protection domains.
+        StringBuilder policy = new StringBuilder("""
+                grant {
+                    permission java.util.PropertyPermission "*", "read";
+                    permission java.lang.RuntimePermission "getProtectionDomain";
+                };
+                """);
         List<Path> dependencies = jars.stream().distinct().toList();
         for (Path jar : dependencies) {
             policy.append("grant codeBase \"").append(jar.toUri()).append("\" {\n")
@@ -237,9 +244,8 @@ public class GuestTestExecutor {
                         .append(escape(workspace.resolve("jacoco.exec").toString()))
                         .append("\", \"write\";\n");
             }
-            if (jar.equals(workspace.resolve("guest-security.jar"))) {
-                policy.append("permission java.lang.RuntimePermission \"getProtectionDomain\";\n")
-                        .append("permission java.lang.RuntimePermission \"modifyThread\";\n")
+            if (jar.equals(workspace.resolve("mutle-security.jar"))) {
+                policy.append("permission java.lang.RuntimePermission \"modifyThread\";\n")
                         .append("permission java.lang.RuntimePermission \"modifyThreadGroup\";\n");
             }
             policy.append("};\n");
@@ -248,11 +254,11 @@ public class GuestTestExecutor {
     }
 
     static void securityManagerJar(Path destination) throws IOException {
-        String name = "org/codedefenders/execution/GuestSecurityManager.class";
+        String name = "org/codedefenders/execution/MutleSecurityManager.class";
         try (var output = new JarOutputStream(Files.newOutputStream(destination));
-             var input = GuestTestExecutor.class.getResourceAsStream("/" + name)) {
+             var input = MutleTestExecutor.class.getResourceAsStream("/" + name)) {
             if (input == null) {
-                throw new IOException("Guest security manager is missing");
+                throw new IOException("Mutle security manager is missing");
             }
             output.putNextEntry(new JarEntry(name));
             input.transferTo(output);
@@ -331,11 +337,11 @@ public class GuestTestExecutor {
 
     public static class ExecutionLimitException extends RuntimeException {
         public ExecutionLimitException() {
-            super("Guest execution exceeded its resource budget or could not run safely");
+            super("Mutle execution exceeded its resource budget or could not run safely");
         }
 
         public ExecutionLimitException(Throwable cause) {
-            super("Guest execution could not run safely", cause);
+            super("Mutle execution could not run safely", cause);
         }
     }
 }

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Run only against a fresh, disposable database. This script starts its own Tomcat.
+set -euo pipefail
+
+export CATALINA_HOME=/usr/share/tomcat10
+export CATALINA_BASE=/var/lib/tomcat10
+export CATALINA_TMPDIR=/tmp
+export CODEDEFENDERS_DATA_DIR="$PWD/target/public-mutle-data"
+export CODEDEFENDERS_ANT_HOME=/usr/share/ant
+export CODEDEFENDERS_APP_URL=http://localhost:8080
+
+printf '%s\n' '<tomcat-users><role rolename="codedefenders-admin"/></tomcat-users>' > /etc/tomcat10/tomcat-users.xml
+mkdir -p "$CATALINA_BASE/webapps/ROOT"
+unzip -q -o target/codedefenders.war -d "$CATALINA_BASE/webapps/ROOT"
+printf '%s' 'mutle-review-canary-20261011' > /tmp/mutle-review-canary.txt
+"$CATALINA_HOME/bin/catalina.sh" run > target/public-mutle-tomcat.log 2>&1 &
+mutle_tomcat_pid=$!
+trap 'kill "$mutle_tomcat_pid" 2>/dev/null || true' EXIT
+
+mutle_ready=false
+for attempt in {1..90}; do
+    if curl -fsS http://localhost:8080/ > /dev/null; then
+        mutle_ready=true
+        break
+    fi
+    if ! kill -0 "$mutle_tomcat_pid" 2>/dev/null; then
+        cat target/public-mutle-tomcat.log
+        exit 1
+    fi
+    sleep 1
+done
+if [ "$mutle_ready" != true ]; then
+    cat target/public-mutle-tomcat.log
+    exit 1
+fi
+
+# Maven/Failsafe owns the tests and reports; seeding is restricted to this disposable instance.
+mvn ${MAVEN_ARGS:-} verify -P it-public-mutle -DskipUnitTests -DskipFrontend=true -Dskip.installnodenpm=true \
+    -DpublicMutle.url=http://localhost:8080 -DpublicMutle.seed=true \
+    "-DpublicMutle.jdbcUrl=jdbc:mysql://${CODEDEFENDERS_DB_HOST}:3306/${CODEDEFENDERS_DB_NAME}" \
+    "-DpublicMutle.dbUsername=${CODEDEFENDERS_DB_USERNAME}" \
+    "-DpublicMutle.dbPassword=${CODEDEFENDERS_DB_PASSWORD}" \
+    -Dwebdriver.chrome.driver=/usr/bin/chromedriver

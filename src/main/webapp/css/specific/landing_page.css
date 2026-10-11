@@ -22,97 +22,42 @@
     --color-error: #dc2626;
 }
 
-body {
-    background: #f5f7fa;
-}
-
-.landing-panel {
-    padding: clamp(1.5rem, 3vw, 2.5rem);
-    border: 1px solid #dce3eb;
-    border-radius: 1rem;
-    background: #fff;
-    box-shadow: 0 3px 12px rgba(23, 32, 51, .035);
-}
-
-.landing-details {
-    padding: 0;
-}
-
-.landing-lessons p {
-    max-width: 65rem;
-    color: #64748b;
-    font-size: 1rem;
-    line-height: 1.7;
-}
-
-.landing-lessons p:last-child {
-    margin-bottom: 0;
-}
-
-.landing-hero .title {
-    font-size: clamp(1.65rem, 3vw, 2.5rem);
+.title {
+    font-size: 48px;
     font-weight: 500;
-    text-align: left;
+    text-align: center;
     letter-spacing: -1px;
-    margin-block: 0;
+    margin-block: 8px;
 }
 
-.landing-hero .subtitle {
-    font-size: 1rem;
+.subtitle {
+    font-size: 20px;
     font-weight: 500;
-    text-align: left;
-    letter-spacing: 0;
-    color: #64748b;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
-.landing-summary {
-    max-width: 38rem;
-    font-size: 1.05rem;
-    color: #64748b;
+.intro, .usage {
+    font-size: 16px;
+    margin-bottom: 48px;
     line-height: 1.7;
-}
-
-.landing-mutle {
-    padding-top: 1.5rem;
-    border-top: 1px solid #dce3eb;
-}
-
-.landing-mutle h2 {
-    margin-bottom: .75rem;
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
-}
-
-.landing-case {
-    display: table;
-    padding: .35rem .75rem;
-    border-radius: .5rem;
-    background: #eef5fc;
-    color: #24496d;
-    font-size: .9rem;
-}
-
-.landing-note {
-    color: #64748b;
-    font-size: .9rem;
-    line-height: 1.6;
+    max-width: 800px;
+    margin-inline: auto;
+    padding-inline: 3rem;
 }
 
 .intro {
-    font-size: 16px;
-    margin-bottom: 0;
-    line-height: 1.7;
-    max-width: 60rem;
-    margin-inline: auto;
-    padding: 0;
     color: #64748b;
 }
 
-.intro p {
+.intro p,
+.usage p {
     margin: 0 0 12px 0;
     text-wrap: pretty;
 }
 
-.intro p:last-child {
+.intro p:last-child,
+.usage p:last-child {
     margin-bottom: 0;
 }
 
@@ -122,11 +67,11 @@ body {
     gap: 24px;
     align-items: stretch;
     margin-bottom: 24px;
-    margin-inline: 0;
+    margin-inline: auto;
+    max-width: 1000px;
 }
 
 .anim .row > div {
-    min-width: 0;
     display: flex;
     flex-direction: column;
 }
@@ -136,13 +81,14 @@ body {
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
 .browser-titlebar {
-    background: #f1f5f9;
+    background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
     padding: 10px 14px;
     display: flex;
     align-items: center;
@@ -292,10 +238,10 @@ body {
 }
 
 .status {
-    margin-top: 0;
-    margin-bottom: 1rem;
+    margin-top: 28px;
+    margin-bottom: 14px;
     font-size: 20px;
-    min-height: 3.5rem;
+    min-height: 82px;
     text-align: center;
     font-weight: 500;
     display: flex;
@@ -393,21 +339,16 @@ body {
 }
 
 @media (min-width: 768px) {
-    .intro {
+    .intro, .usage {
         text-align: center;
     }
 
     .anim .row {
         grid-template-columns: 1fr 1fr;
     }
-}
 
-@media (min-width: 992px) {
-    .landing-mutle {
-        padding-top: 0;
-        padding-left: 2rem;
-        border-top: 0;
-        border-left: 1px solid #dce3eb;
+    .rounded-6-md {
+        border-radius: .6rem !important;
     }
 }
 

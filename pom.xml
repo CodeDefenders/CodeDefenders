@@ -659,6 +659,22 @@
 			</build>
 		</profile>
 
+		<profile>
+			<id>it-public-mutle</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<groups>public-mutle</groups>
+							<runOrder>alphabetical</runOrder>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- Solution inspired by and taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
 		<!-- Integration Tests are run locally without docker or anything else -->
 		<profile>

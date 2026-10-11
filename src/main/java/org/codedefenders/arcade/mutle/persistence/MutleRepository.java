@@ -35,6 +35,7 @@ import org.codedefenders.arcade.mutle.model.MutleGame;
 import org.codedefenders.arcade.mutle.model.MutlePublication;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.transaction.Transactional;
 import org.intellij.lang.annotations.Language;
 
 import com.google.gson.Gson;
@@ -48,6 +49,7 @@ import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 /** Database access for installed Mutle fixtures and player games. */
 @ApplicationScoped
 public class MutleRepository {
+    private static final int MAX_STORED_GUEST_GAMES = 2_000;
     private static final Gson GSON = new Gson();
     private static final java.lang.reflect.Type RESOURCE_MAP = new TypeToken<Map<String, String>>() { }.getType();
     private final QueryRunner queryRunner;
@@ -256,7 +258,7 @@ public class MutleRepository {
                 oneFromRS(rs -> rs.getInt("User_ID")), MUTLE_GUEST_USER_ID).orElseThrow();
         int count = queryRunner.query("SELECT COUNT(*) AS total FROM mutle_game WHERE user_id = ?;",
                 oneFromRS(rs -> rs.getInt("total")), MUTLE_GUEST_USER_ID).orElseThrow();
-        if (count >= 2_000) {
+        if (count >= MAX_STORED_GUEST_GAMES) {
             throw new org.codedefenders.arcade.mutle.service.MutleGuestLimits.RateLimitException();
         }
     }
@@ -272,7 +274,11 @@ public class MutleRepository {
                 MUTLE_GUEST_USER_ID, Timestamp.from(cutoff), Timestamp.from(Instant.now().minus(SUBMISSION_TIMEOUT)));
     }
 
-    /** Delete dependencies explicitly because game/test foreign keys do not all cascade. Requires a transaction. */
+    /**
+     * Deletes the game and its dependencies atomically; existing game/test foreign keys do not all cascade.
+     * The cleanup job also wraps this call and artifact removal in a transaction, retaining failed games for retry.
+     */
+    @Transactional
     public boolean deleteExpiredGuestGame(int gameId, Instant cutoff) {
         @Language("SQL") String guard = """
                 SELECT game_id FROM mutle_game

@@ -12489,5 +12489,5 @@ msgid "Too many requests. Please try again later."
 msgstr ""
 
 #: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
-msgid "Your test could not run within the guest limits. Please simplify it or try again later."
+msgid "Your test could not run within the execution limits. Please simplify it or try again later."
 msgstr ""

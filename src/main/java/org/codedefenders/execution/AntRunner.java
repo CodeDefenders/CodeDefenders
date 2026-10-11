@@ -79,14 +79,13 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final GameClassRepository gameClassRepo;
     private final DependencyProvider dependencyProvider;
 
-    @Inject
-    private GuestTestExecutor guestTestExecutor;
+    private final MutleTestExecutor mutleTestExecutor;
 
     @Inject
     public AntRunner(Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
                      MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo,
-                     DependencyProvider dependencyProvider) {
+                     DependencyProvider dependencyProvider, MutleTestExecutor mutleTestExecutor) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
@@ -95,6 +94,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         this.testRepo = testRepo;
         this.gameClassRepo = gameClassRepo;
         this.dependencyProvider = dependencyProvider;
+        this.mutleTestExecutor = mutleTestExecutor;
     }
 
     /**
@@ -330,8 +330,8 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                 Paths.get(cut.getJavaFile()));
         Path cutDir = topDir.resolve(Constants.CUTS_CLASSES_DIR);
 
-        if (guestTestExecutor.isGuest(testDir)) {
-            return guestTestExecutor.run(target, mutantDir, testDir, cutDir, testClassName);
+        if (mutleTestExecutor.isMutle(testDir)) {
+            return mutleTestExecutor.run(target, mutantDir, testDir, cutDir, testClassName);
         }
 
         config.getAntJavaHome()
