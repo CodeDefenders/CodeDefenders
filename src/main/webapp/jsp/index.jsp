@@ -213,8 +213,8 @@
             </div>
 
 
-            <div class="page py-4">
-                <div class="usage">
+            <div class="page landing-panel landing-lessons">
+                <div>
                     <h2 class="mb-3">${i18n.tr('Use CodeDefenders for your lessons')}</h2>
                     <p>
                         ${i18n.tr('CodeDefenders is an open source software developed and maintained at the Chair of Software Engineering&nbsp;II at the University of Passau.')}
