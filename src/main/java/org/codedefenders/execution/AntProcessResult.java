@@ -156,6 +156,12 @@ public class AntProcessResult {
         return hasError;
     }
 
+    /** Guest execution takes the outcome from a protected report rather than guest-controlled stdout. */
+    void setTestOutcome(boolean failure, boolean error) {
+        hasFailure = failure;
+        hasError = error;
+    }
+
     String getCompilerOutput() {
         return compilerOutput;
     }

@@ -20,12 +20,15 @@ package org.codedefenders.arcade.mutle.service;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
+
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 
@@ -34,15 +37,21 @@ import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 public class MutleGuestSession implements Serializable {
     private static final long serialVersionUID = 1L;
     private final Map<String, Integer> games = new LinkedHashMap<>();
+    private final Map<Integer, Integer> submissions = new LinkedHashMap<>();
+    private final Map<Integer, Instant> created = new LinkedHashMap<>();
 
     @Inject
     private MutleService service;
 
+    @Inject
+    private MutleGuestLimits limits;
+
     public MutleGuestSession() {
     }
 
-    MutleGuestSession(MutleService service) {
+    MutleGuestSession(MutleService service, MutleGuestLimits limits) {
         this.service = service;
+        this.limits = limits;
     }
 
     public synchronized Optional<MutleStateView> current() {
@@ -50,7 +59,8 @@ public class MutleGuestSession implements Serializable {
         return gameId == null ? Optional.empty() : Optional.of(state(gameId));
     }
 
-    public synchronized MutleStateView start() {
+    public synchronized MutleStateView start(String address) {
+        prune();
         MutleFixtureView fixture = service.currentFixture();
         if (fixture == null) {
             throw new MutleService.NotFoundException();
@@ -58,8 +68,10 @@ public class MutleGuestSession implements Serializable {
         String key = key(fixture);
         Integer gameId = games.get(key);
         if (gameId == null) {
-            MutleStateView state = service.startGuest();
+            limits.creation(address);
+            MutleStateView state = service.startGuest(fixture);
             games.put(key, state.gameId());
+            created.put(state.gameId(), Instant.now());
             return state;
         }
         return state(gameId);
@@ -73,20 +85,34 @@ public class MutleGuestSession implements Serializable {
         return service.state(MUTLE_GUEST_USER_ID, resolved);
     }
 
-    public synchronized MutleStateView submit(int gameId, String source) throws IOException {
+    public synchronized MutleStateView submit(int gameId, String source, I18n i18n, String address) throws IOException {
         if (!owns(gameId)) {
             throw new MutleService.NotFoundException();
         }
-        return service.submit(MUTLE_GUEST_USER_ID, gameId, source);
+        if (submissions.getOrDefault(gameId, 0) >= MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME) {
+            throw new MutleGuestLimits.GameSubmissionLimitException();
+        }
+        limits.submission(address, source);
+        submissions.merge(gameId, 1, Integer::sum);
+        return service.submit(MUTLE_GUEST_USER_ID, gameId, source, i18n);
     }
 
     public synchronized boolean owns(int gameId) {
+        prune();
         return games.containsValue(gameId);
     }
 
     private Integer currentGameId() {
+        prune();
         MutleFixtureView fixture = service.currentFixture();
         return fixture == null ? null : games.get(key(fixture));
+    }
+
+    private void prune() {
+        Instant cutoff = Instant.now().minus(MutleGuestLimits.RETENTION);
+        games.values().removeIf(id -> created.getOrDefault(id, Instant.EPOCH).isBefore(cutoff));
+        submissions.keySet().retainAll(games.values());
+        created.keySet().retainAll(games.values());
     }
 
     private static String key(MutleFixtureView fixture) {

@@ -12475,3 +12475,19 @@ msgstr ""
 
 msgid "Guest progress stays in this browser session. Log in to play with your account and earn achievements."
 msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:111
+msgid "Please shorten your test and try again."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:115
+msgid "This guest game has reached its submission limit. Log in to keep playing."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:120
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
+msgid "Your test could not run within the guest limits. Please simplify it or try again later."
+msgstr ""

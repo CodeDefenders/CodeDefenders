@@ -10375,6 +10375,22 @@ msgstr "Kopieren fehlgeschlagen"
 msgid "Error updating whitelist"
 msgstr "Fehler beim Aktualisieren der Whitelist"
 
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:111
+msgid "Please shorten your test and try again."
+msgstr "Bitte kürze deinen Test und versuche es erneut."
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:115
+msgid "This guest game has reached its submission limit. Log in to keep playing."
+msgstr "Dieses Gastspiel hat sein Einreichungslimit erreicht. Melde dich an, um weiterzuspielen."
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:120
+msgid "Too many requests. Please try again later."
+msgstr "Zu viele Anfragen. Bitte versuche es später erneut."
+
+#: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
+msgid "Your test could not run within the guest limits. Please simplify it or try again later."
+msgstr "Dein Test konnte innerhalb der Gastlimits nicht ausgeführt werden. Bitte vereinfache ihn oder versuche es später erneut."
+
 #~ msgid "Mutle case solved"
 #~ msgstr "Mutle-Fall gelöst"
 

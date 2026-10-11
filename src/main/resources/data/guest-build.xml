@@ -1,0 +1,55 @@
+<project basedir=".">
+    <property name="common.cp" value=""/>
+    <property name="testClassname" value=""/>
+    <path id="guest.cp">
+        <pathelement location="mutant"/>
+        <pathelement location="cut"/>
+        <pathelement path="${common.cp}"/>
+        <pathelement location="agent.jar"/>
+        <pathelement location="guest-security.jar"/>
+    </path>
+    <target name="compile-test">
+        <javac srcdir="test" destdir="test" release="16" classpathref="guest.cp"
+               includeantruntime="false" debug="true" nowarn="true">
+            <compilerarg value="-proc:none"/>
+        </javac>
+    </target>
+    <macrodef name="guest-junit">
+        <attribute name="coverage" default="false"/>
+        <sequential>
+            <junit fork="true" clonevm="false" timeout="10000" maxmemory="128m"
+                   printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true"
+                   tempdir="${basedir}/tmp">
+                <classpath refid="guest.cp"/>
+                <classpath location="test"/>
+                <test name="${testClassname}" todir="${basedir}/tmp" outfile="guest-result"/>
+                <formatter type="plain" usefile="false"/>
+                <formatter type="xml" usefile="true"/>
+                <jvmarg value="-XX:MaxMetaspaceSize=64m"/>
+                <jvmarg value="-XX:-CreateCoredumpOnCrash"/>
+                <jvmarg value="-Xss512k"/>
+                <jvmarg value="-Djava.security.manager=org.codedefenders.execution.GuestSecurityManager"/>
+                <jvmarg value="-Djava.security.policy==${basedir}/guest.policy"/>
+                <jvmarg value="-Dguest.workspace=${guest.workspace}"/>
+                <jvmarg value="-Djava.io.tmpdir=${basedir}/tmp"/>
+                <jvmarg value="-Djava.util.concurrent.ForkJoinPool.common.parallelism=1"/>
+                <jvmarg value="-Djava.util.concurrent.ForkJoinPool.common.maximumSpares=0"/>
+                <jvmarg value="-javaagent:${basedir}/agent.jar=destfile=${basedir}/jacoco.exec,includes=*,dumponexit=@{coverage}"/>
+                <assertions><enable/></assertions>
+            </junit>
+        </sequential>
+    </macrodef>
+    <target name="test-original">
+        <guest-junit coverage="true"/>
+    </target>
+    <target name="test-mutant">
+        <guest-junit/>
+    </target>
+    <target name="recompiled-test-mutant">
+        <delete>
+            <fileset dir="test" includes="**/*.class"/>
+        </delete>
+        <antcall target="compile-test"/>
+        <guest-junit/>
+    </target>
+</project>

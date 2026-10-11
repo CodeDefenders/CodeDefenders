@@ -64,6 +64,7 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.TestValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
 
 import com.google.common.util.concurrent.Striped;
 
@@ -152,8 +153,11 @@ public class MutleService {
     }
 
     /** Guest games have their own period slot and never contribute to account achievements. */
-    public synchronized MutleStateView startGuest() {
-        MutleEntry entry = currentEntry();
+    synchronized MutleStateView startGuest(MutleFixtureView fixture) {
+        MutleEntry entry = entry(fixture.fixtureKey());
+        if (entry.series() != fixture.series()) {
+            throw new NotFoundException();
+        }
         installer.ensureInstalled(entry);
         return state(MUTLE_GUEST_USER_ID, createGame(MUTLE_GUEST_USER_ID, fixtureKey(entry), 0, true).gameId());
     }
@@ -230,17 +234,21 @@ public class MutleService {
     }
 
     public MutleStateView submit(int userId, int gameId, String source) throws IOException {
+        return submit(userId, gameId, source, i18nService.getI18n(userId));
+    }
+
+    public MutleStateView submit(int userId, int gameId, String source, I18n i18n) throws IOException {
         // Serialize live submissions for the same game; the database lease recovers abandoned ones.
         Lock submissionLock = SUBMISSION_LOCKS.get(gameId);
         submissionLock.lock();
         try {
-            return submitLocked(userId, gameId, source);
+            return submitLocked(userId, gameId, source, i18n);
         } finally {
             submissionLock.unlock();
         }
     }
 
-    private MutleStateView submitLocked(int userId, int gameId, String source) throws IOException {
+    private MutleStateView submitLocked(int userId, int gameId, String source, I18n i18n) throws IOException {
         MutleGame game = ownedGame(userId, gameId);
         MutleStateView before = state(userId, gameId);
         if (before.expired() || before.solved() || before.failed()) {
@@ -256,7 +264,7 @@ public class MutleService {
             var validation = testValidator.validateTestCode(source, puzzleGame.getMaxAssertionsPerTest(),
                     puzzleGame.getCUT().getAssertionLibrary());
             if (!validation.isValid()) {
-                throw new RejectedSubmissionException(validation.getMessage(i18nService.getI18n(userId)));
+                throw new RejectedSubmissionException(validation.getMessage(i18n));
             }
             Test test = gameManagingUtils.createTest(gameId, puzzleGame.getClassId(), source, userId, "mutle");
             TargetExecution compilation = TargetExecutionDAO.getTargetExecutionForTest(test, COMPILE_TEST);
@@ -328,6 +336,9 @@ public class MutleService {
     }
 
     private MutleGame createGameInTransaction(int userId, String fixtureKey, long rotationPeriod, boolean practice) {
+        if (userId == MUTLE_GUEST_USER_ID) {
+            mutleRepository.reserveGuestCapacity();
+        }
         MutleFixtureInstallation installation = mutleRepository.findFixture(fixtureKey)
                 .orElseThrow(() -> new IllegalStateException("Mutle fixture is not installed: " + fixtureKey));
         Puzzle puzzle = puzzleRepository.getPuzzleForId(installation.hiddenPuzzleId());

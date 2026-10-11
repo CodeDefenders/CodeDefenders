@@ -54,6 +54,9 @@ public class MutleServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
+        if (!login.isLoggedIn()) {
+            request.getSession().setMaxInactiveInterval(24 * 60 * 60);
+        }
         if (Paths.MUTLE.equals(request.getServletPath())) {
             request.setAttribute("currentCase", (login.isLoggedIn()
                     ? mutleService.current(login.getUserId()) : guest.current()).orElse(null));

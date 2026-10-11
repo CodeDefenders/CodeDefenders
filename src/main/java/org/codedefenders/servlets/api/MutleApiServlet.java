@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.api;
 
 import java.io.IOException;
+import java.io.Reader;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,10 +27,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.arcade.mutle.service.MutleGuestLimits;
 import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.execution.GuestTestExecutor;
+import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Paths;
 
 import com.google.gson.Gson;
@@ -53,6 +57,12 @@ public class MutleApiServlet extends HttpServlet {
     @Inject
     private MutleGuestSession guest;
 
+    @Inject
+    private MutleGuestLimits guestLimits;
+
+    @Inject
+    private I18nService i18nService;
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (!"XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
@@ -67,8 +77,14 @@ public class MutleApiServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        try {
-            JsonObject body = JsonParser.parseReader(request.getReader()).getAsJsonObject();
+        boolean anonymous = !login.isLoggedIn();
+        try (var permit = anonymous ? guestLimits.acquire(request.getRemoteAddr(),
+                "/start".equals(request.getPathInfo()) || "/guess".equals(request.getPathInfo())) : null) {
+            if (anonymous) {
+                request.getSession().setMaxInactiveInterval(24 * 60 * 60);
+            }
+            JsonObject body = (anonymous ? JsonParser.parseString(readBody(request.getReader()))
+                    : JsonParser.parseReader(request.getReader())).getAsJsonObject();
             switch (request.getPathInfo()) {
                 case "/start" -> {
                     String fixtureKey = optionalString(body, "fixtureKey");
@@ -76,7 +92,7 @@ public class MutleApiServlet extends HttpServlet {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN);
                         return;
                     }
-                    write(response, !login.isLoggedIn() ? guest.start() : fixtureKey == null
+                    write(response, anonymous ? guest.start(request.getRemoteAddr()) : fixtureKey == null
                             ? mutleService.start(login.getUserId())
                             : mutleService.startPractice(login.getUserId(), fixtureKey));
                 }
@@ -85,9 +101,30 @@ public class MutleApiServlet extends HttpServlet {
                         : guest.state(integer(body, "gameId", false)));
                 case "/guess" -> write(response, login.isLoggedIn()
                         ? mutleService.submit(login.getUserId(), integer(body, "gameId", true), string(body, "source"))
-                        : guest.submit(integer(body, "gameId", true), string(body, "source")));
+                        : guest.submit(integer(body, "gameId", true), string(body, "source"),
+                                i18nService.getI18n(request), request.getRemoteAddr()));
                 default -> response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
+        } catch (MutleGuestLimits.RequestTooLargeException e) {
+            var i18n = i18nService.getI18n(request);
+            response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+            write(response, new ErrorView("too-large", i18n.tr("Please shorten your test and try again.")));
+        } catch (MutleGuestLimits.GameSubmissionLimitException e) {
+            var i18n = i18nService.getI18n(request);
+            response.setStatus(429);
+            write(response, new ErrorView("game-limit",
+                    i18n.tr("This guest game has reached its submission limit. Log in to keep playing.")));
+        } catch (MutleGuestLimits.RateLimitException e) {
+            var i18n = i18nService.getI18n(request);
+            response.setHeader("Retry-After", "3600");
+            response.setStatus(429);
+            write(response, new ErrorView("rate-limit", i18n.tr("Too many requests. Please try again later.")));
+        } catch (MutleGuestLimits.BusyException | GuestTestExecutor.ExecutionLimitException e) {
+            var i18n = i18nService.getI18n(request);
+            response.setHeader("Retry-After", "30");
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+            write(response, new ErrorView("busy",
+                    i18n.tr("Your test could not run within the guest limits. Please simplify it or try again later.")));
         } catch (MutleService.NotFoundException e) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (MutleService.SubmissionInProgressException e) {
@@ -98,6 +135,19 @@ public class MutleApiServlet extends HttpServlet {
         } catch (IllegalArgumentException | IllegalStateException | JsonParseException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
+    }
+
+    static String readBody(Reader reader) throws IOException {
+        StringBuilder body = new StringBuilder();
+        char[] buffer = new char[4_096];
+        int read;
+        while ((read = reader.read(buffer)) != -1) {
+            if (body.length() + read > 32_768) {
+                throw new MutleGuestLimits.RequestTooLargeException();
+            }
+            body.append(buffer, 0, read);
+        }
+        return body.toString();
     }
 
     private static Integer integer(JsonObject body, String name, boolean required) {

@@ -23,13 +23,16 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,14 +40,17 @@ class MutleGuestSessionTest {
     private MutleService service;
     private MutleGuestSession first;
     private MutleGuestSession second;
+    private final I18n english = mock(I18n.class);
+    private static final String ADDRESS = "127.0.0.1";
 
     @BeforeEach
     void setUp() {
         service = mock(MutleService.class);
-        first = new MutleGuestSession(service);
-        second = new MutleGuestSession(service);
+        MutleGuestLimits limits = new MutleGuestLimits();
+        first = new MutleGuestSession(service, limits);
+        second = new MutleGuestSession(service, limits);
         when(service.currentFixture()).thenReturn(new MutleFixtureView("example/one", 1, "Example"));
-        when(service.startGuest()).thenReturn(state(10, 1), state(11, 1));
+        when(service.startGuest(any())).thenReturn(state(10, 1), state(11, 1));
         when(service.state(MUTLE_GUEST_USER_ID, 10)).thenReturn(state(10, 1));
         when(service.state(MUTLE_GUEST_USER_ID, 11)).thenReturn(state(11, 1));
     }
@@ -52,42 +58,85 @@ class MutleGuestSessionTest {
     @Test
     void overviewDoesNotCreateGuestGames() {
         assertFalse(first.current().isPresent());
-        verify(service, never()).startGuest();
+        verify(service, never()).startGuest(any());
     }
 
     @Test
     void sessionsHaveIndependentGamesAndResumeWithoutResettingAttempts() {
-        assertEquals(10, first.start().gameId());
-        assertEquals(11, second.start().gameId());
-        assertEquals(10, first.start().gameId());
+        assertEquals(10, first.start(ADDRESS).gameId());
+        assertEquals(11, second.start(ADDRESS).gameId());
+        assertEquals(10, first.start(ADDRESS).gameId());
         assertEquals(10, first.state(null).gameId());
     }
 
     @Test
     void cannotReadOrSubmitAnotherSessionsGame() throws IOException {
-        first.start();
-        second.start();
+        first.start(ADDRESS);
+        second.start(ADDRESS);
         assertThrows(MutleService.NotFoundException.class, () -> second.state(10));
-        assertThrows(MutleService.NotFoundException.class, () -> second.submit(10, "source"));
-        verify(service, never()).submit(MUTLE_GUEST_USER_ID, 10, "source");
+        assertThrows(MutleService.NotFoundException.class, () -> second.submit(10, "source", english, ADDRESS));
+        verify(service, never()).submit(MUTLE_GUEST_USER_ID, 10, "source", english);
     }
 
     @Test
     void newPublicationStartsANewGuestGameEvenForTheSameFixture() {
-        first.start();
+        first.start(ADDRESS);
         when(service.currentFixture()).thenReturn(new MutleFixtureView("example/one", 2, "Example"));
-        when(service.startGuest()).thenReturn(state(12, 2));
+        when(service.startGuest(any())).thenReturn(state(12, 2));
         assertFalse(first.current().isPresent());
-        assertEquals(12, first.start().gameId());
+        assertEquals(12, first.start(ADDRESS).gameId());
         assertEquals(10, first.state(10).gameId());
     }
 
     @Test
     void unavailablePublicationDoesNotCreateGame() {
         when(service.currentFixture()).thenReturn(null);
-        assertThrows(MutleService.NotFoundException.class, first::start);
+        assertThrows(MutleService.NotFoundException.class, () -> first.start(ADDRESS));
         assertThrows(MutleService.NotFoundException.class, () -> first.state(null));
-        verify(service, never()).startGuest();
+        verify(service, never()).startGuest(any());
+    }
+
+    @Test
+    void publicationChangeDuringCreationDoesNotStoreTheNextCaseUnderThePreviousKey() {
+        MutleFixtureView oldCase = new MutleFixtureView("example/one", 1, "Example");
+        MutleFixtureView newCase = new MutleFixtureView("example/two", 2, "Next");
+        when(service.startGuest(oldCase)).thenAnswer(invocation -> {
+            when(service.currentFixture()).thenReturn(newCase);
+            return state(10, 1);
+        });
+        when(service.startGuest(newCase)).thenReturn(state(12, 2));
+        when(service.state(MUTLE_GUEST_USER_ID, 12)).thenReturn(state(12, 2));
+
+        assertEquals(1, first.start(ADDRESS).series());
+        assertEquals(12, first.start(ADDRESS).gameId());
+        assertEquals(12, first.start(ADDRESS).gameId());
+        verify(service, times(1)).startGuest(oldCase);
+        verify(service, times(1)).startGuest(newCase);
+    }
+
+    @Test
+    void passesEachVisitorsLocaleWithoutChangingTheSharedAccount() throws IOException {
+        I18n german = mock(I18n.class);
+        first.start(ADDRESS);
+        second.start(ADDRESS);
+        first.submit(10, "english source", english, ADDRESS);
+        second.submit(11, "german source", german, ADDRESS);
+        verify(service).submit(MUTLE_GUEST_USER_ID, 10, "english source", english);
+        verify(service).submit(MUTLE_GUEST_USER_ID, 11, "german source", german);
+    }
+
+    @Test
+    void rejectedTestsStillConsumeTheExecutionBudget() throws IOException {
+        first.start(ADDRESS);
+        when(service.submit(MUTLE_GUEST_USER_ID, 10, "source", english))
+                .thenThrow(new MutleService.RejectedSubmissionException("rejected"));
+        for (int attempt = 0; attempt < MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME; attempt++) {
+            assertThrows(MutleService.RejectedSubmissionException.class,
+                    () -> first.submit(10, "source", english, ADDRESS));
+        }
+        assertThrows(MutleGuestLimits.RateLimitException.class, () -> first.submit(10, "source", english, ADDRESS));
+        verify(service, times(MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME))
+                .submit(MUTLE_GUEST_USER_ID, 10, "source", english);
     }
 
     private static MutleStateView state(int gameId, int series) {

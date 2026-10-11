@@ -80,6 +80,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final DependencyProvider dependencyProvider;
 
     @Inject
+    private GuestTestExecutor guestTestExecutor;
+
+    @Inject
     public AntRunner(Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
                      MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo,
@@ -326,6 +329,10 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         Path topDir = org.codedefenders.util.FileUtils.getTopLevelDirectoryFromJavaFile(
                 Paths.get(cut.getJavaFile()));
         Path cutDir = topDir.resolve(Constants.CUTS_CLASSES_DIR);
+
+        if (guestTestExecutor.isGuest(testDir)) {
+            return guestTestExecutor.run(target, mutantDir, testDir, cutDir, testClassName);
+        }
 
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));

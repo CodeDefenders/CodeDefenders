@@ -227,8 +227,8 @@ public class I18nService {
      * @return The locale
      */
     public static Locale getSessionLocale(HttpServletRequest request) {
-        var session = request.getSession();
-        var locale = session.getAttribute("locale");
+        var session = request.getSession(false);
+        var locale = session == null ? null : session.getAttribute("locale");
         return locale != null ? (Locale) locale : request.getLocale();
     }
 

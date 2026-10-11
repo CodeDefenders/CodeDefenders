@@ -139,7 +139,7 @@ if (root) {
             }
         }
         let diagnostic = null;
-        if (response.status === 422) {
+        if ([413, 422, 429, 503].includes(response.status)) {
             try {
                 const rejected = await response.json();
                 diagnostic = typeof rejected.message === 'string' ? rejected.message : null;

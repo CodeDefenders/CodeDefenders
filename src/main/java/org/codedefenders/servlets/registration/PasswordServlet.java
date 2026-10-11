@@ -47,6 +47,7 @@ import org.xnap.commons.i18n.I18n;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
+import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 
 @WebServlet(Paths.PASSWORD)
 public class PasswordServlet extends HttpServlet {
@@ -93,6 +94,7 @@ public class PasswordServlet extends HttpServlet {
                 String username = request.getParameter("accountUsername");
                 Optional<UserEntity> userOpt = userRepo.getUserByEmail(email);
                 if (userOpt.isEmpty()
+                        || userOpt.get().getId() == MUTLE_GUEST_USER_ID
                         || !userOpt.get().getUsername().equals(username)
                         || !userOpt.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add(I18n.marktr("No user was found for this username and email. Please check if the username and email match."));
@@ -125,7 +127,7 @@ public class PasswordServlet extends HttpServlet {
 
                 String responseURL = url.forPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
                 Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);
-                if (resetPwSecret != null && userId.isPresent()) {
+                if (resetPwSecret != null && userId.isPresent() && userId.get() != MUTLE_GUEST_USER_ID) {
                     if (!(validator.validPassword(password))) {
                         messages.add(I18n.marktr("Password not changed. Make sure it is valid."));
                     } else if (password.equals(confirm)) {
