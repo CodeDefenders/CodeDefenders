@@ -12,6 +12,10 @@ export CODEDEFENDERS_APP_URL=http://localhost:8080
 printf '%s\n' '<tomcat-users><role rolename="codedefenders-admin"/></tomcat-users>' > /etc/tomcat10/tomcat-users.xml
 mkdir -p "$CATALINA_BASE/webapps/ROOT"
 unzip -q -o target/codedefenders.war -d "$CATALINA_BASE/webapps/ROOT"
+if [[ ! -f "$CATALINA_BASE/webapps/ROOT/WEB-INF/classes/org/codedefenders/i18n/Messages_de.class" ]]; then
+    echo "The CI WAR is missing German translations. Install gettext in the build job before packaging."
+    exit 1
+fi
 printf '%s' 'mutle-review-canary-20261011' > /tmp/mutle-review-canary.txt
 "$CATALINA_HOME/bin/catalina.sh" run > target/public-mutle-tomcat.log 2>&1 &
 mutle_tomcat_pid=$!

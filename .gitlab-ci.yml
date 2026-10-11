@@ -83,8 +83,12 @@ metrics:
 
 
 build:
+  image: debian:12-slim
   stage: build
   needs: [ ]
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends maven openjdk-17-jdk-headless gettext git
   cache:
     - *cache-maven-repo
     # TODO(Alex): Add caching for node/npm/js stuff

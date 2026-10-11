@@ -125,7 +125,9 @@ class PublicMutleHttpIT {
     @Test
     void germanValidationAndSizeErrors() throws Exception {
         Client client = new Client("de");
-        assertTrue(client.page("/", Duration.ofSeconds(5)).body().contains("Mutle spielen"));
+        var homepage = client.page("/", Duration.ofSeconds(5));
+        assertEquals(200, homepage.statusCode(), homepage.body());
+        assertTrue(homepage.body().contains("Mutle spielen"), "Homepage must offer Mutle in German");
         int game = client.start();
         var validation = client.guess(game, source("for (int i=0; i<1; i++) { assertEquals(0, i); }", ""));
         assertEquals(422, validation.statusCode(), validation.body());
