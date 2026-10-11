@@ -27,6 +27,7 @@ import java.net.http.HttpResponse;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.time.Duration;
+import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -43,6 +44,14 @@ final class PublicMutleSupport {
     static final String NONE = source("assertEquals(0, new AppointmentBook(1, 2).getBookingCount());", "");
     static final String PROOF = source("AppointmentBook book = new AppointmentBook(1, 2); "
             + "book.book(\"A\", 1); assertFalse(book.book(\"A\", 2));", "");
+    private static final String BOOKING_STATEMENTS = "AppointmentBook book = new AppointmentBook(1, 2); "
+            + "assertTrue(book.book(\"A\", 1));";
+    static final String BOOKING = source(BOOKING_STATEMENTS, "");
+    static final List<String> RUNNER_ATTACKS = List.of(
+            source("assertTrue(AppointmentBook.class.getProtectionDomain().getCodeSource()"
+                    + ".getLocation().toString().endsWith(\"/cut/\"));", ""),
+            source(BOOKING_STATEMENTS + " org.jacoco.agent.rt.RT.getAgent().reset();", ""),
+            source("Class.forName(\"org.jacoco.agent.rt.RT\").getMethod(\"getAgent\").invoke(null);", ""));
     private static final Gson GSON = new Gson();
 
     private PublicMutleSupport() {

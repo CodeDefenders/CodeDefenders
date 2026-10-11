@@ -19,11 +19,32 @@
 package org.codedefenders.execution;
 
 import java.net.URI;
+import java.security.Permission;
 
-/** Prevents submitted Mutle tests from creating native threads, including through privileged library calls. */
+/** Restricts submitted Mutle code without exposing the manager's own origin inspection. */
 @SuppressWarnings("removal")
 public final class MutleSecurityManager extends SecurityManager {
     private final String workspace = URI.create(System.getProperty("mutle.workspace")).getPath();
+    private final ThreadLocal<Boolean> inspecting = ThreadLocal.withInitial(() -> false);
+
+    @Override
+    public void checkPermission(Permission permission) {
+        // Only this private inspection may read origins through an otherwise unprivileged caller stack.
+        if (permission instanceof RuntimePermission && "getProtectionDomain".equals(permission.getName())
+                && inspecting.get()) {
+            return;
+        }
+        super.checkPermission(permission);
+    }
+
+    @Override
+    public void checkPackageAccess(String name) {
+        if ((name.equals("org.jacoco.agent.rt") || name.startsWith("org.jacoco.agent.rt."))
+                && hasSubmittedCaller()) {
+            throw new SecurityException("Mutle tests cannot access coverage agent controls");
+        }
+        super.checkPackageAccess(name);
+    }
 
     @Override
     public void checkAccess(Thread thread) {
@@ -38,16 +59,29 @@ public final class MutleSecurityManager extends SecurityManager {
     }
 
     private void rejectSubmittedThreadAccess() {
-        for (Class<?> caller : getClassContext()) {
-            var source = caller.getProtectionDomain().getCodeSource();
-            if (source != null && source.getLocation() != null) {
-                URI location = URI.create(source.getLocation().toExternalForm());
-                // Submitted tests and CUT classes live in directories; trusted tools are immutable jars.
-                if ("file".equals(location.getScheme()) && location.getPath().startsWith(workspace)
-                        && location.getPath().endsWith("/")) {
-                    throw new SecurityException("Mutle tests cannot create or modify threads");
+        if (hasSubmittedCaller()) {
+            throw new SecurityException("Mutle tests cannot create or modify threads");
+        }
+    }
+
+    private boolean hasSubmittedCaller() {
+        boolean previous = inspecting.get();
+        inspecting.set(true);
+        try {
+            for (Class<?> caller : getClassContext()) {
+                var source = caller.getProtectionDomain().getCodeSource();
+                if (source != null && source.getLocation() != null) {
+                    URI location = URI.create(source.getLocation().toExternalForm());
+                    // Submitted tests and CUT classes live in directories; trusted tools are immutable jars.
+                    if ("file".equals(location.getScheme()) && location.getPath().startsWith(workspace)
+                            && location.getPath().endsWith("/")) {
+                        return true;
+                    }
                 }
             }
+            return false;
+        } finally {
+            inspecting.set(previous);
         }
     }
 }

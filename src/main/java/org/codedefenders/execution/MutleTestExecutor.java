@@ -198,20 +198,23 @@ public class MutleTestExecutor {
         throw new IOException("Mutle coverage agent is missing");
     }
 
-    /** Neither submitted classes nor libraries receive access to application files, sockets or environment variables. */
+    /** Restricts submitted code and runner dependencies; the isolated enforcement class remains fully trusted. */
     static String policy(Path workspace, List<Path> jars) {
-        // Reading class origin metadata lets the manager inspect the full caller stack without doPrivileged.
-        // It does not grant submitted code the permissions of the inspected protection domains.
         StringBuilder policy = new StringBuilder("""
                 grant {
                     permission java.util.PropertyPermission "*", "read";
-                    permission java.lang.RuntimePermission "getProtectionDomain";
                 };
                 """);
         List<Path> dependencies = jars.stream().distinct().toList();
         for (Path jar : dependencies) {
-            policy.append("grant codeBase \"").append(jar.toUri()).append("\" {\n")
-                    .append("permission java.io.FilePermission \"").append(escape(workspace.toString()))
+            policy.append("grant codeBase \"").append(jar.toUri()).append("\" {\n");
+            if (jar.equals(workspace.resolve("mutle-security.jar"))) {
+                // This jar contains only the enforcement class. Its checkPermission frame must not
+                // restrict trusted JVM operations; permissions are still checked against every caller.
+                policy.append("permission java.security.AllPermission;\n};\n");
+                continue;
+            }
+            policy.append("permission java.io.FilePermission \"").append(escape(workspace.toString()))
                     .append("\", \"read\";\n")
                     .append("permission java.io.FilePermission \"").append(escape(workspace + "/-"))
                     .append("\", \"read\";\n")
@@ -243,10 +246,6 @@ public class MutleTestExecutor {
                         .append("permission java.io.FilePermission \"")
                         .append(escape(workspace.resolve("jacoco.exec").toString()))
                         .append("\", \"write\";\n");
-            }
-            if (jar.equals(workspace.resolve("mutle-security.jar"))) {
-                policy.append("permission java.lang.RuntimePermission \"modifyThread\";\n")
-                        .append("permission java.lang.RuntimePermission \"modifyThreadGroup\";\n");
             }
             policy.append("};\n");
         }

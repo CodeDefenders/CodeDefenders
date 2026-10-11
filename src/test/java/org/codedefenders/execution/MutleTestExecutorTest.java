@@ -130,8 +130,21 @@ class MutleTestExecutorTest {
         assertTrue(result.hasFailure());
     }
 
+    @Test
+    void submittedCodeCannotInspectOriginsOrControlCoverageDirectlyOrReflectively() throws Exception {
+        for (String statement : List.of(
+                "SandboxJUnitProbe.class.getProtectionDomain();",
+                "org.jacoco.agent.rt.RT.getAgent().reset();",
+                "Class.forName(\"org.jacoco.agent.rt.RT\").getMethod(\"getAgent\").invoke(null);")) {
+            AntProcessResult result = runJunitProbe(statement);
+            assertTrue(result.hasError(), statement + "\n" + result.getErrorMessage());
+            assertTrue(result.getErrorMessage().contains("SecurityException")
+                    || result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
+        }
+    }
+
     private AntProcessResult runJunitProbe(String statement) throws Exception {
-        Path workspace = Files.createDirectory(root.resolve("workspace")).toRealPath();
+        Path workspace = Files.createTempDirectory(root, "workspace-").toRealPath();
         Path classes = Files.createDirectory(workspace.resolve("classes"));
         Path temporary = Files.createDirectory(workspace.resolve("tmp"));
         Path junit = Path.of(org.junit.Assert.class.getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -141,18 +154,18 @@ class MutleTestExecutorTest {
                 .getProtectionDomain().getCodeSource().getLocation().toURI());
         Path antJUnit4 = Path.of(Class.forName("org.apache.tools.ant.taskdefs.optional.junit.CustomJUnit4TestAdapterCache")
                 .getProtectionDomain().getCodeSource().getLocation().toURI());
-        compile(classes, "SandboxJUnitProbe", """
-                import org.junit.Test;
-                import static org.junit.Assert.*;
-                public class SandboxJUnitProbe {
-                    @Test public void test() { %s }
-                }
-                """.formatted(statement), junit, hamcrest);
         String agentArgument = ManagementFactory.getRuntimeMXBean().getInputArguments().stream()
                 .filter(argument -> argument.startsWith("-javaagent:") && argument.contains("org.jacoco.agent"))
                 .findFirst().orElseThrow();
         Path agent = workspace.resolve("agent.jar");
         Files.copy(Path.of(agentArgument.substring("-javaagent:".length()).split("=", 2)[0]), agent);
+        compile(classes, "SandboxJUnitProbe", """
+                import org.junit.Test;
+                import static org.junit.Assert.*;
+                public class SandboxJUnitProbe {
+                    @Test public void test() throws Exception { %s }
+                }
+                """.formatted(statement), junit, hamcrest, agent);
         Path security = workspace.resolve("mutle-security.jar");
         MutleTestExecutor.securityManagerJar(security);
         Path policy = workspace.resolve("mutle.policy");

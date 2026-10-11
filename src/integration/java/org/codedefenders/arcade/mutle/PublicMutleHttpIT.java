@@ -101,6 +101,28 @@ class PublicMutleHttpIT {
     }
 
     @Test
+    void originsAndAgentControlsCannotForgeGuestResults() throws Exception {
+        Client client = new Client();
+        int game = client.start();
+        for (String payload : RUNNER_ATTACKS) {
+            var response = client.guess(game, payload);
+            assertEquals(422, response.statusCode(), response.body());
+            assertTrue(json(response).get("message").getAsString().contains("SecurityException")
+                    || json(response).get("message").getAsString().contains("AccessControlException"), response.body());
+            var state = client.state(game);
+            assertFalse(state.get("solved").getAsBoolean());
+            assertEquals(0, state.get("acceptedGuesses").getAsInt());
+        }
+        var response = client.guess(game, BOOKING);
+        assertEquals(200, response.statusCode(), response.body());
+        var guess = json(response).getAsJsonArray("guesses").get(0).getAsJsonObject();
+        assertEquals("LINE", guess.get("mark").getAsString());
+        assertTrue(guess.getAsJsonArray("coveredLines").size() > 0);
+        assertFalse(json(response).get("solved").getAsBoolean());
+        assertTrue(json(client.guess(game, PROOF)).get("solved").getAsBoolean());
+    }
+
+    @Test
     void germanValidationAndSizeErrors() throws Exception {
         Client client = new Client("de");
         assertTrue(client.page("/", Duration.ofSeconds(5)).body().contains("Mutle spielen"));

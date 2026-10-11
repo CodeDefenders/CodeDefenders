@@ -128,12 +128,25 @@ class PublicMutleBrowserIT {
         waitForCase();
         assertEquals(0, browser.findElements(By.cssSelector("#mutle-history .accordion-item")).size());
         assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
+        for (String payload : RUNNER_ATTACKS) {
+            submit(payload);
+            new WebDriverWait(browser, 40).until(driver -> {
+                String detail = driver.findElement(By.id("mutle-notice-detail-text")).getAttribute("textContent");
+                return detail.contains("SecurityException") || detail.contains("AccessControlException");
+            });
+            assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
+            assertEquals(0, browser.findElements(By.cssSelector("#mutle-history .accordion-item")).size());
+            assertFalse("Solved".equals(browser.findElement(By.id("mutle-status")).getText()));
+        }
         submit(source("assertEquals(\"expected\", getenv(\"CODEDEFENDERS_DB_PASSWORD\"));", "import static java.lang.System.getenv;"));
         new WebDriverWait(browser, 40).until(driver -> driver.findElement(By.id("mutle-notice-detail-text"))
                 .getAttribute("textContent").contains("AccessControlException"));
         assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
-        submit(NONE);
+        submit(BOOKING);
         new WebDriverWait(browser, 40).until(driver -> driver.findElement(By.id("mutle-remaining")).getText().contains("5"));
+        assertEquals(1, browser.findElements(By.cssSelector("#mutle-history .mutle-history-mark.line")).size());
+        submit(PROOF);
+        new WebDriverWait(browser, 40).until(driver -> "Solved".equals(driver.findElement(By.id("mutle-status")).getText()));
     }
 
     private void waitForCase() {
