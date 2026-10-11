@@ -35,10 +35,9 @@ import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 /** Authorizes guest games using server-side session state, never the shared account alone. */
 @SessionScoped
 public class MutleGuestSession implements Serializable {
-    private static final long serialVersionUID = 1L;
-    private final Map<String, Integer> games = new LinkedHashMap<>();
-    private final Map<Integer, Integer> submissions = new LinkedHashMap<>();
-    private final Map<Integer, Instant> created = new LinkedHashMap<>();
+    private static final long serialVersionUID = 2L;
+    // Lock the actual session state, not a synchronized method copied onto Weld's shared client proxy.
+    private final Map<String, GuestGame> games = new LinkedHashMap<>();
 
     @Inject
     private MutleService service;
@@ -54,68 +53,109 @@ public class MutleGuestSession implements Serializable {
         this.limits = limits;
     }
 
-    public synchronized Optional<MutleStateView> current() {
-        Integer gameId = currentGameId();
+    public Optional<MutleStateView> current() {
+        Integer gameId;
+        synchronized (games) {
+            gameId = currentGameId();
+        }
         return gameId == null ? Optional.empty() : Optional.of(state(gameId));
     }
 
-    public synchronized MutleStateView start(String address) {
-        prune();
+    public MutleStateView start(String address) {
         MutleFixtureView fixture = service.currentFixture();
         if (fixture == null) {
             throw new MutleService.NotFoundException();
         }
-        String key = key(fixture);
-        Integer gameId = games.get(key);
-        if (gameId == null) {
-            limits.creation(address);
-            MutleStateView state = service.startGuest(fixture);
-            games.put(key, state.gameId());
-            created.put(state.gameId(), Instant.now());
-            return state;
+        int gameId;
+        synchronized (games) {
+            prune();
+            String key = key(fixture);
+            GuestGame game = games.get(key);
+            if (game == null) {
+                limits.creation(address);
+                MutleStateView state = service.startGuest(fixture);
+                games.put(key, new GuestGame(state.gameId()));
+                return state;
+            }
+            gameId = game.id;
         }
         return state(gameId);
     }
 
-    public synchronized MutleStateView state(Integer gameId) {
-        Integer resolved = gameId == null ? currentGameId() : gameId;
-        if (resolved == null || !owns(resolved)) {
-            throw new MutleService.NotFoundException();
+    public MutleStateView state(Integer gameId) {
+        int resolved;
+        synchronized (games) {
+            Integer candidate = gameId == null ? currentGameId() : gameId;
+            if (candidate == null || ownedGame(candidate) == null) {
+                throw new MutleService.NotFoundException();
+            }
+            resolved = candidate;
         }
         return service.state(MUTLE_GUEST_USER_ID, resolved);
     }
 
-    public synchronized MutleStateView submit(int gameId, String source, I18n i18n, String address) throws IOException {
-        if (!owns(gameId)) {
-            throw new MutleService.NotFoundException();
+    public MutleStateView submit(int gameId, String source, I18n i18n, String address) throws IOException {
+        GuestGame game;
+        synchronized (games) {
+            game = ownedGame(gameId);
+            if (game == null) {
+                throw new MutleService.NotFoundException();
+            }
+            if (game.submitting) {
+                throw new MutleService.SubmissionInProgressException();
+            }
+            if (game.submissions >= MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME) {
+                throw new MutleGuestLimits.GameSubmissionLimitException();
+            }
+            limits.submission(address, source);
+            game.submissions++;
+            game.submitting = true;
         }
-        if (submissions.getOrDefault(gameId, 0) >= MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME) {
-            throw new MutleGuestLimits.GameSubmissionLimitException();
+        try {
+            return service.submit(MUTLE_GUEST_USER_ID, gameId, source, i18n);
+        } finally {
+            synchronized (games) {
+                game.submitting = false;
+            }
         }
-        limits.submission(address, source);
-        submissions.merge(gameId, 1, Integer::sum);
-        return service.submit(MUTLE_GUEST_USER_ID, gameId, source, i18n);
     }
 
-    public synchronized boolean owns(int gameId) {
+    public boolean owns(int gameId) {
+        synchronized (games) {
+            return ownedGame(gameId) != null;
+        }
+    }
+
+    private GuestGame ownedGame(int gameId) {
         prune();
-        return games.containsValue(gameId);
+        return games.values().stream().filter(game -> game.id == gameId).findFirst().orElse(null);
     }
 
     private Integer currentGameId() {
         prune();
         MutleFixtureView fixture = service.currentFixture();
-        return fixture == null ? null : games.get(key(fixture));
+        GuestGame game = fixture == null ? null : games.get(key(fixture));
+        return game == null ? null : game.id;
     }
 
     private void prune() {
         Instant cutoff = Instant.now().minus(MutleGuestLimits.RETENTION);
-        games.values().removeIf(id -> created.getOrDefault(id, Instant.EPOCH).isBefore(cutoff));
-        submissions.keySet().retainAll(games.values());
-        created.keySet().retainAll(games.values());
+        games.values().removeIf(game -> !game.submitting && game.created.isBefore(cutoff));
     }
 
     private static String key(MutleFixtureView fixture) {
         return fixture.series() + "/" + fixture.fixtureKey();
+    }
+
+    private static class GuestGame implements Serializable {
+        private static final long serialVersionUID = 1L;
+        private final int id;
+        private final Instant created = Instant.now();
+        private int submissions;
+        private transient boolean submitting;
+
+        GuestGame(int id) {
+            this.id = id;
+        }
     }
 }

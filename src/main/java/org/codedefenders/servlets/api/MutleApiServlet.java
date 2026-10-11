@@ -41,6 +41,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import static org.codedefenders.arcade.mutle.service.MutleGuestLimits.SESSION_TIMEOUT_SECONDS;
+
 @WebServlet(Paths.API_MUTLE + "/*")
 public class MutleApiServlet extends HttpServlet {
     private static final Gson GSON = new Gson();
@@ -78,13 +80,15 @@ public class MutleApiServlet extends HttpServlet {
             return;
         }
         boolean anonymous = !login.isLoggedIn();
-        try (var permit = anonymous ? guestLimits.acquire(request.getRemoteAddr(),
-                "/start".equals(request.getPathInfo()) || "/guess".equals(request.getPathInfo())) : null) {
+        try {
             if (anonymous) {
-                request.getSession().setMaxInactiveInterval(24 * 60 * 60);
+                guestLimits.request(request.getRemoteAddr());
             }
             JsonObject body = (anonymous ? JsonParser.parseString(readBody(request.getReader()))
                     : JsonParser.parseReader(request.getReader())).getAsJsonObject();
+            if (anonymous) {
+                request.getSession().setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
+            }
             switch (request.getPathInfo()) {
                 case "/start" -> {
                     String fixtureKey = optionalString(body, "fixtureKey");
@@ -92,17 +96,24 @@ public class MutleApiServlet extends HttpServlet {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN);
                         return;
                     }
-                    write(response, anonymous ? guest.start(request.getRemoteAddr()) : fixtureKey == null
-                            ? mutleService.start(login.getUserId())
-                            : mutleService.startPractice(login.getUserId(), fixtureKey));
+                    try (var permit = anonymous ? guestLimits.acquire() : null) {
+                        write(response, anonymous ? guest.start(request.getRemoteAddr()) : fixtureKey == null
+                                ? mutleService.start(login.getUserId())
+                                : mutleService.startPractice(login.getUserId(), fixtureKey));
+                    }
                 }
                 case "/state" -> write(response, login.isLoggedIn()
                         ? mutleService.state(login.getUserId(), integer(body, "gameId", false))
                         : guest.state(integer(body, "gameId", false)));
-                case "/guess" -> write(response, login.isLoggedIn()
-                        ? mutleService.submit(login.getUserId(), integer(body, "gameId", true), string(body, "source"))
-                        : guest.submit(integer(body, "gameId", true), string(body, "source"),
-                                i18nService.getI18n(request), request.getRemoteAddr()));
+                case "/guess" -> {
+                    int gameId = integer(body, "gameId", true);
+                    String source = string(body, "source");
+                    try (var permit = anonymous ? guestLimits.acquire() : null) {
+                        write(response, anonymous ? guest.submit(gameId, source,
+                                i18nService.getI18n(request), request.getRemoteAddr())
+                                : mutleService.submit(login.getUserId(), gameId, source));
+                    }
+                }
                 default -> response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (MutleGuestLimits.RequestTooLargeException e) {

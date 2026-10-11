@@ -40,6 +40,7 @@ import org.intellij.lang.annotations.Language;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import static org.codedefenders.arcade.mutle.model.MutleGame.SUBMISSION_TIMEOUT;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
 import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
@@ -268,7 +269,7 @@ public class MutleRepository {
                 ORDER BY created_at LIMIT 100;
                 """;
         return queryRunner.query(query, listFromRS(rs -> rs.getInt("game_id")),
-                MUTLE_GUEST_USER_ID, Timestamp.from(cutoff), Timestamp.from(Instant.now().minusSeconds(120)));
+                MUTLE_GUEST_USER_ID, Timestamp.from(cutoff), Timestamp.from(Instant.now().minus(SUBMISSION_TIMEOUT)));
     }
 
     /** Delete dependencies explicitly because game/test foreign keys do not all cascade. Requires a transaction. */
@@ -280,7 +281,7 @@ public class MutleRepository {
                 FOR UPDATE;
                 """;
         if (queryRunner.query(guard, oneFromRS(rs -> rs.getInt("game_id")), gameId, MUTLE_GUEST_USER_ID,
-                Timestamp.from(cutoff), Timestamp.from(Instant.now().minusSeconds(120))).isEmpty()) {
+                Timestamp.from(cutoff), Timestamp.from(Instant.now().minus(SUBMISSION_TIMEOUT))).isEmpty()) {
             return false;
         }
         // These tables can reference tests, mutants or players of a game even when their own game ID is absent.
@@ -304,7 +305,6 @@ public class MutleRepository {
                 "DELETE FROM test_smell WHERE Test_ID IN (SELECT Test_ID FROM tests WHERE Game_ID = ?);",
                 "DELETE FROM test_uploaded_with_class WHERE Test_ID IN (SELECT Test_ID FROM tests WHERE Game_ID = ?);",
                 "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID IN (SELECT Mutant_ID FROM mutants WHERE Game_ID = ?);",
-                "DELETE FROM equivalences WHERE Mutant_ID IN (SELECT Mutant_ID FROM mutants WHERE Game_ID = ?);",
                 "DELETE FROM rejection_reasons WHERE Reject_ID IN (SELECT Reject_ID FROM rejected_submissions "
                         + "WHERE Player_ID IN (SELECT ID FROM players WHERE Game_ID = ?));",
                 "DELETE FROM rejected_submissions WHERE Player_ID IN (SELECT ID FROM players WHERE Game_ID = ?);",

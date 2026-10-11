@@ -27,9 +27,13 @@ restart the preview app afterward to reset in-memory quotas for manual testing.
 import http.cookiejar
 import json
 import os
+import socket
+import time
 import unittest
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlsplit
 
 BASE = os.environ.get("PUBLIC_MUTLE_URL", "http://localhost:8084").rstrip("/")
 CANARY = "mutle-review-canary-20261011"
@@ -40,7 +44,7 @@ class Client:
         self.language = language
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
-    def request(self, path, body=None):
+    def request(self, path, body=None, timeout=60):
         headers = {"Accept-Language": self.language}
         data = None
         if body is not None:
@@ -48,7 +52,7 @@ class Client:
             headers.update({"Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest"})
         request = urllib.request.Request(BASE + path, data=data, headers=headers)
         try:
-            response = self.opener.open(request, timeout=60)
+            response = self.opener.open(request, timeout=timeout)
         except urllib.error.HTTPError as error:
             response = error
         with response:
@@ -174,6 +178,61 @@ class PublicMutleHTTPTest(unittest.TestCase):
         status, state = client.api("guess", {"gameId": game, "source": NONE})
         self.assertEqual(status, 200, state)
         self.assertFalse(state["solved"])
+
+    def test_mutant_stage_resource_failure_does_not_consume_guess(self):
+        client = Client()
+        game = client.start()
+        payloads = [
+            source('AppointmentBook book = new AppointmentBook(1,2); book.book("A",1); '
+                   'SECONDS.sleep(20 * Boolean.compare(book.book("A",2), false)); assertNotNull(book);',
+                   'import static java.util.concurrent.TimeUnit.SECONDS;'),
+            source('AppointmentBook book = new AppointmentBook(1,2); book.book("A",1); '
+                   'assertNotNull(new byte[200_000_000 * Boolean.compare(book.book("A",2), false)]);'),
+        ]
+        for payload in payloads:
+            status, error = client.api("guess", {"gameId": game, "source": payload})
+            self.assertEqual(status, 503, error)
+            state = client.api("state", {"gameId": game})[1]
+            self.assertEqual(state["acceptedGuesses"], 0)
+            self.assertFalse(state["solved"])
+            self.assertFalse(state["failed"])
+        status, state = client.api("guess", {"gameId": game, "source": NONE})
+        self.assertEqual(status, 200, state)
+        self.assertEqual(state["acceptedGuesses"], 1)
+
+    def test_running_guest_test_does_not_block_page_reads_through_cdi(self):
+        client, other = Client(), Client()
+        game = client.start()
+        other.start()
+        payload = source('SECONDS.sleep(20); assertNotNull(new AppointmentBook(1,2));',
+                         'import static java.util.concurrent.TimeUnit.SECONDS;')
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(client.api, "guess", {"gameId": game, "source": payload})
+            time.sleep(2)
+            self.assertFalse(pending.done(), "The guest test must still be running during page reads")
+            self.assertEqual(client.request("/mutle", timeout=2)[0], 200)
+            self.assertEqual(other.request("/mutle", timeout=2)[0], 200)
+            self.assertEqual(pending.result(timeout=60)[0], 503)
+
+    def test_incomplete_request_bodies_do_not_occupy_guest_workers(self):
+        base = urlsplit(BASE)
+        if base.scheme != "http":
+            self.skipTest("Raw socket regression requires a local HTTP preview")
+        connections = []
+        try:
+            for _ in range(2):
+                connection = socket.create_connection((base.hostname, base.port or 80), timeout=5)
+                connections.append(connection)
+                connection.sendall((f"POST {base.path}/api/mutle/start HTTP/1.1\r\n"
+                                    f"Host: {base.netloc}\r\nContent-Type: application/json\r\n"
+                                    "X-Requested-With: XMLHttpRequest\r\nContent-Length: 100\r\n"
+                                    "Connection: close\r\n\r\n{").encode())
+            time.sleep(0.5)
+            status, state = Client().api("start", {})
+            self.assertEqual(status, 200, state)
+        finally:
+            for connection in connections:
+                connection.close()
 
     def test_zz_cookie_churn_cannot_bypass_creation_quota(self):
         for cookie in range(41):

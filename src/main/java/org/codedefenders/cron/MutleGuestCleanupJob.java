@@ -55,18 +55,22 @@ public class MutleGuestCleanupJob extends FixedDelayCronJob {
         Instant cutoff = Instant.now().minus(MutleGuestLimits.RETENTION);
         try {
             for (int gameId : repository.expiredGuestGames(cutoff)) {
-                transactions.executeInTransaction((TransactionalSupplier<Boolean>) transaction -> {
-                    if (!repository.deleteExpiredGuestGame(gameId, cutoff)) {
-                        return false;
-                    }
-                    // Delete before commit so a filesystem failure keeps the DB row available for retry.
-                    deleteTests(config.getTestsDir().toPath(), gameId);
-                    transaction.commit();
-                    return true;
-                });
+                try {
+                    transactions.executeInTransaction((TransactionalSupplier<Boolean>) transaction -> {
+                        if (!repository.deleteExpiredGuestGame(gameId, cutoff)) {
+                            return false;
+                        }
+                        // Delete before commit so a filesystem failure keeps the DB row available for retry.
+                        deleteTests(config.getTestsDir().toPath(), gameId);
+                        transaction.commit();
+                        return true;
+                    });
+                } catch (Exception e) {
+                    logger.error("Could not clean up expired Mutle guest game {}", gameId, e);
+                }
             }
         } catch (Exception e) {
-            logger.error("Could not clean up expired Mutle guest games", e);
+            logger.error("Could not select expired Mutle guest games", e);
         }
     }
 

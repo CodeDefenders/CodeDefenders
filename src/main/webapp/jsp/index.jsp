@@ -144,7 +144,7 @@
                                     <c:when test="${empty openMultiplayerGames}">
                                         <tr>
                                             <td colspan="100" class="text-center">
-                                                    ${i18n.tr('There are currently no open games.')}
+                                                ${i18n.tr('There are currently no open games.')}
                                             </td>
                                         </tr>
                                     </c:when>
@@ -165,15 +165,15 @@
                         </div>
                     </div>
                     <div class="p-5 col-xxl-6 col-12">
-                            <h2 class="mb-3">${i18n.tr('Active Melee Games')}</h2>
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                    <tr>
-                                        <th>${i18n.tr('Creator')}</th>
-                                        <th>${i18n.tr('Class')}</th>
-                                        <th>${i18n.tr('Players')}</th>
-                                        <th>${i18n.tr('Level')}</th>
+                        <h2 class="mb-3">${i18n.tr('Active Melee Games')}</h2>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>${i18n.tr('Creator')}</th>
+                                    <th>${i18n.tr('Class')}</th>
+                                    <th>${i18n.tr('Players')}</th>
+                                    <th>${i18n.tr('Level')}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -181,25 +181,25 @@
                                     <c:when test="${empty openMeleeGames}">
                                         <tr>
                                             <td colspan="100" class="text-center">
-                                                    ${i18n.tr('There are currently no open games.')}
-                                                </td>
+                                                ${i18n.tr('There are currently no open games.')}
+                                            </td>
+                                        </tr>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:forEach items="${openMeleeGames}" var="game">
+                                            <tr id="game-${game.id}">
+                                                <td>${gameCreatorNames[game.id]}</td>
+                                                <td><span>${game.CUT.alias}</span></td>
+                                                <td>${game.players.size()}</td>
+                                                <td>${i18n.tr(game.level.formattedString)}</td>
                                             </tr>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:forEach items="${openMeleeGames}" var="game">
-                                                <tr id="game-${game.id}">
-                                                    <td>${gameCreatorNames[game.id]}</td>
-                                                    <td><span>${game.CUT.alias}</span></td>
-                                                    <td>${game.players.size()}</td>
-                                                    <td>${i18n.tr(game.level.formattedString)}</td>
-                                                </tr>
-                                            </c:forEach>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </c:forEach>
+                                    </c:otherwise>
+                                </c:choose>
+                                </tbody>
+                            </table>
                         </div>
+                    </div>
                 </div>
             </div>
 

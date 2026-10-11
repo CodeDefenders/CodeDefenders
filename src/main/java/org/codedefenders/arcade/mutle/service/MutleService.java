@@ -20,7 +20,6 @@ package org.codedefenders.arcade.mutle.service;
 
 import java.io.IOException;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -68,7 +67,9 @@ import org.xnap.commons.i18n.I18n;
 
 import com.google.common.util.concurrent.Striped;
 
+import static org.codedefenders.arcade.mutle.model.MutleGame.SUBMISSION_TIMEOUT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
+import static org.codedefenders.execution.TargetExecution.Target.TEST_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -80,7 +81,6 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 public class MutleService {
     private static final Logger logger = LoggerFactory.getLogger(MutleService.class);
     public static final int MAX_GUESSES = 6;
-    private static final Duration SUBMISSION_TIMEOUT = Duration.ofMinutes(2);
     private static final Striped<Lock> SUBMISSION_LOCKS = Striped.lock(256);
     private static final Pattern COMPILER_ERROR = Pattern.compile(
             "(?m)^\\[javac]\\s+.*\\.java:(\\d+): error: (.+)$");
@@ -445,11 +445,12 @@ public class MutleService {
         return details.toString().stripTrailing();
     }
 
-    private static boolean accepted(Test test) {
+    static boolean accepted(Test test) {
         TargetExecution compilation = TargetExecutionDAO.getTargetExecutionForTest(test, COMPILE_TEST);
         TargetExecution original = TargetExecutionDAO.getTargetExecutionForTest(test, TEST_ORIGINAL);
         return compilation != null && original != null && compilation.status == TargetExecution.Status.SUCCESS
-                && original.status == TargetExecution.Status.SUCCESS;
+                && original.status == TargetExecution.Status.SUCCESS
+                && TargetExecutionDAO.getTargetExecutionForTest(test, TEST_MUTANT) != null;
     }
 
     private MutleGuessView guess(PuzzleGame game, MutleMutant metadata, Mutant target, Test test) {

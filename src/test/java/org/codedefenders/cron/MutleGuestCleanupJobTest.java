@@ -20,6 +20,7 @@ package org.codedefenders.cron;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.codedefenders.arcade.mutle.persistence.MutleRepository;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,5 +68,33 @@ class MutleGuestCleanupJobTest {
         assertTrue(Files.exists(account.resolve("Test.java")));
         assertTrue(Files.exists(fixture));
         verify(transaction).commit();
+    }
+
+    @Test
+    void retriesFailedGamesWithoutBlockingLaterGamesInTheBatch() throws Exception {
+        Path first = Files.createDirectories(root.resolve("mutle/101/8/original/1"));
+        Path second = Files.createDirectories(root.resolve("mutle/102/8/original/1"));
+        MutleRepository repository = mock(MutleRepository.class);
+        when(repository.expiredGuestGames(any())).thenReturn(List.of(101, 102), List.of(101));
+        when(repository.deleteExpiredGuestGame(eq(101), any())).thenReturn(true);
+        when(repository.deleteExpiredGuestGame(eq(102), any())).thenReturn(true);
+        Configuration config = mock(Configuration.class);
+        when(config.getTestsDir()).thenReturn(root.toFile());
+        TransactionManager transactions = mock(TransactionManager.class);
+        Transaction transaction = mock(Transaction.class);
+        when(transactions.executeInTransaction(any(TransactionalSupplier.class)))
+                .thenThrow(new SQLException("first game cannot be deleted"))
+                .thenAnswer(invocation -> ((TransactionalSupplier<?>) invocation.getArgument(0))
+                        .executeInTransaction(transaction));
+
+        MutleGuestCleanupJob job = new MutleGuestCleanupJob(repository, transactions, config);
+        job.run();
+        assertTrue(Files.exists(first));
+        assertFalse(Files.exists(second));
+        verify(transaction).commit();
+
+        job.run();
+        assertFalse(Files.exists(first));
+        verify(transaction, times(2)).commit();
     }
 }

@@ -20,6 +20,9 @@ package org.codedefenders.arcade.mutle.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,7 @@ import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -137,6 +141,35 @@ class MutleGuestSessionTest {
         assertThrows(MutleGuestLimits.RateLimitException.class, () -> first.submit(10, "source", english, ADDRESS));
         verify(service, times(MutleGuestLimits.MAX_SUBMISSIONS_PER_GAME))
                 .submit(MUTLE_GUEST_USER_ID, 10, "source", english);
+    }
+
+    @Test
+    void runningSubmissionDoesNotBlockReadsAndDuplicateSubmissionsFailImmediately() throws Exception {
+        first.start(ADDRESS);
+        second.start(ADDRESS);
+        CountDownLatch running = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        when(service.submit(MUTLE_GUEST_USER_ID, 10, "source", english)).thenAnswer(invocation -> {
+            running.countDown();
+            assertTrue(release.await(5, TimeUnit.SECONDS));
+            return state(10, 1);
+        });
+        var executor = Executors.newFixedThreadPool(2);
+        try {
+            var submission = executor.submit(() -> first.submit(10, "source", english, ADDRESS));
+            assertTrue(running.await(5, TimeUnit.SECONDS));
+            assertEquals(10, executor.submit(() -> first.current().orElseThrow().gameId()).get(1, TimeUnit.SECONDS));
+            assertEquals(11, second.current().orElseThrow().gameId());
+            executor.submit(() -> assertThrows(MutleService.SubmissionInProgressException.class,
+                    () -> first.submit(10, "source", english, ADDRESS))).get(1, TimeUnit.SECONDS);
+            release.countDown();
+            assertEquals(10, submission.get(5, TimeUnit.SECONDS).gameId());
+            assertEquals(10, first.submit(10, "source", english, ADDRESS).gameId());
+            verify(service, times(2)).submit(MUTLE_GUEST_USER_ID, 10, "source", english);
+        } finally {
+            release.countDown();
+            executor.shutdownNow();
+        }
     }
 
     private static MutleStateView state(int gameId, int series) {

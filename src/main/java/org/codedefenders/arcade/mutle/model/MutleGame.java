@@ -18,6 +18,7 @@
  */
 package org.codedefenders.arcade.mutle.model;
 
+import java.time.Duration;
 import java.time.Instant;
 
 /** Identifies the private puzzle game that belongs to a user's fixture attempt. */
@@ -29,4 +30,5 @@ public record MutleGame(
         String submissionToken,
         Instant submissionStartedAt,
         Instant createdAt) {
+    public static final Duration SUBMISSION_TIMEOUT = Duration.ofMinutes(2);
 }

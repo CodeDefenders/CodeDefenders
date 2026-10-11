@@ -49,29 +49,17 @@ body {
     margin-bottom: 0;
 }
 
-.title {
-    font-size: 48px;
-    font-weight: 500;
-    text-align: center;
-    letter-spacing: -1px;
-    margin-block: 8px;
-}
-
-.subtitle {
-    font-size: 20px;
-    font-weight: 500;
-    text-align: center;
-    letter-spacing: 1px;
-}
-
 .landing-hero .title {
     font-size: clamp(1.65rem, 3vw, 2.5rem);
+    font-weight: 500;
     text-align: left;
+    letter-spacing: -1px;
     margin-block: 0;
 }
 
 .landing-hero .subtitle {
     font-size: 1rem;
+    font-weight: 500;
     text-align: left;
     letter-spacing: 0;
     color: #64748b;
@@ -109,52 +97,22 @@ body {
     line-height: 1.6;
 }
 
-.landing-demo .status {
-    min-height: 3.5rem;
-    margin-top: 0;
-    margin-bottom: 1rem;
-}
-
-.landing-demo .anim .row {
-    max-width: none;
-    margin-inline: 0;
-}
-
-.landing-demo .intro {
-    max-width: 60rem;
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.landing-demo .browser-window {
-    box-shadow: none;
-}
-
-.landing-demo .browser-titlebar {
-    background: #f1f5f9;
-}
-
-.intro, .usage {
-    font-size: 16px;
-    margin-bottom: 48px;
-    line-height: 1.7;
-    max-width: 800px;
-    margin-inline: auto;
-    padding-inline: 3rem;
-}
-
 .intro {
+    font-size: 16px;
+    margin-bottom: 0;
+    line-height: 1.7;
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 0;
     color: #64748b;
 }
 
-.intro p,
-.usage p {
+.intro p {
     margin: 0 0 12px 0;
     text-wrap: pretty;
 }
 
-.intro p:last-child,
-.usage p:last-child {
+.intro p:last-child {
     margin-bottom: 0;
 }
 
@@ -164,11 +122,11 @@ body {
     gap: 24px;
     align-items: stretch;
     margin-bottom: 24px;
-    margin-inline: auto;
-    max-width: 1000px;
+    margin-inline: 0;
 }
 
 .anim .row > div {
+    min-width: 0;
     display: flex;
     flex-direction: column;
 }
@@ -178,14 +136,13 @@ body {
     border-radius: 8px;
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     height: 100%;
 }
 
 .browser-titlebar {
-    background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+    background: #f1f5f9;
     padding: 10px 14px;
     display: flex;
     align-items: center;
@@ -335,10 +292,10 @@ body {
 }
 
 .status {
-    margin-top: 28px;
-    margin-bottom: 14px;
+    margin-top: 0;
+    margin-bottom: 1rem;
     font-size: 20px;
-    min-height: 82px;
+    min-height: 3.5rem;
     text-align: center;
     font-weight: 500;
     display: flex;
@@ -436,16 +393,12 @@ body {
 }
 
 @media (min-width: 768px) {
-    .intro, .usage {
+    .intro {
         text-align: center;
     }
 
     .anim .row {
         grid-template-columns: 1fr 1fr;
-    }
-
-    .rounded-6-md {
-        border-radius: .6rem !important;
     }
 }
 

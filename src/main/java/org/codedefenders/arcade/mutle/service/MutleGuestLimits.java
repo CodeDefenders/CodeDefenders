@@ -35,6 +35,7 @@ public class MutleGuestLimits {
     public static final int MAX_SOURCE_CHARACTERS = 16_384;
     public static final int MAX_SUBMISSIONS_PER_GAME = 30;
     public static final Duration RETENTION = Duration.ofDays(7);
+    public static final int SESSION_TIMEOUT_SECONDS = (int) Duration.ofDays(1).toSeconds();
     private static final Duration WINDOW = Duration.ofHours(1);
     private final Cache<String, Window> clients = CacheBuilder.newBuilder()
             .maximumSize(10_000).expireAfterAccess(1, TimeUnit.HOURS).build();
@@ -55,11 +56,6 @@ public class MutleGuestLimits {
             throw new BusyException();
         }
         return new Permit();
-    }
-
-    public Permit acquire(String address, boolean worker) {
-        request(address);
-        return worker ? acquire() : null;
     }
 
     public synchronized void request(String address) {

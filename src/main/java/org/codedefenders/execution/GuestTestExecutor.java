@@ -201,7 +201,8 @@ public class GuestTestExecutor {
     /** Neither submitted classes nor libraries receive access to application files, sockets or environment variables. */
     static String policy(Path workspace, List<Path> jars) {
         StringBuilder policy = new StringBuilder("grant { permission java.util.PropertyPermission \"*\", \"read\"; };\n");
-        for (Path jar : jars.stream().distinct().toList()) {
+        List<Path> dependencies = jars.stream().distinct().toList();
+        for (Path jar : dependencies) {
             policy.append("grant codeBase \"").append(jar.toUri()).append("\" {\n")
                     .append("permission java.io.FilePermission \"").append(escape(workspace.toString()))
                     .append("\", \"read\";\n")
@@ -224,7 +225,7 @@ public class GuestTestExecutor {
                         .append("permission java.lang.RuntimePermission \"exitVM\";\n")
                         .append("permission java.util.PropertyPermission \"*\", \"read,write\";\n");
             }
-            for (Path dependency : jars.stream().distinct().toList()) {
+            for (Path dependency : dependencies) {
                 policy.append("permission java.io.FilePermission \"").append(escape(dependency.toString()))
                         .append("\", \"read\";\n");
             }

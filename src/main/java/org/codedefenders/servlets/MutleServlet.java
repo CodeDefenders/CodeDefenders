@@ -34,6 +34,8 @@ import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.util.Paths;
 
+import static org.codedefenders.arcade.mutle.service.MutleGuestLimits.SESSION_TIMEOUT_SECONDS;
+
 @WebServlet({Paths.MUTLE, Paths.MUTLE_PLAY})
 public class MutleServlet extends HttpServlet {
     @Inject
@@ -55,7 +57,7 @@ public class MutleServlet extends HttpServlet {
             return;
         }
         if (!login.isLoggedIn()) {
-            request.getSession().setMaxInactiveInterval(24 * 60 * 60);
+            request.getSession().setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
         }
         if (Paths.MUTLE.equals(request.getServletPath())) {
             request.setAttribute("currentCase", (login.isLoggedIn()

@@ -58,13 +58,13 @@ class MutleGuestLimitsTest {
     void boundsRequestsBeforeSessionCreationAndBoundsSubmissionsAcrossAddresses() {
         MutleGuestLimits limits = new MutleGuestLimits();
         for (int request = 0; request < 240; request++) {
-            limits.acquire("client", false);
+            limits.request("client");
         }
-        assertThrows(MutleGuestLimits.RateLimitException.class, () -> limits.acquire("client", false));
+        assertThrows(MutleGuestLimits.RateLimitException.class, () -> limits.request("client"));
         for (int request = 240; request < 3_000; request++) {
-            limits.acquire("other-" + request, false);
+            limits.request("other-" + request);
         }
-        assertThrows(MutleGuestLimits.RateLimitException.class, () -> limits.acquire("new-client", false));
+        assertThrows(MutleGuestLimits.RateLimitException.class, () -> limits.request("new-client"));
         for (int submission = 0; submission < 1_200; submission++) {
             limits.submission("submission-client-" + submission / 120, "source");
         }

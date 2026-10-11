@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.codedefenders.arcade.mutle.fixture.MutleEntry;
 import org.codedefenders.arcade.mutle.model.MutleGame;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +31,15 @@ import static org.codedefenders.execution.TargetExecution.Status.ERROR;
 import static org.codedefenders.execution.TargetExecution.Status.FAIL;
 import static org.codedefenders.execution.TargetExecution.Status.SUCCESS;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
+import static org.codedefenders.execution.TargetExecution.Target.TEST_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 class MutleServiceTest {
     private static final String RAW_EXECUTION_OUTPUT = "java.lang.AssertionError\n\tat TestAppointmentBook.test";
@@ -123,6 +128,26 @@ class MutleServiceTest {
     @Test
     void detectsGameForRemovedFixture() {
         assertFalse(MutleService.fixtureAvailable(game(1, "removed/mutant", 12), entries()));
+    }
+
+    @Test
+    void onlyCompletedMutantEvaluationsCountAsGuessesIncludingAssertionFailuresAndErrors() {
+        var test = mock(org.codedefenders.game.Test.class);
+        try (var executions = mockStatic(TargetExecutionDAO.class)) {
+            executions.when(() -> TargetExecutionDAO.getTargetExecutionForTest(test, COMPILE_TEST))
+                    .thenReturn(execution(COMPILE_TEST, SUCCESS));
+            executions.when(() -> TargetExecutionDAO.getTargetExecutionForTest(test, TEST_ORIGINAL))
+                    .thenReturn(execution(TEST_ORIGINAL, SUCCESS));
+            assertFalse(MutleService.accepted(test));
+            for (var status : TargetExecution.Status.values()) {
+                executions.when(() -> TargetExecutionDAO.getTargetExecutionForTest(test, TEST_MUTANT))
+                        .thenReturn(execution(TEST_MUTANT, status));
+                assertTrue(MutleService.accepted(test));
+            }
+            executions.when(() -> TargetExecutionDAO.getTargetExecutionForTest(test, TEST_ORIGINAL))
+                    .thenReturn(execution(TEST_ORIGINAL, FAIL));
+            assertFalse(MutleService.accepted(test));
+        }
     }
 
     private static List<MutleEntry> entries() {
