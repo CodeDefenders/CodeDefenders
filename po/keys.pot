@@ -12467,7 +12467,7 @@ msgstr "Failed to copy"
 msgid "Error updating whitelist"
 msgstr "Error updating whitelist"
 
-msgid "Find the hidden change in Java code with six tests. Play without an account."
+msgid "Find the hidden change in Java code with six tests."
 msgstr ""
 
 msgid "Play Mutle"

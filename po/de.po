@@ -10884,8 +10884,8 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ "angezeigt. In diesem Fall habe ich die Klammern am Ende eines "
 #~ "Funktionsaufrufs nicht hinzugefügt."
 
-msgid "Find the hidden change in Java code with six tests. Play without an account."
-msgstr "Finde die versteckte Änderung im Java-Code mit sechs Tests. Spiele ohne Benutzerkonto."
+msgid "Find the hidden change in Java code with six tests."
+msgstr "Finde die versteckte Änderung im Java-Code mit sechs Tests."
 
 msgid "Play Mutle"
 msgstr "Mutle spielen"

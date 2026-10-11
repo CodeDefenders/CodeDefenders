@@ -46,23 +46,34 @@
     </jsp:attribute>
 
     <jsp:body>
-        <%-- Vertically align content if enough space is available. --%>
-        <div class="container py-5 page">
-            <div class="d-flex flex-column align-items-center gap-3 mb-3">
-                <img src="${url.forPath("/images/logo.png")}" alt="${i18n.tr('Code Defenders Logo')}" width="58">
-                    <%-- Make the header break nicely on smaller screens. --%>
-                <h1 class="d-flex flex-column">
-                    <span class="title">${i18n.tr('Code Defenders')}</span>
-                    <span class="subtitle">${i18n.tr('A Mutation Testing Game')}</span>
-                </h1>
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <a href="${url.forPath(Paths.LOGIN)}"
-           class="btn btn-lg btn-primary btn-highlight"
-           style="margin-bottom: 5rem;">
-                ${i18n.tr('Log in or Sign up')}
-                </a>
+        <div class="container py-4 page">
+            <div class="row g-4 align-items-center landing-hero mb-4">
+                <div class="${empty mutleFixture ? 'col-12' : 'col-lg-5'}">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <img src="${url.forPath("/images/logo.png")}" alt="${i18n.tr('Code Defenders Logo')}" width="48">
+                        <h1 class="d-flex flex-column mb-0">
+                            <span class="title">${i18n.tr('Code Defenders')}</span>
+                            <span class="subtitle">${i18n.tr('A Mutation Testing Game')}</span>
+                        </h1>
+                    </div>
+                    <p class="landing-summary">${i18n.tr('CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple, competitive challenge between two roles: defenders and attackers.')}</p>
+                    <a href="${url.forPath(Paths.LOGIN)}" class="btn btn-lg btn-primary btn-highlight">
+                        ${i18n.tr('Log in or Sign up')}
+                    </a>
+                </div>
+                <c:if test="${not empty mutleFixture}">
+                    <div class="col-lg-7">
+                        <section class="bg-light rounded-3 p-4" aria-labelledby="landing-mutle-title">
+                            <h2 id="landing-mutle-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h2>
+                            <p class="lead">${i18n.tr('Find the hidden change in Java code with six tests.')}</p>
+                            <p>${i18n.tr('Series')} ${mutleFixture.series} · <c:out value="${mutleFixture.title}"/></p>
+                            <a class="btn btn-lg btn-primary" href="${url.forPath(Paths.MUTLE_PLAY)}">
+                                ${i18n.tr('Play Mutle')}
+                            </a>
+                            <p class="text-muted mt-3 mb-0">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
+                        </section>
+                    </div>
+                </c:if>
             </div>
 
             <div class="anim">
@@ -106,24 +117,9 @@
             <div id="prompt" class="hidden">${i18n.tr('Can you kill the mutant?')}</div>
 
             <div class="intro">
-                <p>${i18n.tr('CodeDefenders is a web-based game about testing code. It turns mutation testing into a simple, competitive challenge between two roles: defenders and attackers.')}</p>
                 <p>${i18n.tr('Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all tests still pass, the mutant survives and scores for the attacker.')}</p>
             </div>
         </div>
-
-        <c:if test="${not empty mutleFixture}">
-            <section class="page container bg-light rounded-6-md mb-5" aria-labelledby="landing-mutle-title">
-                <div class="p-4 p-md-5">
-                    <h2 id="landing-mutle-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h2>
-                    <p class="lead">${i18n.tr('Find the hidden change in Java code with six tests. Play without an account.')}</p>
-                    <p>${i18n.tr('Series')} ${mutleFixture.series} · <c:out value="${mutleFixture.title}"/></p>
-                    <a class="btn btn-lg btn-primary" href="${url.forPath(Paths.MUTLE)}">
-                        ${i18n.tr('Play Mutle')}
-                    </a>
-                    <p class="text-muted mt-3 mb-0">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
-                </div>
-            </section>
-        </c:if>
 
         <div class="page container bg-light rounded-6-md mb-5">
             <div class="row">

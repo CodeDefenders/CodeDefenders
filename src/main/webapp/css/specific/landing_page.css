@@ -37,6 +37,24 @@
     letter-spacing: 1px;
 }
 
+.landing-hero .title {
+    font-size: clamp(1.65rem, 3vw, 2.5rem);
+    text-align: left;
+    margin-block: 0;
+}
+
+.landing-hero .subtitle {
+    font-size: 1rem;
+    text-align: left;
+    letter-spacing: 0;
+}
+
+.landing-summary {
+    max-width: 38rem;
+    color: #64748b;
+    line-height: 1.7;
+}
+
 .intro, .usage {
     font-size: 16px;
     margin-bottom: 48px;
