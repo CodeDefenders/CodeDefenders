@@ -43,7 +43,7 @@ const root = typeof document === 'undefined' ? null : document.querySelector('#m
 if (root) {
     const api = `${window.contextPath || ''}/api/mutle`;
     const text = root.dataset;
-    const marks = {NONE: '⬜', METHOD: '🟨', LINE: '🟦', KILLED: '💀'};
+    const marks = {NONE: '⬜', METHOD: '🟨', LINE: '🟧', KILLED: '💀'};
     const markText = mark => text[`mark${mark[0]}${mark.slice(1).toLowerCase()}`] || mark;
     const coverageClasses = [
         'mutle-covered-none',
