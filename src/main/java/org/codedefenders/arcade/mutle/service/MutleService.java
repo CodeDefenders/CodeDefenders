@@ -71,6 +71,7 @@ import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 
@@ -150,6 +151,13 @@ public class MutleService {
         return state(userId, createGame(userId, fixtureKey, 0, true).gameId());
     }
 
+    /** Guest games have their own period slot and never contribute to account achievements. */
+    public synchronized MutleStateView startGuest() {
+        MutleEntry entry = currentEntry();
+        installer.ensureInstalled(entry);
+        return state(MUTLE_GUEST_USER_ID, createGame(MUTLE_GUEST_USER_ID, fixtureKey(entry), 0, true).gameId());
+    }
+
     public List<MutleFixtureView> fixtures() {
         return catalog.allEntries().stream()
                 .map(this::fixtureView)
@@ -202,7 +210,10 @@ public class MutleService {
         MutleMutant metadata = mutant(entry);
         Mutant target = target(puzzleGame);
         boolean practice = game.rotationPeriod() == -game.gameId();
-        boolean current = practice || game.rotationPeriod() == currentRotationPeriod();
+        boolean current = userId == MUTLE_GUEST_USER_ID
+                ? catalog.currentEntry(clock.instant()).map(currentEntry -> currentEntry.series() == entry.series()
+                        && fixtureKey(currentEntry).equals(game.fixtureKey())).orElse(false)
+                : practice || game.rotationPeriod() == currentRotationPeriod();
         List<MutleGuessView> guesses = guesses(puzzleGame, metadata, target);
         boolean solved = puzzleGame.getState() == GameState.SOLVED || !target.isAlive();
         boolean failed = !solved && (puzzleGame.getState() == GameState.FAILED || guesses.size() >= MAX_GUESSES);

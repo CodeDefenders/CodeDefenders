@@ -12466,3 +12466,12 @@ msgstr "Failed to copy"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Error updating whitelist"
+
+msgid "Find the hidden change in Java code with six tests. Play without an account."
+msgstr ""
+
+msgid "Play Mutle"
+msgstr ""
+
+msgid "Guest progress stays in this browser session. Log in to play with your account and earn achievements."
+msgstr ""

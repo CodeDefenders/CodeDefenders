@@ -10883,3 +10883,12 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ "kann, wird oben auf dem Bildschirm ein vollständiger Compiler-Fehler "
 #~ "angezeigt. In diesem Fall habe ich die Klammern am Ende eines "
 #~ "Funktionsaufrufs nicht hinzugefügt."
+
+msgid "Find the hidden change in Java code with six tests. Play without an account."
+msgstr "Finde die versteckte Änderung im Java-Code mit sechs Tests. Spiele ohne Benutzerkonto."
+
+msgid "Play Mutle"
+msgstr "Mutle spielen"
+
+msgid "Guest progress stays in this browser session. Log in to play with your account and earn achievements."
+msgstr "Dein Gastfortschritt bleibt in dieser Browsersitzung. Melde dich an, um mit deinem Benutzerkonto zu spielen und Errungenschaften zu erhalten."

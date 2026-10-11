@@ -40,6 +40,12 @@
             <p>${i18n.tr("You have six attempts to write a test that detects/kills the mutant. The only problem: Initially you know nothing about the mutant. But after each test you write, you get feedback in form of a color that tells you if you covered the method or line where the mutation is located. Using this information you have to locate the mutated line and write a test that successfully detects it.")}</p>
         </section>
 
+        <c:if test="${not login.loggedIn}">
+            <p class="alert alert-info">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}
+                <a href="${url.forPath(Paths.LOGIN)}">${i18n.tr('Log in or Sign up')}</a>
+            </p>
+        </c:if>
+
         <section class="mutle-hero p-4 p-md-5 mb-5">
             <h2>${empty currentFixture ? i18n.tr('Mutle coming soon') : i18n.tr('This week\'s mutle')}</h2>
             <p class="lead mb-2">
@@ -119,6 +125,7 @@
             </section>
         </c:if>
 
+        <c:if test="${login.loggedIn}">
         <section aria-labelledby="mutle-history-title">
             <h2 id="mutle-history-title">${i18n.tr('Case history')}</h2>
             <c:choose>
@@ -142,5 +149,6 @@
                 </c:otherwise>
             </c:choose>
         </section>
+        </c:if>
     </main>
 </p:main_page>

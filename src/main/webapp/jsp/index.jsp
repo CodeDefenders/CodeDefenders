@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
@@ -109,6 +110,20 @@
                 <p>${i18n.tr('Defenders write tests for a small piece of code, the Class Under Test (CUT). Attackers then change the CUT in tiny ways, creating mutants. If a test fails on a mutant, that mutant is killed. If all tests still pass, the mutant survives and scores for the attacker.')}</p>
             </div>
         </div>
+
+        <c:if test="${not empty mutleFixture}">
+            <section class="page container bg-light rounded-6-md mb-5" aria-labelledby="landing-mutle-title">
+                <div class="p-4 p-md-5">
+                    <h2 id="landing-mutle-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h2>
+                    <p class="lead">${i18n.tr('Find the hidden change in Java code with six tests. Play without an account.')}</p>
+                    <p>${i18n.tr('Series')} ${mutleFixture.series} · <c:out value="${mutleFixture.title}"/></p>
+                    <a class="btn btn-lg btn-primary" href="${url.forPath(Paths.MUTLE)}">
+                        ${i18n.tr('Play Mutle')}
+                    </a>
+                    <p class="text-muted mt-3 mb-0">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
+                </div>
+            </section>
+        </c:if>
 
         <div class="page container bg-light rounded-6-md mb-5">
             <div class="row">

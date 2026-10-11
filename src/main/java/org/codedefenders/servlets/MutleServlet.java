@@ -19,6 +19,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -27,6 +28,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
@@ -43,6 +45,9 @@ public class MutleServlet extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private MutleGuestSession guest;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (!settings.enabled() || !mutleService.isReady()) {
@@ -50,9 +55,10 @@ public class MutleServlet extends HttpServlet {
             return;
         }
         if (Paths.MUTLE.equals(request.getServletPath())) {
-            request.setAttribute("currentCase", mutleService.current(login.getUserId()).orElse(null));
+            request.setAttribute("currentCase", (login.isLoggedIn()
+                    ? mutleService.current(login.getUserId()) : guest.current()).orElse(null));
             request.setAttribute("currentFixture", mutleService.currentFixture());
-            request.setAttribute("history", mutleService.history(login.getUserId()));
+            request.setAttribute("history", login.isLoggedIn() ? mutleService.history(login.getUserId()) : List.of());
             if (login.isAdmin()) {
                 request.setAttribute("fixtures", mutleService.fixtures());
             }
@@ -63,6 +69,17 @@ public class MutleServlet extends HttpServlet {
         if (gameId != null && !gameId.matches("[1-9][0-9]*")) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
+        }
+        if (!login.isLoggedIn() && gameId != null) {
+            try {
+                if (!guest.owns(Integer.parseInt(gameId))) {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                    return;
+                }
+            } catch (NumberFormatException exception) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
         }
         String fixtureKey = request.getParameter("fixture");
         if (fixtureKey != null && (gameId != null || !login.isAdmin()

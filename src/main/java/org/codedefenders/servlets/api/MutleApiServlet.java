@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
@@ -48,6 +49,9 @@ public class MutleApiServlet extends HttpServlet {
 
     @Inject
     private CodeDefendersAuth login;
+
+    @Inject
+    private MutleGuestSession guest;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -72,13 +76,16 @@ public class MutleApiServlet extends HttpServlet {
                         response.sendError(HttpServletResponse.SC_FORBIDDEN);
                         return;
                     }
-                    write(response, fixtureKey == null
+                    write(response, !login.isLoggedIn() ? guest.start() : fixtureKey == null
                             ? mutleService.start(login.getUserId())
                             : mutleService.startPractice(login.getUserId(), fixtureKey));
                 }
-                case "/state" -> write(response, mutleService.state(login.getUserId(), integer(body, "gameId", false)));
-                case "/guess" -> write(response, mutleService.submit(login.getUserId(), integer(body, "gameId", true),
-                        string(body, "source")));
+                case "/state" -> write(response, login.isLoggedIn()
+                        ? mutleService.state(login.getUserId(), integer(body, "gameId", false))
+                        : guest.state(integer(body, "gameId", false)));
+                case "/guess" -> write(response, login.isLoggedIn()
+                        ? mutleService.submit(login.getUserId(), integer(body, "gameId", true), string(body, "source"))
+                        : guest.submit(integer(body, "gameId", true), string(body, "source")));
                 default -> response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (MutleService.NotFoundException e) {

@@ -21,6 +21,8 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="static org.codedefenders.util.Constants.DEFAULT_NB_ASSERTIONS" %>
 <% pageContext.setAttribute("MUTLE_MAX_ASSERTIONS", DEFAULT_NB_ASSERTIONS); %>
 <p:main_page title="${i18n.tr('Mutle')}">
@@ -28,7 +30,7 @@
     <main class="container mutle-play" id="mutle-play"
           data-game-id="${mutleGameId}"
           data-fixture-key="${mutleFixtureKey}"
-          data-keymap="${login.user.keyMap.CMName}"
+          data-keymap="${login.loggedIn ? login.user.keyMap.CMName : 'default'}"
           data-series="${i18n.tr('Series')}"
           data-remaining="${i18n.tr('{0} guesses remaining')}"
           data-solved="${i18n.tr('Solved')}"
@@ -58,6 +60,11 @@
           data-load-error="${i18n.tr('Unable to load the case.')}">
         <div id="mutle-loading" role="status">${i18n.tr('Loading case…')}</div>
         <div id="mutle-load-error" class="alert alert-danger d-none" role="alert"></div>
+        <c:if test="${not login.loggedIn}">
+            <p class="alert alert-info">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}
+                <a href="${url.forPath(Paths.LOGIN)}">${i18n.tr('Log in or Sign up')}</a>
+            </p>
+        </c:if>
         <div id="mutle-content" class="d-none">
             <header class="mutle-case-header mb-5">
                 <div class="mutle-case-copy">
@@ -121,7 +128,9 @@
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
                         ${i18n.tr('What tests are allowed?')}
                     </button>
-                    <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                    <c:if test="${login.loggedIn}">
+                        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+                    </c:if>
                 </div>
                 <div class="collapse mt-3" id="mutle-test-rules">
                     <div class="card card-body">
