@@ -41,9 +41,11 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.notification.INotificationService;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.PreparedMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +68,10 @@ public class ParallelMutationTester extends MutationTester {
 
     // TODO Move the Executor service before useMutantCoverage
     public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            TestRepository testRepo, MutantRepository mutantRepo, boolean useMutantCoverage,
-                                  ExecutorService testExecutorThreadPool) {
-        super(backend, userRepo, eventDAO, testRepo, mutantRepo, useMutantCoverage);
+            TestRepository testRepo, MutantRepository mutantRepo, INotificationService notificationService,
+            boolean useMutantCoverage, GameManagingUtils gameManagingUtils, ExecutorService testExecutorThreadPool) {
+        super(backend, userRepo, eventDAO, testRepo, mutantRepo, notificationService, useMutantCoverage,
+                gameManagingUtils);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -126,6 +129,7 @@ public class ParallelMutationTester extends MutationTester {
                 if (tasks.get(mutant).get()) {
                     killed++;
                     killedMutants.add(mutant);
+                    gameManagingUtils.notifyPlayersOnMutantUpdated(game.getId(), mutant);
                 }
             } catch (InterruptedException | ExecutionException | CancellationException e) {
                 logger.error("While waiting results for mutant " + mutant, e);
@@ -153,6 +157,7 @@ public class ParallelMutationTester extends MutationTester {
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
                 int score = Scorer.score(game, mutant, missedTests);
+                mutant.setScore(score);
                 mutantRepo.incrementMutantScore(mutant, score);
             }
         }
@@ -276,6 +281,7 @@ public class ParallelMutationTester extends MutationTester {
             // missedTests));
             // mutant.update();
             int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            mutant.setScore(score);
             mutantRepo.incrementMutantScore(mutant, score);
         }
 

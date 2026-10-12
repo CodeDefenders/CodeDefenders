@@ -75,6 +75,8 @@ public class Constants {
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";
     public static final String MELEE_DETAILS_VIEW_JSP = "/jsp/melee/details_view.jsp";
     public static final String BATTLEGROUND_ROLE_SELECTION = "/jsp/battleground/role_selection.jsp";
+    public static final String BATTLEGROUND_SCOREBOARD_JSP = "/jsp/battleground/game_scoreboard_raw.jsp";
+    public static final String MELEE_SCOREBOARD_JSP = "/jsp/melee/game_scoreboard_raw.jsp";
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";

@@ -19,7 +19,7 @@
 import DataTable from '../thirdparty/datatables';
 import {DataTablesUtils} from '../main';
 import {Popover} from '../thirdparty/bootstrap';
-import {InfoApi, LoadingAnimation, Modal} from '../main';
+import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 
 
 class TestAccordion {
@@ -31,8 +31,10 @@ class TestAccordion {
      *      Given by [new Map(JSON.parse('${testAccordion.testsAsJSON}'))].
      * @param {TestEditor | false} cloneTo
      *      The test editor to clone tests to, or false if no clone button should be shown.
+     * @param {int | false} gameId
+     *      The game id of the game this test accordion is showing the tests for
      */
-    constructor(categories, tests, cloneTo = false) {
+    constructor(categories, tests, cloneTo = false, gameId = false) {
         /**
          * The categories of tests to display, i.e. one category per method + all.
          * @type {TestAccordionCategory[]}
@@ -46,6 +48,12 @@ class TestAccordion {
         this._tests = tests;
 
         /**
+         * The id of the current game.
+         * @type {number | false}
+         */
+        this._gameId = gameId;
+
+        /**
          * The test editor to clone tests to, or false if no clone button should be shown.
          * @type {TestEditor | false}
          * @private
@@ -57,6 +65,12 @@ class TestAccordion {
          * @type {Map<number, Modal>}
          */
         this._testModals = new Map();
+
+        /**
+         * Maps category ids to the datatable that displays the category.
+         * @type {Map<string, DataTable>}
+         */
+        this._dataTablesByCategory = new Map();
 
         this._init();
     }
@@ -142,7 +156,7 @@ class TestAccordion {
     };
 
     /** @private */
-    _init () {
+    async _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
@@ -205,9 +219,15 @@ class TestAccordion {
                     }
                 }
             });
+
+            this._dataTablesByCategory.set(category.id, dataTable);
         }
 
         LoadingAnimation.hideAnimation(document.getElementById('tests-accordion'));
+
+        this._pushSocket = await objects.await('pushSocket');
+        this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
+        this._pushSocket.register('highlighting.TestAddedEvent', event => this.addTest(event.test));
     }
 
     /** @private */
@@ -300,6 +320,54 @@ class TestAccordion {
         return data.smells.length > 0
                 ? data.smells.join('<br>')
             : i18n.tr('This test does not have any smells.')
+    }
+
+    /**
+     * Fetches the current test data relevant for rendering it in the test accordion.
+     *
+     * @param {number} testId
+     * @returns {Promise<{categories: Array, test: TestDTO} | null>}
+     */
+    async fetchTestData (testId) {
+        const data = await fetch(`${contextPath}api/test-accordion?gameId=${this._gameId}&testId=${testId}`)
+                .then(response => response.json())
+                .catch(error => console.error(error));
+
+        if (data === undefined || !data.categories || !data.test) {
+            console.error(`Failed to fetch test accordion data for test ${testId}.`);
+        } else {
+            return data;
+        }
+    }
+
+    /**
+     * Adds a new test to the accordion.
+     * @param {TestDTO} test The test to add.
+     */
+    async addTest (test) {
+        const data = await this.fetchTestData(test.id);
+        if (!data) return;
+        this._tests.set(test.id, data.test);
+
+        for (const category of data.categories) {
+            // update category objects used for count badges when filtering
+            this._categories[this._categories.findIndex(c => c.id === category.id)] = category;
+            // update data tables
+            if (this._dataTablesByCategory.has(category.id)) {
+                /* Update the existing DataTable. */
+                const dataTable = this._dataTablesByCategory.get(category.id);
+                dataTable.row.add(data.test).draw(false);
+                /* Update the count badge. */
+                const countElement = document.getElementById('ta-count-' + category.id);
+                countElement.innerText = category.testIds.length.toString();
+                countElement.hidden = false;
+                /* Add the ma-covered class */
+                const buttonElement = document.querySelector(`#ta-heading-${category.id} .accordion-button`);
+                buttonElement.classList.add('ta-covered');
+            } else {
+                console.error(`Category ${category.id} not found.`);
+            }
+        }
     }
 
     /** @private */

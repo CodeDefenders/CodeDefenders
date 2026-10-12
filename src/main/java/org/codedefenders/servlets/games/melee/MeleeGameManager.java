@@ -62,10 +62,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -438,6 +434,7 @@ public class MeleeGameManager extends HttpServlet {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
 
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
     }
@@ -601,6 +598,8 @@ public class MeleeGameManager extends HttpServlet {
         ttme.setUserId(login.getUserId());
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
+
+        gameManagingUtils.notifyPlayersOnTestAdded(newTest, game.getId());
 
         // Clean up the session
         previousSubmission.clear();
@@ -780,6 +779,9 @@ public class MeleeGameManager extends HttpServlet {
         }
         // Clean the mutated code only if mutant is accepted
         previousSubmission.clear();
+
+        gameManagingUtils.notifyPlayersOnMutantAdded(newMutant, game);
+
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
@@ -884,6 +886,8 @@ public class MeleeGameManager extends HttpServlet {
             ede.setMutantId(equivMutant.getId());
             ede.setDefenderWon();
             notificationService.post(ede);
+
+            gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
 
             // We need this to pass the mutation information along
             Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
@@ -1060,6 +1064,8 @@ public class MeleeGameManager extends HttpServlet {
                                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(scoreEvent);
 
+                        gameManagingUtils.notifyPlayersOnMutantUpdated(game, mPending);
+
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                             newTest.getId(), mPending.getId());
@@ -1154,6 +1160,8 @@ public class MeleeGameManager extends HttpServlet {
                                         EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT,
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
+
+                                gameManagingUtils.notifyPlayersOnMutantUpdated(game, m);
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence

@@ -17,8 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import DataTable from '../thirdparty/datatables';
-import {DataTablesUtils} from '../main';
-import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
+import {DataTablesUtils, InfoApi, LoadingAnimation, Modal, objects} from '../main';
 
 
 class MutantAccordion {
@@ -164,70 +163,45 @@ class MutantAccordion {
         LoadingAnimation.hideAnimation(modal.body);
     };
 
-    /** @private */
-    _init () {
-        /* Bind "this" to safely use it in callback functions. */
-        const self = this;
+    _renderCategoryAccordion (category) {
+        return `
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="ma-heading-${category.id}">
+                    <button class="${category.mutantIds.length === 0 ? "" : 'ma-covered'} accordion-button collapsed"
+                            type="button" data-bs-toggle="collapse"
+                            data-bs-target="#ma-collapse-${category.id}"
+                            aria-controls="ma-collapse-${category.id}">
+                        <span class="badge bg-attacker me-2 ma-count"
+                              id="ma-count-${category.id}"
+                              ${category.mutantIds.length === 0 ? 'hidden' : ''}>
+                            ${category.mutantIds.length}
+                        </span>
+                        ${category.description}
+                    </button>
+                </h2>
+                <div class="accordion-collapse collapse"
+                     id="ma-collapse-${category.id}"
+                     data-bs-parent="#mutants-accordion"
+                     aria-expanded="false" aria-labelledby="ma-heading-${category.id}">
+                    <div class="accordion-body p-0">
+                        <table id="ma-table-${category.id}" class="table table-sm"></table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 
-        /* Loop through the categories and create a mutant table for each one. */
+    /** @private */
+    async _init () {
+        const mutantAccordionElement = document.getElementById('mutants-accordion');
+
+        /* Loop through the categories and create an accordion with a mutant table for each one. */
         for (const category of this._categories) {
-            const rows = category.mutantIds
-                    .sort()
-                    .map(this._mutants.get, this._mutants);
+            /* Create accordion */
+            mutantAccordionElement.insertAdjacentHTML('beforeend', this._renderCategoryAccordion(category));
 
             /* Create the DataTable. */
-            const tableElement = document.getElementById(`ma-table-${category.id}`);
-            const dataTable = new DataTable(tableElement, {
-                data: rows,
-                columns: [
-                    {data: null, title: '', defaultContent: ''},
-                    {data: this._renderIcon.bind(this), title: ''},
-                    {data: this._renderId.bind(this), title: ''},
-                    {data: this._renderLines.bind(this), title: ''},
-                    {data: this._renderPoints.bind(this), title: ''},
-                    {data: this._renderViewButton.bind(this), title: ''},
-                    {data: this._renderAdditionalButton.bind(this), title: ''}
-                ],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: DataTablesUtils.language({
-                    emptyTable: category.id === 'all'
-                        ? i18n.tr('No mutants.')
-                        : i18n.tr('No mutants in this method.'),
-                    zeroRecords: i18n.tr('No mutants match the selected category.')
-                }),
-                createdRow: function (row, data, index) {
-                    /* Assign function to the "View" buttons. */
-                    let element = row.querySelector('.ma-view-button');
-                    if (element !== null) {
-                        element.addEventListener('click', function (event) {
-                            self._viewMutantModal(data);
-                        })
-                    }
-
-                    /* Assign function to the "View killing test" buttons. */
-                    element = row.querySelector('.ma-view-test-button');
-                    if (element !== null) {
-                        element.addEventListener('click', function (event) {
-                            self._viewTestModal(data);
-                        })
-                    }
-
-                    /* Assign function to the "Mutant <id>" link. */
-                    row.querySelector('.ma-mutant-link').addEventListener('click', async function (event) {
-                        const editor = (await Promise.race([
-                                objects.await('classViewer'),
-                                objects.await('mutantEditor')
-                        ])).editor;
-                        editor.getWrapperElement().scrollIntoView();
-                        editor.scrollIntoView(
-                                {line: data.lines[0] - 1, char: 0},
-                                editor.getScrollInfo().clientHeight / 2 - 10);
-                    });
-                }
-            });
+            const dataTable = this._renderMutantTable(category);
 
             this._dataTablesByCategory.set(category.id, dataTable);
         }
@@ -235,6 +209,69 @@ class MutantAccordion {
         this._initFilters();
 
         LoadingAnimation.hideAnimation(document.getElementById('mutants-accordion'));
+
+        this._pushSocket = await objects.await('pushSocket');
+        this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
+        this._pushSocket.register('highlighting.MutantAddedEvent', event => this.addMutant(event.mutant));
+        this._pushSocket.register('highlighting.MutantUpdatedEvent', event => this.updateMutant(event.mutant));
+    }
+
+    _renderMutantTable(category) {
+        /* Bind "this" to safely use it in callback functions. */
+        const self = this;
+        const rows = category.mutantIds.sort().map(this._mutants.get, this._mutants);
+        const tableElement = document.getElementById(`ma-table-${category.id}`);
+        return new DataTable(tableElement, {
+            data: rows,
+            columns: [
+                {data: null, title: '', defaultContent: ''},
+                {data: this._renderIcon.bind(this), title: ''},
+                {data: this._renderId.bind(this), title: ''},
+                {data: this._renderLines.bind(this), title: ''},
+                {data: this._renderPoints.bind(this), title: ''},
+                {data: this._renderViewButton.bind(this), title: ''},
+                {data: this._renderAdditionalButton.bind(this), title: ''}
+            ],
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: DataTablesUtils.language({
+                emptyTable: category.id === 'all'
+                    ? i18n.tr('No mutants.')
+                    : i18n.tr('No mutants in this method.'),
+                zeroRecords: i18n.tr('No mutants match the selected category.')
+            }),
+            createdRow: function (row, data, index) {
+                /* Assign function to the "View" buttons. */
+                let element = row.querySelector('.ma-view-button');
+                if (element !== null) {
+                    element.addEventListener('click', function (event) {
+                        self._viewMutantModal(data);
+                    })
+                }
+
+                /* Assign function to the "View killing test" buttons. */
+                element = row.querySelector('.ma-view-test-button');
+                if (element !== null) {
+                    element.addEventListener('click', function (event) {
+                        self._viewTestModal(data);
+                    })
+                }
+
+                /* Assign function to the "Mutant <id>" link. */
+                row.querySelector('.ma-mutant-link').addEventListener('click', async function (event) {
+                    const editor = (await Promise.race([
+                        objects.await('classViewer'),
+                        objects.await('mutantEditor')
+                    ])).editor;
+                    editor.getWrapperElement().scrollIntoView();
+                    editor.scrollIntoView(
+                        {line: data.lines[0] - 1, char: 0},
+                        editor.getScrollInfo().clientHeight / 2 - 10);
+                });
+            }
+        });
     }
 
     /**
@@ -244,12 +281,13 @@ class MutantAccordion {
     _initFilters () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
+        this._selectedCategory = 'ALL';
 
         /* Setup filter functionality for mutant-accordion. */
         document.getElementById('ma-filter')
                 .addEventListener('change', function(event) {
-                    const selectedCategory = event.target.value;
-                    self.filterMutants(selectedCategory);
+                    self._selectedCategory = event.target.value;
+                    self.filterMutants(self._selectedCategory);
                 });
     }
 
@@ -359,7 +397,7 @@ class MutantAccordion {
                     // In case of no killing test (-1) or the current user being a defender, the test isn't viewable.
                     return '';
                 } else {
-                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip" 
+                    return `<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap" data-bs-toggle="tooltip"
                                     title="${i18n.tr("This mutant was not killed, but was killable. You can view a test from a different game as an example for how the mutant could have been killed.")}"
                             >${i18n.tr("View Example Killing Test")}</button>`;
                 }
@@ -368,6 +406,99 @@ class MutantAccordion {
             default:
                 return '';
         }
+    }
+
+    /**
+     * Fetches the current mutant data relevant for rendering it in the mutant accordion.
+     *
+     * @param mutantId
+     * @returns {Promise<{categories : Array, mutant : MutantDTO} | null>}
+     */
+    async fetchMutantData(mutantId){
+        const data = await fetch(`${contextPath}api/mutant-accordion?gameId=${this._gameId}&mutantId=${mutantId}`)
+                .then(response => response.json())
+                .catch(error => console.error(error));
+
+        if (data === undefined || !data.categories || !data.mutant) {
+            console.error(`Failed to fetch mutant accordion data for mutant ${mutantId}.`);
+            return null;
+        } else {
+            return data;
+        }
+    }
+
+    /**
+     * Adds a new mutant to the accordion.
+     * @param {MutantDTO} mutant The mutant to add.
+     */
+    async addMutant (mutant) {
+        const data = await this.fetchMutantData(mutant.id);
+        if (!data) return;
+        this._mutants.set(mutant.id, data.mutant);
+
+        for (const category of data.categories) {
+            // update category objects used for count badges when filtering
+            this._categories[this._categories.findIndex(c => c.id === category.id)] = category;
+            // update data tables
+            if (this._dataTablesByCategory.has(category.id)) {
+                /* Update the existing DataTable. */
+                const dataTable = this._dataTablesByCategory.get(category.id);
+                dataTable.row.add(data.mutant).draw(false);
+                /* Update the count badge. */
+                const countElement = document.getElementById('ma-count-' + category.id);
+                countElement.innerText = category.mutantIds.length.toString();
+                countElement.hidden = false;
+                /* Add the ma-covered class */
+                const buttonElement = document.querySelector(`#ma-heading-${category.id} .accordion-button`);
+                buttonElement.classList.add('ma-covered');
+            } else {
+                /* this case will most likely never happen,
+                 * as adding methods (and thus categories) is prohibited by the validation rules */
+                this._categories.push(category);
+                /* Create a new accordion and DataTable for the new category. */
+                const mutantAccordionElement = document.getElementById('mutants-accordion');
+                mutantAccordionElement.insertAdjacentHTML('beforeend', this._renderCategoryAccordion(category));
+                const dataTable = this._renderMutantTable(category);
+                this._dataTablesByCategory.set(category.id, dataTable);
+            }
+        }
+
+        this.filterMutants(this._selectedCategory);
+    }
+
+    /**
+     * Updates the status and data for a mutant (e.g. when marked as equivalent or killed) and redraws the corresponding
+     * rows in the mutant accordion.
+     *
+     * @param mutant The mutant to update.
+     */
+    async updateMutant (mutant) {
+        console.log(`Mutant updated:`, mutant)
+
+        const data = await this.fetchMutantData(mutant.id);
+        if (!data) return;
+        this._mutants.set(mutant.id, data.mutant);
+
+        for (const category of data.categories) {
+            // update category objects used for count badges when filtering
+            this._categories[this._categories.findIndex(c => c.id === category.id)] = category;
+            // update data tables
+            if (this._dataTablesByCategory.has(category.id)) {
+                const dataTable = this._dataTablesByCategory.get(category.id);
+                const row = dataTable.row((index, rowData) => rowData.id === mutant.id);
+                if (row.any()) {
+                    // remove and add instead of row.data(...) to ensure createdRow is called and the event listeners are added
+                    row.remove();
+                    dataTable.row.add(data.mutant).draw(false);
+                } else {
+                    console.error(`Mutant ${mutant.id} not found in category ${category.id}.`);
+                }
+            } else {
+                console.error(`Category ${category.id} not found.`);
+            }
+        }
+
+        this.filterMutants(this._selectedCategory);
     }
 }
 

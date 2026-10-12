@@ -140,7 +140,7 @@ public class AdminPuzzleManagement extends HttpServlet {
                 .toList();
 
         classViewer.init(cut);
-        testAccordion.init(cut, testDTOs);
+        testAccordion.init(cut, testDTOs, -1);
         mutantAccordion.init(cut, mutantDTOs, -1);
 
         // Resolve the puzzle text for the admin's locale

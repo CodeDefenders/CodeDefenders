@@ -17,8 +17,26 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Popover} from '../thirdparty/bootstrap';
-import {objects} from '../main';
+import {objects, PushSocket} from '../main';
 
+
+/**
+ * @typedef {Object} GHMutantDTO
+ * @description Data transfer object for mutants used in Game Highlighting.
+ * @property {number} id The mutant's id.
+ * @property {score} score The mutant's score.
+ * @property {string} lines The lines changed by the mutant.
+ * @property {List<number>} mutatedLines The line numbers changed by the mutant.
+ * @property {string} creatorName The name of the mutant's creator.
+ * @property {string} status The mutant's status (ALIVE, KILLED, FLAGGED, EQUIVALENT).
+ * @property {boolean} canClaim Whether the mutant can be claimed as equivalent by the current player.
+ */
+
+/**
+ * @typedef {Object} GHTestDTO
+ * @description Data transfer object for tests used in Game Highlighting.
+ * @property {number} id The test's id.
+ */
 
 class GameHighlighting {
 
@@ -101,6 +119,14 @@ class GameHighlighting {
          * @private
          */
         this._activePopover = null;
+
+        /**
+         * Maps line numbers (1-indexed) and mutant status to the HTML element containing the mutant icons for the line.
+         *
+         * @type {Map<number, Map<string, HTMLElement>>}
+         * @private
+         */
+        this._mutantIconsPerLine = new Map();
     }
 
     async initAsync () {
@@ -112,6 +138,8 @@ class GameHighlighting {
             objects.await('classViewer'),
             objects.await('mutantEditor')
         ])).editor;
+
+        await this._initSocket();
 
         return this;
     }
@@ -146,6 +174,10 @@ class GameHighlighting {
      * @private
      */
     _createMutantIcons (line, mutantsOnLine) {
+        if (!this._mutantIconsPerLine.has(line)) {
+            this._mutantIconsPerLine.set(line, new Map());
+        }
+
         /* Split the mutants list by the mutant status: {ALIVE: [...], KILLED: [...], ...} */
         const sortedMutants = {};
         for (const mutantStatus in GameHighlighting.MutantStatuses) {
@@ -169,6 +201,7 @@ class GameHighlighting {
             mutantIcon.dataset.count = sortedMutants[mutantStatus].length;
             mutantIcon.dataset.canClaim = String(mutantsOnLine.some(element => element.canClaim));
 
+            this._mutantIconsPerLine.get(line).set(mutantStatus, mutantIcon);
             mutantIcons.appendChild(mutantIcon);
         }
 
@@ -415,6 +448,157 @@ class GameHighlighting {
      */
     clearMutants () {
         this._editor.clearGutter('CodeMirror-mutantIcons');
+    }
+
+
+    /**
+     * Register for WebSocket events.
+     * @private
+     */
+    async _initSocket () {
+        this._pushSocket = await objects.await('pushSocket');
+        this._pushSocket.subscribe('registration.GameHighlightingRegistrationEvent', {gameId: this._gameId});
+        this._pushSocket.register('highlighting.MutantAddedEvent', this._onMutantAdded.bind(this));
+        this._pushSocket.register('highlighting.MutantUpdatedEvent', this._onMutantUpdated.bind(this));
+        this._pushSocket.register('highlighting.TestAddedEvent', this._onTestAdded.bind(this));
+    }
+
+    /**
+     * @typedef {Object} MutantAddedEvent
+     * @property {GHMutantDTO} mutant The added mutant.
+     * @property {number} gameId The id of the game the mutant was added in.
+     */
+
+    /**
+     * @typedef {Object} TestAddedEvent
+     * @property {GHTestDTO} test The added test.
+     * @property {number[]} coveredLines The lines covered by the added test.
+     */
+
+    /**
+     * Event handler for when a new mutant is added.
+     * This adds the mutant to the highlighting and updates the popover if it is active.
+     *
+     * @param {MutantAddedEvent} event The WebSocket event.
+     * @private
+     */
+    _onMutantAdded (event) {
+        const mutantId = event.mutant.id;
+        console.log("added mutant: ", event.mutant);
+
+        this._mutants.set(mutantId, event.mutant);
+        for (const line of event.mutant.mutatedLines) {
+            if (!this._mutantIdsPerLine.has(line)) {
+                this._mutantIdsPerLine.set(line, []);
+            }
+            this._mutantIdsPerLine.get(line).push(mutantId);
+
+            /* add mutant icon if no previous mutants with the same status exist on the line or change count on icon */
+            const mutantsOnLine = this._mutantIdsPerLine.get(line).map(mId => this._mutants.get(mId));
+            const other = mutantsOnLine.filter(m => m.id !== mutantId && m.status === event.mutant.status);
+            if (other.length) {
+                /* change count of status-category */
+                this._mutantIconsPerLine.get(line).get(event.mutant.status).dataset.count = String(other.length + 1);
+
+            } else {
+                /* Remove all current icons of this line */
+                this._mutantIconsPerLine.get(line)?.forEach(icon => icon.remove());
+                this._mutantIconsPerLine.get(line)?.clear();
+
+                /* create new icons */
+                const marker = this._createMutantIcons(line, mutantsOnLine);
+                this._addPopoverTriggerToMutantIcons(marker);
+                this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+            }
+
+            // animate icon
+            const icon = this._mutantIconsPerLine.get(line).get(event.mutant.status);
+            icon.classList.add('mutant-update-animation');
+            icon.addEventListener('animationend', function () {
+                icon.classList.remove('mutant-update-animation');
+            }, {once: true});
+        }
+    }
+
+    _onTestAdded (event) {
+        const testId = event.test.id;
+        console.log("added test: ", event.test);
+        this.clearCoverage();
+
+        const showAltCov = document.querySelector('#highlighting-switch');
+        const isBattleground = !showAltCov;
+        let tipl = null;
+        if (isBattleground) { // battleground
+            this._tests.set(testId, event.test);
+            tipl = this._testIdsPerLine;
+        } else { // melee
+            this._alternativeTests.set(testId, event.test);
+            tipl = this._alternativeTestIdsPerLine;
+        }
+
+        for (const line of event.coveredLines) {
+            if (!tipl.has(line)) {
+                tipl.set(line, []);
+            }
+            tipl.get(line).push(testId);
+        }
+
+        if (isBattleground || !showAltCov.checked) {
+            this.highlightCoverage();
+        } else {
+            this.highlightAlternativeCoverage();
+        }
+
+        // animate coverage update if the shown coverage is the one that was updated
+        if (isBattleground || showAltCov.checked) {
+            for (const line of event.coveredLines) {
+                this._editor.addLineClass(line - 1, 'background', 'coverage-update-animation');
+                setTimeout(() => {
+                    this._editor.removeLineClass(line - 1, 'background', 'coverage-update-animation');
+                }, 400); // animation duration
+            }
+        }
+    }
+
+    /**
+     * @typedef {Object} MutantUpdatedEvent
+     * @property {GHMutantDTO} mutant The added mutant.
+     * @property {number} gameId The id of the game the mutant was added in.
+     */
+
+    /**
+     * Event handler for when a mutant is updated.
+     * This updates the mutant icon/counts of the highlighting and updates the popover if it is active.
+     *
+     * @param {MutantUpdatedEvent} event The WebSocket event.
+     * @private
+     */
+    _onMutantUpdated (event) {
+        const mutantId = event.mutant.id;
+        console.log("updated mutant: ", event.mutant);
+
+        this._mutants.set(mutantId, event.mutant);
+
+        for (const line of event.mutant.mutatedLines) {
+            /* Remove all current icons of this line */
+            this._mutantIconsPerLine.get(line)?.forEach(icon => icon.remove());
+            this._mutantIconsPerLine.get(line)?.clear();
+
+            /* create new icons */
+            const mutantsOnLine = this._mutantIdsPerLine.get(line).map(id => this._mutants.get(id));
+            const marker = this._createMutantIcons(line, mutantsOnLine);
+            this._addPopoverTriggerToMutantIcons(marker);
+            this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+
+            /* animate icon */
+            const icon = this._mutantIconsPerLine.get(line).get(event.mutant.status);
+            if (icon) {
+                icon.classList.add('mutant-update-animation');
+                icon.addEventListener('animationend', function () {
+                    icon.classList.remove('mutant-update-animation');
+                }, {once: true});
+            }
+        }
     }
 }
 

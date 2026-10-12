@@ -465,8 +465,7 @@ public class MutantRepository {
                 WHERE Mutant_ID = ? AND Alive = 1;
         """;
 
-        queryRunner.update(query,
-                score, mutant.getId());
+        queryRunner.update(query, score, mutant.getId());
     }
 
     public boolean killMutant(Mutant mutant, Equivalence equivalence) {

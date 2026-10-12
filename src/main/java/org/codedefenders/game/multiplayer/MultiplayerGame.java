@@ -165,6 +165,11 @@ public class MultiplayerGame extends AbstractMultiplayerGame {
         }
     }
 
+    @Override
+    public boolean isUserAuthorized(int userId) {
+        return getRole(userId) != Role.NONE;
+    }
+
     public boolean isMayChooseRoles() {
         return mayChooseRoles;
     }

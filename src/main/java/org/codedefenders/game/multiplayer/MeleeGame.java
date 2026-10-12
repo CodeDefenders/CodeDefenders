@@ -99,6 +99,27 @@ public class MeleeGame extends AbstractMultiplayerGame {
         }
     }
 
+    @Override
+    public boolean isUserAuthorized(int userId) {
+        return getRole(userId) != Role.NONE;
+    }
+
+    public int getGameDurationMinutes() {
+        return gameDurationMinutes;
+    }
+
+    public void setGameDurationMinutes(int gameDurationMinutes) {
+        this.gameDurationMinutes = gameDurationMinutes;
+    }
+
+    public long getStartTimeUnixSeconds() {
+        return startTimeUnixSeconds;
+    }
+
+    public long getFinishTimeUnixSeconds() {
+        return finishTimeUnixSeconds;
+    }
+
     public Optional<Integer> getClassroomId() {
         return Optional.ofNullable(classroomId);
     }

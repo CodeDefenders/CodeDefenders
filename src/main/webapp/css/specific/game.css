@@ -67,6 +67,31 @@
     gap: .5rem; /* Corresponds to .gap-2 in Bootstrap. */
 }
 
+#game-container .score-badge-group .badge {
+    border-radius: 50rem 0 0 50rem;
+}
+#game-container .score-badge-group .btn {
+    border-radius: 0 50rem 50rem 0;
+    border: 2px solid;
+    background-color: #f8f9fa;
+}
+#game-container .score-badge-group.Melee .btn {
+    color: var(--bg-player);
+    border-color: var(--bg-player);
+}
+#game-container .score-badge-group.Melee .btn:hover {
+    color: #fff;
+    background-color: var(--bg-player);
+}
+#game-container .score-badge-group.Battleground .btn {
+    color: var(--bg-defender);
+    border-color: var(--bg-defender);
+}
+#game-container .score-badge-group.Battleground .btn:hover {
+    color: #fff;
+    background-color: var(--bg-defender);
+}
+
 /* Resizable game components.
 ----------------------------------------------------------------------------- */
 
@@ -88,4 +113,32 @@
     border-radius: 5px;
     width: 100%;
     padding: .5rem 1rem;
+}
+
+
+/* Live Game Highlighting
+----------------------------------------------------------------------------- */
+.mutant-update-animation {
+    animation: mutant-update-animation .66s ease-out;
+}
+@keyframes mutant-update-animation {
+    0% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+    90% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.coverage-update-animation {
+    animation: coverage-update-animation 400ms ease-out; /* animation-duration has to match JS timeout */
+}
+@keyframes coverage-update-animation {
+    50% {
+        background-color: var(--fg-defender);
+    }
 }

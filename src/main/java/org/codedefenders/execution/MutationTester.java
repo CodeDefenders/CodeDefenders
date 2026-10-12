@@ -39,9 +39,11 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.notification.INotificationService;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.PreparedMessage;
 import org.slf4j.Logger;
@@ -71,22 +73,27 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 public class MutationTester implements IMutationTester {
     private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
-    protected BackendExecutorService backend;
-    protected EventDAO eventDAO;
-    protected UserRepository userRepo;
-    protected TestRepository testRepo;
-    protected MutantRepository mutantRepo;
+    protected final BackendExecutorService backend;
+    protected final EventDAO eventDAO;
+    protected final UserRepository userRepo;
+    protected final TestRepository testRepo;
+    protected final MutantRepository mutantRepo;
+    protected final INotificationService notificationService;
+    protected final GameManagingUtils gameManagingUtils;
 
     protected boolean useMutantCoverage;
 
     public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            TestRepository testRepo, MutantRepository mutantRepo, boolean useMutantCoverage) {
+                          TestRepository testRepo, MutantRepository mutantRepo, INotificationService notificationService,
+                          boolean useMutantCoverage, GameManagingUtils gameManagingUtils) {
         this.backend = backend;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
+        this.notificationService = notificationService;
         this.useMutantCoverage = useMutantCoverage;
+        this.gameManagingUtils = gameManagingUtils;
     }
 
     @Override
@@ -126,6 +133,7 @@ public class MutationTester implements IMutationTester {
             if (testVsMutant(test, mutant)) {
                 killed++;
                 killedMutants.add(mutant);
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
             }
         }
 
@@ -148,6 +156,7 @@ public class MutationTester implements IMutationTester {
                 // mutant.setScore(Scorer.score(game, mutant, missedTests));
                 // mutant.update();
                 int score = Scorer.score(game, mutant, missedTests);
+                mutant.setScore(score);
                 mutantRepo.incrementMutantScore(mutant, score);
             }
         }
@@ -196,6 +205,8 @@ public class MutationTester implements IMutationTester {
                         test.getId() + ":" + mutant.getId(),
                         EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(scoreEvent);
+
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
             } else {
                 Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
                         test.getId() + ":" + mutant.getId(),
@@ -299,6 +310,8 @@ public class MutationTester implements IMutationTester {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
 
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+
                 // return as soon as the first test kills the mutant we return
                 return new PreparedMessage(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
             }
@@ -318,6 +331,7 @@ public class MutationTester implements IMutationTester {
             // missedTests));
             // mutant.update();
             int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            mutant.setScore(score);
             mutantRepo.incrementMutantScore(mutant, score);
         }
 
@@ -373,6 +387,8 @@ public class MutationTester implements IMutationTester {
         mutant.setKillMessage(executedTarget.message);
         mutantRepo.updateMutantKillMessageForMutant(mutant);
 
+        gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
+
         return true;
     }
 
@@ -402,6 +418,7 @@ public class MutationTester implements IMutationTester {
                 testRepo.incrementMutantsKilled(test);
                 mutant.setKillMessage(executedTarget.message);
                 mutantRepo.updateMutantKillMessageForMutant(mutant);
+                gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
             } else {
                 logger.info(
                         "Test {} would have killed Mutant {} and resolve equivalence,"
@@ -447,6 +464,7 @@ public class MutationTester implements IMutationTester {
 
             if (testVsMutant(test, mutant)) {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
+                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
                 ArrayList<Mutant> mlist = new ArrayList<>();
                 mlist.add(mutant);
                 // TODO Scoring MeleeGames is still open

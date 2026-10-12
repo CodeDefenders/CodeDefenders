@@ -32,7 +32,7 @@ import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.util.CDIUtil;
 
 /**
- * <p>Provides data for the scoreboard game component.</p>
+ * <p>Provides data for the multiplayer scoreboard game component.</p>
  * <p>Bean Name: {@code scoreboard}</p>
  */
 @RequestScoped
