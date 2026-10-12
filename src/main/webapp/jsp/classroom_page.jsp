@@ -1135,43 +1135,43 @@
                     columns: [
                         {
                             data: 'gameId',
-                            title: 'Game ID',
+                            title: '${i18n.tr("Game ID")}',
                             type: 'number',
                             width: '5em'
                         },
                         {
                             data: 'mode',
-                            title: 'Game Mode',
+                            title: '${i18n.tr("Game Mode")}',
                             type: 'string',
                             render: renderGameMode
                         },
                         {
                             data: 'cut',
-                            title: 'Class',
+                            title: '${i18n.tr("Class")}',
                             type: 'string',
                             render: renderCut
                         },
                         {
                             data: null,
-                            title: 'Players',
+                            title: '${i18n.tr("Players")}',
                             type: 'string',
                             render: renderPlayers
                         },
                         {
                             data: 'role',
-                            title: 'Your Role',
+                            title: '${i18n.tr("Your Role")}',
                             type: 'html',
                             render: renderGameRole
                         },
                         {
                             data: null,
-                            title: 'State',
+                            title: '${i18n.tr("State")}',
                             type: 'html',
                             render: renderGameState
                         },
                         {
                             data: null,
-                            title: 'Link',
+                            title: '${i18n.tr("Link")}',
                             type: 'html',
                             render: renderGameActions,
                             width: '2em'
