@@ -20,6 +20,7 @@
 --%>
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
@@ -28,16 +29,15 @@
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 <%--@elvariable id="fixtures" type="java.util.List"--%>
-<%--@elvariable id="currentFixture" type="org.codedefenders.game.multiplayer.MutleFixture"--%>
-<%--@elvariable id="currentCase" type="org.codedefenders.game.multiplayer.MutleCase"--%>
+<%--@elvariable id="currentFixture" type="org.codedefenders.arcade.mutle.service.MutleFixtureView"--%>
+<%--@elvariable id="currentCase" type="org.codedefenders.arcade.mutle.service.MutleStateView"--%>
 
 <p:main_page title="${i18n.tr('Mutle')}">
     <link rel="stylesheet" href="${url.forPath('/css/mutle.css')}">
     <main class="container">
         <section class="mb-5 mt-3" aria-labelledby="mutle-explanation-title">
             <h1 id="mutle-explanation-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h1>
-            <p class="text-muted">${i18n.tr("This game mode is similar to the concept known from Wordle or Mastermind; just with finding mutants in Java code.")}</p>
-            <p>${i18n.tr("You have six attempts to write a test that detects/kills the mutant. The only problem: Initially you know nothing about the mutant. But after each test you write, you get feedback in form of a color that tells you if you covered the method or line where the mutation is located. Using this information you have to locate the mutated line and write a test that successfully detects it.")}</p>
+            <t:mutle_instructions/>
         </section>
 
         <c:if test="${not login.loggedIn}">
@@ -46,52 +46,8 @@
             </p>
         </c:if>
 
-        <section class="mutle-hero p-4 p-md-5 mb-5">
-            <h2>${empty currentFixture ? i18n.tr('Mutle coming soon') : i18n.tr('This week\'s mutle')}</h2>
-            <p class="lead mb-2">
-                <c:choose>
-                    <c:when test="${not empty currentCase}">
-                        ${i18n.tr('Series')} ${currentCase.series} · <c:out value="${currentCase.title}" />
-                    </c:when>
-                    <c:when test="${not empty currentFixture}">
-                        ${i18n.tr('Series')} ${currentFixture.series} · <c:out value="${currentFixture.title}" />
-                    </c:when>
-                    <c:otherwise>${i18n.tr('The first mutle has not been published yet.')}</c:otherwise>
-                </c:choose>
-            </p>
-            <p class="mb-4">${empty currentFixture
-                    ? i18n.tr('Check back when the semester begins.')
-                    : i18n.tr('You have six tests to isolate the hidden change.')}</p>
-            <c:if test="${not empty currentCase}">
-                <p class="mb-3">
-                    <span class="badge bg-${currentCase.solved ? 'success' : (currentCase.failed ? 'danger' : (currentCase.expired ? 'secondary' : 'primary'))} text-white">
-                        <i class="fa fa-${currentCase.solved ? 'check' : (currentCase.failed ? 'close' : (currentCase.expired ? 'hourglass-end' : 'cog'))}"></i>
-                        ${currentCase.solved ? i18n.tr('Solved') : (currentCase.failed ? i18n.tr('Failed in six') : (currentCase.expired ? i18n.tr('Expired') : i18n.tr('In progress')))}
-                    </span>
-                    <span class="ms-2">${currentCase.acceptedGuesses}/${currentCase.acceptedGuesses + currentCase.remainingGuesses} ${i18n.tr('guesses')}</span>
-                </p>
-            </c:if>
-            <c:choose>
-                <c:when test="${empty currentFixture}">
-                    <!-- no button -->
-                </c:when>
-                <c:when test="${empty currentCase}">
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}">
-                            ${i18n.tr('Solve current mutle')}
-                    </a>
-                </c:when>
-                <c:when test="${currentCase.solved || currentCase.failed || currentCase.expired}">
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
-                            ${i18n.tr('View current mutle')}
-                    </a>
-                </c:when>
-                <c:otherwise>
-                    <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
-                            ${i18n.tr('Continue current mutle')}
-                    </a>
-                </c:otherwise>
-            </c:choose>
-        </section>
+        <t:mutle_banner fixture="${currentFixture}" currentCase="${currentCase}"/>
+
 
         <c:if test="${login.admin}">
             <section class="card mb-5" aria-labelledby="mutle-practice-title">

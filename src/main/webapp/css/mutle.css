@@ -19,9 +19,13 @@
 .mutle-hero {
     overflow: hidden;
     border-radius: 1rem;
-    background: linear-gradient(90deg, rgba(15, 23, 42, .96) 0%, rgba(15, 23, 42, .76) 48%, rgba(15, 23, 42, .28)), url('../images/mutle/hero.jpg') center/cover;
+    background: linear-gradient(90deg, rgba(15, 23, 42, .96) 0%, rgba(15, 23, 42, .76) 48%, rgba(15, 23, 42, .6)), url('../images/mutle/hero.jpg') center/cover;
     color: #fff;
     text-shadow: 0 1px 2px #000;
+}
+
+.mutle-instructions li + li {
+    margin-top: .5rem;
 }
 
 .mutle-play {

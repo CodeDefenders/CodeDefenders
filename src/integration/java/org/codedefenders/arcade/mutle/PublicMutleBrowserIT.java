@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -85,6 +86,12 @@ class PublicMutleBrowserIT {
         assertTrue(browser.getCurrentUrl().contains("/mutle/play"));
         assertEquals("Appointment Book", browser.findElement(By.id("mutle-title")).getText());
         assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
+        String instructions = readInstructions();
+        browser.get(BASE + "/mutle");
+        assertEquals(instructions, browser.findElement(By.cssSelector(".mutle-instructions")).getText());
+        browser.findElement(By.cssSelector("[aria-labelledby='current-mutle-title'] a")).click();
+        waitForCase();
+        assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
         submit(NONE);
         new WebDriverWait(browser, 40).until(driver -> driver.findElement(By.id("mutle-remaining")).getText().contains("5"));
         assertEquals(1, browser.findElements(By.cssSelector("#mutle-history .accordion-item")).size());
@@ -117,6 +124,7 @@ class PublicMutleBrowserIT {
     void accountGameIsSeparateAndUsesTheSameSandbox() throws Exception {
         browser.get(BASE + "/mutle/play");
         waitForCase();
+        String guestInstructions = readInstructions();
         submit(NONE);
         new WebDriverWait(browser, 40).until(driver -> driver.findElement(By.id("mutle-remaining")).getText().contains("5"));
         browser.get(BASE + "/login");
@@ -126,6 +134,7 @@ class PublicMutleBrowserIT {
         new WebDriverWait(browser, 10).until(driver -> !driver.getCurrentUrl().contains("/login"));
         browser.get(BASE + "/mutle/play");
         waitForCase();
+        assertEquals(guestInstructions, readInstructions());
         assertEquals(0, browser.findElements(By.cssSelector("#mutle-history .accordion-item")).size());
         assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
         for (String payload : RUNNER_ATTACKS) {
@@ -147,6 +156,23 @@ class PublicMutleBrowserIT {
         assertEquals(1, browser.findElements(By.cssSelector("#mutle-history .mutle-history-mark.line")).size());
         submit(PROOF);
         new WebDriverWait(browser, 40).until(driver -> "Solved".equals(driver.findElement(By.id("mutle-status")).getText()));
+    }
+
+    /** The same guidance works with a keyboard for both guests and signed-in players. */
+    private String readInstructions() {
+        assertTrue(browser.findElement(By.id("mutle-goal")).isDisplayed());
+        var instructions = browser.findElement(By.cssSelector("#mutle-how-to-play .mutle-instructions"));
+        var disclosure = browser.findElement(By.id("mutle-how-to-play"));
+        assertNull(disclosure.getAttribute("open"));
+        var toggle = browser.findElement(By.cssSelector("#mutle-how-to-play summary"));
+        toggle.sendKeys(Keys.ENTER);
+        new WebDriverWait(browser, 10).until(driver -> disclosure.getAttribute("open") != null);
+        String text = instructions.getText();
+        assertTrue(text.contains("JUnit test"));
+        assertTrue(text.contains("six attempts"));
+        toggle.sendKeys(Keys.ENTER);
+        new WebDriverWait(browser, 10).until(driver -> disclosure.getAttribute("open") == null);
+        return text;
     }
 
     private void waitForCase() {

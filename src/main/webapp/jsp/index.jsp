@@ -20,6 +20,7 @@
 --%>
 <%@ page pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="p" tagdir="/WEB-INF/tags/page" %>
 
 <%@ page import="java.util.List" %>
@@ -43,6 +44,7 @@
 <p:main_page title="${i18n.tr('Welcome to Code Defenders')}">
     <jsp:attribute name="additionalImports">
         <link href="${url.forPath("/css/specific/landing_page.css")}" rel="stylesheet">
+        <link href="${url.forPath('/css/mutle.css')}" rel="stylesheet">
     </jsp:attribute>
 
     <jsp:body>
@@ -57,24 +59,15 @@
                 </h1>
             </div>
 
-            <div class="d-flex justify-content-center">
+            <div class="d-flex justify-content-center mb-4">
                 <a href="${url.forPath(Paths.LOGIN)}"
-           class="btn btn-lg btn-primary btn-highlight"
-           style="margin-bottom: 5rem;">
-                ${i18n.tr('Log in or Sign up')}
+                   class="btn btn-lg btn-primary btn-highlight">
+                    ${i18n.tr('Log in or Sign up')}
                 </a>
             </div>
 
             <c:if test="${not empty mutleFixture}">
-                <section class="bg-light rounded-6-md p-4 mb-4 text-center" aria-labelledby="landing-mutle-title">
-                    <h2 id="landing-mutle-title">${i18n.tr('Mutle: weekly mutation puzzles')}</h2>
-                    <p>${i18n.tr('Find the hidden change in Java code with six tests.')}</p>
-                    <p>${i18n.tr('Series')} ${mutleFixture.series} · <c:out value="${mutleFixture.title}"/></p>
-                    <a class="btn btn-lg btn-primary" href="${url.forPath(Paths.MUTLE_PLAY)}">
-                        ${i18n.tr('Play Mutle')}
-                    </a>
-                    <p class="small text-muted mt-3 mb-0">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
-                </section>
+                <t:mutle_banner fixture="${mutleFixture}" homepage="${true}"/>
             </c:if>
 
             <div class="anim">

@@ -66,7 +66,7 @@
             </p>
         </c:if>
         <div id="mutle-content" class="d-none">
-            <header class="mutle-case-header mb-5">
+            <header class="mutle-case-header mb-4">
                 <div class="mutle-case-copy">
                     <p class="mutle-series mb-2" id="mutle-series"></p>
                     <h1 id="mutle-title"></h1>
@@ -77,6 +77,17 @@
                     <p id="mutle-remaining" class="mb-0" role="status" aria-live="polite" aria-atomic="true"></p>
                 </div>
             </header>
+            <section class="card mb-4" aria-label="${i18n.tr('How to play')}">
+                <div class="card-body">
+                    <p class="mb-2" id="mutle-goal">${i18n.tr('Find the hidden change in six tests. Write a test that passes on the original code but fails on the mutant. After each attempt, feedback tells you whether you covered the mutated method or line.')}</p>
+                    <details id="mutle-how-to-play">
+                        <summary class="fw-semibold">${i18n.tr('How to play')}</summary>
+                        <div class="mt-3">
+                            <t:mutle_instructions/>
+                        </div>
+                    </details>
+                </div>
+            </section>
             <div id="mutle-notice" class="alert d-none" role="status" aria-live="polite">
                 <span id="mutle-notice-spinner" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
                 <span id="mutle-notice-message"></span>

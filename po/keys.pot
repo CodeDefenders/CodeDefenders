@@ -12491,3 +12491,21 @@ msgstr ""
 #: src/main/java/org/codedefenders/servlets/api/MutleApiServlet.java:125
 msgid "Your test could not run within the execution limits. Please simplify it or try again later."
 msgstr ""
+
+msgid "How to play"
+msgstr ""
+
+msgid "Find the hidden change in six tests. Write a test that passes on the original code but fails on the mutant. After each attempt, feedback tells you whether you covered the mutated method or line."
+msgstr ""
+
+msgid "Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and the hidden answer is a small change to the code: a mutant."
+msgstr ""
+
+msgid "Read the original class and its specification. The mutant is hidden until the game ends."
+msgstr ""
+
+msgid "Use the test editor to write a JUnit test that passes on the original class but fails on the mutant. This kills the mutant and solves the puzzle."
+msgstr ""
+
+msgid "If the mutant survives, use the feedback to narrow down the change: no relevant coverage, the mutated method covered, or the changed line covered. Select an attempt to see its test and coverage, then refine your next test. You have six attempts."
+msgstr ""

@@ -10908,3 +10908,21 @@ msgstr "Mutle spielen"
 
 msgid "Guest progress stays in this browser session. Log in to play with your account and earn achievements."
 msgstr "Dein Gastfortschritt bleibt in dieser Browsersitzung. Melde dich an, um mit deinem Benutzerkonto zu spielen und Errungenschaften zu erhalten."
+
+msgid "How to play"
+msgstr "So wird gespielt"
+
+msgid "Find the hidden change in six tests. Write a test that passes on the original code but fails on the mutant. After each attempt, feedback tells you whether you covered the mutated method or line."
+msgstr "Finde die versteckte Änderung mit sechs Tests. Schreibe einen Test, der beim Originalcode besteht, aber beim Mutanten fehlschlägt. Nach jedem Versuch zeigt dir die Rückmeldung, ob du die mutierte Methode oder Zeile abgedeckt hast."
+
+msgid "Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and the hidden answer is a small change to the code: a mutant."
+msgstr "Wie bei Wordle oder Mastermind erhältst du bei Mutle nach jedem Versuch eine Rückmeldung. Hier sind deine Versuche Java-Tests und die versteckte Lösung ist eine kleine Änderung am Code: ein Mutant."
+
+msgid "Read the original class and its specification. The mutant is hidden until the game ends."
+msgstr "Lies die Originalklasse und ihre Spezifikation. Der Mutant bleibt bis zum Spielende verborgen."
+
+msgid "Use the test editor to write a JUnit test that passes on the original class but fails on the mutant. This kills the mutant and solves the puzzle."
+msgstr "Schreibe im Testeditor einen JUnit-Test, der bei der Originalklasse besteht, aber beim Mutanten fehlschlägt. Damit tötest du den Mutanten und löst das Rätsel."
+
+msgid "If the mutant survives, use the feedback to narrow down the change: no relevant coverage, the mutated method covered, or the changed line covered. Select an attempt to see its test and coverage, then refine your next test. You have six attempts."
+msgstr "Wenn der Mutant überlebt, grenze die Änderung anhand der Rückmeldung ein: keine relevante Abdeckung, mutierte Methode abgedeckt oder geänderte Zeile abgedeckt. Wähle einen Versuch aus, um seinen Test und seine Abdeckung zu sehen, und verbessere dann deinen nächsten Test. Du hast sechs Versuche."
