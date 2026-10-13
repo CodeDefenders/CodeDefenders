@@ -10915,8 +10915,8 @@ msgstr "So wird gespielt"
 msgid "Find the hidden change in six tests. Write a test that passes on the original code but fails on the mutant. After each attempt, feedback tells you whether you covered the mutated method or line."
 msgstr "Finde die versteckte Änderung mit sechs Tests. Schreibe einen Test, der beim Originalcode besteht, aber beim Mutanten fehlschlägt. Nach jedem Versuch zeigt dir die Rückmeldung, ob du die mutierte Methode oder Zeile abgedeckt hast."
 
-msgid "Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and the hidden answer is a small change to the code: a mutant."
-msgstr "Wie bei Wordle oder Mastermind erhältst du bei Mutle nach jedem Versuch eine Rückmeldung. Hier sind deine Versuche Java-Tests und die versteckte Lösung ist eine kleine Änderung am Code: ein Mutant."
+msgid "Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and your goal is to find and kill a hidden mutant: a small change to the code."
+msgstr "Wie bei Wordle oder Mastermind erhältst du bei Mutle nach jedem Versuch eine Rückmeldung. Hier sind deine Versuche Java-Tests und dein Ziel ist es, einen versteckten Mutanten – eine kleine Änderung am Code – zu finden und zu töten."
 
 msgid "Read the original class and its specification. The mutant is hidden until the game ends."
 msgstr "Lies die Originalklasse und ihre Spezifikation. Der Mutant bleibt bis zum Spielende verborgen."

@@ -23,7 +23,7 @@
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
 <div class="mutle-instructions">
-    <p>${i18n.tr('Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and the hidden answer is a small change to the code: a mutant.')}</p>
+    <p>${i18n.tr('Like Wordle or Mastermind, Mutle gives you feedback after each guess. Here, your guesses are Java tests, and your goal is to find and kill a hidden mutant: a small change to the code.')}</p>
     <ol class="mb-0">
         <li>${i18n.tr('Read the original class and its specification. The mutant is hidden until the game ends.')}</li>
         <li>${i18n.tr('Use the test editor to write a JUnit test that passes on the original class but fails on the mutant. This kills the mutant and solves the puzzle.')}</li>
