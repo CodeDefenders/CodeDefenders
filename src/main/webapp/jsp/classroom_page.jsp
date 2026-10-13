@@ -935,11 +935,11 @@
                 }
                 switch (data.mode) {
                     case GameMode.PARTY:
-                        return `<span class="players" style="cursor: pointer;">
+                        return `<span class="players" style="cursor: default;">
                             <span class="badge bg-attacker">\${attackers}</span> - <span class="badge bg-defender">\${defenders}</span>
                         </span>`;
                     default:
-                        return `<span class="players" style="cursor: pointer;"><span class="badge bg-player">\${players}</span></span>`;
+                        return `<span class="players" style="cursor: default;"><span class="badge bg-player">\${players}</span></span>`;
                 }
             };
 
