@@ -423,6 +423,20 @@ class AntRunnerTest {
     }
 
     @Test
+    void securityManagerIsNotOnTheSubmittedCompilationClasspath() throws Exception {
+        Fixture fixture = fixture();
+        fixture.test("""
+                import org.junit.Test;
+                public class SandboxJUnitProbe {
+                    @Test public void test() { new org.codedefenders.execution.TestSecurityManager(); }
+                }
+                """);
+        AntProcessResult result = fixture.run("compile-test");
+        assertFalse(result.compiled(), result.getErrorMessage());
+        assertTrue(result.getErrorMessage().contains("TestSecurityManager"), result.getErrorMessage());
+    }
+
+    @Test
     void runnerFailureWithoutATestReportIsRejected() throws Exception {
         Path report = root.resolve("result.xml");
         assertThrows(AntRunner.ExecutionLimitException.class,

@@ -75,17 +75,6 @@ public class MutleServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        if (!login.isLoggedIn() && gameId != null) {
-            try {
-                if (!guest.owns(Integer.parseInt(gameId))) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                    return;
-                }
-            } catch (NumberFormatException exception) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return;
-            }
-        }
         String fixtureKey = request.getParameter("fixture");
         if (fixtureKey != null && (gameId != null || !login.isAdmin()
                 || mutleService.fixtures().stream().noneMatch(fixture -> fixture.fixtureKey().equals(fixtureKey)))) {

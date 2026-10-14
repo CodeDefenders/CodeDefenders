@@ -85,8 +85,7 @@ public class MutleApiServlet extends HttpServlet {
             if (anonymous) {
                 guestLimits.request(request.getRemoteAddr());
             }
-            JsonObject body = (anonymous ? JsonParser.parseString(readBody(request.getReader()))
-                    : JsonParser.parseReader(request.getReader())).getAsJsonObject();
+            JsonObject body = JsonParser.parseString(readBody(request.getReader())).getAsJsonObject();
             if (anonymous) {
                 request.getSession().setMaxInactiveInterval(SESSION_TIMEOUT_SECONDS);
             }

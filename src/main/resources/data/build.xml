@@ -53,8 +53,6 @@
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
 		<pathelement path="${common.cp}"/>
 
-		<pathelement location="${codedef.library}/test-security.jar"/>
-
 		<!-- JaCoCo -->
 		<pathelement path="${jacoco.cp}"/>
 
@@ -93,6 +91,8 @@
 				<!-- JaCoCo sets this property when it extracts the agent for the coverage task. -->
 				<sysproperty key="jacoco.agent.file" value="${_jacoco.agentFile}"/>
 
+				<!-- The enforcement class is needed at runtime, but must not be visible while compiling submissions. -->
+				<classpath location="${codedef.library}/test-security.jar"/>
 				<classpath refid="test.cp"/>
 				<classpath location="${test.file}"/>
 

@@ -38,10 +38,13 @@ import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.service.I18nService;
 import org.junit.jupiter.api.Test;
+import org.xnap.commons.i18n.I18n;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -54,6 +57,37 @@ class MutleApiServletTest {
         assertEquals(32_768, MutleApiServlet.readBody(new StringReader("a".repeat(32_768))).length());
         assertThrows(MutleGuestLimits.RequestTooLargeException.class,
                 () -> MutleApiServlet.readBody(new StringReader("a".repeat(32_769))));
+    }
+
+    @Test
+    void boundsLoggedInBodiesBeforeDispatchingTheRequest() throws Exception {
+        MutleApiServlet servlet = new MutleApiServlet();
+        MutleService service = mock(MutleService.class);
+        when(service.isReady()).thenReturn(true);
+        MutleSettings settings = mock(MutleSettings.class);
+        when(settings.enabled()).thenReturn(true);
+        CodeDefendersAuth login = mock(CodeDefendersAuth.class);
+        when(login.isLoggedIn()).thenReturn(true);
+        I18nService i18nService = mock(I18nService.class);
+        when(i18nService.getI18n(any(HttpServletRequest.class))).thenReturn(mock(I18n.class));
+        inject(servlet, "mutleService", service);
+        inject(servlet, "settings", settings);
+        inject(servlet, "login", login);
+        inject(servlet, "i18nService", i18nService);
+        inject(servlet, "guest", mock(MutleGuestSession.class));
+        inject(servlet, "guestLimits", new MutleGuestLimits());
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getHeader("X-Requested-With")).thenReturn("XMLHttpRequest");
+        when(request.getPathInfo()).thenReturn("/state");
+        when(request.getReader()).thenReturn(new BufferedReader(new StringReader("a".repeat(32_769))));
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(response.getWriter()).thenReturn(new PrintWriter(new StringWriter()));
+
+        servlet.doPost(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        verify(service, never()).state(anyInt(), anyInt());
     }
 
     @Test

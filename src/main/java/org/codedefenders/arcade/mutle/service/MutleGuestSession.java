@@ -115,12 +115,6 @@ public class MutleGuestSession implements Serializable {
         }
     }
 
-    public boolean owns(int gameId) {
-        synchronized (games) {
-            return ownedGame(gameId) != null;
-        }
-    }
-
     private GuestGame ownedGame(int gameId) {
         prune();
         return games.values().stream().filter(game -> game.id == gameId).findFirst().orElse(null);

@@ -153,7 +153,7 @@ public class MutleService {
     }
 
     /** Guest games have their own period slot and never contribute to account achievements. */
-    synchronized MutleStateView startGuest(MutleFixtureView fixture) {
+    MutleStateView startGuest(MutleFixtureView fixture) {
         MutleEntry entry = entry(fixture.fixtureKey());
         if (entry.series() != fixture.series()) {
             throw new NotFoundException();

@@ -10,6 +10,12 @@ export CODEDEFENDERS_ANT_HOME=/usr/share/ant
 export CODEDEFENDERS_APP_URL=http://localhost:8080
 
 printf '%s\n' '<tomcat-users><role rolename="codedefenders-admin"/></tomcat-users>' > /etc/tomcat10/tomcat-users.xml
+# Delay the 100-continue response until the servlet reads the body, so the socket
+# test can prove incomplete requests do not consume guest workers.
+if ! grep -q 'continueResponseTiming="onRead"' /etc/tomcat10/server.xml; then
+    sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/ s/protocol="HTTP\/1.1"/protocol="HTTP\/1.1" continueResponseTiming="onRead"/' \
+        /etc/tomcat10/server.xml
+fi
 mkdir -p "$CATALINA_BASE/webapps/ROOT"
 unzip -q -o target/codedefenders.war -d "$CATALINA_BASE/webapps/ROOT"
 if [[ ! -f "$CATALINA_BASE/webapps/ROOT/WEB-INF/classes/org/codedefenders/i18n/Messages_de.class" ]]; then

@@ -35,7 +35,6 @@ import org.codedefenders.arcade.mutle.model.MutleGame;
 import org.codedefenders.arcade.mutle.model.MutlePublication;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.transaction.Transactional;
 import org.intellij.lang.annotations.Language;
 
 import com.google.gson.Gson;
@@ -275,10 +274,9 @@ public class MutleRepository {
     }
 
     /**
-     * Deletes the game and its dependencies atomically; existing game/test foreign keys do not all cascade.
-     * The cleanup job also wraps this call and artifact removal in a transaction, retaining failed games for retry.
+     * Deletes the game and its dependencies; callers must invoke this inside the cleanup transaction.
+     * Existing game/test foreign keys do not all cascade.
      */
-    @Transactional
     public boolean deleteExpiredGuestGame(int gameId, Instant cutoff) {
         @Language("SQL") String guard = """
                 SELECT game_id FROM mutle_game

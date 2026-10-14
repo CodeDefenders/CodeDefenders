@@ -18,7 +18,9 @@
  */
 package org.codedefenders.arcade.mutle;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +47,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 import com.google.gson.JsonObject;
 
 import static org.codedefenders.arcade.mutle.PublicMutleSupport.*;
+import static org.codedefenders.util.Constants.MUTLE_GUEST_USER_ID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -68,7 +71,7 @@ class PublicMutleHttpIT {
         assertEquals(game, first.start());
         assertEquals(404, second.api("state", game(game)).statusCode());
         assertEquals(404, second.guess(game, PROOF).statusCode());
-        assertEquals(404, second.page("/mutle/play?gameId=" + game, Duration.ofSeconds(5)).statusCode());
+        assertEquals(200, second.page("/mutle/play?gameId=" + game, Duration.ofSeconds(5)).statusCode());
         JsonObject practice = new JsonObject();
         practice.addProperty("fixtureKey", "appointment-book/duplicate-name-allowed");
         assertEquals(403, first.api("start", practice).statusCode());
@@ -123,6 +126,41 @@ class PublicMutleHttpIT {
         assertTrue(guess.getAsJsonArray("coveredLines").size() > 0);
         assertFalse(json(response).get("solved").getAsBoolean());
         assertTrue(json(client.guess(game, PROOF)).get("solved").getAsBoolean());
+    }
+
+    @Test
+    void productionAssertionLibrariesAndMockitoWorkThroughTheLiveRunner() throws Exception {
+        Client client = new Client();
+        int game = client.start();
+        String payload = source(""
+                + "AppointmentBook mock = mock(AppointmentBook.class); "
+                + "when(mock.getBookingCount()).thenReturn(7); "
+                + "com.google.common.truth.Truth.assertThat(mock.getBookingCount()).isEqualTo(7); "
+                + "verify(mock).getBookingCount(); "
+                + "AppointmentBook book = new AppointmentBook(1, 2); book.book(\"A\", 1); "
+                + "assertThat(book.book(\"A\", 2), is(false));",
+                "import static org.hamcrest.MatcherAssert.assertThat; "
+                        + "import static org.hamcrest.Matchers.is; "
+                        + "import static org.mockito.Mockito.*;");
+        var response = client.guess(game, payload);
+        assertEquals(200, response.statusCode(), response.body());
+        JsonObject state = json(response);
+        assertEquals(1, state.get("acceptedGuesses").getAsInt());
+        assertTrue(state.get("solved").getAsBoolean());
+    }
+
+    @Test
+    void longMutantDiagnosticStillKillsAndIsAccepted() throws Exception {
+        Client client = new Client();
+        int game = client.start();
+        String payload = source(""
+                + "AppointmentBook book = new AppointmentBook(1, 2); book.book(\"A\", 1); "
+                + "assertFalse(\"diagnostic \".repeat(300), book.book(\"A\", 2));", "");
+        var response = client.guess(game, payload);
+        assertEquals(200, response.statusCode(), response.body());
+        JsonObject state = json(response);
+        assertEquals(1, state.get("acceptedGuesses").getAsInt());
+        assertTrue(state.get("solved").getAsBoolean());
     }
 
     @Test
@@ -250,19 +288,35 @@ class PublicMutleHttpIT {
             for (int upload = 0; upload < 2; upload++) {
                 Socket socket = new Socket(base.getHost(), base.getPort() == -1 ? 80 : base.getPort());
                 sockets.add(socket);
+                socket.setSoTimeout(5_000);
                 socket.getOutputStream().write(("POST " + base.getPath() + "/api/mutle/start HTTP/1.1\r\n"
                         + "Host: " + base.getAuthority() + "\r\nContent-Type: application/json\r\n"
-                        + "X-Requested-With: XMLHttpRequest\r\nContent-Length: 100\r\n"
-                        + "Connection: close\r\n\r\n{").getBytes(StandardCharsets.US_ASCII));
+                        + "X-Requested-With: XMLHttpRequest\r\nExpect: 100-continue\r\n"
+                        + "Content-Length: 100\r\nConnection: close\r\n\r\n")
+                        .getBytes(StandardCharsets.US_ASCII));
+                socket.getOutputStream().flush();
+                readHeaders(socket);
+                socket.getOutputStream().write('{');
                 socket.getOutputStream().flush();
             }
-            Thread.sleep(500);
             assertTrue(new Client().start() > 0);
         } finally {
             for (Socket socket : sockets) {
                 socket.close();
             }
         }
+    }
+
+    /** Requires the disposable CI Tomcat connector's {@code continueResponseTiming} to be {@code onRead}. */
+    private static void readHeaders(Socket socket) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream(),
+                StandardCharsets.US_ASCII));
+        String status = reader.readLine();
+        assertTrue(status != null && status.matches("HTTP/1\\.1 100(?: .*)?"), status);
+        String line;
+        while ((line = reader.readLine()) != null && !line.isEmpty()) {
+        }
+        assertNotNull(line, "Did not receive a complete interim HTTP response");
     }
 
     @Test
@@ -275,8 +329,8 @@ class PublicMutleHttpIT {
         when(connections.getConnection()).thenAnswer(invocation -> database());
         TransactionAwareQueryRunner queries = new TransactionAwareQueryRunner(connections);
         MutleRepository repository = new MutleRepository(queries);
-        queries.update("UPDATE mutle_game SET created_at = ? WHERE game_id = ? AND user_id = 8",
-                Timestamp.from(Instant.now().minus(Duration.ofDays(9))), game);
+        queries.update("UPDATE mutle_game SET created_at = ? WHERE game_id = ? AND user_id = ?",
+                Timestamp.from(Instant.now().minus(Duration.ofDays(9))), game, MUTLE_GUEST_USER_ID);
         int testsBefore = count(queries, "tests", "Game_ID", game);
         int executionsBefore = executions(queries, game);
         assertTrue(testsBefore > 0);

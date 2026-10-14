@@ -64,14 +64,10 @@
                 ${homepage ? i18n.tr('Play Mutle') : i18n.tr('Solve current mutle')}
             </a>
         </c:when>
-        <c:when test="${currentCase.solved || currentCase.failed || currentCase.expired}">
-            <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
-                ${i18n.tr('View current mutle')}
-            </a>
-        </c:when>
         <c:otherwise>
             <a class="btn btn-primary btn-lg" href="${url.forPath(Paths.MUTLE_PLAY)}?gameId=${currentCase.gameId}">
-                ${i18n.tr('Continue current mutle')}
+                ${currentCase.solved || currentCase.failed || currentCase.expired
+                        ? i18n.tr('View current mutle') : i18n.tr('Continue current mutle')}
             </a>
         </c:otherwise>
     </c:choose>
