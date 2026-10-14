@@ -62,6 +62,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -1108,8 +1109,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response,
-                                 int gameId, MeleeGame game,
-                                 int playerId) throws IOException {
+                                 int gameId, MeleeGame game, int playerId) throws IOException {
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add(I18n.marktr("You cannot claim mutants as equivalent in this game anymore."));
@@ -1143,9 +1143,7 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 mutantRepo.updateMutant(m);
 
-                                Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
-
-                                Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
+                                Event event = new Event(-1, gameId, m.getCreatorId(),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
@@ -1167,6 +1165,13 @@ public class MeleeGameManager extends HttpServlet {
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
                                 mutantRepo.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
+
+                                var edte = new EquivalenceDuelTriggeredEvent();
+                                edte.setGameId(gameId);
+                                edte.setMutantId(m.getId());
+                                edte.setAttackerId(m.getCreatorId());
+                                userRepo.getUserIdForPlayerId(playerId).ifPresent(edte::setDefenderId);
+                                notificationService.post(edte);
                             });
                 });
 
