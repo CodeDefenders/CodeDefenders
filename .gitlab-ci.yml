@@ -83,12 +83,12 @@ metrics:
 
 
 build:
-  image: debian:12-slim
+  image: maven:3.9-eclipse-temurin-17
   stage: build
   needs: [ ]
   before_script:
     - apt-get update
-    - apt-get install -y --no-install-recommends maven openjdk-17-jdk-headless gettext git
+    - apt-get install -y --no-install-recommends gettext
   cache:
     - *cache-maven-repo
     # TODO(Alex): Add caching for node/npm/js stuff
