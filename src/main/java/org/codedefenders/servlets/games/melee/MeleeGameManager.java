@@ -61,6 +61,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
@@ -205,6 +206,8 @@ public class MeleeGameManager extends HttpServlet {
     private I18nService i18nService;
     @Inject
     private ValidationRepository validationRepository;
+    @Inject
+    private LiveFeedback liveFeedback;
 
 
     @Override
@@ -435,7 +438,7 @@ public class MeleeGameManager extends HttpServlet {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
 
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, aliveMutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
     }
@@ -600,7 +603,7 @@ public class MeleeGameManager extends HttpServlet {
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
-        gameManagingUtils.notifyPlayersOnTestAdded(newTest, game.getId());
+        liveFeedback.notifyPlayersOnTestAdded(newTest, game.getId());
 
         // Clean up the session
         previousSubmission.clear();
@@ -888,7 +891,7 @@ public class MeleeGameManager extends HttpServlet {
             ede.setDefenderWon();
             notificationService.post(ede);
 
-            gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+            liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
 
             // We need this to pass the mutation information along
             Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
@@ -1065,7 +1068,7 @@ public class MeleeGameManager extends HttpServlet {
                                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(scoreEvent);
 
-                        gameManagingUtils.notifyPlayersOnMutantUpdated(game, mPending);
+                        liveFeedback.notifyPlayersOnMutantUpdated(game, mPending);
 
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
@@ -1159,7 +1162,7 @@ public class MeleeGameManager extends HttpServlet {
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
 
-                                gameManagingUtils.notifyPlayersOnMutantUpdated(game, m);
+                                liveFeedback.notifyPlayersOnMutantUpdated(game, m);
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence

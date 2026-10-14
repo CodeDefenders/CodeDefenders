@@ -53,6 +53,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.MutantRepository;
@@ -159,6 +160,8 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameService gameService;
+    @Inject
+    private LiveFeedback liveFeedback;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -367,7 +370,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
 
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, aliveMutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, aliveMutant);
             }
         }
 

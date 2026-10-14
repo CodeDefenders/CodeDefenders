@@ -41,6 +41,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -81,12 +82,13 @@ public class MutationTester implements IMutationTester {
     protected final MutantRepository mutantRepo;
     protected final INotificationService notificationService;
     protected final GameManagingUtils gameManagingUtils;
+    protected final LiveFeedback liveFeedback;
 
     protected boolean useMutantCoverage;
 
     public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
                           TestRepository testRepo, MutantRepository mutantRepo, INotificationService notificationService,
-                          boolean useMutantCoverage, GameManagingUtils gameManagingUtils) {
+                          boolean useMutantCoverage, GameManagingUtils gameManagingUtils, LiveFeedback liveFeedback) {
         this.backend = backend;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
@@ -95,6 +97,7 @@ public class MutationTester implements IMutationTester {
         this.notificationService = notificationService;
         this.useMutantCoverage = useMutantCoverage;
         this.gameManagingUtils = gameManagingUtils;
+        this.liveFeedback = liveFeedback;
     }
 
     @Override
@@ -136,7 +139,7 @@ public class MutationTester implements IMutationTester {
             if (testVsMutant(test, mutant)) {
                 killed++;
                 killedMutants.add(mutant);
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
             }
         }
 
@@ -209,7 +212,7 @@ public class MutationTester implements IMutationTester {
                         EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(scoreEvent);
 
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
             } else {
                 Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
                         test.getId() + ":" + mutant.getId(),
@@ -318,7 +321,7 @@ public class MutationTester implements IMutationTester {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
 
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
 
                 // return as soon as the first test kills the mutant we return
                 return new PreparedMessage(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
@@ -395,7 +398,7 @@ public class MutationTester implements IMutationTester {
         mutant.setKillMessage(executedTarget.message);
         mutantRepo.updateMutantKillMessageForMutant(mutant);
 
-        gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
+        liveFeedback.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
 
         return true;
     }
@@ -426,7 +429,7 @@ public class MutationTester implements IMutationTester {
                 testRepo.incrementMutantsKilled(test);
                 mutant.setKillMessage(executedTarget.message);
                 mutantRepo.updateMutantKillMessageForMutant(mutant);
-                gameManagingUtils.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(test.getGameId(), mutant);
             } else {
                 logger.info(
                         "Test {} would have killed Mutant {} and resolve equivalence,"
@@ -472,7 +475,7 @@ public class MutationTester implements IMutationTester {
 
             if (testVsMutant(test, mutant)) {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
                 ArrayList<Mutant> mlist = new ArrayList<>();
                 mlist.add(mutant);
                 // TODO Scoring MeleeGames is still open

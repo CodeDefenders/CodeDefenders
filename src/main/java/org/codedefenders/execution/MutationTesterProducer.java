@@ -24,6 +24,7 @@ import jakarta.enterprise.inject.Produces;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -39,14 +40,16 @@ public class MutationTesterProducer {
                                              ExecutorServiceProvider executorServiceProvider,
                                              TestRepository testRepo, MutantRepository mutantRepo,
                                              INotificationService notificationService,
-                                             GameManagingUtils gameManagingUtils) {
+                                             GameManagingUtils gameManagingUtils,
+                                             LiveFeedback liveFeedback) {
         if (config.isParallelize()) {
             return new ParallelMutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo,
                     notificationService, config.isMutantCoverage(), gameManagingUtils,
-                    executorServiceProvider.createExecutorService("test-executor-parallel", config.getNumberOfParallelAntExecutions()));
+                    executorServiceProvider.createExecutorService("test-executor-parallel",
+                            config.getNumberOfParallelAntExecutions()), liveFeedback);
         } else {
             return new MutationTester(backend, userRepo, eventDAO, testRepo, mutantRepo,
-                    notificationService, config.isMutantCoverage(), gameManagingUtils);
+                    notificationService, config.isMutantCoverage(), gameManagingUtils, liveFeedback);
         }
     }
 }

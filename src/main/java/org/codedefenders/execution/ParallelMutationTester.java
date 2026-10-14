@@ -43,6 +43,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.persistence.database.MutantRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.UserRepository;
@@ -69,10 +70,12 @@ public class ParallelMutationTester extends MutationTester {
 
     // TODO Move the Executor service before useMutantCoverage
     public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
-            TestRepository testRepo, MutantRepository mutantRepo, INotificationService notificationService,
-            boolean useMutantCoverage, GameManagingUtils gameManagingUtils, ExecutorService testExecutorThreadPool) {
+                                  TestRepository testRepo, MutantRepository mutantRepo,
+                                  INotificationService notificationService, boolean useMutantCoverage,
+                                  GameManagingUtils gameManagingUtils, ExecutorService testExecutorThreadPool,
+                                  LiveFeedback liveFeedback) {
         super(backend, userRepo, eventDAO, testRepo, mutantRepo, notificationService, useMutantCoverage,
-                gameManagingUtils);
+                gameManagingUtils, liveFeedback);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -131,7 +134,7 @@ public class ParallelMutationTester extends MutationTester {
                 if (tasks.get(mutant).get()) {
                     killed++;
                     killedMutants.add(mutant);
-                    gameManagingUtils.notifyPlayersOnMutantUpdated(game.getId(), mutant);
+                    liveFeedback.notifyPlayersOnMutantUpdated(game.getId(), mutant);
                 }
             } catch (InterruptedException | ExecutionException | CancellationException e) {
                 logger.error("While waiting results for mutant " + mutant, e);
