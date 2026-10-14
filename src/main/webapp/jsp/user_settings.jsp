@@ -124,7 +124,8 @@
                         <label for="updatedPassword" class="form-label">${i18n.tr('New password')}</label>
                         <input type="password" class="form-control" id="updatedPassword" required
                                name="updatedPassword" placeholder="${i18n.tr('Password')}"
-                               minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*">
+                               minlength="${pwMinLength}" maxlength="1000" pattern="[a-zA-Z0-9]*"
+                               autocomplete="new-password">
                         <div class="invalid-feedback">
                                 ${i18n.tr('Please enter a valid password.')}
                         </div>

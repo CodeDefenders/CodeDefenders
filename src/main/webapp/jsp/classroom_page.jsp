@@ -327,7 +327,8 @@
                             <label for="password-input" class="form-label">${i18n.tr('Password')}</label>
                             <input type="password" class="form-control" id="password-input" name="password"
                                    placeholder="${i18n.tr('Password')}"
-                                   required maxlength="100">
+                                   required maxlength="100"
+                                   autocomplete="new-password">
                             <div class="invalid-feedback">
                                     ${i18n.tr('Please enter a valid password.')}
                             </div>
@@ -601,7 +602,8 @@
                             <c:when test="${classroom.password.isPresent()}">
                                 <p>${i18n.tr('A password is required to join this classroom:')}</p>
                                 <input type="password" class="form-control" id="join-password-input"
-                                       name="password" placeholder="${i18n.tr('Password')}" required>
+                                       name="password" placeholder="${i18n.tr('Password')}" required
+                                       autocomplete="new-password">
                                 <div class="invalid-feedback">${i18n.tr('Please enter the password.')}</div>
                             </c:when>
                             <c:otherwise>

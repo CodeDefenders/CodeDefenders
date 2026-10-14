@@ -73,6 +73,7 @@ import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
+import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantUpdatedEvent;
 import org.codedefenders.notification.events.server.highlighting.TestAddedEvent;
@@ -1212,6 +1213,13 @@ public class GameManagingUtils implements IGameManagingUtils {
                         notifyPlayersOnMutantUpdated(game, m);
 
                         mutantRepo.insertEquivalence(m, playerId);
+
+                        var edte = new EquivalenceDuelTriggeredEvent();
+                        edte.setGameId(game.getId());
+                        edte.setMutantId(m.getId());
+                        edte.setAttackerId(m.getCreatorId());
+                        edte.setDefenderId(userId);
+                        notificationService.post(edte);
                     })
                     .forEach(claimedMutants::add);
         }
