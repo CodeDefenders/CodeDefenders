@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import javax.tools.ToolProvider;
 
+import org.codedefenders.dependencies.DependencyProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class TestExecutionSandboxTest {
+class AntRunnerTest {
     @TempDir
     Path root;
 
@@ -105,7 +106,7 @@ class TestExecutionSandboxTest {
                 """, jar);
         Path policy = workspace.resolve("test.policy");
         Path security = library.resolve("test-security.jar");
-        TestExecutionSandbox.securityManagerJar(security);
+        DependencyProvider.securityManagerJar(security);
         Files.writeString(policy, resource("security.policy")
                 .replace("${codedef.library.url}", library.toUri().toString())
                 .replace("${ant.library.url}", root.resolve("ant/lib").toUri().toString()));
@@ -117,7 +118,7 @@ class TestExecutionSandboxTest {
                 "-cp", classes + java.io.File.pathSeparator + jar + java.io.File.pathSeparator + security,
                 "SandboxProbe", canary.toString());
         process.environment().put("MUTLE_SECRET", "private-review-canary");
-        String output = TestExecutionSandbox.runProcess(process, Duration.ofSeconds(10));
+        String output = AntRunner.runProcess(process, Duration.ofSeconds(10));
         assertEquals(12, output.lines().filter("DENIED"::equals).count(), output);
         assertFalse(output.contains("private-review-canary"), output);
         assertEquals("private-review-canary", Files.readString(canary));
@@ -178,7 +179,7 @@ class TestExecutionSandboxTest {
     }
 
     private static String resource(String name) throws IOException {
-        try (var input = TestExecutionSandboxTest.class.getResourceAsStream("/data/" + name)) {
+        try (var input = AntRunnerTest.class.getResourceAsStream("/data/" + name)) {
             return new String(input.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
         }
     }
@@ -214,7 +215,7 @@ class TestExecutionSandboxTest {
                 common.add(destination.toString());
             }
         }
-        TestExecutionSandbox.securityManagerJar(library.resolve("test-security.jar"));
+        DependencyProvider.securityManagerJar(library.resolve("test-security.jar"));
         for (String name : List.of("build.xml", "security.policy", "security.properties")) {
             Files.writeString(directory.resolve(name), resource(name));
         }
@@ -254,7 +255,7 @@ class TestExecutionSandboxTest {
             builder.directory(directory.toFile()).redirectErrorStream(true);
             try {
                 return AntRunner.runAntProcess(builder);
-            } catch (TestExecutionSandbox.ExecutionLimitException e) {
+            } catch (AntRunner.ExecutionLimitException e) {
                 if (e.getCause() != null) {
                     throw new AssertionError(e.getCause().getMessage(), e);
                 }
@@ -384,11 +385,11 @@ class TestExecutionSandboxTest {
     @Test
     void runnerFailureWithoutATestReportIsRejected() throws Exception {
         Path report = root.resolve("result.xml");
-        assertThrows(TestExecutionSandbox.ExecutionLimitException.class,
-                () -> TestExecutionSandbox.readTestOutcome(report, new AntProcessResult()));
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.readTestOutcome(report, new AntProcessResult()));
         Files.writeString(report, "<testsuite tests=\"0\" failures=\"0\" errors=\"0\"/>");
-        assertThrows(TestExecutionSandbox.ExecutionLimitException.class,
-                () -> TestExecutionSandbox.readTestOutcome(report, new AntProcessResult()));
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.readTestOutcome(report, new AntProcessResult()));
     }
 
     @Test
@@ -406,8 +407,8 @@ class TestExecutionSandboxTest {
         when(process.getInputStream()).thenReturn(input);
         when(process.waitFor(1_000, TimeUnit.MILLISECONDS)).thenReturn(false);
         when(process.descendants()).thenAnswer(invocation -> Stream.empty());
-        var thrown = assertThrows(TestExecutionSandbox.ExecutionLimitException.class,
-                () -> TestExecutionSandbox.runProcess(builder, Duration.ofSeconds(1)));
+        var thrown = assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.runProcess(builder, Duration.ofSeconds(1)));
         assertEquals(1, thrown.getSuppressed().length);
         assertSame(cleanupFailure, thrown.getSuppressed()[0]);
     }
@@ -432,16 +433,16 @@ class TestExecutionSandboxTest {
                 """);
         Path childPid = root.resolve("child.pid");
         String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
-        assertThrows(TestExecutionSandbox.ExecutionLimitException.class,
-                () -> TestExecutionSandbox.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "parent",
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "parent",
                         java, classes.toString(), childPid.toString()), Duration.ofSeconds(2)));
         long pid = Long.parseLong(Files.readString(childPid));
         for (int wait = 0; wait < 100 && ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false); wait++) {
             Thread.sleep(20);
         }
         assertFalse(ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false));
-        assertThrows(TestExecutionSandbox.ExecutionLimitException.class,
-                () -> TestExecutionSandbox.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "output"),
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "output"),
                         Duration.ofSeconds(10)));
     }
 
