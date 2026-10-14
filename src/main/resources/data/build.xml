@@ -82,11 +82,6 @@
 		</javac>
 	</target>
 
-	<target name="echo-path" description="Echo test path">
-		<pathconvert targetos="unix" property="test.path.unix" refid="test.cp"/>
-		<echo message="Test path: ${test.path.unix}"/>
-	</target>
-
 	<!-- requires test to compile, and the classname of the test file -->
 	<target name="test-original" description="run test on original code to ensure it passes">
 		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true">

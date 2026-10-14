@@ -186,7 +186,7 @@ class PublicMutleHttpIT {
     }
 
     @Test
-    void timeoutAndMemoryLimitDoNotCountAsMutantKills() throws Exception {
+    void timeoutAndMemoryLimitRejectOriginalTestsWithoutAcceptingThem() throws Exception {
         Client client = new Client();
         int game = client.start();
         for (String payload : List.of(source("SECONDS.sleep(20); "
@@ -194,7 +194,7 @@ class PublicMutleHttpIT {
                         "import static java.util.concurrent.TimeUnit.SECONDS;"),
                 source("assertNotNull(new byte[200_000_000]);", ""))) {
             var response = client.guess(game, payload);
-            assertEquals(503, response.statusCode(), response.body());
+            assertEquals(422, response.statusCode(), response.body());
             assertEquals(0, client.state(game).get("acceptedGuesses").getAsInt());
         }
         var response = client.guess(game, NONE);
@@ -203,24 +203,22 @@ class PublicMutleHttpIT {
     }
 
     @Test
-    void mutantStageResourceFailureDoesNotConsumeGuess() throws Exception {
-        Client client = new Client();
-        int game = client.start();
+    void mutantStageResourceFailureKillsMutantAndConsumesGuess() throws Exception {
         for (String payload : List.of(
                 source("AppointmentBook book = new AppointmentBook(1,2); book.book(\"A\",1); "
                         + "SECONDS.sleep(20 * Boolean.compare(book.book(\"A\",2), false)); assertNotNull(book);",
                         "import static java.util.concurrent.TimeUnit.SECONDS;"),
                 source("AppointmentBook book = new AppointmentBook(1,2); book.book(\"A\",1); "
                         + "assertNotNull(new byte[200_000_000 * Boolean.compare(book.book(\"A\",2), false)]);", ""))) {
+            Client client = new Client();
+            int game = client.start();
             var response = client.guess(game, payload);
-            assertEquals(503, response.statusCode(), response.body());
+            assertEquals(200, response.statusCode(), response.body());
             JsonObject state = client.state(game);
-            assertEquals(0, state.get("acceptedGuesses").getAsInt());
-            assertFalse(state.get("solved").getAsBoolean());
+            assertEquals(1, state.get("acceptedGuesses").getAsInt());
+            assertTrue(state.get("solved").getAsBoolean());
             assertFalse(state.get("failed").getAsBoolean());
         }
-        assertEquals(200, client.guess(game, NONE).statusCode());
-        assertEquals(1, client.state(game).get("acceptedGuesses").getAsInt());
     }
 
     @Test
@@ -237,7 +235,7 @@ class PublicMutleHttpIT {
             assertFalse(pending.isDone(), "The guest test must still be executing during page reads");
             assertEquals(200, client.page("/mutle", Duration.ofSeconds(2)).statusCode());
             assertEquals(200, other.page("/mutle", Duration.ofSeconds(2)).statusCode());
-            assertEquals(503, pending.get(60, TimeUnit.SECONDS).statusCode());
+            assertEquals(422, pending.get(60, TimeUnit.SECONDS).statusCode());
         } finally {
             executor.shutdownNow();
         }

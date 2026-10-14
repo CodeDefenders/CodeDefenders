@@ -132,6 +132,46 @@ class AntRunnerTest {
     }
 
     @Test
+    void submittedOutputCanContainExecutionFailureMessages() throws Exception {
+        AntProcessResult result = runJunitProbe("""
+                for (String message : java.util.List.of(
+                        "Timeout occurred",
+                        "java.lang.OutOfMemoryError",
+                        "FATAL ERROR in native method",
+                        "Could not create SecurityManager",
+                        "Forked Java VM exited abnormally")) {
+                    System.out.println(message);
+                }
+                assertEquals(2, Math.abs(-2));
+                """);
+        assertFalse(result.hasFailure(), result.getErrorMessage());
+        assertFalse(result.hasError(), result.getErrorMessage());
+    }
+
+    @Test
+    void junitTimeoutIsReturnedAsAnErrorForMutants() throws Exception {
+        Fixture fixture = fixture();
+        compile(fixture.directory().resolve("mutant"), "Sample", """
+                public class Sample {
+                    public int value() {
+                        while (true) { }
+                    }
+                }
+                """, fixture.directory().resolve("cut"));
+        fixture.test("""
+                import org.junit.Test;
+                import static org.junit.Assert.*;
+                public class SandboxJUnitProbe {
+                    @Test public void test() { assertEquals(2, new Sample().value()); }
+                }
+                """);
+        assertTrue(fixture.run("compile-test").compiled());
+        AntProcessResult result = fixture.run("test-mutant");
+        assertFalse(result.hasFailure(), result.getErrorMessage());
+        assertTrue(result.hasError(), result.getErrorMessage());
+    }
+
+    @Test
     void printedSuccessCannotOverrideAFailingTest() throws Exception {
         AntProcessResult result = runJunitProbe("""
                 System.out.println("[junit] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec");

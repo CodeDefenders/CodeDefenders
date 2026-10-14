@@ -439,22 +439,21 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         environment.keySet().removeIf(key -> !List.of("PATH", "JAVA_HOME", "ANT_HOME", "LANG", "LC_ALL")
                 .contains(key) && !key.startsWith("SLURM_"));
         environment.put("ANT_OPTS", "-Xmx128m -XX:MaxMetaspaceSize=96m");
-        try (var reports = new ReportDirectory(Files.createTempDirectory(builder.directory().toPath(), "test-report-"))) {
-            builder.command().add("-Dtest.report.dir=" + reports.path());
+        boolean testTarget = builder.command().stream().anyMatch(List.of("test-original", "test-mutant",
+                "recompiled-test-mutant")::contains);
+        try (var reports = testTarget
+                ? new ReportDirectory(Files.createTempDirectory(builder.directory().toPath(), "test-report-"))
+                : null) {
+            if (reports != null) {
+                builder.command().add("-Dtest.report.dir=" + reports.path());
+            }
             // Slurm owns queueing and the configured job deadline; the JUnit timeout starts on the worker.
             Duration deadline = "srun".equals(builder.command().get(0))
                     ? Duration.ofMillis(Long.MAX_VALUE) : PROCESS_TIMEOUT;
             String output = runProcess(builder, deadline);
-            if (output.contains("Timeout occurred") || output.contains("java.lang.OutOfMemoryError")
-                    || output.contains("FATAL ERROR in native method")
-                    || output.contains("Could not create SecurityManager")
-                    || output.contains("Forked Java VM exited abnormally")) {
-                throw new ExecutionLimitException(new IOException(output));
-            }
             AntProcessResult result = new AntProcessResult();
             result.setInputStream(new BufferedReader(new StringReader(output)));
-            if (builder.command().stream().anyMatch(List.of("test-original", "test-mutant",
-                    "recompiled-test-mutant")::contains)) {
+            if (testTarget) {
                 if (!result.compiled()) {
                     throw new ExecutionLimitException(new IOException(output));
                 }
