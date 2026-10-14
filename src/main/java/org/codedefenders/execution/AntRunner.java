@@ -18,9 +18,7 @@
  */
 package org.codedefenders.execution;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -79,13 +77,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private final GameClassRepository gameClassRepo;
     private final DependencyProvider dependencyProvider;
 
-    private final MutleTestExecutor mutleTestExecutor;
-
     @Inject
     public AntRunner(Configuration config,
                      CoverageGenerator coverageGenerator, GameRepository gameRepo, PlayerRepository playerRepo,
                      MutantRepository mutantRepo, TestRepository testRepo, GameClassRepository gameClassRepo,
-                     DependencyProvider dependencyProvider, MutleTestExecutor mutleTestExecutor) {
+                     DependencyProvider dependencyProvider) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
         this.gameRepo = gameRepo;
@@ -94,7 +90,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         this.testRepo = testRepo;
         this.gameClassRepo = gameClassRepo;
         this.dependencyProvider = dependencyProvider;
-        this.mutleTestExecutor = mutleTestExecutor;
     }
 
     /**
@@ -330,10 +325,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                 Paths.get(cut.getJavaFile()));
         Path cutDir = topDir.resolve(Constants.CUTS_CLASSES_DIR);
 
-        if (mutleTestExecutor.isMutle(testDir)) {
-            return mutleTestExecutor.run(target, mutantDir, testDir, cutDir, testClassName);
-        }
-
         config.getAntJavaHome()
                 .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
 
@@ -387,6 +378,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dcut.dir=" + cutDir);
         command.add("-DtestClassname=" + testClassName);
 
+        command.add("-Dcodedef.library=" + config.getLibraryDir().getAbsolutePath());
         command.add("-Dcommon.cp=" + dependencyProvider.getCommonClasspath());
         command.add("-Djacoco.cp=" + dependencyProvider.getJacocoClasspath());
 
@@ -425,24 +417,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         }
     }
 
-    private static AntProcessResult runAntProcess(ProcessBuilder pb) {
-        AntProcessResult res = new AntProcessResult();
-        try {
-            Process p = pb.start();
-
-            BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            res.setInputStream(is);
-
-            String line;
-            BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-            StringBuilder esLog = new StringBuilder();
-            while ((line = es.readLine()) != null) {
-                esLog.append(line).append(System.lineSeparator());
-            }
-            res.setErrorStreamText(esLog.toString());
-        } catch (Exception ex) {
-            res.setExceptionText(String.format("Exception: %s%s", ex.toString(), System.lineSeparator()));
-        }
-        return res;
+    static AntProcessResult runAntProcess(ProcessBuilder pb) {
+        return TestExecutionSandbox.run(pb);
     }
 }

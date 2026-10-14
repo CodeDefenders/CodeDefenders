@@ -18,6 +18,7 @@
  */
 package org.codedefenders.dependencies;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import jakarta.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.dependencies.MavenDependencyResolver.MavenDependencyResolverException;
+import org.codedefenders.execution.TestExecutionSandbox;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +94,13 @@ public class DependencyProvider {
     public void installDependencies() throws MavenDependencyResolverException {
         try (var resolver = new MavenDependencyResolver(getLocalRepoPath(), "16")) {
             JACOCO_CLASSPATH = resolver.resolveDependencies(parseSpecs(JACOCO_SPECS)).getClasspath();
+            try {
+                TestExecutionSandbox.securityManagerJar(config.getLibraryDir().toPath().resolve("test-security.jar"));
+                TestExecutionSandbox.coverageAgent(JACOCO_CLASSPATH,
+                        config.getLibraryDir().toPath().resolve("jacocoagent.jar"));
+            } catch (IOException e) {
+                throw resolver.new MavenDependencyResolverException(e);
+            }
             logger.info("Resolved JaCoCo Classpath: " + JACOCO_CLASSPATH);
 
             COMMON_CLASSPATH = resolver.resolveDependencies(parseSpecs(COMMON_SPECS)).getClasspath();

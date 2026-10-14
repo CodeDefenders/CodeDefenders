@@ -32,7 +32,7 @@ import org.codedefenders.arcade.mutle.service.MutleGuestSession;
 import org.codedefenders.arcade.mutle.service.MutleService;
 import org.codedefenders.arcade.mutle.service.MutleSettings;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.execution.MutleTestExecutor;
+import org.codedefenders.execution.TestExecutionSandbox;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.util.Paths;
 
@@ -128,7 +128,7 @@ public class MutleApiServlet extends HttpServlet {
             response.setHeader("Retry-After", "3600");
             response.setStatus(429);
             write(response, new ErrorView("rate-limit", i18n.tr("Too many requests. Please try again later.")));
-        } catch (MutleGuestLimits.BusyException | MutleTestExecutor.ExecutionLimitException e) {
+        } catch (MutleGuestLimits.BusyException | TestExecutionSandbox.ExecutionLimitException e) {
             response.setHeader("Retry-After", "30");
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
             write(response, new ErrorView("busy",

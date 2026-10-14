@@ -1,4 +1,4 @@
-<project default="" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
+<project default="" basedir=".">
 	<property name="java.sdk" value="${java.version}"/>
 
 	<description>
@@ -7,6 +7,34 @@
 
 	<property name="policyfile" location="security.policy"/>
 	<property name="java.release.version" value="16"/>
+    <property name="mutant.test.file" value="${test.file}"/>
+    <makeurl property="codedef.library.url" file="${codedef.library}"/>
+    <dirname property="ant.library" file="${ant.core.lib}"/>
+    <makeurl property="ant.library.url" file="${ant.library}"/>
+    <makeurl property="test.url" file="${test.file}"/>
+    <makeurl property="recompiled.test.url" file="${mutant.test.file}"/>
+    <pathconvert property="mutle.common.cp">
+        <restrict>
+            <path path="${common.cp}"/>
+            <or>
+                <name name="**/junit-4*.jar"/>
+                <name name="**/hamcrest-*.jar"/>
+            </or>
+        </restrict>
+    </pathconvert>
+    <condition property="test.common.cp" value="${mutle.common.cp}" else="${common.cp}">
+        <matches string="${test.file}" pattern="[/\\]tests[/\\]mutle[/\\]"/>
+    </condition>
+    <condition property="test.jacoco.cp" value="" else="${jacoco.cp}">
+        <matches string="${test.file}" pattern="[/\\]tests[/\\]mutle[/\\]"/>
+    </condition>
+    <!-- Existing game modes support Mockito; hidden Mutle tests retain their reflection restriction. -->
+    <condition property="test.reflection.url" value="file:/restricted-mutle-tests/" else="${test.url}">
+        <matches string="${test.file}" pattern="[/\\]tests[/\\]mutle[/\\]"/>
+    </condition>
+    <condition property="recompiled.test.reflection.url" value="file:/restricted-mutle-tests/" else="${recompiled.test.url}">
+        <matches string="${test.file}" pattern="[/\\]tests[/\\]mutle[/\\]"/>
+    </condition>
 
 	<!--
 	Properties set via System Properties in AntRunner.java:
@@ -22,7 +50,9 @@
 
 	<path id="sources.cp">
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
-		<pathelement path="${common.cp}"/>
+		<pathelement path="${test.common.cp}"/>
+		<pathelement location="${codedef.library}/test-security.jar"/>
+		<pathelement location="${codedef.library}/jacocoagent.jar"/>
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
@@ -30,29 +60,31 @@
 
 	<path id="test.cp">
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
-		<pathelement path="${common.cp}"/>
+		<pathelement path="${test.common.cp}"/>
+		<pathelement location="${codedef.library}/test-security.jar"/>
+		<pathelement location="${codedef.library}/jacocoagent.jar"/>
 
 		<!-- JaCoCo -->
-		<pathelement path="${jacoco.cp}"/>
+		<pathelement path="${test.jacoco.cp}"/>
 
 		<!-- CUT and deps -->
 		<pathelement location="${cut.dir}"/>
 	</path>
 
-	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
-		<classpath refid="test.cp"/>
-	</taskdef>
-
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
 		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.release.version}" classpathref="sources.cp"
-			   includeantruntime="false" debug="true" nowarn="true"/>
+			   includeantruntime="false" debug="true" nowarn="true">
+            <compilerarg value="-proc:none"/>
+        </javac>
 	</target>
 
 	<!-- requires test to compile only -->
 	<target name="compile-test" description="compile a single test">
 		<javac srcdir="${test.file}" destdir="${test.file}" release="${java.release.version}" classpathref="test.cp"
-			   includeantruntime="false" debug="true" nowarn="true"/>
+			   includeantruntime="false" debug="true" nowarn="true">
+            <compilerarg value="-proc:none"/>
+        </javac>
 	</target>
 
 	<target name="echo-path" description="Echo test path">
@@ -60,49 +92,65 @@
 		<echo message="Test path: ${test.path.unix}"/>
 	</target>
 
+    <macrodef name="sandbox-junit">
+        <attribute name="coverage" default="false"/>
+        <element name="test-classpath"/>
+        <sequential>
+            <junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true"
+                   fork="true" clonevm="false" timeout="10000" maxmemory="128m" tempdir="${test.report.dir}">
+                <test-classpath/>
+                <test name="${testClassname}" todir="${test.report.dir}" outfile="result"/>
+                <formatter type="plain" usefile="false"/>
+                <formatter type="xml" usefile="true"/>
+                <jvmarg value="-javaagent:${codedef.library}/jacocoagent.jar=destfile=${test.file}/jacoco.exec,dumponexit=@{coverage}"/>
+                <sysproperty key="codedef.home" value="${codedef.home}"/>
+                <sysproperty key="codedef.library" value="${codedef.library}"/>
+                <sysproperty key="codedef.library.url" value="${codedef.library.url}"/>
+                <sysproperty key="ant.library.url" value="${ant.library.url}"/>
+                <sysproperty key="ant.home" value="${ant.home}"/>
+                <sysproperty key="ant.core.lib" value="${ant.core.lib}"/>
+                <sysproperty key="cut.dir" value="${cut.dir}"/>
+                <sysproperty key="test.file" value="${test.file}"/>
+                <sysproperty key="mutant.file" value="${mutant.file}"/>
+                <sysproperty key="mutant.test.file" value="${mutant.test.file}"/>
+                <sysproperty key="test.report.dir" value="${test.report.dir}"/>
+                <sysproperty key="test.reflection.url" value="${test.reflection.url}"/>
+                <sysproperty key="recompiled.test.reflection.url" value="${recompiled.test.reflection.url}"/>
+                <sysproperty key="java.io.tmpdir" value="${test.report.dir}"/>
+                <jvmarg value="-XX:MaxMetaspaceSize=64m"/>
+                <jvmarg value="-XX:-CreateCoredumpOnCrash"/>
+                <jvmarg value="-Xss512k"/>
+                <jvmarg value="-Djava.security.manager=org.codedefenders.execution.TestSecurityManager"/>
+                <jvmarg value="-Djava.security.properties=${codedef.home}/security.properties"/>
+                <jvmarg value="-Djava.security.policy==${policyfile}"/>
+                <assertions><enable/></assertions>
+            </junit>
+        </sequential>
+    </macrodef>
+
 	<!-- requires test to compile, and the classname of the test file -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
-		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true">
 			<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 			<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
-			<junit printsummary="true" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-                <sysproperty key="codedef.home" value="${codedef.home}"/>
-
-				<classpath refid="test.cp"/>
-				<classpath location="${test.file}"/>
-
-				<test name="${testClassname}"/>
-
-				<formatter type="plain" usefile="false"/>
-
-				<jvmarg value="-Djava.security.manager"/>
-				<jvmarg value="-Djava.security.policy==${policyfile}"/>
-				<assertions><enable/></assertions>
-			</junit>
-		</jacoco:coverage>
+		<sandbox-junit coverage="true">
+            <test-classpath>
+                <classpath refid="test.cp"/>
+                <classpath location="${test.file}"/>
+            </test-classpath>
+        </sandbox-junit>
 	</target>
 
 	<!-- requires test, mutant, and the name of the class -->
 	<target name="test-mutant" description="run test on mutant to see if test fails">
 		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-            <sysproperty key="codedef.home" value="${codedef.home}"/>
-
-			<!-- Sets the content of the classpath to the mutant -->
-			<classpath location="${mutant.file}"/>
-			<classpath location="${test.file}"/>
-			<classpath refid="sources.cp"/>
-
-			<!-- testname -->
-			<test name="${testClassname}"/>
-
-			<formatter type="plain" usefile="false"/>
-
-			<jvmarg value="-Djava.security.manager"/>
-			<jvmarg value="-Djava.security.policy==${policyfile}"/>
-			<assertions><enable/></assertions>
-		</junit>
+		<sandbox-junit>
+            <test-classpath>
+                <classpath location="${mutant.file}"/>
+                <classpath location="${test.file}"/>
+                <classpath refid="sources.cp"/>
+            </test-classpath>
+        </sandbox-junit>
 	</target>
 
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
@@ -110,7 +158,9 @@
 			depends="compile-mutant, compile-test">
 		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.release.version}"
 			   classpath="${mutant.file}" classpathref="sources.cp"
-			   includeantruntime="false" debug="true" nowarn="true"/>
+			   includeantruntime="false" debug="true" nowarn="true">
+            <compilerarg value="-proc:none"/>
+        </javac>
 	</target>
 
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
@@ -119,23 +169,13 @@
 			depends="recompile-test-with-mutant">
 		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-            <sysproperty key="codedef.home" value="${codedef.home}"/>
-
-			<!-- Sets the content of the classpath to the mutant -->
-			<classpath location="${mutant.file}"/>
-			<classpath location="${mutant.test.file}"/>
-			<classpath refid="sources.cp"/>
-
-			<!-- testname -->
-			<test name="${testClassname}"/>
-
-			<formatter type="plain" usefile="false"/>
-
-			<jvmarg value="-Djava.security.manager"/>
-			<jvmarg value="-Djava.security.policy==${policyfile}"/>
-			<assertions><enable/></assertions>
-		</junit>
+		<sandbox-junit>
+            <test-classpath>
+                <classpath location="${mutant.file}"/>
+                <classpath location="${mutant.test.file}"/>
+                <classpath refid="sources.cp"/>
+            </test-classpath>
+        </sandbox-junit>
 	</target>
 
 </project>

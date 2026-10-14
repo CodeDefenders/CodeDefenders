@@ -156,7 +156,7 @@ public class AntProcessResult {
         return hasError;
     }
 
-    /** Mutle execution takes the outcome from a protected report rather than submitted-code stdout. */
+    /** Test execution takes the outcome from a protected report rather than submitted-code stdout. */
     void setTestOutcome(boolean failure, boolean error) {
         hasFailure = failure;
         hasError = error;

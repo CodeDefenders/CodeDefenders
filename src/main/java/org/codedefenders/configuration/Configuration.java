@@ -158,6 +158,8 @@ public class Configuration extends BaseConfiguration {
                     validationErrors.add(setupDirectory(getSourcesDir()));
 
                     validationErrors.add(setupDirectory(getLibraryDir()));
+                    validationErrors.add(setupFile(dataDir, "security.properties",
+                            () -> this.getClass().getResourceAsStream("/data/security.properties")));
                 }
             }
 
