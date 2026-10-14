@@ -27,7 +27,7 @@ import org.codedefenders.arcade.mutle.persistence.MutleRepository;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.transaction.Transaction;
 import org.codedefenders.transaction.TransactionManager;
-import org.codedefenders.transaction.TransactionalSupplier;
+import org.codedefenders.transaction.TransactionalRunnable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -35,6 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -58,9 +60,10 @@ class MutleGuestCleanupJobTest {
         when(config.getTestsDir()).thenReturn(root.toFile());
         TransactionManager transactions = mock(TransactionManager.class);
         Transaction transaction = mock(Transaction.class);
-        when(transactions.executeInTransaction(any(TransactionalSupplier.class)))
-                .thenAnswer(invocation -> ((TransactionalSupplier<?>) invocation.getArgument(0))
-                        .executeInTransaction(transaction));
+        doAnswer(invocation -> {
+            ((TransactionalRunnable) invocation.getArgument(0)).executeInTransaction(transaction);
+            return null;
+        }).when(transactions).executeInTransaction(any(TransactionalRunnable.class));
 
         new MutleGuestCleanupJob(repository, transactions, config).run();
 
@@ -82,10 +85,11 @@ class MutleGuestCleanupJobTest {
         when(config.getTestsDir()).thenReturn(root.toFile());
         TransactionManager transactions = mock(TransactionManager.class);
         Transaction transaction = mock(Transaction.class);
-        when(transactions.executeInTransaction(any(TransactionalSupplier.class)))
-                .thenThrow(new SQLException("first game cannot be deleted"))
-                .thenAnswer(invocation -> ((TransactionalSupplier<?>) invocation.getArgument(0))
-                        .executeInTransaction(transaction));
+        doThrow(new SQLException("first game cannot be deleted"))
+                .doAnswer(invocation -> {
+                    ((TransactionalRunnable) invocation.getArgument(0)).executeInTransaction(transaction);
+                    return null;
+                }).when(transactions).executeInTransaction(any(TransactionalRunnable.class));
 
         MutleGuestCleanupJob job = new MutleGuestCleanupJob(repository, transactions, config);
         job.run();

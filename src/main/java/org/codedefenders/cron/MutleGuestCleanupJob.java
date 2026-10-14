@@ -31,7 +31,6 @@ import org.codedefenders.arcade.mutle.persistence.MutleRepository;
 import org.codedefenders.arcade.mutle.service.MutleGuestLimits;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.transaction.TransactionManager;
-import org.codedefenders.transaction.TransactionalSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +56,13 @@ public class MutleGuestCleanupJob extends FixedDelayCronJob {
         try {
             for (int gameId : repository.expiredGuestGames(cutoff)) {
                 try {
-                    transactions.executeInTransaction((TransactionalSupplier<Boolean>) transaction -> {
+                    transactions.executeInTransaction(transaction -> {
                         if (!repository.deleteExpiredGuestGame(gameId, cutoff)) {
-                            return false;
+                            return;
                         }
                         // Delete before commit so a filesystem failure keeps the DB row available for retry.
                         deleteTests(config.getTestsDir().toPath(), gameId);
                         transaction.commit();
-                        return true;
                     });
                 } catch (Exception e) {
                     logger.error("Could not clean up expired Mutle guest game {}", gameId, e);

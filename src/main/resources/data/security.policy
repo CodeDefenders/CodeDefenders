@@ -42,7 +42,6 @@ grant codeBase "${codedef.library.url}-" {
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
     permission java.lang.RuntimePermission "getProtectionDomain";
     permission java.util.PropertyPermission "*", "read";
-    permission java.io.FilePermission "${codedef.library}/-", "read";
     permission java.io.FilePermission "${ant.home}/lib/-", "read";
     permission java.io.FilePermission "${cut.dir}/-", "read";
     permission java.io.FilePermission "${test.file}/-", "read";
@@ -81,7 +80,6 @@ grant codeBase "${ant.library.url}-" {
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
     permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt";
     permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt.*";
-    permission java.io.FilePermission "${codedef.library}/-", "read";
     permission java.io.FilePermission "${ant.home}/lib/-", "read";
     permission java.io.FilePermission "${cut.dir}/-", "read";
     permission java.io.FilePermission "${test.file}/-", "read";

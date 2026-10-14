@@ -13,7 +13,6 @@
 	<makeurl property="recompiled.test.url" file="${mutant.test.file}"/>
 	<!-- Pass only the paths needed by the shared policy to each forked test JVM. -->
 	<propertyset id="sandbox.properties">
-		<propertyref name="codedef.home"/>
 		<propertyref name="codedef.library"/>
 		<propertyref name="codedef.library.url"/>
 		<propertyref name="ant.home"/>

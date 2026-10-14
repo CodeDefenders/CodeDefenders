@@ -125,13 +125,6 @@ class AntRunnerTest {
     }
 
     @Test
-    void junitAndCoverageRunSuccessfullyUnderTheSameRestrictedPolicy() throws Exception {
-        AntProcessResult result = runJunitProbe("assertEquals(2, Math.abs(-2));");
-        assertFalse(result.hasFailure());
-        assertFalse(result.hasError());
-    }
-
-    @Test
     void submittedOutputCanContainExecutionFailureMessages() throws Exception {
         AntProcessResult result = runJunitProbe("""
                 for (String message : java.util.List.of(
@@ -315,7 +308,9 @@ class AntRunnerTest {
                 import static org.hamcrest.Matchers.is;
                 import static org.mockito.Mockito.*;
                 public class SandboxJUnitProbe {
-                    @Test public void test() {
+                    @Test public void test() throws Exception {
+                        SandboxJUnitProbe.class.getDeclaredMethod("test").setAccessible(true);
+                        assertNotNull(Class.forName("net.bytebuddy.ByteBuddy"));
                         Sample mock = mock(Sample.class);
                         when(mock.value()).thenReturn(7);
                         assertEquals(7, mock.value());
@@ -370,17 +365,6 @@ class AntRunnerTest {
             assertTrue(result.getErrorMessage().contains("SecurityException")
                     || result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
         }
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void sharedBuildAllowsMockitoReflectionAndLibrariesInEveryMode(boolean mutle) throws Exception {
-        AntProcessResult result = runJunitProbe("""
-                SandboxJUnitProbe.class.getDeclaredMethod("test").setAccessible(true);
-                assertNotNull(Class.forName("net.bytebuddy.ByteBuddy"));
-                """, mutle);
-        assertFalse(result.hasFailure(), result.getErrorMessage());
-        assertFalse(result.hasError(), result.getErrorMessage());
     }
 
     @Test
