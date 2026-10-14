@@ -156,7 +156,7 @@ integration-tests_public-mutle:
     CODEDEFENDERS_DB_PASSWORD: public-mutle-ci
   before_script:
     - apt-get update
-    - apt-get install -y --no-install-recommends maven openjdk-17-jdk-headless ant ant-optional tomcat10 chromium chromium-driver curl unzip gettext git
+    - apt-get install -y --no-install-recommends maven openjdk-17-jdk-headless ant ant-optional tomcat10 chromium chromium-driver curl unzip
   script:
     - bash scripts/ci/test-public-mutle
   artifacts:

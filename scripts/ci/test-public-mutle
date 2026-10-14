@@ -38,8 +38,12 @@ if [ "$mutle_ready" != true ]; then
     exit 1
 fi
 
-# Maven/Failsafe owns the tests and reports; seeding is restricted to this disposable instance.
-mvn ${MAVEN_ARGS:-} verify -P it-public-mutle -DskipUnitTests -DskipFrontend=true -Dskip.installnodenpm=true \
+# The build job already compiled the application and integration tests and supplied the WAR.
+# Run only the JaCoCo setup and Failsafe goals here; running the full lifecycle would
+# rebuild and repackage an artifact that is not deployed by this job.
+mvn ${MAVEN_ARGS:-} \
+    jacoco:prepare-agent-integration@pre-integration-test \
+    failsafe:integration-test failsafe:verify -P it-public-mutle \
     -DpublicMutle.url=http://localhost:8080 -DpublicMutle.seed=true \
     "-DpublicMutle.jdbcUrl=jdbc:mysql://${CODEDEFENDERS_DB_HOST}:3306/${CODEDEFENDERS_DB_NAME}" \
     "-DpublicMutle.dbUsername=${CODEDEFENDERS_DB_USERNAME}" \
