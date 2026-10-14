@@ -96,8 +96,6 @@ public class DependencyProvider {
             JACOCO_CLASSPATH = resolver.resolveDependencies(parseSpecs(JACOCO_SPECS)).getClasspath();
             try {
                 TestExecutionSandbox.securityManagerJar(config.getLibraryDir().toPath().resolve("test-security.jar"));
-                TestExecutionSandbox.coverageAgent(JACOCO_CLASSPATH,
-                        config.getLibraryDir().toPath().resolve("jacocoagent.jar"));
             } catch (IOException e) {
                 throw resolver.new MavenDependencyResolverException(e);
             }

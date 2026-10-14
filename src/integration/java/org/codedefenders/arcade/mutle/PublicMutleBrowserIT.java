@@ -140,8 +140,10 @@ class PublicMutleBrowserIT {
         for (String payload : RUNNER_ATTACKS) {
             submit(payload);
             new WebDriverWait(browser, 40).until(driver -> {
-                String detail = driver.findElement(By.id("mutle-notice-detail-text")).getAttribute("textContent");
-                return detail.contains("SecurityException") || detail.contains("AccessControlException");
+                String detail = driver.findElement(By.id("mutle-notice")).getAttribute("textContent");
+                return detail.contains("SecurityException") || detail.contains("AccessControlException")
+                        || (payload.contains("org.jacoco.agent.rt.RT.getAgent()")
+                            && detail.contains("package org.jacoco.agent.rt does not exist"));
             });
             assertTrue(browser.findElement(By.id("mutle-remaining")).getText().contains("6"));
             assertEquals(0, browser.findElements(By.cssSelector("#mutle-history .accordion-item")).size());

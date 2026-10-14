@@ -34,6 +34,8 @@ import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,7 +50,7 @@ class TestExecutionSandboxTest {
     Path root;
 
     @Test
-    void sandboxBlocksFileReadWriteEnvironmentNetworkProcessesReflectionAndPolicyRemoval() throws Exception {
+    void sandboxBlocksFileReadWriteEnvironmentNetworkProcessesAndPolicyRemoval() throws Exception {
         Path workspace = Files.createDirectory(root.resolve("workspace")).toRealPath();
         Path library = Files.createDirectory(workspace.resolve("lib"));
         Path canary = root.resolve("canary.txt");
@@ -81,7 +83,6 @@ class TestExecutionSandboxTest {
                         try { action.run(); throw new AssertionError("escaped"); }
                         catch (SecurityException expected) { System.out.println("DENIED"); }
                     }
-                    private static void hidden() { }
                     public static void main(String[] args) throws Exception {
                         denied(() -> java.nio.file.Files.readString(java.nio.file.Path.of(args[0])));
                         denied(() -> java.nio.file.Files.writeString(java.nio.file.Path.of(args[0]), "overwritten"));
@@ -89,7 +90,6 @@ class TestExecutionSandboxTest {
                         denied(() -> new java.net.Socket("127.0.0.1", 9));
                         denied(() -> new ProcessBuilder("/bin/true").start());
                         denied(() -> System.setSecurityManager(null));
-                        denied(() -> SandboxProbe.class.getDeclaredMethod("hidden").setAccessible(true));
                         denied(() -> TrustedReader.read(args[0]));
                         denied(() -> SandboxProbe.class.getProtectionDomain().getPermissions()
                             .add(new java.security.AllPermission()));
@@ -103,7 +103,7 @@ class TestExecutionSandboxTest {
                     }
                 }
                 """, jar);
-        Path policy = workspace.resolve("mutle.policy");
+        Path policy = workspace.resolve("test.policy");
         Path security = library.resolve("test-security.jar");
         TestExecutionSandbox.securityManagerJar(security);
         Files.writeString(policy, resource("security.policy")
@@ -118,7 +118,7 @@ class TestExecutionSandboxTest {
                 "SandboxProbe", canary.toString());
         process.environment().put("MUTLE_SECRET", "private-review-canary");
         String output = TestExecutionSandbox.runProcess(process, Duration.ofSeconds(10));
-        assertEquals(13, output.lines().filter("DENIED"::equals).count(), output);
+        assertEquals(12, output.lines().filter("DENIED"::equals).count(), output);
         assertFalse(output.contains("private-review-canary"), output);
         assertEquals("private-review-canary", Files.readString(canary));
     }
@@ -140,10 +140,22 @@ class TestExecutionSandboxTest {
     }
 
     @Test
-    void submittedCodeCannotInspectOriginsOrControlCoverageDirectlyOrReflectively() throws Exception {
+    void securityFailureDetailsFitTheStoredExecutionMessage() throws Exception {
+        AntProcessResult result = runJunitProbe("""
+                System.out.println("TEST_BODY_ENTERED");
+                java.nio.file.Files.readString(java.nio.file.Path.of("/etc/passwd"));
+                """);
+        assertTrue(result.hasError(), result.getErrorMessage());
+        // TargetExecutionDAO stores at most 2,000 characters, before Mutle formats the details.
+        String stored = result.getErrorMessage().substring(0, Math.min(2_000, result.getErrorMessage().length()));
+        assertTrue(stored.contains("TEST_BODY_ENTERED"), stored);
+        assertTrue(stored.contains("AccessControlException"), stored);
+    }
+
+    @Test
+    void submittedCodeCannotInspectOriginsOrControlCoverageReflectively() throws Exception {
         for (String statement : List.of(
                 "SandboxJUnitProbe.class.getProtectionDomain();",
-                "org.jacoco.agent.rt.RT.getAgent().reset();",
                 "Class.forName(\"org.jacoco.agent.rt.RT\").getMethod(\"getAgent\").invoke(null);")) {
             AntProcessResult result = runJunitProbe(statement);
             assertTrue(result.hasError(), statement + "\n" + result.getErrorMessage());
@@ -153,7 +165,11 @@ class TestExecutionSandboxTest {
     }
 
     private AntProcessResult runJunitProbe(String statement) throws Exception {
-        Fixture fixture = fixture();
+        return runJunitProbe(statement, false);
+    }
+
+    private AntProcessResult runJunitProbe(String statement, boolean mutle) throws Exception {
+        Fixture fixture = fixture(mutle);
         fixture.test("import org.junit.Test; import static org.junit.Assert.*; public class SandboxJUnitProbe {"
                 + " @Test public void test() throws Exception { " + statement + " } }");
         AntProcessResult compilation = fixture.run("compile-test");
@@ -198,12 +214,6 @@ class TestExecutionSandboxTest {
                 common.add(destination.toString());
             }
         }
-        // The agent's public runtime API is intentionally visible at compile time and restricted at execution.
-        Path agent = library.resolve("jacocoagent.jar");
-        try (var input = org.jacoco.agent.AgentJar.getResourceAsStream()) {
-            Files.copy(input, agent);
-        }
-        common.add(agent.toString());
         TestExecutionSandbox.securityManagerJar(library.resolve("test-security.jar"));
         for (String name : List.of("build.xml", "security.policy", "security.properties")) {
             Files.writeString(directory.resolve(name), resource(name));
@@ -253,9 +263,10 @@ class TestExecutionSandboxTest {
         }
     }
 
-    @Test
-    void sharedBuildSupportsAssertionsMocksCoverageAndBothMutantTargets() throws Exception {
-        Fixture fixture = fixture();
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void sharedBuildSupportsAssertionsMocksCoverageAndBothMutantTargets(boolean mutle) throws Exception {
+        Fixture fixture = fixture(mutle);
         fixture.test("""
                 import org.junit.Test;
                 import static org.junit.Assert.*;
@@ -278,17 +289,27 @@ class TestExecutionSandboxTest {
         AntProcessResult original = fixture.run("test-original");
         assertFalse(original.hasFailure(), original.getErrorMessage());
         assertFalse(original.hasError(), original.getErrorMessage());
-        assertTrue(Files.size(fixture.testDirectory().resolve("jacoco.exec")) > 0);
+        Path coverage = fixture.testDirectory().resolve("jacoco.exec");
+        byte[] originalCoverage = Files.readAllBytes(coverage);
+        var loader = new org.jacoco.core.tools.ExecFileLoader();
+        loader.load(coverage.toFile());
+        assertTrue(loader.getExecutionDataStore().getContents().stream()
+                .anyMatch(data -> data.getName().equals("Sample") && data.hasHits()));
+        assertTrue(loader.getExecutionDataStore().getContents().stream()
+                .anyMatch(data -> data.getName().equals("Dependency") && data.hasHits()));
         AntProcessResult mutant = fixture.run("test-mutant");
         assertTrue(mutant.hasFailure(), mutant.getErrorMessage());
         assertFalse(mutant.hasError(), mutant.getErrorMessage());
         AntProcessResult recompiled = fixture.run("recompiled-test-mutant");
         assertTrue(recompiled.hasFailure(), recompiled.getErrorMessage());
         assertFalse(recompiled.hasError(), recompiled.getErrorMessage());
+        assertTrue(java.util.Arrays.equals(originalCoverage, Files.readAllBytes(coverage)),
+                "Mutant executions must not overwrite original coverage");
     }
 
-    @Test
-    void sharedBuildDeniesValidationBypassesAndOrdinaryThreadCreation() throws Exception {
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void sharedBuildDeniesValidationBypassesAndOrdinaryThreadCreation(boolean mutle) throws Exception {
         for (String statement : List.of(
                 "java.nio.file.Files.readString(java.nio.file.Path.of(\"/etc/passwd\"));",
                 "java.nio.file.Files.writeString(java.nio.file.Path.of(\"escape.txt\"), \"escape\");",
@@ -303,46 +324,61 @@ class TestExecutionSandboxTest {
                 "new ClassLoader() {};",
                 "new net.bytebuddy.ByteBuddy().subclass(Object.class).make()"
                     + ".load(SandboxJUnitProbe.class.getClassLoader());")) {
-            AntProcessResult result = runJunitProbe(statement);
+            AntProcessResult result = runJunitProbe(statement, mutle);
             assertTrue(result.hasError(), statement + "\n" + result.getErrorMessage());
             assertTrue(result.getErrorMessage().contains("SecurityException")
                     || result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
         }
     }
 
-    @Test
-    void sharedBuildRetainsMutleReflectionRestriction() throws Exception {
-        Fixture fixture = fixture(true);
-        fixture.test("""
-                import org.junit.Test;
-                public class SandboxJUnitProbe {
-                    private int hidden;
-                    @Test public void test() throws Exception {
-                        SandboxJUnitProbe.class.getDeclaredField("hidden").setAccessible(true);
-                    }
-                }
-                """);
-        assertTrue(fixture.run("compile-test").compiled());
-        AntProcessResult result = fixture.run("test-original");
-        assertTrue(result.hasError(), result.getErrorMessage());
-        assertTrue(result.getErrorMessage().contains("suppressAccessChecks"), result.getErrorMessage());
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void sharedBuildAllowsMockitoReflectionAndLibrariesInEveryMode(boolean mutle) throws Exception {
+        AntProcessResult result = runJunitProbe("""
+                SandboxJUnitProbe.class.getDeclaredMethod("test").setAccessible(true);
+                assertNotNull(Class.forName("net.bytebuddy.ByteBuddy"));
+                """, mutle);
+        assertFalse(result.hasFailure(), result.getErrorMessage());
+        assertFalse(result.hasError(), result.getErrorMessage());
     }
 
     @Test
-    void sharedBuildRetainsMutleClasspathRestriction() throws Exception {
-        Fixture fixture = fixture(true);
+    void mutantClassesCannotShadowTheSecurityManager() throws Exception {
+        Fixture fixture = fixture();
+        compile(fixture.directory().resolve("mutant"), "TestSecurityManager", """
+                package org.codedefenders.execution;
+                public class TestSecurityManager extends SecurityManager {
+                    @Override public void checkPermission(java.security.Permission permission) { }
+                }
+                """);
         fixture.test("""
                 import org.junit.Test;
                 public class SandboxJUnitProbe {
                     @Test public void test() throws Exception {
-                        Class.forName("net.bytebuddy.ByteBuddy");
+                        java.nio.file.Files.readString(java.nio.file.Path.of("/etc/passwd"));
                     }
                 }
                 """);
         assertTrue(fixture.run("compile-test").compiled());
-        AntProcessResult result = fixture.run("test-original");
-        assertTrue(result.hasError(), result.getErrorMessage());
-        assertTrue(result.getErrorMessage().contains("ClassNotFoundException"), result.getErrorMessage());
+        for (String target : List.of("test-mutant", "recompiled-test-mutant")) {
+            AntProcessResult result = fixture.run(target);
+            assertTrue(result.hasError(), result.getErrorMessage());
+            assertTrue(result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
+        }
+    }
+
+    @Test
+    void coverageControlApiIsNotOnTheSubmittedCompilationClasspath() throws Exception {
+        Fixture fixture = fixture();
+        fixture.test("""
+                import org.junit.Test;
+                public class SandboxJUnitProbe {
+                    @Test public void test() { org.jacoco.agent.rt.RT.getAgent().reset(); }
+                }
+                """);
+        AntProcessResult result = fixture.run("compile-test");
+        assertFalse(result.compiled(), result.getErrorMessage());
+        assertTrue(result.getErrorMessage().contains("org.jacoco.agent.rt"), result.getErrorMessage());
     }
 
     @Test

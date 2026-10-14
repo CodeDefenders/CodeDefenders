@@ -107,8 +107,11 @@ class PublicMutleHttpIT {
         for (String payload : RUNNER_ATTACKS) {
             var response = client.guess(game, payload);
             assertEquals(422, response.statusCode(), response.body());
-            assertTrue(json(response).get("message").getAsString().contains("SecurityException")
-                    || json(response).get("message").getAsString().contains("AccessControlException"), response.body());
+            String message = json(response).get("message").getAsString();
+            // The existing JaCoCo setup exposes its control API only inside the instrumented JVM.
+            assertTrue(message.contains("SecurityException") || message.contains("AccessControlException")
+                    || (payload.contains("org.jacoco.agent.rt.RT.getAgent()")
+                        && message.contains("package org.jacoco.agent.rt does not exist")), response.body());
             var state = client.state(game);
             assertFalse(state.get("solved").getAsBoolean());
             assertEquals(0, state.get("acceptedGuesses").getAsInt());

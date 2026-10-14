@@ -27,16 +27,24 @@ import java.security.Permission;
 @SuppressWarnings("removal")
 public final class TestSecurityManager extends SecurityManager {
     public TestSecurityManager() {
-        // Resolve Ant's actual jar directory on this worker (Debian's ant/lib jars are symlinks).
-        if (System.getProperty("ant.core.lib") != null) {
+        // Resolve trusted jar URLs on this worker, including Debian's symlinked Ant jars.
+        setJarUrl("ant.core.lib", "ant.library.url", true);
+        // Mutant executions have no agent; keep the policy's agent grant inactive there.
+        System.setProperty("jacoco.agent.url", "file:/no-coverage-agent");
+        setJarUrl("jacoco.agent.file", "jacoco.agent.url", false);
+    }
+
+    private static void setJarUrl(String fileProperty, String urlProperty, boolean parent) {
+        String file = System.getProperty(fileProperty);
+        if (file != null) {
             try {
-                Path jar = Path.of(System.getProperty("ant.core.lib")).toRealPath();
+                Path jar = Path.of(file).toRealPath();
                 if (!Files.isRegularFile(jar)) {
-                    throw new IOException("Ant runtime is not a jar");
+                    throw new IOException("Trusted runtime is not a jar");
                 }
-                System.setProperty("ant.library.url", jar.getParent().toUri().toString());
+                System.setProperty(urlProperty, (parent ? jar.getParent() : jar).toUri().toString());
             } catch (IOException e) {
-                throw new IllegalStateException("Could not locate the trusted Ant runtime", e);
+                throw new IllegalStateException("Could not locate the trusted runtime: " + fileProperty, e);
             }
         }
     }

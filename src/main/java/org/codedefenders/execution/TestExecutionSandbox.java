@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
-import java.util.zip.ZipFile;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -101,20 +100,6 @@ public final class TestExecutionSandbox {
             input.transferTo(output);
             output.closeEntry();
         }
-    }
-
-    /** Install the coverage agent in the trusted library directory rather than a shared temporary directory. */
-    public static void coverageAgent(String classpath, Path destination) throws IOException {
-        for (String entry : classpath.split(java.util.regex.Pattern.quote(java.io.File.pathSeparator))) {
-            if (Path.of(entry).getFileName().toString().startsWith("org.jacoco.agent-")) {
-                try (var zip = new ZipFile(entry);
-                     var input = zip.getInputStream(zip.getEntry("jacocoagent.jar"))) {
-                    Files.copy(input, destination, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    return;
-                }
-            }
-        }
-        throw new IOException("Coverage agent is missing");
     }
 
     static void readTestOutcome(Path report, AntProcessResult result) {

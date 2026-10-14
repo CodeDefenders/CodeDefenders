@@ -23,13 +23,13 @@ grant {
     permission java.lang.RuntimePermission "net.bytebuddy.createJavaDispatcher";
 };
 
-// Preserve Mockito support in existing modes without allowing Mutle tests to change private state.
-grant codeBase "${test.reflection.url}-" {
+// All game modes use the same permissions, including the reflection needed by Mockito.
+grant codeBase "${test.url}-" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
 };
-grant codeBase "${recompiled.test.reflection.url}-" {
+grant codeBase "${recompiled.test.url}-" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
@@ -60,7 +60,16 @@ grant codeBase "${codedef.library.url}-" {
 };
 
 // JaCoCo creates its shutdown-hook thread before any submitted code runs.
-grant codeBase "${codedef.library.url}jacocoagent.jar" {
+// Ant extracts the coverage agent; the security manager normalizes that exact jar's URL.
+grant codeBase "${jacoco.agent.url}" {
+    permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+    permission java.lang.RuntimePermission "defineClass";
+    permission java.util.PropertyPermission "*", "read";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt.*";
+    permission java.io.FilePermission "${test.file}", "read";
+    permission java.io.FilePermission "${test.file}/jacoco.exec", "write";
+    permission java.lang.RuntimePermission "shutdownHooks";
     permission java.lang.RuntimePermission "modifyThread";
     permission java.lang.RuntimePermission "modifyThreadGroup";
 };

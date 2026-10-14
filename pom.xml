@@ -1192,7 +1192,7 @@
 
 		<dependency>
 			<groupId>org.jacoco</groupId>
-			<artifactId>org.jacoco.agent</artifactId>
+			<artifactId>org.jacoco.ant</artifactId>
 			<version>0.8.8</version>
 			<scope>test</scope>
 		</dependency>
