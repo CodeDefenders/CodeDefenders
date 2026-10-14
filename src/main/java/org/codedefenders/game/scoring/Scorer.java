@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 /**
@@ -32,21 +33,21 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 @Deprecated
 public abstract class Scorer {
 
-    protected abstract int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants);
+    protected abstract int scoreTest(AbstractMultiplayerGame game, Test test, List<Mutant> killedMutants);
 
-    protected abstract int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests);
+    protected abstract int scoreMutant(AbstractMultiplayerGame game, Mutant mutant, List<Test> passedTests);
 
     /**
-     * Calls {@link SizeScorer#scoreTest(MultiplayerGame, Test, List)} for a new {@link SizeScorer} instance.
+     * Calls {@link SizeScorer#scoreTest(AbstractMultiplayerGame, Test, List)} for a new {@link SizeScorer} instance.
      */
-    public static int score(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
+    public static int score(AbstractMultiplayerGame game, Test test, List<Mutant> killedMutants) {
         return new SizeScorer().scoreTest(game, test, killedMutants);
     }
 
     /**
-     * Calls {@link SizeScorer#scoreMutant(MultiplayerGame, Mutant, List)} for a new {@link SizeScorer} instance.
+     * Calls {@link SizeScorer#scoreMutant(AbstractMultiplayerGame, Mutant, List)} for a new {@link SizeScorer} instance.
      */
-    public static int score(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+    public static int score(AbstractMultiplayerGame game, Mutant mutant, List<Test> passedTests) {
         return new SizeScorer().scoreMutant(game, mutant, passedTests);
     }
 }

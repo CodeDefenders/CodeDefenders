@@ -31,12 +31,14 @@ import org.codedefenders.game.scoring.Scorer;
 @Deprecated
 public class CoverageScorer extends Scorer {
     @Override
-    protected int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
-        return (game.getDefenderValue() + killedMutants.size()) * test.getLineCoverage().getLinesCovered().size();
+    protected int scoreTest(AbstractMultiplayerGame game, Test test, List<Mutant> killedMutants) {
+        MultiplayerGame multiplayerGame = (MultiplayerGame) game;
+        return (multiplayerGame.getDefenderValue() + killedMutants.size()) * test.getLineCoverage().getLinesCovered().size();
     }
 
     @Override
-    protected int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
-        return (game.getAttackerValue() + passedTests.size());
+    protected int scoreMutant(AbstractMultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+        MultiplayerGame multiplayerGame = (MultiplayerGame) game;
+        return (multiplayerGame.getAttackerValue() + passedTests.size());
     }
 }

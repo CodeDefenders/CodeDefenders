@@ -586,7 +586,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
+        messages.add(mutationTester.runTestOnAllMultiplayerMutants(game, newTest));
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 /**
@@ -33,17 +34,19 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 public class CoverageScorer extends Scorer {
 
     @Override
-    protected int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
+    protected int scoreTest(AbstractMultiplayerGame game, Test test, List<Mutant> killedMutants) {
+        MultiplayerGame multiplayerGame = (MultiplayerGame) game;
         int totalLines = test.getLineCoverage().getLinesCovered().size()
                 + test.getLineCoverage().getLinesUncovered().size();
 
         float percentCovered = test.getLineCoverage().getLinesCovered().size() / (float) totalLines;
 
-        return killedMutants.size() + (int) (game.getDefenderValue() * percentCovered);
+        return killedMutants.size() + (int) (multiplayerGame.getDefenderValue() * percentCovered);
     }
 
     @Override
-    protected int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+    protected int scoreMutant(AbstractMultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+        MultiplayerGame multiplayerGame = (MultiplayerGame) game;
         List<Mutant> mutants = game.getMutants();
 
         Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
@@ -60,7 +63,7 @@ public class CoverageScorer extends Scorer {
             }
         }
 
-        int lineScore = game.getAttackerValue();
+        int lineScore = multiplayerGame.getAttackerValue();
         for (int line : mutant.getLines()) {
             if (mutantLines.containsKey(line)) {
                 float percent = mutants.size() == 0 ? 1f : 1f - (mutantLines.get(line).size() / (float) mutants.size());

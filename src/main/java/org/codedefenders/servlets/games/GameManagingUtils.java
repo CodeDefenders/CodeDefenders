@@ -569,7 +569,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        final PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }

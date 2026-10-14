@@ -32,6 +32,7 @@ import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.scoring.Scorer;
@@ -108,10 +109,11 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
+    public PreparedMessage runTestOnAllMultiplayerMutants(AbstractMultiplayerGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
+        mutants.removeIf(mutant -> mutant.getPlayerId() == test.getPlayerId());
         List<Mutant> killedMutants = new ArrayList<>();
 
         // Acquire and release the connection
@@ -122,6 +124,7 @@ public class MutationTester implements IMutationTester {
         }
 
         for (Mutant mutant : mutants) {
+
             // Skip mutants which changed lines does not match with covered lines by the test
             // Exception for mutants who modify static variables (which also requires a recompile)
             if (!mutant.doesRequireRecompilation() && useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -232,6 +235,10 @@ public class MutationTester implements IMutationTester {
                         break;
                     }
                 }
+
+                int score = Scorer.score(game, mutant, missedTests);
+                mutant.setScore(score);
+                mutantRepo.incrementMutantScore(mutant, score);
             }
         }
 
@@ -280,6 +287,7 @@ public class MutationTester implements IMutationTester {
     public PreparedMessage runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler) {
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
+        tests.removeIf(test -> test.getPlayerId() == mutant.getPlayerId());
 
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
         if (u.isEmpty()) {
@@ -295,13 +303,13 @@ public class MutationTester implements IMutationTester {
 
             if (testVsMutant(test, mutant)) {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-                if (game instanceof MultiplayerGame) {
+                if (game instanceof AbstractMultiplayerGame abstractMultiplayerGame) {
                     ArrayList<Mutant> mlist = new ArrayList<>();
                     mlist.add(mutant);
                     // test.setScore(Scorer.score((MultiplayerGame) game, test,
                     // mlist));
                     // test.update();
-                    int score = Scorer.score((MultiplayerGame) game, test, mlist);
+                    int score = Scorer.score(abstractMultiplayerGame, test, mlist);
                     testRepo.incrementTestScore(test.getId(), score);
                 }
 
@@ -321,7 +329,7 @@ public class MutationTester implements IMutationTester {
         // 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
         // the first block and the second one are swapped. Why ?
         ArrayList<Test> missedTests = new ArrayList<>();
-        if (game instanceof MultiplayerGame) {
+        if (game instanceof AbstractMultiplayerGame abstractMultiplayerGame) {
             for (Test t : tests) {
                 if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
                     missedTests.add(t);
@@ -330,7 +338,7 @@ public class MutationTester implements IMutationTester {
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
             // mutant.update();
-            int score = 1 + Scorer.score((MultiplayerGame) game, mutant, missedTests);
+            int score = 1 + Scorer.score(abstractMultiplayerGame, mutant, missedTests);
             mutant.setScore(score);
             mutantRepo.incrementMutantScore(mutant, score);
         }

@@ -21,6 +21,7 @@ package org.codedefenders.execution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.util.PreparedMessage;
@@ -29,7 +30,7 @@ public interface IMutationTester {
 
     PreparedMessage runTestOnAllMutants(AbstractGame game, Test test);
 
-    PreparedMessage runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test);
+    PreparedMessage runTestOnAllMultiplayerMutants(AbstractMultiplayerGame game, Test test);
 
     // TODO Note that we need duplicate methods because the basic runAll methods use
     // AbstractGame !
