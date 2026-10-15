@@ -337,7 +337,7 @@ container-image-build-only:
 ###
 
 .deploy:
-  image: debian:11-slim
+  image: debian:bookworm-slim
   stage: deploy
   needs:
     - build
@@ -347,7 +347,7 @@ container-image-build-only:
     GIT_STRATEGY: none
   before_script:
     # Taken from: https://docs.gitlab.com/ee/ci/ssh_keys/README.html#ssh-keys-when-using-the-docker-executor
-    - command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )
+    - command -v ssh-agent >/dev/null || ( apt-get update -y --allow-releaseinfo-change && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-client )
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | base64 --decode | ssh-add -
     - mkdir -p ~/.ssh
