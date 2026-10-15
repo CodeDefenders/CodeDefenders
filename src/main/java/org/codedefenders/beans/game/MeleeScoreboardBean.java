@@ -77,7 +77,16 @@ public class MeleeScoreboardBean {
 
                     PlayerScore mutantScore = mutantsScores.getOrDefault(playerId, new PlayerScore(playerId));
                     PlayerScore testScore = testsScores.getOrDefault(playerId, new PlayerScore(playerId));
+
+                    int mutantDuelScore = mutantScore.getDuelsWon();
+                    mutantScore.increaseTotalScore(-mutantDuelScore);
+
+                    int testDuelScore = testScore.getDuelsWon();
+                    testScore.increaseTotalScore(-testDuelScore);
+
                     PlayerScore duelScore = new PlayerScore(playerId);
+                    duelScore.setDuelsWon(testDuelScore + mutantDuelScore);
+                    duelScore.increaseTotalScore(testDuelScore + mutantDuelScore);
 
 
                     return new ScoreItem(

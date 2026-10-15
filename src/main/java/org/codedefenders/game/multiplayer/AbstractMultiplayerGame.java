@@ -295,13 +295,10 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
         PlayerRepository playerRepo = CDIUtil.getBeanFromCDI(PlayerRepository.class);
 
         List<Player> defenderPlayers;
-        List<Player> attackerPlayers;
         if (this instanceof MultiplayerGame multiplayerGame) {
             defenderPlayers = multiplayerGame.getDefenderPlayers();
-            attackerPlayers = multiplayerGame.getAttackerPlayers();
         } else if (this instanceof MeleeGame meleeGame) {
             defenderPlayers = meleeGame.getPlayers();
-            attackerPlayers = new ArrayList<>(defenderPlayers);
         } else {
             throw new IllegalStateException("Unsupported kind of game: " + this.getClass());
         }
@@ -337,6 +334,9 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
             //            && playerRepo.getPlayer(test.getPlayerId()).getRole() == Role.ATTACKER) {
             //    continue;
             //}
+            if (defenderPlayers.stream().noneMatch(player -> player.getId() == test.getPlayerId())) {
+                continue;
+            }
             if (!testScores.containsKey(test.getPlayerId())) {
                 testScores.put(test.getPlayerId(), new PlayerScore(test.getPlayerId()));
                 mutantsKilled.put(test.getPlayerId(), 0);
@@ -355,7 +355,7 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
         }
 
         //TODO Brauchen wir das? Was sind eigentlich player scores?
-        for (int playerId : mutantsKilled.keySet()) {
+        /*for (int playerId : mutantsKilled.keySet()) {
             if (playerId < 0) {// || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
             }
@@ -366,7 +366,9 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
 
             PlayerScore ts = testScores.get(defendersTeamId);
             ts.increaseTotalScore(playerScore);
-        }
+        }*/
+
+
 
         for (Mutant m : getKilledMutants()) {
             if (!m.getEquivalent().equals(PROVEN_NO)) {
@@ -396,9 +398,13 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
 
         for (var player : defenderPlayers) {
             int playerId = player.getId();
-            testScores.get(playerId).setDuelInformation(challengesWon.get(playerId) + " / "
+            int numberDuelsWon = challengesWon.getOrDefault(playerId, 0);
+            testScores.get(playerId).setDuelInformation(numberDuelsWon + " / "
                     + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
-            testScores.get(playerId).setDuelsWon(challengesWon.get(playerId));
+            testScores.get(playerId).setDuelsWon(numberDuelsWon);
+
+            testScores.get(playerId).increaseTotalScore(numberDuelsWon);
+            testScores.get(defendersTeamId).increaseTotalScore(numberDuelsWon);
         }
         testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / "
                 + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
