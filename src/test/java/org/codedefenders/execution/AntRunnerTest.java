@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -65,6 +66,129 @@ class AntRunnerTest {
         if (!valid) {
             assertTrue(result.getCompilerOutput().contains("Sample.java"), result.getErrorMessage());
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "org.junit.jupiter.api.Assertions.assertEquals(2, new Sample().value());",
+            "org.hamcrest.MatcherAssert.assertThat(new Sample().value(), org.hamcrest.Matchers.is(2));",
+            "com.google.common.truth.Truth.assertThat(new Sample().value()).isEqualTo(2);",
+            "Sample mock = org.mockito.Mockito.mock(Sample.class); mock.value(); "
+                    + "org.mockito.Mockito.verify(mock, org.mockito.Mockito.times(new Sample().value() - 1)).value();"
+    })
+    void assertionLibrariesReportMutantKillsAsFailures(String assertion) throws Exception {
+        Fixture fixture = fixture();
+        fixture.test("import org.junit.Test; public class SandboxJUnitProbe {"
+                + " @Test public void test() { " + assertion + " } }");
+        assertTrue(fixture.run("compile-test").compiled());
+        AntProcessResult original = fixture.run("test-original");
+        assertFalse(original.hasFailure(), original.getErrorMessage());
+        assertFalse(original.hasError(), original.getErrorMessage());
+        for (String target : List.of("test-mutant", "recompiled-test-mutant")) {
+            AntProcessResult result = fixture.run(target);
+            assertTrue(result.hasFailure(), result.getErrorMessage());
+            assertFalse(result.hasError(), result.getErrorMessage());
+        }
+    }
+
+    @Test
+    void legacyPuzzleTestTimeoutWorksAgainstOriginalAndMutants() throws Exception {
+        Fixture fixture = fixture();
+        fixture.test("""
+                import org.junit.*;
+                import static org.junit.Assert.*;
+                public class SandboxJUnitProbe {
+                    private static boolean initialized;
+                    private int value;
+                    @BeforeClass public static void initialize() { initialized = true; }
+                    @Before public void prepare() { value = new Sample().value(); }
+                    @Test(timeout = 4000) public void test() { assertTrue(initialized); assertEquals(2, value); }
+                    @Test(expected = IllegalArgumentException.class)
+                    public void expectedException() { throw new IllegalArgumentException(); }
+                }
+                """);
+        assertTrue(fixture.run("compile-test").compiled());
+        AntProcessResult original = fixture.run("test-original");
+        assertFalse(original.hasFailure(), original.getErrorMessage());
+        assertFalse(original.hasError(), original.getErrorMessage());
+        for (String target : List.of("test-mutant", "recompiled-test-mutant")) {
+            AntProcessResult result = fixture.run(target);
+            assertTrue(result.hasFailure(), result.getErrorMessage());
+            assertFalse(result.hasError(), result.getErrorMessage());
+        }
+    }
+
+    @Test
+    void junitTimeoutRetainsItsDiagnostic() throws Exception {
+        Fixture fixture = fixture();
+        compile(fixture.directory().resolve("mutant"), "Sample", """
+                public class Sample { public int value() { while (true) { } } }
+                """, fixture.directory().resolve("cut"));
+        fixture.test("""
+                import org.junit.Test;
+                import static org.junit.Assert.*;
+                public class SandboxJUnitProbe {
+                    @Test(timeout = 100) public void test() { assertEquals(2, new Sample().value()); }
+                }
+                """);
+        assertTrue(fixture.run("compile-test").compiled());
+        AntProcessResult result = fixture.run("test-mutant");
+        assertTrue(result.hasError(), result.getErrorMessage());
+        assertTrue(result.getErrorMessage().contains("TestTimedOutException"), result.getErrorMessage());
+        assertFalse(result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
+    }
+
+    @Test
+    void jdkModuleEncapsulationStillBlocksInternalReflection() throws Exception {
+        AntProcessResult result = runJunitProbe("""
+                Class.forName("jdk.internal.reflect.ReflectionFactory")
+                    .getDeclaredMethod("getReflectionFactory").setAccessible(true);
+                """);
+        assertTrue(result.hasError(), result.getErrorMessage());
+        assertTrue(result.getErrorMessage().contains("InaccessibleObjectException"), result.getErrorMessage());
+    }
+
+    @Test
+    void compilingTestsWithoutMutantPathsRetainsJavacDiagnostics() throws Exception {
+        Fixture fixture = fixture();
+        fixture.test("public class SandboxJUnitProbe { invalid syntax }");
+        AntProcessResult rejected = fixture.run("compile-test", fixture.testDirectory(), null);
+        assertFalse(rejected.compiled(), rejected.getErrorMessage());
+        assertTrue(rejected.getCompilerOutput().contains("SandboxJUnitProbe.java"), rejected.getErrorMessage());
+        fixture.test("import org.junit.Test; public class SandboxJUnitProbe { @Test public void test() { } }");
+        AntProcessResult accepted = fixture.run("compile-test", fixture.testDirectory(), null);
+        assertTrue(accepted.compiled(), accepted.getErrorMessage());
+        assertTrue(Files.isRegularFile(fixture.testDirectory().resolve("SandboxJUnitProbe.class")));
+    }
+
+    @Test
+    void packagedUploadedTestsRecompileInlinedConstantsInPathsWithSpaces() throws Exception {
+        Fixture fixture = fixture();
+        compile(fixture.directory().resolve("cut"), "Sample",
+                "package sample; public class Sample { public static final int VALUE = 2; }");
+        compile(fixture.directory().resolve("mutant"), "Sample",
+                "package sample; public class Sample { public static final int VALUE = 3; }");
+        Files.copy(root.resolve("Sample.java"), fixture.directory().resolve("mutant/Sample.java"),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        Files.delete(fixture.directory().resolve("mutant/Sample.class"));
+        Path tests = Files.createDirectory(fixture.directory().resolve("uploaded tests"));
+        Files.writeString(tests.resolve("SandboxJUnitProbe.java"), """
+                package example;
+                import org.junit.Test;
+                import static org.junit.Assert.*;
+                public class SandboxJUnitProbe {
+                    @Test public void test() { assertEquals(2, sample.Sample.VALUE); }
+                }
+                """);
+        assertTrue(fixture.run("compile-test", tests, "example.SandboxJUnitProbe").compiled());
+        for (String target : List.of("test-original", "test-mutant")) {
+            AntProcessResult result = fixture.run(target, tests, "example.SandboxJUnitProbe");
+            assertFalse(result.hasFailure(), result.getErrorMessage());
+            assertFalse(result.hasError(), result.getErrorMessage());
+        }
+        AntProcessResult recompiled = fixture.run("recompiled-test-mutant", tests, "example.SandboxJUnitProbe");
+        assertTrue(recompiled.hasFailure(), recompiled.getErrorMessage());
+        assertFalse(recompiled.hasError(), recompiled.getErrorMessage());
     }
 
     @Test
@@ -257,7 +381,7 @@ class AntRunnerTest {
             Path source = Path.of(entry);
             if (entry.endsWith(".jar") && Files.isRegularFile(source)
                     && source.getFileName().toString().matches("(?:ant|junit|hamcrest|mockito|byte-buddy|objenesis"
-                        + "|truth|guava|failureaccess|listenablefuture|checker|error_prone|j2objc|jsr305"
+                        + "|truth|guava|failureaccess|listenablefuture|checker|error_prone|j2objc|jsr305|opentest4j"
                         + "|org.jacoco|asm).*\\.jar")) {
                 Path destination = source.getFileName().toString().startsWith("ant-")
                         ? ant.resolve(source.getFileName()) : library.resolve(source.getFileName());
@@ -297,15 +421,20 @@ class AntRunnerTest {
         }
 
         AntProcessResult run(String target, Path testDirectory) {
+            return run(target, testDirectory, "SandboxJUnitProbe");
+        }
+
+        AntProcessResult run(String target, Path testDirectory, String className) {
             ProcessBuilder builder = javaProcess("-cp", classpath, "org.apache.tools.ant.Main", target,
                     "-Dant.home=" + directory.resolve("ant"),
                     "-Dcodedef.home=" + directory,
                     "-Dcodedef.library=" + directory.resolve("lib"),
                     "-Dcommon.cp=" + classpath, "-Djacoco.cp=" + classpath,
                     "-Dcut.dir=" + directory.resolve("cut"), "-Dtest.file=" + testDirectory,
-                    "-Dmutant.file=" + directory.resolve("mutant"),
-                    "-DtestClassname=" + (testDirectory == null ? null : "SandboxJUnitProbe"));
-            if (testDirectory != null) {
+                    "-Dmutant.file=" + (List.of("compile-test", "test-original").contains(target)
+                            ? null : directory.resolve("mutant")),
+                    "-DtestClassname=" + (testDirectory == null ? null : className));
+            if (List.of("recompiled-test-mutant", "recompile-test-with-mutant").contains(target)) {
                 builder.command().add("-Dmutant.test.file=" + directory.resolve("recompiled"));
             }
             builder.directory(directory.toFile()).redirectErrorStream(true);
@@ -476,6 +605,56 @@ class AntRunnerTest {
 
     @Test
     void timeoutKillsChildProcessesAndExcessiveOutputIsRejected() throws Exception {
+        Path classes = processProbe();
+        Path childPid = root.resolve("child.pid");
+        String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "parent",
+                        java, classes.toString(), childPid.toString()), Duration.ofSeconds(2)));
+        assertChildTerminated(childPid);
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "output"),
+                        Duration.ofSeconds(10)));
+    }
+
+    @Test
+    void interruptionKillsChildProcessesAndPreservesInterruptStatus() throws Exception {
+        Path classes = processProbe();
+        Path childPid = root.resolve("child.pid");
+        String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+        FutureTask<Void> execution = new FutureTask<>(() -> {
+            assertThrows(AntRunner.ExecutionLimitException.class,
+                    () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "parent",
+                            java, classes.toString(), childPid.toString()), Duration.ofSeconds(30)));
+            assertTrue(Thread.currentThread().isInterrupted());
+            return null;
+        });
+        Thread worker = new Thread(execution);
+        worker.setDaemon(true);
+        worker.start();
+        try {
+            for (int wait = 0; wait < 250 && !Files.exists(childPid); wait++) {
+                Thread.sleep(20);
+            }
+            assertTrue(Files.exists(childPid), "Child process did not start");
+            worker.interrupt();
+            execution.get(10, TimeUnit.SECONDS);
+            assertChildTerminated(childPid);
+        } finally {
+            worker.interrupt();
+            worker.join(2_000);
+        }
+    }
+
+    private void assertChildTerminated(Path childPid) throws Exception {
+        long pid = Long.parseLong(Files.readString(childPid));
+        for (int wait = 0; wait < 100 && ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false); wait++) {
+            Thread.sleep(20);
+        }
+        assertFalse(ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false));
+    }
+
+    private Path processProbe() throws Exception {
         Path classes = Files.createDirectory(root.resolve("classes"));
         compile(classes, "ProcessProbe", """
                 public class ProcessProbe {
@@ -492,19 +671,7 @@ class AntRunnerTest {
                     }
                 }
                 """);
-        Path childPid = root.resolve("child.pid");
-        String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
-        assertThrows(AntRunner.ExecutionLimitException.class,
-                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "parent",
-                        java, classes.toString(), childPid.toString()), Duration.ofSeconds(2)));
-        long pid = Long.parseLong(Files.readString(childPid));
-        for (int wait = 0; wait < 100 && ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false); wait++) {
-            Thread.sleep(20);
-        }
-        assertFalse(ProcessHandle.of(pid).map(ProcessHandle::isAlive).orElse(false));
-        assertThrows(AntRunner.ExecutionLimitException.class,
-                () -> AntRunner.runProcess(javaProcess("-cp", classes.toString(), "ProcessProbe", "output"),
-                        Duration.ofSeconds(10)));
+        return classes;
     }
 
     private void compile(Path classes, String name, String source, Path... dependencies) throws Exception {

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -154,8 +155,12 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
      * {@inheritDoc}
      */
     public void testOriginal(GameClass cut, String testDir, String testClassName) throws ExecutionException {
-        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName,
-                config.isForceLocalExecution());
+        AntProcessResult result;
+        try {
+            result = runAntTarget("test-original", null, testDir, cut, testClassName, config.isForceLocalExecution());
+        } catch (ExecutionLimitException e) {
+            throw new ExecutionException("Test could not run safely against class under test.", e);
+        }
 
         if (result.hasFailure() || result.hasError()) {
             if (result.hasFailure()) {
@@ -535,6 +540,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static void kill(Process process) {
         List<ProcessHandle> children = process.descendants().toList();
         children.forEach(ProcessHandle::destroyForcibly);
+        // Let the parent reap terminated children before killing it, including on interruption.
+        CompletableFuture.allOf(children.stream().map(ProcessHandle::onExit).toArray(CompletableFuture[]::new))
+                .handle((ignored, failure) -> null)
+                .completeOnTimeout(null, 1, TimeUnit.SECONDS)
+                .join();
         process.destroyForcibly();
     }
 

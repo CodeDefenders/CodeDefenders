@@ -24,14 +24,17 @@ grant {
 };
 
 // All game modes use the same permissions, including the reflection needed by Mockito.
+// Truth resolves JDK reflection frames; Java module encapsulation still prevents access to their internals.
 grant codeBase "${test.url}-" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.reflect";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
 };
 grant codeBase "${recompiled.test.url}-" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.reflect";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
 };
 
@@ -39,6 +42,9 @@ grant codeBase "${recompiled.test.url}-" {
 grant codeBase "${codedef.library.url}-" {
     permission java.lang.reflect.ReflectPermission "*";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.reflect";
+    // JUnit timeout diagnostics inspect the worker thread's stack.
+    permission java.lang.RuntimePermission "getStackTrace";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
     permission java.lang.RuntimePermission "getProtectionDomain";
     permission java.util.PropertyPermission "*", "read";
@@ -77,6 +83,8 @@ grant codeBase "${jacoco.agent.url}" {
 grant codeBase "${ant.library.url}-" {
     permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
     permission java.lang.RuntimePermission "accessClassInPackage.sun.reflect";
+    permission java.lang.RuntimePermission "accessClassInPackage.jdk.internal.reflect";
+    permission java.lang.RuntimePermission "getStackTrace";
     permission java.lang.RuntimePermission "reflectionFactoryAccess";
     permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt";
     permission java.lang.RuntimePermission "accessClassInPackage.org.jacoco.agent.rt.*";

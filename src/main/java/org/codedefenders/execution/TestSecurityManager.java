@@ -27,6 +27,8 @@ import java.security.Permission;
 @SuppressWarnings("removal")
 public final class TestSecurityManager extends SecurityManager {
     public TestSecurityManager() {
+        // JUL creates its cleanup thread lazily; initialize it before submitted code runs.
+        java.util.logging.LogManager.getLogManager();
         // Resolve trusted jar URLs on this worker, including Debian's symlinked Ant jars.
         setJarUrl("ant.core.lib", "ant.library.url", true);
         // Mutant executions have no agent; keep the policy's agent grant inactive there.
