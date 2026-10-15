@@ -9,8 +9,9 @@
 	<property name="java.release.version" value="16"/>
 	<property name="mutant.test.file" value="${test.file}"/>
 	<makeurl property="codedef.library.url" file="${codedef.library}"/>
-	<makeurl property="test.url" file="${test.file}"/>
-	<makeurl property="recompiled.test.url" file="${mutant.test.file}"/>
+	<!-- Compilation-only targets do not supply test directories. -->
+	<makeurl property="test.url" file="${test.file}" validate="false"/>
+	<makeurl property="recompiled.test.url" file="${mutant.test.file}" validate="false"/>
 	<!-- Pass only the paths needed by the shared policy to each forked test JVM. -->
 	<propertyset id="sandbox.properties">
 		<propertyref name="codedef.library"/>

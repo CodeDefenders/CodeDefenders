@@ -50,6 +50,23 @@ class AntRunnerTest {
     @TempDir
     Path root;
 
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void mutantCompilationDoesNotRequireTestDirectories(boolean valid) throws Exception {
+        Fixture fixture = fixture();
+        Path mutant = fixture.directory().resolve("mutant");
+        Files.delete(mutant.resolve("Sample.class"));
+        if (!valid) {
+            Files.writeString(mutant.resolve("Sample.java"), "public class Sample { invalid syntax }");
+        }
+        AntProcessResult result = fixture.run("compile-mutant", null);
+        assertEquals(valid, result.compiled(), result.getErrorMessage());
+        assertEquals(valid, Files.exists(mutant.resolve("Sample.class")), result.getErrorMessage());
+        if (!valid) {
+            assertTrue(result.getCompilerOutput().contains("Sample.java"), result.getErrorMessage());
+        }
+    }
+
     @Test
     void sandboxBlocksFileReadWriteEnvironmentNetworkProcessesAndPolicyRemoval() throws Exception {
         Path workspace = Files.createDirectory(root.resolve("workspace")).toRealPath();
@@ -276,6 +293,10 @@ class AntRunnerTest {
         }
 
         AntProcessResult run(String target) {
+            return run(target, testDirectory);
+        }
+
+        AntProcessResult run(String target, Path testDirectory) {
             ProcessBuilder builder = javaProcess("-cp", classpath, "org.apache.tools.ant.Main", target,
                     "-Dant.home=" + directory.resolve("ant"),
                     "-Dcodedef.home=" + directory,
@@ -283,8 +304,10 @@ class AntRunnerTest {
                     "-Dcommon.cp=" + classpath, "-Djacoco.cp=" + classpath,
                     "-Dcut.dir=" + directory.resolve("cut"), "-Dtest.file=" + testDirectory,
                     "-Dmutant.file=" + directory.resolve("mutant"),
-                    "-Dmutant.test.file=" + directory.resolve("recompiled"),
-                    "-DtestClassname=SandboxJUnitProbe");
+                    "-DtestClassname=" + (testDirectory == null ? null : "SandboxJUnitProbe"));
+            if (testDirectory != null) {
+                builder.command().add("-Dmutant.test.file=" + directory.resolve("recompiled"));
+            }
             builder.directory(directory.toFile()).redirectErrorStream(true);
             try {
                 return AntRunner.runAntProcess(builder);
