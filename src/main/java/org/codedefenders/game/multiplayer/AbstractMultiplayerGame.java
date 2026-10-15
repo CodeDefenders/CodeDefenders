@@ -18,7 +18,6 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.persistence.database.MutantRepository;
-import org.codedefenders.persistence.database.PlayerRepository;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.validation.code.DefaultRuleSets;
 import org.codedefenders.validation.code.MutantValidationRuleSet;
@@ -291,8 +289,7 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
-        MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
-        PlayerRepository playerRepo = CDIUtil.getBeanFromCDI(PlayerRepository.class);
+        final MutantRepository mutantRepo = CDIUtil.getBeanFromCDI(MutantRepository.class);
 
         List<Player> defenderPlayers;
         if (this instanceof MultiplayerGame multiplayerGame) {
@@ -327,13 +324,7 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
         }
 
         for (Test test : getTests()) {
-            //Check if the test is an equivalence test. Some legacy ways of figuring this out have to be preserved for
-            //backwards compatability
-            //if (test.isEquivalenceTest()
-            //        || this instanceof MultiplayerGame
-            //            && playerRepo.getPlayer(test.getPlayerId()).getRole() == Role.ATTACKER) {
-            //    continue;
-            //}
+            //Check if the test is an equivalence test.
             if (defenderPlayers.stream().noneMatch(player -> player.getId() == test.getPlayerId())) {
                 continue;
             }
@@ -353,22 +344,6 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
             mutantsKilled.put(defendersTeamId, mutantsKilled.get(defendersTeamId) + test.getMutantsKilled());
 
         }
-
-        //TODO Brauchen wir das? Was sind eigentlich player scores?
-        /*for (int playerId : mutantsKilled.keySet()) {
-            if (playerId < 0) {// || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
-                continue;
-            }
-
-            PlayerScore ps = testScores.get(playerId);
-            int playerScore = playerRepo.getPlayerPoints(playerId);
-            ps.increaseTotalScore(playerScore);
-
-            PlayerScore ts = testScores.get(defendersTeamId);
-            ts.increaseTotalScore(playerScore);
-        }*/
-
-
 
         for (Mutant m : getKilledMutants()) {
             if (!m.getEquivalent().equals(PROVEN_NO)) {

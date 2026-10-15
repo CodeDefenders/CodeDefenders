@@ -21,7 +21,6 @@ package org.codedefenders.beans.game;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -32,7 +31,6 @@ import jakarta.inject.Named;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Player;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameProducer;
@@ -58,7 +56,7 @@ public class MeleeScoreboardBean {
     private final List<ScoreItem> currentScore;
 
     @Inject
-    public MeleeScoreboardBean(UserService userService, GameProducer gameProducer, ScoreCalculator scoreCalculator) {
+    public MeleeScoreboardBean(UserService userService, GameProducer gameProducer) {
         MeleeGame meleeGame = gameProducer.getMeleeGame();
 
         if (meleeGame == null) {
@@ -68,7 +66,6 @@ public class MeleeScoreboardBean {
 
         final Map<Integer, PlayerScore> mutantsScores = meleeGame.getMutantScores();
         final Map<Integer, PlayerScore> testsScores = meleeGame.getTestScores();
-        //final Map<Integer, PlayerScore> duelsScores = meleeGame.geSc
 
         currentScore = meleeGame.getPlayers().stream()
                 .map(Player::getId)

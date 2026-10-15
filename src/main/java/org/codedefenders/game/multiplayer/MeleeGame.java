@@ -20,7 +20,6 @@ package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.codedefenders.database.EventDAO;
@@ -28,7 +27,6 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;

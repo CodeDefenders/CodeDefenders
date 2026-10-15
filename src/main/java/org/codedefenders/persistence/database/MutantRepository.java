@@ -252,34 +252,6 @@ public class MutantRepository {
         return queryRunner.query(query, listFromRS(MutantRepository::mutantFromRS), playerId);
     }
 
-    public int getNumberOfDuelsWonAsDefender(int defenderId) {
-        return getNumberOfDuelsWithState(defenderId, Equivalence.ASSUMED_YES, Equivalence.DECLARED_YES);
-    }
-
-    public int getNumberOfDuelsWonAsAttacker(int attackerId) {
-        return getNumberOfDuelsWithState(attackerId, Equivalence.PROVEN_NO);
-    }
-
-    private int getNumberOfDuelsWithState(int playerId, Mutant.Equivalence... allowedEquivalenceStates) {
-
-        Object[] arguments = new Object[allowedEquivalenceStates.length + 1];
-        for (int i = 0; i < allowedEquivalenceStates.length; i++) {
-            arguments[i] = allowedEquivalenceStates[i].toString();
-        }
-        arguments[arguments.length - 1] = playerId;
-        @Language("SQL")
-        String sql = String.format("""
-                SELECT COUNT(*)
-                FROM equivalences e LEFT JOIN mutants m
-                ON e.Mutant_ID = m.Mutant_ID
-                WHERE m.Equivalent IN %s
-                    AND e.Defender_ID = ?
-                """, QueryUtils.makePlaceholders(allowedEquivalenceStates.length));
-        return queryRunner.query(sql,
-                ResultSetUtils.oneFromRS(row -> row.getInt(0)),
-                arguments).orElse(0);
-    }
-
     /**
      * Stores a given {@link Mutant} in the database.
      *
