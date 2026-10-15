@@ -28,24 +28,41 @@
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="i18n" type="org.xnap.commons.i18n.I18n"--%>
 
+<c:if test="${not homepage or not empty fixture}">
 <c:set var="titleId" value="${homepage ? 'landing-mutle-title' : 'current-mutle-title'}"/>
-<section class="mutle-hero p-4 ${homepage ? '' : 'p-md-5'} mb-4" aria-labelledby="${titleId}">
-    <h2 id="${titleId}">${homepage ? i18n.tr('Mutle: weekly mutation puzzles')
-            : (empty fixture ? i18n.tr('Mutle coming soon') : i18n.tr('This week\'s mutle'))}</h2>
-    <p class="lead mb-2">
-        <c:choose>
-            <c:when test="${not empty currentCase}">
-                ${i18n.tr('Series')} ${currentCase.series} · <c:out value="${currentCase.title}" />
-            </c:when>
-            <c:when test="${not empty fixture}">
-                ${i18n.tr('Series')} ${fixture.series} · <c:out value="${fixture.title}" />
-            </c:when>
-            <c:otherwise>${i18n.tr('The first mutle has not been published yet.')}</c:otherwise>
-        </c:choose>
-    </p>
-    <p class="mb-4">${empty fixture
-            ? i18n.tr('Check back when the semester begins.')
-            : i18n.tr('Find the hidden change in Java code with six tests.')}</p>
+<section class="mutle-hero p-4 ${homepage ? '' : 'p-md-5'} mt-4 mb-4" aria-labelledby="${titleId}">
+    <c:if test="${homepage}">
+        <div class="d-md-flex gap-5">
+            <div class="left">
+    </c:if>
+
+    <h2 id="${titleId}">
+        ${homepage
+            ? i18n.tr('Mutle: weekly mutation puzzles')
+            : (empty fixture ? i18n.tr('Mutle coming soon') : i18n.tr('This week\'s mutle'))}
+    </h2>
+
+    <c:choose>
+        <c:when test="${not empty currentCase}">
+            <p class="mb-2">${i18n.tr('Find the hidden change in Java code with six tests.')}</p>
+            <c:if test="${not homepage}">
+                <p class="mb-2">${i18n.tr('Series')} ${currentCase.series} · <c:out value="${currentCase.title}" /></p>
+            </c:if>
+        </c:when>
+        <c:when test="${not empty fixture}">
+            <p class="mb-2">${i18n.tr('Find the hidden change in Java code with six tests.')}</p>
+            <c:if test="${not homepage}">
+                <p class="mb-2">${i18n.tr('Series')} ${fixture.series} · <c:out value="${fixture.title}" /></p>
+            </c:if>
+        </c:when>
+        <c:otherwise>
+            <p class="lead mb-2">
+                ${i18n.tr('The first mutle has not been published yet.')} <br>
+                ${i18n.tr('Check back when the semester begins.')}
+            </p>
+        </c:otherwise>
+    </c:choose>
+
     <c:if test="${not empty currentCase}">
         <p class="mb-3">
             <span class="badge bg-${currentCase.solved ? 'success' : (currentCase.failed ? 'danger' : (currentCase.expired ? 'secondary' : 'primary'))} text-white">
@@ -55,6 +72,16 @@
             <span class="ms-2">${currentCase.acceptedGuesses}/${currentCase.acceptedGuesses + currentCase.remainingGuesses} ${i18n.tr('guesses')}</span>
         </p>
     </c:if>
+
+    <c:if test="${homepage}">
+                <p class="small mb-2">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
+            </div>
+            <div class="right d-flex flex-column justify-content-center flex-shrink-0">
+    </c:if>
+    <c:if test="${not homepage}">
+        <div class="mt-3">
+    </c:if>
+
     <c:choose>
         <c:when test="${empty fixture}">
             <!-- no button -->
@@ -71,7 +98,10 @@
             </a>
         </c:otherwise>
     </c:choose>
+
+            </div>
     <c:if test="${homepage}">
-        <p class="small mt-3 mb-0">${i18n.tr('Guest progress stays in this browser session. Log in to play with your account and earn achievements.')}</p>
+        </div>
     </c:if>
 </section>
+</c:if>
