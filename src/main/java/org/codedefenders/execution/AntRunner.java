@@ -75,6 +75,8 @@ import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static final Duration PROCESS_TIMEOUT = Duration.ofSeconds(30);
     private static final int MAX_OUTPUT_BYTES = 65_536;
+    // Reports also contain JVM properties and per-test metadata.
+    private static final int MAX_REPORT_BYTES = 1_048_576;
 
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
@@ -479,7 +481,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
 
     static void readTestOutcome(Path report, AntProcessResult result) {
         try {
-            if (Files.size(report) > MAX_OUTPUT_BYTES) {
+            if (Files.size(report) > MAX_REPORT_BYTES) {
                 throw new ExecutionLimitException();
             }
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -538,14 +540,23 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     }
 
     private static void kill(Process process) {
-        List<ProcessHandle> children = process.descendants().toList();
-        children.forEach(ProcessHandle::destroyForcibly);
-        // Let the parent reap terminated children before killing it, including on interruption.
-        CompletableFuture.allOf(children.stream().map(ProcessHandle::onExit).toArray(CompletableFuture[]::new))
-                .handle((ignored, failure) -> null)
-                .completeOnTimeout(null, 1, TimeUnit.SECONDS)
-                .join();
-        process.destroyForcibly();
+        try {
+            List<ProcessHandle> children = process.descendants().toList();
+            children.forEach(ProcessHandle::destroyForcibly);
+            // Let the parent reap terminated children before killing it, including on interruption.
+            CompletableFuture.allOf(children.stream().map(ProcessHandle::onExit).toArray(CompletableFuture[]::new))
+                    .handle((ignored, failure) -> null)
+                    .completeOnTimeout(null, 1, TimeUnit.SECONDS)
+                    .join();
+        } catch (RuntimeException e) {
+            logger.warn("Could not clean up execution descendants", e);
+        } finally {
+            try {
+                process.destroyForcibly();
+            } catch (RuntimeException e) {
+                logger.warn("Could not terminate execution process", e);
+            }
+        }
     }
 
     public static class ExecutionLimitException extends RuntimeException {

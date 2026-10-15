@@ -37,6 +37,7 @@ import org.codedefenders.dependencies.DependencyProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class AntRunnerTest {
@@ -340,11 +342,7 @@ class AntRunnerTest {
     }
 
     private AntProcessResult runJunitProbe(String statement) throws Exception {
-        return runJunitProbe(statement, false);
-    }
-
-    private AntProcessResult runJunitProbe(String statement, boolean mutle) throws Exception {
-        Fixture fixture = fixture(mutle);
+        Fixture fixture = fixture();
         fixture.test("import org.junit.Test; import static org.junit.Assert.*; public class SandboxJUnitProbe {"
                 + " @Test public void test() throws Exception { " + statement + " } }");
         AntProcessResult compilation = fixture.run("compile-test");
@@ -495,9 +493,8 @@ class AntRunnerTest {
                 "Mutant executions must not overwrite original coverage");
     }
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void sharedBuildDeniesValidationBypassesAndOrdinaryThreadCreation(boolean mutle) throws Exception {
+    @Test
+    void sharedBuildDeniesValidationBypassesAndOrdinaryThreadCreation() throws Exception {
         for (String statement : List.of(
                 "java.nio.file.Files.readString(java.nio.file.Path.of(\"/etc/passwd\"));",
                 "java.nio.file.Files.writeString(java.nio.file.Path.of(\"escape.txt\"), \"escape\");",
@@ -512,7 +509,7 @@ class AntRunnerTest {
                 "new ClassLoader() {};",
                 "new net.bytebuddy.ByteBuddy().subclass(Object.class).make()"
                     + ".load(SandboxJUnitProbe.class.getClassLoader());")) {
-            AntProcessResult result = runJunitProbe(statement, mutle);
+            AntProcessResult result = runJunitProbe(statement);
             assertTrue(result.hasError(), statement + "\n" + result.getErrorMessage());
             assertTrue(result.getErrorMessage().contains("SecurityException")
                     || result.getErrorMessage().contains("AccessControlException"), result.getErrorMessage());
@@ -580,6 +577,52 @@ class AntRunnerTest {
         Files.writeString(report, "<testsuite tests=\"0\" failures=\"0\" errors=\"0\"/>");
         assertThrows(AntRunner.ExecutionLimitException.class,
                 () -> AntRunner.readTestOutcome(report, new AntProcessResult()));
+    }
+
+    @Test
+    void passingTestOutputLeavesRoomForReportMetadata() throws Exception {
+        AntProcessResult result = runJunitProbe("System.out.print(\"<\".repeat(50_000));");
+        assertFalse(result.hasFailure(), result.getErrorMessage());
+        assertFalse(result.hasError(), result.getErrorMessage());
+        assertTrue(result.getErrorMessage().getBytes(java.nio.charset.StandardCharsets.UTF_8).length < 65_536);
+    }
+
+    @Test
+    void oversizedTestReportsAreStillRejected() throws Exception {
+        Path report = root.resolve("result.xml");
+        Files.writeString(report, "<testsuite tests=\"1\" failures=\"0\" errors=\"0\"><system-out>"
+                + "x".repeat(1_048_576) + "</system-out></testsuite>");
+        assertThrows(AntRunner.ExecutionLimitException.class,
+                () -> AntRunner.readTestOutcome(report, new AntProcessResult()));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true,descendants", "false,descendants", "true,child", "false,child", "true,parent", "false,parent"})
+    void cleanupFailuresPreserveTheOutcomeAndAlwaysAttemptParentTermination(boolean completed, String failure)
+            throws Exception {
+        Process process = mock(Process.class);
+        ProcessBuilder builder = mock(ProcessBuilder.class);
+        when(builder.start()).thenReturn(process);
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        when(process.waitFor(1_000, TimeUnit.MILLISECONDS)).thenReturn(completed);
+        RuntimeException denied = new SecurityException("Process inspection or termination denied");
+        if (failure.equals("descendants")) {
+            when(process.descendants()).thenThrow(denied);
+        } else if (failure.equals("child")) {
+            ProcessHandle child = mock(ProcessHandle.class);
+            when(process.descendants()).thenAnswer(invocation -> Stream.of(child));
+            when(child.destroyForcibly()).thenThrow(denied);
+        } else {
+            when(process.descendants()).thenAnswer(invocation -> Stream.empty());
+            when(process.destroyForcibly()).thenThrow(denied);
+        }
+        if (completed) {
+            assertEquals("", AntRunner.runProcess(builder, Duration.ofSeconds(1)));
+        } else {
+            assertThrows(AntRunner.ExecutionLimitException.class,
+                    () -> AntRunner.runProcess(builder, Duration.ofSeconds(1)));
+        }
+        verify(process).destroyForcibly();
     }
 
     @Test

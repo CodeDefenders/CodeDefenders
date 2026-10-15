@@ -45,6 +45,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.execution.AntRunner.ExecutionLimitException;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
@@ -209,6 +210,17 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private ValidationRepository validationRepository;
 
+
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            super.service(request, response);
+        } catch (ExecutionLimitException e) {
+            logger.warn("Game execution rejected", e);
+            ServletUtils.executionRejected(request, response, previousSubmission, messages);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

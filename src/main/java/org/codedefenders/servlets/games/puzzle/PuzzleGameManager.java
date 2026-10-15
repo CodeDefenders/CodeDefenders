@@ -38,6 +38,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.AntRunner.ExecutionLimitException;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -182,6 +183,17 @@ public class PuzzleGameManager extends HttpServlet {
     private MutantValidator mutantValidator;
     @Inject
     private ValidationRepository validationRepository;
+
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            super.service(request, response);
+        } catch (ExecutionLimitException e) {
+            logger.warn("Game execution rejected", e);
+            ServletUtils.executionRejected(request, response, previousSubmission, messages);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request,

@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.util;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -25,9 +26,13 @@ import java.util.UUID;
 
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.model.WhitelistElement;
 import org.codedefenders.model.WhitelistType;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.
@@ -37,6 +42,16 @@ import org.codedefenders.model.WhitelistType;
 public final class ServletUtils {
 
     private ServletUtils() {
+    }
+
+    /** Preserve rejected submissions without turning an unverified execution into a game result. */
+    public static void executionRejected(HttpServletRequest request, HttpServletResponse response,
+            PreviousSubmissionBean previousSubmission, MessagesBean messages) throws IOException {
+        getStringParameter(request, "test").ifPresent(previousSubmission::setTestCode);
+        getStringParameter(request, "mutant").ifPresent(previousSubmission::setMutantCode);
+        messages.add(I18n.marktr("Your test could not run within the execution limits. Please simplify it or try again later."))
+                .alert();
+        Redirect.redirectBack(request, response);
     }
 
     /**

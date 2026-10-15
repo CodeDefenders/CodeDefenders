@@ -41,6 +41,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.execution.AntRunner.ExecutionLimitException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -159,6 +160,17 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameService gameService;
+
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            super.service(request, response);
+        } catch (ExecutionLimitException e) {
+            logger.warn("Game execution rejected", e);
+            ServletUtils.executionRejected(request, response, previousSubmission, messages);
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
