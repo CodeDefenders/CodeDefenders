@@ -535,7 +535,7 @@ public class MultiplayerGameManager extends HttpServlet {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}",
                     game.getId(), game.getClassId(), login.getUserId(), mutantText);
-            response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         } catch (UncheckedSQLException e) {
             if (e.isDataTooLong()) {
@@ -544,8 +544,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add(I18n.marktr("Database error while saving the mutant."));
                 logger.error("Database error while saving the mutant: {}", e.getMessage());
             }
-            response.sendRedirect(
-                    url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -579,7 +578,7 @@ public class MultiplayerGameManager extends HttpServlet {
             }
         }
 
-        response.sendRedirect(url.forPath(org.codedefenders.util.Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + game.getId());
     }
 
     @SuppressWarnings("Duplicates")
