@@ -27,7 +27,9 @@ import org.codedefenders.game.multiplayer.PlayerScore;
  *
  * @author gambi
  *
+ * @deprecated Do not use this, scores are calculated live and are already fetched from the DB.
  */
+@Deprecated
 public interface IScoringPolicy {
 
     /**

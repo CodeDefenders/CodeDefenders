@@ -177,7 +177,6 @@ public class MutationTester implements IMutationTester {
         return getTestOnMutantResultString(mutants, killed);
     }
 
-    @Override
     public PreparedMessage runTestOnAllMeleeMutants(MeleeGame game, Test test) {
 
         int testOwnerPlayerId = test.getPlayerId();

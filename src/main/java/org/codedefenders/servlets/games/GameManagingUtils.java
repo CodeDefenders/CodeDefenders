@@ -60,6 +60,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.highlighting.GHMutantDTO;
 import org.codedefenders.game.highlighting.GHTestDTO;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -788,10 +789,8 @@ public class GameManagingUtils implements IGameManagingUtils {
 
 
         PreparedMessage mutationTesterMessage;// = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
-        if (game instanceof MultiplayerGame multiplayerGame) {
+        if (game instanceof AbstractMultiplayerGame multiplayerGame) {
             mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
-        } else if (game instanceof MeleeGame meleeGame) {
-            mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
         } else {
             throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
         }

@@ -61,20 +61,28 @@ public class MeleeScoreboardBean {
     public MeleeScoreboardBean(UserService userService, GameProducer gameProducer, ScoreCalculator scoreCalculator) {
         MeleeGame meleeGame = gameProducer.getMeleeGame();
 
-        final Map<Integer, PlayerScore> mutantsScores = scoreCalculator.getMutantScores(meleeGame.getId());
-        final Map<Integer, PlayerScore> testsScores = scoreCalculator.getTestScores(meleeGame.getId());
-        final Map<Integer, PlayerScore> duelsScores = scoreCalculator.getDuelScores(meleeGame.getId());
+        if (meleeGame == null) {
+            throw new RuntimeException("No melee game exists in this request.");
+        }
+
+
+        final Map<Integer, PlayerScore> mutantsScores = meleeGame.getMutantScores();
+        final Map<Integer, PlayerScore> testsScores = meleeGame.getTestScores();
+        //final Map<Integer, PlayerScore> duelsScores = meleeGame.geSc
 
         currentScore = meleeGame.getPlayers().stream()
                 .map(Player::getId)
                 .map(playerId -> {
                     SimpleUser user = userService.getSimpleUserByPlayerId(playerId).get();
 
+                    PlayerScore mutantScore = mutantsScores.getOrDefault(playerId, new PlayerScore(playerId));
+                    PlayerScore testScore = testsScores.getOrDefault(playerId, new PlayerScore(playerId));
+                    PlayerScore duelScore = new PlayerScore(playerId);
+
+
                     return new ScoreItem(
                             user,
-                            Optional.ofNullable(mutantsScores.get(playerId)).orElse(new PlayerScore(playerId)),
-                            Optional.ofNullable(testsScores.get(playerId)).orElse(new PlayerScore(playerId)),
-                            Optional.ofNullable(duelsScores.get(playerId)).orElse(new PlayerScore(playerId))
+                            mutantScore, testScore, duelScore
                     );
                 })
                 .sorted().collect(Collectors.toList());

@@ -47,17 +47,14 @@ import org.codedefenders.persistence.database.TestRepository;
 @RequestScoped
 public class ScoreCalculator {
 
-    private final IScoringPolicy scoringPolicy;
     private final TestRepository testRepo;
     private final MutantRepository mutantRepo;
     private final GameRepository gameRepo;
     private final PlayerRepository playerRepo;
 
     @Inject
-    public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy,
-                           TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
+    public ScoreCalculator(TestRepository testRepo, MutantRepository mutantRepo, GameRepository gameRepo,
                            PlayerRepository playerRepo) {
-        this.scoringPolicy = scoringPolicy;
         this.testRepo = testRepo;
         this.mutantRepo = mutantRepo;
         this.gameRepo = gameRepo;
@@ -77,8 +74,6 @@ public class ScoreCalculator {
         }
 
         for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
-            // Compute the score for the mutant and store it inside the mutant object
-            scoringPolicy.scoreMutant(mutant);
             // Update the Map
             Integer playerId = mutant.getPlayerId();
             PlayerScore playerScore = mutantScores.get(playerId);
@@ -108,8 +103,6 @@ public class ScoreCalculator {
         }
 
         for (Test test : testRepo.getValidTestsForGame(gameId)) {
-            // Compute the score for the test and store it inside the test object
-            scoringPolicy.scoreTest(test);
             // Update the map
             Integer playerId = test.getPlayerId();
             PlayerScore playerScore = testScores.get(playerId);
@@ -122,42 +115,5 @@ public class ScoreCalculator {
         }
 
         return testScores;
-    }
-
-    /**
-     * Calculate the score that the players gained by winning equivalence duels,
-     * i.e., claiming equivalence
-     *
-     * @return mapping from playerId to player score.
-     */
-    public Map<Integer, PlayerScore> getDuelScores(int gameId) {
-        final Map<Integer, PlayerScore> duelScores = new HashMap<>();
-
-        // Create the data structure to host their data
-        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
-            PlayerScore playerScore = new PlayerScore(player.getId());
-            scoringPolicy.scoreDuels(playerScore);
-            duelScores.put(player.getId(), playerScore);
-        }
-
-        return duelScores;
-    }
-
-    public void storeScoresToDB(int gameId) {
-        for (Mutant mutant : mutantRepo.getValidMutantsForGame(gameId)) {
-            // Compute the score for the mutant and store it inside the mutant object
-            scoringPolicy.scoreMutant(mutant);
-            mutantRepo.updateMutantScore(mutant);
-        }
-        for (Test test : testRepo.getValidTestsForGame(gameId)) {
-            // Compute the score for the test and store it inside the test object
-            scoringPolicy.scoreTest(test);
-            testRepo.updateTest(test);
-        }
-        for (Player player : gameRepo.getValidPlayersForGame(gameId)) {
-            PlayerScore playerScore = new PlayerScore(player.getId());
-            scoringPolicy.scoreDuels(playerScore);
-            playerRepo.setPlayerPoints(playerScore.getTotalScore(), player.getId());
-        }
     }
 }

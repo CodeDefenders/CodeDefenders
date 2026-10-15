@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>TODO Some caching would be great at this point ?
  */
+@Deprecated
 public class DefaultScoringPolicy implements IScoringPolicy {
     private static final Logger logger = LoggerFactory.getLogger(DefaultScoringPolicy.class);
 

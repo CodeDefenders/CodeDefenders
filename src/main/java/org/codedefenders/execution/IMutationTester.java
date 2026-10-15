@@ -32,19 +32,6 @@ public interface IMutationTester {
 
     PreparedMessage runTestOnAllMultiplayerMutants(AbstractMultiplayerGame game, Test test);
 
-    // TODO Note that we need duplicate methods because the basic runAll methods use
-    // AbstractGame !
-    /**
-     * Execute the test against all the other players' mutants
-     */
-    PreparedMessage runTestOnAllMeleeMutants(MeleeGame game, Test test);
-
-    /**
-     * Execute all the tests registered from all the other players against the
-     * provided mutant, using a random scheduling of test execution.
-     */
-    PreparedMessage runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant);
-
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a random scheduling of test execution.

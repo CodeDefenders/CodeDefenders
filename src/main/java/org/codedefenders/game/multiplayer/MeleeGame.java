@@ -124,18 +124,6 @@ public class MeleeGame extends AbstractMultiplayerGame {
         return Optional.ofNullable(classroomId);
     }
 
-    // TODO Those methods should be removed? The scoring bean should take the game
-    // as input and then compute the score
-    public Map<Integer, PlayerScore> getMutantScores() {
-        var scoringBean = CDIUtil.getBeanFromCDI(ScoreCalculator.class);
-        return scoringBean.getMutantScores(id);
-    }
-
-    public Map<Integer, PlayerScore> getTestScores() {
-        var scoringBean = CDIUtil.getBeanFromCDI(ScoreCalculator.class);
-        return scoringBean.getTestScores(id);
-    }
-
     /*
      * Every user has two players, one as defender and one as attacker
      */
