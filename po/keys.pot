@@ -11854,3 +11854,31 @@ msgstr "Failed to copy"
 #: src/main/webapp/WEB-INF/tags/whitelist_modal.tag:584
 msgid "Error updating whitelist"
 msgstr "Error updating whitelist"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:136
+msgid "Missing Parameter: {0}"
+msgstr "Missing Parameter: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:251
+msgid "Successfully installed default puzzles."
+msgstr "Successfully installed default puzzles."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:54
+msgid "Install default puzzles"
+msgstr "Install default puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:295
+msgid "Install Default Puzzles"
+msgstr "Install Default Puzzles"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:299
+msgid "Are you sure you want to install the default puzzle chapers? This will take a few minutes."
+msgstr "Are you sure you want to install the default puzzle chapers? This will take a few minutes."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:304
+msgid "Installing..."
+msgstr "Installing..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:305
+msgid "Install"
+msgstr "Install"
