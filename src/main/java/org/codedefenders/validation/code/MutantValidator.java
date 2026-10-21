@@ -157,6 +157,9 @@ public class MutantValidator {
                 String originalString = String.join("\n", delta.getSource().getLines());
                 String mutatedString = String.join("\n", delta.getTarget().getLines());
 
+                //To be used for the error message
+                final String unmodifiedMutatedLine = mutatedString;
+
                 //Deltas may need some changes before being parsable
 
                 //Close a single dangling closing bracket. Won't work for multiple dangling brackets.
@@ -214,7 +217,7 @@ public class MutantValidator {
                             });
                         }
                         if (suspiciousNodesInOriginal.get() < suspiciousNodesInMutant.size()) {
-                            result.add(rule, mutatedString);
+                            result.add(rule, unmodifiedMutatedLine);
                         }
 
                         //if (!rule.fails(originalStmt.get()) && rule.fails(mutatedStmt.get())) {
