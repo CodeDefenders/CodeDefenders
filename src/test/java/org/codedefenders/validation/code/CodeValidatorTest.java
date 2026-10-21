@@ -418,13 +418,15 @@ public class CodeValidatorTest {
                     testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", RELAXED, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/addedCallToSystem_currentTimeMillis", RELAXED, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/javaIoCalls", RELAXED, MUTANT_CALL_IO),
+                    testCase("systemCalls/randomReflection", RELAXED, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/replacedWithCallToMath_random01", RELAXED, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/replacedWithCallToMath_random02", RELAXED, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/replacedWithCallToMath_random03", RELAXED, MUTANT_CALL_RANDOM),
                     testCase("systemCalls/System_exit01", RELAXED, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit02", RELAXED, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit03", RELAXED, MUTANT_CALL_SYSTEM),
-                    testCase("systemCalls/systemCallOnDifferentLines01", RELAXED, MUTANT_CALL_SYSTEM), //TODO Fails
-                    testCase("systemCalls/systemCallOnDifferentLines02", RELAXED, MUTANT_CALL_SYSTEM), //TODO Fails
+                    testCase("systemCalls/systemCallOnDifferentLines01", RELAXED, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/systemCallOnDifferentLines02", RELAXED, MUTANT_CALL_SYSTEM),
 
                     testCase("systemCalls/withExistingMath_random01", RELAXED, MUTANT_CALL_RANDOM),
                     //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), //TODO Fails
@@ -459,7 +461,7 @@ public class CodeValidatorTest {
                     testCases("valid/withField", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/withoutPackage", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/withPackage", STRICT, VALIDATION_SUCCESS)
-            ).flatMap(Function.identity());//.filter(a -> a.get()[0].equals("logicalOperators/addedTernaryOperator03"));
+            ).flatMap(Function.identity());//.filter(a -> a.get()[0].equals("systemCalls/withExistingMath_random02"));
         }
     }
 

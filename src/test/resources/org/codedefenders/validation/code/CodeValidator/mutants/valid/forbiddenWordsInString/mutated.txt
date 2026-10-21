@@ -1,5 +1,5 @@
 public class CUT {
     public void test() {
-        String forWhat = "System for while switch System. Random // && || java.io java.nio java.net java.sql Thread. Date. random( randomUUID(";
+        String forWhat = " for while switch  // && || ";
     }
 }

@@ -198,7 +198,7 @@ public class MutantValidationRules {
             METHOD_CALLS,
             I18n.marktr("No calls to System.*"),
             ValidationMessage.MUTANT_CALL_SYSTEM)
-            //.withInsertion("System.")
+            .withInsertion("System.")
 
             //The following checks were present in the original validator. The original tests passed without them,
             // and I haven't found a mutant that they trigger that wouldn't be triggered anyway.
@@ -217,7 +217,7 @@ public class MutantValidationRules {
             METHOD_CALLS,
             I18n.marktr("No use of random number generators"),
             ValidationMessage.MUTANT_CALL_RANDOM)
-            //.withInsertion("Random.", "Random(", "random(", "randomUUID(")
+            .withInsertion("Random.", "Random(", "random(", "getMethod(\"random\")", "randomUUID(")
             .withInsertionNode(n -> n instanceof SimpleName name
                     && List.of("Random", "random", "randomUUID").contains(
                     name.asString()))
@@ -227,7 +227,7 @@ public class MutantValidationRules {
             METHOD_CALLS,
             I18n.marktr("No calls to Date classes"),
             ValidationMessage.MUTANT_CALL_DATE)
-            //.withInsertion("Date(")
+            .withInsertion("Date(")
             .withInsertionNode(n -> n instanceof SimpleName name
                     && name.asString().equals("Date"))
             .build();
@@ -236,7 +236,7 @@ public class MutantValidationRules {
             METHOD_CALLS,
             I18n.marktr("No calls to multithreading classes"),
             ValidationMessage.MUTANT_CALL_THREAD)
-            //.withInsertion("Thread.")
+            .withInsertion("Thread.")
             .withInsertionNode(n -> n instanceof SimpleName name
                     && name.asString().equals("Thread"))
             .build();
@@ -250,7 +250,7 @@ public class MutantValidationRules {
                     && List.of("io", "nio", "net", "sql").contains(n.asString())
                     && n.getParentNode().isPresent()
                     && n.getParentNode().get().findFirst(SimpleName.class, j -> j.asString().equals("java")).isPresent())
-            //.withInsertion("java.io", "java.nio", "java.net", "java.sql")
+            .withInsertion("java.io", "java.nio", "java.net", "java.sql")
             .build();
 
 

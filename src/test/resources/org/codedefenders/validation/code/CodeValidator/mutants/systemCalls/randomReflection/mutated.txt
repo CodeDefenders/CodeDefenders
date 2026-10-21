@@ -1,0 +1,11 @@
+public class Test {
+    public double test() {
+        try {
+            return (Double) Class.forName("java.lang.Math")
+                .getMethod("random")
+                .invoke(null);
+        } catch (ReflectiveOperationException e) {
+        }
+        return 5;
+    }
+}
