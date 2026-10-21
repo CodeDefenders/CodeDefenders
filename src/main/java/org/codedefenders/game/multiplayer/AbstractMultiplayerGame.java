@@ -345,6 +345,8 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
 
         }
 
+
+        //Increase the duel values (won/lost/pending)
         for (Mutant m : getKilledMutants()) {
             if (!m.getEquivalent().equals(PROVEN_NO)) {
                 continue;
@@ -371,6 +373,7 @@ public abstract class AbstractMultiplayerGame extends AbstractGame {
             }
         }
 
+        //Increase test scores based on duels won, set the String representation of duel statistics
         for (var player : defenderPlayers) {
             int playerId = player.getId();
             int numberDuelsWon = challengesWon.getOrDefault(playerId, 0);
