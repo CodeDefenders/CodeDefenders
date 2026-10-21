@@ -10338,3 +10338,35 @@ msgstr "Fehler beim Aktualisieren der Whitelist"
 #~ "kann, wird oben auf dem Bildschirm ein vollständiger Compiler-Fehler "
 #~ "angezeigt. In diesem Fall habe ich die Klammern am Ende eines "
 #~ "Funktionsaufrufs nicht hinzugefügt."
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:136
+msgid "Missing Parameter: {0}"
+msgstr "Fehlender Parameter: {0}"
+
+#: src/main/java/org/codedefenders/servlets/admin/AdminPuzzleManagement.java:251
+msgid "Successfully installed default puzzles."
+msgstr "Die Standardrätsel wurden erfolgreich installiert."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:54
+msgid "Install default puzzles"
+msgstr "Standardrätsel installieren"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:295
+msgid "Install Default Puzzles"
+msgstr "Standard-Puzzles installieren"
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:299
+msgid ""
+"Are you sure you want to install the default puzzle chapers? This will take "
+"a few minutes."
+msgstr ""
+"Möchtest Du die Standard-Puzzle-Kapitel wirklich installieren? Das wird ein "
+"paar Minuten dauern."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:304
+msgid "Installing..."
+msgstr "Wird installiert..."
+
+#: src/main/webapp/jsp/admin_puzzle_management.jsp:305
+msgid "Install"
+msgstr "Installieren"

@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import jakarta.inject.Inject;
@@ -30,25 +31,34 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.ClassViewerBean;
 import org.codedefenders.beans.game.MutantAccordionBean;
 import org.codedefenders.beans.game.TestAccordionBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.CompileException;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleText;
+import org.codedefenders.importer.PuzzleImporter;
 import org.codedefenders.persistence.database.GameClassRepository;
 import org.codedefenders.persistence.database.PuzzleRepository;
 import org.codedefenders.persistence.database.TestRepository;
 import org.codedefenders.persistence.database.TestSmellRepository;
 import org.codedefenders.service.I18nService;
 import org.codedefenders.service.UserService;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
@@ -69,6 +79,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
  */
 @WebServlet({Paths.ADMIN_PUZZLE_OVERVIEW, Paths.ADMIN_PUZZLE_MANAGEMENT})
 public class AdminPuzzleManagement extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManagement.class);
 
     @Inject
     private GameClassRepository gameClassRepo;
@@ -100,6 +111,12 @@ public class AdminPuzzleManagement extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private MessagesBean messages;
+
+    @Inject
+    private PuzzleImporter puzzleImporter;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -108,6 +125,26 @@ public class AdminPuzzleManagement extends HttpServlet {
             displayPuzzlePreview(request, response, puzzleId.get());
         } else {
             request.getRequestDispatcher(ADMIN_PUZZLE_MANAGEMENT_JSP).forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+        Optional<String> action = ServletUtils.getStringParameter(request, "action");
+        if (action.isEmpty()) {
+            messages.addFormatted(I18n.marktr("Missing Parameter: {0}"), "action");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        switch (action.get()) {
+            case "importDefaultPuzzles":
+                installDefaultPuzzles();
+                Redirect.redirectBack(request, response);
+                break;
+            default:
+                messages.addFormatted(I18n.marktr("Invalid action: {0}"), action);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
@@ -206,5 +243,25 @@ public class AdminPuzzleManagement extends HttpServlet {
                 mutant.getPlayerId(),
                 mutant.getLines(),
                 mutant.getPatchString());
+    }
+
+    private void installDefaultPuzzles() throws ServletException, IOException {
+        try {
+            puzzleImporter.importDefaultPuzzles();
+            messages.add(I18n.marktr("Successfully installed default puzzles."));
+            logger.info("Successfully installed default puzzles.");
+        } catch (CoverageGenerator.CoverageGeneratorException e) {
+            messages.add(I18n.marktr("Error while computing coverage."));
+            logger.error("Error while computing coverage", e);
+        } catch (CompileException e) {
+            messages.add(I18n.marktr("Error while compiling."));
+            logger.error("Error while compiling", e);
+        } catch (IOException e) {
+            messages.add(I18n.marktr("IO Error."));
+            logger.error("IO Error", e);
+        } catch (BackendExecutorService.ExecutionException e) {
+            messages.add(I18n.marktr("Execution Error"));
+            logger.error("Execution Error", e);
+        }
     }
 }
