@@ -622,7 +622,7 @@
         <script type="module">
             import DataTable from '${url.forPath("/js/datatables.mjs")}';
             import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
-            import {Tooltip, Modal} from '${url.forPath("/js/bootstrap.mjs")}';
+            import {Tooltip, Modal, Popover} from '${url.forPath("/js/bootstrap.mjs")}';
             import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
             import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
@@ -912,6 +912,73 @@
                 }
             };
 
+            const renderCut = function(cut, type, row, meta) {
+                return cut.alias;
+            };
+
+            const renderPlayers = function(data, type, row, meta) {
+                let attackers = 0;
+                let defenders = 0;
+                let players = 0;
+                for (const player of data.players) {
+                    switch (player.role) {
+                        case Role.ATTACKER:
+                            attackers++;
+                            break;
+                        case Role.DEFENDER:
+                            defenders++;
+                            break;
+                        case Role.PLAYER:
+                            players++;
+                            break;
+                    }
+                }
+                switch (data.mode) {
+                    case GameMode.PARTY:
+                        return `<span class="players" style="cursor: default;">
+                            <span class="badge bg-attacker">\${attackers}</span> - <span class="badge bg-defender">\${defenders}</span>
+                        </span>`;
+                    default:
+                        return `<span class="players" style="cursor: default;"><span class="badge bg-player">\${players}</span></span>`;
+                }
+            };
+
+            const createPlayersTable = function(data) {
+                const table = document.createElement('table');
+                table.classList.add('table', 'table-sm', 'table-no-last-border', 'm-0');
+
+                const players = [...data.players];
+                players.sort(
+                    (a, b) => (a.role.charCodeAt(0) - b.role.charCodeAt(0)) * 100
+                            + (a.name.charCodeAt(0) - b.name.charCodeAt(0))
+                );
+
+                for (const player of players) {
+                    const tr = table.insertRow();
+                    tr.insertCell().textContent = player.name;
+                    switch (player.role) {
+                        case Role.ATTACKER:
+                            tr.insertCell().textContent = "${i18n.tr('Attacker')}";
+                            break;
+                        case Role.DEFENDER:
+                            tr.insertCell().textContent = "${i18n.tr('Defender')}";
+                            break;
+                        case Role.PLAYER:
+                            tr.insertCell().textContent = "${i18n.tr('Player')}";
+                            break;
+                        case Role.OBSERVER:
+                            tr.insertCell().textContent = "${i18n.tr('Observer')}";
+                            break;
+                        case Role.NONE:
+                            tr.insertCell().textContent = "";
+                            break;
+                    }
+                    tr.classList.add("fg-" + player.role.toLowerCase());
+                }
+
+                return table;
+            };
+
             const renderGameRole = function(role, type, row, meta) {
                 switch (type) {
                     case 'type':
@@ -1068,36 +1135,68 @@
                     columns: [
                         {
                             data: 'gameId',
-                            title: 'Game ID',
+                            title: '${i18n.tr("Game ID")}',
                             type: 'number',
                             width: '5em'
                         },
                         {
                             data: 'mode',
-                            title: 'Game Mode',
+                            title: '${i18n.tr("Game Mode")}',
                             type: 'string',
                             render: renderGameMode
                         },
                         {
+                            data: 'cut',
+                            title: '${i18n.tr("Class")}',
+                            type: 'string',
+                            render: renderCut
+                        },
+                        {
+                            data: null,
+                            title: '${i18n.tr("Players")}',
+                            type: 'string',
+                            render: renderPlayers
+                        },
+                        {
                             data: 'role',
-                            title: 'Your Role',
+                            title: '${i18n.tr("Your Role")}',
                             type: 'html',
                             render: renderGameRole
                         },
                         {
                             data: null,
-                            title: 'State',
+                            title: '${i18n.tr("State")}',
                             type: 'html',
                             render: renderGameState
                         },
                         {
                             data: null,
-                            title: 'Link',
+                            title: '${i18n.tr("Link")}',
                             type: 'html',
                             render: renderGameActions,
                             width: '2em'
                         }
                     ],
+                    drawCallback: function () {
+                        const table = this.api().table().container();
+
+                        /* Setup popovers to display the game settings. */
+                        for (const elem of table.querySelectorAll('.players')) {
+                            new Popover(elem, {
+                                container: document.body,
+                                placement: 'right',
+                                trigger: 'hover',
+                                html: true,
+                                title: '${i18n.tr("Players")}',
+                                content: function () {
+                                    const tr = this.closest('tr');
+                                    const row = gamesTable.row(tr);
+                                    const gameData = row.data();
+                                    return createPlayersTable(gameData);
+                                }
+                            });
+                        }
+                    },
                     order: [[0, 'asc']],
                     scrollY: '500px',
                     scrollCollapse: true,
