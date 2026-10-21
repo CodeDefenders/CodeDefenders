@@ -367,8 +367,8 @@ public class CodeValidatorTest {
                     testCase("literals/changedMultipleStrings", STRICT, VALIDATION_SUCCESS),
                     testCase("literals/changedSingleCharToSemicolon", STRICT, VALIDATION_SUCCESS),
 
-                    testCases("logicalOperators/addedBinaryOr", STRICT, MUTANT_BITWISE),
-                    testCases("logicalOperators/addedBinaryOr2", STRICT, MUTANT_BITWISE),
+                    testCases("logicalOperators/addedBinaryOr", MODERATE, MUTANT_LOGIC),
+                    testCases("logicalOperators/addedBinaryOr2", MODERATE, MUTANT_LOGIC),
                     // Logical Operator Added 01 - Only forbidden with STRICT and MODERATE validation
                     testCases("logicalOperators/addedLogicalAnd", MODERATE, MUTANT_LOGIC),
                     // Logical Operator Added on Lift Class - Only forbidden with STRICT and MODERATE validation
@@ -392,8 +392,8 @@ public class CodeValidatorTest {
                     testCases("methodSignature/changedProtectedMethod", RELAXED, MUTANT_METHOD_SIGNATURE, MUTANT_ADDS_OR_RENAMES_METHOD),
                     testCases("methodSignature/changedPublicMethod", STRICT, MUTANT_METHOD_SIGNATURE),
 
-                    // Bit Shifts are only forbidden with STRICT validation
-                    testCases("otherInvalid/addedBitShift01", STRICT, MUTANT_BITWISE),
+                    // Bit Shifts are only forbidden with STRICT validation, but binary ORs are forbidden with MODERATE
+                    testCases("otherInvalid/addedBitShift01", MODERATE, MUTANT_LOGIC),
                     testCases("otherInvalid/addedBitShift02", STRICT, MUTANT_BITWISE),
 
                     // Some other strange cases

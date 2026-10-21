@@ -165,7 +165,10 @@ public class MutantValidationRules {
             ValidationMessage.MUTANT_LOGIC)
             //.withInsertion("&&", "||")
             .withInsertionNode(n -> n instanceof BinaryExpr b
-                    && List.of(BinaryExpr.Operator.AND, BinaryExpr.Operator.OR).contains(b.getOperator()))
+                    && List.of(BinaryExpr.Operator.AND,
+                    BinaryExpr.Operator.OR,
+                    BinaryExpr.Operator.BINARY_AND,
+                    BinaryExpr.Operator.BINARY_OR).contains(b.getOperator()))
             .build();
 
     public static MutantRule prohibitedConditionals = new MutantRule.Builder(
