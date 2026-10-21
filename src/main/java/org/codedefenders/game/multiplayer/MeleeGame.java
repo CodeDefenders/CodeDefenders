@@ -20,7 +20,6 @@ package org.codedefenders.game.multiplayer;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.codedefenders.database.EventDAO;
@@ -28,7 +27,6 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -122,18 +120,6 @@ public class MeleeGame extends AbstractMultiplayerGame {
 
     public Optional<Integer> getClassroomId() {
         return Optional.ofNullable(classroomId);
-    }
-
-    // TODO Those methods should be removed? The scoring bean should take the game
-    // as input and then compute the score
-    public Map<Integer, PlayerScore> getMutantScores() {
-        var scoringBean = CDIUtil.getBeanFromCDI(ScoreCalculator.class);
-        return scoringBean.getMutantScores(id);
-    }
-
-    public Map<Integer, PlayerScore> getTestScores() {
-        var scoringBean = CDIUtil.getBeanFromCDI(ScoreCalculator.class);
-        return scoringBean.getTestScores(id);
     }
 
     /*

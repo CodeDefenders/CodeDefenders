@@ -38,9 +38,6 @@ import org.codedefenders.game.Mutant.State;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.scoring.IScoringPolicy;
-import org.codedefenders.game.scoring.ScoreCalculator;
-import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -134,28 +131,6 @@ public class MeleeGameService extends AbstractGameService {
                 || playerRole == Role.OBSERVER
                 || game.getLevel() == GameLevel.EASY
                 || test.getPlayerId() == player.getId();
-    }
-
-    /**
-     * Close the game and additionally write the calculated scores to persistent storage.
-     *
-     * @param game The game to close.
-     *
-     * @return {@code true} if the game was closed, {@code false} otherwise.
-     */
-    @Override
-    public boolean closeGame(AbstractGame game) {
-        boolean closed = super.closeGame(game);
-        if (closed) {
-            createScoreCalculator().storeScoresToDB(game.getId());
-        }
-        return closed;
-    }
-
-    private ScoreCalculator createScoreCalculator() {
-        ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
-        IScoringPolicy policy = scoringPolicyProducer.getTheBasicPolicy(eventDAO, mutantRepo, gameRepo, playerRepo);
-        return new ScoreCalculator(policy, testRepo, mutantRepo, gameRepo, playerRepo);
     }
 
     public boolean createGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {

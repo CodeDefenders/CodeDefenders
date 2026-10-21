@@ -34,6 +34,8 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.persistence.database.util.QueryUtils;
+import org.codedefenders.persistence.database.util.ResultSetUtils;
 import org.codedefenders.util.FileUtils;
 import org.intellij.lang.annotations.Language;
 import org.slf4j.Logger;

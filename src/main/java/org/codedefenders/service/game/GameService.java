@@ -42,6 +42,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.game.GameResolvedAllDuelsEvent;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.persistence.database.GameRepository;
@@ -86,12 +87,13 @@ public class GameService implements IGameService {
     private final NotificationService notificationService;
 
     private final Set<Integer> gamesCurrentlyClosing = Collections.synchronizedSet(new HashSet<>());
+    private final LiveFeedback liveFeedback;
 
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
                        PuzzleGameService puzzleGameService, TestRepository testRepo, MutantRepository mutantRepo,
                        GameRepository gameRepo, PlayerRepository playerRepo, NotificationService notificationService,
-                       ITestCaseSelector regressionTestCaseSelector, KillMapService killMapService, GameManagingUtils gameManagingUtils) {
+                       ITestCaseSelector regressionTestCaseSelector, KillMapService killMapService, GameManagingUtils gameManagingUtils, LiveFeedback liveFeedback) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
@@ -103,6 +105,7 @@ public class GameService implements IGameService {
         this.killMapService = killMapService;
         this.notificationService = notificationService;
         this.gameManagingUtils = gameManagingUtils;
+        this.liveFeedback = liveFeedback;
     }
 
     @Override
@@ -403,7 +406,7 @@ public class GameService implements IGameService {
                 logger.info("Mutant {} was automatically resolved as {}.",
                         mutant.getId(), isKillable ? "not equivalent" : "equivalent");
 
-                gameManagingUtils.notifyPlayersOnMutantUpdated(game, mutant);
+                liveFeedback.notifyPlayersOnMutantUpdated(game, mutant);
 
                 // TODO: create events like the EquivalenceDuelAttackerWonEvent?
 

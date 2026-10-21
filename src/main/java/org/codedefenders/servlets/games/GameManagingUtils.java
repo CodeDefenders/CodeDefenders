@@ -60,6 +60,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.highlighting.GHMutantDTO;
 import org.codedefenders.game.highlighting.GHTestDTO;
+import org.codedefenders.game.multiplayer.AbstractMultiplayerGame;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.llm.LlmOrganizer;
@@ -72,6 +73,7 @@ import org.codedefenders.model.llm.LlModel;
 import org.codedefenders.model.llm.LlmStrategy;
 import org.codedefenders.model.llm.LlmType;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.LiveFeedback;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelResultEvent;
 import org.codedefenders.notification.events.server.equivalence.EquivalenceDuelTriggeredEvent;
 import org.codedefenders.notification.events.server.highlighting.MutantAddedEvent;
@@ -221,6 +223,8 @@ public class GameManagingUtils implements IGameManagingUtils {
     private I18nService i18nService;
     @Inject
     private ValidationRepository validationRepository;
+    @Inject
+    private LiveFeedback liveFeedback;
 
     /**
      * {@inheritDoc}
@@ -468,7 +472,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
-        notifyPlayersOnMutantAdded(newMutant, game);
+        liveFeedback.notifyPlayersOnMutantAdded(newMutant, game);
 
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
@@ -570,7 +574,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMeleeMutant(game, newMutant);
+        final PreparedMessage mutationTesterMessage = mutationTester.runAllTestsOnMutant(game, newMutant);
         if (!gameRepo.isGameActive(game.getId())) {
             game.setState(GameState.FINISHED);
         }
@@ -582,7 +586,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
-        notifyPlayersOnMutantAdded(newMutant, game);
+        liveFeedback.notifyPlayersOnMutantAdded(newMutant, game);
 
         return CreateBattlegroundMutantResult.success(newMutant, mutationTesterMessage);
     }
@@ -600,43 +604,9 @@ public class GameManagingUtils implements IGameManagingUtils {
         return allPlayers;
     }
 
-    public void notifyPlayersOnMutantAdded(Mutant mutant, AbstractGame game) {
-        notifyPlayersOnMutantAdded(mutant, getAllPlayersInGame(game), game.getId());
-    }
-    public void notifyPlayersOnMutantAdded(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
-        var creatorId = mutant.getCreatorId();
-        gamePlayers.removeIf(p -> p.getUser().getId() == creatorId);
-        gamePlayers.stream().map(player -> {
-            var uid = player.getUser().getId();
-            var mte = new MutantAddedEvent();
-            mte.setUserId(uid);
-            mte.setGameId(gameId);
-            mte.setMutant(new GHMutantDTO(mutant, uid));
-            return mte;
-        }).forEach(notificationService::post);
-    }
 
-    public void notifyPlayersOnMutantUpdated(AbstractGame game, Mutant mutant) {
-        notifyPlayersOnMutantUpdated(mutant, getAllPlayersInGame(game), game.getId());
-    }
 
-    public void notifyPlayersOnMutantUpdated(int gameId, Mutant mutant) {
-        var game = gameRepo.getGame(gameId);
-        if (game != null) {
-            notifyPlayersOnMutantUpdated(game, mutant);
-        }
-    }
 
-    private void notifyPlayersOnMutantUpdated(Mutant mutant, Collection<Player> gamePlayers, int gameId) {
-        gamePlayers.stream().map(player -> {
-            var uid = player.getUser().getId();
-            var mue = new MutantUpdatedEvent();
-            mue.setUserId(uid);
-            mue.setGameId(gameId);
-            mue.setMutant(new GHMutantDTO(mutant, uid));
-            return mue;
-        }).forEach(notificationService::post);
-    }
 
     /**
      * {@inheritDoc}
@@ -819,10 +789,8 @@ public class GameManagingUtils implements IGameManagingUtils {
 
 
         PreparedMessage mutationTesterMessage;// = mutationTester.runTestOnAllMultiplayerMutants(game, newTest);
-        if (game instanceof MultiplayerGame multiplayerGame) {
+        if (game instanceof AbstractMultiplayerGame multiplayerGame) {
             mutationTesterMessage = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
-        } else if (game instanceof MeleeGame meleeGame) {
-            mutationTesterMessage = mutationTester.runTestOnAllMeleeMutants(meleeGame, newTest);
         } else {
             throw new NotImplementedException("This is not supposed to work for puzzles right now."); //TODO Further abstract this
         }
@@ -838,18 +806,12 @@ public class GameManagingUtils implements IGameManagingUtils {
         ttme.setTestId(newTest.getId());
         notificationService.post(ttme);
 
-        notifyPlayersOnTestAdded(newTest, game.getId());
+        liveFeedback.notifyPlayersOnTestAdded(newTest, game.getId());
 
         return CreateBattlegroundTestResult.success(newTest, mutationTesterMessage);
     }
 
-    public void notifyPlayersOnTestAdded(Test test, int gameId) {
-        var tae = new TestAddedEvent();
-        tae.setTest(new GHTestDTO(test));
-        tae.setGameId(gameId);
-        tae.setCoveredLines(test.getLineCoverage().getLinesCovered().toArray(new Integer[]{}));
-        notificationService.post(tae);
-    }
+
 
 
     public enum CanUserResolveEquivalenceResult {
@@ -952,7 +914,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             eventDAO.insert(notifDefenderEquiv);
         }
 
-        notifyPlayersOnMutantUpdated(game, equivMutant);
+        liveFeedback.notifyPlayersOnMutantUpdated(game, equivMutant);
 
         return new AcceptBattlegroundEquivalenceResult(isMutantKillable);
     }
@@ -1119,7 +1081,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
 
-                    notifyPlayersOnMutantUpdated(game, mutPending);
+                    liveFeedback.notifyPlayersOnMutantUpdated(game, mutPending);
                 }
                 logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
                         newTest.getId(), mutPending.getId());
@@ -1210,7 +1172,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(event);
 
-                        notifyPlayersOnMutantUpdated(game, m);
+                        liveFeedback.notifyPlayersOnMutantUpdated(game, m);
 
                         mutantRepo.insertEquivalence(m, playerId);
 
