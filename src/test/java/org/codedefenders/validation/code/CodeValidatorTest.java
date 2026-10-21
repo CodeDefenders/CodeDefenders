@@ -50,6 +50,7 @@ import static org.codedefenders.validation.code.DefaultRuleSets.STRICT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ADDS_OR_RENAMES_FIELD;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_ADDS_OR_RENAMES_METHOD;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_BITWISE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CALL_IO;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CALL_RANDOM;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CALL_SYSTEM;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_CLASS;
@@ -411,18 +412,20 @@ public class CodeValidatorTest {
                     testCase("packageSignature/changedPackage", RELAXED, MUTANT_PACKAGE),
 
                     // MUTANT_VALIDATION_OPERATORS
-                    testCase("systemCalls/addCallToMath_random_toLine01", STRICT, MUTANT_CALL_RANDOM),
-                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_CALL_RANDOM),
-                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_CALL_SYSTEM),
-                    testCase("systemCalls/replacedWithCallToMath_random01", STRICT, MUTANT_CALL_RANDOM),
-                    testCase("systemCalls/replacedWithCallToMath_random02", STRICT, MUTANT_CALL_RANDOM),
-                    testCase("systemCalls/System_exit01", STRICT, MUTANT_CALL_SYSTEM),
-                    testCase("systemCalls/System_exit02", STRICT, MUTANT_CALL_SYSTEM),
-                    //testCase("systemCalls/systemCallOnDifferentLines01", STRICT, MUTANT_CALL_SYSTEM), TODO Fails
-                    //testCase("systemCalls/systemCallOnDifferentLines02", STRICT, MUTANT_CALL_SYSTEM), TODO Fails
+                    testCase("systemCalls/addCallToMath_random_toLine01", RELAXED, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", RELAXED, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", RELAXED, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/javaIoCalls", RELAXED, MUTANT_CALL_IO),
+                    testCase("systemCalls/replacedWithCallToMath_random01", RELAXED, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/replacedWithCallToMath_random02", RELAXED, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/System_exit01", RELAXED, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/System_exit02", RELAXED, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/System_exit03", RELAXED, MUTANT_CALL_SYSTEM),
+                    testCase("systemCalls/systemCallOnDifferentLines01", STRICT, MUTANT_CALL_SYSTEM), //TODO Fails
+                    testCase("systemCalls/systemCallOnDifferentLines02", STRICT, MUTANT_CALL_SYSTEM), //TODO Fails
 
                     testCase("systemCalls/withExistingMath_random01", STRICT, MUTANT_CALL_RANDOM),
-                    //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), TODO Fails
+                    //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), //TODO Fails
                     testCase("systemCalls/withExistingMath_random03", STRICT, VALIDATION_SUCCESS),
 
                     // MUTANT_VALIDATION_SUCCESS
@@ -431,7 +434,9 @@ public class CodeValidatorTest {
                     testCases("valid/changeAfterSlash", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/changedFieldInitializer", STRICT, VALIDATION_SUCCESS),
 
+
                     testCase("valid/changeStringValue", STRICT, VALIDATION_SUCCESS),
+                    testCases("valid/forbiddenWordsInString", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/inlinedStringVariable01", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/inlinedStringVariable02", STRICT, VALIDATION_FAILED_PARSING), //TODO What's the point of this class? Why the escape?
 
@@ -440,6 +445,8 @@ public class CodeValidatorTest {
 
                     testCase("valid/liftDecrementTopFloorOnGetCurrentFloor", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/liftTopFloorIsIncrementedByOneInConstructor", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/pseudoJavaIoCalls", STRICT, VALIDATION_SUCCESS),
+
                     testCase("valid/simpleChange01", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/simpleChange02", STRICT, VALIDATION_SUCCESS),
 

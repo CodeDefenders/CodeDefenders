@@ -18,8 +18,11 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -27,7 +30,9 @@ import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.util.JavaParserUtils;
 import org.xnap.commons.i18n.I18n;
 
+import com.github.difflib.patch.DeltaType;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 @ApplicationScoped
@@ -138,6 +143,68 @@ public class MutantValidator {
                         }
                     }
                 }
+            }
+        }
+
+        //Create a line-level diff and check if the predicates return false for the original and true for the
+        // replacement
+
+        var lineDiff = com.github.difflib.DiffUtils.diff(
+                List.of(originalCode.replace("\r", "").split("\n")),
+                List.of(mutatedCode.replace("\r", "").split("\n")));
+        for (var delta : lineDiff.getDeltas()) {
+            if (delta.getType() == DeltaType.CHANGE) {
+                String originalString = String.join("\n", delta.getSource().getLines());
+                String mutatedString = String.join("\n", delta.getTarget().getLines());
+                if (originalString.endsWith("{")) {
+                    originalString += "}";
+                }
+                if (mutatedString.endsWith("{")) {
+                    mutatedString += "}";
+                }
+                originalString = String.format("{ %s }", originalString);
+                mutatedString = String.format("{ %s }", mutatedString);
+                Optional<? extends Node> originalStmt = JavaParserUtils.parse(
+                        originalString, JavaParserUtils.defaultParser()::parseBlock);
+                Optional<? extends Node> mutatedStmt = JavaParserUtils.parse(
+                        mutatedString, JavaParserUtils.defaultParser()::parseBlock);
+                if (originalStmt.isEmpty() && !originalString.isEmpty()) {
+                    originalString = originalString.substring(1, originalString.length() - 1);
+                    originalStmt = JavaParserUtils.parse(
+                            originalString, JavaParserUtils.defaultParser()::parse);
+                }
+                if (mutatedStmt.isEmpty() && !mutatedString.isEmpty()) {
+                    mutatedString = mutatedString.substring(1, mutatedString.length() - 1);
+                    mutatedStmt = JavaParserUtils.parse(
+                            mutatedString, JavaParserUtils.defaultParser()::parse);
+                }
+                if (originalStmt.isPresent() && mutatedStmt.isPresent()) {
+                    for (MutantRule rule : ruleSet.getRules()) {
+
+                        List<Node> suspiciousNodesInMutant = new ArrayList<>();
+                        mutatedStmt.get().walk(n -> {
+                            if (rule.fails(n)) {
+                                suspiciousNodesInMutant.add(n);
+                            }
+                        });
+                        AtomicInteger suspiciousNodesInOriginal = new AtomicInteger(0);
+                        if (!suspiciousNodesInMutant.isEmpty()) {
+                            originalStmt.get().walk(n -> {
+                                if (rule.fails(n)) {
+                                    suspiciousNodesInOriginal.incrementAndGet();
+                                }
+                            });
+                        }
+                        if (suspiciousNodesInOriginal.get() < suspiciousNodesInMutant.size()) {
+                            result.add(rule, mutatedString);
+                        }
+
+                        //if (!rule.fails(originalStmt.get()) && rule.fails(mutatedStmt.get())) {
+                        //    result.add(rule);
+                        //}
+                    }
+                }
+
             }
         }
 
