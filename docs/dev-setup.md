@@ -132,12 +132,5 @@ Then visit http://localhost:8080 in your browser, register a user named `admin`,
 
 ## 11. Install Puzzles
 
-Build ZIP files for the puzzle chapters:
-
-```bash
-sudo apt-get install zip
-cd installation/puzzles/
-./pack_puzzles.sh
-```
-
-Then go to [Admin > Puzzles](http://localhost:8080/admin/puzzles/management) and upload the ZIP files as chapters.
+You can install the provided default puzzles by going to [Admin > Puzzles](http://localhost:8080/admin/puzzles/management) and selecting `Install default puzzles`,
+or install your own puzzles by uploading them as ZIP files.
