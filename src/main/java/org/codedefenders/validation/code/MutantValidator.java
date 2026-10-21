@@ -42,13 +42,13 @@ public class MutantValidator {
      * Checks if a mutant follows the rules of a rule set.
      *
      * @param originalCode The code of the original CuT
-     * @param mutatedCode The mutated code
-     * @param ruleSet The ruleset the mutant is validated against
+     * @param mutatedCode  The mutated code
+     * @param ruleSet      The ruleset the mutant is validated against
      * @param ignoredRules These rules are ignored for this validation.
      * @return A {@link CodeValidationResult} containing information on all rules this mutant violated
      */
     public CodeValidationResult validateMutant(String originalCode, String mutatedCode,
-                                                      MutantValidationRuleSet ruleSet, I18n i18n, MutantRule... ignoredRules) {
+                                               MutantValidationRuleSet ruleSet, I18n i18n, MutantRule... ignoredRules) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
         MutantValidationRuleSet tmpRuleSet = new MutantValidationRuleSet("tmp", ruleSet);
@@ -93,7 +93,7 @@ public class MutantValidator {
     }
 
     private CodeValidationResult checkCodeRules(String originalCode, String mutatedCode,
-                                                       MutantValidationRuleSet ruleSet) {
+                                                MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         for (MutantRule rule : ruleSet.getRules()) {
             if (rule.fails(originalCode, mutatedCode)) {
@@ -105,7 +105,7 @@ public class MutantValidator {
     }
 
     private CodeValidationResult checkLineDiffRules(String originalCode, String mutatedCode,
-                                                           MutantValidationRuleSet ruleSet) {
+                                                    MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
         var lineDiff = ValidationUtils.getDeltas(originalCode, mutatedCode);
         // line-level diff
@@ -117,7 +117,7 @@ public class MutantValidator {
     }
 
     private CodeValidationResult checkInsertionRules(String originalCode, String mutatedCode,
-                                            MutantValidationRuleSet ruleSet) {
+                                                     MutantValidationRuleSet ruleSet) {
         CodeValidationResult result = new CodeValidationResult(CodeValidationResult.Type.MUTANT);
 
         // Runs character-level diff match patch between the two Strings to see if there are any differences.
@@ -156,30 +156,48 @@ public class MutantValidator {
             if (delta.getType() == DeltaType.CHANGE) {
                 String originalString = String.join("\n", delta.getSource().getLines());
                 String mutatedString = String.join("\n", delta.getTarget().getLines());
+
+                //Deltas may need some changes before being parsable
+
+                //Close a single dangling closing bracket. Won't work for multiple dangling brackets.
                 if (originalString.endsWith("{")) {
                     originalString += "}";
                 }
                 if (mutatedString.endsWith("{")) {
                     mutatedString += "}";
                 }
-                originalString = String.format("{ %s }", originalString);
-                mutatedString = String.format("{ %s }", mutatedString);
+                //Adding an empty block in the end will never hurt, but will fix problems for
+                // one-line if-statements without curly brackets.
+                //Enclosing the entire thing with {} enables it to be parsed as block.
+                originalString = String.format("{%s{}}", originalString);
+                mutatedString = String.format("{%s{}}", mutatedString);
+
+                //Parse as blocks, so it doesn't need all the CompilationUnit boilerplate
                 Optional<? extends Node> originalStmt = JavaParserUtils.parse(
                         originalString, JavaParserUtils.defaultParser()::parseBlock);
                 Optional<? extends Node> mutatedStmt = JavaParserUtils.parse(
                         mutatedString, JavaParserUtils.defaultParser()::parseBlock);
-                if (originalStmt.isEmpty() && !originalString.isEmpty()) {
-                    originalString = originalString.substring(1, originalString.length() - 1);
+
+                //Parse as an entire CompilationUnit. Only relevant if the entire class is one line?
+                // Could probably be optimized to only check this when relevant
+                if (originalStmt.isEmpty()) {
+                    originalString = originalString.substring(1, originalString.length() - 3);
                     originalStmt = JavaParserUtils.parse(
                             originalString, JavaParserUtils.defaultParser()::parse);
                 }
-                if (mutatedStmt.isEmpty() && !mutatedString.isEmpty()) {
-                    mutatedString = mutatedString.substring(1, mutatedString.length() - 1);
+                if (mutatedStmt.isEmpty()) {
+                    mutatedString = mutatedString.substring(1, mutatedString.length() - 3);
                     mutatedStmt = JavaParserUtils.parse(
                             mutatedString, JavaParserUtils.defaultParser()::parse);
                 }
+
                 if (originalStmt.isPresent() && mutatedStmt.isPresent()) {
                     for (MutantRule rule : ruleSet.getRules()) {
+
+                        //Debugging convenience for breakpoints
+                        //if (rule == MutantValidationRules.prohibitedBitwiseOperators) {
+                        //    int x = 2;
+                        //}
 
                         List<Node> suspiciousNodesInMutant = new ArrayList<>();
                         mutatedStmt.get().walk(n -> {

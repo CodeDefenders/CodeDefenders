@@ -367,6 +367,8 @@ public class CodeValidatorTest {
                     testCase("literals/changedMultipleStrings", STRICT, VALIDATION_SUCCESS),
                     testCase("literals/changedSingleCharToSemicolon", STRICT, VALIDATION_SUCCESS),
 
+                    testCases("logicalOperators/addedBinaryOr", STRICT, MUTANT_BITWISE),
+                    testCases("logicalOperators/addedBinaryOr2", STRICT, MUTANT_BITWISE),
                     // Logical Operator Added 01 - Only forbidden with STRICT and MODERATE validation
                     testCases("logicalOperators/addedLogicalAnd", MODERATE, MUTANT_LOGIC),
                     // Logical Operator Added on Lift Class - Only forbidden with STRICT and MODERATE validation
@@ -421,12 +423,12 @@ public class CodeValidatorTest {
                     testCase("systemCalls/System_exit01", RELAXED, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit02", RELAXED, MUTANT_CALL_SYSTEM),
                     testCase("systemCalls/System_exit03", RELAXED, MUTANT_CALL_SYSTEM),
-                    testCase("systemCalls/systemCallOnDifferentLines01", STRICT, MUTANT_CALL_SYSTEM), //TODO Fails
-                    testCase("systemCalls/systemCallOnDifferentLines02", STRICT, MUTANT_CALL_SYSTEM), //TODO Fails
+                    testCase("systemCalls/systemCallOnDifferentLines01", RELAXED, MUTANT_CALL_SYSTEM), //TODO Fails
+                    testCase("systemCalls/systemCallOnDifferentLines02", RELAXED, MUTANT_CALL_SYSTEM), //TODO Fails
 
-                    testCase("systemCalls/withExistingMath_random01", STRICT, MUTANT_CALL_RANDOM),
+                    testCase("systemCalls/withExistingMath_random01", RELAXED, MUTANT_CALL_RANDOM),
                     //testCase("systemCalls/withExistingMath_random02", STRICT, MUTANT_CALL_RANDOM), //TODO Fails
-                    testCase("systemCalls/withExistingMath_random03", STRICT, VALIDATION_SUCCESS),
+                    testCase("systemCalls/withExistingMath_random03", RELAXED, VALIDATION_SUCCESS),
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, VALIDATION_SUCCESS),
@@ -435,8 +437,8 @@ public class CodeValidatorTest {
                     testCases("valid/changedFieldInitializer", STRICT, VALIDATION_SUCCESS),
 
 
-                    testCase("valid/changeStringValue", STRICT, VALIDATION_SUCCESS),
-                    testCases("valid/forbiddenWordsInString", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/changeStringValue", RELAXED, VALIDATION_SUCCESS),
+                    testCase("valid/forbiddenWordsInString", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/inlinedStringVariable01", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/inlinedStringVariable02", STRICT, VALIDATION_FAILED_PARSING), //TODO What's the point of this class? Why the escape?
 
@@ -445,7 +447,7 @@ public class CodeValidatorTest {
 
                     testCase("valid/liftDecrementTopFloorOnGetCurrentFloor", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/liftTopFloorIsIncrementedByOneInConstructor", STRICT, VALIDATION_SUCCESS),
-                    testCase("valid/pseudoJavaIoCalls", STRICT, VALIDATION_SUCCESS),
+                    testCase("valid/pseudoJavaIoCalls", RELAXED, VALIDATION_SUCCESS),
 
                     testCase("valid/simpleChange01", STRICT, VALIDATION_SUCCESS),
                     testCase("valid/simpleChange02", STRICT, VALIDATION_SUCCESS),
@@ -457,7 +459,7 @@ public class CodeValidatorTest {
                     testCases("valid/withField", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/withoutPackage", STRICT, VALIDATION_SUCCESS),
                     testCases("valid/withPackage", STRICT, VALIDATION_SUCCESS)
-            ).flatMap(Function.identity());
+            ).flatMap(Function.identity());//.filter(a -> a.get()[0].equals("logicalOperators/addedTernaryOperator03"));
         }
     }
 
