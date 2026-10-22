@@ -35,6 +35,7 @@
 <jsp:include page="/jsp/push_socket.jsp"/>
 
 <!-- Context path of server, so plain JS code (without JSP templating) can construct a correct url. -->
+<!-- TODO: use the paths in document.head.dataset instead -->
 <script>
     const contextPath = "${url.forPath("/")}";
     const applicationURL = "${url.getAbsoluteURLForPath("/")}";

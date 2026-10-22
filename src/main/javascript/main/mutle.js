@@ -41,7 +41,7 @@ export const formatMutleDiff = diff => {
 const root = typeof document === 'undefined' ? null : document.querySelector('#mutle-play');
 
 if (root) {
-    const api = `${window.contextPath || ''}/api/mutle`;
+    const api = `${document.head.dataset.contextPath}/api/mutle`;
     const text = root.dataset;
     const marks = {NONE: '⬜', METHOD: '🟨', LINE: '🟧', KILLED: '💀'};
     const markText = mark => text[`mark${mark[0]}${mark.slice(1).toLowerCase()}`] || mark;
