@@ -1,0 +1,5 @@
+public class Test {
+    public double test() {
+        return 5;
+    }
+}
